@@ -82,24 +82,28 @@ class RxnPathway(MSONable):
 
 class CombinedPathway(MSONable):
 
-    def __init__(self, paths, targets=None):
-        self._paths = paths
+    def __init__(self, paths, targets):
+        self._paths = list(paths)
+        self._targets = list(targets)
         self.average_weight = np.mean([path.total_weight for path in self._paths])
         self.total_weight = sum([path.total_weight for path in self._paths])
-        self._targets = targets
         self.net_rxn = self.get_net_rxn()
 
     def get_net_rxn(self):
-        reactants = []
-        products = []
+        reactants = set()
+        products = set()
+
         for path in self._paths:
             for step in path.rxns:
-                reactants.extend(step._reactant_entries)
-                products.extend(step._product_entries)
+                reactants.update(step._reactant_entries)
+                products.update(step._product_entries)
 
-        if set(self._targets).issubset(set(products)):
+        self.all_reactants = reactants
+        self.all_products = products
+
+        if set(self._targets).issubset(products):
             try:
-                rxn = ComputedReaction(reactants, products)
+                rxn = ComputedReaction(list(reactants), list(products))
             except:
                 rxn = None
         else:
