@@ -1,60 +1,42 @@
+import logging
+from itertools import combinations, chain
+
 import numpy as np
-import copy
+from scipy.constants import physical_constants
+
+import networkx as nx
 
 from rxn_network.helpers import RxnEntries, RxnPathway, CombinedPathway
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction
-
-from itertools import combinations, chain
-
-import networkx as nx
-
-import logging
 
 
 class ReactionNetwork():
-    def __init__(self, entries, starters, target, max_num_components, max_e_above_hull, initial_cost_function):
-        self._entries = entries
-        self._starters = starters
-        self._target = target
+    def __init__(self, entries, max_num_components=2, max_e_above_hull=0.0):
+        self._all_entries = entries
         self._max_num_components = max_num_components
         self._max_e_above_hull = max_e_above_hull
-        self._cost_function = initial_cost_function
-        self._paths_to_all_targets = None
 
         self.logger = logging.getLogger('ReactionNetwork')
         self.logger.setLevel("INFO")
 
-        self._filtered_entries = self.filter_entries(self._entries, self._max_e_above_hull)
+        self._filtered_entries = self._filter_entries(self._all_entries, self._max_e_above_hull)
 
         self.logger.info("Generating combinations...")
         self._all_combos = self.generate_all_combos(self._filtered_entries, self._max_num_components)
         self.logger.info(f"Found {len(self._all_combos)} combinations of entries (size <= {self._max_num_components}).")
 
-        self._rxn_network = self.generate_rxn_network(self._starters, self._target,
-                                                      self._max_num_components, self._cost_function)
+    def generate_rxn_network(self, starters, target, cost_function):
+        self._starters = starters
+        self._target = target
+        self._cost_function = cost_function
+        self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
-    def filter_entries(self, entries, e_above_hull):
-        pd_of_all_entries = PhaseDiagram(entries)
+        if False in [isinstance(starter, ComputedEntry) for starter in starters] or not isinstance(target, ComputedEntry):
+            raise TypeError("Starters and target must be ComputedEntries.")
 
-        if e_above_hull == 0:
-            logging.info("Using stable entries only!")
-            return list(pd_of_all_entries.stable_entries)
-        else:
-            filtered_list = [entry for entry in entries if pd_of_all_entries.get_e_above_hull(entry) <= e_above_hull]
-            return filtered_list
-
-    def generate_all_combos(self, entries, max_num_components):
-
-        all_combos = []
-        for num_components in range(1, max_num_components + 1):
-            # add combinations for all sizes between 1 --> max_num_components
-            all_combos.extend([set(combo) for combo in combinations(entries, num_components)])
-
-        return all_combos
-
-    def generate_rxn_network(self, starters, target, max_num_components, cost_function):
         G = nx.DiGraph()
 
         starters = set(starters)
@@ -63,9 +45,7 @@ class ReactionNetwork():
         starter_entries = RxnEntries(starters, "s")
         target_entries = RxnEntries(target, "t")
 
-        self._most_negative_rxn = float("inf")  # variable to keep track of most exothermic reaction seen
-
-        G.add_nodes_from([starter_entries, target_entries])  # add initial and final nodes
+        G.add_nodes_from([starter_entries, target_entries])
 
         self.logger.info("Generating reactions...")
 
@@ -73,14 +53,14 @@ class ReactionNetwork():
             reactant_entries = RxnEntries(reactants, "r")
             G.add_node(reactant_entries)
 
-            if reactants.issubset(starters):  # link starting node to reactant nodes
+            if reactants.issubset(starters):  # link starting node to reactant nodes (no cost)
                 G.add_edge(starter_entries, reactant_entries, weight=0)
 
         for products in self._all_combos:
             product_entries = RxnEntries(products, "p")
-            G.add_node(product_entries)  # add node for products (via RxnEntries object)
+            G.add_node(product_entries)  # add node for products
 
-            linking_combos = self.generate_all_combos(list(products.union(starters)), max_num_components)
+            linking_combos = self.generate_all_combos(list(products.union(starters)), self._max_num_components)
 
             for combo in linking_combos:
                 G.add_edge(product_entries, RxnEntries(combo, "r"),
@@ -101,7 +81,7 @@ class ReactionNetwork():
                     # removes reactions which change chemical systems
                     continue
 
-                reactant_entries = RxnEntries(reactants, "r")  # recreate reactant_entries object
+                reactant_entries = RxnEntries(reactants, "r")
 
                 try:
                     rxn = ComputedReaction(list(reactants), list(products))
@@ -138,7 +118,7 @@ class ReactionNetwork():
                 if rxn != None and (G[u][v]["weight"] < 0):
                     G[u][v]["weight"] = 1 - (G[u][v]["weight"] / self._most_negative_rxn)
 
-        return G
+        self._rxn_network = G
 
     def find_k_shortest_pathways(self, k):
 
@@ -180,11 +160,11 @@ class ReactionNetwork():
 
         return pathways
 
-    def find_balanced_total_paths(self, k, targets=None, max_num_combos=3):
+    def find_combined_paths(self, k, targets=None, max_num_combos=3):
         paths_to_all_targets = []
 
         if targets is None:
-            targets = self._entries
+            targets = self._all_entries
 
         for target in targets:
             try:
@@ -238,32 +218,25 @@ class ReactionNetwork():
 
         return sorted(balanced_total_paths, key=lambda combined_pathway: combined_pathway.average_weight)
 
-    def determine_rxn_weight(self, dH_per_atom, cost_function):
-        if cost_function == "custom":
-            weight = self._custom_exponential(dH_per_atom, 100)
-
-        elif cost_function == "arrhenius":
-            weight = self._arrhenius(dH_per_atom, 100)
-
-        elif cost_function == "enthalpies_positive":
-            weight = dH_per_atom
-            if weight < self._most_negative_rxn:
-                self._most_negative_rxn = weight
-
+    def determine_rxn_weight(self, energy, cost_function):
+        if cost_function == "softplus":
+            weight = self._softplus(energy, T=500)
         elif cost_function == "bipartite":
-            weight = dH_per_atom
+            weight = energy
             if weight < self._most_negative_rxn:
                 self._most_negative_rxn = weight
             if weight >= 0:
                 weight = 2 * weight + 1
-
-        elif cost_function == "enthalpies":
-            weight = dH_per_atom
-
-        elif cost_function == "clipped":
-            weight = dH_per_atom
+        elif cost_function == "rectified":
+            weight = energy
             if weight < 0:
                 weight = 0
+        elif cost_function == "arrhenius":
+            weight = self._arrhenius(energy, 100)
+        elif cost_function == "enthalpies_positive":
+            weight = energy
+            if weight < self._most_negative_rxn:
+                self._most_negative_rxn = weight
         else:
             weight = 0
 
@@ -327,18 +300,40 @@ class ReactionNetwork():
 
         self._target = target
 
+    def _filter_entries(self, entries, e_above_hull):
+        pd_of_all_entries = PhaseDiagram(entries)
+
+        if e_above_hull == 0:
+            logging.info("Using stable entries only!")
+            return list(pd_of_all_entries.stable_entries)
+        else:
+            filtered_list = [entry for entry in entries if pd_of_all_entries.get_e_above_hull(entry) <= e_above_hull]
+            return filtered_list
+
+    def generate_all_combos(self, entries, max_num_components):
+        all_combos = []
+        for num_components in range(1, max_num_components + 1):
+            # add combinations for all sizes between 1 --> max_num_components
+            all_combos.extend([set(combo) for combo in combinations(entries, num_components)])
+
+        return all_combos
+
     @staticmethod
     def _arrhenius(energy, T):
-        return np.exp(energy / (k_b * T))
+        kb = physical_constants["Boltzmann constant in eV/K"][0]
+        return np.exp(energy / (kb * T))
 
     @staticmethod
-    def _custom_exponential(energy, T):
-        T_adj = (T / 100) ** 0.7
-        return 100 * np.exp(energy / T_adj - T_adj)
+    def _softplus(energy, T=1.0):
+        return np.log(1 + (273/T)*np.exp(energy))
 
     @property
-    def entries(self):
-        return self._entries
+    def all_entries(self):
+        return self._all_entries
+
+    @property
+    def filtered_entries(self):
+        return self._filtered_entries
 
     @property
     def rxn_network(self):
