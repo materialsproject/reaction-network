@@ -12,6 +12,8 @@ from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction
 
+__author__ = "Matthew McDermott"
+__email__ = "mcdermott@lbl.gov"
 
 class ReactionNetwork():
     def __init__(self, entries, max_num_components=2, max_e_above_hull=0.0):
