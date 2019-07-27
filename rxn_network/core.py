@@ -6,43 +6,63 @@ from scipy.constants import physical_constants
 
 import networkx as nx
 
-from rxn_network.helpers import RxnEntries, RxnPathway, CombinedPathway
-
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction
 
+from rxn_network.helpers import RxnEntries, RxnPathway, CombinedPathway
+
+
 __author__ = "Matthew McDermott"
 __email__ = "mcdermott@lbl.gov"
 
-class ReactionNetwork():
-    def __init__(self, entries, max_num_components=2, max_e_above_hull=0.0):
+
+class ReactionNetwork:
+    def __init__(self, entries, max_num_components=2, filter_metastable=False):
         self._all_entries = entries
         self._max_num_components = max_num_components
-        self._max_e_above_hull = max_e_above_hull
+        self._e_above_hull = filter_metastable
+
+        self._starters = None
+        self._all_targets = None
+        self._target = None
+        self._cost_function = None
+        self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
+
+        self._pd = None # keep phase diagram for future filtering
+        self._rxn_network = None
 
         self.logger = logging.getLogger('ReactionNetwork')
         self.logger.setLevel("INFO")
 
-        self._filtered_entries = self._filter_entries(self._all_entries, self._max_e_above_hull)
+        if filter_metastable > 0.0:
+            self._filtered_entries = self._filter_entries(filter_metastable)
+        else:
+            self._filtered_entries = self._all_entries
 
-        self.logger.info("Generating combinations...")
-        self._all_combos = self.generate_all_combos(self._filtered_entries, self._max_num_components)
+        filtered_entries_str = ', '.join([entry.composition.reduced_formula for entry in self._filtered_entries])
+
+        self.logger.info(
+            f"Building network with {len(self._filtered_entries)} entries: \n{filtered_entries_str}")
+
+        self._all_combos = self.generate_all_combos(self._filtered_entries, max_num_components)
         self.logger.info(f"Found {len(self._all_combos)} combinations of entries (size <= {self._max_num_components}).")
 
-    def generate_rxn_network(self, starters, target, cost_function):
+    def generate_rxn_network(self, starters, targets, cost_function):
         self._starters = starters
-        self._target = target
+        self._all_targets = targets
+        self._target = [targets[0]] # take first entry to be designated target
         self._cost_function = cost_function
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
-        if False in [isinstance(starter, ComputedEntry) for starter in starters] or not isinstance(target, ComputedEntry):
+        if False in [isinstance(starter, ComputedEntry) for starter in starters] or False in [
+            isinstance(target, ComputedEntry) for target in targets]:
             raise TypeError("Starters and target must be ComputedEntries.")
 
         G = nx.DiGraph()
 
-        starters = set(starters)
-        target = {target}
+        starters = set(self._starters)
+        target = set(self._target)
 
         starter_entries = RxnEntries(starters, "s")
         target_entries = RxnEntries(target, "t")
@@ -55,18 +75,17 @@ class ReactionNetwork():
             reactant_entries = RxnEntries(reactants, "r")
             G.add_node(reactant_entries)
 
-            if reactants.issubset(starters):  # link starting node to reactant nodes (no cost)
+            if reactants.issubset(starters):
                 G.add_edge(starter_entries, reactant_entries, weight=0)
 
         for products in self._all_combos:
             product_entries = RxnEntries(products, "p")
-            G.add_node(product_entries)  # add node for products
+            G.add_node(product_entries)
 
             linking_combos = self.generate_all_combos(list(products.union(starters)), self._max_num_components)
 
             for combo in linking_combos:
-                G.add_edge(product_entries, RxnEntries(combo, "r"),
-                           weight=0)  # add edge linking products back to reactants
+                G.add_edge(product_entries, RxnEntries(combo, "r"), weight=0)
 
             if target.issubset(products):
                 G.add_edge(product_entries, target_entries, weight=0)  # add edge connecting to target
@@ -108,13 +127,14 @@ class ReactionNetwork():
         self.logger.info(f"Complete: Created graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
 
         if cost_function == "enthalpies_positive":
-            self.logger.info(f"Adjusting enthalpies up by {-round(self._most_negative_rxn,3)} eV")
+            self.logger.info(f"Adjusting enthalpies up by {-round(self._most_negative_rxn, 3)} eV")
             # shift all energies to be on a positive scale
             for (u, v, rxn) in G.edges.data(data='rxn'):
                 if rxn != None:
                     G[u][v]["weight"] -= self._most_negative_rxn
+
         elif cost_function == "bipartite":
-            self.logger.info(f"Adjusting enthalpies using {-round(self._most_negative_rxn,3)} eV")
+            self.logger.info(f"Adjusting enthalpies using {-round(self._most_negative_rxn, 3)} eV")
             # shift all exothermic energies to be on a positive scale between 0-1
             for (u, v, rxn) in G.edges.data(data='rxn'):
                 if rxn != None and (G[u][v]["weight"] < 0):
@@ -122,12 +142,11 @@ class ReactionNetwork():
 
         self._rxn_network = G
 
-    def find_k_shortest_pathways(self, k):
-
+    def find_k_shortest_paths(self, k):
         starters = RxnEntries(set(self._starters), "s")
         target = RxnEntries(set(self._target), "t")
 
-        pathways = []
+        paths = []
         num_found = 0
 
         for path in nx.shortest_simple_paths(self._rxn_network, starters, target, weight="weight"):
@@ -153,21 +172,19 @@ class ReactionNetwork():
                     weights.append(weight)
 
             rxn_pathway = RxnPathway(rxns, weights)
-            pathways.append(rxn_pathway)
+            paths.append(rxn_pathway)
             print(rxn_pathway)
+            print("\n")
 
             num_found += 1
 
-            print("\n")
-
-        return pathways
+        return paths
 
     def find_combined_paths(self, k, targets=None, max_num_combos=3):
         paths_to_all_targets = []
 
         if targets is None:
-            targets = self._all_entries
-
+            targets = self._all_targets
         for target in targets:
             try:
                 print(f"PATHS to {target.composition.reduced_formula} \n")
@@ -177,8 +194,7 @@ class ReactionNetwork():
                 print(f"No (more) pathways found! \n")
 
         balanced_total_paths = []
-        for combo in chain.from_iterable(
-                [combinations(paths_to_all_targets, num) for num in range(1, max_num_combos + 1)]):
+        for combo in self.generate_all_combos(paths_to_all_targets, max_num_combos):
             combined_pathway = CombinedPathway(combo, targets)
 
             if combined_pathway.net_rxn:
@@ -197,11 +213,11 @@ class ReactionNetwork():
                 leftover_rxns = set()
 
                 for leftover_reactants in chain.from_iterable(
-                        [combinations(leftover_products, num) for num in range(1, len(leftover_products)+1)]):
+                        [combinations(leftover_products, num) for num in range(1, len(leftover_products) + 1)]):
                     for target_combos in chain.from_iterable(
                             [combinations(targets, num) for num in range(1, len(targets) + 1)]):
                         try:
-                            leftover_rxns.add(ComputedReaction(list(leftover_reactants),list(target_combos)))
+                            leftover_rxns.add(ComputedReaction(list(leftover_reactants), list(target_combos)))
                         except:
                             continue
 
@@ -210,10 +226,10 @@ class ReactionNetwork():
                     all_paths = combined_pathway.paths.copy()
                     all_paths.append(leftover_path)
 
-                    appended_combined_path = CombinedPathway(all_paths,targets)
+                    appended_combined_path = CombinedPathway(all_paths, targets)
                     print(appended_combined_path)
-                    #print([e.composition.reduced_formula for e in appended_combined_path.all_reactants])
-                    #print([e.composition.reduced_formula for e in appended_combined_path.all_products])
+                    # print([e.composition.reduced_formula for e in appended_combined_path.all_reactants])
+                    # print([e.composition.reduced_formula for e in appended_combined_path.all_products])
 
                     if appended_combined_path.net_rxn:
                         balanced_total_paths.append(combined_pathway)
@@ -302,22 +318,42 @@ class ReactionNetwork():
 
         self._target = target
 
-    def _filter_entries(self, entries, e_above_hull):
-        pd_of_all_entries = PhaseDiagram(entries)
+    def _filter_entries(self, e_above_hull):
+        """
+        Helper method for filtering entries by specified energy above hull. Must create phase diagram.
+
+        Returns:
+            List of entries less than or equal to specified energy above hull
+        """
+
+        if not self._pd:
+            pd = PhaseDiagram(self._all_entries)
+            self._pd = pd
 
         if e_above_hull == 0:
-            logging.info("Using stable entries only!")
-            return list(pd_of_all_entries.stable_entries)
+            self.logger.info("Using stable entries only!")
+            filtered_entries = list(self._pd.stable_entries)
         else:
-            filtered_list = [entry for entry in entries if pd_of_all_entries.get_e_above_hull(entry) <= e_above_hull]
-            return filtered_list
+            self.logger.info(f"Considering all entries with energy above hull <= {1000 * e_above_hull} meV")
+            filtered_entries = [entry for entry in self._all_entries if
+                                self._pd.get_e_above_hull(entry) <= e_above_hull]
 
-    def generate_all_combos(self, entries, max_num_components):
-        all_combos = []
-        for num_components in range(1, max_num_components + 1):
-            # add combinations for all sizes between 1 --> max_num_components
-            all_combos.extend([set(combo) for combo in combinations(entries, num_components)])
+        return filtered_entries
 
+    @staticmethod
+    def generate_all_combos(entries, max_num_combos):
+        """
+        Generates combination sets ranging from singular length to maximum length specified by max_num_combos.
+
+        Args:
+            entries ([ComputedEntries]): List of ComputedEntries
+            max_num_combos ([Composition]): List of products
+        Returns:
+            List of ComputedEntry combination sets
+        """
+
+        all_combos = [set(combo) for combo in chain.from_iterable(
+            [combinations(entries, num_combos) for num_combos in range(1, max_num_combos + 1)])]
         return all_combos
 
     @staticmethod
@@ -327,7 +363,7 @@ class ReactionNetwork():
 
     @staticmethod
     def _softplus(energy, T=1.0):
-        return np.log(1 + (273/T)*np.exp(energy))
+        return np.log(1 + (273 / T) * np.exp(energy))
 
     @property
     def all_entries(self):
@@ -341,17 +377,5 @@ class ReactionNetwork():
     def rxn_network(self):
         return self._rxn_network
 
-#     def __str__(self):
-#         return f"{self._description}: {str([entry.composition.reduced_formula for entry in self._entries])}"
-
-#     def __eq__(self, other):
-#         if isinstance(other, self.__class__):
-#             return self.as_dict() == other.as_dict()
-#         else:
-#             return False
-
-#     def __hash__(self):
-#         return hash((self._description, frozenset(self._entries)))
-
-#     __repr__ = __str__
-
+    def __repr__(self):
+        return str(self._rxn_network)
