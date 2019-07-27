@@ -29,7 +29,7 @@ class ReactionNetwork:
         self._cost_function = None
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
-        self._pd = None # keep phase diagram for future filtering
+        self._pd = None  # keep phase diagram for future filtering
         self._rxn_network = None
 
         self.logger = logging.getLogger('ReactionNetwork')
@@ -51,15 +51,15 @@ class ReactionNetwork:
     def generate_rxn_network(self, starters, targets, cost_function):
         self._starters = starters
         self._all_targets = targets
-        self._target = [targets[0]] # take first entry to be designated target
+        self._target = [targets[0]]  # take first entry to be designated target
         self._cost_function = cost_function
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
         if False in [isinstance(starter, ComputedEntry) for starter in starters] or False in [
-            isinstance(target, ComputedEntry) for target in targets]:
+                isinstance(target, ComputedEntry) for target in targets]:
             raise TypeError("Starters and target must be ComputedEntries.")
 
-        G = nx.DiGraph()
+        g = nx.DiGraph()
 
         starters = set(self._starters)
         target = set(self._target)
@@ -67,80 +67,75 @@ class ReactionNetwork:
         starter_entries = RxnEntries(starters, "s")
         target_entries = RxnEntries(target, "t")
 
-        G.add_nodes_from([starter_entries, target_entries])
+        g.add_nodes_from([starter_entries, target_entries])
 
         self.logger.info("Generating reactions...")
 
         for reactants in self._all_combos:
             reactant_entries = RxnEntries(reactants, "r")
-            G.add_node(reactant_entries)
+            g.add_node(reactant_entries)
 
             if reactants.issubset(starters):
-                G.add_edge(starter_entries, reactant_entries, weight=0)
+                g.add_edge(starter_entries, reactant_entries, weight=0)
 
         for products in self._all_combos:
             product_entries = RxnEntries(products, "p")
-            G.add_node(product_entries)
+            g.add_node(product_entries)
 
             linking_combos = self.generate_all_combos(list(products.union(starters)), self._max_num_components)
 
             for combo in linking_combos:
-                G.add_edge(product_entries, RxnEntries(combo, "r"), weight=0)
+                g.add_edge(product_entries, RxnEntries(combo, "r"), weight=0)
 
             if target.issubset(products):
-                G.add_edge(product_entries, target_entries, weight=0)  # add edge connecting to target
+                g.add_edge(product_entries, target_entries, weight=0)  # add edge connecting to target
 
             for reactants in self._all_combos:
                 if products == reactants:
-                    # removes many identity-like reactions
-                    continue
+                    continue  # removes many identity-like reactions
 
                 reactants_elems = set([elem for entry in reactants for elem in entry.composition.elements])
                 products_elems = set([elem for entry in products for elem in entry.composition.elements])
 
                 if reactants_elems != products_elems:
-                    # removes reactions which change chemical systems
-                    continue
+                    continue  # removes reactions which change chemical systems
 
                 reactant_entries = RxnEntries(reactants, "r")
 
                 try:
                     rxn = ComputedReaction(list(reactants), list(products))
-
                     reactants_comps = {reactant.composition.reduced_composition for reactant in reactants}
                     products_comps = {product.composition.reduced_composition for product in products}
 
                     if (True in (abs(rxn.coeffs) < rxn.TOLERANCE)) or (reactants_comps != set(rxn.reactants)) or (
                             products_comps != set(rxn.products)):
-                        # removes reactions which have components that either change sides or disappear
-                        continue
+                        continue  # removes reactions which have components that either change sides or disappear
                 except:
                     continue
 
                 total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
-                dH_per_atom = rxn.calculated_reaction_energy / total_num_atoms
+                dg_per_atom = rxn.calculated_reaction_energy / total_num_atoms
 
-                weight = self.determine_rxn_weight(dH_per_atom, cost_function)
+                weight = self.determine_rxn_weight(dg_per_atom, cost_function)
+                g.add_edge(reactant_entries, product_entries, weight=weight, rxn=rxn)
 
-                G.add_edge(reactant_entries, product_entries, weight=weight, rxn=rxn)
-
-        self.logger.info(f"Complete: Created graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
+        self.logger.info(f"Complete: Created graph with {g.number_of_nodes()} nodes and {g.number_of_edges()} edges.")
 
         if cost_function == "enthalpies_positive":
             self.logger.info(f"Adjusting enthalpies up by {-round(self._most_negative_rxn, 3)} eV")
             # shift all energies to be on a positive scale
-            for (u, v, rxn) in G.edges.data(data='rxn'):
-                if rxn != None:
-                    G[u][v]["weight"] -= self._most_negative_rxn
+            for (u, v, rxn) in g.edges.data(data='rxn'):
+                if rxn is not None:
+                    g[u][v]["weight"] -= self._most_negative_rxn
 
         elif cost_function == "bipartite":
             self.logger.info(f"Adjusting enthalpies using {-round(self._most_negative_rxn, 3)} eV")
             # shift all exothermic energies to be on a positive scale between 0-1
-            for (u, v, rxn) in G.edges.data(data='rxn'):
-                if rxn != None and (G[u][v]["weight"] < 0):
-                    G[u][v]["weight"] = 1 - (G[u][v]["weight"] / self._most_negative_rxn)
+            for (u, v, rxn) in g.edges.data(data='rxn'):
+                if rxn is not None and (g[u][v]["weight"] < 0):
+                    g[u][v]["weight"] = 1 - (g[u][v]["weight"] / self._most_negative_rxn)
 
-        self._rxn_network = G
+        self._rxn_network = g
 
     def find_k_shortest_paths(self, k):
         starters = RxnEntries(set(self._starters), "s")
@@ -189,7 +184,7 @@ class ReactionNetwork:
             try:
                 print(f"PATHS to {target.composition.reduced_formula} \n")
                 self.set_target([target])
-                paths_to_all_targets.extend(self.find_k_shortest_pathways(k))
+                paths_to_all_targets.extend(self.find_k_shortest_paths(k))
             except:
                 print(f"No (more) pathways found! \n")
 
@@ -228,17 +223,15 @@ class ReactionNetwork:
 
                     appended_combined_path = CombinedPathway(all_paths, targets)
                     print(appended_combined_path)
-                    # print([e.composition.reduced_formula for e in appended_combined_path.all_reactants])
-                    # print([e.composition.reduced_formula for e in appended_combined_path.all_products])
 
                     if appended_combined_path.net_rxn:
                         balanced_total_paths.append(combined_pathway)
 
-        return sorted(balanced_total_paths, key=lambda combined_pathway: combined_pathway.average_weight)
+        return sorted(balanced_total_paths, key=lambda combined_path: combined_path.average_weight)
 
     def determine_rxn_weight(self, energy, cost_function):
         if cost_function == "softplus":
-            weight = self._softplus(energy, T=500)
+            weight = self._softplus(energy, t=500)
         elif cost_function == "bipartite":
             weight = energy
             if weight < self._most_negative_rxn:
@@ -250,7 +243,7 @@ class ReactionNetwork:
             if weight < 0:
                 weight = 0
         elif cost_function == "arrhenius":
-            weight = self._arrhenius(energy, 100)
+            weight = self._arrhenius(energy, t=100)
         elif cost_function == "enthalpies_positive":
             weight = energy
             if weight < self._most_negative_rxn:
@@ -262,11 +255,11 @@ class ReactionNetwork:
 
     def set_cost_function(self, cost_function):
         for (u, v, rxn) in self._rxn_network.edges.data(data='rxn'):
-            if rxn != None:
+            if rxn is not None:
                 total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
-                dH_per_atom = rxn.calculated_reaction_energy / total_num_atoms
+                dg_per_atom = rxn.calculated_reaction_energy / total_num_atoms
 
-                weight = self.determine_rxn_weight(dH_per_atom, cost_function)
+                weight = self.determine_rxn_weight(dg_per_atom, cost_function)
                 self._rxn_network[u][v]["weight"] = weight
 
     def set_starters(self, starters):
@@ -322,6 +315,9 @@ class ReactionNetwork:
         """
         Helper method for filtering entries by specified energy above hull. Must create phase diagram.
 
+        Args:
+            e_above_hull (float): cutoff for energy above hull (** eV **)
+
         Returns:
             List of entries less than or equal to specified energy above hull
         """
@@ -357,13 +353,13 @@ class ReactionNetwork:
         return all_combos
 
     @staticmethod
-    def _arrhenius(energy, T):
+    def _arrhenius(energy, t):
         kb = physical_constants["Boltzmann constant in eV/K"][0]
-        return np.exp(energy / (kb * T))
+        return np.exp(energy / (kb * t))
 
     @staticmethod
-    def _softplus(energy, T=1.0):
-        return np.log(1 + (273 / T) * np.exp(energy))
+    def _softplus(energy, t=1.0):
+        return np.log(1 + (273 / t) * np.exp(energy))
 
     @property
     def all_entries(self):
