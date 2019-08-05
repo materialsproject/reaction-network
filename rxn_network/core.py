@@ -18,14 +18,29 @@ __email__ = "mcdermott@lbl.gov"
 
 
 class ReactionNetwork:
+    """
+    This class creates and stores a weighted, directed graph (implemented in NetworkX) which enumerates and
+        explores all possible chemical reactions (edges) between reactant/product combinations (nodes) in a
+        chemical system.
+    """
     def __init__(self, entries, max_num_components=2, filter_metastable=False):
+        """
+        Constructs a ReactionNetwork object with necessary initialization steps
+        (but does not generate the actual network).
+
+        Args:
+            entries ([ComputedEntry]): list of ComputedEntry objects to consider in network
+            max_num_components (int): maximum number of components allowed on each side of the reaction (default 2)
+            filter_metastable (float or bool): either the specified cutoff for energy above hull, or False if
+                considering only stable entries
+        """
         self._all_entries = entries
         self._max_num_components = max_num_components
         self._e_above_hull = filter_metastable
 
         self._starters = None
         self._all_targets = None
-        self._target = None
+        self._selected_target = None
         self._cost_function = None
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
@@ -48,10 +63,20 @@ class ReactionNetwork:
         self._all_combos = self.generate_all_combos(self._filtered_entries, max_num_components)
         self.logger.info(f"Found {len(self._all_combos)} combinations of entries (size <= {self._max_num_components}).")
 
-    def generate_rxn_network(self, starters, targets, cost_function):
+    def generate_rxn_network(self, starters, targets, cost_function="softplus"):
+        """
+        Generates the actual reaction network (weighted, directed graph) using Networkx.
+
+        Args:
+            starters (list of ComputedEntries):
+            targets (list of ComputedEntries):
+            cost_function (str): name of cost function to use (e.g. "softplus")
+        Returns:
+            None
+        """
         self._starters = starters
         self._all_targets = targets
-        self._target = [targets[0]]  # take first entry to be designated target
+        self._selected_target = [targets[0]]  # take first entry to be designated target
         self._cost_function = cost_function
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
@@ -62,7 +87,7 @@ class ReactionNetwork:
         g = nx.DiGraph()
 
         starters = set(self._starters)
-        target = set(self._target)
+        target = set(self._selected_target)
 
         starter_entries = RxnEntries(starters, "s")
         target_entries = RxnEntries(target, "t")
@@ -137,15 +162,26 @@ class ReactionNetwork:
 
         self._rxn_network = g
 
-    def find_k_shortest_paths(self, k):
+    def find_k_shortest_paths(self, k, target=None):
+        """
+        Finds k shortest paths to designated target using Yen's Algorithm (as defined in networkx)
+
+        Args:
+            k (int): desired number of shortest pathways (ranked by cost)
+
+        Returns:
+            [RxnPathway]: list of RxnPathway objects
+        """
         starters = RxnEntries(set(self._starters), "s")
-        target = RxnEntries(set(self._target), "t")
+
+        if target is None:
+            target = self._selected_target
+        target = RxnEntries({target}, "t")
 
         paths = []
         num_found = 0
 
         for path in nx.shortest_simple_paths(self._rxn_network, starters, target, weight="weight"):
-
             if num_found == k:
                 break
 
@@ -176,6 +212,17 @@ class ReactionNetwork:
         return paths
 
     def find_combined_paths(self, k, targets=None, max_num_combos=3):
+        """
+        Builds k shortest paths to provided targets and then seeks to combine them to achieve a "net reaction"
+            with balanced stoichiometry. In other words, the full conversion of all intermediates.
+
+        Args:
+            k (int): calculated free energy of reaction
+            targets ([ComputedEntries]): list of all target ComputedEntry objects
+            max_num_combos (int): upper limit on how many pathways to consider at a time (default 3).
+        Returns:
+            [CombinedPathway]: list of CombinedPathway objects, sorted by average cost
+        """
         paths_to_all_targets = []
 
         if targets is None:
@@ -230,6 +277,15 @@ class ReactionNetwork:
         return sorted(balanced_total_paths, key=lambda combined_path: combined_path.average_weight)
 
     def determine_rxn_weight(self, energy, cost_function):
+        """
+        Helper method which determines reaction cost/weight.
+
+        Args:
+            energy (float): calculated free energy of reaction
+            cost_function (str): name of cost function (e.g. "softplus")
+        Returns:
+            float: cost/weight of individual reaction edge
+        """
         if cost_function == "softplus":
             weight = self._softplus(energy, t=500)
         elif cost_function == "bipartite":
@@ -254,6 +310,14 @@ class ReactionNetwork:
         return weight
 
     def set_cost_function(self, cost_function):
+        """
+        Replaces network's current cost function with provided new function by recomputing edge weights.
+
+        Args:
+            cost_function (str): name of cost function (e.g. "softplus")
+        Returns:
+            None
+        """
         for (u, v, rxn) in self._rxn_network.edges.data(data='rxn'):
             if rxn is not None:
                 total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
@@ -263,6 +327,15 @@ class ReactionNetwork:
                 self._rxn_network[u][v]["weight"] = weight
 
     def set_starters(self, starters):
+        """
+        Replaces network's previous starter nodes with provided new starters.
+            Recreates edges that link products back to reactants.
+
+        Args:
+            starters ([ComputedEntry]): list of new starter entries
+        Returns:
+            None
+        """
         # remove previous starters node
         for node in self._rxn_network.nodes():
             if node.description == "Starters":
@@ -295,6 +368,14 @@ class ReactionNetwork:
         self._starters = starters
 
     def set_target(self, target):
+        """
+        Replaces network's previous target node with provided new target.
+
+        Args:
+            target (ComputedEntry): entry of new target
+        Returns:
+            None
+        """
         for node in self._rxn_network.nodes():
             if node.description == "Target":
                 self._rxn_network.remove_node(node)
@@ -309,7 +390,7 @@ class ReactionNetwork:
 
                 break
 
-        self._target = target
+        self._selected_target = target
 
     def _filter_entries(self, e_above_hull):
         """
@@ -317,9 +398,8 @@ class ReactionNetwork:
 
         Args:
             e_above_hull (float): cutoff for energy above hull (** eV **)
-
         Returns:
-            List of entries less than or equal to specified energy above hull
+            list: all entries less than or equal to specified energy above hull
         """
 
         if not self._pd:
@@ -339,13 +419,14 @@ class ReactionNetwork:
     @staticmethod
     def generate_all_combos(entries, max_num_combos):
         """
-        Generates combination sets ranging from singular length to maximum length specified by max_num_combos.
+        Static helper method for generating combination sets ranging from singular length to maximum length
+            specified by max_num_combos.
 
         Args:
-            entries ([ComputedEntries]): List of ComputedEntries
-            max_num_combos ([Composition]): List of products
+            entries (list): list of all entry objects to combine
+            max_num_combos (int): upper limit for size of combinations of entries
         Returns:
-            List of ComputedEntry combination sets
+            list: all combination sets
         """
 
         all_combos = [set(combo) for combo in chain.from_iterable(
@@ -354,6 +435,7 @@ class ReactionNetwork:
 
     @staticmethod
     def _arrhenius(energy, t):
+        ''' Simple Arrenhius relation involving energy and temperature '''
         kb = physical_constants["Boltzmann constant in eV/K"][0]
         return np.exp(energy / (kb * t))
 
