@@ -5,6 +5,10 @@ from pymatgen.analysis.reaction_calculator import ComputedReaction
 from monty.json import MSONable
 
 
+__author__ = "Matthew McDermott"
+__email__ = "mcdermott@lbl.gov"
+
+
 class RxnEntries(MSONable):
 
     def __init__(self, entries, description):

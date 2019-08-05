@@ -1,0 +1,6 @@
+setuptools==40.2.0
+monty==2.0.2
+networkx==2.3
+pymatgen==2019.7.2
+numpy==1.16.2
+scipy==1.2.1
