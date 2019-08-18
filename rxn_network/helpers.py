@@ -13,7 +13,6 @@ from monty.json import MSONable, MontyDecoder
 __author__ = "Matthew McDermott"
 __email__ = "mcdermott@lbl.gov"
 
-
 with open("g_els.json") as f:
     G_ELEMS = json.load(f)
 
@@ -30,12 +29,10 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
         Args:
             structure (Structure): The actual structure of an entry.
-            formation_enthalpy (float): Enthalpy of the entry. The energy calculated from
+            formation_enthalpy (float): Formation enthalpy of the entry, calculated using phase diagram construction (eV)
+            temp (int): Temperature in Kelvin.
             gibbs_model (str): Model for Gibbs Free energy. Currently supported options: ["SISSO"]
-            correction (float): A correction to be applied to the energy.
-                This is used to modify the energy for certain analyses.
-                Defaults to 0.0.
-            temp (int): Temperature in Kelvin
+            correction (float): A correction to be applied to the energy. Defaults to 0
             parameters (dict): An optional dict of parameters associated with
                 the entry. Defaults to None.
             data (dict): An optional dict of any additional data associated
@@ -46,13 +43,18 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         self.formation_enthalpy = formation_enthalpy
         self.temp = temp
 
-        super().__init__(structure, energy=self._g_sisso(), correction=correction,
+        super().__init__(structure, energy=self.gf_sisso(), correction=correction,
                          parameters=parameters, data=data, entry_id=entry_id)
 
         self._gibbs_model = gibbs_model
         self._temp = temp
 
-    def _g_sisso(self):
+    def gf_sisso(self):
+        """
+        Returns:
+            Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel et al. (2018) [eV]
+                (not normalized)
+        """
         if self.structure.composition.is_element:
             return 0
 
@@ -60,31 +62,37 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         vol_per_atom = self.structure.volume / num_atoms
         reduced_mass = self.reduced_mass()
 
-        return self.formation_enthalpy + num_atoms*self._g_delta(vol_per_atom, reduced_mass, self.temp) - self._sum_g_i()
+        return self.formation_enthalpy + num_atoms*self.g_delta(vol_per_atom, reduced_mass, self.temp) - self._sum_g_i()
 
     def _sum_g_i(self):
         """
         Returns:
-            sum of the stoichiometrically weighted chemical potentials of the elements at T (float) [eV/atom]
+            Sum of the stoichiometrically weighted chemical potentials of the elements at T found in "g_els.json"
+             (float) [eV]
         """
         elems = self.structure.composition.get_el_amt_dict()
         return sum([amt*G_ELEMS[str(self.temp)][elem] for elem, amt in elems.items()])
 
     def reduced_mass(self):
+        """
+        Returns:
+            Reduced mass calculated via Eq. 6 in Bartel et al. (2018)
+        """
         reduced_comp = self.structure.composition.reduced_composition
         num_elems = len(reduced_comp.elements)
         elem_dict = reduced_comp.get_el_amt_dict()
 
         denominator = ((num_elems - 1)*reduced_comp.num_atoms)
 
-        all_combos = combinations(elem_dict.items(), 2)
+        all_pairs = combinations(elem_dict.items(), 2)
         mass_sum = 0
 
-        for combo in all_combos:
-            m_i = Composition(combo[0][0]).weight
-            m_j = Composition(combo[1][0]).weight
-            alpha_i = combo[0][1]
-            alpha_j = combo[1][1]
+        for pair in all_pairs:
+            m_i = Composition(pair[0][0]).weight
+            m_j = Composition(pair[1][0]).weight
+            alpha_i = pair[0][1]
+            alpha_j = pair[1][1]
+
             mass_sum += (alpha_i + alpha_j)*(m_i*m_j)/(m_i+m_j)
 
         reduced_mass = (1 / denominator) * mass_sum
@@ -92,14 +100,14 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         return reduced_mass
 
     @staticmethod
-    def _g_delta(vol_per_atom, reduced_mass, temp):
+    def g_delta(vol_per_atom, reduced_mass, temp):
         """
         Args:
-            vol_per_atom
-            t (int) - temperature [K]
-            m
+            vol_per_atom: volume per atom [Å^3/atom]
+            reduced_mass (float) - reduced mass as calculated with pair-wise sum formula [amu]
+            temp (float) - Temperature [K]
         Returns:
-            G^delta as predicted by SISSO-learned descriptor (float) [eV/atom]
+            G^delta as predicted by SISSO-learned descriptor from Bartel et al. (2018) (float) [eV/atom]
         """
 
         return (-2.48e-4*np.log(vol_per_atom) - 8.94e-5*reduced_mass/vol_per_atom)*temp + 0.181*np.log(temp) - 0.882
@@ -123,6 +131,10 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
 
 class RxnEntries(MSONable):
+    """
+    Helper class for describing ComputedEntry-like objects in context of a reaction network.
+        Necessary for implementation in NetworkX.
+    """
 
     def __init__(self, entries, description):
         self._entries = entries
@@ -158,6 +170,9 @@ class RxnEntries(MSONable):
 
 
 class RxnPathway(MSONable):
+    """
+    Helper class for storing multiple ComputedReaction objects which form a single reaction pathway.
+    """
 
     def __init__(self, rxns, weights):
         self._rxns = list(rxns)
@@ -199,6 +214,10 @@ class RxnPathway(MSONable):
 
 
 class CombinedPathway(MSONable):
+    """
+    Helper class for combining multiple RxnPathway objects in series/parallel to form a "net" pathway
+        from a set of initial reactants to final products.
+    """
 
     def __init__(self, paths, targets):
         self._paths = list(paths)

@@ -23,8 +23,7 @@ class ReactionNetwork:
         explores all possible chemical reactions (edges) between reactant/product combinations (nodes) in a
         chemical system.
     """
-    def __init__(self, entries, max_num_components=2, include_metastable=False, include_polymorphs=False,
-                    use_g_sisso = True):
+    def __init__(self, entries, max_num_components=2, include_metastable=False, include_polymorphs=False):
         """
         Constructs a ReactionNetwork object with necessary initialization steps
         (but does not generate the actual network).
@@ -35,14 +34,12 @@ class ReactionNetwork:
             include_metastable (float or bool): either the specified cutoff for energy above hull, or False if
                 considering only stable entries
             include_polymorphs (bool): Whether or not to consider non-ground state polymorphs (defaults to False)
-            use_g_sisso (bool): Whether or not to use Gibbs Free Energy descriptor from Bartel et al. (2018)
         """
         self._all_entries = entries
         self._pd = PhaseDiagram(entries)
         self._max_num_components = max_num_components
         self._e_above_hull = include_metastable
         self._include_polymorphs = include_polymorphs
-        self._use_g_sisso = use_g_sisso
 
         self._starters = None
         self._all_targets = None
@@ -264,7 +261,7 @@ class ReactionNetwork:
             targets = self._all_targets
         for target in targets:
             print(f"PATHS to {target.composition.reduced_formula} \n")
-            self.set_target([target])
+            self.set_target(target)
             paths_to_all_targets.extend(self.find_k_shortest_paths(k))
 
         balanced_total_paths = []
