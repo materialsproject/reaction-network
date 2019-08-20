@@ -153,18 +153,14 @@ class ReactionNetwork:
 
         self.logger.info(f"Complete: Created graph with {g.number_of_nodes()} nodes and {g.number_of_edges()} edges.")
 
-        if cost_function == "enthalpies_positive":
+        if cost_function in ["enthalpies_positive", "bipartite"]:
             self.logger.info(f"Adjusting enthalpies up by {-round(self._most_negative_rxn, 3)} eV")
-            # shift all energies to be on a positive scale
             for (u, v, rxn) in g.edges.data(data='rxn'):
-                if rxn is not None:
+                if rxn is None:
+                    continue
+                elif cost_function=="enthalpies_positive":
                     g[u][v]["weight"] -= self._most_negative_rxn
-
-        elif cost_function == "bipartite":
-            self.logger.info(f"Adjusting enthalpies using {-round(self._most_negative_rxn, 3)} eV")
-            # shift all exothermic energies to be on a positive scale between 0-1
-            for (u, v, rxn) in g.edges.data(data='rxn'):
-                if rxn is not None and (g[u][v]["weight"] < 0):
+                elif cost_function=="bipartite" and (g[u][v]["weight"] < 0):
                     g[u][v]["weight"] = 1 - (g[u][v]["weight"] / self._most_negative_rxn)
 
         self._rxn_network = g
@@ -182,9 +178,9 @@ class ReactionNetwork:
         starters = RxnEntries(set(self._starters), "s")
 
         if target is None:
-            target = set(self._selected_target)
+            target = self._selected_target
 
-        target = RxnEntries(target, "t")
+        target = RxnEntries(set(target), "t")
 
         paths = []
         num_found = 0
@@ -242,7 +238,7 @@ class ReactionNetwork:
 
         return sorted(paths_from_all_starters, key=lambda path: path.total_weight)
 
-    def find_combined_paths(self, k, targets=None, max_num_combos=3):
+    def find_combined_paths(self, k, targets=None, max_num_combos=3, consider_remnant_rxns=True):
         """
         Builds k shortest paths to provided targets and then seeks to combine them to achieve a "net reaction"
             with balanced stoichiometry. In other words, the full conversion of all intermediates to final products.
@@ -255,55 +251,53 @@ class ReactionNetwork:
         Returns:
             [CombinedPathway]: list of CombinedPathway objects, sorted by average cost
         """
-        paths_to_all_targets = []
+        paths_to_all_targets = set()
 
-        if targets is None:
+        if not targets:
             targets = self._all_targets
+
         for target in targets:
             print(f"PATHS to {target.composition.reduced_formula} \n")
             self.set_target(target)
-            paths_to_all_targets.extend(self.find_k_shortest_paths(k))
+            paths_to_all_targets.update(self.find_k_shortest_paths(k))
 
-        balanced_total_paths = []
+        if consider_remnant_rxns:
+            starters_and_targets = set(targets + self._starters)
+            intermediates = set([entry for path in paths_to_all_targets
+                                 for rxn in path.rxns for entry in rxn.all_entries]) - starters_and_targets
+            remnant_paths = self.find_remnant_paths(intermediates, targets)
+            print("Remnant Reactions \n")
+            print(remnant_paths, "\n")
+            paths_to_all_targets.update(remnant_paths)
+
+        balanced_total_paths = set()
         for combo in self.generate_all_combos(paths_to_all_targets, max_num_combos):
-            combined_pathway = CombinedPathway(combo, targets)
+            combined_pathway = CombinedPathway(combo, self._starters, targets)
+            if combined_pathway.is_balanced:
+                balanced_total_paths.add(combined_pathway)
 
-            if combined_pathway.net_rxn:
-                reactants_set = set(combined_pathway.net_rxn._reactant_entries)
-                products_set = set(combined_pathway.net_rxn._product_entries)
+        return sorted(list(balanced_total_paths), key=lambda combined_path: combined_path.average_weight)
 
-                common_entries = reactants_set.intersection(products_set)
-                reactants_set = reactants_set - common_entries
-                products_set = products_set - common_entries
+    def find_remnant_paths(self, intermediates, targets, max_num_combos=2):
+        remnant_paths = set()
+        for reactants_combo in self.generate_all_combos(intermediates, max_num_combos):
+            for products_combo in self.generate_all_combos(targets, max_num_combos):
+                try:
+                    rxn = ComputedReaction(list(reactants_combo), list(products_combo))
 
-                if (set(targets).issubset(products_set)) and (set(self._starters) == reactants_set):
-                    balanced_total_paths.append(combined_pathway)
+                    reactants_comps = {reactant.composition.reduced_composition for reactant in reactants_combo}
+                    products_comps = {product.composition.reduced_composition for product in products_combo}
 
-                leftover_products = products_set - set(targets)
+                    if (True in (abs(rxn.coeffs) < rxn.TOLERANCE)) or (reactants_comps != set(rxn.reactants)) or (
+                            products_comps != set(rxn.products)):
+                        continue
 
-                leftover_rxns = set()
+                    path = RxnPathway([rxn], [self.determine_rxn_weight(rxn.calculated_reaction_energy, self._cost_function)])
+                    remnant_paths.add(path)
+                except:
+                    continue
 
-                for leftover_reactants in chain.from_iterable(
-                        [combinations(leftover_products, num) for num in range(1, len(leftover_products) + 1)]):
-                    for target_combos in chain.from_iterable(
-                            [combinations(targets, num) for num in range(1, len(targets) + 1)]):
-                        try:
-                            leftover_rxns.add(ComputedReaction(list(leftover_reactants), list(target_combos)))
-                        except:
-                            continue
-
-                for leftover_rxn in leftover_rxns:
-                    leftover_path = RxnPathway([leftover_rxn], [0])
-                    all_paths = combined_pathway.paths.copy()
-                    all_paths.append(leftover_path)
-
-                    appended_combined_path = CombinedPathway(all_paths, targets)
-                    print(appended_combined_path)
-
-                    if appended_combined_path.net_rxn:
-                        balanced_total_paths.append(combined_pathway)
-
-        return sorted(balanced_total_paths, key=lambda combined_path: combined_path.average_weight)
+        return remnant_paths
 
     def determine_rxn_weight(self, energy, cost_function):
         """
@@ -368,7 +362,6 @@ class ReactionNetwork:
         Returns:
             None
         """
-
         for node in self._rxn_network.nodes():
             if node.description == "Starters":
                 self._rxn_network.remove_node(node)
@@ -417,7 +410,6 @@ class ReactionNetwork:
             return
 
         target = [target]
-
         self._selected_target = target
 
         for node in self._rxn_network.nodes():
@@ -433,7 +425,6 @@ class ReactionNetwork:
                         self._rxn_network.add_edge(product_entries, target_entry, weight=0) # link product node to target node
 
                 break
-
 
     @staticmethod
     def filter_entries(pd, e_above_hull, include_polymorphs):

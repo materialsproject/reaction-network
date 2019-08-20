@@ -219,41 +219,46 @@ class CombinedPathway(MSONable):
         from a set of initial reactants to final products.
     """
 
-    def __init__(self, paths, targets):
+    def __init__(self, paths, starters, targets):
         self._paths = list(paths)
+        self._starters = list(starters)
         self._targets = list(targets)
         self.average_weight = np.mean([path.total_weight for path in self._paths])
         self.total_weight = sum([path.total_weight for path in self._paths])
+        self.net_rxn = ComputedReaction(self._starters, self._targets)
 
-    def get_net_rxn(self):
+        self.all_rxns = list({step for path in self._paths for step in path.rxns})
+
         reactants = set()
         products = set()
 
         for path in self._paths:
             for step in path.rxns:
-                reactants.update(step._reactant_entries)
-                products.update(step._product_entries)
+                reactants.update(step.reactants)
+                products.update(step.products)
 
         self.all_reactants = reactants
         self.all_products = products
+        self.all_comp = list(self.all_reactants | self.all_products)
 
-        if set(self._targets).issubset(products):
-            try:
-                rxn = ComputedReaction(list(reactants), list(products))
-            except:
-                rxn = None
-        else:
-            rxn = None
+        self.multiplicities = None
+        self.is_balanced = False
+        self._balance_pathways()
 
-        return rxn
+    def _balance_pathways(self):
+        net_coeffs = [self.net_rxn.get_coeff(comp) if comp in self.net_rxn.all_comp else 0
+                      for comp in self.all_comp]
+        comp_matrix = np.array([[rxn.get_coeff(comp) if comp in rxn.all_comp else 0 for comp in self.all_comp]
+                                for rxn in self.all_rxns])
+        comp_pseudo_inverse = np.linalg.pinv(comp_matrix).transpose()
+        self.multiplicities = np.matmul(comp_pseudo_inverse, net_coeffs)
 
-    def get_balanced_pathways(self):
-        balanced_pathways = []
-        return balanced_pathways
+        if (self.multiplicities < self.net_rxn.TOLERANCE).any():
+            return
+        elif np.allclose(np.matmul(comp_matrix.transpose(), self.multiplicities), net_coeffs):
+            self.is_balanced = True
 
-    @property
-    def net_rxn(self):
-        return self.get_net_rxn()
+        return
 
     @property
     def paths(self):
