@@ -139,14 +139,16 @@ class RxnEntries(MSONable):
     def __init__(self, entries, description):
         self._entries = entries
 
-        if description in ["r", "reactants", "Reactants"]:
-            self._description = "Reactants"
-        elif description in ["p", "products", "Products"]:
-            self._description = "Products"
-        elif description in ["s", "starters", "Starters"]:
-            self._description = "Starters"
-        elif description in ["t", "target", "Target"]:
-            self._description = "Target"
+        if description in ["r", "R", "reactants", "Reactants"]:
+            self._description = "R"
+        elif description in ["p", "P", "products", "Products"]:
+            self._description = "P"
+        elif description in ["s", "S", "starters", "Starters"]:
+            self._description = "S"
+        elif description in ["t", "T", "target", "Target"]:
+            self._description = "T"
+        else:
+            self._description = description
 
     @property
     def entries(self):
@@ -157,7 +159,13 @@ class RxnEntries(MSONable):
         return self._description
 
     def __repr__(self):
-        return f"{self._description}: {str([entry.composition.reduced_formula for entry in self._entries])}"
+        formulas = [entry.composition.reduced_formula for entry in self._entries]
+        formulas.sort()
+
+        if self._description:
+            return f"{self._description}: {','.join(formulas)}"
+        else:
+            return f"{','.join(formulas)}"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -166,7 +174,10 @@ class RxnEntries(MSONable):
             return False
 
     def __hash__(self):
-        return hash((self._description, frozenset(self._entries)))
+        if self._description:
+            return hash((self._description, frozenset(self._entries)))
+        else:
+            return hash(frozenset(self._entries))
 
 
 class RxnPathway(MSONable):
@@ -197,7 +208,7 @@ class RxnPathway(MSONable):
     def __repr__(self):
         path_info = ""
         for rxn, dH in zip(self._rxns, self._dH_per_atom):
-            path_info += f"{rxn} (dH = {round(dH,3)} eV/atom) \n"
+            path_info += f"{rxn} (dG = {round(dH,3)} eV/atom) \n"
 
         path_info += f"Total Cost: {round(self.total_weight,3)}"
 
@@ -246,6 +257,9 @@ class CombinedPathway(MSONable):
         self._balance_pathways()
 
     def _balance_pathways(self):
+        if len(self.all_rxns) == 0:
+            return
+
         net_coeffs = [self.net_rxn.get_coeff(comp) if comp in self.net_rxn.all_comp else 0
                       for comp in self.all_comp]
         comp_matrix = np.array([[rxn.get_coeff(comp) if comp in rxn.all_comp else 0 for comp in self.all_comp]
