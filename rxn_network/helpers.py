@@ -1,3 +1,4 @@
+import os
 from itertools import combinations
 
 import numpy as np
@@ -13,8 +14,11 @@ from monty.json import MSONable, MontyDecoder
 __author__ = "Matthew McDermott"
 __email__ = "mcdermott@lbl.gov"
 
-with open("g_els.json") as f:
+
+with open(os.path.join(os.path.dirname(__file__), "g_els.json")) as f:
     G_ELEMS = json.load(f)
+with open(os.path.join(os.path.dirname(__file__), "nist_gas_gf.json")) as f:
+    G_GASES = json.load(f)
 
 
 class GibbsComputedStructureEntry(ComputedStructureEntry):
@@ -47,7 +51,6 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
                          parameters=parameters, data=data, entry_id=entry_id)
 
         self._gibbs_model = gibbs_model
-        self._temp = temp
 
     def gf_sisso(self):
         """
@@ -55,8 +58,11 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
             Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel et al. (2018) [eV]
                 (not normalized)
         """
-        if self.structure.composition.is_element:
-            return 0
+        comp = self.structure.composition
+        if comp.is_element:
+            return self.formation_enthalpy
+        elif comp.reduced_formula in G_GASES.keys():
+            return G_GASES[comp.reduced_formula][str(self.temp)]*comp.get_reduced_formula_and_factor()[1]
 
         num_atoms = self.structure.num_sites
         vol_per_atom = self.structure.volume / num_atoms
@@ -190,7 +196,7 @@ class RxnPathway(MSONable):
         self._weights = list(weights)
 
         self.total_weight = sum(self._weights)
-        self._dH_per_atom = [rxn.calculated_reaction_energy / sum([rxn.get_el_amount(elem) for elem in rxn.elements])
+        self._dG_per_atom = [rxn.calculated_reaction_energy / sum([rxn.get_el_amount(elem) for elem in rxn.elements])
                              for rxn in self._rxns]
 
     @property
@@ -202,13 +208,13 @@ class RxnPathway(MSONable):
         return self._weights
 
     @property
-    def dH_per_atom(self):
-        return self._dH_per_atom
+    def dG_per_atom(self):
+        return self._dG_per_atom
 
     def __repr__(self):
         path_info = ""
-        for rxn, dH in zip(self._rxns, self._dH_per_atom):
-            path_info += f"{rxn} (dG = {round(dH,3)} eV/atom) \n"
+        for rxn, dG in zip(self._rxns, self._dG_per_atom):
+            path_info += f"{rxn} (dG = {round(dG,3)} eV/atom) \n"
 
         path_info += f"Total Cost: {round(self.total_weight,3)}"
 
@@ -234,11 +240,9 @@ class CombinedPathway(MSONable):
         self._paths = list(paths)
         self._starters = list(starters)
         self._targets = list(targets)
-        self.average_weight = np.mean([path.total_weight for path in self._paths])
-        self.total_weight = sum([path.total_weight for path in self._paths])
         self.net_rxn = ComputedReaction(self._starters, self._targets)
 
-        self.all_rxns = list({step for path in self._paths for step in path.rxns})
+        self.all_rxns = {rxn: weight for path in self._paths for (rxn, weight) in zip(path.rxns, path.weights)}
 
         reactants = set()
         products = set()
@@ -254,22 +258,30 @@ class CombinedPathway(MSONable):
 
         self.multiplicities = None
         self.is_balanced = False
+
         self._balance_pathways()
+
+        if self.is_balanced:
+            self.total_weight = sum([mult*self.all_rxns[rxn] for (rxn, mult) in self.multiplicities.items()])
+            self.average_weight = self.total_weight / len(self.all_rxns)
 
     def _balance_pathways(self):
         if len(self.all_rxns) == 0:
             return
 
+        rxns = list(self.all_rxns.keys())
+
         net_coeffs = [self.net_rxn.get_coeff(comp) if comp in self.net_rxn.all_comp else 0
                       for comp in self.all_comp]
         comp_matrix = np.array([[rxn.get_coeff(comp) if comp in rxn.all_comp else 0 for comp in self.all_comp]
-                                for rxn in self.all_rxns])
+                                for rxn in rxns])
         comp_pseudo_inverse = np.linalg.pinv(comp_matrix).transpose()
-        self.multiplicities = np.matmul(comp_pseudo_inverse, net_coeffs)
+        multiplicities = np.matmul(comp_pseudo_inverse, net_coeffs)
 
-        if (self.multiplicities < self.net_rxn.TOLERANCE).any():
+        if (multiplicities < self.net_rxn.TOLERANCE).any():
             return
-        elif np.allclose(np.matmul(comp_matrix.transpose(), self.multiplicities), net_coeffs):
+        elif np.allclose(np.matmul(comp_matrix.transpose(), multiplicities), net_coeffs):
+            self.multiplicities = {rxn: multiplicity for (rxn, multiplicity) in zip(rxns, multiplicities)}
             self.is_balanced = True
 
         return
@@ -288,9 +300,9 @@ class CombinedPathway(MSONable):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.as_dict() == other.as_dict()
+            return self.all_rxns.keys() == other.all_rxns.keys()
         else:
             return False
 
     def __hash__(self):
-        return hash(tuple(self._paths))
+        return hash(frozenset(self.all_rxns.keys()))
