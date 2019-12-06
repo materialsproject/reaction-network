@@ -1,18 +1,20 @@
 import logging
 from itertools import combinations, chain
+from collections import Counter
 
 import numpy as np
 from scipy.constants import physical_constants
 
 import networkx as nx
 
-from pymatgen import Element
+from pymatgen import Element, Composition
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction, ReactionError
 from matminer.featurizers.structure import StructuralComplexity
 
-from rxn_network.helpers import RxnEntries, RxnPathway, CombinedPathway, GibbsComputedStructureEntry
+from rxn_network.helpers import RxnEntries, RxnPathway, CombinedPathway
+from rxn_network.analysis import PathwayAnalysis
 
 
 __author__ = "Matthew McDermott"
@@ -26,13 +28,13 @@ class ReactionNetwork:
         chemical system.
     """
     def __init__(self, entries, max_num_components=2, include_metastable=False,
-                 include_polymorphs=False, include_info_entropy=True):
+                 include_polymorphs=False, include_info_entropy=False):
         """
         Constructs a ReactionNetwork object with necessary initialization steps of finding combinations
         (but does not generate the actual network).
 
         Args:
-            entries ([ComputedEntry]): list of ComputedEntry objects to consider in network
+            entries ([ComputedStructureEntry]): list of ComputedStructureEntry-like objects to consider in network
             max_num_components (int): maximum number of components allowed on each side of the reaction (default 2)
             include_metastable (float or bool): either the specified cutoff for energy above hull, or False if
                 considering only stable entries
@@ -50,10 +52,11 @@ class ReactionNetwork:
         self._cost_function = None
         self._complex_loopback = None
         self._temp = None
+        self._redox = None
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
         self._rxn_network = None
-        self._vis = None
+        #self._vis = None
 
         self.logger = logging.getLogger('ReactionNetwork')
         self.logger.setLevel("INFO")
@@ -70,9 +73,9 @@ class ReactionNetwork:
             f"Initializing network with {len(self._filtered_entries)} entries: \n{filtered_entries_str}")
         #self.logger.info(f"Found {len(self._all_combos)} combinations of entries (size <= {self._max_num_components}).")
 
-    def generate_rxn_network(self, starters, targets, cost_function="softplus", temp=300, complex_loopback=True):
+    def generate_rxn_network(self, starters, targets, cost_function="softplus", temp=300, complex_loopback=True, redox=False):
         """
-        Generates the actual reaction network (weighted, directed graph) using Networkx.
+        Generates the actual reaction network (weighted, directed graph) using NetworkX.
 
         Args:
             starters (list of ComputedEntries): entries for all phases which serve as the main reactants
@@ -84,29 +87,33 @@ class ReactionNetwork:
         Returns:
             None
         """
-        self._starters = starters
-        self._all_targets = targets
-        self._selected_target = [targets[0]]  # take first entry to be first designated target
+        self._starters = set(starters) if starters else None
+        self._all_targets = set(targets) if targets else None
+        self._selected_target = {targets[0]}  # take first entry to be first designated target
         self._cost_function = cost_function
         self._complex_loopback = complex_loopback
+        self._starter_entries = None
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
         self._temp = temp
+        self._redox = redox
 
-        if False in [isinstance(starter, ComputedEntry) for starter in starters] or False in [
-                isinstance(target, ComputedEntry) for target in targets]:
+        if not self._starters:
+            starter_entries = RxnEntries(None, "d")  # use dummy starter node
+            if self._complex_loopback:
+                raise ValueError("Complex loopback cannot be enabled when using a dummy starters node!")
+        elif False in [isinstance(starter, ComputedEntry) for starter in self._starters] or False in [
+                isinstance(target, ComputedEntry) for target in self._all_targets]:
             raise TypeError("Starters and target must be (or inherit from) ComputedEntry objects.")
+        else:
+            starter_entries = RxnEntries(starters, "s")
+            self._starter_entries = starter_entries
 
         g = nx.DiGraph()
-        vis = nx.DiGraph()  # simpler graph for visualization
+        #vis = nx.DiGraph()  # simpler graph for visualization
 
-        starters = set(self._starters)
-        target = set(self._selected_target)
-
-        starter_entries = RxnEntries(starters, "s")
-        target_entry = RxnEntries(target, "t")
+        target_entry = RxnEntries(self._selected_target, "t")
 
         g.add_nodes_from([starter_entries, target_entry])
-
         self.logger.info("Generating reactions...")
 
         for r in self.generate_all_combos(self._filtered_entries, self._max_num_components):
@@ -114,9 +121,11 @@ class ReactionNetwork:
             reactant_entries = RxnEntries(reactants, "r")
             g.add_node(reactant_entries)
 
-            vis.add_node(RxnEntries(reactants, None), path=0)
+            #vis.add_node(RxnEntries(reactants, None), path=0)
 
-            if reactants.issubset(starters):
+            # connect starters to reactants
+            if starter_entries.description == "D" or (self._starters.issubset(reactants) and redox) \
+                    or (reactants.issubset(self._starters) and not redox):
                 g.add_edge(starter_entries, reactant_entries, weight=0)
 
         for p in self.generate_all_combos(self._filtered_entries, self._max_num_components):
@@ -124,34 +133,37 @@ class ReactionNetwork:
             product_entries = RxnEntries(products, "p")
             g.add_node(product_entries)
 
+            # link back to any node which contains starters or these intermediate products, p
             if complex_loopback:
-                for c in self.generate_all_combos(products.union(starters), self._max_num_components):
+                for c in self.generate_all_combos(products.union(self._starters), self._max_num_components):
                     combo = set(c)
-                    g.add_edge(product_entries, RxnEntries(combo, "r"), weight=0)
-                    if combo != products:
-                        vis.add_edge(RxnEntries(products, None), RxnEntries(combo, None), weight=0, path=0)
+                    if not combo.issubset(self._starters):  # must contain at least one intermediate
+                        g.add_edge(product_entries, RxnEntries(combo, "r"), weight=0)
+                    #if combo != products:
+                        #vis.add_edge(RxnEntries(products, None), RxnEntries(combo, None), weight=0, path=0)
             else:
                 g.add_edge(product_entries, RxnEntries(products, "r"), weight=0)
 
-            if target.issubset(products):
-                g.add_edge(product_entries, target_entry, weight=0)  # add edge connecting to target
+            if self._selected_target.issubset(products):
+                g.add_edge(product_entries, target_entry, weight=0)  # add edges connecting to target
 
+            # find all the reactions now
             for r in self.generate_all_combos(self._filtered_entries, self._max_num_components):
                 reactants = set(r)
                 if products == reactants:
-                    continue  # removes many identity-like reactions
+                    continue  # do not consider identity-like reactions (A + B -> A + B)
 
                 reactants_elems = set([elem for entry in reactants for elem in entry.composition.elements])
                 products_elems = set([elem for entry in products for elem in entry.composition.elements])
 
                 if reactants_elems != products_elems:
-                    continue  # removes reactions which change chemical systems
+                    continue  # do not consider reaction which changes chemical systems
 
                 reactant_entries = RxnEntries(reactants, "r")
 
                 try:
                     rxn_forwards = ComputedReaction(list(reactants), list(products))
-                    rxn_backwards = ComputedReaction(list(products), list(reactants))
+                    #rxn_backwards = ComputedReaction(list(products), list(reactants))
                 except ReactionError:
                     continue
 
@@ -160,27 +172,27 @@ class ReactionNetwork:
 
                 if (True in (abs(rxn_forwards.coeffs) < rxn_forwards.TOLERANCE)) or (reactants_comps != set(rxn_forwards.reactants)) or (
                         products_comps != set(rxn_forwards.products)):
-                    continue  # removes reactions which have components that either change sides or disappear
+                    continue  # remove reaction which has components that either change sides or disappear
 
                 total_num_atoms = sum([rxn_forwards.get_el_amount(elem) for elem in rxn_forwards.elements])
                 dg_per_atom_f = rxn_forwards.calculated_reaction_energy / total_num_atoms
-                dg_per_atom_b = rxn_backwards.calculated_reaction_energy / total_num_atoms
+                #dg_per_atom_b = rxn_backwards.calculated_reaction_energy / total_num_atoms
 
-                densities = np.array([entry.structure.density for entry in rxn_forwards.all_entries])
-                info_entropies = np.array([entry.parameters["info_entropy"] for entry in rxn_forwards.all_entries])
-                total_coeffs = sum([abs(coeff) for coeff in rxn_forwards.coeffs])
+                # densities = np.array([entry.structure.density for entry in rxn_forwards.all_entries])
+                # info_entropies = np.array([entry.parameters["info_entropy"] for entry in rxn_forwards.all_entries])
+                # total_coeffs = sum([abs(coeff) for coeff in rxn_forwards.coeffs])
 
-                #d_density = np.dot(rxn_forwards.coeffs, densities) / total_coeffs
-                d_info_entropy = np.dot(rxn_forwards.coeffs, info_entropies) / total_coeffs
+                # d_density = np.dot(rxn_forwards.coeffs, densities) / total_coeffs
+                # d_info_entropy = np.dot(rxn_forwards.coeffs, info_entropies) / total_coeffs
 
-                weight_f = self.get_rxn_cost(dg_per_atom_f, cost_function, temp, d_info_entropy) #d_density)
-                weight_b = self.get_rxn_cost(dg_per_atom_b, cost_function, temp)
+                weight_f = self.get_rxn_cost(dg_per_atom_f, cost_function, temp) # d_info_entropy)  # d_density)
+                #weight_b = self.get_rxn_cost(dg_per_atom_b, cost_function, temp)
                 g.add_edge(reactant_entries, product_entries, weight=weight_f, rxn=rxn_forwards)
 
-                if dg_per_atom_f < 1:
-                    vis.add_edge(RxnEntries(reactants, None), RxnEntries(products, None), weight=weight_f, rxn=rxn_forwards, path=0)
-                if dg_per_atom_b < 1:
-                    vis.add_edge(RxnEntries(products, None), RxnEntries(reactants, None), weight=weight_b, rxn=rxn_backwards, path=-0)
+                #if dg_per_atom_f < 1:
+                    #vis.add_edge(RxnEntries(reactants, None), RxnEntries(products, None), weight=weight_f, rxn=rxn_forwards, path=0)
+                #if dg_per_atom_b < 1:
+                    #vis.add_edge(RxnEntries(products, None), RxnEntries(reactants, None), weight=weight_b, rxn=rxn_backwards, path=0)
 
         self.logger.info(f"Complete: Created graph with {g.number_of_nodes()} nodes and {g.number_of_edges()} edges.")
 
@@ -195,7 +207,7 @@ class ReactionNetwork:
                     g[u][v]["weight"] = 1 - (g[u][v]["weight"] / self._most_negative_rxn)
 
         self._rxn_network = g
-        self._vis = vis
+        #self._vis = vis
 
     def find_k_shortest_paths(self, k, target=None):
         """
@@ -207,12 +219,16 @@ class ReactionNetwork:
         Returns:
             [RxnPathway]: list of RxnPathway objects
         """
-        starters = RxnEntries(set(self._starters), "s")
+
+        if self._starters:
+            starters = RxnEntries(self._starters, "s")
+        else:
+            starters = RxnEntries(None, "d")
 
         if target is None:
             target = self._selected_target
 
-        target = RxnEntries(set(target), "t")
+        target = RxnEntries(target, "t")
 
         paths = []
         num_found = 0
@@ -230,19 +246,19 @@ class ReactionNetwork:
                 for step in path:
                     if step.description == "R":
                         path_reactants = step
-                        if path_products:
-                            vis_reactants = RxnEntries(path_reactants.entries, None)
-                            vis_products = RxnEntries(path_products.entries, None)
-                            nx.set_edge_attributes(self._vis, {(vis_products, vis_reactants): {"path": {"path": 10}}})
+                        #if path_products:
+                            #vis_reactants = RxnEntries(path_reactants.entries, None)
+                            #vis_products = RxnEntries(path_products.entries, None)
+                            #nx.set_edge_attributes(self._vis, {(vis_products, vis_reactants): {"path": {"path": 10}}})
                     elif step.description == "P":
                         path_products = step
                         rxn_data = self._rxn_network.get_edge_data(path_reactants, path_products)
 
-                        vis_reactants = RxnEntries(path_reactants.entries, None)
-                        vis_products = RxnEntries(path_products.entries, None)
-                        nx.set_edge_attributes(self._vis, {(vis_reactants, vis_products): {"path": 10}})
-                        nx.set_node_attributes(self._vis, {vis_reactants: {"path": 10}})
-                        nx.set_node_attributes(self._vis, {vis_products: {"path": 10}})
+                        #vis_reactants = RxnEntries(path_reactants.entries, None)
+                        #vis_products = RxnEntries(path_products.entries, None)
+                        #nx.set_edge_attributes(self._vis, {(vis_reactants, vis_products): {"path": 10}})
+                        #nx.set_node_attributes(self._vis, {vis_reactants: {"path": 10}})
+                        #nx.set_node_attributes(self._vis, {vis_products: {"path": 10}})
 
                         rxn = rxn_data["rxn"]
                         weight = rxn_data["weight"]
@@ -261,35 +277,63 @@ class ReactionNetwork:
 
         return paths
 
-    def find_redox_paths(self, num_paths_to_consider=5):
+    def find_redox_paths(self, entry, reduced_entry, k=5, max_num_combos=4, consider_remnant_rxns=True):
         """
-        Iterates through possible starting phases (+ O2) to find shortest paths to some desired target
-        (e.g. an oxidized material). Useful for finding thermochemical redox pathways.
 
         Args:
-            num_paths_to_consider (int): how many shortest paths to consider when trying to get to desired target
         Returns:
-            [RxnPathway]: Sorted list of all reaction pathways
         """
-
-        paths_from_all_starters = set()
+        hydrogen_entry = self._pd.el_refs[Element("H")]
         oxygen_entry = self._pd.el_refs[Element("O")]
-        filtered_entries = self._filtered_entries.copy()
-        filtered_entries.remove(self._selected_target[0])
-        filtered_entries.remove(oxygen_entry)
+        water_entry = None
 
-        for s in self.generate_all_combos(filtered_entries, self._max_num_components):
-            starters = set(s)
-            starters.add(oxygen_entry)
-            try:
-                print(f"PATHS from {[starter.composition.reduced_formula for starter in starters]} \n")
-                self.set_starters(starters, connect_direct=True)
-                paths_from_all_starters.update(self.find_k_shortest_paths(num_paths_to_consider))
-            except Exception as e:
-                print(e)
-                continue
+        for e in self._filtered_entries:
+            if e.composition.reduced_composition == Composition("H2O"):
+                water_entry = e
 
-        return sorted(paths_from_all_starters, key=lambda path: path.total_weight)
+        all_paths = set()
+
+        self.set_starters([entry])
+        self.set_target(reduced_entry)
+        print(f"PATHS to {reduced_entry.composition.reduced_formula} \n")
+        all_paths.update(self.find_k_shortest_paths(k))
+
+        self.set_starters([reduced_entry])
+        self.set_target(entry)
+        print(f"PATHS to {entry.composition.reduced_formula} \n")
+        all_paths.update(self.find_k_shortest_paths(k))
+
+        self.set_starters(None)
+        self.set_target(hydrogen_entry)
+        print(f"PATHS to {hydrogen_entry.composition.reduced_formula} \n")
+        all_paths.update(self.find_k_shortest_paths(k))
+
+        self.set_starters(None)
+        self.set_target(oxygen_entry)
+        print(f"PATHS to {oxygen_entry.composition.reduced_formula} \n")
+        all_paths.update(self.find_k_shortest_paths(k))
+
+        self.set_starters([water_entry])
+        self.set_target(entry, dummy=True)
+        print(f"PATHS from {water_entry.composition.reduced_formula} \n")
+        all_paths.update(self.find_k_shortest_paths(k))
+
+        if consider_remnant_rxns:
+            intermediates = {entry for path in all_paths for rxn in path.rxns for entry in rxn.all_entries} \
+                            - {entry, reduced_entry}
+            remnant_paths = self.find_remnant_paths(intermediates, {entry, reduced_entry})
+            if remnant_paths:
+                print("Remnant Reactions \n")
+                print(remnant_paths, "\n")
+                all_paths.update(remnant_paths)
+
+        balanced_total_paths = set()
+        for combo in self.generate_all_combos(all_paths, max_num_combos):
+            combined_pathway = CombinedPathway(combo, [water_entry], [hydrogen_entry, oxygen_entry])
+            if combined_pathway.is_balanced:
+                balanced_total_paths.add(combined_pathway)
+
+        return sorted(list(balanced_total_paths), key=lambda combined_path: combined_path.total_weight)
 
     def find_combined_paths(self, k, targets=None, max_num_combos=4, consider_remnant_rxns=True):
         """
@@ -308,8 +352,10 @@ class ReactionNetwork:
         paths_to_all_targets = set()
         if not targets:
             targets = self._all_targets
+        else:
+            targets = set(targets)
 
-        net_rxn = ComputedReaction(self._starters, targets)
+        net_rxn = ComputedReaction(list(self._starters), list(targets))
         print(f"NET RXN: {net_rxn} \n")
 
         for target in targets:
@@ -318,7 +364,7 @@ class ReactionNetwork:
             paths_to_all_targets.update(self.find_k_shortest_paths(k))
 
         if consider_remnant_rxns:
-            starters_and_targets = set(targets + self._starters)
+            starters_and_targets = targets | self._starters
             intermediates = {entry for path in paths_to_all_targets
                                  for rxn in path.rxns for entry in rxn.all_entries} - starters_and_targets
             remnant_paths = self.find_remnant_paths(intermediates, targets)
@@ -333,9 +379,18 @@ class ReactionNetwork:
             if combined_pathway.is_balanced:
                 balanced_total_paths.add(combined_pathway)
 
-        return sorted(list(balanced_total_paths), key=lambda combined_path: combined_path.total_weight)
+        analysis = PathwayAnalysis(self, balanced_total_paths)
+
+        return sorted(list(balanced_total_paths), key=lambda combined_path: combined_path.total_weight), analysis
 
     def find_remnant_paths(self, intermediates, targets, max_num_combos=2):
+        """
+        Helper method which looks for potential pathways between found intermediates.
+
+        Args:
+        Returns:
+
+        """
         remnant_paths = set()
 
         for reactants_combo in self.generate_all_combos(intermediates, max_num_combos):
@@ -411,7 +466,7 @@ class ReactionNetwork:
                 weight = self.get_rxn_cost(dg_per_atom, cost_function, temp)
                 self._rxn_network[u][v]["weight"] = weight
 
-    def set_starters(self, starters, connect_direct = False):
+    def set_starters(self, starters, connect_direct = False, dummy_exclusive = False):
         """
         Replaces network's previous starter nodes with provided new starters.
             Recreates edges that link products back to reactants.
@@ -422,17 +477,27 @@ class ReactionNetwork:
         Returns:
             None
         """
+
         for node in self._rxn_network.nodes():
-            if node.description == "S":
+            if node.description == "S" or node.description == "D":
                 self._rxn_network.remove_node(node)
 
-                starters = set(starters)
-                starter_entries = RxnEntries(starters, "s")
+                if not starters or dummy_exclusive:
+                    starter_entries = RxnEntries(None, "d")
+                else:
+                    starters = set(starters)
+                    starter_entries = RxnEntries(starters, "s")
 
                 self._rxn_network.add_node(starter_entries)
 
                 if connect_direct:
                     self._rxn_network.add_edge(starter_entries, RxnEntries(starters, "r"), weight=0)
+                elif self._redox:
+                    for r in self.generate_all_combos(self._filtered_entries, self._max_num_components):
+                        reactants = set(r)
+                        if (not starters or (dummy_exclusive) or starters.issubset(reactants)):
+                            reactant_entries = RxnEntries(reactants, "r")
+                            self._rxn_network.add_edge(starter_entries, reactant_entries, weight=0)
                 else:
                     for r in self.generate_all_combos(self._filtered_entries, self._max_num_components):
                         reactants = set(r)
@@ -460,7 +525,7 @@ class ReactionNetwork:
 
         self._starters = starters
 
-    def set_target(self, target):
+    def set_target(self, target, dummy=False):
         """
         Replaces network's previous target node with provided new target.
 
@@ -473,19 +538,17 @@ class ReactionNetwork:
         if target in self._selected_target:
             return
 
-        target = [target]
-        self._selected_target = target
+        self._selected_target = {target}
 
         for node in self._rxn_network.nodes():
             if node.description == "T":
                 self._rxn_network.remove_node(node)
 
-                target = set(target)
-                target_entry = RxnEntries(target, "t")
+                target_entry = RxnEntries(self._selected_target, "t")
 
                 for p in self.generate_all_combos(self._filtered_entries, self._max_num_components):
                     products = set(p)
-                    if target.issubset(products):
+                    if self._selected_target.issubset(products) or dummy:
                         product_entries = RxnEntries(products, "p")
                         self._rxn_network.add_edge(product_entries, target_entry, weight=0) # link product node to target node
 
@@ -545,7 +608,7 @@ class ReactionNetwork:
 
     @staticmethod
     def _softplus(energy, t=1.0, d_info_entropy=0, d_density=0):
-        weighted_params = energy - d_info_entropy - 0.0*d_density
+        weighted_params = energy - 0.25*d_info_entropy - 0.0*d_density
         return np.log(1 + (273 / t) * np.exp(weighted_params))
 
     @property
@@ -559,6 +622,14 @@ class ReactionNetwork:
     @property
     def rxn_network(self):
         return self._rxn_network
+
+    @property
+    def starters(self):
+        return self._starters
+
+    @property
+    def all_targets(self):
+        return self._all_targets
 
     def __repr__(self):
         return str(self._rxn_network)

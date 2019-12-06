@@ -143,7 +143,7 @@ class RxnEntries(MSONable):
     """
 
     def __init__(self, entries, description):
-        self._entries = entries
+        self._entries = set(entries)
 
         if description in ["r", "R", "reactants", "Reactants"]:
             self._description = "R"
@@ -153,6 +153,8 @@ class RxnEntries(MSONable):
             self._description = "S"
         elif description in ["t", "T", "target", "Target"]:
             self._description = "T"
+        elif description in ["d", "D", "dummy", "Dummy"]:
+            self._description = "D"
         else:
             self._description = description
 
@@ -165,13 +167,15 @@ class RxnEntries(MSONable):
         return self._description
 
     def __repr__(self):
+        if self._description == "D":
+            return "Dummy Node"
+
         formulas = [entry.composition.reduced_formula for entry in self._entries]
         formulas.sort()
-
-        if self._description:
-            return f"{self._description}: {','.join(formulas)}"
-        else:
+        if not self._description:
             return f"{','.join(formulas)}"
+        else:
+            return f"{self._description}: {','.join(formulas)}"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -180,10 +184,10 @@ class RxnEntries(MSONable):
             return False
 
     def __hash__(self):
-        if self._description:
-            return hash((self._description, frozenset(self._entries)))
+        if not self._description or self._description == "D":
+            return hash(self._description)
         else:
-            return hash(frozenset(self._entries))
+            return hash((self._description, frozenset(self._entries)))
 
 
 class RxnPathway(MSONable):
