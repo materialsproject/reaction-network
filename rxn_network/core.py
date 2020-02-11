@@ -167,11 +167,7 @@ class ReactionNetwork:
                 except ReactionError:
                     continue
 
-                reactants_comps = {reactant.composition.reduced_composition for reactant in reactants}
-                products_comps = {product.composition.reduced_composition for product in products}
-
-                if (True in (abs(rxn_forwards.coeffs) < rxn_forwards.TOLERANCE)) or (reactants_comps != set(rxn_forwards.reactants)) or (
-                        products_comps != set(rxn_forwards.products)):
+                if rxn_forwards._lowest_num_errors > 0:
                     continue  # remove reaction which has components that either change sides or disappear
 
                 total_num_atoms = sum([rxn_forwards.get_el_amount(elem) for elem in rxn_forwards.elements])
@@ -285,8 +281,8 @@ class ReactionNetwork:
         """
         hydrogen_entry = self._pd.el_refs[Element("H")]
         oxygen_entry = self._pd.el_refs[Element("O")]
-        water_entry = None
 
+        water_entry = None
         for e in self._filtered_entries:
             if e.composition.reduced_composition == Composition("H2O"):
                 water_entry = e
@@ -346,7 +342,7 @@ class ReactionNetwork:
             max_num_combos (int): upper limit on how many pathways to consider at a time (default 3).
 
         Returns:
-            [CombinedPathway]: list of CombinedPathway objects, sorted by average cost
+            [CombinedPathway]: list of CombinedPathway objects, sorted by total cost
 
         """
         paths_to_all_targets = set()
@@ -510,7 +506,8 @@ class ReactionNetwork:
             self._starters = starters
             return
 
-        for products in self.generate_all_combos(self._filtered_entries, self._max_num_components):
+        for p in self.generate_all_combos(self._filtered_entries, self._max_num_components):
+            products = set(p)
             product_entries = RxnEntries(products, "p")
 
             old_loopbacks = self.generate_all_combos(list(products.union(self._starters)), self._max_num_components)

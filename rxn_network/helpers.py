@@ -273,19 +273,18 @@ class CombinedPathway(MSONable):
         if len(self.all_rxns) == 0:
             return
 
-        rxns = list(self.all_rxns.keys())
-
         net_coeffs = [self.net_rxn.get_coeff(comp) if comp in self.net_rxn.all_comp else 0
                       for comp in self.all_comp]
         comp_matrix = np.array([[rxn.get_coeff(comp) if comp in rxn.all_comp else 0 for comp in self.all_comp]
-                                for rxn in rxns])
+                                for rxn in self.all_rxns])
         comp_pseudo_inverse = np.linalg.pinv(comp_matrix).transpose()
         multiplicities = np.matmul(comp_pseudo_inverse, net_coeffs)
 
-        if (multiplicities < self.net_rxn.TOLERANCE).any():
+        if (multiplicities < -self.net_rxn.TOLERANCE).any() or len(np.where(abs(multiplicities)
+                                                                            < self.net_rxn.TOLERANCE)) > 2:
             return
         elif np.allclose(np.matmul(comp_matrix.transpose(), multiplicities), net_coeffs):
-            self.multiplicities = {rxn: multiplicity for (rxn, multiplicity) in zip(rxns, multiplicities)}
+            self.multiplicities = {rxn: multiplicity for (rxn, multiplicity) in zip(self.all_rxns, multiplicities)}
             self.is_balanced = True
 
         return
