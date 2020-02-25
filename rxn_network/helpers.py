@@ -1,3 +1,8 @@
+"""
+This module implements several helper classes for storing and parsing reaction pathway info
+in the Reaction Network module.
+"""
+
 import os
 from itertools import combinations
 
@@ -13,6 +18,7 @@ from monty.json import MSONable, MontyDecoder
 
 __author__ = "Matthew McDermott"
 __email__ = "mcdermott@lbl.gov"
+__date__ = "February 25, 2020"
 
 
 with open(os.path.join(os.path.dirname(__file__), "g_els.json")) as f:
@@ -138,7 +144,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
 class RxnEntries(MSONable):
     """
-    Helper class for describing ComputedEntry-like objects in context of a reaction network.
+    Helper class for describing combinations of ComputedEntry-like objects in context of a reaction network.
         Necessary for implementation in NetworkX.
     """
 
