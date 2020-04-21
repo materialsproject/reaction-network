@@ -1,8 +1,10 @@
 import logging
-from itertools import combinations, chain
+import os
+from itertools import combinations, chain, groupby
 
 import numpy as np
 from scipy.constants import physical_constants
+import pandas as pd
 
 import graph_tool.all as gt
 import queue
@@ -12,23 +14,24 @@ from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction, ReactionError
 from matminer.featurizers.structure import StructuralComplexity
 
-from rxn_network.helpers import RxnEntries, RxnPathway, CombinedPathway
-from rxn_network.analysis import PathwayAnalysis
-
+from rxn_network.helpers import *
+from rxn_network.analysis import *
 
 __author__ = "Matthew McDermott"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "February 25, 2020"
+__date__ = "March 21, 2020"
+
+MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class ReactionNetwork:
     """
     This class creates and stores a weighted, directed graph in graph-tool which enumerates and
-        explores all possible chemical reactions (edges) between phase combinations (nodes) in a
+        traverses possible chemical reactions (edges) between phase combinations (vertices) in a
         chemical system.
     """
     def __init__(self, entries, max_num_phases=2, include_metastable=False,
-                 include_polymorphs=False, include_info_entropy=False):
+                 include_polymorphs=False, include_info_entropy=False, include_literature=False):
         """
         Constructs a ReactionNetwork object with necessary initialization steps. This does not yet compute the graph.
 
@@ -38,6 +41,7 @@ class ReactionNetwork:
             include_metastable (float or bool): either the specified cutoff for energy above hull, or False if
                 considering only stable entries
             include_polymorphs (bool): Whether or not to consider non-ground state polymorphs (defaults to False)
+            include_info_entropy (bool): Whether or not to consider Shannon information entropy as a cost metric
         """
 
         self.logger = logging.getLogger('ReactionNetwork')
@@ -48,6 +52,7 @@ class ReactionNetwork:
         self._max_num_phases = max_num_phases
         self._e_above_hull = include_metastable
         self._include_polymorphs = include_polymorphs
+        self._include_literature = include_literature
 
         self._starters = None
         self._starters_v = None
@@ -59,7 +64,7 @@ class ReactionNetwork:
         self._temp = None
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
-        self._rxn_network = None
+        self.g = None
 
         self._filtered_entries = self.filter_entries(self._pd, include_metastable, include_polymorphs)
         self._all_entry_combos = [set(combo) for combo in self.generate_all_combos(self._filtered_entries,
@@ -70,6 +75,18 @@ class ReactionNetwork:
                 info_entropy = StructuralComplexity().featurize(entry.structure)[0]
                 entry.parameters = {"info_entropy": info_entropy}
 
+        if include_literature:
+            all_chemsyses = []
+            for i in range(len(self._pd.elements)):
+                for els in combinations([str(el) for el in self._pd.elements], i + 1):
+                    all_chemsyses.append('-'.join(sorted(els)))
+
+            lit_dfs = []
+            for df in include_literature:
+                lit_dfs.append(pd.read_pickle(os.path.join(MODULE_DIR, df)))
+            literature_df = pd.concat(lit_dfs)
+            self.literature_df = literature_df[literature_df["chemsys"].isin(all_chemsyses)]
+
         filtered_entries_str = ', '.join([entry.composition.reduced_formula for entry in self._filtered_entries])
 
         self.logger.info(
@@ -77,7 +94,7 @@ class ReactionNetwork:
 
     def generate_rxn_network(self, starters, targets, cost_function="softplus", temp=300, complex_loopback=True):
         """
-        Generates the actual reaction network (weighted, directed graph) using graph-tool.
+        Generates and stores the actual reaction network (weighted, directed graph) using graph-tool.
 
         Args:
             starters (list of ComputedEntries): entries for all phases which serve as the main reactants
@@ -111,88 +128,93 @@ class ReactionNetwork:
         g = gt.Graph()
 
         entries_dict = {}
-        v_map = g.new_vertex_property("object")
-        type_map = g.new_vertex_property("int")  # 0: starters, 1: reactants, 2: products, 3: target
-        filter_v_map = g.new_vertex_property("bool")
-        weight_map = g.new_edge_property("double")
-        rxn_map = g.new_edge_property("object")
-        filter_e_map = g.new_edge_property("bool")
 
-        g.vertex_properties["entries"] = v_map
-        g.vertex_properties["type"] = type_map
-        g.vertex_properties["bool"] = filter_v_map
-        g.edge_properties["weight"] = weight_map
-        g.edge_properties["rxn"] = rxn_map
-        g.edge_properties["bool"] = filter_e_map
+        g.vp["entries"] = g.new_vertex_property("object")
+        g.vp["type"] = g.new_vertex_property("int")  # 0: starters, 1: reactants, 2: products, 3: target
+        g.vp["bool"] = g.new_vertex_property("bool")
+        g.vp["path"] = g.new_vertex_property("bool")
+        g.vp["chemsys"] = g.new_vertex_property("string")
+
+        g.ep["weight"] = g.new_edge_property("double")
+        g.ep["rxn"] = g.new_edge_property("object")
+        g.ep["bool"] = g.new_edge_property("bool")
+        g.ep["path"] = g.new_edge_property("bool")
+        g.ep["doi"] = g.new_edge_property("object")
 
         starters_v = g.add_vertex()
-        v_map[starters_v] = starter_entries
-        type_map[starters_v] = 0
-        filter_v_map[starters_v] = True
+
+        g.vp["entries"][starters_v] = starter_entries
+        g.vp["type"][starters_v] = 0
+        g.vp["bool"][starters_v] = True
+        g.vp["path"][starters_v] = True
+        g.vp["chemsys"][starters_v] = starter_entries.chemical_system
         self._starters_v = starters_v
 
+        idx = 0
         for num, entries in enumerate(self._all_entry_combos):
             idx = 2*num + 1
             reactants = RxnEntries(entries, "R")
             products = RxnEntries(entries, "P")
+            chemsys = reactants.chemical_system
+            if chemsys not in entries_dict:
+                entries_dict[chemsys] = dict({"R": {}, "P": {}})
 
-            entries_dict[reactants] = idx
-            type_map[idx] = 1
-            v_map[idx] = reactants
-            filter_v_map[idx] = True
+            entries_dict[chemsys]["R"][reactants] = idx
+            g.vp["entries"][idx] = reactants
+            g.vp["type"][idx] = 1
+            g.vp["bool"][idx] = True
+            g.vp["path"][idx] = False
+            g.vp["chemsys"][idx] = chemsys
 
-            entries_dict[products] = idx+1
-            type_map[idx+1] = 2
-            v_map[idx+1] = products
-            filter_v_map[idx + 1] = True
+            entries_dict[chemsys]["P"][products] = idx+1
+            g.vp["entries"][idx+1] = products
+            g.vp["type"][idx+1] = 2
+            g.vp["bool"][idx + 1] = True
+            g.vp["path"][idx+1] = False
+            g.vp["chemsys"][idx+1] = chemsys
 
-        edge_list = []
-
-        g.add_vertex(len(entries_dict) - 1)
+        g.add_vertex(idx+1)
 
         target_v = g.add_vertex()
+
         target_entries = RxnEntries(self._current_target, "t")
-        v_map[target_v] = target_entries
-        type_map[target_v] = 3
-        filter_v_map[target_v] = True
+        g.vp["entries"][target_v] = target_entries
+        g.vp["type"][target_v] = 3
+        g.vp["bool"][target_v] = True
+        g.vp["path"][target_v] = True
+        g.vp["chemsys"][target_v] = target_entries.chemical_system
         self._target_v = target_v
 
         self.logger.info("Generating reactions...")
 
-        for entry, v in entries_dict.items():
-            phases = entry.entries
+        edge_list = []
+        for chemsys, vertices in entries_dict.items():
+            for entry, v in vertices["R"].items():
+                phases = entry.entries
 
-            v = g.vertex(v)
+                v = g.vertex(v)
 
-            if type_map[v] == 1:
-                if phases.issubset(self._starters):
-                    edge_list.append([starters_v, v, 0, None, True])
-            elif type_map[v] == 2:
+                if starter_entries.description == "D" or phases.issubset(self._starters):
+                    edge_list.append([starters_v, v, 0, None, True, False, None])
+
+            for entry, v in vertices["P"].items():
+                phases = entry.entries
                 if self._current_target.issubset(phases):
-                    edge_list.append([v, target_v, 0, None, True])
+                    edge_list.append([v, target_v, 0, None, True, False, None])
 
                 if complex_loopback:
                     for c in self.generate_all_combos(phases.union(self._starters), self._max_num_phases):
                         combo_phases = set(c)
                         combo_entry = RxnEntries(combo_phases, "R")
-                        loopback_v = g.vertex(entries_dict[combo_entry])
+                        loopback_v = g.vertex(entries_dict[combo_entry.chemical_system]["R"][combo_entry])
                         if not combo_phases.issubset(self._starters):  # must contain at least one intermediate
-                            edge_list.append([v, loopback_v, 0, None, True])
+                            edge_list.append([v, loopback_v, 0, None, True, False, None])
 
-                for other_entry, other_v in entries_dict.items():
-                    if not other_entry.description == "R":
-                        continue
-
+                for other_entry, other_v in vertices["R"].items():
                     other_phases = other_entry.entries
 
                     if other_phases == phases:
                         continue  # do not consider identity-like reactions (A + B -> A + B)
-
-                    reactants_elems = set([elem for entry in other_phases for elem in entry.composition.elements])
-                    products_elems = set([elem for entry in phases for elem in entry.composition.elements])
-
-                    if reactants_elems != products_elems:
-                        continue  # do not consider reaction which changes chemical systems
 
                     try:
                         rxn = ComputedReaction(list(other_phases), list(phases))
@@ -202,39 +224,41 @@ class ReactionNetwork:
                     if rxn._lowest_num_errors != 0:
                         continue  # remove reaction which has components that either change sides or disappear
 
+                    doi = None
+                    if self._include_literature:
+                        doi_df = self.literature_df[self.literature_df["rxn"] == rxn]
+                        if not doi_df.empty:
+                            doi = doi_df["doi"].values[0]
+
                     total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
                     dg_per_atom = rxn.calculated_reaction_energy / total_num_atoms
                     weight = self.get_rxn_cost(dg_per_atom, cost_function, temp)
 
                     other_v = g.vertex(other_v)
 
-                    edge_list.append([other_v, v, weight, rxn, True])
+                    edge_list.append([other_v, v, weight, rxn, True, False, doi])
 
-        g.add_edge_list(edge_list, eprops=[weight_map, rxn_map, filter_e_map])
+        g.add_edge_list(edge_list, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"], g.ep["path"], g.ep["doi"]])
 
-        self.logger.info(f"Complete: Created graph with {g.num_vertices()} nodes and {g.num_edges()} edges.")
-        self._rxn_network = g
+        self.logger.info(f"Created graph with {g.num_vertices()} nodes and {g.num_edges()} edges.")
+        self.g = g
 
-    def find_k_shortest_paths(self, k):
+    def find_k_shortest_rxn_pathways(self, k):
         """
         Finds k shortest paths to designated target using Yen's Algorithm.
 
         Args:
             k (int): desired number of shortest pathways (ranked by cost)
-            target (ComputedEntry-like object): desired target, defaults to first target when network was created
 
         Returns:
             [RxnPathway]: list of RxnPathway objects
         """
+        g = self.g
 
         paths = []
         num_found = 0
 
-        type_map = self._rxn_network.vp["type"]
-        weight_map = self._rxn_network.ep["weight"]
-        rxn_map = self._rxn_network.ep["rxn"]
-
-        for num, path in enumerate(self.yens_ksp(self._rxn_network, k, self._starters_v, self._target_v)):
+        for num, path in enumerate(self.yens_ksp(g, k, self._starters_v, self._target_v)):
             if num_found == k:
                 break
 
@@ -242,10 +266,13 @@ class ReactionNetwork:
             weights = []
 
             for step, v in enumerate(path):
-                if type_map[v] == 2:  # add rxn step if current node in path is a product
-                    e = self._rxn_network.edge(path[step-1], v)
-                    rxns.append(rxn_map[e])
-                    weights.append(weight_map[e])
+                g.vp["path"][v] = True
+
+                if g.vp["type"][v] == 2:  # add rxn step if current node in path is a product
+                    e = g.edge(path[step-1], v)
+                    g.ep["path"][e] = True
+                    rxns.append(g.ep["rxn"][e])
+                    weights.append(g.ep["weight"][e])
 
             rxn_pathway = RxnPathway(rxns, weights)
             paths.append(rxn_pathway)
@@ -255,7 +282,7 @@ class ReactionNetwork:
 
         return paths
 
-    def find_combined_paths(self, k, targets=None, max_num_combos=4, consider_remnant_rxns=True):
+    def find_combined_paths(self, k, targets=None, max_num_combos=4, rxns_only=False, consider_remnant_rxns=True):
         """
         Builds k shortest paths to provided targets and then seeks to combine them to achieve a "net reaction"
             with balanced stoichiometry. In other words, the full conversion of all intermediates to final products.
@@ -269,7 +296,10 @@ class ReactionNetwork:
             [CombinedPathway]: list of CombinedPathway objects, sorted by total cost
 
         """
-        paths_to_all_targets = set()
+        if rxns_only:
+            paths_to_all_targets = dict()
+        else:
+            paths_to_all_targets = set()
 
         if not targets:
             targets = self._all_targets
@@ -282,27 +312,45 @@ class ReactionNetwork:
         for target in targets:
             print(f"PATHS to {target.composition.reduced_formula} \n")
             self.set_target(target)
-            paths_to_all_targets.update(self.find_k_shortest_paths(k))
+            paths = self.find_k_shortest_rxn_pathways(k)
+            if rxns_only:
+                paths = {rxn: cost for path in paths for (rxn, cost) in zip(path.rxns, path.costs)}
+            paths_to_all_targets.update(paths)
 
         if consider_remnant_rxns:
             starters_and_targets = targets | self._starters
-            intermediates = {entry for path in paths_to_all_targets
-                                 for rxn in path.rxns for entry in rxn.all_entries} - starters_and_targets
+
+            if rxns_only:
+                intermediates = {entry for rxn in paths_to_all_targets for entry in rxn.all_entries} - starters_and_targets
+            else:
+                intermediates = {entry for path in paths_to_all_targets
+                                 for rxn in path.all_rxns for entry in rxn.all_entries} - starters_and_targets
             remnant_paths = self.find_remnant_paths(intermediates, targets)
+
             if remnant_paths:
                 print("Remnant Reactions \n")
                 print(remnant_paths, "\n")
+                if rxns_only:
+                    remnant_paths = {rxn: cost for path in remnant_paths for (rxn, cost) in zip(path.rxns, path.costs)}
                 paths_to_all_targets.update(remnant_paths)
 
         balanced_total_paths = set()
-        for combo in self.generate_all_combos(paths_to_all_targets, max_num_combos):
-            combined_pathway = CombinedPathway(combo, self._starters, targets)
+        if rxns_only:
+            paths_to_try = list(paths_to_all_targets.keys())
+        else:
+            paths_to_try = paths_to_all_targets
+
+        for combo in self.generate_all_combos(paths_to_try, max_num_combos):
+            if rxns_only:
+                combined_pathway = BalancedPathway({p: paths_to_all_targets[p] for p in combo}, net_rxn)
+            else:
+                combined_pathway = CombinedPathway(combo, net_rxn)
+
             if combined_pathway.is_balanced:
                 balanced_total_paths.add(combined_pathway)
 
         analysis = PathwayAnalysis(self, balanced_total_paths)
-
-        return sorted(list(balanced_total_paths), key=lambda combined_path: combined_path.total_weight), analysis
+        return sorted(list(balanced_total_paths), key=lambda x: x.total_cost), analysis
 
     def find_remnant_paths(self, intermediates, targets, max_num_combos=2):
         """
@@ -375,13 +423,13 @@ class ReactionNetwork:
         Returns:
             None
         """
-        for (u, v, rxn) in self._rxn_network.edges.data(data='rxn'):
+        for (u, v, rxn) in self.g.edges.data(data='rxn'):
             if rxn:
                 total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
                 dg_per_atom = rxn.calculated_reaction_energy / total_num_atoms
 
                 weight = self.get_rxn_cost(dg_per_atom, cost_function, temp)
-                self._rxn_network[u][v]["weight"] = weight
+                self.g[u][v]["weight"] = weight
 
     def set_starters(self, starters, connect_direct = False, dummy_exclusive = False):
         """
@@ -395,9 +443,9 @@ class ReactionNetwork:
             None
         """
 
-        for node in self._rxn_network.nodes():
+        for node in self.g.nodes():
             if node.description == "S" or node.description == "D":
-                self._rxn_network.remove_node(node)
+                self.g.remove_node(node)
 
                 if not starters or dummy_exclusive:
                     starter_entries = RxnEntries(None, "d")
@@ -405,16 +453,16 @@ class ReactionNetwork:
                     starters = set(starters)
                     starter_entries = RxnEntries(starters, "s")
 
-                self._rxn_network.add_node(starter_entries)
+                self.g.add_node(starter_entries)
 
                 if connect_direct:
-                    self._rxn_network.add_edge(starter_entries, RxnEntries(starters, "r"), weight=0)
+                    self.g.add_edge(starter_entries, RxnEntries(starters, "r"), weight=0)
                 else:
                     for r in self.generate_all_combos(self._filtered_entries, self._max_num_phases):
                         reactants = set(r)
                         if reactants.issubset(starters):  # link starting node to reactant nodes
                             reactant_entries = RxnEntries(reactants, "r")
-                            self._rxn_network.add_edge(starter_entries, reactant_entries, weight=0)
+                            self.g.add_edge(starter_entries, reactant_entries, weight=0)
                 break
 
         if not self._complex_loopback:
@@ -428,12 +476,12 @@ class ReactionNetwork:
             old_loopbacks = self.generate_all_combos(list(products.union(self._starters)), self._max_num_phases)
             for combo in old_loopbacks:
                 # delete old edge linking back
-                self._rxn_network.remove_edge(product_entries, RxnEntries(combo, "r"))
+                self.g.remove_edge(product_entries, RxnEntries(combo, "r"))
 
             new_loopbacks = self.generate_all_combos(list(products.union(starters)), self._max_num_phases)
             for combo in new_loopbacks:
                 # add new edges linking back
-                self._rxn_network.add_edge(product_entries, RxnEntries(combo, "r"), weight=0)
+                self.g.add_edge(product_entries, RxnEntries(combo, "r"), weight=0)
 
         self._starters = starters
 
@@ -447,53 +495,40 @@ class ReactionNetwork:
         Returns:
             None
         """
-        g = self._rxn_network
+        g = self.g
 
         if target in self._current_target:
             return
         else:
             self._current_target = {target}
 
-        v_map = g.vp["entries"]
-        type_map = g.vp["type"]
-        filter_v_map = g.vp["bool"]
-
         g.remove_vertex(self._target_v)
 
         new_target_entry = RxnEntries(self._current_target, "t")
-        new_target_v = self._rxn_network.add_vertex()
-        v_map[new_target_v] = new_target_entry
-        type_map[new_target_v] = 3
-        filter_v_map[new_target_v] = True
+        new_target_v = g.add_vertex()
+        g.vp["entries"][new_target_v] = new_target_entry
+        g.vp["type"][new_target_v] = 3
+        g.vp["bool"][new_target_v] = True
         self._target_v = new_target_v
 
         new_edges = []
-        all_vertices = g.get_vertices(vprops=[g.vertex_index, type_map])
+        all_vertices = g.get_vertices(vprops=[g.vertex_index, g.vp["type"]])
 
         for v in all_vertices[all_vertices[:, 2] == 2]:  # search for all products
             vertex = g.vertex(v[1])
-            if self._current_target.issubset(v_map[vertex].entries):
+            if self._current_target.issubset(g.vp["entries"][vertex].entries):
                 new_edges.append([vertex, new_target_v, 0, None, True])  # link all products to new target
 
-        weight_map = g.ep["weight"]
-        rxn_map = g.ep["rxn"]
-        filter_e_map = g.ep["bool"]
-
-        g.add_edge_list(new_edges, eprops=[weight_map, rxn_map, filter_e_map])
+        g.add_edge_list(new_edges, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"]])
 
     @staticmethod
-    def yens_ksp(g, num_k, starter_v, target_v, weight_prop="weight"):
+    def yens_ksp(g, num_k, starter_v, target_v, edge_prop="bool", weight_prop="weight"):
         """
         Yen's Algorithm for k-shortest paths. Inspired by igraph implementation by Antonin Lenfant.
 
         Ref: Jin Y. Yen, "Finding the K Shortest Loopless Paths in a Network",
         Management Science, Vol. 17, No. 11, Theory Series (Jul., 1971), pp. 712-716.
         """
-        g = g.copy()
-
-        filter_v_map = g.vp["bool"]
-        filter_e_map = g.ep["bool"]
-        weights = g.ep[weight_prop]
 
         def path_cost(vertices):
             cost = 0
@@ -501,12 +536,12 @@ class ReactionNetwork:
                 cost += g.ep["weight"][g.edge(vertices[j], vertices[j+1])]
             return cost
 
-        path = gt.shortest_path(g, starter_v, target_v, weights=weights)[0]
+        path = gt.shortest_path(g, starter_v, target_v, weights=g.ep[weight_prop])[0]
 
         a = [path]
         a_costs = [path_cost(path)]
 
-        b = queue.PriorityQueue()
+        b = queue.PriorityQueue()  # automatically sorts by path cost (priority)
 
         for k in range(1, num_k):
             for i in range(len(a[k - 1]) - 1):
@@ -520,15 +555,15 @@ class ReactionNetwork:
                         e = g.edge(path[i], path[i + 1])
                         if not e:
                             continue
-                        filter_e_map[e] = False
+                        g.ep[edge_prop][e] = False
                         filtered_edges.append(e)
 
-                g.set_edge_filter(filter_e_map)
+                gv = gt.GraphView(g, efilt=g.ep[edge_prop])
 
-                spur_path = gt.shortest_path(g, spur_v, target_v, weights=weights)[0]
+                spur_path = gt.shortest_path(gv, spur_v, target_v, weights=g.ep[weight_prop])[0]
 
                 for e in filtered_edges:
-                    filter_e_map[e] = True
+                    g.ep[edge_prop][e] = True
 
                 if spur_path:
                     total_path = root_path + spur_path
@@ -613,10 +648,6 @@ class ReactionNetwork:
         return self._filtered_entries
 
     @property
-    def rxn_network(self):
-        return self._rxn_network
-
-    @property
     def starters(self):
         return self._starters
 
@@ -625,4 +656,4 @@ class ReactionNetwork:
         return self._all_targets
 
     def __repr__(self):
-        return str(self._rxn_network)
+        return str(self.g)

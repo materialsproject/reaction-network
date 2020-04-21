@@ -94,7 +94,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         num_elems = len(reduced_comp.elements)
         elem_dict = reduced_comp.get_el_amt_dict()
 
-        denominator = ((num_elems - 1)*reduced_comp.num_atoms)
+        denominator = (num_elems - 1)*reduced_comp.num_atoms
 
         all_pairs = combinations(elem_dict.items(), 2)
         mass_sum = 0
@@ -105,9 +105,9 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
             alpha_i = pair[0][1]
             alpha_j = pair[1][1]
 
-            mass_sum += (alpha_i + alpha_j)*(m_i*m_j)/(m_i+m_j)
+            mass_sum += (alpha_i + alpha_j)*(m_i*m_j)/(m_i + m_j)
 
-        reduced_mass = (1 / denominator) * mass_sum
+        reduced_mass = (1/denominator)*mass_sum
 
         return reduced_mass
 
@@ -149,7 +149,9 @@ class RxnEntries(MSONable):
     """
 
     def __init__(self, entries, description):
-        self._entries = set(entries)
+        self._entries = set(entries) if entries else None
+        self._chemical_system = "-".join(sorted({str(el) for entry in self._entries
+                                                 for el in entry.composition.elements})) if entries else None
 
         if description in ["r", "R", "reactants", "Reactants"]:
             self._description = "R"
@@ -171,6 +173,10 @@ class RxnEntries(MSONable):
     @property
     def description(self):
         return self._description
+
+    @property
+    def chemical_system(self):
+        return self._chemical_system
 
     def __repr__(self):
         if self._description == "D":
@@ -201,11 +207,11 @@ class RxnPathway(MSONable):
     Helper class for storing multiple ComputedReaction objects which form a single reaction pathway.
     """
 
-    def __init__(self, rxns, weights):
+    def __init__(self, rxns, costs):
         self._rxns = list(rxns)
-        self._weights = list(weights)
+        self._costs = list(costs)
 
-        self.total_weight = sum(self._weights)
+        self.total_cost = sum(self._costs)
         self._dG_per_atom = [rxn.calculated_reaction_energy / sum([rxn.get_el_amount(elem) for elem in rxn.elements])
                              for rxn in self._rxns]
 
@@ -214,8 +220,8 @@ class RxnPathway(MSONable):
         return self._rxns
 
     @property
-    def weights(self):
-        return self._weights
+    def costs(self):
+        return self._costs
 
     @property
     def dG_per_atom(self):
@@ -226,7 +232,7 @@ class RxnPathway(MSONable):
         for rxn, dG in zip(self._rxns, self._dG_per_atom):
             path_info += f"{rxn} (dG = {round(dG,3)} eV/atom) \n"
 
-        path_info += f"Total Cost: {round(self.total_weight,3)}"
+        path_info += f"Total Cost: {round(self.total_cost,3)}"
 
         return path_info
 
@@ -240,60 +246,88 @@ class RxnPathway(MSONable):
         return hash(tuple(self._rxns))
 
 
-class CombinedPathway(MSONable):
+class BalancedPathway(MSONable):
+    """
+    Helper class for combining multiple reactions which stoichiometrically balance to form a net reaction.
+    """
+    def __init__(self, rxn_dict, net_rxn, multiplicities=None, is_balanced=False):
+        self.rxn_dict = rxn_dict
+        self.all_rxns = list(self.rxn_dict.keys())
+        self.net_rxn = net_rxn
+        self.all_reactants = set()
+        self.all_products = set()
+        self.is_balanced = is_balanced
+
+        for rxn in self.rxn_dict.keys():
+            self.all_reactants.update(rxn.reactants)
+            self.all_products.update(rxn.products)
+
+        self.all_comp = list(self.all_reactants | self.all_products | set(self.net_rxn.all_comp))
+
+        if not multiplicities:
+            net_coeffs = self._get_net_coeffs(net_rxn, self.all_comp)
+            comp_matrix = self._get_comp_matrix(self.all_comp, self.all_rxns)
+            self.is_balanced, multiplicities = self._balance_rxns(comp_matrix, net_coeffs)
+            self.multiplicities = {rxn: multiplicity for (rxn, multiplicity) in zip(self.all_rxns, multiplicities)}
+
+        if self.is_balanced:
+            self.total_cost = sum([mult*self.rxn_dict[rxn] for (rxn, mult) in self.multiplicities.items()])
+            self.average_cost = self.total_cost / len(self.rxn_dict)
+
+    @staticmethod
+    def _balance_rxns(comp_matrix, net_coeffs, tol=1e-6):
+        comp_pseudo_inverse = np.linalg.pinv(comp_matrix).T
+        multiplicities = comp_pseudo_inverse @ net_coeffs
+
+        is_balanced = False
+
+        if (multiplicities < tol).any():
+            is_balanced = False
+        elif np.allclose(comp_matrix.T @ multiplicities, net_coeffs):
+            is_balanced = True
+
+        return is_balanced, multiplicities
+
+    @staticmethod
+    def _get_net_coeffs(net_rxn, all_comp):
+        return np.array([net_rxn.get_coeff(comp) if comp in net_rxn.all_comp else 0
+                         for comp in all_comp])
+
+    @staticmethod
+    def _get_comp_matrix(all_comp, all_rxns):
+        return np.array([[rxn.get_coeff(comp) if comp in rxn.all_comp else 0 for comp in all_comp]
+                         for rxn in all_rxns])
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return set(self.all_rxns) == set(other.all_rxns)
+        else:
+            return False
+
+    def __repr__(self):
+        rxn_info = ""
+        for rxn, cost in self.rxn_dict.items():
+            dg_per_atom = rxn.calculated_reaction_energy / sum([rxn.get_el_amount(elem) for elem in rxn.elements])
+            rxn_info += f"{rxn} (dG = {round(dg_per_atom,3)} eV/atom) \n"
+        rxn_info += f"\nAverage Cost: {round(self.average_cost,3)} \nTotal Cost: {round(self.total_cost,3)}"
+
+        return rxn_info
+
+    def __hash__(self):
+        return hash(frozenset(self.all_rxns))
+
+
+class CombinedPathway(BalancedPathway):
     """
     Helper class for combining multiple RxnPathway objects in series/parallel to form a "net" pathway
         from a set of initial reactants to final products.
     """
 
-    def __init__(self, paths, starters, targets):
-        self._paths = list(paths)
-        self._starters = list(starters)
-        self._targets = list(targets)
-        self.net_rxn = ComputedReaction(self._starters, self._targets)
+    def __init__(self, paths, net_rxn):
+        self._paths = paths
+        rxn_dict = {rxn: cost for path in self._paths for (rxn, cost) in zip(path.rxns, path.costs)}
 
-        self.all_rxns = {rxn: weight for path in self._paths for (rxn, weight) in zip(path.rxns, path.weights)}
-
-        reactants = set()
-        products = set()
-
-        for path in self._paths:
-            for step in path.rxns:
-                reactants.update(step.reactants)
-                products.update(step.products)
-
-        self.all_reactants = reactants
-        self.all_products = products
-        self.all_comp = list(self.all_reactants | self.all_products)
-
-        self.multiplicities = None
-        self.is_balanced = False
-
-        self._balance_pathways()
-
-        if self.is_balanced:
-            self.total_weight = sum([mult*self.all_rxns[rxn] for (rxn, mult) in self.multiplicities.items()])
-            self.average_weight = self.total_weight / len(self.all_rxns)
-
-    def _balance_pathways(self):
-        if len(self.all_rxns) == 0:
-            return
-
-        net_coeffs = [self.net_rxn.get_coeff(comp) if comp in self.net_rxn.all_comp else 0
-                      for comp in self.all_comp]
-        comp_matrix = np.array([[rxn.get_coeff(comp) if comp in rxn.all_comp else 0 for comp in self.all_comp]
-                                for rxn in self.all_rxns])
-        comp_pseudo_inverse = np.linalg.pinv(comp_matrix).transpose()
-        multiplicities = np.matmul(comp_pseudo_inverse, net_coeffs)
-
-        if (multiplicities < -self.net_rxn.TOLERANCE).any() or len(np.where(abs(multiplicities)
-                                                                            < self.net_rxn.TOLERANCE)) > 2:
-            return
-        elif np.allclose(np.matmul(comp_matrix.transpose(), multiplicities), net_coeffs):
-            self.multiplicities = {rxn: multiplicity for (rxn, multiplicity) in zip(self.all_rxns, multiplicities)}
-            self.is_balanced = True
-
-        return
+        super().__init__(rxn_dict, net_rxn)
 
     @property
     def paths(self):
@@ -303,15 +337,6 @@ class CombinedPathway(MSONable):
         path_info = ""
         for path in self._paths:
             path_info += f"{str(path)} \n\n"
-        path_info += f"Average Cost: {round(self.average_weight,3)} \nTotal Cost: {round(self.total_weight,3)}"
+        path_info += f"Average Cost: {round(self.average_cost,3)} \nTotal Cost: {round(self.total_cost,3)}"
 
         return path_info
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.all_rxns.keys() == other.all_rxns.keys()
-        else:
-            return False
-
-    def __hash__(self):
-        return hash(frozenset(self.all_rxns.keys()))

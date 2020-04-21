@@ -13,7 +13,6 @@ class PathwayAnalysis(MSONable):
         self._balanced_combined_paths = balanced_combined_paths
         self._starters = rxn_network.starters
         self._targets = rxn_network.all_targets
-
         self._intermediate_count = self.count_intermediates()
 
     def count_intermediates(self):
