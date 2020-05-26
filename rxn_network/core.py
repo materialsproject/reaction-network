@@ -19,7 +19,7 @@ from rxn_network.analysis import *
 
 __author__ = "Matthew McDermott"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "March 21, 2020"
+__date__ = "May 21, 2020"
 
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 
