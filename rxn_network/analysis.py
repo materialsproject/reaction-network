@@ -11,7 +11,7 @@ class PathwayAnalysis(MSONable):
 
     def __init__(self, rxn_network, balanced_combined_paths):
         self._balanced_combined_paths = balanced_combined_paths
-        self._starters = rxn_network.starters
+        self._precursors = rxn_network.precursors
         self._targets = rxn_network.all_targets
         self._intermediate_count = self.count_intermediates()
 
@@ -23,10 +23,10 @@ class PathwayAnalysis(MSONable):
         Returns:
         """
         intermediate_count = Counter()
-        starters_and_targets = {entry.composition.reduced_composition for entry in self._starters | self._targets}
+        precursors_and_targets = {entry.composition.reduced_composition for entry in self._precursors | self._targets}
         for combined_path in self._balanced_combined_paths:
             for comp in combined_path.all_comp:
-                if comp.reduced_composition not in starters_and_targets:
+                if comp.reduced_composition not in precursors_and_targets:
                     intermediate_count[comp] += 1
 
         self._intermediate_count = intermediate_count

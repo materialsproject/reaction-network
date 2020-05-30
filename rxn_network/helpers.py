@@ -132,7 +132,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
                 gibbs_entries.append(GibbsComputedStructureEntry(entry.structure,
                                                                  formation_enthalpy=pd.get_form_energy(entry),
                                                                  temp=temp, correction=0, gibbs_model=gibbs_model,
-                                                                 data=entry.data,entry_id=entry.entry_id))
+                                                                 data=entry.data, entry_id=entry.entry_id))
         return gibbs_entries
 
     def __repr__(self):
@@ -150,14 +150,14 @@ class RxnEntries(MSONable):
 
     def __init__(self, entries, description):
         self._entries = set(entries) if entries else None
-        self._chemical_system = "-".join(sorted({str(el) for entry in self._entries
-                                                 for el in entry.composition.elements})) if entries else None
+        self._chemsys = "-".join(sorted({str(el) for entry in self._entries
+                                         for el in entry.composition.elements})) if entries else None
 
         if description in ["r", "R", "reactants", "Reactants"]:
             self._description = "R"
         elif description in ["p", "P", "products", "Products"]:
             self._description = "P"
-        elif description in ["s", "S", "starters", "Starters"]:
+        elif description in ["s", "S", "precursors", "Precursors", "starters", "Starters"]:
             self._description = "S"
         elif description in ["t", "T", "target", "Target"]:
             self._description = "T"
@@ -175,8 +175,8 @@ class RxnEntries(MSONable):
         return self._description
 
     @property
-    def chemical_system(self):
-        return self._chemical_system
+    def chemsys(self):
+        return self._chemsys
 
     def __repr__(self):
         if self._description == "D":
