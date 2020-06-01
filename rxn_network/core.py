@@ -1,5 +1,6 @@
 import logging
 from itertools import combinations, chain, groupby
+from tqdm import tqdm
 
 import numpy as np
 from scipy.constants import physical_constants
@@ -27,7 +28,7 @@ class ReactionNetwork:
         all possible chemical reactions (edges) between phase combinations (vertices) in a
         chemical system. Reaction pathway hypotheses are generated using pathfinding methods.
     """
-    def __init__(self, entries, max_num_phases=2, include_metastable=False,
+    def __init__(self, entries, max_num_phases=2, include_metastable=False, extend_entries=None,
                  include_polymorphs=False, include_info_entropy=False):
         """
         Initializes ReactionNetwork object with necessary preprocessing steps. This does not yet compute the graph.
@@ -36,9 +37,11 @@ class ReactionNetwork:
             entries ([ComputedStructureEntry]): list of ComputedStructureEntry-like objects to consider in network.
                 These can be acquired from Materials Project (using MPRester) or created manually in pymatgen.
             max_num_phases (int): maximum number of phases allowed on each side of the reaction (default 2).
-                Note that n > 2 leads to combinatorial explosion.
+                Note that n > 2 leads to significant (and often prohibitive) combinatorial explosion.
             include_metastable (float or bool): either a) the specified cutoff for energy above hull, or b) False if
                 considering only stable entries
+            extend entries([ComputedStructureEntry]): list of ComputedStructureEntry-like objects which will be included
+                in the network even after filtering for thermodynamic stability.
             include_polymorphs (bool): Whether or not to consider non-ground state polymorphs. User should
                 keep False until more cost function metrics are included.
             include_info_entropy (bool): (BETA) -- Whether or not to consider Shannon information entropy as a
@@ -55,6 +58,8 @@ class ReactionNetwork:
         self._e_above_hull = include_metastable
         self._include_polymorphs = include_polymorphs
         self._filtered_entries = self._filter_entries(self._pd, include_metastable, include_polymorphs)
+        if extend_entries:
+            self._filtered_entries.extend(extend_entries)
         self._all_entry_combos = [set(combo) for combo in self._generate_all_combos(self._filtered_entries,
                                                                                     self._max_num_phases)]
 
@@ -67,9 +72,10 @@ class ReactionNetwork:
         self._cost_function = None
         self._complex_loopback = None
         self._temp = None
+        self._entries_dict = None
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
-        self._g = None  # Graph object
+        self._g = None  # Graph object in graph-tool
 
         if include_info_entropy:  # This is in BETA -- use with caution (no evidence this is realistic!)
             for entry in self._filtered_entries:
@@ -84,7 +90,7 @@ class ReactionNetwork:
                              temp=300, complex_loopback=True):
         """
         Generates and stores the reaction network (weighted, directed graph) using graph-tool. In practice,
-        the main iterative loop will start taking a considerable amount of time when using >40 phases. As
+        the main iterative loop will start taking a considerable amount of time when using >40-50 phases. As
         of now, temperature must be provided in the range [300 K, 2000 K] in steps of 100 K.
 
         Args:
@@ -172,10 +178,10 @@ class ReactionNetwork:
         g.vp["chemsys"][target_v] = target_entries.chemsys
         self._target_v = target_v
 
-        self.logger.info("Generating reactions...")
+        self.logger.info("Generating reactions by chemical system...")
 
         edge_list = []
-        for chemsys, vertices in entries_dict.items():
+        for chemsys, vertices in tqdm(entries_dict.items()):
             for entry, v in vertices["R"].items():
                 phases = entry.entries
 
@@ -201,7 +207,7 @@ class ReactionNetwork:
                     other_phases = other_entry.entries
 
                     if other_phases == phases:
-                        continue  # do not consider identity-like reactions (A + B -> A + B)
+                        continue  # do not consider identity-like reactions (e.g. A + B -> A + B)
 
                     try:
                         rxn = ComputedReaction(list(other_phases), list(phases))
@@ -209,7 +215,7 @@ class ReactionNetwork:
                         continue
 
                     if rxn._lowest_num_errors != 0:
-                        continue  # remove reaction which has components that either change sides or disappear
+                        continue  # remove reaction which has components that change sides or disappear
 
                     total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
                     dg_per_atom = rxn.calculated_reaction_energy / total_num_atoms
@@ -221,6 +227,7 @@ class ReactionNetwork:
 
         g.add_edge_list(edge_list, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"], g.ep["path"]])
 
+        self._entries_dict = entries_dict
         self.logger.info(f"Created graph with {g.num_vertices()} nodes and {g.num_edges()} edges.")
         self._g = g
 
@@ -450,15 +457,9 @@ class ReactionNetwork:
         Returns:
             None
         """
-        for (u, v, rxn) in self._g.edges.data(data='rxn'):
-            if rxn:
-                total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
-                dg_per_atom = rxn.calculated_reaction_energy / total_num_atoms
+        return None
 
-                weight = self._get_rxn_cost(dg_per_atom, cost_function, temp)
-                self._g[u][v]["weight"] = weight
-
-    def _get_rxn_cost(self, energy, cost_function, temp=300, d_info_entropy=0, d_density=0):
+    def _get_rxn_cost(self, energy, cost_function, temp=300):
         """
         Helper method which determines reaction cost/weight.
 
@@ -472,7 +473,7 @@ class ReactionNetwork:
         """
 
         if cost_function == "softplus":
-            weight = self._softplus(energy, temp, d_info_entropy, d_density)
+            weight = self._softplus([energy], [1], t=temp)
         elif cost_function == "bipartite":
             weight = energy
             if weight < self._most_negative_rxn:
@@ -599,19 +600,36 @@ class ReactionNetwork:
         Returns:
             list: all combination sets
         """
-
         return chain.from_iterable([combinations(entries, num_combos) for num_combos in range(1, max_num_combos + 1)])
 
     @staticmethod
-    def _arrhenius(energy, t):
-        ''' Simple Arrenhius relation involving energy and temperature '''
-        kb = physical_constants["Boltzmann constant in eV/K"][0]
-        return np.exp(energy / (kb * t))
+    def _softplus(params, weights, t=273):
+        """
+        Args:
+            params: list of cost function parameters (e.g. energy)
+            weights: list of weights corresponds to parameters of the cost function
+            t: temperature (K)
+
+        Returns:
+            float: cost (in a.u.)
+        """
+        weighted_params = np.dot(np.array(params), np.array(weights))
+        return np.log(1 + (273 / t) * np.exp(weighted_params))
 
     @staticmethod
-    def _softplus(energy, t=1.0, d_info_entropy=0, d_density=0):
-        weighted_params = energy - 0.25*d_info_entropy - 0.0*d_density
-        return np.log(1 + (273 / t) * np.exp(weighted_params))
+    def _arrhenius(energy, t):
+        """
+        Simple Arrenhius relation involving energy and temperature
+
+        Args:
+            energy:
+            t:
+
+        Returns: cost
+
+        """
+        kb = physical_constants["Boltzmann constant in eV/K"][0]
+        return np.exp(energy / (kb * t))
 
     @property
     def g(self):

@@ -145,10 +145,16 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 class RxnEntries(MSONable):
     """
     Helper class for describing combinations of ComputedEntry-like objects in context of a reaction network.
-        Necessary for implementation in NetworkX.
+        Necessary for implementation in NetworkX (and useful for other network packages!)
     """
 
     def __init__(self, entries, description):
+        """
+        Args:
+            entries: [ComputedEntry] list of ComputedEntry-like objects
+            description: Node type, selected from "R" (reactants), "P" (products), "S" (starters/precursors),
+                "T" (target), or "D" (dummy)
+        """
         self._entries = set(entries) if entries else None
         self._chemsys = "-".join(sorted({str(el) for entry in self._entries
                                          for el in entry.composition.elements})) if entries else None
