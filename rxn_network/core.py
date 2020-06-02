@@ -520,9 +520,15 @@ class ReactionNetwork:
         b = queue.PriorityQueue()  # automatically sorts by path cost (priority)
 
         for k in range(1, num_k):
-            for i in range(len(a[k - 1]) - 1):
-                spur_v = a[k - 1][i]
-                root_path = a[k - 1][:i]
+            try:
+                prev_path = a[k - 1]
+            except IndexError:
+                print(f"Identified only k={k} paths before exiting. \n")
+                break
+
+            for i in range(len(prev_path) - 1):
+                spur_v = prev_path[i]
+                root_path = prev_path[:i]
 
                 filtered_edges = []
 
