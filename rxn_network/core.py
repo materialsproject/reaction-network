@@ -632,7 +632,6 @@ class ReactionNetwork:
             t:
 
         Returns: cost
-
         """
         kb = physical_constants["Boltzmann constant in eV/K"][0]
         return np.exp(energy / (kb * t))
@@ -657,4 +656,5 @@ class ReactionNetwork:
         return self._all_targets
 
     def __repr__(self):
-        return str(self._g)
+        return f"ReactionNetwork object, of {'-'.join(sorted([str(e) for e in self._pd.elements]))}, " \
+               f"with {str(self._g)}"
