@@ -11,7 +11,10 @@ import queue
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction, ReactionError
+
 from matminer.featurizers.structure import StructuralComplexity
+from matminer.featurizers.site import CrystalNNFingerprint
+from matminer.featurizers.structure import SiteStatsFingerprint
 
 from rxn_network.helpers import *
 from rxn_network.analysis import *
@@ -29,7 +32,7 @@ class ReactionNetwork:
         chemical system. Reaction pathway hypotheses are generated using pathfinding methods.
     """
     def __init__(self, entries, max_num_phases=2, include_metastable=False, extend_entries=None,
-                 include_polymorphs=False, include_info_entropy=False):
+                 include_struct_similarity=True, include_polymorphs=False, include_info_entropy=False):
         """
         Initializes ReactionNetwork object with necessary preprocessing steps. This does not yet compute the graph.
 
@@ -40,8 +43,10 @@ class ReactionNetwork:
                 Note that n > 2 leads to significant (and often prohibitive) combinatorial explosion.
             include_metastable (float or bool): either a) the specified cutoff for energy above hull, or b) False if
                 considering only stable entries
-            extend entries([ComputedStructureEntry]): list of ComputedStructureEntry-like objects which will be included
-                in the network even after filtering for thermodynamic stability.
+            extend entries([ComputedStructureEntry]): list of ComputedStructureEntry-like objects which will
+                be included in the network even after filtering for thermodynamic stability.
+            include_struct_similarity (bool): Whether or not to include structural similarity metrics in the
+                cost function
             include_polymorphs (bool): Whether or not to consider non-ground state polymorphs. User should
                 keep False until more cost function metrics are included.
             include_info_entropy (bool): (BETA) -- Whether or not to consider Shannon information entropy as a
@@ -60,6 +65,14 @@ class ReactionNetwork:
         self._filtered_entries = self._filter_entries(self._pd, include_metastable, include_polymorphs)
         if extend_entries:
             self._filtered_entries.extend(extend_entries)
+        if include_struct_similarity:
+            self.fingerprints = dict()
+            ssf = SiteStatsFingerprint(
+                CrystalNNFingerprint.from_preset('ops', distance_cutoffs=None, x_diff_weight=0),
+                stats=('mean', 'std_dev', 'minimum', 'maximum'))
+            for entry in self._filtered_entries:
+                self.fingerprints[entry] = np.array(ssf.featurize(entry.structure))
+
         self._all_entry_combos = [set(combo) for combo in self._generate_all_combos(self._filtered_entries,
                                                                                     self._max_num_phases)]
 
@@ -217,12 +230,8 @@ class ReactionNetwork:
                     if rxn._lowest_num_errors != 0:
                         continue  # remove reaction which has components that change sides or disappear
 
-                    total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
-                    dg_per_atom = rxn.calculated_reaction_energy / total_num_atoms
-                    weight = self._get_rxn_cost(dg_per_atom, cost_function, temp)
-
+                    weight = self._get_rxn_cost(rxn, cost_function, temp, self.fingerprints)
                     other_v = g.vertex(other_v)
-
                     edge_list.append([other_v, v, weight, rxn, True, False])
 
         g.add_edge_list(edge_list, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"], g.ep["path"]])
@@ -263,7 +272,8 @@ class ReactionNetwork:
             paths.append(rxn_pathway)
 
         if verbose:
-            print(paths)
+            for path in paths:
+                print(path,"\n")
 
         return paths
 
@@ -317,8 +327,8 @@ class ReactionNetwork:
                             continue
                         if rxn._lowest_num_errors > 0:
                             continue
-                        path = RxnPathway([rxn],
-                                          [self._get_rxn_cost(rxn.calculated_reaction_energy, self._cost_function)])
+                        path = RxnPathway([rxn], [self._get_rxn_cost(
+                            rxn, self._cost_function, self._temp, self.fingerprints)])
                         all_remnant_rxns.add(path)
                 return all_remnant_rxns
 
@@ -459,12 +469,12 @@ class ReactionNetwork:
         """
         return None
 
-    def _get_rxn_cost(self, energy, cost_function, temp=300):
+    def _get_rxn_cost(self, rxn, cost_function="softplus", temp=300, struct_fingerprints=None):
         """
         Helper method which determines reaction cost/weight.
 
         Args:
-            energy (float): calculated free energy of reaction
+            (CalculatedReaction): calculated free energy of reaction
             cost_function (str): name of cost function (e.g. "softplus")
             temp (int): temperature parameter for scaling cost function [Kelvin]
 
@@ -472,8 +482,22 @@ class ReactionNetwork:
             float: cost/weight of individual reaction edge
         """
 
+        total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
+        energy = rxn.calculated_reaction_energy / total_num_atoms
+
         if cost_function == "softplus":
-            weight = self._softplus([energy], [1], t=temp)
+            if struct_fingerprints:
+                # coeffs = np.array([rxn.get_coeff(entry.composition.reduced_composition)
+                #                    for entry in rxn.all_entries])
+                # similarity = np.linalg.norm(coeffs/np.abs(coeffs) @ [struct_fingerprints[e]
+                #                                                      for e in rxn.all_entries])
+
+                similarity = np.linalg.norm(-np.mean([struct_fingerprints[e] for e in rxn._reactant_entries])
+                                            + np.mean([struct_fingerprints[e] for e in rxn._product_entries]))
+                weight = self._softplus([energy, similarity], [0.5, 0.5], t=temp)
+            else:
+                weight = self._softplus([energy], [1], t=temp)
+
         elif cost_function == "bipartite":
             weight = energy
             if weight < self._most_negative_rxn:
