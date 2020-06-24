@@ -32,7 +32,7 @@ class ReactionNetwork:
         chemical system. Reaction pathway hypotheses are generated using pathfinding methods.
     """
     def __init__(self, entries, max_num_phases=2, include_metastable=False, extend_entries=None,
-                 include_struct_similarity=True, include_polymorphs=False, include_info_entropy=False):
+                 include_struct_similarity=False, include_polymorphs=False, include_info_entropy=False):
         """
         Initializes ReactionNetwork object with necessary preprocessing steps. This does not yet compute the graph.
 
@@ -47,8 +47,7 @@ class ReactionNetwork:
                 be included in the network even after filtering for thermodynamic stability.
             include_struct_similarity (bool): Whether or not to include structural similarity metrics in the
                 cost function
-            include_polymorphs (bool): Whether or not to consider non-ground state polymorphs. User should
-                keep False until more cost function metrics are included.
+            include_polymorphs (bool): Whether or not to consider non-ground state polymorphs.
             include_info_entropy (bool): (BETA) -- Whether or not to consider Shannon information entropy as a
                 cost metric.
         """
@@ -58,11 +57,11 @@ class ReactionNetwork:
 
         # Chemical system / phase diagram variables
         self._all_entries = entries
-        self._pd = PhaseDiagram(entries)
         self._max_num_phases = max_num_phases
         self._e_above_hull = include_metastable
         self._include_polymorphs = include_polymorphs
-        self._filtered_entries = self._filter_entries(self._pd, include_metastable, include_polymorphs)
+        self._elements, self._pd, self._filtered_entries = self._filter_entries(self._all_entries,
+                                                                                include_metastable, include_polymorphs)
         if extend_entries:
             self._filtered_entries.extend(extend_entries)
         if include_struct_similarity:
@@ -588,7 +587,7 @@ class ReactionNetwork:
         return a
 
     @staticmethod
-    def _filter_entries(pd, e_above_hull, include_polymorphs):
+    def _filter_entries(all_entries, e_above_hull, include_polymorphs):
         """
         Helper method for filtering entries by specified energy above hull
 
@@ -599,23 +598,53 @@ class ReactionNetwork:
         Returns:
             list: all entries less than or equal to specified energy above hull
         """
+        elements = {elem for e in all_entries for elem in e.composition.elements}
+
+        if len(elements) >= 9:  # this is roughly the max size where the PD algorithm starts to struggle
+            pd = None  # can't generate normal PhaseDiagram object, need to split into multiple ones
+            pd_dict = dict()
+            for e in sorted(all_entries, key=lambda e: len(e.composition.elements), reverse=True):
+                for chemsys in pd_dict.keys():
+                    if set(e.composition.chemical_system.split("-")).issubset(chemsys.split("-")):
+                        break
+                else:
+                    pd_dict[e.composition.chemical_system] = PhaseDiagram(
+                        list(filter(lambda x: set(x.composition.elements).issubset(
+                            e.composition.elements), all_entries)))
+        else:
+            pd = PhaseDiagram(all_entries)
+
+        if not pd:
+            energies_above_hull = dict()
+            for entry in all_entries:
+                for chemsys, phase_diag in pd_dict.items():
+                    if set(entry.composition.chemical_system.split("-")).issubset(chemsys.split("-")):
+                        energies_above_hull[entry] = phase_diag.get_e_above_hull(entry)
+                        break
 
         if e_above_hull == 0:
-            filtered_entries = list(pd.stable_entries)
+            if pd:
+                filtered_entries = list(pd.stable_entries)
+            else:
+                filtered_entries = [e[0] for e in energies_above_hull.items() if e[1] == 0]
         else:
-            filtered_entries = [entry for entry in pd.all_entries if
-                                pd.get_e_above_hull(entry) <= e_above_hull]
+            if pd:
+                filtered_entries = [entry for entry in pd.all_entries if
+                                    pd.get_e_above_hull(entry) <= e_above_hull]
+            else:
+                filtered_entries = [e[0] for e in energies_above_hull.items() if e[1] <= e_above_hull]
+
             if not include_polymorphs:
                 filtered_entries_no_polymorphs = []
                 all_comp = {entry.composition.reduced_composition for entry in filtered_entries}
                 for comp in all_comp:
                     polymorphs = [entry for entry in filtered_entries if entry.composition.reduced_composition == comp]
-                    min_entry = min(polymorphs, key=lambda entry: entry.energy_per_atom)
+                    min_entry = min(polymorphs, key=lambda x: x.energy_per_atom)
                     filtered_entries_no_polymorphs.append(min_entry)
 
-                return filtered_entries_no_polymorphs
+                filtered_entries = filtered_entries_no_polymorphs
 
-        return filtered_entries
+        return elements, pd, filtered_entries
 
     @staticmethod
     def _generate_all_combos(entries, max_num_combos):
