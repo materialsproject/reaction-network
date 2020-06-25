@@ -10,6 +10,7 @@ import numpy as np
 import json
 
 from pymatgen import Composition
+from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.analysis.reaction_calculator import ComputedReaction
 from pymatgen.entries.computed_entries import ComputedStructureEntry
 
@@ -124,16 +125,30 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
         return (-2.48e-4*np.log(vol_per_atom) - 8.94e-5*reduced_mass/vol_per_atom)*temp + 0.181*np.log(temp) - 0.882
 
-    @staticmethod
-    def from_pd(pd, temp=300, gibbs_model="SISSO"):
+    @classmethod
+    def from_pd(cls, pd, temp=300, gibbs_model="SISSO"):
         gibbs_entries = []
         for entry in pd.all_entries:
             if entry in pd.el_refs.values() or not entry.structure.composition.is_element:
-                gibbs_entries.append(GibbsComputedStructureEntry(entry.structure,
-                                                                 formation_enthalpy=pd.get_form_energy(entry),
-                                                                 temp=temp, correction=0, gibbs_model=gibbs_model,
-                                                                 data=entry.data, entry_id=entry.entry_id))
+                gibbs_entries.append(cls(entry.structure, formation_enthalpy=pd.get_form_energy(entry),
+                                         temp=temp, correction=0, gibbs_model=gibbs_model,
+                                         data=entry.data, entry_id=entry.entry_id))
         return gibbs_entries
+
+    @classmethod
+    def from_entries(cls, entries, temp=300, gibbs_model="SISSO"):
+        pd_dict = expand_pd(entries)
+        gibbs_entries = set()
+        for entry in entries:
+            for chemsys, phase_diag in pd_dict.items():
+                if set(entry.composition.chemical_system.split("-")).issubset(chemsys.split("-")):
+                    if entry in phase_diag.el_refs.values() or not entry.structure.composition.is_element:
+                        gibbs_entries.add(cls(entry.structure, formation_enthalpy=phase_diag.get_form_energy(entry),
+                                              temp=temp, correction=0, gibbs_model=gibbs_model,
+                                              data=entry.data, entry_id=entry.entry_id))
+                    break
+
+        return list(gibbs_entries)
 
     def __repr__(self):
         output = ["GibbsComputedStructureEntry {} - {}".format(
@@ -346,3 +361,18 @@ class CombinedPathway(BalancedPathway):
         path_info += f"Average Cost: {round(self.average_cost,3)} \nTotal Cost: {round(self.total_cost,3)}"
 
         return path_info
+
+def expand_pd(entries):
+
+    pd_dict = dict()
+
+    for e in sorted(entries, key=lambda x: len(x.composition.elements), reverse=True):
+        for chemsys in pd_dict.keys():
+            if set(e.composition.chemical_system.split("-")).issubset(chemsys.split("-")):
+                break
+        else:
+            pd_dict[e.composition.chemical_system] = PhaseDiagram(
+                list(filter(lambda x: set(x.composition.elements).issubset(
+                    e.composition.elements), entries)))
+
+    return pd_dict

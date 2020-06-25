@@ -31,7 +31,7 @@ class ReactionNetwork:
         all possible chemical reactions (edges) between phase combinations (vertices) in a
         chemical system. Reaction pathway hypotheses are generated using pathfinding methods.
     """
-    def __init__(self, entries, max_num_phases=2, include_metastable=False, extend_entries=None,
+    def __init__(self, entries, max_num_phases=2, temp=300, extend_entries=None, include_metastable=False,
                  include_struct_similarity=False, include_polymorphs=False, include_info_entropy=False):
         """
         Initializes ReactionNetwork object with necessary preprocessing steps. This does not yet compute the graph.
@@ -41,10 +41,11 @@ class ReactionNetwork:
                 These can be acquired from Materials Project (using MPRester) or created manually in pymatgen.
             max_num_phases (int): maximum number of phases allowed on each side of the reaction (default 2).
                 Note that n > 2 leads to significant (and often prohibitive) combinatorial explosion.
-            include_metastable (float or bool): either a) the specified cutoff for energy above hull, or b) False if
-                considering only stable entries
             extend entries([ComputedStructureEntry]): list of ComputedStructureEntry-like objects which will
                 be included in the network even after filtering for thermodynamic stability.
+            include_metastable (float or bool): either a) the specified cutoff for energy per atom (eV/atom)
+                above hull, or b) True/False if considering only stable vs. all entries.
+                An energy cutoff of 0.1 eV/atom is a reasonable starting threshold for thermodynamic stability.
             include_struct_similarity (bool): Whether or not to include structural similarity metrics in the
                 cost function
             include_polymorphs (bool): Whether or not to consider non-ground state polymorphs.
@@ -60,12 +61,17 @@ class ReactionNetwork:
         self._max_num_phases = max_num_phases
         self._e_above_hull = include_metastable
         self._include_polymorphs = include_polymorphs
-        self._elements, self._pd, self._filtered_entries = self._filter_entries(self._all_entries,
-                                                                                include_metastable, include_polymorphs)
+        self._temp = temp
+        self._elements = {elem for entry in self.all_entries for elem in entry.composition.elements}
+        self._gibbs_entries = GibbsComputedStructureEntry.from_entries(self._all_entries, self._temp)
+        self._pd_dict, self._filtered_entries = self._filter_entries(self._gibbs_entries,
+                                                                     include_metastable, include_polymorphs)
+        self.fingerprints = dict()
+
         if extend_entries:
             self._filtered_entries.extend(extend_entries)
+
         if include_struct_similarity:
-            self.fingerprints = dict()
             ssf = SiteStatsFingerprint(
                 CrystalNNFingerprint.from_preset('ops', distance_cutoffs=None, x_diff_weight=0),
                 stats=('mean', 'std_dev', 'minimum', 'maximum'))
@@ -83,7 +89,6 @@ class ReactionNetwork:
         self._current_target = None
         self._cost_function = None
         self._complex_loopback = None
-        self._temp = None
         self._entries_dict = None
         self._most_negative_rxn = float("inf")  # used for shifting reaction energies in some cost functions
 
@@ -98,8 +103,7 @@ class ReactionNetwork:
         self.logger.info(
             f"Initializing network with {len(self._filtered_entries)} entries: \n{filtered_entries_str}")
 
-    def generate_rxn_network(self, precursors=None, targets=None, cost_function="softplus",
-                             temp=300, complex_loopback=True):
+    def generate_rxn_network(self, precursors=None, targets=None, cost_function="softplus", complex_loopback=True):
         """
         Generates and stores the reaction network (weighted, directed graph) using graph-tool. In practice,
         the main iterative loop will start taking a considerable amount of time when using >40-50 phases. As
@@ -121,7 +125,6 @@ class ReactionNetwork:
         self._current_target = {targets[0]} if targets else None  # take first entry to be first designated target
         self._cost_function = cost_function
         self._complex_loopback = complex_loopback
-        self._temp = temp
 
         if not self._precursors:
             precursors_entries = RxnEntries(None, "d")  # use dummy precursors node
@@ -190,7 +193,7 @@ class ReactionNetwork:
         g.vp["chemsys"][target_v] = target_entries.chemsys
         self._target_v = target_v
 
-        self.logger.info("Generating reactions by chemical system...")
+        self.logger.info("Generating reactions by chemical subsystem...")
 
         edge_list = []
         for chemsys, vertices in tqdm(entries_dict.items()):
@@ -229,7 +232,7 @@ class ReactionNetwork:
                     if rxn._lowest_num_errors != 0:
                         continue  # remove reaction which has components that change sides or disappear
 
-                    weight = self._get_rxn_cost(rxn, cost_function, temp, self.fingerprints)
+                    weight = self._get_rxn_cost(rxn, cost_function, self._temp, self.fingerprints)
                     other_v = g.vertex(other_v)
                     edge_list.append([other_v, v, weight, rxn, True, False])
 
@@ -486,11 +489,6 @@ class ReactionNetwork:
 
         if cost_function == "softplus":
             if struct_fingerprints:
-                # coeffs = np.array([rxn.get_coeff(entry.composition.reduced_composition)
-                #                    for entry in rxn.all_entries])
-                # similarity = np.linalg.norm(coeffs/np.abs(coeffs) @ [struct_fingerprints[e]
-                #                                                      for e in rxn.all_entries])
-
                 similarity = np.linalg.norm(-np.mean([struct_fingerprints[e] for e in rxn._reactant_entries])
                                             + np.mean([struct_fingerprints[e] for e in rxn._product_entries]))
                 weight = self._softplus([energy, similarity], [0.5, 0.5], t=temp)
@@ -598,41 +596,19 @@ class ReactionNetwork:
         Returns:
             list: all entries less than or equal to specified energy above hull
         """
-        elements = {elem for e in all_entries for elem in e.composition.elements}
+        pd_dict = expand_pd(all_entries)
+        energies_above_hull = dict()
 
-        if len(elements) >= 9:  # this is roughly the max size where the PD algorithm starts to struggle
-            pd = None  # can't generate normal PhaseDiagram object, need to split into multiple ones
-            pd_dict = dict()
-            for e in sorted(all_entries, key=lambda e: len(e.composition.elements), reverse=True):
-                for chemsys in pd_dict.keys():
-                    if set(e.composition.chemical_system.split("-")).issubset(chemsys.split("-")):
-                        break
-                else:
-                    pd_dict[e.composition.chemical_system] = PhaseDiagram(
-                        list(filter(lambda x: set(x.composition.elements).issubset(
-                            e.composition.elements), all_entries)))
-        else:
-            pd = PhaseDiagram(all_entries)
-
-        if not pd:
-            energies_above_hull = dict()
-            for entry in all_entries:
-                for chemsys, phase_diag in pd_dict.items():
-                    if set(entry.composition.chemical_system.split("-")).issubset(chemsys.split("-")):
-                        energies_above_hull[entry] = phase_diag.get_e_above_hull(entry)
-                        break
+        for entry in all_entries:
+            for chemsys, phase_diag in pd_dict.items():
+                if set(entry.composition.chemical_system.split("-")).issubset(chemsys.split("-")):
+                    energies_above_hull[entry] = phase_diag.get_e_above_hull(entry)
+                    break
 
         if e_above_hull == 0:
-            if pd:
-                filtered_entries = list(pd.stable_entries)
-            else:
-                filtered_entries = [e[0] for e in energies_above_hull.items() if e[1] == 0]
+            filtered_entries = [e[0] for e in energies_above_hull.items() if e[1] == 0]
         else:
-            if pd:
-                filtered_entries = [entry for entry in pd.all_entries if
-                                    pd.get_e_above_hull(entry) <= e_above_hull]
-            else:
-                filtered_entries = [e[0] for e in energies_above_hull.items() if e[1] <= e_above_hull]
+            filtered_entries = [e[0] for e in energies_above_hull.items() if e[1] <= e_above_hull]
 
             if not include_polymorphs:
                 filtered_entries_no_polymorphs = []
@@ -644,7 +620,7 @@ class ReactionNetwork:
 
                 filtered_entries = filtered_entries_no_polymorphs
 
-        return elements, pd, filtered_entries
+        return pd_dict, filtered_entries
 
     @staticmethod
     def _generate_all_combos(entries, max_num_combos):
