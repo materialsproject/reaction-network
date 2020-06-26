@@ -1,5 +1,5 @@
 import logging
-from itertools import combinations, chain, groupby
+from itertools import combinations, chain, groupby, compress
 from tqdm import tqdm
 
 import numpy as np
@@ -7,6 +7,8 @@ from scipy.constants import physical_constants
 
 import graph_tool.all as gt
 import queue
+from numba import njit, prange
+from numba.typed import List
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
@@ -308,6 +310,7 @@ class ReactionNetwork:
             targets = set(targets)
 
         net_rxn = ComputedReaction(list(self._precursors), list(targets))
+        net_rxn_all_comp = set(net_rxn.all_comp)
         print(f"NET RXN: {net_rxn} \n")
 
         for target in targets:
@@ -350,20 +353,32 @@ class ReactionNetwork:
                     remnant_rxns = {rxn: cost for path in remnant_rxns for (rxn, cost) in zip(path.rxns, path.costs)}
                 paths_to_all_targets.update(remnant_rxns)
 
-        balanced_total_paths = set()
         if rxns_only:
             paths_to_try = list(paths_to_all_targets.keys())
         else:
             paths_to_try = paths_to_all_targets
 
-        for combo in self._generate_all_combos(paths_to_try, max_num_combos):
+        trial_combos = list(self._generate_all_combos(paths_to_try, max_num_combos))
+        unbalanced_paths = []
+
+        for i, combo in enumerate(trial_combos):
             if rxns_only:
-                combined_pathway = BalancedPathway({p: paths_to_all_targets[p] for p in combo}, net_rxn)
+                if net_rxn_all_comp.issubset([comp for rxn in combo for comp in rxn.all_comp]):
+                    unbalanced_paths.append(BalancedPathway({p: paths_to_all_targets[p] for p in combo},
+                                                          net_rxn, balance=False))
             else:
                 combined_pathway = CombinedPathway(combo, net_rxn)
 
-            if combined_pathway.is_balanced:
-                balanced_total_paths.add(combined_pathway)
+        comp_matrices = List([p.comp_matrix for p in unbalanced_paths])
+        net_coeffs = List([p.net_coeffs for p in unbalanced_paths])
+        is_balanced, multiplicities = self._balance_all_paths(comp_matrices, net_coeffs)
+
+        balanced_total_paths = list(compress(unbalanced_paths, is_balanced))
+        balanced_multiplicities = list(compress(multiplicities, is_balanced))
+
+        for p, m in zip(balanced_total_paths, balanced_multiplicities):
+            p.set_multiplicities(m)
+            p.calculate_costs()
 
         analysis = PathwayAnalysis(self, balanced_total_paths)
         return sorted(list(balanced_total_paths), key=lambda x: x.total_cost), analysis
@@ -621,6 +636,26 @@ class ReactionNetwork:
                 filtered_entries = filtered_entries_no_polymorphs
 
         return pd_dict, filtered_entries
+
+    @staticmethod
+    @njit(parallel=True)
+    def _balance_all_paths(comp_matrices, net_coeffs, tol=1e-6):
+        n = len(comp_matrices)
+        comp_pseudo_inverse = List([0.0*s for s in comp_matrices])
+        multiplicities = List([0.0*c for c in net_coeffs])
+        is_balanced = List([False]*n)
+
+        for i in prange(n):
+            comp_pseudo_inverse[i] = np.linalg.pinv(comp_matrices[i]).T
+            multiplicities[i] = comp_pseudo_inverse[i] @ net_coeffs[i]
+            solved_coeffs = comp_matrices[i].T @ multiplicities[i]
+
+            if (multiplicities[i] < tol).any():
+                is_balanced[i] = False
+            elif (np.abs(solved_coeffs - net_coeffs[i]) <= (1e-08 + 1e-05 * np.abs(net_coeffs[i]))).all():
+                is_balanced[i] = True
+
+        return is_balanced, multiplicities
 
     @staticmethod
     def _generate_all_combos(entries, max_num_combos):

@@ -271,29 +271,38 @@ class BalancedPathway(MSONable):
     """
     Helper class for combining multiple reactions which stoichiometrically balance to form a net reaction.
     """
-    def __init__(self, rxn_dict, net_rxn, multiplicities=None, is_balanced=False):
+    def __init__(self, rxn_dict, net_rxn, balance=True):
         self.rxn_dict = rxn_dict
         self.all_rxns = list(self.rxn_dict.keys())
         self.net_rxn = net_rxn
         self.all_reactants = set()
         self.all_products = set()
-        self.is_balanced = is_balanced
+        self.is_balanced = False
+        self.multiplicities = None
+        self.total_cost = None
+        self.average_cost = None
 
         for rxn in self.rxn_dict.keys():
             self.all_reactants.update(rxn.reactants)
             self.all_products.update(rxn.products)
 
         self.all_comp = list(self.all_reactants | self.all_products | set(self.net_rxn.all_comp))
+        self.net_coeffs = self._get_net_coeffs(net_rxn, self.all_comp)
+        self.comp_matrix = self._get_comp_matrix(self.all_comp, self.all_rxns)
 
-        if not multiplicities:
-            net_coeffs = self._get_net_coeffs(net_rxn, self.all_comp)
-            comp_matrix = self._get_comp_matrix(self.all_comp, self.all_rxns)
-            self.is_balanced, multiplicities = self._balance_rxns(comp_matrix, net_coeffs)
-            self.multiplicities = {rxn: multiplicity for (rxn, multiplicity) in zip(self.all_rxns, multiplicities)}
+        if balance:
+            self.is_balanced, multiplicities = self._balance_rxns(self.comp_matrix, self.net_coeffs)
+            self.set_multiplicities(multiplicities)
 
         if self.is_balanced:
-            self.total_cost = sum([mult*self.rxn_dict[rxn] for (rxn, mult) in self.multiplicities.items()])
-            self.average_cost = self.total_cost / len(self.rxn_dict)
+            self.calculate_costs()
+
+    def set_multiplicities(self, multiplicities):
+        self.multiplicities = {rxn: multiplicity for (rxn, multiplicity) in zip(self.all_rxns, multiplicities)}
+
+    def calculate_costs(self):
+        self.total_cost = sum([mult * self.rxn_dict[rxn] for (rxn, mult) in self.multiplicities.items()])
+        self.average_cost = self.total_cost / len(self.rxn_dict)
 
     @staticmethod
     def _balance_rxns(comp_matrix, net_coeffs, tol=1e-6):
