@@ -4,17 +4,15 @@ from tqdm import tqdm
 
 import numpy as np
 from scipy.constants import physical_constants
-
-import graph_tool.all as gt
-import queue
 from numba import njit, prange
 from numba.typed import List
 
-from pymatgen.analysis.phase_diagram import PhaseDiagram
+import graph_tool.all as gt
+import queue
+
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction, ReactionError
 
-from matminer.featurizers.structure import StructuralComplexity
 from matminer.featurizers.site import CrystalNNFingerprint
 from matminer.featurizers.structure import SiteStatsFingerprint
 
@@ -24,7 +22,7 @@ from rxn_network.analysis import *
 
 __author__ = "Matthew McDermott"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "May 21, 2020"
+__date__ = "June 26, 2020"
 
 
 class ReactionNetwork:
@@ -33,26 +31,26 @@ class ReactionNetwork:
         all possible chemical reactions (edges) between phase combinations (vertices) in a
         chemical system. Reaction pathway hypotheses are generated using pathfinding methods.
     """
-    def __init__(self, entries, max_num_phases=2, temp=300, extend_entries=None, include_metastable=False,
-                 include_struct_similarity=False, include_polymorphs=False, include_info_entropy=False):
+    def __init__(self, entries, n=2, temp=300, extend_entries=None, include_metastable=False,
+                 include_struct_similarity=False, include_polymorphs=False):
         """
         Initializes ReactionNetwork object with necessary preprocessing steps. This does not yet compute the graph.
 
         Args:
             entries ([ComputedStructureEntry]): list of ComputedStructureEntry-like objects to consider in network.
                 These can be acquired from Materials Project (using MPRester) or created manually in pymatgen.
-            max_num_phases (int): maximum number of phases allowed on each side of the reaction (default 2).
+            n (int): maximum number of phases allowed on each side of the reaction (default 2).
                 Note that n > 2 leads to significant (and often prohibitive) combinatorial explosion.
+            temp (int): Temperature (in Kelvin) used for estimating Gibbs free energy of formation, as well as
+                scaling the cost function later during network generation. Must select from [300, 400, 500, ... 2000].
             extend entries([ComputedStructureEntry]): list of ComputedStructureEntry-like objects which will
                 be included in the network even after filtering for thermodynamic stability.
             include_metastable (float or bool): either a) the specified cutoff for energy per atom (eV/atom)
                 above hull, or b) True/False if considering only stable vs. all entries.
                 An energy cutoff of 0.1 eV/atom is a reasonable starting threshold for thermodynamic stability.
-            include_struct_similarity (bool): Whether or not to include structural similarity metrics in the
+            include_struct_similarity (bool): Whether or not to include structural similarity metric in the
                 cost function
             include_polymorphs (bool): Whether or not to consider non-ground state polymorphs.
-            include_info_entropy (bool): (BETA) -- Whether or not to consider Shannon information entropy as a
-                cost metric.
         """
 
         self.logger = logging.getLogger('ReactionNetwork')
@@ -60,10 +58,10 @@ class ReactionNetwork:
 
         # Chemical system / phase diagram variables
         self._all_entries = entries
-        self._max_num_phases = max_num_phases
+        self._max_num_phases = n
+        self._temp = temp
         self._e_above_hull = include_metastable
         self._include_polymorphs = include_polymorphs
-        self._temp = temp
         self._elements = {elem for entry in self.all_entries for elem in entry.composition.elements}
         self._gibbs_entries = GibbsComputedStructureEntry.from_entries(self._all_entries, self._temp)
         self._pd_dict, self._filtered_entries = self._filter_entries(self._gibbs_entries,
@@ -96,11 +94,6 @@ class ReactionNetwork:
 
         self._g = None  # Graph object in graph-tool
 
-        if include_info_entropy:  # This is in BETA -- use with caution (no evidence this is realistic!)
-            for entry in self._filtered_entries:
-                info_entropy = StructuralComplexity().featurize(entry.structure)[0]
-                entry.parameters = {"info_entropy": info_entropy}
-
         filtered_entries_str = ', '.join([entry.composition.reduced_formula for entry in self._filtered_entries])
         self.logger.info(
             f"Initializing network with {len(self._filtered_entries)} entries: \n{filtered_entries_str}")
@@ -117,7 +110,6 @@ class ReactionNetwork:
             targets (list of ComputedEntries): entries for all phases which are the final products; if None,
                 a "dummy" node is used to represent any possible set of targets.
             cost_function (str): name of cost function to use for entire network (e.g. "softplus").
-            temp (int): temperature used for scaling cost functions.
             complex_loopback (bool): if True, adds zero-weight edges which "loop back" to allow for multi-step
                 reactions, i.e. original precursors can appear many times and in different steps.
         """
@@ -281,7 +273,7 @@ class ReactionNetwork:
 
         return paths
 
-    def find_all_rxn_pathways(self, k, targets=None, max_num_combos=4, rxns_only=False, consider_remnant_rxns=True):
+    def find_all_rxn_pathways(self, k, targets=None, max_num_combos=4, rxns_only=True, consider_crossover_rxns=True):
         """
         Builds k shortest paths to provided targets and then seeks to combine them to achieve a "net reaction"
             with balanced stoichiometry. In other words, the full conversion of all intermediates to final products.
@@ -292,7 +284,7 @@ class ReactionNetwork:
                 when network was created.
             max_num_combos (int): upper limit on how many reactions to consider at a time (default 4).
             rxns_only (bool): Whether to consider combinations of reactions (True) or full pathways (False)
-            consider_remnant_rxns (bool): Whether to consider "crossover" reactions between intermediates on
+            consider_crossover_rxns (bool): Whether to consider "crossover" reactions between intermediates on
                 other pathways. This can be crucial for generating realistic predictions.
 
         Returns:
@@ -321,9 +313,9 @@ class ReactionNetwork:
                 paths = {rxn: cost for path in paths for (rxn, cost) in zip(path.rxns, path.costs)}
             paths_to_all_targets.update(paths)
 
-        if consider_remnant_rxns:
-            def find_remnant_rxns():
-                all_remnant_rxns = set()
+        if consider_crossover_rxns:
+            def find_crossover_rxns():
+                all_crossover_rxns = set()
                 for reactants_combo in self._generate_all_combos(intermediates, self._max_num_phases):
                     for products_combo in self._generate_all_combos(targets, self._max_num_phases):
                         try:
@@ -334,8 +326,8 @@ class ReactionNetwork:
                             continue
                         path = RxnPathway([rxn], [self._get_rxn_cost(
                             rxn, self._cost_function, self._temp, self.fingerprints)])
-                        all_remnant_rxns.add(path)
-                return all_remnant_rxns
+                        all_crossover_rxns.add(path)
+                return all_crossover_rxns
 
             precursors_and_targets = targets | self._precursors
 
@@ -344,14 +336,14 @@ class ReactionNetwork:
             else:
                 intermediates = {entry for path in paths_to_all_targets
                                  for rxn in path.all_rxns for entry in rxn.all_entries} - precursors_and_targets
-            remnant_rxns = find_remnant_rxns()
+            crossover_rxns = find_crossover_rxns()
 
-            if remnant_rxns:
-                print("Remnant Reactions \n")
-                print(remnant_rxns, "\n")
+            if crossover_rxns:
+                print("crossover Reactions \n")
+                print(crossover_rxns, "\n")
                 if rxns_only:
-                    remnant_rxns = {rxn: cost for path in remnant_rxns for (rxn, cost) in zip(path.rxns, path.costs)}
-                paths_to_all_targets.update(remnant_rxns)
+                    crossover_rxns = {rxn: cost for path in crossover_rxns for (rxn, cost) in zip(path.rxns, path.costs)}
+                paths_to_all_targets.update(crossover_rxns)
 
         if rxns_only:
             paths_to_try = list(paths_to_all_targets.keys())
@@ -361,7 +353,7 @@ class ReactionNetwork:
         trial_combos = list(self._generate_all_combos(paths_to_try, max_num_combos))
         unbalanced_paths = []
 
-        for i, combo in enumerate(trial_combos):
+        for i, combo in enumerate(tqdm(trial_combos)):
             if rxns_only:
                 if net_rxn_all_comp.issubset([comp for rxn in combo for comp in rxn.all_comp]):
                     unbalanced_paths.append(BalancedPathway({p: paths_to_all_targets[p] for p in combo},
@@ -371,6 +363,7 @@ class ReactionNetwork:
 
         comp_matrices = List([p.comp_matrix for p in unbalanced_paths])
         net_coeffs = List([p.net_coeffs for p in unbalanced_paths])
+
         is_balanced, multiplicities = self._balance_all_paths(comp_matrices, net_coeffs)
 
         balanced_total_paths = list(compress(unbalanced_paths, is_balanced))
@@ -538,6 +531,16 @@ class ReactionNetwork:
 
         Ref: Jin Y. Yen, "Finding the K Shortest Loopless Paths in a Network",
         Management Science, Vol. 17, No. 11, Theory Series (Jul., 1971), pp. 712-716.
+
+        Args:
+            g:
+            num_k:
+            precursors_v:
+            target_v:
+            edge_prop:
+            weight_prop:
+        Returns:
+
         """
 
         def path_cost(vertices):
@@ -605,11 +608,12 @@ class ReactionNetwork:
         Helper method for filtering entries by specified energy above hull
 
         Args:
-            e_above_hull (float): cutoff for energy above hull (** eV **)
+            all_entries ([ComputedEntry]): List of ComputedEntry-like objects to be filtered
+            e_above_hull (float): Thermodynamic stability threshold (energy above hull) [eV/atom]
             include_polymorphs (bool): whether to include higher energy polymorphs of existing structures
 
         Returns:
-            list: all entries less than or equal to specified energy above hull
+            list: all entries with energies above hull equal to or less than the specified e_above_hull.
         """
         pd_dict = expand_pd(all_entries)
         energies_above_hull = dict()
@@ -640,6 +644,20 @@ class ReactionNetwork:
     @staticmethod
     @njit(parallel=True)
     def _balance_all_paths(comp_matrices, net_coeffs, tol=1e-6):
+        """
+        Fast solution for reaction multiplicities via mass balance stochiometric constraints. Parallelized
+        using Numba.
+
+        Args:
+            comp_matrices ([np.array]): list of numpy arrays containing stoichiometric coefficients of all compositions
+                in all reactions, for each trial combination.
+            net_coeffs ([np.array]): list of numpy arrays containing stoichiometric coefficients of net reaction.
+            tol (float): numerical tolerance for determining if a multiplicity is zero (reaction was removed).
+
+        Returns:
+            Tuple containing bool identifying which trial BalancedPathway objects were successfully balanced,
+            and a list of all multiplicities arrays.
+        """
         n = len(comp_matrices)
         comp_pseudo_inverse = List([0.0*s for s in comp_matrices])
         multiplicities = List([0.0*c for c in net_coeffs])
@@ -660,7 +678,7 @@ class ReactionNetwork:
     @staticmethod
     def _generate_all_combos(entries, max_num_combos):
         """
-        Static helper method for generating combination sets ranging from singular length to maximum length
+        Helper static method for generating combination sets ranging from singular length to maximum length
             specified by max_num_combos.
 
         Args:
@@ -675,6 +693,8 @@ class ReactionNetwork:
     @staticmethod
     def _softplus(params, weights, t=273):
         """
+        Cost function (softplus).
+
         Args:
             params: list of cost function parameters (e.g. energy)
             weights: list of weights corresponds to parameters of the cost function
@@ -703,6 +723,7 @@ class ReactionNetwork:
     @property
     def g(self):
         return self._g
+
     @property
     def all_entries(self):
         return self._all_entries

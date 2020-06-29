@@ -3,13 +3,24 @@ from monty.json import MSONable
 
 import matplotlib.pyplot as plt
 
+
 __author__ = "Matthew McDermott"
 __email__ = "mcdermott@lbl.gov"
+__date__ = "June 26, 2020"
 
 
 class PathwayAnalysis(MSONable):
+    """
+    A convenience class for performing data analytic operations on BalancedPathway objects generated during
+    the reaction pathway pathfinding process.
+    """
 
     def __init__(self, rxn_network, balanced_combined_paths):
+        """
+        Args:
+            rxn_network: ReactionNetwork object used to create paths.
+            balanced_combined_paths ([BalancedPathway]): list of reaction pathway objects.
+        """
         self._balanced_combined_paths = balanced_combined_paths
         self._precursors = rxn_network.precursors
         self._targets = rxn_network.all_targets
@@ -17,10 +28,13 @@ class PathwayAnalysis(MSONable):
 
     def count_intermediates(self):
         """
-        Helper method for counting frequency of intermediates.
+        Method for counting the frequency of intermediate phases which show up along the provided pathways. May provide
+            a metric for understanding the flexibility (compositionally-speaking) to which an intermediate phase can be
+            used to access a target product. Note: there is no existing evidence that intermediate phases
+            with higher counts have any scientific significance (this may just be due to bias).
 
-        Args:
         Returns:
+            Counter object with counts of intermediate phases
         """
         intermediate_count = Counter()
         precursors_and_targets = {entry.composition.reduced_composition for entry in self._precursors | self._targets}
@@ -36,8 +50,8 @@ class PathwayAnalysis(MSONable):
         """
         Plot frequency of intermediates (using matplotlib).
 
-        Args:
         Returns:
+            Bar plot object created using matplotlib.
         """
         if not self._intermediate_count:
             self._intermediate_count = self.count_intermediates()

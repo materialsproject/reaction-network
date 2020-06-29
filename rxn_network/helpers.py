@@ -19,7 +19,7 @@ from monty.json import MSONable, MontyDecoder
 
 __author__ = "Matthew McDermott"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "February 25, 2020"
+__date__ = "June 26, 2020"
 
 
 with open(os.path.join(os.path.dirname(__file__), "g_els.json")) as f:
@@ -39,10 +39,12 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         Initializes a GibbsComputedStructureEntry.
 
         Args:
-            structure (Structure): The actual structure of an entry.
-            formation_enthalpy (float): Formation enthalpy of the entry, calculated using phase diagram construction (eV)
-            temp (int): Temperature in Kelvin.
-            gibbs_model (str): Model for Gibbs Free energy. Currently supported options: ["SISSO"]
+            structure (Structure): The pymatgen Structure object of an entry.
+            formation_enthalpy (float): Formation enthalpy of the entry, calculated using phase diagram
+                construction (eV)
+            temp (int): Temperature in Kelvin. Temperature must be selected from [300, 400, 500, ... 2000 K].
+            gibbs_model (str): Model for Gibbs Free energy. Current (and only supported option) is "SISSO",
+                the descriptor created by Bartel et al. (2018).
             correction (float): A correction to be applied to the energy. Defaults to 0
             parameters (dict): An optional dict of parameters associated with
                 the entry. Defaults to None.
@@ -62,8 +64,13 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
     def gf_sisso(self):
         """
         Returns:
-            Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel et al. (2018) [eV]
-                (not normalized)
+            Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel et al. (2018)
+            Units: eV (not normalized)
+
+            Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R., Tumas, W.,
+            Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for the Gibbs energy of
+            inorganic crystalline solids and temperature-dependent materials chemistry.
+            Nature Communications, 9(1), 4168. https://doi.org/10.1038/s41467-018-06682-4
         """
         comp = self.structure.composition
         if comp.is_element:
@@ -120,13 +127,26 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
             reduced_mass (float) - reduced mass as calculated with pair-wise sum formula [amu]
             temp (float) - Temperature [K]
         Returns:
-            G^delta as predicted by SISSO-learned descriptor from Bartel et al. (2018) (float) [eV/atom]
+            G^delta as predicted by SISSO-learned descriptor from Eq. (4) in Bartel et al. (2018) (float) [eV/atom]
         """
 
         return (-2.48e-4*np.log(vol_per_atom) - 8.94e-5*reduced_mass/vol_per_atom)*temp + 0.181*np.log(temp) - 0.882
 
     @classmethod
     def from_pd(cls, pd, temp=300, gibbs_model="SISSO"):
+        """
+        Constructor method for initializing GibbsComputedStructureEntry objects from an existing T = 0 K phase diagram,
+            as generated via data from a thermochemical database e.g. The Materials Project.
+
+        Args:
+            pd (PhaseDiagram): T = 0 K phase diagram as created in pymatgen.
+            temp (int): Temperature [K] for estimating the Gibbs free energy of formation.
+            gibbs_model (str): Gibbs model to use; currently, the only option is "SISSO".
+
+        Returns:
+            A list of GibbsComputedStructureEntry objects which replace the T = 0 K entries with entries
+            estimating the Gibbs free energy of formation at the specified temperature.
+        """
         gibbs_entries = []
         for entry in pd.all_entries:
             if entry in pd.el_refs.values() or not entry.structure.composition.is_element:
@@ -137,6 +157,19 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
     @classmethod
     def from_entries(cls, entries, temp=300, gibbs_model="SISSO"):
+        """
+        Constructor method for initializing GibbsComputedStructureEntry objects from T = 0 K entries,
+            as acquired from a thermochemical database e.g. The Materials Project.
+        Args:
+            entries ([ComputedStructureEntry]): List of ComputedStructureEntry objects, as downloaded from
+                The Materials Project API.
+            temp (int): Temperature [K] for estimating the Gibbs free energy of formation.
+            gibbs_model (str): Gibbs model to use; currently, the only option is "SISSO".
+
+        Returns:
+            A list of GibbsComputedStructureEntry objects which replace the T = 0 K entries with entries
+            estimating the Gibbs free energy of formation at the specified temperature
+        """
         pd_dict = expand_pd(entries)
         gibbs_entries = set()
         for entry in entries:
@@ -166,9 +199,11 @@ class RxnEntries(MSONable):
     def __init__(self, entries, description):
         """
         Args:
-            entries: [ComputedEntry] list of ComputedEntry-like objects
-            description: Node type, selected from "R" (reactants), "P" (products), "S" (starters/precursors),
-                "T" (target), or "D" (dummy)
+            entries [ComputedEntry]: list of ComputedEntry-like objects
+            description (str): Node type, as selected from:
+                "R" (reactants), "P" (products),
+                "S" (starters/precursors), "T" (target),
+                "D" (dummy)
         """
         self._entries = set(entries) if entries else None
         self._chemsys = "-".join(sorted({str(el) for entry in self._entries
@@ -225,10 +260,16 @@ class RxnEntries(MSONable):
 
 class RxnPathway(MSONable):
     """
-    Helper class for storing multiple ComputedReaction objects which form a single reaction pathway.
+    Helper class for storing multiple ComputedReaction objects which form a single reaction pathway as identified
+        via pathfinding methods. Includes cost of each reaction.
     """
 
     def __init__(self, rxns, costs):
+        """
+        Args:
+            rxns ([ComputedReaction]): list of ComputedReaction objects in pymatgen which occur along path.
+            costs ([float]): list of corresponding costs for each reaction.
+        """
         self._rxns = list(rxns)
         self._costs = list(costs)
 
@@ -371,7 +412,20 @@ class CombinedPathway(BalancedPathway):
 
         return path_info
 
+
 def expand_pd(entries):
+    """
+    Helper method for expanding a single PhaseDiagram into a set of smaller phase diagrams, indexed by chemical
+    subsystem. This is an absolutely necessary approach when considering chemical systems which contain > ~10 elements,
+    due to limitations of the ConvexHull algorithm.
+
+    Args:
+        entries:
+
+    Returns:
+        Dictionary of PhaseDiagram objects indexed by chemical subsystem string;
+        e.g. {"Li-Mn-O": <PhaseDiagram object>, "C-Y": <PhaseDiagram object>, ...}
+    """
 
     pd_dict = dict()
 
