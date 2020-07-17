@@ -5,25 +5,30 @@ Reaction Network
         :alt: Reaction Network logo
 
 Reaction network (rxn-network) is a Python package for predicting chemical reaction
-pathways in solid-state materials synthesis using graph theoretic methods.
+pathways in solid-state materials synthesis using graph theory.
 
 Installing rxn-network
 ================
 
 The rxn-network package has several dependencies, most of which can be installed
 through PyPI. However, graph-tool must be installed through a more customized method;
-please see <https://graph-tool.skewed.de/> for more details. We recommend the
-following installation procedure which creates a new conda environment and installs
-graph-tool through conda-forge:
+please see https://graph-tool.skewed.de/ for more details. We recommend the
+following installation procedure which creates a new conda environment:
 
     conda create -n gt python=3.8
+
+And then installs graph-tool through conda-forge:
+
     conda install -c conda-forge graph-tool
 
 To install an editable version of the rxn-network code, simply download (clone) the
 code from this repository, navigate to its directory in terminal, and then run the
-following two commands:
+following command to install the requirements:
 
     pip install -r requirements.txt
+
+And then to finally install an editable version of the package:
+
     pip install -e .
 
 Demo
@@ -40,7 +45,7 @@ It is currently under review, but a preprint is accessible via:
 
 https://assets.researchsquare.com/files/rs-38000/v1_stamped.pdf
 
-Acknolwedgements
+Acknowledgements
 ================
 
 This work was supported as part of GENESIS: A Next Generation Synthesis Center, an
