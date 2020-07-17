@@ -111,9 +111,7 @@ class ReactionNetwork:
 
         # Graph variables used during graph creation
         self._precursors = None
-        self._precursors_v = None
         self._all_targets = None
-        self._target_v = None
         self._current_target = None
         self._cost_function = None
         self._complex_loopback = None
@@ -207,7 +205,6 @@ class ReactionNetwork:
                 "chemsys": precursors_entries.chemsys,
             },
         )
-        self._precursors_v = precursors_v
 
         entries_dict = {}
         idx = 0
@@ -257,7 +254,6 @@ class ReactionNetwork:
                 "chemsys": target_entries.chemsys,
             },
         )
-        self._target_v = target_v
 
         self.logger.info("Generating reactions by chemical subsystem...")
 
@@ -341,8 +337,11 @@ class ReactionNetwork:
         g = self._g
         paths = []
 
+        precursors_v = gt.find_vertex(g, g.vp["type"], 0)[0]
+        target_v = gt.find_vertex(g, g.vp["type"], 3)[0]
+
         for num, path in enumerate(
-            self._yens_ksp(g, k, self._precursors_v, self._target_v)
+            self._yens_ksp(g, k, precursors_v, target_v)
         ):
             rxns = []
             weights = []
@@ -404,7 +403,12 @@ class ReactionNetwork:
         else:
             targets = set(targets)
 
-        net_rxn = ComputedReaction(list(self._precursors), list(targets))
+        try:
+            net_rxn = ComputedReaction(list(self._precursors), list(targets))
+        except ReactionError:
+            raise ReactionError("Net reaction must be balanceable to find all reaction "
+                           "pathways.")
+
         net_rxn_all_comp = set(net_rxn.all_comp)
         print(f"NET RXN: {net_rxn} \n")
 
@@ -509,7 +513,7 @@ class ReactionNetwork:
 
         if not self._precursors:
             precursors_entries = RxnEntries(None, "d")  # use dummy precursors node
-            if self._complex_loopback:
+            if complex_loopback:
                 raise ValueError(
                     "Complex loopback can't be enabled when using a dummy precursors "
                     "node!"
@@ -521,7 +525,7 @@ class ReactionNetwork:
         else:
             precursors_entries = RxnEntries(precursors, "s")
 
-        g.remove_vertex(self._precursors_v)
+        g.remove_vertex(gt.find_vertex(g, g.vp["type"], 0))
         new_precursors_v = g.add_vertex()
 
         self._update_vertex_properties(
@@ -535,7 +539,6 @@ class ReactionNetwork:
                 "chemsys": precursors_entries.chemsys,
             },
         )
-        self._precursors_v = new_precursors_v
 
         new_edges = []
         remove_edges = []
@@ -562,7 +565,7 @@ class ReactionNetwork:
 
             for c in combos:
                 combo_phases = set(c)
-                if combo_phases.issubset(self._precursors):
+                if complex_loopback and combo_phases.issubset(self._precursors):
                     continue
                 combo_entry = RxnEntries(combo_phases, "R")
                 loopback_v = gt.find_vertex(g, g.vp["entries"], combo_entry)[0]
@@ -591,7 +594,7 @@ class ReactionNetwork:
         else:
             self._current_target = {target}
 
-        g.remove_vertex(self._target_v)
+        g.remove_vertex(gt.find_vertex(g, g.vp["type"], 3))
         new_target_entry = RxnEntries(self._current_target, "t")
         new_target_v = g.add_vertex()
         self._update_vertex_properties(
@@ -605,7 +608,6 @@ class ReactionNetwork:
                 "chemsys": new_target_entry.chemsys,
             },
         )
-        self._target_v = new_target_v
 
         new_edges = []
 
@@ -757,8 +759,7 @@ class ReactionNetwork:
                 (sorted in increasing order by cost).
         """
         def path_cost(vertices):
-            """Calculates path cost given a list of vertices.
-            """
+            """Calculates path cost given a list of vertices."""
             cost = 0
             for j in range(len(vertices) - 1):
                 cost += g.ep[weight_prop][g.edge(vertices[j], vertices[j + 1])]
