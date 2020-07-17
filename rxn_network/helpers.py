@@ -1,6 +1,6 @@
 """
 This module implements several helper classes for storing and parsing reaction pathway
-info in the core module.
+info in the Reaction Network core module.
 """
 
 import os
@@ -329,7 +329,9 @@ class RxnEntries(MSONable):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.as_dict() == other.as_dict()
+            if self.description == other.description:
+                if self.chemsys == other.chemsys:
+                    return self.entries == other.entries
         else:
             return False
 

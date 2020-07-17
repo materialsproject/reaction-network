@@ -1,6 +1,7 @@
 import logging
-from itertools import combinations, chain, groupby, compress, product
+from itertools import combinations, chain, groupby, compress
 from tqdm import tqdm
+from profilehooks import profile
 
 import numpy as np
 from numba import njit, prange
@@ -116,11 +117,7 @@ class ReactionNetwork:
         self._current_target = None
         self._cost_function = None
         self._complex_loopback = None
-        self._entries_dict = None
-        self._most_negative_rxn = float(
-            "inf"
-        )  # used for shifting reaction energies in some cost functions
-
+        self._most_negative_rxn = None  # used in piecewise cost function
         self._g = None  # Graph object in graph-tool
 
         filtered_entries_str = ", ".join(
@@ -153,7 +150,7 @@ class ReactionNetwork:
             cost_function (str): name of cost function to use for entire network
                 (e.g. "softplus").
             complex_loopback (bool): if True, adds zero-weight edges which "loop back"
-                to allow for multi-step r autocatalytic-like reactions, i.e. original
+                to allow for multi-step or autocatalytic-like reactions, i.e. original
                 precursors can reappear many times and in different steps.
         """
         self._precursors = set(precursors) if precursors else None
@@ -182,7 +179,7 @@ class ReactionNetwork:
         else:
             precursors_entries = RxnEntries(precursors, "s")
 
-        g = gt.Graph()  # initialization of graph object in graph-tool
+        g = gt.Graph()  # initialization of graph obj
 
         # Create all property maps
         g.vp["entries"] = g.new_vertex_property("object")
@@ -192,6 +189,7 @@ class ReactionNetwork:
         g.vp["bool"] = g.new_vertex_property("bool")
         g.vp["path"] = g.new_vertex_property("bool")  # whether node is part of path
         g.vp["chemsys"] = g.new_vertex_property("string")
+
         g.ep["weight"] = g.new_edge_property("double")
         g.ep["rxn"] = g.new_edge_property("object")
         g.ep["bool"] = g.new_edge_property("bool")
@@ -233,7 +231,6 @@ class ReactionNetwork:
                     "chemsys": chemsys,
                 },
             )
-
             entries_dict[chemsys]["P"][products] = idx + 1
             self._update_vertex_properties(
                 g,
@@ -246,7 +243,6 @@ class ReactionNetwork:
                     "chemsys": chemsys,
                 },
             )
-
         g.add_vertex(idx + 1)  # add all precursors, reactant, and product vertices
         target_v = g.add_vertex()  # add target vertex
         target_entries = RxnEntries(self._current_target, "t")
@@ -283,18 +279,21 @@ class ReactionNetwork:
                     edge_list.append([v, target_v, 0, None, True, False])
 
                 if complex_loopback:
-                    for c in self._generate_all_combos(
+                    combos = self._generate_all_combos(
                         phases.union(self._precursors), self._max_num_phases
-                    ):
-                        combo_phases = set(c)
-                        combo_entry = RxnEntries(combo_phases, "R")
-                        loopback_v = g.vertex(
-                            entries_dict[combo_entry.chemsys]["R"][combo_entry]
-                        )
-                        if not combo_phases.issubset(
-                            self._precursors
-                        ):  # must contain at least one intermediate
-                            edge_list.append([v, loopback_v, 0, None, True, False])
+                    )
+                else:
+                    combos = self._generate_all_combos(phases, self._max_num_phases)
+
+                for c in combos:
+                    combo_phases = set(c)
+                    if combo_phases.issubset(self._precursors):
+                        continue
+                    combo_entry = RxnEntries(combo_phases, "R")
+                    loopback_v = g.vertex(
+                        entries_dict[combo_entry.chemsys]["R"][combo_entry]
+                    )
+                    edge_list.append([v, loopback_v, 0, None, True, False])
 
             for entry, v in vertices["R"].items():
                 phases = entry.entries
@@ -322,7 +321,6 @@ class ReactionNetwork:
             edge_list, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"], g.ep["path"]]
         )
 
-        self._entries_dict = entries_dict
         self.logger.info(
             f"Created graph with {g.num_vertices()} nodes and {g.num_edges()} edges."
         )
@@ -330,7 +328,7 @@ class ReactionNetwork:
 
     def find_k_shortest_paths(self, k, verbose=True):
         """
-        Finds k shortest paths to designated target using Yen's Algorithm.
+        Finds k shortest paths to current target using Yen's Algorithm.
 
         Args:
             k (int): desired number of shortest pathways (ranked by cost)
@@ -356,9 +354,7 @@ class ReactionNetwork:
                     g.vp["type"][v] == 2
                 ):  # add rxn step if current node in path is a product
                     e = g.edge(path[step - 1], v)
-                    g.ep["path"][
-                        e
-                    ] = True  # mark this edge as occurring on a path
+                    g.ep["path"][e] = True  # mark this edge as occurring on a path
                     rxns.append(g.ep["rxn"][e])
                     weights.append(g.ep["weight"][e])
 
@@ -372,12 +368,7 @@ class ReactionNetwork:
         return paths
 
     def find_all_rxn_pathways(
-        self,
-        k=15,
-        targets=None,
-        max_num_combos=4,
-        rxns_only=True,
-        consider_crossover_rxns=True,
+        self, k=15, targets=None, max_num_combos=4, consider_crossover_rxns=True,
     ):
         """
         Builds the k shortest paths to provided targets and then seeks to combine
@@ -396,8 +387,6 @@ class ReactionNetwork:
                 defaults to targets provided when network was created.
             max_num_combos (int): upper limit on how many reactions to consider at a
                 time (default 4).
-            rxns_only (bool): Whether to consider combinations of reactions (True) or
-                full pathways (False)
             consider_crossover_rxns (bool): Whether to consider "crossover" reactions
                 between intermediates in other pathways. This can be crucial for
                 generating realistic predictions and it is highly recommended;
@@ -408,10 +397,7 @@ class ReactionNetwork:
                 CombinedPathway objects (sorted by total cost) and a PathwayAnalysis
                 object with helpful analysis methods for hypothesized pathways.
         """
-        if rxns_only:
-            paths_to_all_targets = dict()
-        else:
-            paths_to_all_targets = set()
+        paths_to_all_targets = dict()
 
         if not targets:
             targets = self._all_targets
@@ -426,12 +412,11 @@ class ReactionNetwork:
             print(f"PATHS to {target.composition.reduced_formula} \n")
             self.set_target(target)
             paths = self.find_k_shortest_paths(k)
-            if rxns_only:
-                paths = {
-                    rxn: cost
-                    for path in paths
-                    for (rxn, cost) in zip(path.rxns, path.costs)
-                }
+            paths = {
+                rxn: cost
+                for path in paths
+                for (rxn, cost) in zip(path.rxns, path.costs)
+            }
             paths_to_all_targets.update(paths)
 
         if consider_crossover_rxns:
@@ -458,52 +443,37 @@ class ReactionNetwork:
 
             precursors_and_targets = targets | self._precursors
 
-            if rxns_only:
-                intermediates = {
-                    entry for rxn in paths_to_all_targets for entry in rxn.all_entries
-                } - precursors_and_targets
-            else:
-                intermediates = {
-                    entry
-                    for path in paths_to_all_targets
-                    for rxn in path.all_rxns
-                    for entry in rxn.all_entries
-                } - precursors_and_targets
+            intermediates = {
+                entry for rxn in paths_to_all_targets for entry in rxn.all_entries
+            } - precursors_and_targets
             crossover_rxns = find_crossover_rxns()
 
             if crossover_rxns:
                 print("Crossover Reactions \n")
                 print(crossover_rxns, "\n")
-                if rxns_only:
-                    crossover_rxns = {
-                        rxn: cost
-                        for path in crossover_rxns
-                        for (rxn, cost) in zip(path.rxns, path.costs)
-                    }
+                crossover_rxns = {
+                    rxn: cost
+                    for path in crossover_rxns
+                    for (rxn, cost) in zip(path.rxns, path.costs)
+                }
                 paths_to_all_targets.update(crossover_rxns)
 
-        if rxns_only:
-            paths_to_try = list(paths_to_all_targets.keys())
-        else:
-            paths_to_try = paths_to_all_targets
+        paths_to_try = list(paths_to_all_targets.keys())
 
         trial_combos = list(self._generate_all_combos(paths_to_try, max_num_combos))
         unbalanced_paths = []
 
         for i, combo in enumerate(tqdm(trial_combos)):
-            if rxns_only:
-                if net_rxn_all_comp.issubset(
-                    [comp for rxn in combo for comp in rxn.all_comp]
-                ):
-                    unbalanced_paths.append(
-                        BalancedPathway(
-                            {p: paths_to_all_targets[p] for p in combo},
-                            net_rxn,
-                            balance=False,
-                        )
+            if net_rxn_all_comp.issubset(
+                [comp for rxn in combo for comp in rxn.all_comp]
+            ):
+                unbalanced_paths.append(
+                    BalancedPathway(
+                        {p: paths_to_all_targets[p] for p in combo},
+                        net_rxn,
+                        balance=False,
                     )
-            else:
-                combined_pathway = CombinedPathway(combo, net_rxn)
+                )
 
         comp_matrices = List([p.comp_matrix for p in unbalanced_paths])
         net_coeffs = List([p.net_coeffs for p in unbalanced_paths])
@@ -520,71 +490,90 @@ class ReactionNetwork:
         analysis = PathwayAnalysis(self, balanced_total_paths)
         return sorted(list(balanced_total_paths), key=lambda x: x.total_cost), analysis
 
-    def set_precursors(self, precursors, connect_direct=False, dummy_exclusive=False):
-        """Replaces network's previous precursor nodes with provided new precursors.
-            Recreates edges that link products back to reactants.
+    def set_precursors(self, precursors=None, complex_loopback=True):
+        """Replaces network's previous precursor node with provided new precursors.
+            Finds new edges that link products back to reactants as dependent on the
+            complex_loopback parameter.
 
         Args:
             precursors ([ComputedEntry]): list of new precursor entries
+            complex_loopback (bool): if True, adds zero-weight edges which "loop back"
+                to allow for multi-step or autocatalytic-like reactions, i.e. original
+                precursors can reappear many times and in different steps.
 
         Returns:
             None
         """
-        for node in self._g.nodes():
-            if node.description == "S" or node.description == "D":
-                self._g.remove_node(node)
+        g = self._g
+        self._precursors = set(precursors) if precursors else None
 
-                if not precursors or dummy_exclusive:
-                    precursors_entries = RxnEntries(None, "d")
-                else:
-                    precursors = set(precursors)
-                    precursors_entries = RxnEntries(precursors, "s")
+        if not self._precursors:
+            precursors_entries = RxnEntries(None, "d")  # use dummy precursors node
+            if self._complex_loopback:
+                raise ValueError(
+                    "Complex loopback can't be enabled when using a dummy precursors "
+                    "node!"
+                )
+        elif False in [
+            isinstance(precursor, ComputedEntry) for precursor in self._precursors
+        ]:
+            raise TypeError("Precursors must be ComputedEntry-like objects.")
+        else:
+            precursors_entries = RxnEntries(precursors, "s")
 
-                self._g.add_node(precursors_entries)
+        g.remove_vertex(self._precursors_v)
+        new_precursors_v = g.add_vertex()
 
-                if connect_direct:
-                    self._g.add_edge(
-                        precursors_entries, RxnEntries(precursors, "r"), weight=0
-                    )
-                else:
-                    for r in self._generate_all_combos(
-                        self._filtered_entries, self._max_num_phases
-                    ):
-                        reactants = set(r)
-                        if reactants.issubset(
-                            precursors
-                        ):  # link starting node to reactant nodes
-                            reactant_entries = RxnEntries(reactants, "r")
-                            self._g.add_edge(
-                                precursors_entries, reactant_entries, weight=0
-                            )
-                break
+        self._update_vertex_properties(
+            g,
+            new_precursors_v,
+            {
+                "entries": precursors_entries,
+                "type": 0,
+                "bool": True,
+                "path": True,
+                "chemsys": precursors_entries.chemsys,
+            },
+        )
+        self._precursors_v = new_precursors_v
 
-        if not self._complex_loopback:
-            self._precursors = precursors
-            return
+        new_edges = []
+        remove_edges = []
 
-        for p in self._generate_all_combos(
-            self._filtered_entries, self._max_num_phases
-        ):
-            products = set(p)
-            product_entries = RxnEntries(products, "p")
+        for v in gt.find_vertex(g, g.vp["type"], 1):  # iterate over all reactants
+            phases = g.vp["entries"][v].entries
 
-            old_loopbacks = self._generate_all_combos(
-                list(products.union(self._precursors)), self._max_num_phases
-            )
-            for combo in old_loopbacks:
-                # delete old edge linking back
-                self._g.remove_edge(product_entries, RxnEntries(combo, "r"))
+            remove_edges.extend(list(v.in_edges()))
 
-            new_loopbacks = self._generate_all_combos(
-                list(products.union(precursors)), self._max_num_phases
-            )
-            for combo in new_loopbacks:
-                # add new edges linking back
-                self._g.add_edge(product_entries, RxnEntries(combo, "r"), weight=0)
+            if precursors_entries.description == "D" or phases.issubset(
+                self._precursors
+            ):
+                new_edges.append([new_precursors_v, v, 0, None, True, False])
 
-        self._precursors = precursors
+        for v in gt.find_vertex(g, g.vp["type"], 2):  # iterate over all products
+            phases = g.vp["entries"][v].entries
+
+            if complex_loopback:
+                combos = self._generate_all_combos(
+                    phases.union(self._precursors), self._max_num_phases
+                )
+            else:
+                combos = self._generate_all_combos(phases, self._max_num_phases)
+
+            for c in combos:
+                combo_phases = set(c)
+                if combo_phases.issubset(self._precursors):
+                    continue
+                combo_entry = RxnEntries(combo_phases, "R")
+                loopback_v = gt.find_vertex(g, g.vp["entries"], combo_entry)[0]
+                new_edges.append([v, loopback_v, 0, None, True, False])
+
+        for e in remove_edges:
+            g.remove_edge(e)
+
+        g.add_edge_list(
+            new_edges, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"], g.ep["path"]]
+        )
 
     def set_target(self, target):
         """Replaces network's current target phase with new target phase.
@@ -619,13 +608,11 @@ class ReactionNetwork:
         self._target_v = new_target_v
 
         new_edges = []
-        all_vertices = g.get_vertices(vprops=[g.vertex_index, g.vp["type"]])
 
-        for v in all_vertices[all_vertices[:, 2] == 2]:  # search for all products
-            vertex = g.vertex(v[1])
-            if self._current_target.issubset(g.vp["entries"][vertex].entries):
+        for v in gt.find_vertex(g, g.vp["type"], 2):  # search for all products
+            if self._current_target.issubset(g.vp["entries"][v].entries):
                 new_edges.append(
-                    [vertex, new_target_v, 0, None, True, False]
+                    [v, new_target_v, 0, None, True, False]
                 )  # link all products to new target
 
         g.add_edge_list(
@@ -643,11 +630,17 @@ class ReactionNetwork:
         Returns:
             None
         """
-        return None
+        g = self._g
+        self._cost_function = cost_function
+
+        for e in gt.find_edge_range(g, g.ep["weight"], (1e-8, 1e8)):
+            g.ep["weight"][e] = self._get_rxn_cost(g.ep["rxn"][e])
 
     def set_temp(self, temp):
         """Sets new temperature parameter of network by recomputing
-            GibbsComputedStructureEntry objects and edge weights.
+            GibbsComputedStructureEntry objects and edge weights. Does not re-filter
+            for thermodynamic stability, as this would essentially
+            require full initialization of a newobject.
 
         Args:
             temp (int): temperature in Kelvin; must be selected from
@@ -656,7 +649,36 @@ class ReactionNetwork:
         Returns:
             None
         """
-        return None
+        g = self._g
+        self._temp = temp
+        old_entries = self._filtered_entries
+        self._filtered_entries = GibbsComputedStructureEntry.from_entries(
+            self._filtered_entries, self._temp
+        )
+        mapping = dict()
+        for old_e in old_entries:
+            for new_e in self._filtered_entries:
+                if old_e.structure == new_e.structure:
+                    mapping[old_e] = new_e
+                    break
+
+        for v in g.vertices():
+            current_entries = g.vp["entries"][v]
+            new_phases = [mapping[e] for e in current_entries.entries]
+            new_entries = RxnEntries(new_phases, current_entries.description)
+            g.vp["entries"][v] = new_entries
+
+        for e in gt.find_edge_range(g, g.ep["weight"], (1e-8, 1e8)):
+            rxn = ComputedReaction(
+                list(g.vp["entries"][e.source()].entries),
+                list(g.vp["entries"][e.target()].entries),
+            )
+            g.ep["rxn"][e] = rxn
+            g.ep["weight"][e] = self._get_rxn_cost(rxn)
+
+        self._precursors = {mapping[p] for p in self._precursors}
+        self._all_targets = {mapping[t] for t in self._all_targets}
+        self._current_target = {mapping[ct] for ct in self._current_target}
 
     def _get_rxn_cost(self, rxn):
         """Helper method which determines reaction cost/weight.
@@ -677,6 +699,7 @@ class ReactionNetwork:
             weight = self._softplus(params, weights, t=self._temp)
         elif cost_function == "piecewise":
             weight = energy
+
             if weight < self._most_negative_rxn:
                 self._most_negative_rxn = weight
             if weight >= 0:
@@ -733,15 +756,8 @@ class ReactionNetwork:
             List of lists of graph vertices corresponding to each shortest path
                 (sorted in increasing order by cost).
         """
-
         def path_cost(vertices):
-            """ Calculates path cost given a list of vertices.
-
-            Args:
-                vertices ([gt.Vertex]):
-
-            Returns:
-
+            """Calculates path cost given a list of vertices.
             """
             cost = 0
             for j in range(len(vertices) - 1):
@@ -956,6 +972,10 @@ class ReactionNetwork:
     @property
     def all_targets(self):
         return self._all_targets
+
+    @property
+    def temp(self):
+        return self._temp
 
     def __repr__(self):
         return (
