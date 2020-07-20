@@ -1,0 +1,1188 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rxn_network.core &mdash; Reaction Network  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #800080" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Reaction Network
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Reaction Network</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>rxn_network.core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rxn_network.core</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">groupby</span><span class="p">,</span> <span class="n">compress</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span>
+<span class="kn">from</span> <span class="nn">numba.typed</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">graph_tool.all</span> <span class="k">as</span> <span class="nn">gt</span>
+<span class="kn">import</span> <span class="nn">queue</span>
+
+<span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.reaction_calculator</span> <span class="kn">import</span> <span class="n">ComputedReaction</span><span class="p">,</span> <span class="n">ReactionError</span>
+
+<span class="kn">from</span> <span class="nn">rxn_network.helpers</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">rxn_network.analysis</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Matthew McDermott&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Matthew McDermott&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;mcdermott@lbl.gov&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;July 20, 2020&quot;</span>
+
+
+<div class="viewcode-block" id="ReactionNetwork"><a class="viewcode-back" href="../../index.html#rxn_network.core.ReactionNetwork">[docs]</a><span class="k">class</span> <span class="nc">ReactionNetwork</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class creates and stores a weighted, directed graph in graph-tool</span>
+<span class="sd">    that is a dense network of all possible chemical reactions (edges)</span>
+<span class="sd">    between phase combinations (vertices) in a chemical system. Reaction</span>
+<span class="sd">    pathway hypotheses are generated using pathfinding methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">entries</span><span class="p">,</span>
+        <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+        <span class="n">extend_entries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">include_metastable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">include_polymorphs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes ReactionNetwork object with necessary preprocessing</span>
+<span class="sd">        steps. This does not yet compute the graph. The preprocessing</span>
+<span class="sd">        steps currently include: generating the phase diagram and/or</span>
+<span class="sd">        energies above hull for filtering (using estimated Gibbs free</span>
+<span class="sd">        energies of formation at specified temperature).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entries ([ComputedStructureEntry]): list of ComputedStructureEntry-</span>
+<span class="sd">                like objects to consider in network. These can be acquired</span>
+<span class="sd">                from Materials Project (using MPRester) or created manually in</span>
+<span class="sd">                pymatgen. Entries should have same compatability (e.g.</span>
+<span class="sd">                MPCompability) for phase diagram generation.</span>
+<span class="sd">            n (int): maximum number of phases allowed on each side of the</span>
+<span class="sd">                reaction (default 2). Note that n &gt; 2 leads to significant (</span>
+<span class="sd">                and often intractable) combinatorial explosion.</span>
+<span class="sd">            temp (int): Temperature (in Kelvin) used for estimating Gibbs</span>
+<span class="sd">                free energy of formation, as well as scaling the cost function</span>
+<span class="sd">                later during network generation. Must select from [300, 400,</span>
+<span class="sd">                500, ... 2000] K.</span>
+<span class="sd">            extend entries([ComputedStructureEntry]): list of</span>
+<span class="sd">                ComputedStructureEntry-like objects which will be included in</span>
+<span class="sd">                the network even after filtering for thermodynamic stability.</span>
+<span class="sd">                Helpful if target phase has a significantly high energy above</span>
+<span class="sd">                the hull.</span>
+<span class="sd">            include_metastable (float or bool): either a) the specified cutoff</span>
+<span class="sd">                for energy per atom (eV/atom) above hull, or b) True/False</span>
+<span class="sd">                if considering only stable vs. all entries. An energy cutoff of</span>
+<span class="sd">                0.1 eV/atom is a reasonable starting threshold for thermodynamic</span>
+<span class="sd">                stability. Defaults to False.</span>
+<span class="sd">            include_polymorphs (bool): Whether or not to consider non-ground</span>
+<span class="sd">                state polymorphs. Defaults to False. Note this is not useful</span>
+<span class="sd">                unless structural metrics are considered in the cost function</span>
+<span class="sd">                (to be added!)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ReactionNetwork&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="s2">&quot;INFO&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Chemical system / phase diagram variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_entries</span> <span class="o">=</span> <span class="n">entries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_phases</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temp</span> <span class="o">=</span> <span class="n">temp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e_above_hull</span> <span class="o">=</span> <span class="n">include_metastable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_include_polymorphs</span> <span class="o">=</span> <span class="n">include_polymorphs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">elem</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_entries</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gibbs_entries</span> <span class="o">=</span> <span class="n">GibbsComputedStructureEntry</span><span class="o">.</span><span class="n">from_entries</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_all_entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pd_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_entries</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gibbs_entries</span><span class="p">,</span> <span class="n">include_metastable</span><span class="p">,</span> <span class="n">include_polymorphs</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pd</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">10</span>
+        <span class="p">):</span>  <span class="c1"># phase diagrams take considerable time to build &gt;10 elems</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pd</span> <span class="o">=</span> <span class="n">PhaseDiagram</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">extend_entries</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">extend_entries</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_entry_combos</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">combo</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">combo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_all_combos</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_phases</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Graph variables used during graph creation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_targets</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cost_function</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_complex_loopback</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_most_negative_rxn</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># used in piecewise cost function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Graph object in graph-tool</span>
+
+        <span class="n">filtered_entries_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Initializing network with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;entries: </span><span class="se">\n</span><span class="si">{</span><span class="n">filtered_entries_str</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ReactionNetwork.generate_rxn_network"><a class="viewcode-back" href="../../index.html#rxn_network.core.ReactionNetwork.generate_rxn_network">[docs]</a>    <span class="k">def</span> <span class="nf">generate_rxn_network</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;softplus&quot;</span><span class="p">,</span>
+        <span class="n">complex_loopback</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates and stores the actual reaction network (weighted, directed graph)</span>
+<span class="sd">        using graph-tool. In practice, the main iterative loop will start taking</span>
+<span class="sd">        a significant amount of time (i.e. over 60 secs) when using  &gt;50 phases.</span>
+<span class="sd">        As of now, temperature must be selected from [300, 400, 500, ... 2000 K].</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            precursors ([ComputedEntry]): entries for all phases which serve as the</span>
+<span class="sd">                main reactants; if None,a &quot;dummy&quot; node is used to represent any</span>
+<span class="sd">                possible set of precursors.</span>
+<span class="sd">            targets ([ComputedEntry]): entries for all phases which are the final</span>
+<span class="sd">                products; if None, a &quot;dummy&quot; node is used to represent any possible</span>
+<span class="sd">                set of targets.</span>
+<span class="sd">            cost_function (str): name of cost function to use for entire network</span>
+<span class="sd">                (e.g. &quot;softplus&quot;).</span>
+<span class="sd">            complex_loopback (bool): if True, adds zero-weight edges which &quot;loop back&quot;</span>
+<span class="sd">                to allow for multi-step or autocatalytic-like reactions, i.e. original</span>
+<span class="sd">                precursors can reappear many times and in different steps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">precursors</span><span class="p">)</span> <span class="k">if</span> <span class="n">precursors</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_targets</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span> <span class="k">if</span> <span class="n">targets</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">{</span><span class="n">targets</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span> <span class="k">if</span> <span class="n">targets</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>  <span class="c1"># take first entry to be first designated target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cost_function</span> <span class="o">=</span> <span class="n">cost_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_complex_loopback</span> <span class="o">=</span> <span class="n">complex_loopback</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span><span class="p">:</span>
+            <span class="n">precursors_entries</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">)</span>  <span class="c1"># use dummy precursors node</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_complex_loopback</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Complex loopback can&#39;t be enabled when using a dummy precursors &quot;</span>
+                    <span class="s2">&quot;node!&quot;</span>
+                <span class="p">)</span>
+        <span class="k">elif</span> <span class="kc">False</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">precursor</span><span class="p">,</span> <span class="n">ComputedEntry</span><span class="p">)</span> <span class="k">for</span> <span class="n">precursor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span>
+        <span class="p">]</span> <span class="ow">or</span> <span class="kc">False</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">ComputedEntry</span><span class="p">)</span> <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_targets</span>
+        <span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;Precursors and targets must be ComputedEntry-like objects.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">precursors_entries</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="n">precursors</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>  <span class="c1"># initialization of graph obj</span>
+
+        <span class="c1"># Create all property maps</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span>
+            <span class="s2">&quot;int&quot;</span>
+        <span class="p">)</span>  <span class="c1"># 0: precursors, 1: reactants, 2: products, 3: target</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;bool&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>  <span class="c1"># whether node is part of path</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;chemsys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;double&quot;</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;bool&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>  <span class="c1"># whether edge is part of path</span>
+
+        <span class="n">precursors_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_vertex_properties</span><span class="p">(</span>
+            <span class="n">g</span><span class="p">,</span>
+            <span class="n">precursors_v</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">precursors_entries</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;chemsys&quot;</span><span class="p">:</span> <span class="n">precursors_entries</span><span class="o">.</span><span class="n">chemsys</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="n">entries_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">entries</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_entry_combos</span><span class="p">):</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">num</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">reactants</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">)</span>
+            <span class="n">products</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">)</span>
+            <span class="n">chemsys</span> <span class="o">=</span> <span class="n">reactants</span><span class="o">.</span><span class="n">chemsys</span>
+            <span class="k">if</span> <span class="n">chemsys</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">entries_dict</span><span class="p">:</span>
+                <span class="n">entries_dict</span><span class="p">[</span><span class="n">chemsys</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span><span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="p">{},</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="p">{}})</span>
+
+            <span class="n">entries_dict</span><span class="p">[</span><span class="n">chemsys</span><span class="p">][</span><span class="s2">&quot;R&quot;</span><span class="p">][</span><span class="n">reactants</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_vertex_properties</span><span class="p">(</span>
+                <span class="n">g</span><span class="p">,</span>
+                <span class="n">idx</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">reactants</span><span class="p">,</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;chemsys&quot;</span><span class="p">:</span> <span class="n">chemsys</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="n">entries_dict</span><span class="p">[</span><span class="n">chemsys</span><span class="p">][</span><span class="s2">&quot;P&quot;</span><span class="p">][</span><span class="n">products</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_vertex_properties</span><span class="p">(</span>
+                <span class="n">g</span><span class="p">,</span>
+                <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">products</span><span class="p">,</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                    <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;chemsys&quot;</span><span class="p">:</span> <span class="n">chemsys</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># add all precursors, reactant, and product vertices</span>
+        <span class="n">target_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>  <span class="c1"># add target vertex</span>
+        <span class="n">target_entries</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_vertex_properties</span><span class="p">(</span>
+            <span class="n">g</span><span class="p">,</span>
+            <span class="n">target_v</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">target_entries</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;chemsys&quot;</span><span class="p">:</span> <span class="n">target_entries</span><span class="o">.</span><span class="n">chemsys</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating reactions by chemical subsystem...&quot;</span><span class="p">)</span>
+
+        <span class="n">edge_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chemsys</span><span class="p">,</span> <span class="n">vertices</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">entries_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">[</span><span class="s2">&quot;R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">phases</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">entries</span>
+
+                <span class="n">v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">precursors_entries</span><span class="o">.</span><span class="n">description</span> <span class="o">==</span> <span class="s2">&quot;D&quot;</span> <span class="ow">or</span> <span class="n">phases</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span>
+                <span class="p">):</span>
+                    <span class="n">edge_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">precursors_v</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">phases</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">entries</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">phases</span><span class="p">):</span>
+                    <span class="n">edge_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">complex_loopback</span><span class="p">:</span>
+                    <span class="n">combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_all_combos</span><span class="p">(</span>
+                        <span class="n">phases</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_phases</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_all_combos</span><span class="p">(</span><span class="n">phases</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_phases</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combos</span><span class="p">:</span>
+                    <span class="n">combo_phases</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">combo_phases</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                    <span class="n">combo_entry</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="n">combo_phases</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">)</span>
+                    <span class="n">loopback_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span>
+                        <span class="n">entries_dict</span><span class="p">[</span><span class="n">combo_entry</span><span class="o">.</span><span class="n">chemsys</span><span class="p">][</span><span class="s2">&quot;R&quot;</span><span class="p">][</span><span class="n">combo_entry</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="n">edge_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">loopback_v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">[</span><span class="s2">&quot;R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">phases</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">entries</span>
+
+                <span class="k">for</span> <span class="n">other_entry</span><span class="p">,</span> <span class="n">other_v</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">other_phases</span> <span class="o">=</span> <span class="n">other_entry</span><span class="o">.</span><span class="n">entries</span>
+
+                    <span class="k">if</span> <span class="n">other_phases</span> <span class="o">==</span> <span class="n">phases</span><span class="p">:</span>
+                        <span class="k">continue</span>  <span class="c1"># do not consider identity-like reactions</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">rxn</span> <span class="o">=</span> <span class="n">ComputedReaction</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">phases</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">other_phases</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="n">ReactionError</span><span class="p">:</span>
+                        <span class="k">continue</span>
+
+                    <span class="k">if</span> <span class="n">rxn</span><span class="o">.</span><span class="n">_lowest_num_errors</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">continue</span>  <span class="c1"># remove reaction if comps. change sides / disappear</span>
+
+                    <span class="n">weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_cost</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
+                    <span class="n">edge_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">other_v</span><span class="p">),</span> <span class="n">weight</span><span class="p">,</span> <span class="n">rxn</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span>
+            <span class="n">edge_list</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;bool&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]]</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Created graph with </span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">num_vertices</span><span class="p">()</span><span class="si">}</span><span class="s2"> nodes and </span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">num_edges</span><span class="p">()</span><span class="si">}</span><span class="s2"> edges.&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">g</span></div>
+
+<div class="viewcode-block" id="ReactionNetwork.find_k_shortest_paths"><a class="viewcode-back" href="../../index.html#rxn_network.core.ReactionNetwork.find_k_shortest_paths">[docs]</a>    <span class="k">def</span> <span class="nf">find_k_shortest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds k shortest paths to current target using Yen&#39;s Algorithm.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            k (int): desired number of shortest pathways (ranked by cost)</span>
+<span class="sd">            verbose (bool): whether to print all identified pathways to the console.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [RxnPathway]: list of RxnPathway objects containing reactions traversed on</span>
+<span class="sd">                each path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">precursors_v</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">target_v</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="mi">3</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_yens_ksp</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">precursors_v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">)):</span>
+            <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span>
+                <span class="p">):</span>  <span class="c1"># add rxn step if current node in path is a product</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="n">step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># mark this edge as occurring on a path</span>
+                    <span class="n">rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">][</span><span class="n">e</span><span class="p">])</span>
+                    <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">][</span><span class="n">e</span><span class="p">])</span>
+
+            <span class="n">rxn_pathway</span> <span class="o">=</span> <span class="n">RxnPathway</span><span class="p">(</span><span class="n">rxns</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn_pathway</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">paths</span></div>
+
+<div class="viewcode-block" id="ReactionNetwork.find_all_rxn_pathways"><a class="viewcode-back" href="../../index.html#rxn_network.core.ReactionNetwork.find_all_rxn_pathways">[docs]</a>    <span class="k">def</span> <span class="nf">find_all_rxn_pathways</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_num_combos</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">consider_crossover_rxns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the k shortest paths to provided targets and then seeks to combine</span>
+<span class="sd">        them to achieve a &quot;net reaction&quot; with balanced stoichiometry. In other</span>
+<span class="sd">        words, the full conversion of all intermediates to final products.</span>
+<span class="sd">        Warning: this method can take a significant amount of time depending on the</span>
+<span class="sd">        size of the network and the max_num_combos parameter. General</span>
+<span class="sd">        recommendations are k = 15 and max_num_combos = 4, although a higher</span>
+<span class="sd">        max_num_combos may be required to capture the full pathway.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            k (int): Number of shortest paths to calculate to each target (i.e. if</span>
+<span class="sd">                there are 3 targets and k=15, then 3x15 = 45 paths will be generated</span>
+<span class="sd">                and the reactions from these will be combined.</span>
+<span class="sd">            targets ([ComputedEntries]): list of all target ComputedEntry objects;</span>
+<span class="sd">                defaults to targets provided when network was created.</span>
+<span class="sd">            max_num_combos (int): upper limit on how many reactions to consider at a</span>
+<span class="sd">                time (default 4).</span>
+<span class="sd">            consider_crossover_rxns (bool): Whether to consider &quot;crossover&quot; reactions</span>
+<span class="sd">                between intermediates in other pathways. This can be crucial for</span>
+<span class="sd">                generating realistic predictions and it is highly recommended;</span>
+<span class="sd">                generally the added computational cost is extremely low.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ([CombinedPathway], PathwayAnalysis): Tuple containing list of</span>
+<span class="sd">                CombinedPathway objects (sorted by total cost) and a PathwayAnalysis</span>
+<span class="sd">                object with helpful analysis methods for hypothesized pathways.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">paths_to_all_targets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">targets</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_targets</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">net_rxn</span> <span class="o">=</span> <span class="n">ComputedReaction</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">ReactionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ReactionError</span><span class="p">(</span>
+                <span class="s2">&quot;Net reaction must be balanceable to find all reaction &quot;</span> <span class="s2">&quot;pathways.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">net_rxn_all_comp</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">net_rxn</span><span class="o">.</span><span class="n">all_comp</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NET RXN: </span><span class="si">{</span><span class="n">net_rxn</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PATHS to </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_k_shortest_paths</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">paths</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">rxn</span><span class="p">:</span> <span class="n">cost</span>
+                <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">rxns</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">costs</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="n">paths_to_all_targets</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">consider_crossover_rxns</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">find_crossover_rxns</span><span class="p">():</span>
+                <span class="n">all_crossover_rxns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">reactants_combo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_all_combos</span><span class="p">(</span>
+                    <span class="n">intermediates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_phases</span>
+                <span class="p">):</span>
+                    <span class="k">for</span> <span class="n">products_combo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_all_combos</span><span class="p">(</span>
+                        <span class="n">targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_phases</span>
+                    <span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">rxn</span> <span class="o">=</span> <span class="n">ComputedReaction</span><span class="p">(</span>
+                                <span class="nb">list</span><span class="p">(</span><span class="n">reactants_combo</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">products_combo</span><span class="p">)</span>
+                            <span class="p">)</span>
+                        <span class="k">except</span> <span class="n">ReactionError</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="k">if</span> <span class="n">rxn</span><span class="o">.</span><span class="n">_lowest_num_errors</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">RxnPathway</span><span class="p">([</span><span class="n">rxn</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_cost</span><span class="p">(</span><span class="n">rxn</span><span class="p">)])</span>
+                        <span class="n">all_crossover_rxns</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">all_crossover_rxns</span>
+
+            <span class="n">precursors_and_targets</span> <span class="o">=</span> <span class="n">targets</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span>
+
+            <span class="n">intermediates</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">entry</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">paths_to_all_targets</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">all_entries</span>
+            <span class="p">}</span> <span class="o">-</span> <span class="n">precursors_and_targets</span>
+            <span class="n">crossover_rxns</span> <span class="o">=</span> <span class="n">find_crossover_rxns</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">crossover_rxns</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Crossover Reactions </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">crossover_rxns</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">crossover_rxns</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">rxn</span><span class="p">:</span> <span class="n">cost</span>
+                    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">crossover_rxns</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">rxns</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">costs</span><span class="p">)</span>
+                <span class="p">}</span>
+                <span class="n">paths_to_all_targets</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">crossover_rxns</span><span class="p">)</span>
+
+        <span class="n">paths_to_try</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">paths_to_all_targets</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="n">trial_combos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_all_combos</span><span class="p">(</span><span class="n">paths_to_try</span><span class="p">,</span> <span class="n">max_num_combos</span><span class="p">))</span>
+        <span class="n">unbalanced_paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">combo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">trial_combos</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">net_rxn_all_comp</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">comp</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">combo</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">all_comp</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="n">unbalanced_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">BalancedPathway</span><span class="p">(</span>
+                        <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="n">paths_to_all_targets</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">},</span>
+                        <span class="n">net_rxn</span><span class="p">,</span>
+                        <span class="n">balance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="n">comp_matrices</span> <span class="o">=</span> <span class="n">List</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">comp_matrix</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">unbalanced_paths</span><span class="p">])</span>
+        <span class="n">net_coeffs</span> <span class="o">=</span> <span class="n">List</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">net_coeffs</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">unbalanced_paths</span><span class="p">])</span>
+
+        <span class="n">is_balanced</span><span class="p">,</span> <span class="n">multiplicities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_balance_all_paths</span><span class="p">(</span><span class="n">comp_matrices</span><span class="p">,</span> <span class="n">net_coeffs</span><span class="p">)</span>
+
+        <span class="n">balanced_total_paths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">unbalanced_paths</span><span class="p">,</span> <span class="n">is_balanced</span><span class="p">))</span>
+        <span class="n">balanced_multiplicities</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">multiplicities</span><span class="p">,</span> <span class="n">is_balanced</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">balanced_total_paths</span><span class="p">,</span> <span class="n">balanced_multiplicities</span><span class="p">):</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">set_multiplicities</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">calculate_costs</span><span class="p">()</span>
+
+        <span class="n">analysis</span> <span class="o">=</span> <span class="n">PathwayAnalysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balanced_total_paths</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">balanced_total_paths</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">total_cost</span><span class="p">),</span> <span class="n">analysis</span></div>
+
+<div class="viewcode-block" id="ReactionNetwork.set_precursors"><a class="viewcode-back" href="../../index.html#rxn_network.core.ReactionNetwork.set_precursors">[docs]</a>    <span class="k">def</span> <span class="nf">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">complex_loopback</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replaces network&#39;s previous precursor node with provided new precursors.</span>
+<span class="sd">        Finds new edges that link products back to reactants as dependent on the</span>
+<span class="sd">        complex_loopback parameter.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            precursors ([ComputedEntry]): list of new precursor entries</span>
+<span class="sd">            complex_loopback (bool): if True, adds zero-weight edges which &quot;loop back&quot;</span>
+<span class="sd">                to allow for multi-step or autocatalytic-like reactions, i.e. original</span>
+<span class="sd">                precursors can reappear many times and in different steps.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">precursors</span><span class="p">)</span> <span class="k">if</span> <span class="n">precursors</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span><span class="p">:</span>
+            <span class="n">precursors_entries</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">)</span>  <span class="c1"># use dummy precursors node</span>
+            <span class="k">if</span> <span class="n">complex_loopback</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Complex loopback can&#39;t be enabled when using a dummy precursors &quot;</span>
+                    <span class="s2">&quot;node!&quot;</span>
+                <span class="p">)</span>
+        <span class="k">elif</span> <span class="kc">False</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">precursor</span><span class="p">,</span> <span class="n">ComputedEntry</span><span class="p">)</span> <span class="k">for</span> <span class="n">precursor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span>
+        <span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Precursors must be ComputedEntry-like objects.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">precursors_entries</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="n">precursors</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">remove_vertex</span><span class="p">(</span><span class="n">gt</span><span class="o">.</span><span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">new_precursors_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_vertex_properties</span><span class="p">(</span>
+            <span class="n">g</span><span class="p">,</span>
+            <span class="n">new_precursors_v</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">precursors_entries</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;chemsys&quot;</span><span class="p">:</span> <span class="n">precursors_entries</span><span class="o">.</span><span class="n">chemsys</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="n">new_edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">remove_edges</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">gt</span><span class="o">.</span><span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>  <span class="c1"># iterate over all reactants</span>
+            <span class="n">phases</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">entries</span>
+
+            <span class="n">remove_edges</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">in_edges</span><span class="p">()))</span>
+
+            <span class="k">if</span> <span class="n">precursors_entries</span><span class="o">.</span><span class="n">description</span> <span class="o">==</span> <span class="s2">&quot;D&quot;</span> <span class="ow">or</span> <span class="n">phases</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span>
+            <span class="p">):</span>
+                <span class="n">new_edges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">new_precursors_v</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">gt</span><span class="o">.</span><span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># iterate over all products</span>
+            <span class="n">phases</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">entries</span>
+
+            <span class="k">if</span> <span class="n">complex_loopback</span><span class="p">:</span>
+                <span class="n">combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_all_combos</span><span class="p">(</span>
+                    <span class="n">phases</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_phases</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_all_combos</span><span class="p">(</span><span class="n">phases</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_phases</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combos</span><span class="p">:</span>
+                <span class="n">combo_phases</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">complex_loopback</span> <span class="ow">and</span> <span class="n">combo_phases</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">combo_entry</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="n">combo_phases</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">)</span>
+                <span class="n">loopback_v</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">],</span> <span class="n">combo_entry</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">new_edges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">loopback_v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">remove_edges</span><span class="p">:</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span>
+            <span class="n">new_edges</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;bool&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReactionNetwork.set_target"><a class="viewcode-back" href="../../index.html#rxn_network.core.ReactionNetwork.set_target">[docs]</a>    <span class="k">def</span> <span class="nf">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replaces network&#39;s current target phase with new target phase.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target (ComputedEntry): ComputedEntry-like object for new target phase.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span> <span class="o">=</span> <span class="p">{</span><span class="n">target</span><span class="p">}</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">remove_vertex</span><span class="p">(</span><span class="n">gt</span><span class="o">.</span><span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">new_target_entry</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">)</span>
+        <span class="n">new_target_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_vertex_properties</span><span class="p">(</span>
+            <span class="n">g</span><span class="p">,</span>
+            <span class="n">new_target_v</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">new_target_entry</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;chemsys&quot;</span><span class="p">:</span> <span class="n">new_target_entry</span><span class="o">.</span><span class="n">chemsys</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="n">new_edges</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">gt</span><span class="o">.</span><span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># search for all products</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">entries</span><span class="p">):</span>
+                <span class="n">new_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">new_target_v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+                <span class="p">)</span>  <span class="c1"># link all products to new target</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span>
+            <span class="n">new_edges</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;bool&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReactionNetwork.set_cost_function"><a class="viewcode-back" href="../../index.html#rxn_network.core.ReactionNetwork.set_cost_function">[docs]</a>    <span class="k">def</span> <span class="nf">set_cost_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cost_function</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replaces network&#39;s current cost function with new function by recomputing</span>
+<span class="sd">        edge weights.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cost_function (str): name of cost function. Current options are</span>
+<span class="sd">                [&quot;softplus&quot;, &quot;relu&quot;, &quot;piecewise&quot;].</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cost_function</span> <span class="o">=</span> <span class="n">cost_function</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">gt</span><span class="o">.</span><span class="n">find_edge_range</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">],</span> <span class="p">(</span><span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e8</span><span class="p">)):</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_cost</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">][</span><span class="n">e</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ReactionNetwork.set_temp"><a class="viewcode-back" href="../../index.html#rxn_network.core.ReactionNetwork.set_temp">[docs]</a>    <span class="k">def</span> <span class="nf">set_temp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets new temperature parameter of network by recomputing</span>
+<span class="sd">        GibbsComputedStructureEntry objects and edge weights. Does not re-filter</span>
+<span class="sd">        for thermodynamic stability, as this would essentially</span>
+<span class="sd">        require full initialization of a newobject.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            temp (int): temperature in Kelvin; must be selected from</span>
+<span class="sd">                [300, 400, 500, ... 2000] K.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temp</span> <span class="o">=</span> <span class="n">temp</span>
+        <span class="n">old_entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span> <span class="o">=</span> <span class="n">GibbsComputedStructureEntry</span><span class="o">.</span><span class="n">from_entries</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp</span>
+        <span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">old_e</span> <span class="ow">in</span> <span class="n">old_entries</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">new_e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">old_e</span><span class="o">.</span><span class="n">structure</span> <span class="o">==</span> <span class="n">new_e</span><span class="o">.</span><span class="n">structure</span><span class="p">:</span>
+                    <span class="n">mapping</span><span class="p">[</span><span class="n">old_e</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_e</span>
+                    <span class="k">break</span>
+
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+            <span class="n">current_entries</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
+            <span class="n">new_phases</span> <span class="o">=</span> <span class="p">[</span><span class="n">mapping</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">current_entries</span><span class="o">.</span><span class="n">entries</span><span class="p">]</span>
+            <span class="n">new_entries</span> <span class="o">=</span> <span class="n">RxnEntries</span><span class="p">(</span><span class="n">new_phases</span><span class="p">,</span> <span class="n">current_entries</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_entries</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">gt</span><span class="o">.</span><span class="n">find_edge_range</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">],</span> <span class="p">(</span><span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e8</span><span class="p">)):</span>
+            <span class="n">rxn</span> <span class="o">=</span> <span class="n">ComputedReaction</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">][</span><span class="n">e</span><span class="o">.</span><span class="n">source</span><span class="p">()]</span><span class="o">.</span><span class="n">entries</span><span class="p">),</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">][</span><span class="n">e</span><span class="o">.</span><span class="n">target</span><span class="p">()]</span><span class="o">.</span><span class="n">entries</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxn</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_cost</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span> <span class="o">=</span> <span class="p">{</span><span class="n">mapping</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_targets</span> <span class="o">=</span> <span class="p">{</span><span class="n">mapping</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_targets</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span> <span class="o">=</span> <span class="p">{</span><span class="n">mapping</span><span class="p">[</span><span class="n">ct</span><span class="p">]</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_target</span><span class="p">}</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_rxn_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper method which determines reaction cost/weight.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rxn (CalculatedReaction): the pymatgen CalculatedReaction object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: cost/weight of individual reaction edge</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total_num_atoms</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">rxn</span><span class="o">.</span><span class="n">get_el_amount</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">elements</span><span class="p">])</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">calculated_reaction_energy</span> <span class="o">/</span> <span class="n">total_num_atoms</span>
+        <span class="n">cost_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cost_function</span>
+
+        <span class="k">if</span> <span class="n">cost_function</span> <span class="o">==</span> <span class="s2">&quot;softplus&quot;</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">energy</span><span class="p">]</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_softplus</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cost_function</span> <span class="o">==</span> <span class="s2">&quot;piecewise&quot;</span><span class="p">:</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="n">energy</span>
+
+            <span class="k">if</span> <span class="n">weight</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_most_negative_rxn</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_most_negative_rxn</span> <span class="o">=</span> <span class="n">weight</span>
+            <span class="k">if</span> <span class="n">weight</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">weight</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">weight</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">cost_function</span> <span class="o">==</span> <span class="s2">&quot;relu&quot;</span><span class="p">:</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="n">energy</span>
+            <span class="k">if</span> <span class="n">weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">weight</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">weight</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_update_vertex_properties</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">prop_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method for updating several vertex properties at once in a graph-tool</span>
+<span class="sd">        graph.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g (gt.Graph): a graph-tool Graph object.</span>
+<span class="sd">            v (gt.Vertex or int): a graph-tool Vertex object (or its index) for a vertex</span>
+<span class="sd">                in the provided graph.</span>
+<span class="sd">            prop_dict (dict): a dictionary of the form {&quot;prop&quot;: val}, where prop is the</span>
+<span class="sd">                name of a VertexPropertyMap of the graph and val is the new updated</span>
+<span class="sd">                value for that vertex&#39;s property.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">prop</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">prop_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="n">prop</span><span class="p">][</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_yens_ksp</span><span class="p">(</span>
+        <span class="n">g</span><span class="p">,</span> <span class="n">num_k</span><span class="p">,</span> <span class="n">precursors_v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="n">edge_prop</span><span class="o">=</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">weight_prop</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yen&#39;s Algorithm for k-shortest paths. Inspired by igraph implementation by</span>
+<span class="sd">        Antonin Lenfant. Ref: Jin Y. Yen, &quot;Finding the K Shortest Loopless Paths</span>
+<span class="sd">        in a Network&quot;, Management Science, Vol. 17, No. 11, Theory Series (Jul.,</span>
+<span class="sd">        1971), pp. 712-716.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            g (gt.Graph): the graph-tool graph object.</span>
+<span class="sd">            num_k (int): number of k shortest paths that should be found.</span>
+<span class="sd">            precursors_v (gt.Vertex): graph-tool vertex object containing precursors.</span>
+<span class="sd">            target_v (gt.Vertex): graph-tool vertex object containing target.</span>
+<span class="sd">            edge_prop (str): name of edge property map which allows for filtering edges.</span>
+<span class="sd">                Defaults to the word &quot;bool&quot;.</span>
+<span class="sd">            weight_prop (str): name of edge property map that stores edge weights/costs.</span>
+<span class="sd">                Defaults to the word &quot;weight&quot;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of lists of graph vertices corresponding to each shortest path</span>
+<span class="sd">                (sorted in increasing order by cost).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">path_cost</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Calculates path cost given a list of vertices.&quot;&quot;&quot;</span>
+            <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">cost</span> <span class="o">+=</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">weight_prop</span><span class="p">][</span><span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">vertices</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])]</span>
+            <span class="k">return</span> <span class="n">cost</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">precursors_v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">weight_prop</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
+        <span class="n">a_costs</span> <span class="o">=</span> <span class="p">[</span><span class="n">path_cost</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">PriorityQueue</span><span class="p">()</span>  <span class="c1"># automatically sorts by path cost (priority)</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_k</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">prev_path</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Identified only k=</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> paths before exiting. </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prev_path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">spur_v</span> <span class="o">=</span> <span class="n">prev_path</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">root_path</span> <span class="o">=</span> <span class="n">prev_path</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span>
+
+                <span class="n">filtered_edges</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">root_path</span> <span class="o">==</span> <span class="n">path</span><span class="p">[:</span><span class="n">i</span><span class="p">]:</span>
+                        <span class="n">e</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">edge_prop</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="n">filtered_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+                <span class="n">gv</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">GraphView</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">efilt</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">edge_prop</span><span class="p">])</span>
+                <span class="n">spur_path</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">(</span>
+                    <span class="n">gv</span><span class="p">,</span> <span class="n">spur_v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">weight_prop</span><span class="p">]</span>
+                <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">filtered_edges</span><span class="p">:</span>
+                    <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">edge_prop</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+                <span class="k">if</span> <span class="n">spur_path</span><span class="p">:</span>
+                    <span class="n">total_path</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="n">spur_path</span>
+                    <span class="n">total_path_cost</span> <span class="o">=</span> <span class="n">path_cost</span><span class="p">(</span><span class="n">total_path</span><span class="p">)</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">total_path_cost</span><span class="p">,</span> <span class="n">total_path</span><span class="p">))</span>
+
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">cost_</span><span class="p">,</span> <span class="n">path_</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="n">path_</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+                    <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path_</span><span class="p">)</span>
+                    <span class="n">a_costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cost_</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">a</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_filter_entries</span><span class="p">(</span><span class="n">all_entries</span><span class="p">,</span> <span class="n">e_above_hull</span><span class="p">,</span> <span class="n">include_polymorphs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method for filtering entries by specified energy above hull</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            all_entries ([ComputedEntry]): List of ComputedEntry-like objects to be</span>
+<span class="sd">                filtered</span>
+<span class="sd">            e_above_hull (float): Thermodynamic stability threshold (energy above hull)</span>
+<span class="sd">                [eV/atom]</span>
+<span class="sd">            include_polymorphs (bool): whether to include higher energy polymorphs of</span>
+<span class="sd">                existing structures</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [ComputedEntry]: list of all entries with energies above hull equal to or</span>
+<span class="sd">                less than the specified e_above_hull.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pd_dict</span> <span class="o">=</span> <span class="n">expand_pd</span><span class="p">(</span><span class="n">all_entries</span><span class="p">)</span>
+        <span class="n">energies_above_hull</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">all_entries</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">chemsys</span><span class="p">,</span> <span class="n">phase_diag</span> <span class="ow">in</span> <span class="n">pd_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">chemical_system</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+                    <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="n">energies_above_hull</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">phase_diag</span><span class="o">.</span><span class="n">get_e_above_hull</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">e_above_hull</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">filtered_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">energies_above_hull</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filtered_entries</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">energies_above_hull</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">e_above_hull</span>
+            <span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">include_polymorphs</span><span class="p">:</span>
+                <span class="n">filtered_entries_no_polymorphs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">all_comp</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">filtered_entries</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">all_comp</span><span class="p">:</span>
+                    <span class="n">polymorphs</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">entry</span>
+                        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">filtered_entries</span>
+                        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="o">==</span> <span class="n">comp</span>
+                    <span class="p">]</span>
+                    <span class="n">min_entry</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">polymorphs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)</span>
+                    <span class="n">filtered_entries_no_polymorphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">min_entry</span><span class="p">)</span>
+
+                <span class="n">filtered_entries</span> <span class="o">=</span> <span class="n">filtered_entries_no_polymorphs</span>
+
+        <span class="k">return</span> <span class="n">pd_dict</span><span class="p">,</span> <span class="n">filtered_entries</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_balance_all_paths</span><span class="p">(</span><span class="n">comp_matrices</span><span class="p">,</span> <span class="n">net_coeffs</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fast solution for reaction multiplicities via mass balance stochiometric</span>
+<span class="sd">        constraints. Parallelized using Numba.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            comp_matrices ([np.array]): list of numpy arrays containing stoichiometric</span>
+<span class="sd">                coefficients of all compositions in all reactions, for each trial</span>
+<span class="sd">                combination.</span>
+<span class="sd">            net_coeffs ([np.array]): list of numpy arrays containing stoichiometric</span>
+<span class="sd">                coefficients of net reaction.</span>
+<span class="sd">            tol (float): numerical tolerance for determining if a multiplicity is zero</span>
+<span class="sd">                (reaction was removed).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ([bool],[np.array]): Tuple containing bool identifying which trial</span>
+<span class="sd">                BalancedPathway objects were successfully balanced, and a list of all</span>
+<span class="sd">                multiplicities arrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">comp_matrices</span><span class="p">)</span>
+        <span class="n">comp_pseudo_inverse</span> <span class="o">=</span> <span class="n">List</span><span class="p">([</span><span class="mf">0.0</span> <span class="o">*</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">comp_matrices</span><span class="p">])</span>
+        <span class="n">multiplicities</span> <span class="o">=</span> <span class="n">List</span><span class="p">([</span><span class="mf">0.0</span> <span class="o">*</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">net_coeffs</span><span class="p">])</span>
+        <span class="n">is_balanced</span> <span class="o">=</span> <span class="n">List</span><span class="p">([</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">comp_pseudo_inverse</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">comp_matrices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">multiplicities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp_pseudo_inverse</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">net_coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">solved_coeffs</span> <span class="o">=</span> <span class="n">comp_matrices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">multiplicities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">multiplicities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                <span class="n">is_balanced</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">solved_coeffs</span> <span class="o">-</span> <span class="n">net_coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="o">&lt;=</span> <span class="p">(</span><span class="mf">1e-08</span> <span class="o">+</span> <span class="mf">1e-05</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">net_coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="n">is_balanced</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">is_balanced</span><span class="p">,</span> <span class="n">multiplicities</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_generate_all_combos</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">max_num_combos</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper static method for generating combination sets ranging from singular</span>
+<span class="sd">        length to maximum length specified by max_num_combos.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entries (list/set): list/set of all entry objects to combine</span>
+<span class="sd">            max_num_combos (int): upper limit for size of combinations of entries</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: all combination sets</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">combinations</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">num_combos</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">num_combos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_num_combos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_softplus</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">273</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cost function (softplus).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            params: list of cost function parameters (e.g. energy)</span>
+<span class="sd">            weights: list of weights corresponds to parameters of the cost function</span>
+<span class="sd">            t: temperature (K)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: cost (in a.u.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">weighted_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">params</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="mi">273</span> <span class="o">/</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">weighted_params</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pd</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_entries</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filtered_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_entries</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_targets</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">temp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;ReactionNetwork for chemical system: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pd</span><span class="o">.</span><span class="n">elements</span><span class="p">]))</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;with Graph: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Matthew McDermott
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

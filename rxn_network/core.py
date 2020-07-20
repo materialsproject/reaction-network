@@ -1,7 +1,6 @@
 import logging
 from itertools import combinations, chain, groupby, compress
 from tqdm import tqdm
-from profilehooks import profile
 
 import numpy as np
 from numba import njit, prange
@@ -21,14 +20,15 @@ __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2020, Matthew McDermott"
 __version__ = "0.1"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "July 4, 2020"
+__date__ = "July 20, 2020"
 
 
 class ReactionNetwork:
-    """This class creates and stores a weighted, directed graph in graph-tool
-        that is a dense network of all possible chemical reactions (edges)
-        between phase combinations (vertices) in a chemical system. Reaction
-        pathway hypotheses are generated using pathfinding methods.
+    """
+    This class creates and stores a weighted, directed graph in graph-tool
+    that is a dense network of all possible chemical reactions (edges)
+    between phase combinations (vertices) in a chemical system. Reaction
+    pathway hypotheses are generated using pathfinding methods.
     """
 
     def __init__(
@@ -41,10 +41,10 @@ class ReactionNetwork:
         include_polymorphs=False,
     ):
         """Initializes ReactionNetwork object with necessary preprocessing
-            steps. This does not yet compute the graph. The preprocessing
-            steps currently include: generating the phase diagram and/or
-            energies above hull for filtering (using estimated Gibbs free
-            energies of formation at specified temperature).
+        steps. This does not yet compute the graph. The preprocessing
+        steps currently include: generating the phase diagram and/or
+        energies above hull for filtering (using estimated Gibbs free
+        energies of formation at specified temperature).
 
         Args:
             entries ([ComputedStructureEntry]): list of ComputedStructureEntry-
@@ -133,10 +133,11 @@ class ReactionNetwork:
         cost_function="softplus",
         complex_loopback=True,
     ):
-        """Generates and stores the actual reaction network (weighted, directed graph)
-            using graph-tool. In practice, the main iterative loop will start taking
-            a significant amount of time (i.e. over 60 secs) when using  >50 phases.
-            As of now, temperature must be selected from [300, 400, 500, ... 2000 K].
+        """
+        Generates and stores the actual reaction network (weighted, directed graph)
+        using graph-tool. In practice, the main iterative loop will start taking
+        a significant amount of time (i.e. over 60 secs) when using  >50 phases.
+        As of now, temperature must be selected from [300, 400, 500, ... 2000 K].
 
         Args:
             precursors ([ComputedEntry]): entries for all phases which serve as the
@@ -340,9 +341,7 @@ class ReactionNetwork:
         precursors_v = gt.find_vertex(g, g.vp["type"], 0)[0]
         target_v = gt.find_vertex(g, g.vp["type"], 3)[0]
 
-        for num, path in enumerate(
-            self._yens_ksp(g, k, precursors_v, target_v)
-        ):
+        for num, path in enumerate(self._yens_ksp(g, k, precursors_v, target_v)):
             rxns = []
             weights = []
 
@@ -371,12 +370,12 @@ class ReactionNetwork:
     ):
         """
         Builds the k shortest paths to provided targets and then seeks to combine
-            them to achieve a "net reaction" with balanced stoichiometry. In other
-            words, the full conversion of all intermediates to final products.
-            Warning: this method can take a significant amount of time depending on the
-            size of the network and the max_num_combos parameter. General
-            recommendations are k = 15 and max_num_combos = 4, although a higher
-            max_num_combos may be required to capture the full pathway.
+        them to achieve a "net reaction" with balanced stoichiometry. In other
+        words, the full conversion of all intermediates to final products.
+        Warning: this method can take a significant amount of time depending on the
+        size of the network and the max_num_combos parameter. General
+        recommendations are k = 15 and max_num_combos = 4, although a higher
+        max_num_combos may be required to capture the full pathway.
 
         Args:
             k (int): Number of shortest paths to calculate to each target (i.e. if
@@ -406,8 +405,9 @@ class ReactionNetwork:
         try:
             net_rxn = ComputedReaction(list(self._precursors), list(targets))
         except ReactionError:
-            raise ReactionError("Net reaction must be balanceable to find all reaction "
-                           "pathways.")
+            raise ReactionError(
+                "Net reaction must be balanceable to find all reaction " "pathways."
+            )
 
         net_rxn_all_comp = set(net_rxn.all_comp)
         print(f"NET RXN: {net_rxn} \n")
@@ -495,9 +495,10 @@ class ReactionNetwork:
         return sorted(list(balanced_total_paths), key=lambda x: x.total_cost), analysis
 
     def set_precursors(self, precursors=None, complex_loopback=True):
-        """Replaces network's previous precursor node with provided new precursors.
-            Finds new edges that link products back to reactants as dependent on the
-            complex_loopback parameter.
+        """
+        Replaces network's previous precursor node with provided new precursors.
+        Finds new edges that link products back to reactants as dependent on the
+        complex_loopback parameter.
 
         Args:
             precursors ([ComputedEntry]): list of new precursor entries
@@ -579,7 +580,8 @@ class ReactionNetwork:
         )
 
     def set_target(self, target):
-        """Replaces network's current target phase with new target phase.
+        """
+        Replaces network's current target phase with new target phase.
 
         Args:
             target (ComputedEntry): ComputedEntry-like object for new target phase.
@@ -622,8 +624,9 @@ class ReactionNetwork:
         )
 
     def set_cost_function(self, cost_function):
-        """Replaces network's current cost function with new function by recomputing
-            edge weights.
+        """
+        Replaces network's current cost function with new function by recomputing
+        edge weights.
 
         Args:
             cost_function (str): name of cost function. Current options are
@@ -639,10 +642,11 @@ class ReactionNetwork:
             g.ep["weight"][e] = self._get_rxn_cost(g.ep["rxn"][e])
 
     def set_temp(self, temp):
-        """Sets new temperature parameter of network by recomputing
-            GibbsComputedStructureEntry objects and edge weights. Does not re-filter
-            for thermodynamic stability, as this would essentially
-            require full initialization of a newobject.
+        """
+        Sets new temperature parameter of network by recomputing
+        GibbsComputedStructureEntry objects and edge weights. Does not re-filter
+        for thermodynamic stability, as this would essentially
+        require full initialization of a newobject.
 
         Args:
             temp (int): temperature in Kelvin; must be selected from
@@ -717,8 +721,9 @@ class ReactionNetwork:
 
     @staticmethod
     def _update_vertex_properties(g, v, prop_dict):
-        """Helper method for updating several vertex properties at once in a graph-tool
-            graph.
+        """
+        Helper method for updating several vertex properties at once in a graph-tool
+        graph.
 
         Args:
             g (gt.Graph): a graph-tool Graph object.
@@ -739,10 +744,11 @@ class ReactionNetwork:
     def _yens_ksp(
         g, num_k, precursors_v, target_v, edge_prop="bool", weight_prop="weight"
     ):
-        """Yen's Algorithm for k-shortest paths. Inspired by igraph implementation by
-            Antonin Lenfant. Ref: Jin Y. Yen, "Finding the K Shortest Loopless Paths
-            in a Network", Management Science, Vol. 17, No. 11, Theory Series (Jul.,
-            1971), pp. 712-716.
+        """
+        Yen's Algorithm for k-shortest paths. Inspired by igraph implementation by
+        Antonin Lenfant. Ref: Jin Y. Yen, "Finding the K Shortest Loopless Paths
+        in a Network", Management Science, Vol. 17, No. 11, Theory Series (Jul.,
+        1971), pp. 712-716.
 
         Args:
             g (gt.Graph): the graph-tool graph object.
@@ -758,6 +764,7 @@ class ReactionNetwork:
             List of lists of graph vertices corresponding to each shortest path
                 (sorted in increasing order by cost).
         """
+
         def path_cost(vertices):
             """Calculates path cost given a list of vertices."""
             cost = 0
@@ -878,7 +885,7 @@ class ReactionNetwork:
     def _balance_all_paths(comp_matrices, net_coeffs, tol=1e-6):
         """
         Fast solution for reaction multiplicities via mass balance stochiometric
-            constraints. Parallelized using Numba.
+        constraints. Parallelized using Numba.
 
         Args:
             comp_matrices ([np.array]): list of numpy arrays containing stoichiometric
@@ -918,7 +925,7 @@ class ReactionNetwork:
     def _generate_all_combos(entries, max_num_combos):
         """
         Helper static method for generating combination sets ranging from singular
-            length to maximum length specified by max_num_combos.
+        length to maximum length specified by max_num_combos.
 
         Args:
             entries (list/set): list/set of all entry objects to combine

@@ -18,8 +18,10 @@ from monty.json import MSONable, MontyDecoder
 
 
 __author__ = "Matthew McDermott"
+__copyright__ = "Copyright 2020, Matthew McDermott"
+__version__ = "0.1"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "June 26, 2020"
+__date__ = "July 20, 2020"
 
 
 with open(os.path.join(os.path.dirname(__file__), "g_els.json")) as f:
@@ -29,8 +31,9 @@ with open(os.path.join(os.path.dirname(__file__), "nist_gas_gf.json")) as f:
 
 
 class GibbsComputedStructureEntry(ComputedStructureEntry):
-    """An extension to ComputedStructureEntry which includes the estimated Gibbs
-        free energy of formation via a machine-learned model (e.g. SISSO).
+    """
+    An extension to ComputedStructureEntry which includes the estimated Gibbs
+    free energy of formation via a machine-learned model (e.g. SISSO).
     """
 
     def __init__(
@@ -45,8 +48,6 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         entry_id=None,
     ):
         """
-        Initializes a GibbsComputedStructureEntry.
-
         Args:
             structure (Structure): The pymatgen Structure object of an entry.
             formation_enthalpy (float): Formation enthalpy of the entry, calculated
@@ -78,14 +79,15 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         self._gibbs_model = gibbs_model
 
     def gf_sisso(self):
-        """Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel
-            et al. (2018). Units: eV (not normalized)
+        """
+        Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel
+        et al. (2018). Units: eV (not normalized)
 
-            Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
-            Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
-            the Gibbs energy of inorganic crystalline solids and
-            temperature-dependent materials chemistry. Nature Communications, 9(1),
-            4168. https://doi.org/10.1038/s41467-018-06682-4
+        Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
+        Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
+        the Gibbs energy of inorganic crystalline solids and
+        temperature-dependent materials chemistry. Nature Communications, 9(1),
+        4168. https://doi.org/10.1038/s41467-018-06682-4
 
         Returns:
             float: Gibbs free energy of formation (eV)
@@ -110,8 +112,9 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         )
 
     def _sum_g_i(self):
-        """Sum of the stoichiometrically weighted chemical potentials of the elements
-            at specified temperature, as acquired from "g_els.json".
+        """
+        Sum of the stoichiometrically weighted chemical potentials of the elements
+        at specified temperature, as acquired from "g_els.json".
 
         Returns:
              float: sum of weighted chemical potentials [eV]
@@ -120,7 +123,8 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         return sum([amt * G_ELEMS[str(self.temp)][elem] for elem, amt in elems.items()])
 
     def reduced_mass(self):
-        """Reduced mass as calculated via Eq. 6 in Bartel et al. (2018)
+        """
+        Reduced mass as calculated via Eq. 6 in Bartel et al. (2018)
 
         Returns:
             float: reduced mass (amu)
@@ -148,11 +152,14 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
     @staticmethod
     def g_delta(vol_per_atom, reduced_mass, temp):
-        """G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
-                Bartel et al. (2018).
+        """
+        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
+        Bartel et al. (2018).
+
         Args:
             vol_per_atom: volume per atom [Å^3/atom]
-            reduced_mass (float) - reduced mass as calculated with pair-wise sum formula [amu]
+            reduced_mass (float) - reduced mass as calculated with pair-wise sum formula
+                [amu]
             temp (float) - Temperature [K]
 
         Returns:
@@ -168,9 +175,10 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
     @classmethod
     def from_pd(cls, pd, temp=300, gibbs_model="SISSO"):
-        """ Constructor method for initializing GibbsComputedStructureEntry objects
-            from an existing T = 0 K phase diagram, as generated via data from a
-            thermochemical database e.g. The Materials Project.
+        """
+        Constructor method for initializing GibbsComputedStructureEntry objects
+        from an existing T = 0 K phase diagram, as generated via data from a
+        thermochemical database e.g. The Materials Project.
 
         Args:
             pd (PhaseDiagram): T = 0 K phase diagram as created in pymatgen.
@@ -203,9 +211,10 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
     @classmethod
     def from_entries(cls, entries, temp=300, gibbs_model="SISSO"):
-        """Constructor method for initializing GibbsComputedStructureEntry objects from
-            T = 0 K entries, as acquired from a thermochemical database e.g. The
-            Materials Project.
+        """
+        Constructor method for initializing GibbsComputedStructureEntry objects from
+        T = 0 K entries, as acquired from a thermochemical database e.g. The
+        Materials Project.
 
         Args:
             entries ([ComputedStructureEntry]): List of ComputedStructureEntry objects,
@@ -255,9 +264,10 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
 
 class RxnEntries(MSONable):
-    """Helper class for describing combinations of ComputedEntry-like objects in context
-        of a reaction network. Necessary for implementation in NetworkX (and useful
-        for other network packages!)
+    """
+    Helper class for describing combinations of ComputedEntry-like objects in context
+    of a reaction network. Necessary for implementation in NetworkX (and useful
+    for other network packages!)
     """
 
     def __init__(self, entries, description):
@@ -343,9 +353,10 @@ class RxnEntries(MSONable):
 
 
 class RxnPathway(MSONable):
-    """Helper class for storing multiple ComputedReaction objects which form a single
-        reaction pathway as identified via pathfinding methods. Includes cost of each
-        reaction.
+    """
+    Helper class for storing multiple ComputedReaction objects which form a single
+    reaction pathway as identified via pathfinding methods. Includes cost of each
+    reaction.
     """
 
     def __init__(self, rxns, costs):
@@ -359,7 +370,7 @@ class RxnPathway(MSONable):
         self._costs = list(costs)
 
         self.total_cost = sum(self._costs)
-        self._dG_per_atom = [
+        self._dg_per_atom = [
             rxn.calculated_reaction_energy
             / sum([rxn.get_el_amount(elem) for elem in rxn.elements])
             for rxn in self._rxns
@@ -374,13 +385,13 @@ class RxnPathway(MSONable):
         return self._costs
 
     @property
-    def dG_per_atom(self):
-        return self._dG_per_atom
+    def dg_per_atom(self):
+        return self._dg_per_atom
 
     def __repr__(self):
         path_info = ""
-        for rxn, dG in zip(self._rxns, self._dG_per_atom):
-            path_info += f"{rxn} (dG = {round(dG,3)} eV/atom) \n"
+        for rxn, dg in zip(self._rxns, self._dg_per_atom):
+            path_info += f"{rxn} (dG = {round(dg, 3)} eV/atom) \n"
 
         path_info += f"Total Cost: {round(self.total_cost,3)}"
 
@@ -398,16 +409,21 @@ class RxnPathway(MSONable):
 
 class BalancedPathway(MSONable):
     """
-    Helper class for combining multiple reactions which stoichiometrically balance to form a net reaction.
+    Helper class for combining multiple reactions which stoichiometrically balance to
+    form a net reaction.
     """
 
     def __init__(self, rxn_dict, net_rxn, balance=True):
         """
-
         Args:
-            rxn_dict:
-            net_rxn:
-            balance:
+            rxn_dict (dict): dictionary of ComputedReaction objects (keys) and their
+                associated costs (values).
+            net_rxn (ComputedReaction): net reaction to use for stoichiometric
+                constraints.
+            balance (bool): whether to solve for multiplicities on initialization.
+                You might want this to be False if you're balancing the pathways first
+                and then initializing the object later, as is done in the pathfinding
+                methods.
         """
         self.rxn_dict = rxn_dict
         self.all_rxns = list(self.rxn_dict.keys())
@@ -440,12 +456,12 @@ class BalancedPathway(MSONable):
 
     def set_multiplicities(self, multiplicities):
         """
+        Stores the provided multiplicities (e.g. if solved for outside of object
+        initialization).
 
         Args:
-            multiplicities:
-
-        Returns:
-
+            multiplicities ([float]): list of multiplicities in same order as list of
+                all rxns (see self.all_rxns).
         """
         self.multiplicities = {
             rxn: multiplicity
@@ -454,9 +470,8 @@ class BalancedPathway(MSONable):
 
     def calculate_costs(self):
         """
-
-        Returns:
-
+        Calculates and sets total and average cost of all pathways using the reaction
+        dict.
         """
         self.total_cost = sum(
             [mult * self.rxn_dict[rxn] for (rxn, mult) in self.multiplicities.items()]
@@ -466,11 +481,14 @@ class BalancedPathway(MSONable):
     @staticmethod
     def _balance_rxns(comp_matrix, net_coeffs, tol=1e-6):
         """
+        Internal method for balancing a set of reactions to achieve the same
+        stoichiometry as a net reaction. Solves for multiplicities of reactions by
+        using matrix psuedoinverse and checks to see if solution works.
 
         Args:
-            comp_matrix:
-            net_coeffs:
-            tol:
+            comp_matrix (np.array): Matrix of stoichiometric coeffs for each reaction.
+            net_coeffs (np.array): Vector of stoichiometric coeffs for net reaction.
+            tol (float): Numerical tolerance for checking solution.
 
         Returns:
 
@@ -490,13 +508,15 @@ class BalancedPathway(MSONable):
     @staticmethod
     def _get_net_coeffs(net_rxn, all_comp):
         """
+        Internal method for getting the net reaction coefficients vector.
 
         Args:
-            net_rxn:
-            all_comp:
+            net_rxn (ComputedReaction): net reaction object.
+            all_comp ([Composition]): list of compositions in system of reactions.
 
         Returns:
-
+            Numpy array which is a vector of the stoichiometric coeffs of net
+            reaction and zeros for all intermediate phases.
         """
         return np.array(
             [
@@ -508,13 +528,16 @@ class BalancedPathway(MSONable):
     @staticmethod
     def _get_comp_matrix(all_comp, all_rxns):
         """
+        Internal method for getting the composition matrix used in the balancing
+        procedure.
 
         Args:
-            all_comp:
-            all_rxns:
+            all_comp ([Composition]): list of compositions in system of reactions.
+            all_rxns ([ComputedReaction]): list of all reaction objects.
 
         Returns:
-
+            Numpy array which is a matrix of the stoichiometric coeffs of each
+            reaction in the system of reactions.
         """
         return np.array(
             [
@@ -539,7 +562,8 @@ class BalancedPathway(MSONable):
                 [rxn.get_el_amount(elem) for elem in rxn.elements]
             )
             rxn_info += f"{rxn} (dG = {round(dg_per_atom,3)} eV/atom) \n"
-        rxn_info += f"\nAverage Cost: {round(self.average_cost,3)} \nTotal Cost: {round(self.total_cost,3)}"
+        rxn_info += f"\nAverage Cost: {round(self.average_cost,3)} \n" \
+                    f"Total Cost: {round(self.total_cost,3)}"
 
         return rxn_info
 
@@ -548,16 +572,16 @@ class BalancedPathway(MSONable):
 
 
 class CombinedPathway(BalancedPathway):
-    """Helper class for combining multiple RxnPathway objects in series/parallel to form
-        a "net" pathway from a set of initial reactants to final products.
+    """
+    Extends the BalancedPathway object to allow for combining of multiple RxnPathway
+    objects (instead of ComputedReaction objects themselves).
     """
 
     def __init__(self, paths, net_rxn):
         """
-
         Args:
-            paths:
-            net_rxn:
+            paths ([RxnPathway]): list of reaction pathway objects.
+            net_rxn (ComputedReaction): net reaction object.
         """
         self._paths = paths
         rxn_dict = {
@@ -576,17 +600,20 @@ class CombinedPathway(BalancedPathway):
         path_info = ""
         for path in self._paths:
             path_info += f"{str(path)} \n\n"
-        path_info += f"Average Cost: {round(self.average_cost,3)} \n" \
-                     f"Total Cost: {round(self.total_cost,3)}"
+        path_info += (
+            f"Average Cost: {round(self.average_cost,3)} \n"
+            f"Total Cost: {round(self.total_cost,3)}"
+        )
 
         return path_info
 
 
 def expand_pd(entries):
-    """Helper method for expanding a single PhaseDiagram into a set of smaller phase
-        diagrams, indexed by chemical subsystem. This is an absolutely necessary
-        approach when considering chemical systems which contain > ~10 elements,
-        due to limitations of the ConvexHull algorithm.
+    """
+    Helper method for expanding a single PhaseDiagram into a set of smaller phase
+    diagrams, indexed by chemical subsystem. This is an absolutely necessary
+    approach when considering chemical systems which contain > ~10 elements,
+    due to limitations of the ConvexHull algorithm.
 
     Args:
         entries ([ComputedEntry]): list of ComputedEntry-like objects for building

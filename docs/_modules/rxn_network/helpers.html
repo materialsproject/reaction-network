@@ -1,0 +1,842 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rxn_network.helpers &mdash; Reaction Network  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #800080" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Reaction Network
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Reaction Network</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>rxn_network.helpers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rxn_network.helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module implements several helper classes for storing and parsing reaction pathway</span>
+<span class="sd">info in the Reaction Network core module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">pymatgen</span> <span class="kn">import</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.phase_diagram</span> <span class="kn">import</span> <span class="n">PhaseDiagram</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.reaction_calculator</span> <span class="kn">import</span> <span class="n">ComputedReaction</span>
+<span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedStructureEntry</span>
+
+<span class="kn">from</span> <span class="nn">monty.json</span> <span class="kn">import</span> <span class="n">MSONable</span><span class="p">,</span> <span class="n">MontyDecoder</span>
+
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Matthew McDermott&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2020, Matthew McDermott&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;mcdermott@lbl.gov&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;July 20, 2020&quot;</span>
+
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;g_els.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">G_ELEMS</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;nist_gas_gf.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">G_GASES</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="GibbsComputedStructureEntry"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.GibbsComputedStructureEntry">[docs]</a><span class="k">class</span> <span class="nc">GibbsComputedStructureEntry</span><span class="p">(</span><span class="n">ComputedStructureEntry</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An extension to ComputedStructureEntry which includes the estimated Gibbs</span>
+<span class="sd">    free energy of formation via a machine-learned model (e.g. SISSO).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">structure</span><span class="p">,</span>
+        <span class="n">formation_enthalpy</span><span class="p">,</span>
+        <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+        <span class="n">gibbs_model</span><span class="o">=</span><span class="s2">&quot;SISSO&quot;</span><span class="p">,</span>
+        <span class="n">correction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">entry_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            structure (Structure): The pymatgen Structure object of an entry.</span>
+<span class="sd">            formation_enthalpy (float): Formation enthalpy of the entry, calculated</span>
+<span class="sd">                sing phase diagram construction (eV)</span>
+<span class="sd">            temp (int): Temperature in Kelvin. Temperature must be selected from</span>
+<span class="sd">                [300, 400, 500, ... 2000 K].</span>
+<span class="sd">            gibbs_model (str): Model for Gibbs Free energy. Current (and only supported</span>
+<span class="sd">                option) is &quot;SISSO&quot;, the descriptor created by Bartel et al. (2018).</span>
+<span class="sd">            correction (float): A correction to be applied to the energy. Defaults to 0</span>
+<span class="sd">            parameters (dict): An optional dict of parameters associated with</span>
+<span class="sd">                the entry. Defaults to None.</span>
+<span class="sd">            data (dict): An optional dict of any additional data associated</span>
+<span class="sd">                with the entry. Defaults to None.</span>
+<span class="sd">            entry_id (obj): An optional id to uniquely identify the entry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure</span> <span class="o">=</span> <span class="n">structure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formation_enthalpy</span> <span class="o">=</span> <span class="n">formation_enthalpy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">structure</span><span class="p">,</span>
+            <span class="n">energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_sisso</span><span class="p">(),</span>
+            <span class="n">correction</span><span class="o">=</span><span class="n">correction</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">entry_id</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gibbs_model</span> <span class="o">=</span> <span class="n">gibbs_model</span>
+
+<div class="viewcode-block" id="GibbsComputedStructureEntry.gf_sisso"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.GibbsComputedStructureEntry.gf_sisso">[docs]</a>    <span class="k">def</span> <span class="nf">gf_sisso</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel</span>
+<span class="sd">        et al. (2018). Units: eV (not normalized)</span>
+
+<span class="sd">        Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,</span>
+<span class="sd">        Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for</span>
+<span class="sd">        the Gibbs energy of inorganic crystalline solids and</span>
+<span class="sd">        temperature-dependent materials chemistry. Nature Communications, 9(1),</span>
+<span class="sd">        4168. https://doi.org/10.1038/s41467-018-06682-4</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Gibbs free energy of formation (eV)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">composition</span>
+        <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">is_element</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">formation_enthalpy</span>
+        <span class="k">elif</span> <span class="n">comp</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="ow">in</span> <span class="n">G_GASES</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">G_GASES</span><span class="p">[</span><span class="n">comp</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp</span><span class="p">)]</span>
+                <span class="o">*</span> <span class="n">comp</span><span class="o">.</span><span class="n">get_reduced_formula_and_factor</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="n">num_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">num_sites</span>
+        <span class="n">vol_per_atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">volume</span> <span class="o">/</span> <span class="n">num_atoms</span>
+        <span class="n">reduced_mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduced_mass</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">formation_enthalpy</span>
+            <span class="o">+</span> <span class="n">num_atoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_delta</span><span class="p">(</span><span class="n">vol_per_atom</span><span class="p">,</span> <span class="n">reduced_mass</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp</span><span class="p">)</span>
+            <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_g_i</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_sum_g_i</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sum of the stoichiometrically weighted chemical potentials of the elements</span>
+<span class="sd">        at specified temperature, as acquired from &quot;g_els.json&quot;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">             float: sum of weighted chemical potentials [eV]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">elems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">get_el_amt_dict</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">amt</span> <span class="o">*</span> <span class="n">G_ELEMS</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp</span><span class="p">)][</span><span class="n">elem</span><span class="p">]</span> <span class="k">for</span> <span class="n">elem</span><span class="p">,</span> <span class="n">amt</span> <span class="ow">in</span> <span class="n">elems</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+
+<div class="viewcode-block" id="GibbsComputedStructureEntry.reduced_mass"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.GibbsComputedStructureEntry.reduced_mass">[docs]</a>    <span class="k">def</span> <span class="nf">reduced_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reduced mass as calculated via Eq. 6 in Bartel et al. (2018)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: reduced mass (amu)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reduced_comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span>
+        <span class="n">num_elems</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">reduced_comp</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
+        <span class="n">elem_dict</span> <span class="o">=</span> <span class="n">reduced_comp</span><span class="o">.</span><span class="n">get_el_amt_dict</span><span class="p">()</span>
+
+        <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_elems</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">reduced_comp</span><span class="o">.</span><span class="n">num_atoms</span>
+
+        <span class="n">all_pairs</span> <span class="o">=</span> <span class="n">combinations</span><span class="p">(</span><span class="n">elem_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">mass_sum</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">all_pairs</span><span class="p">:</span>
+            <span class="n">m_i</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">weight</span>
+            <span class="n">m_j</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">weight</span>
+            <span class="n">alpha_i</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">alpha_j</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">mass_sum</span> <span class="o">+=</span> <span class="p">(</span><span class="n">alpha_i</span> <span class="o">+</span> <span class="n">alpha_j</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">m_i</span> <span class="o">*</span> <span class="n">m_j</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">m_i</span> <span class="o">+</span> <span class="n">m_j</span><span class="p">)</span>
+
+        <span class="n">reduced_mass</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">denominator</span><span class="p">)</span> <span class="o">*</span> <span class="n">mass_sum</span>
+
+        <span class="k">return</span> <span class="n">reduced_mass</span></div>
+
+<div class="viewcode-block" id="GibbsComputedStructureEntry.g_delta"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.GibbsComputedStructureEntry.g_delta">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">g_delta</span><span class="p">(</span><span class="n">vol_per_atom</span><span class="p">,</span> <span class="n">reduced_mass</span><span class="p">,</span> <span class="n">temp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in</span>
+<span class="sd">        Bartel et al. (2018).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            vol_per_atom: volume per atom [Å^3/atom]</span>
+<span class="sd">            reduced_mass (float) - reduced mass as calculated with pair-wise sum formula</span>
+<span class="sd">                [amu]</span>
+<span class="sd">            temp (float) - Temperature [K]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: G^delta</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="o">-</span><span class="mf">2.48e-4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vol_per_atom</span><span class="p">)</span> <span class="o">-</span> <span class="mf">8.94e-5</span> <span class="o">*</span> <span class="n">reduced_mass</span> <span class="o">/</span> <span class="n">vol_per_atom</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">temp</span>
+            <span class="o">+</span> <span class="mf">0.181</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+            <span class="o">-</span> <span class="mf">0.882</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GibbsComputedStructureEntry.from_pd"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.GibbsComputedStructureEntry.from_pd">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_pd</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">gibbs_model</span><span class="o">=</span><span class="s2">&quot;SISSO&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor method for initializing GibbsComputedStructureEntry objects</span>
+<span class="sd">        from an existing T = 0 K phase diagram, as generated via data from a</span>
+<span class="sd">        thermochemical database e.g. The Materials Project.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pd (PhaseDiagram): T = 0 K phase diagram as created in pymatgen.</span>
+<span class="sd">            temp (int): Temperature [K] for estimating Gibbs free energy of formation.</span>
+<span class="sd">            gibbs_model (str): Gibbs model to use; currently the only option is &quot;SISSO&quot;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [GibbsComputedStructureEntry]: list of new entries which replace the orig.</span>
+<span class="sd">                entries with inclusion of Gibbs free energy of formation at the</span>
+<span class="sd">                specified temperature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gibbs_entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">all_entries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">entry</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">el_refs</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="ow">or</span> <span class="ow">not</span> <span class="n">entry</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">is_element</span>
+            <span class="p">):</span>
+                <span class="n">gibbs_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">cls</span><span class="p">(</span>
+                        <span class="n">entry</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
+                        <span class="n">formation_enthalpy</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">get_form_energy</span><span class="p">(</span><span class="n">entry</span><span class="p">),</span>
+                        <span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span>
+                        <span class="n">correction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">gibbs_model</span><span class="o">=</span><span class="n">gibbs_model</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                        <span class="n">entry_id</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">entry_id</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">gibbs_entries</span></div>
+
+<div class="viewcode-block" id="GibbsComputedStructureEntry.from_entries"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.GibbsComputedStructureEntry.from_entries">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_entries</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">gibbs_model</span><span class="o">=</span><span class="s2">&quot;SISSO&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor method for initializing GibbsComputedStructureEntry objects from</span>
+<span class="sd">        T = 0 K entries, as acquired from a thermochemical database e.g. The</span>
+<span class="sd">        Materials Project.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entries ([ComputedStructureEntry]): List of ComputedStructureEntry objects,</span>
+<span class="sd">                as downloaded from The Materials Project API.</span>
+<span class="sd">            temp (int): Temperature [K] for estimating Gibbs free energy of formation.</span>
+<span class="sd">            gibbs_model (str): Gibbs model to use; currently the only option is &quot;SISSO&quot;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [GibbsComputedStructureEntry]: list of new entries which replace the orig.</span>
+<span class="sd">                entries with inclusion of Gibbs free energy of formation at the</span>
+<span class="sd">                specified temperature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pd_dict</span> <span class="o">=</span> <span class="n">expand_pd</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+        <span class="n">gibbs_entries</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">chemsys</span><span class="p">,</span> <span class="n">phase_diag</span> <span class="ow">in</span> <span class="n">pd_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">chemical_system</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+                    <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">entry</span> <span class="ow">in</span> <span class="n">phase_diag</span><span class="o">.</span><span class="n">el_refs</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                        <span class="ow">or</span> <span class="ow">not</span> <span class="n">entry</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">is_element</span>
+                    <span class="p">):</span>
+                        <span class="n">gibbs_entries</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                            <span class="bp">cls</span><span class="p">(</span>
+                                <span class="n">entry</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
+                                <span class="n">formation_enthalpy</span><span class="o">=</span><span class="n">phase_diag</span><span class="o">.</span><span class="n">get_form_energy</span><span class="p">(</span><span class="n">entry</span><span class="p">),</span>
+                                <span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span>
+                                <span class="n">correction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                <span class="n">gibbs_model</span><span class="o">=</span><span class="n">gibbs_model</span><span class="p">,</span>
+                                <span class="n">data</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                                <span class="n">entry_id</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">entry_id</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">gibbs_entries</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;GibbsComputedStructureEntry </span><span class="si">{}</span><span class="s2"> - </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">formula</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;Gibbs Free Energy (Formation) = </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RxnEntries"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.RxnEntries">[docs]</a><span class="k">class</span> <span class="nc">RxnEntries</span><span class="p">(</span><span class="n">MSONable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper class for describing combinations of ComputedEntry-like objects in context</span>
+<span class="sd">    of a reaction network. Necessary for implementation in NetworkX (and useful</span>
+<span class="sd">    for other network packages!)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            entries [ComputedEntry]: list of ComputedEntry-like objects</span>
+<span class="sd">            description (str): Node type, as selected from:</span>
+<span class="sd">                &quot;R&quot; (reactants), &quot;P&quot; (products),</span>
+<span class="sd">                &quot;S&quot; (starters/precursors), &quot;T&quot; (target),</span>
+<span class="sd">                &quot;D&quot; (dummy)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span> <span class="k">if</span> <span class="n">entries</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chemsys</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">sorted</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span>
+                        <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">entries</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">description</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;reactants&quot;</span><span class="p">,</span> <span class="s2">&quot;Reactants&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="s2">&quot;R&quot;</span>
+        <span class="k">elif</span> <span class="n">description</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="s2">&quot;products&quot;</span><span class="p">,</span> <span class="s2">&quot;Products&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="s2">&quot;P&quot;</span>
+        <span class="k">elif</span> <span class="n">description</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s2">&quot;s&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;S&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;precursors&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Precursors&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;starters&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Starters&quot;</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="s2">&quot;S&quot;</span>
+        <span class="k">elif</span> <span class="n">description</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;Target&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="s2">&quot;T&quot;</span>
+        <span class="k">elif</span> <span class="n">description</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;dummy&quot;</span><span class="p">,</span> <span class="s2">&quot;Dummy&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="s2">&quot;D&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">description</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">entries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chemsys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chemsys</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">==</span> <span class="s2">&quot;D&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Dummy Node&quot;</span>
+
+        <span class="n">formulas</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="p">]</span>
+        <span class="n">formulas</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">formulas</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">formulas</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">description</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chemsys</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">chemsys</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">entries</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">==</span> <span class="s2">&quot;D&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="RxnPathway"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.RxnPathway">[docs]</a><span class="k">class</span> <span class="nc">RxnPathway</span><span class="p">(</span><span class="n">MSONable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper class for storing multiple ComputedReaction objects which form a single</span>
+<span class="sd">    reaction pathway as identified via pathfinding methods. Includes cost of each</span>
+<span class="sd">    reaction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxns</span><span class="p">,</span> <span class="n">costs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            rxns ([ComputedReaction]): list of ComputedReaction objects in pymatgen</span>
+<span class="sd">                which occur along path.</span>
+<span class="sd">            costs ([float]): list of corresponding costs for each reaction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rxns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_costs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">costs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_costs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dg_per_atom</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">rxn</span><span class="o">.</span><span class="n">calculated_reaction_energy</span>
+            <span class="o">/</span> <span class="nb">sum</span><span class="p">([</span><span class="n">rxn</span><span class="o">.</span><span class="n">get_el_amount</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">elements</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rxns</span>
+        <span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rxns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rxns</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">costs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_costs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dg_per_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dg_per_atom</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">rxn</span><span class="p">,</span> <span class="n">dg</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rxns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dg_per_atom</span><span class="p">):</span>
+            <span class="n">path_info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rxn</span><span class="si">}</span><span class="s2"> (dG = </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2"> eV/atom) </span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="n">path_info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Total Cost: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_cost</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">path_info</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rxns</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="BalancedPathway"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.BalancedPathway">[docs]</a><span class="k">class</span> <span class="nc">BalancedPathway</span><span class="p">(</span><span class="n">MSONable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper class for combining multiple reactions which stoichiometrically balance to</span>
+<span class="sd">    form a net reaction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn_dict</span><span class="p">,</span> <span class="n">net_rxn</span><span class="p">,</span> <span class="n">balance</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            rxn_dict (dict): dictionary of ComputedReaction objects (keys) and their</span>
+<span class="sd">                associated costs (values).</span>
+<span class="sd">            net_rxn (ComputedReaction): net reaction to use for stoichiometric</span>
+<span class="sd">                constraints.</span>
+<span class="sd">            balance (bool): whether to solve for multiplicities on initialization.</span>
+<span class="sd">                You might want this to be False if you&#39;re balancing the pathways first</span>
+<span class="sd">                and then initializing the object later, as is done in the pathfinding</span>
+<span class="sd">                methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rxn_dict</span> <span class="o">=</span> <span class="n">rxn_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_rxns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rxn_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net_rxn</span> <span class="o">=</span> <span class="n">net_rxn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_reactants</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_products</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_balanced</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiplicities</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_cost</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_cost</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rxn_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_reactants</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">products</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_comp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_reactants</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_products</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">net_rxn</span><span class="o">.</span><span class="n">all_comp</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net_coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_net_coeffs</span><span class="p">(</span><span class="n">net_rxn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_comp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comp_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_comp_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_comp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_rxns</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">balance</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_balanced</span><span class="p">,</span> <span class="n">multiplicities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_balance_rxns</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comp_matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">net_coeffs</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_multiplicities</span><span class="p">(</span><span class="n">multiplicities</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_balanced</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_costs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BalancedPathway.set_multiplicities"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.BalancedPathway.set_multiplicities">[docs]</a>    <span class="k">def</span> <span class="nf">set_multiplicities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiplicities</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stores the provided multiplicities (e.g. if solved for outside of object</span>
+<span class="sd">        initialization).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            multiplicities ([float]): list of multiplicities in same order as list of</span>
+<span class="sd">                all rxns (see self.all_rxns).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiplicities</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">rxn</span><span class="p">:</span> <span class="n">multiplicity</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_rxns</span><span class="p">,</span> <span class="n">multiplicities</span><span class="p">)</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BalancedPathway.calculate_costs"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.BalancedPathway.calculate_costs">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_costs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates and sets total and average cost of all pathways using the reaction</span>
+<span class="sd">        dict.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">mult</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">rxn_dict</span><span class="p">[</span><span class="n">rxn</span><span class="p">]</span> <span class="k">for</span> <span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">mult</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicities</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_cost</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rxn_dict</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_balance_rxns</span><span class="p">(</span><span class="n">comp_matrix</span><span class="p">,</span> <span class="n">net_coeffs</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal method for balancing a set of reactions to achieve the same</span>
+<span class="sd">        stoichiometry as a net reaction. Solves for multiplicities of reactions by</span>
+<span class="sd">        using matrix psuedoinverse and checks to see if solution works.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            comp_matrix (np.array): Matrix of stoichiometric coeffs for each reaction.</span>
+<span class="sd">            net_coeffs (np.array): Vector of stoichiometric coeffs for net reaction.</span>
+<span class="sd">            tol (float): Numerical tolerance for checking solution.</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comp_pseudo_inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">comp_matrix</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">multiplicities</span> <span class="o">=</span> <span class="n">comp_pseudo_inverse</span> <span class="o">@</span> <span class="n">net_coeffs</span>
+
+        <span class="n">is_balanced</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">multiplicities</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">is_balanced</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">comp_matrix</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">multiplicities</span><span class="p">,</span> <span class="n">net_coeffs</span><span class="p">):</span>
+            <span class="n">is_balanced</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">is_balanced</span><span class="p">,</span> <span class="n">multiplicities</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_net_coeffs</span><span class="p">(</span><span class="n">net_rxn</span><span class="p">,</span> <span class="n">all_comp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal method for getting the net reaction coefficients vector.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            net_rxn (ComputedReaction): net reaction object.</span>
+<span class="sd">            all_comp ([Composition]): list of compositions in system of reactions.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Numpy array which is a vector of the stoichiometric coeffs of net</span>
+<span class="sd">            reaction and zeros for all intermediate phases.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">net_rxn</span><span class="o">.</span><span class="n">get_coeff</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span> <span class="k">if</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">net_rxn</span><span class="o">.</span><span class="n">all_comp</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">all_comp</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_comp_matrix</span><span class="p">(</span><span class="n">all_comp</span><span class="p">,</span> <span class="n">all_rxns</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal method for getting the composition matrix used in the balancing</span>
+<span class="sd">        procedure.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            all_comp ([Composition]): list of compositions in system of reactions.</span>
+<span class="sd">            all_rxns ([ComputedReaction]): list of all reaction objects.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Numpy array which is a matrix of the stoichiometric coeffs of each</span>
+<span class="sd">            reaction in the system of reactions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">[</span>
+                    <span class="n">rxn</span><span class="o">.</span><span class="n">get_coeff</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span> <span class="k">if</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">all_comp</span> <span class="k">else</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">all_comp</span>
+                <span class="p">]</span>
+                <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">all_rxns</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_rxns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">all_rxns</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rxn_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">rxn</span><span class="p">,</span> <span class="n">cost</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rxn_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">dg_per_atom</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">calculated_reaction_energy</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">rxn</span><span class="o">.</span><span class="n">get_el_amount</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">elements</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">rxn_info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rxn</span><span class="si">}</span><span class="s2"> (dG = </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">dg_per_atom</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2"> eV/atom) </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rxn_info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Average Cost: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">average_cost</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span> \
+                    <span class="sa">f</span><span class="s2">&quot;Total Cost: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_cost</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">rxn_info</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_rxns</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="CombinedPathway"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.CombinedPathway">[docs]</a><span class="k">class</span> <span class="nc">CombinedPathway</span><span class="p">(</span><span class="n">BalancedPathway</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extends the BalancedPathway object to allow for combining of multiple RxnPathway</span>
+<span class="sd">    objects (instead of ComputedReaction objects themselves).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">net_rxn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            paths ([RxnPathway]): list of reaction pathway objects.</span>
+<span class="sd">            net_rxn (ComputedReaction): net reaction object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span> <span class="o">=</span> <span class="n">paths</span>
+        <span class="n">rxn_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">rxn</span><span class="p">:</span> <span class="n">cost</span>
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">rxns</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">costs</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">rxn_dict</span><span class="p">,</span> <span class="n">net_rxn</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">:</span>
+            <span class="n">path_info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="n">path_info</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Average Cost: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">average_cost</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Total Cost: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_cost</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">path_info</span></div>
+
+
+<div class="viewcode-block" id="expand_pd"><a class="viewcode-back" href="../../index.html#rxn_network.helpers.expand_pd">[docs]</a><span class="k">def</span> <span class="nf">expand_pd</span><span class="p">(</span><span class="n">entries</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper method for expanding a single PhaseDiagram into a set of smaller phase</span>
+<span class="sd">    diagrams, indexed by chemical subsystem. This is an absolutely necessary</span>
+<span class="sd">    approach when considering chemical systems which contain &gt; ~10 elements,</span>
+<span class="sd">    due to limitations of the ConvexHull algorithm.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        entries ([ComputedEntry]): list of ComputedEntry-like objects for building</span>
+<span class="sd">            phase diagram.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary of PhaseDiagram objects indexed by chemical subsystem string;</span>
+<span class="sd">        e.g. {&quot;Li-Mn-O&quot;: &lt;PhaseDiagram object&gt;, &quot;C-Y&quot;: &lt;PhaseDiagram object&gt;, ...}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pd_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">chemsys</span> <span class="ow">in</span> <span class="n">pd_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">chemical_system</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+                <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pd_dict</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">chemical_system</span><span class="p">]</span> <span class="o">=</span> <span class="n">PhaseDiagram</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span>
+                    <span class="nb">filter</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+                            <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span>
+                        <span class="p">),</span>
+                        <span class="n">entries</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pd_dict</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Matthew McDermott
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

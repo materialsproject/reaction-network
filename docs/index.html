@@ -1,0 +1,696 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction &mdash; Reaction Network  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #800080" >
+          
+
+          
+            <a href="#" class="icon icon-home" alt="Documentation Home"> Reaction Network
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Introduction</a></li>
+<li><a class="reference internal" href="#installing-rxn-network">Installing rxn-network</a></li>
+<li><a class="reference internal" href="#demo">Demo</a></li>
+<li><a class="reference internal" href="#how-to-cite-rxn-network">How to cite rxn-network</a></li>
+<li><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+<li><a class="reference internal" href="#module-rxn_network.core">Core module</a></li>
+<li><a class="reference internal" href="#module-rxn_network.helpers">Helpers module</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Reaction Network</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Introduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <img alt="Reaction Network Logo" class="align-center" src="_images/logo.png" />
+<div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Reaction network (rxn-network) is a Python package for predicting chemical reaction
+pathways in solid-state materials synthesis using graph theory.</p>
+</div>
+<div class="section" id="installing-rxn-network">
+<h1>Installing rxn-network<a class="headerlink" href="#installing-rxn-network" title="Permalink to this headline">¶</a></h1>
+<p>The rxn-network package has several dependencies, most of which can be installed
+through PyPI. However, graph-tool must be installed through a more customized method;
+please see <a class="reference external" href="https://graph-tool.skewed.de/">https://graph-tool.skewed.de/</a> for more details. We recommend the
+following installation procedure which creates a new conda environment:</p>
+<blockquote>
+<div><p>conda create -n gt python=3.8</p>
+</div></blockquote>
+<p>And then installs graph-tool through conda-forge:</p>
+<blockquote>
+<div><p>conda install -c conda-forge graph-tool</p>
+</div></blockquote>
+<p>To install an editable version of the rxn-network code, simply download (clone) the
+code from this repository, navigate to its directory in terminal, and then run the
+following command to install the requirements:</p>
+<blockquote>
+<div><p>pip install -r requirements.txt</p>
+</div></blockquote>
+<p>And then to finally install an editable version of the package:</p>
+<blockquote>
+<div><p>pip install -e .</p>
+</div></blockquote>
+</div>
+<div class="section" id="demo">
+<h1>Demo<a class="headerlink" href="#demo" title="Permalink to this headline">¶</a></h1>
+<p>A demo Jupyter notebook (demo.ipynb) contains the code necessary to replicate the
+results of the paper and is a good starting template for using the rxn-network package.</p>
+</div>
+<div class="section" id="how-to-cite-rxn-network">
+<h1>How to cite rxn-network<a class="headerlink" href="#how-to-cite-rxn-network" title="Permalink to this headline">¶</a></h1>
+<p>The following paper explains the methodology of the rxn-network package.
+It is currently under review, but a preprint is accessible via:</p>
+<p><a class="reference external" href="https://assets.researchsquare.com/files/rs-38000/v1_stamped.pdf">https://assets.researchsquare.com/files/rs-38000/v1_stamped.pdf</a></p>
+</div>
+<div class="section" id="acknowledgements">
+<h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h1>
+<p>This work was supported as part of GENESIS: A Next Generation Synthesis Center, an
+Energy Frontier Research Center funded by the U.S. Department of Energy, Office of
+Science, Basic Energy Sciences under Award Number DE-SC0019212.</p>
+<p>Learn more about the GENESIS EFRC here: <a class="reference external" href="https://www.stonybrook.edu/genesis/">https://www.stonybrook.edu/genesis/</a></p>
+</div>
+<div class="section" id="module-rxn_network.core">
+<span id="core-module"></span><h1>Core module<a class="headerlink" href="#module-rxn_network.core" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="rxn_network.core.ReactionNetwork">
+<em class="property">class </em><code class="sig-prename descclassname">rxn_network.core.</code><code class="sig-name descname">ReactionNetwork</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">entries</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">temp</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">extend_entries</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">include_metastable</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">include_polymorphs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/core.html#ReactionNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.core.ReactionNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class creates and stores a weighted, directed graph in graph-tool
+that is a dense network of all possible chemical reactions (edges)
+between phase combinations (vertices) in a chemical system. Reaction
+pathway hypotheses are generated using pathfinding methods.</p>
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.all_entries">
+<em class="property">property </em><code class="sig-name descname">all_entries</code><a class="headerlink" href="#rxn_network.core.ReactionNetwork.all_entries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.all_targets">
+<em class="property">property </em><code class="sig-name descname">all_targets</code><a class="headerlink" href="#rxn_network.core.ReactionNetwork.all_targets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.filtered_entries">
+<em class="property">property </em><code class="sig-name descname">filtered_entries</code><a class="headerlink" href="#rxn_network.core.ReactionNetwork.filtered_entries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.find_all_rxn_pathways">
+<code class="sig-name descname">find_all_rxn_pathways</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">15</span></em>, <em class="sig-param"><span class="n">targets</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_num_combos</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">consider_crossover_rxns</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/core.html#ReactionNetwork.find_all_rxn_pathways"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.core.ReactionNetwork.find_all_rxn_pathways" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds the k shortest paths to provided targets and then seeks to combine
+them to achieve a “net reaction” with balanced stoichiometry. In other
+words, the full conversion of all intermediates to final products.
+Warning: this method can take a significant amount of time depending on the
+size of the network and the max_num_combos parameter. General
+recommendations are k = 15 and max_num_combos = 4, although a higher
+max_num_combos may be required to capture the full pathway.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<em>int</em>) – Number of shortest paths to calculate to each target (i.e. if
+there are 3 targets and k=15, then 3x15 = 45 paths will be generated
+and the reactions from these will be combined.</p></li>
+<li><p><strong>targets</strong> (<em>[</em><em>ComputedEntries</em><em>]</em>) – list of all target ComputedEntry objects;
+defaults to targets provided when network was created.</p></li>
+<li><p><strong>max_num_combos</strong> (<em>int</em>) – upper limit on how many reactions to consider at a
+time (default 4).</p></li>
+<li><p><strong>consider_crossover_rxns</strong> (<em>bool</em>) – Whether to consider “crossover” reactions
+between intermediates in other pathways. This can be crucial for
+generating realistic predictions and it is highly recommended;
+generally the added computational cost is extremely low.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Tuple containing list of</dt><dd><p>CombinedPathway objects (sorted by total cost) and a PathwayAnalysis
+object with helpful analysis methods for hypothesized pathways.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>([<a class="reference internal" href="#rxn_network.helpers.CombinedPathway" title="rxn_network.helpers.CombinedPathway">CombinedPathway</a>], PathwayAnalysis)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.find_k_shortest_paths">
+<code class="sig-name descname">find_k_shortest_paths</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/core.html#ReactionNetwork.find_k_shortest_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.core.ReactionNetwork.find_k_shortest_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds k shortest paths to current target using Yen’s Algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<em>int</em>) – desired number of shortest pathways (ranked by cost)</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – whether to print all identified pathways to the console.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>list of RxnPathway objects containing reactions traversed on</dt><dd><p>each path.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>[<a class="reference internal" href="#rxn_network.helpers.RxnPathway" title="rxn_network.helpers.RxnPathway">RxnPathway</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.g">
+<em class="property">property </em><code class="sig-name descname">g</code><a class="headerlink" href="#rxn_network.core.ReactionNetwork.g" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.generate_rxn_network">
+<code class="sig-name descname">generate_rxn_network</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">precursors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">targets</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cost_function</span><span class="o">=</span><span class="default_value">'softplus'</span></em>, <em class="sig-param"><span class="n">complex_loopback</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/core.html#ReactionNetwork.generate_rxn_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.core.ReactionNetwork.generate_rxn_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates and stores the actual reaction network (weighted, directed graph)
+using graph-tool. In practice, the main iterative loop will start taking
+a significant amount of time (i.e. over 60 secs) when using  &gt;50 phases.
+As of now, temperature must be selected from [300, 400, 500, … 2000 K].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>precursors</strong> (<em>[</em><em>ComputedEntry</em><em>]</em>) – entries for all phases which serve as the
+main reactants; if None,a “dummy” node is used to represent any
+possible set of precursors.</p></li>
+<li><p><strong>targets</strong> (<em>[</em><em>ComputedEntry</em><em>]</em>) – entries for all phases which are the final
+products; if None, a “dummy” node is used to represent any possible
+set of targets.</p></li>
+<li><p><strong>cost_function</strong> (<em>str</em>) – name of cost function to use for entire network
+(e.g. “softplus”).</p></li>
+<li><p><strong>complex_loopback</strong> (<em>bool</em>) – if True, adds zero-weight edges which “loop back”
+to allow for multi-step or autocatalytic-like reactions, i.e. original
+precursors can reappear many times and in different steps.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.pd">
+<em class="property">property </em><code class="sig-name descname">pd</code><a class="headerlink" href="#rxn_network.core.ReactionNetwork.pd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.precursors">
+<em class="property">property </em><code class="sig-name descname">precursors</code><a class="headerlink" href="#rxn_network.core.ReactionNetwork.precursors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.set_cost_function">
+<code class="sig-name descname">set_cost_function</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cost_function</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/core.html#ReactionNetwork.set_cost_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.core.ReactionNetwork.set_cost_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces network’s current cost function with new function by recomputing
+edge weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cost_function</strong> (<em>str</em>) – name of cost function. Current options are
+[“softplus”, “relu”, “piecewise”].</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.set_precursors">
+<code class="sig-name descname">set_precursors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">precursors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">complex_loopback</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/core.html#ReactionNetwork.set_precursors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.core.ReactionNetwork.set_precursors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces network’s previous precursor node with provided new precursors.
+Finds new edges that link products back to reactants as dependent on the
+complex_loopback parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>precursors</strong> (<em>[</em><em>ComputedEntry</em><em>]</em>) – list of new precursor entries</p></li>
+<li><p><strong>complex_loopback</strong> (<em>bool</em>) – if True, adds zero-weight edges which “loop back”
+to allow for multi-step or autocatalytic-like reactions, i.e. original
+precursors can reappear many times and in different steps.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.set_target">
+<code class="sig-name descname">set_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/core.html#ReactionNetwork.set_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.core.ReactionNetwork.set_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces network’s current target phase with new target phase.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>target</strong> (<em>ComputedEntry</em>) – ComputedEntry-like object for new target phase.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.set_temp">
+<code class="sig-name descname">set_temp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">temp</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/core.html#ReactionNetwork.set_temp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.core.ReactionNetwork.set_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets new temperature parameter of network by recomputing
+GibbsComputedStructureEntry objects and edge weights. Does not re-filter
+for thermodynamic stability, as this would essentially
+require full initialization of a newobject.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>temp</strong> (<em>int</em>) – temperature in Kelvin; must be selected from
+[300, 400, 500, … 2000] K.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.core.ReactionNetwork.temp">
+<em class="property">property </em><code class="sig-name descname">temp</code><a class="headerlink" href="#rxn_network.core.ReactionNetwork.temp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-rxn_network.helpers">
+<span id="helpers-module"></span><h1>Helpers module<a class="headerlink" href="#module-rxn_network.helpers" title="Permalink to this headline">¶</a></h1>
+<p>This module implements several helper classes for storing and parsing reaction pathway
+info in the Reaction Network core module.</p>
+<dl class="py class">
+<dt id="rxn_network.helpers.BalancedPathway">
+<em class="property">class </em><code class="sig-prename descclassname">rxn_network.helpers.</code><code class="sig-name descname">BalancedPathway</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rxn_dict</span></em>, <em class="sig-param"><span class="n">net_rxn</span></em>, <em class="sig-param"><span class="n">balance</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#BalancedPathway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.BalancedPathway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">monty.json.MSONable</span></code></p>
+<p>Helper class for combining multiple reactions which stoichiometrically balance to
+form a net reaction.</p>
+<dl class="py method">
+<dt id="rxn_network.helpers.BalancedPathway.calculate_costs">
+<code class="sig-name descname">calculate_costs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#BalancedPathway.calculate_costs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.BalancedPathway.calculate_costs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates and sets total and average cost of all pathways using the reaction
+dict.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.helpers.BalancedPathway.set_multiplicities">
+<code class="sig-name descname">set_multiplicities</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">multiplicities</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#BalancedPathway.set_multiplicities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.BalancedPathway.set_multiplicities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores the provided multiplicities (e.g. if solved for outside of object
+initialization).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>multiplicities</strong> (<em>[</em><em>float</em><em>]</em>) – list of multiplicities in same order as list of
+all rxns (see self.all_rxns).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="rxn_network.helpers.CombinedPathway">
+<em class="property">class </em><code class="sig-prename descclassname">rxn_network.helpers.</code><code class="sig-name descname">CombinedPathway</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">paths</span></em>, <em class="sig-param"><span class="n">net_rxn</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#CombinedPathway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.CombinedPathway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rxn_network.helpers.BalancedPathway" title="rxn_network.helpers.BalancedPathway"><code class="xref py py-class docutils literal notranslate"><span class="pre">rxn_network.helpers.BalancedPathway</span></code></a></p>
+<p>Extends the BalancedPathway object to allow for combining of multiple RxnPathway
+objects (instead of ComputedReaction objects themselves).</p>
+<dl class="py method">
+<dt id="rxn_network.helpers.CombinedPathway.paths">
+<em class="property">property </em><code class="sig-name descname">paths</code><a class="headerlink" href="#rxn_network.helpers.CombinedPathway.paths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="rxn_network.helpers.GibbsComputedStructureEntry">
+<em class="property">class </em><code class="sig-prename descclassname">rxn_network.helpers.</code><code class="sig-name descname">GibbsComputedStructureEntry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">structure</span></em>, <em class="sig-param"><span class="n">formation_enthalpy</span></em>, <em class="sig-param"><span class="n">temp</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">gibbs_model</span><span class="o">=</span><span class="default_value">'SISSO'</span></em>, <em class="sig-param"><span class="n">correction</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">entry_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#GibbsComputedStructureEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.GibbsComputedStructureEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.entries.computed_entries.ComputedStructureEntry</span></code></p>
+<p>An extension to ComputedStructureEntry which includes the estimated Gibbs
+free energy of formation via a machine-learned model (e.g. SISSO).</p>
+<dl class="py method">
+<dt id="rxn_network.helpers.GibbsComputedStructureEntry.from_entries">
+<em class="property">classmethod </em><code class="sig-name descname">from_entries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">entries</span></em>, <em class="sig-param"><span class="n">temp</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">gibbs_model</span><span class="o">=</span><span class="default_value">'SISSO'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#GibbsComputedStructureEntry.from_entries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.GibbsComputedStructureEntry.from_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor method for initializing GibbsComputedStructureEntry objects from
+T = 0 K entries, as acquired from a thermochemical database e.g. The
+Materials Project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entries</strong> (<em>[</em><em>ComputedStructureEntry</em><em>]</em>) – List of ComputedStructureEntry objects,
+as downloaded from The Materials Project API.</p></li>
+<li><p><strong>temp</strong> (<em>int</em>) – Temperature [K] for estimating Gibbs free energy of formation.</p></li>
+<li><p><strong>gibbs_model</strong> (<em>str</em>) – Gibbs model to use; currently the only option is “SISSO”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>list of new entries which replace the orig.</dt><dd><p>entries with inclusion of Gibbs free energy of formation at the
+specified temperature.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>[<a class="reference internal" href="#rxn_network.helpers.GibbsComputedStructureEntry" title="rxn_network.helpers.GibbsComputedStructureEntry">GibbsComputedStructureEntry</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.helpers.GibbsComputedStructureEntry.from_pd">
+<em class="property">classmethod </em><code class="sig-name descname">from_pd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pd</span></em>, <em class="sig-param"><span class="n">temp</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">gibbs_model</span><span class="o">=</span><span class="default_value">'SISSO'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#GibbsComputedStructureEntry.from_pd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.GibbsComputedStructureEntry.from_pd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor method for initializing GibbsComputedStructureEntry objects
+from an existing T = 0 K phase diagram, as generated via data from a
+thermochemical database e.g. The Materials Project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pd</strong> (<em>PhaseDiagram</em>) – T = 0 K phase diagram as created in pymatgen.</p></li>
+<li><p><strong>temp</strong> (<em>int</em>) – Temperature [K] for estimating Gibbs free energy of formation.</p></li>
+<li><p><strong>gibbs_model</strong> (<em>str</em>) – Gibbs model to use; currently the only option is “SISSO”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>list of new entries which replace the orig.</dt><dd><p>entries with inclusion of Gibbs free energy of formation at the
+specified temperature.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>[<a class="reference internal" href="#rxn_network.helpers.GibbsComputedStructureEntry" title="rxn_network.helpers.GibbsComputedStructureEntry">GibbsComputedStructureEntry</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.helpers.GibbsComputedStructureEntry.g_delta">
+<em class="property">static </em><code class="sig-name descname">g_delta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vol_per_atom</span></em>, <em class="sig-param"><span class="n">reduced_mass</span></em>, <em class="sig-param"><span class="n">temp</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#GibbsComputedStructureEntry.g_delta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.GibbsComputedStructureEntry.g_delta" title="Permalink to this definition">¶</a></dt>
+<dd><p>G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
+Bartel et al. (2018).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vol_per_atom</strong> – volume per atom [Å^3/atom]</p></li>
+<li><p><strong>reduced_mass</strong> (<em>float</em>) – [amu]</p></li>
+<li><p><strong>temp</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>G^delta</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.helpers.GibbsComputedStructureEntry.gf_sisso">
+<code class="sig-name descname">gf_sisso</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#GibbsComputedStructureEntry.gf_sisso"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.GibbsComputedStructureEntry.gf_sisso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel
+et al. (2018). Units: eV (not normalized)</p>
+<p>Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
+Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
+the Gibbs energy of inorganic crystalline solids and
+temperature-dependent materials chemistry. Nature Communications, 9(1),
+4168. <a class="reference external" href="https://doi.org/10.1038/s41467-018-06682-4">https://doi.org/10.1038/s41467-018-06682-4</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gibbs free energy of formation (eV)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.helpers.GibbsComputedStructureEntry.reduced_mass">
+<code class="sig-name descname">reduced_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#GibbsComputedStructureEntry.reduced_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.GibbsComputedStructureEntry.reduced_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduced mass as calculated via Eq. 6 in Bartel et al. (2018)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>reduced mass (amu)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="rxn_network.helpers.RxnEntries">
+<em class="property">class </em><code class="sig-prename descclassname">rxn_network.helpers.</code><code class="sig-name descname">RxnEntries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">entries</span></em>, <em class="sig-param"><span class="n">description</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#RxnEntries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.RxnEntries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">monty.json.MSONable</span></code></p>
+<p>Helper class for describing combinations of ComputedEntry-like objects in context
+of a reaction network. Necessary for implementation in NetworkX (and useful
+for other network packages!)</p>
+<dl class="py method">
+<dt id="rxn_network.helpers.RxnEntries.chemsys">
+<em class="property">property </em><code class="sig-name descname">chemsys</code><a class="headerlink" href="#rxn_network.helpers.RxnEntries.chemsys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.helpers.RxnEntries.description">
+<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#rxn_network.helpers.RxnEntries.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.helpers.RxnEntries.entries">
+<em class="property">property </em><code class="sig-name descname">entries</code><a class="headerlink" href="#rxn_network.helpers.RxnEntries.entries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="rxn_network.helpers.RxnPathway">
+<em class="property">class </em><code class="sig-prename descclassname">rxn_network.helpers.</code><code class="sig-name descname">RxnPathway</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rxns</span></em>, <em class="sig-param"><span class="n">costs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#RxnPathway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.RxnPathway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">monty.json.MSONable</span></code></p>
+<p>Helper class for storing multiple ComputedReaction objects which form a single
+reaction pathway as identified via pathfinding methods. Includes cost of each
+reaction.</p>
+<dl class="py method">
+<dt id="rxn_network.helpers.RxnPathway.costs">
+<em class="property">property </em><code class="sig-name descname">costs</code><a class="headerlink" href="#rxn_network.helpers.RxnPathway.costs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.helpers.RxnPathway.dg_per_atom">
+<em class="property">property </em><code class="sig-name descname">dg_per_atom</code><a class="headerlink" href="#rxn_network.helpers.RxnPathway.dg_per_atom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rxn_network.helpers.RxnPathway.rxns">
+<em class="property">property </em><code class="sig-name descname">rxns</code><a class="headerlink" href="#rxn_network.helpers.RxnPathway.rxns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="rxn_network.helpers.expand_pd">
+<code class="sig-prename descclassname">rxn_network.helpers.</code><code class="sig-name descname">expand_pd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">entries</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/helpers.html#expand_pd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rxn_network.helpers.expand_pd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method for expanding a single PhaseDiagram into a set of smaller phase
+diagrams, indexed by chemical subsystem. This is an absolutely necessary
+approach when considering chemical systems which contain &gt; ~10 elements,
+due to limitations of the ConvexHull algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>entries</strong> (<em>[</em><em>ComputedEntry</em><em>]</em>) – list of ComputedEntry-like objects for building
+phase diagram.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of PhaseDiagram objects indexed by chemical subsystem string;
+e.g. {“Li-Mn-O”: &lt;PhaseDiagram object&gt;, “C-Y”: &lt;PhaseDiagram object&gt;, …}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Matthew McDermott
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
