@@ -1,7 +1,7 @@
 Reaction Network
 ================
 
-.. image:: docs/images/logo.png
+.. image:: docs_rst/images/logo.png
         :alt: Reaction Network logo
 
 Reaction network (rxn-network) is a Python package for predicting chemical reaction
