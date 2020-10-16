@@ -10,11 +10,10 @@ import numpy as np
 import json
 
 from pymatgen import Composition
-from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.analysis.phase_diagram import PhaseDiagram, PDEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction
-from pymatgen.entries.computed_entries import ComputedStructureEntry
 
-from monty.json import MSONable, MontyDecoder
+from monty.json import MSONable
 
 
 __author__ = "Matthew McDermott"
@@ -24,243 +23,24 @@ __email__ = "mcdermott@lbl.gov"
 __date__ = "July 20, 2020"
 
 
-with open(os.path.join(os.path.dirname(__file__), "g_els.json")) as f:
-    G_ELEMS = json.load(f)
-with open(os.path.join(os.path.dirname(__file__), "nist_gas_gf.json")) as f:
-    G_GASES = json.load(f)
+class CustomEntry(PDEntry):
+    def __init__(self, composition, energy_dict, temp=None, name=None, attribute=None):
+        composition = Composition(composition)
 
+        if not temp:
+            temp = 300
 
-class GibbsComputedStructureEntry(ComputedStructureEntry):
-    """
-    An extension to ComputedStructureEntry which includes the estimated Gibbs
-    free energy of formation via a machine-learned model (e.g. SISSO).
-    """
-
-    def __init__(
-        self,
-        structure,
-        formation_enthalpy,
-        temp=300,
-        gibbs_model="SISSO",
-        correction=None,
-        parameters=None,
-        data=None,
-        entry_id=None,
-    ):
-        """
-        Args:
-            structure (Structure): The pymatgen Structure object of an entry.
-            formation_enthalpy (float): Formation enthalpy of the entry, calculated
-                sing phase diagram construction (eV)
-            temp (int): Temperature in Kelvin. Temperature must be selected from
-                [300, 400, 500, ... 2000 K].
-            gibbs_model (str): Model for Gibbs Free energy. Current (and only supported
-                option) is "SISSO", the descriptor created by Bartel et al. (2018).
-            correction (float): A correction to be applied to the energy. Defaults to 0
-            parameters (dict): An optional dict of parameters associated with
-                the entry. Defaults to None.
-            data (dict): An optional dict of any additional data associated
-                with the entry. Defaults to None.
-            entry_id (obj): An optional id to uniquely identify the entry.
-        """
-        self.structure = structure
-        self.formation_enthalpy = formation_enthalpy
+        super().__init__(composition, energy_dict[str(temp)], name=name,
+                         attribute=attribute)
         self.temp = temp
+        self.energy_dict = energy_dict
 
-        super().__init__(
-            structure,
-            energy=self.gf_sisso(),
-            correction=correction,
-            parameters=parameters,
-            data=data,
-            entry_id=entry_id,
-        )
-
-        self._gibbs_model = gibbs_model
-
-    def gf_sisso(self):
-        """
-        Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel
-        et al. (2018). Units: eV (not normalized)
-
-        Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
-        Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
-        the Gibbs energy of inorganic crystalline solids and
-        temperature-dependent materials chemistry. Nature Communications, 9(1),
-        4168. https://doi.org/10.1038/s41467-018-06682-4
-
-        Returns:
-            float: Gibbs free energy of formation (eV)
-        """
-        comp = self.structure.composition
-        if comp.is_element:
-            return self.formation_enthalpy
-        elif comp.reduced_formula in G_GASES.keys():
-            return (
-                G_GASES[comp.reduced_formula][str(self.temp)]
-                * comp.get_reduced_formula_and_factor()[1]
-            )
-
-        num_atoms = self.structure.num_sites
-        vol_per_atom = self.structure.volume / num_atoms
-        reduced_mass = self.reduced_mass()
-
-        return (
-            self.formation_enthalpy
-            + num_atoms * self.g_delta(vol_per_atom, reduced_mass, self.temp)
-            - self._sum_g_i()
-        )
-
-    def _sum_g_i(self):
-        """
-        Sum of the stoichiometrically weighted chemical potentials of the elements
-        at specified temperature, as acquired from "g_els.json".
-
-        Returns:
-             float: sum of weighted chemical potentials [eV]
-        """
-        elems = self.structure.composition.get_el_amt_dict()
-        return sum([amt * G_ELEMS[str(self.temp)][elem] for elem, amt in elems.items()])
-
-    def reduced_mass(self):
-        """
-        Reduced mass as calculated via Eq. 6 in Bartel et al. (2018)
-
-        Returns:
-            float: reduced mass (amu)
-        """
-        reduced_comp = self.structure.composition.reduced_composition
-        num_elems = len(reduced_comp.elements)
-        elem_dict = reduced_comp.get_el_amt_dict()
-
-        denominator = (num_elems - 1) * reduced_comp.num_atoms
-
-        all_pairs = combinations(elem_dict.items(), 2)
-        mass_sum = 0
-
-        for pair in all_pairs:
-            m_i = Composition(pair[0][0]).weight
-            m_j = Composition(pair[1][0]).weight
-            alpha_i = pair[0][1]
-            alpha_j = pair[1][1]
-
-            mass_sum += (alpha_i + alpha_j) * (m_i * m_j) / (m_i + m_j)
-
-        reduced_mass = (1 / denominator) * mass_sum
-
-        return reduced_mass
-
-    @staticmethod
-    def g_delta(vol_per_atom, reduced_mass, temp):
-        """
-        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
-        Bartel et al. (2018).
-
-        Args:
-            vol_per_atom: volume per atom [Å^3/atom]
-            reduced_mass (float) - reduced mass as calculated with pair-wise sum formula
-                [amu]
-            temp (float) - Temperature [K]
-
-        Returns:
-            float: G^delta
-        """
-
-        return (
-            (-2.48e-4 * np.log(vol_per_atom) - 8.94e-5 * reduced_mass / vol_per_atom)
-            * temp
-            + 0.181 * np.log(temp)
-            - 0.882
-        )
-
-    @classmethod
-    def from_pd(cls, pd, temp=300, gibbs_model="SISSO"):
-        """
-        Constructor method for initializing GibbsComputedStructureEntry objects
-        from an existing T = 0 K phase diagram, as generated via data from a
-        thermochemical database e.g. The Materials Project.
-
-        Args:
-            pd (PhaseDiagram): T = 0 K phase diagram as created in pymatgen.
-            temp (int): Temperature [K] for estimating Gibbs free energy of formation.
-            gibbs_model (str): Gibbs model to use; currently the only option is "SISSO".
-
-        Returns:
-            [GibbsComputedStructureEntry]: list of new entries which replace the orig.
-                entries with inclusion of Gibbs free energy of formation at the
-                specified temperature.
-        """
-        gibbs_entries = []
-        for entry in pd.all_entries:
-            if (
-                entry in pd.el_refs.values()
-                or not entry.structure.composition.is_element
-            ):
-                gibbs_entries.append(
-                    cls(
-                        entry.structure,
-                        formation_enthalpy=pd.get_form_energy(entry),
-                        temp=temp,
-                        correction=0,
-                        gibbs_model=gibbs_model,
-                        data=entry.data,
-                        entry_id=entry.entry_id,
-                    )
-                )
-        return gibbs_entries
-
-    @classmethod
-    def from_entries(cls, entries, temp=300, gibbs_model="SISSO"):
-        """
-        Constructor method for initializing GibbsComputedStructureEntry objects from
-        T = 0 K entries, as acquired from a thermochemical database e.g. The
-        Materials Project.
-
-        Args:
-            entries ([ComputedStructureEntry]): List of ComputedStructureEntry objects,
-                as downloaded from The Materials Project API.
-            temp (int): Temperature [K] for estimating Gibbs free energy of formation.
-            gibbs_model (str): Gibbs model to use; currently the only option is "SISSO".
-
-        Returns:
-            [GibbsComputedStructureEntry]: list of new entries which replace the orig.
-                entries with inclusion of Gibbs free energy of formation at the
-                specified temperature.
-        """
-        pd_dict = expand_pd(entries)
-        gibbs_entries = set()
-        for entry in entries:
-            for chemsys, phase_diag in pd_dict.items():
-                if set(entry.composition.chemical_system.split("-")).issubset(
-                    chemsys.split("-")
-                ):
-                    if (
-                        entry in phase_diag.el_refs.values()
-                        or not entry.structure.composition.is_element
-                    ):
-                        gibbs_entries.add(
-                            cls(
-                                entry.structure,
-                                formation_enthalpy=phase_diag.get_form_energy(entry),
-                                temp=temp,
-                                correction=0,
-                                gibbs_model=gibbs_model,
-                                data=entry.data,
-                                entry_id=entry.entry_id,
-                            )
-                        )
-                    break
-
-        return list(gibbs_entries)
+    def set_temp(self, temp):
+        super().__init__(self.composition, self.energy_dict[str(temp)], name=self.name,
+                         attribute=self.attribute)
 
     def __repr__(self):
-        output = [
-            "GibbsComputedStructureEntry {} - {}".format(
-                self.entry_id, self.composition.formula
-            ),
-            "Gibbs Free Energy (Formation) = {:.4f}".format(self.energy),
-        ]
-        return "\n".join(output)
+        return super().__repr__() + f" (T={self.temp} K)"
 
 
 class RxnEntries(MSONable):

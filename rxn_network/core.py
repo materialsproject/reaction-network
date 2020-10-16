@@ -9,7 +9,7 @@ from numba.typed import List
 import graph_tool.all as gt
 import queue
 
-from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.entries.computed_entries import ComputedEntry, GibbsComputedStructureEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction, ReactionError
 
 from rxn_network.helpers import *
