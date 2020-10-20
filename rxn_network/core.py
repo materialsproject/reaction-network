@@ -9,6 +9,7 @@ from numba.typed import List
 import graph_tool.all as gt
 import queue
 
+from pymatgen import Element
 from pymatgen.entries.computed_entries import ComputedEntry, GibbsComputedStructureEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction, ReactionError
 
@@ -39,6 +40,8 @@ class ReactionNetwork:
         extend_entries=None,
         include_metastable=False,
         include_polymorphs=False,
+        include_chempot_restriction=False,
+        filter_rxn_energies=0.2,
     ):
         """Initializes ReactionNetwork object with necessary preprocessing
         steps. This does not yet compute the graph. The preprocessing
@@ -73,6 +76,11 @@ class ReactionNetwork:
                 state polymorphs. Defaults to False. Note this is not useful
                 unless structural metrics are considered in the cost function
                 (to be added!)
+            include_chempot_restriction (bool): Whether or not to restrict reactions to
+                those where the minimum possible μ of each element in the products
+                can not be higher than the maximum possible μ of each element in the
+                reactants. Seems to lead to more logical pathway predictions.
+                Defaults to False.
         """
         self.logger = logging.getLogger("ReactionNetwork")
         self.logger.setLevel("INFO")
@@ -83,6 +91,7 @@ class ReactionNetwork:
         self._temp = temp
         self._e_above_hull = include_metastable
         self._include_polymorphs = include_polymorphs
+        self._include_chempot_restriction = include_chempot_restriction
         self._elements = {
             elem for entry in self.all_entries for elem in entry.composition.elements
         }
@@ -92,15 +101,39 @@ class ReactionNetwork:
         self._pd_dict, self._filtered_entries = self._filter_entries(
             self._gibbs_entries, include_metastable, include_polymorphs
         )
+        self._entry_mu_ranges = {}
         self._pd = None
+        self._rxn_e_filter = filter_rxn_energies
 
         if (
             len(self._elements) <= 10
         ):  # phase diagrams take considerable time to build >10 elems
             self._pd = PhaseDiagram(self._filtered_entries)
+        elif len(self._elements) > 10 and include_chempot_restriction:
+            raise ValueError(
+                "Cannot include chempot restriction for networks with greater than 10 elements!"
+            )
 
         if extend_entries:
             self._filtered_entries.extend(extend_entries)
+
+        if include_chempot_restriction:
+            for e in self._filtered_entries:
+                elems = e.composition.elements
+                chempot_ranges = {}
+                all_chempots = {e: [] for e in elems}
+                for simplex, chempots in self._pd.get_all_chempots(
+                    e.composition
+                ).items():
+                    for elem in elems:
+                        all_chempots[elem].append(chempots[elem])
+                for elem in elems:
+                    chempot_ranges[elem] = (
+                        min(all_chempots[elem]),
+                        max(all_chempots[elem]),
+                    )
+
+                self._entry_mu_ranges[e] = chempot_ranges
 
         self._all_entry_combos = [
             set(combo)
@@ -167,14 +200,6 @@ class ReactionNetwork:
                     "Complex loopback can't be enabled when using a dummy precursors "
                     "node!"
                 )
-        elif False in [
-            isinstance(precursor, ComputedEntry) for precursor in self._precursors
-        ] or False in [
-            isinstance(target, ComputedEntry) for target in self._all_targets
-        ]:
-            raise TypeError(
-                "Precursors and targets must be ComputedEntry-like objects."
-            )
         else:
             precursors_entries = RxnEntries(precursors, "s")
 
@@ -260,6 +285,7 @@ class ReactionNetwork:
 
         edge_list = []
         for chemsys, vertices in tqdm(entries_dict.items()):
+            elems = {Element(e) for e in chemsys.split("-")}
             for entry, v in vertices["R"].items():
                 phases = entry.entries
 
@@ -294,12 +320,50 @@ class ReactionNetwork:
 
             for entry, v in vertices["R"].items():
                 phases = entry.entries
+                if self._include_chempot_restriction:
+                    reactant_mu_ranges = [self._entry_mu_ranges[e] for e in phases]
+                    reactant_mu_span = {
+                        elem: (
+                            min([r[elem][0] for r in reactant_mu_ranges if elem in r]),
+                            max([r[elem][1] for r in reactant_mu_ranges if elem in r]),
+                        )
+                        for elem in elems
+                    }
 
                 for other_entry, other_v in vertices["P"].items():
                     other_phases = other_entry.entries
 
                     if other_phases == phases:
-                        continue  # do not consider identity-like reactions
+                        continue  # do not consider identity-like reactions (e.g. A + B -> A + B)
+
+                    if self._include_chempot_restriction:
+                        product_mu_ranges = [
+                            self._entry_mu_ranges[e] for e in other_phases
+                        ]
+                        product_mu_span = {
+                            elem: (
+                                min(
+                                    [p[elem][0] for p in product_mu_ranges if elem in p]
+                                ),
+                                max(
+                                    [p[elem][1] for p in product_mu_ranges if elem in p]
+                                ),
+                            )
+                            for elem in elems
+                        }
+
+                        out_of_bounds = False
+                        for elem in product_mu_span:
+                            if not out_of_bounds:
+                                if product_mu_span[elem][0] > (
+                                    reactant_mu_span[elem][1] + 1e-5
+                                ):
+                                    out_of_bounds = True
+                            else:
+                                break
+
+                        if out_of_bounds:
+                            continue
 
                     try:
                         rxn = ComputedReaction(list(phases), list(other_phases))
@@ -307,7 +371,14 @@ class ReactionNetwork:
                         continue
 
                     if rxn._lowest_num_errors != 0:
-                        continue  # remove reaction if comps. change sides / disappear
+                        continue  # remove reaction which has components that change sides or disappear
+
+                    total_num_atoms = sum(
+                        [rxn.get_el_amount(elem) for elem in rxn.elements])
+                    rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
+
+                    if self._rxn_e_filter and rxn_energy > self._rxn_e_filter:
+                        continue
 
                     weight = self._get_rxn_cost(rxn)
                     edge_list.append(

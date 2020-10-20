@@ -12,8 +12,9 @@ import json
 from pymatgen import Composition
 from pymatgen.analysis.phase_diagram import PhaseDiagram, PDEntry
 from pymatgen.analysis.reaction_calculator import ComputedReaction
+from pymatgen.entries.computed_entries import ComputedStructureEntry
 
-from monty.json import MSONable
+from monty.json import MSONable, MontyDecoder
 
 
 __author__ = "Matthew McDermott"
@@ -21,6 +22,238 @@ __copyright__ = "Copyright 2020, Matthew McDermott"
 __version__ = "0.1"
 __email__ = "mcdermott@lbl.gov"
 __date__ = "July 20, 2020"
+
+
+with open(os.path.join(os.path.dirname(__file__), "g_els.json")) as f:
+    G_ELEMS = json.load(f)
+with open(os.path.join(os.path.dirname(__file__), "nist_gas_gf.json")) as f:
+    G_GASES = json.load(f)
+
+
+class GibbsComputedStructureEntry(ComputedStructureEntry):
+    """
+    An extension to ComputedStructureEntry which includes the estimated Gibbs
+    free energy of formation via a machine-learned model (e.g. SISSO).
+    """
+
+    def __init__(
+        self,
+        structure,
+        formation_enthalpy,
+        temp=300,
+        gibbs_model="SISSO",
+        correction=None,
+        parameters=None,
+        data=None,
+        entry_id=None,
+    ):
+        """
+        Args:
+            structure (Structure): The pymatgen Structure object of an entry.
+            formation_enthalpy (float): Formation enthalpy of the entry, calculated
+                sing phase diagram construction (eV)
+            temp (int): Temperature in Kelvin. Temperature must be selected from
+                [300, 400, 500, ... 2000 K].
+            gibbs_model (str): Model for Gibbs Free energy. Current (and only supported
+                option) is "SISSO", the descriptor created by Bartel et al. (2018).
+            correction (float): A correction to be applied to the energy. Defaults to 0
+            parameters (dict): An optional dict of parameters associated with
+                the entry. Defaults to None.
+            data (dict): An optional dict of any additional data associated
+                with the entry. Defaults to None.
+            entry_id (obj): An optional id to uniquely identify the entry.
+        """
+        self.structure = structure
+        self.formation_enthalpy = formation_enthalpy
+        self.temp = temp
+
+        super().__init__(
+            structure,
+            energy=self.gf_sisso(),
+            correction=correction,
+            parameters=parameters,
+            data=data,
+            entry_id=entry_id,
+        )
+
+        self._gibbs_model = gibbs_model
+
+    def gf_sisso(self):
+        """
+        Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel
+        et al. (2018). Units: eV (not normalized)
+        Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
+        Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
+        the Gibbs energy of inorganic crystalline solids and
+        temperature-dependent materials chemistry. Nature Communications, 9(1),
+        4168. https://doi.org/10.1038/s41467-018-06682-4
+        Returns:
+            float: Gibbs free energy of formation (eV)
+        """
+        comp = self.structure.composition
+        if comp.is_element:
+            return self.formation_enthalpy
+        elif comp.reduced_formula in G_GASES.keys():
+            return (
+                G_GASES[comp.reduced_formula][str(self.temp)]
+                * comp.get_reduced_formula_and_factor()[1]
+            )
+
+        num_atoms = self.structure.num_sites
+        vol_per_atom = self.structure.volume / num_atoms
+        reduced_mass = self.reduced_mass()
+
+        return (
+            self.formation_enthalpy
+            + num_atoms * self.g_delta(vol_per_atom, reduced_mass, self.temp)
+            - self._sum_g_i()
+        )
+
+    def _sum_g_i(self):
+        """
+        Sum of the stoichiometrically weighted chemical potentials of the elements
+        at specified temperature, as acquired from "g_els.json".
+        Returns:
+             float: sum of weighted chemical potentials [eV]
+        """
+        elems = self.structure.composition.get_el_amt_dict()
+        return sum([amt * G_ELEMS[str(self.temp)][elem] for elem, amt in elems.items()])
+
+    def reduced_mass(self):
+        """
+        Reduced mass as calculated via Eq. 6 in Bartel et al. (2018)
+        Returns:
+            float: reduced mass (amu)
+        """
+        reduced_comp = self.structure.composition.reduced_composition
+        num_elems = len(reduced_comp.elements)
+        elem_dict = reduced_comp.get_el_amt_dict()
+
+        denominator = (num_elems - 1) * reduced_comp.num_atoms
+
+        all_pairs = combinations(elem_dict.items(), 2)
+        mass_sum = 0
+
+        for pair in all_pairs:
+            m_i = Composition(pair[0][0]).weight
+            m_j = Composition(pair[1][0]).weight
+            alpha_i = pair[0][1]
+            alpha_j = pair[1][1]
+
+            mass_sum += (alpha_i + alpha_j) * (m_i * m_j) / (m_i + m_j)
+
+        reduced_mass = (1 / denominator) * mass_sum
+
+        return reduced_mass
+
+    @staticmethod
+    def g_delta(vol_per_atom, reduced_mass, temp):
+        """
+        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
+        Bartel et al. (2018).
+        Args:
+            vol_per_atom: volume per atom [Å^3/atom]
+            reduced_mass (float) - reduced mass as calculated with pair-wise sum formula
+                [amu]
+            temp (float) - Temperature [K]
+        Returns:
+            float: G^delta
+        """
+
+        return (
+            (-2.48e-4 * np.log(vol_per_atom) - 8.94e-5 * reduced_mass / vol_per_atom)
+            * temp
+            + 0.181 * np.log(temp)
+            - 0.882
+        )
+
+    @classmethod
+    def from_pd(cls, pd, temp=300, gibbs_model="SISSO"):
+        """
+        Constructor method for initializing GibbsComputedStructureEntry objects
+        from an existing T = 0 K phase diagram, as generated via data from a
+        thermochemical database e.g. The Materials Project.
+        Args:
+            pd (PhaseDiagram): T = 0 K phase diagram as created in pymatgen.
+            temp (int): Temperature [K] for estimating Gibbs free energy of formation.
+            gibbs_model (str): Gibbs model to use; currently the only option is "SISSO".
+        Returns:
+            [GibbsComputedStructureEntry]: list of new entries which replace the orig.
+                entries with inclusion of Gibbs free energy of formation at the
+                specified temperature.
+        """
+        gibbs_entries = []
+        for entry in pd.all_entries:
+            if (
+                entry in pd.el_refs.values()
+                or not entry.structure.composition.is_element
+            ):
+                gibbs_entries.append(
+                    cls(
+                        entry.structure,
+                        formation_enthalpy=pd.get_form_energy(entry),
+                        temp=temp,
+                        correction=0,
+                        gibbs_model=gibbs_model,
+                        data=entry.data,
+                        entry_id=entry.entry_id,
+                    )
+                )
+        return gibbs_entries
+
+    @classmethod
+    def from_entries(cls, entries, temp=300, gibbs_model="SISSO"):
+        """
+        Constructor method for initializing GibbsComputedStructureEntry objects from
+        T = 0 K entries, as acquired from a thermochemical database e.g. The
+        Materials Project.
+        Args:
+            entries ([ComputedStructureEntry]): List of ComputedStructureEntry objects,
+                as downloaded from The Materials Project API.
+            temp (int): Temperature [K] for estimating Gibbs free energy of formation.
+            gibbs_model (str): Gibbs model to use; currently the only option is "SISSO".
+        Returns:
+            [GibbsComputedStructureEntry]: list of new entries which replace the orig.
+                entries with inclusion of Gibbs free energy of formation at the
+                specified temperature.
+        """
+        pd_dict = expand_pd(entries)
+        gibbs_entries = set()
+        for entry in entries:
+            for chemsys, phase_diag in pd_dict.items():
+                if set(entry.composition.chemical_system.split("-")).issubset(
+                    chemsys.split("-")
+                ):
+                    if type(entry) == CustomEntry:
+                        entry.set_temp(temp)
+                        gibbs_entries.add(entry)
+                    elif (
+                        entry in phase_diag.el_refs.values()
+                        or not entry.structure.composition.is_element
+                    ):
+                        gibbs_entries.add(
+                            cls(
+                                entry.structure,
+                                formation_enthalpy=phase_diag.get_form_energy(entry),
+                                temp=temp,
+                                correction=0,
+                                gibbs_model=gibbs_model,
+                                data=entry.data,
+                                entry_id=entry.entry_id,
+                            )
+                        )
+                    break
+
+        return list(gibbs_entries)
+
+    def __repr__(self):
+        output = [
+            "GibbsComputedStructureEntry {} - {}".format(
+                self.entry_id, self.composition.formula
+            ),
+            "Gibbs Free Energy (Formation) = {:.4f}".format(self.energy),
+        ]
+        return "\n".join(output)
 
 
 class CustomEntry(PDEntry):
@@ -238,7 +471,6 @@ class BalancedPathway(MSONable):
         """
         Stores the provided multiplicities (e.g. if solved for outside of object
         initialization).
-
         Args:
             multiplicities ([float]): list of multiplicities in same order as list of
                 all rxns (see self.all_rxns).
@@ -264,14 +496,11 @@ class BalancedPathway(MSONable):
         Internal method for balancing a set of reactions to achieve the same
         stoichiometry as a net reaction. Solves for multiplicities of reactions by
         using matrix psuedoinverse and checks to see if solution works.
-
         Args:
             comp_matrix (np.array): Matrix of stoichiometric coeffs for each reaction.
             net_coeffs (np.array): Vector of stoichiometric coeffs for net reaction.
             tol (float): Numerical tolerance for checking solution.
-
         Returns:
-
         """
         comp_pseudo_inverse = np.linalg.pinv(comp_matrix).T
         multiplicities = comp_pseudo_inverse @ net_coeffs
@@ -289,11 +518,9 @@ class BalancedPathway(MSONable):
     def _get_net_coeffs(net_rxn, all_comp):
         """
         Internal method for getting the net reaction coefficients vector.
-
         Args:
             net_rxn (ComputedReaction): net reaction object.
             all_comp ([Composition]): list of compositions in system of reactions.
-
         Returns:
             Numpy array which is a vector of the stoichiometric coeffs of net
             reaction and zeros for all intermediate phases.
@@ -310,11 +537,9 @@ class BalancedPathway(MSONable):
         """
         Internal method for getting the composition matrix used in the balancing
         procedure.
-
         Args:
             all_comp ([Composition]): list of compositions in system of reactions.
             all_rxns ([ComputedReaction]): list of all reaction objects.
-
         Returns:
             Numpy array which is a matrix of the stoichiometric coeffs of each
             reaction in the system of reactions.
@@ -394,11 +619,9 @@ def expand_pd(entries):
     diagrams, indexed by chemical subsystem. This is an absolutely necessary
     approach when considering chemical systems which contain > ~10 elements,
     due to limitations of the ConvexHull algorithm.
-
     Args:
         entries ([ComputedEntry]): list of ComputedEntry-like objects for building
             phase diagram.
-
     Returns:
         Dictionary of PhaseDiagram objects indexed by chemical subsystem string;
         e.g. {"Li-Mn-O": <PhaseDiagram object>, "C-Y": <PhaseDiagram object>, ...}
