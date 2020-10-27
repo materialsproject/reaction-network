@@ -4,7 +4,7 @@ info in the Reaction Network core module.
 """
 
 import os
-from itertools import combinations
+from itertools import chain, combinations
 
 import numpy as np
 import json
@@ -613,6 +613,26 @@ class CombinedPathway(BalancedPathway):
         return path_info
 
 
+def generate_all_combos(entries, max_num_combos):
+    """
+    Helper static method for generating combination sets ranging from singular
+    length to maximum length specified by max_num_combos.
+
+    Args:
+        entries (list/set): list/set of all entry objects to combine
+        max_num_combos (int): upper limit for size of combinations of entries
+
+    Returns:
+        list: all combination sets
+    """
+    return chain.from_iterable(
+        [
+            combinations(entries, num_combos)
+            for num_combos in range(1, max_num_combos + 1)
+        ]
+    )
+
+
 def expand_pd(entries):
     """
     Helper method for expanding a single PhaseDiagram into a set of smaller phase
@@ -654,26 +674,35 @@ def find_interdependent_rxns(path, precursors, verbose=True):
     precursors = set(precursors)
     interdependent = False
     combined_rxn = None
+
     rxns = set(path.all_rxns)
-    if len(rxns) == 1:
+    num_rxns = len(rxns)
+
+    if num_rxns == 1:
         return False, None
 
-    for combo in combinations(rxns, 2):
-        if any([set(rxn.reactants).issubset(precursors) for rxn in combo]):
+    for combo in generate_all_combos(rxns, num_rxns):
+        size = len(combo)
+        if any([set(rxn.reactants).issubset(precursors) for rxn in combo]) or size==1:
             continue
         other_comp = {c for rxn in (rxns - set(combo)) for c in rxn.all_comp}
 
-        unique_r1 = set(combo[0].reactants) - precursors
-        unique_r2 = set(combo[1].reactants) - precursors
-        unique_p1 = set(combo[0].products) - precursors
-        unique_p2 = set(combo[1].products) - precursors
+        unique_reactants = []
+        unique_products = []
+        for rxn in combo:
+            unique_reactants.append(set(rxn.reactants) - precursors)
+            unique_products.append(set(rxn.products) - precursors)
 
-        overlap1 = unique_r1 & unique_p2
-        overlap2 = unique_r2 & unique_p1
+        overlap = [False]*size
+        for i in range(size):
+            for j in range(size):
+                if i == j:
+                    continue
+                overlapping_phases = unique_reactants[i] & unique_products[j]
+                if overlapping_phases and (overlapping_phases not in other_comp):
+                    overlap[i] = True
 
-        if overlap1 and overlap2 and (overlap1 not in
-                                      other_comp) and (overlap2 not in other_comp):
-
+        if all(overlap):
             interdependent = True
 
             combined_reactants = {c for p in combo for c in p.reactants}
@@ -690,3 +719,4 @@ def find_interdependent_rxns(path, precursors, verbose=True):
                 print("Could not combine interdependent reactions!")
 
     return interdependent, combined_rxn
+

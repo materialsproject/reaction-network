@@ -435,7 +435,7 @@ class ReactionNetwork:
 
     def find_all_rxn_pathways(
         self, k=15, precursors=None, targets=None, max_num_combos=4,
-            consider_crossover_rxns=10, filter_independent=True
+            consider_crossover_rxns=10, filter_interdependent=True
     ):
         """
         Builds the k shortest paths to provided targets and then seeks to combine
@@ -489,6 +489,7 @@ class ReactionNetwork:
 
         for target in targets:
             print(f"PATHS to {target.composition.reduced_formula} \n")
+            print("--------------------------------------- \n")
             self.set_target(target)
             paths = self.find_k_shortest_paths(k)
             paths = {
@@ -556,13 +557,16 @@ class ReactionNetwork:
             p.set_multiplicities(m)
             p.calculate_costs()
 
-        final_paths = set()
-        for p in balanced_total_paths:
-            interdependent, combined_rxn = find_interdependent_rxns(p, [c.composition
-                                                                      for c in precursors])
-            if interdependent:
-                continue
-            final_paths.add(p)
+        if filter_interdependent:
+            final_paths = set()
+            for p in balanced_total_paths:
+                interdependent, combined_rxn = find_interdependent_rxns(p, [c.composition
+                                                                          for c in precursors])
+                if interdependent:
+                    continue
+                final_paths.add(p)
+        else:
+            final_paths = balanced_total_paths
         analysis = PathwayAnalysis(self, balanced_total_paths)
         return sorted(list(final_paths), key=lambda x: x.total_cost), analysis
 
@@ -754,6 +758,7 @@ class ReactionNetwork:
         self._all_targets = {mapping[t] for t in self._all_targets}
         self._current_target = {mapping[ct] for ct in self._current_target}
 
+
     def _get_rxn_cost(self, rxn, max_mu_diff=None):
         """Helper method which determines reaction cost/weight.
 
@@ -770,7 +775,7 @@ class ReactionNetwork:
         if cost_function == "softplus":
             if max_mu_diff:
                 params = [energy, max_mu_diff]
-                weights = [1.0, 1.0]
+                weights = [1, 0.2]
             else:
                 params = [energy]
                 weights = [1.0]
@@ -934,21 +939,21 @@ class ReactionNetwork:
                 e[0] for e in energies_above_hull.items() if e[1] <= e_above_hull
             ]
 
-            if not include_polymorphs:
-                filtered_entries_no_polymorphs = []
-                all_comp = {
-                    entry.composition.reduced_composition for entry in filtered_entries
-                }
-                for comp in all_comp:
-                    polymorphs = [
-                        entry
-                        for entry in filtered_entries
-                        if entry.composition.reduced_composition == comp
-                    ]
-                    min_entry = min(polymorphs, key=lambda x: x.energy_per_atom)
-                    filtered_entries_no_polymorphs.append(min_entry)
+        if not include_polymorphs:
+            filtered_entries_no_polymorphs = []
+            all_comp = {
+                entry.composition.reduced_composition for entry in filtered_entries
+            }
+            for comp in all_comp:
+                polymorphs = [
+                    entry
+                    for entry in filtered_entries
+                    if entry.composition.reduced_composition == comp
+                ]
+                min_entry = min(polymorphs, key=lambda x: x.energy_per_atom)
+                filtered_entries_no_polymorphs.append(min_entry)
 
-                filtered_entries = filtered_entries_no_polymorphs
+            filtered_entries = filtered_entries_no_polymorphs
 
         return pd_dict, filtered_entries
 
