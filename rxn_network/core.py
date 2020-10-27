@@ -11,7 +11,8 @@ import queue
 
 from pymatgen import Element
 from pymatgen.entries.computed_entries import ComputedEntry, GibbsComputedStructureEntry
-from pymatgen.analysis.reaction_calculator import ComputedReaction, ReactionError
+from pymatgen.analysis.reaction_calculator import Reaction, ComputedReaction, \
+    ReactionError
 
 from rxn_network.helpers import *
 from rxn_network.analysis import *
@@ -41,7 +42,7 @@ class ReactionNetwork:
         include_metastable=False,
         include_polymorphs=False,
         include_chempot_restriction=False,
-        filter_rxn_energies=0.2,
+        filter_rxn_energies=0.5,
     ):
         """Initializes ReactionNetwork object with necessary preprocessing
         steps. This does not yet compute the graph. The preprocessing
@@ -76,7 +77,7 @@ class ReactionNetwork:
                 state polymorphs. Defaults to False. Note this is not useful
                 unless structural metrics are considered in the cost function
                 (to be added!)
-            include_chempot_restriction (bool): Whether or not to restrict reactions to
+            include_chempot_restriction (bool): Whether or not to consider reactions to
                 those where the minimum possible μ of each element in the products
                 can not be higher than the maximum possible μ of each element in the
                 reactants. Seems to lead to more logical pathway predictions.
@@ -336,6 +337,7 @@ class ReactionNetwork:
                     if other_phases == phases:
                         continue  # do not consider identity-like reactions (e.g. A + B -> A + B)
 
+                    max_mu_diff = None
                     if self._include_chempot_restriction:
                         product_mu_ranges = [
                             self._entry_mu_ranges[e] for e in other_phases
@@ -352,18 +354,12 @@ class ReactionNetwork:
                             for elem in elems
                         }
 
-                        out_of_bounds = False
+                        max_mu_diff = -np.inf
                         for elem in product_mu_span:
-                            if not out_of_bounds:
-                                if product_mu_span[elem][0] > (
-                                    reactant_mu_span[elem][1] + 1e-5
-                                ):
-                                    out_of_bounds = True
-                            else:
-                                break
-
-                        if out_of_bounds:
-                            continue
+                            mu_diff = (product_mu_span[elem][0]
+                                       - reactant_mu_span[elem][1])
+                            if mu_diff > max_mu_diff:
+                                max_mu_diff = mu_diff
 
                     try:
                         rxn = ComputedReaction(list(phases), list(other_phases))
@@ -371,7 +367,8 @@ class ReactionNetwork:
                         continue
 
                     if rxn._lowest_num_errors != 0:
-                        continue  # remove reaction which has components that change sides or disappear
+                        continue  # remove reaction which has components that
+                        # change sides or disappear
 
                     total_num_atoms = sum(
                         [rxn.get_el_amount(elem) for elem in rxn.elements])
@@ -380,7 +377,7 @@ class ReactionNetwork:
                     if self._rxn_e_filter and rxn_energy > self._rxn_e_filter:
                         continue
 
-                    weight = self._get_rxn_cost(rxn)
+                    weight = self._get_rxn_cost(rxn, max_mu_diff)
                     edge_list.append(
                         [g.vertex(v), g.vertex(other_v), weight, rxn, True, False]
                     )
@@ -437,7 +434,8 @@ class ReactionNetwork:
         return paths
 
     def find_all_rxn_pathways(
-        self, k=15, targets=None, max_num_combos=4, consider_crossover_rxns=True,
+        self, k=15, precursors=None, targets=None, max_num_combos=4,
+            consider_crossover_rxns=10, filter_independent=True
     ):
         """
         Builds the k shortest paths to provided targets and then seeks to combine
@@ -473,15 +471,21 @@ class ReactionNetwork:
         else:
             targets = set(targets)
 
+        if not precursors or set(precursors) == self._precursors:
+            precursors = self._precursors
+        else:
+            self.set_precursors(precursors, self._complex_loopback)
+
         try:
-            net_rxn = ComputedReaction(list(self._precursors), list(targets))
+            net_rxn = ComputedReaction(list(precursors), list(targets))
+            net_rxn = Reaction.from_string(net_rxn.normalized_repr)
         except ReactionError:
             raise ReactionError(
-                "Net reaction must be balanceable to find all reaction " "pathways."
+                "Net reaction must be balanceable to find all reaction pathways."
             )
 
         net_rxn_all_comp = set(net_rxn.all_comp)
-        print(f"NET RXN: {net_rxn} \n")
+        self.logger.info(f"NET RXN: {net_rxn} \n")
 
         for target in targets:
             print(f"PATHS to {target.composition.reduced_formula} \n")
@@ -494,49 +498,33 @@ class ReactionNetwork:
             }
             paths_to_all_targets.update(paths)
 
+        print("Rebuilding to find crossover paths...")
+
         if consider_crossover_rxns:
-
-            def find_crossover_rxns():
-                all_crossover_rxns = set()
-                for reactants_combo in self._generate_all_combos(
-                    intermediates, self._max_num_phases
-                ):
-                    for products_combo in self._generate_all_combos(
-                        targets, self._max_num_phases
-                    ):
-                        try:
-                            rxn = ComputedReaction(
-                                list(reactants_combo), list(products_combo)
-                            )
-                        except ReactionError:
-                            continue
-                        if rxn._lowest_num_errors > 0:
-                            continue
-                        path = RxnPathway([rxn], [self._get_rxn_cost(rxn)])
-                        all_crossover_rxns.add(path)
-                return all_crossover_rxns
-
             precursors_and_targets = targets | self._precursors
+            intermediates = {entry for rxn in paths_to_all_targets for entry in
+                             rxn.all_entries} - precursors_and_targets
+            self.set_precursors(intermediates)
 
-            intermediates = {
-                entry for rxn in paths_to_all_targets for entry in rxn.all_entries
-            } - precursors_and_targets
-            crossover_rxns = find_crossover_rxns()
-
-            if crossover_rxns:
-                print("Crossover Reactions \n")
-                print(crossover_rxns, "\n")
-                crossover_rxns = {
+            for target in targets:
+                print(f"Crossover paths to {target.composition.reduced_formula} \n")
+                self.set_target(target)
+                crossover_paths = self.find_k_shortest_paths(consider_crossover_rxns)
+                crossover_paths = {
                     rxn: cost
-                    for path in crossover_rxns
+                    for path in crossover_paths
                     for (rxn, cost) in zip(path.rxns, path.costs)
                 }
-                paths_to_all_targets.update(crossover_rxns)
+                paths_to_all_targets.update(crossover_paths)
 
         paths_to_try = list(paths_to_all_targets.keys())
+        if net_rxn in paths_to_try:
+            paths_to_try.remove(net_rxn)
 
         trial_combos = list(self._generate_all_combos(paths_to_try, max_num_combos))
         unbalanced_paths = []
+
+        self.logger.info("Building possible total pathways...")
 
         for i, combo in enumerate(tqdm(trial_combos)):
             if net_rxn_all_comp.issubset(
@@ -550,8 +538,14 @@ class ReactionNetwork:
                     )
                 )
 
+        if not unbalanced_paths:
+            raise ValueError("Cannot generate any viable trail pathways... check for "
+                             "reactants which are missing from shortest paths.")
+
         comp_matrices = List([p.comp_matrix for p in unbalanced_paths])
         net_coeffs = List([p.net_coeffs for p in unbalanced_paths])
+
+        self.logger.info("Mass balancing...")
 
         is_balanced, multiplicities = self._balance_all_paths(comp_matrices, net_coeffs)
 
@@ -562,8 +556,15 @@ class ReactionNetwork:
             p.set_multiplicities(m)
             p.calculate_costs()
 
+        final_paths = set()
+        for p in balanced_total_paths:
+            interdependent, combined_rxn = find_interdependent_rxns(p, [c.composition
+                                                                      for c in precursors])
+            if interdependent:
+                continue
+            final_paths.add(p)
         analysis = PathwayAnalysis(self, balanced_total_paths)
-        return sorted(list(balanced_total_paths), key=lambda x: x.total_cost), analysis
+        return sorted(list(final_paths), key=lambda x: x.total_cost), analysis
 
     def set_precursors(self, precursors=None, complex_loopback=True):
         """
@@ -590,10 +591,6 @@ class ReactionNetwork:
                     "Complex loopback can't be enabled when using a dummy precursors "
                     "node!"
                 )
-        elif False in [
-            isinstance(precursor, ComputedEntry) for precursor in self._precursors
-        ]:
-            raise TypeError("Precursors must be ComputedEntry-like objects.")
         else:
             precursors_entries = RxnEntries(precursors, "s")
 
@@ -757,7 +754,7 @@ class ReactionNetwork:
         self._all_targets = {mapping[t] for t in self._all_targets}
         self._current_target = {mapping[ct] for ct in self._current_target}
 
-    def _get_rxn_cost(self, rxn):
+    def _get_rxn_cost(self, rxn, max_mu_diff=None):
         """Helper method which determines reaction cost/weight.
 
         Args:
@@ -771,8 +768,12 @@ class ReactionNetwork:
         cost_function = self._cost_function
 
         if cost_function == "softplus":
-            params = [energy]
-            weights = [1]
+            if max_mu_diff:
+                params = [energy, max_mu_diff]
+                weights = [1.0, 1.0]
+            else:
+                params = [energy]
+                weights = [1.0]
             weight = self._softplus(params, weights, t=self._temp)
         elif cost_function == "piecewise":
             weight = energy

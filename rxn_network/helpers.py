@@ -11,7 +11,7 @@ import json
 
 from pymatgen import Composition
 from pymatgen.analysis.phase_diagram import PhaseDiagram, PDEntry
-from pymatgen.analysis.reaction_calculator import ComputedReaction
+from pymatgen.analysis.reaction_calculator import Reaction, ReactionError
 from pymatgen.entries.computed_entries import ComputedStructureEntry
 
 from monty.json import MSONable, MontyDecoder
@@ -648,3 +648,45 @@ def expand_pd(entries):
             )
 
     return pd_dict
+
+
+def find_interdependent_rxns(path, precursors, verbose=True):
+    precursors = set(precursors)
+    interdependent = False
+    combined_rxn = None
+    rxns = set(path.all_rxns)
+    if len(rxns) == 1:
+        return False, None
+
+    for combo in combinations(rxns, 2):
+        if any([set(rxn.reactants).issubset(precursors) for rxn in combo]):
+            continue
+        other_comp = {c for rxn in (rxns - set(combo)) for c in rxn.all_comp}
+
+        unique_r1 = set(combo[0].reactants) - precursors
+        unique_r2 = set(combo[1].reactants) - precursors
+        unique_p1 = set(combo[0].products) - precursors
+        unique_p2 = set(combo[1].products) - precursors
+
+        overlap1 = unique_r1 & unique_p2
+        overlap2 = unique_r2 & unique_p1
+
+        if overlap1 and overlap2 and (overlap1 not in
+                                      other_comp) and (overlap2 not in other_comp):
+
+            interdependent = True
+
+            combined_reactants = {c for p in combo for c in p.reactants}
+            combined_products = {c for p in combo for c in p.products}
+            shared = combined_reactants & combined_products
+
+            combined_reactants = combined_reactants - shared
+            combined_products = combined_products - shared
+            try:
+                combined_rxn = Reaction(list(combined_reactants), list(combined_products))
+                if verbose:
+                    print(combined_rxn)
+            except ReactionError:
+                print("Could not combine interdependent reactions!")
+
+    return interdependent, combined_rxn
