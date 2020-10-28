@@ -138,7 +138,7 @@ class ReactionNetwork:
 
         self._all_entry_combos = [
             set(combo)
-            for combo in self._generate_all_combos(
+            for combo in generate_all_combos(
                 self._filtered_entries, self._max_num_phases
             )
         ]
@@ -204,6 +204,12 @@ class ReactionNetwork:
         else:
             precursors_entries = RxnEntries(precursors, "s")
 
+        o2_entry = None
+        o2_precursor = [e for e in self._precursors if e.composition.reduced_formula
+                        == "O2"]
+        if o2_precursor:
+            o2_entry = o2_precursor[0]
+
         g = gt.Graph()  # initialization of graph obj
 
         # Create all property maps
@@ -234,9 +240,8 @@ class ReactionNetwork:
         )
 
         entries_dict = {}
-        idx = 0
-        for num, entries in enumerate(self._all_entry_combos):
-            idx = 2 * num + 1
+        idx = 1
+        for entries in self._all_entry_combos:
             reactants = RxnEntries(entries, "R")
             products = RxnEntries(entries, "P")
             chemsys = reactants.chemsys
@@ -267,7 +272,42 @@ class ReactionNetwork:
                     "chemsys": chemsys,
                 },
             )
-        g.add_vertex(idx + 1)  # add all precursors, reactant, and product vertices
+            idx = idx + 2
+            if o2_entry:
+                entries.add(o2_entry)
+                reactants = RxnEntries(entries, "R")
+                products = RxnEntries(entries, "P")
+                chemsys = reactants.chemsys
+                if chemsys not in entries_dict:
+                    entries_dict[chemsys] = dict({"R": {}, "P": {}})
+
+                entries_dict[chemsys]["R"][reactants] = idx
+                self._update_vertex_properties(
+                    g,
+                    idx,
+                    {
+                        "entries": reactants,
+                        "type": 1,
+                        "bool": True,
+                        "path": False,
+                        "chemsys": chemsys,
+                    },
+                )
+                entries_dict[chemsys]["P"][products] = idx + 1
+                self._update_vertex_properties(
+                    g,
+                    idx + 1,
+                    {
+                        "entries": products,
+                        "type": 2,
+                        "bool": True,
+                        "path": False,
+                        "chemsys": chemsys,
+                    },
+                )
+                idx = idx + 2
+
+        g.add_vertex(idx)  # add all precursors, reactant, and product vertices
         target_v = g.add_vertex()  # add target vertex
         target_entries = RxnEntries(self._current_target, "t")
         self._update_vertex_properties(
@@ -303,11 +343,11 @@ class ReactionNetwork:
                     edge_list.append([v, target_v, 0, None, True, False])
 
                 if complex_loopback:
-                    combos = self._generate_all_combos(
+                    combos = generate_all_combos(
                         phases.union(self._precursors), self._max_num_phases
                     )
                 else:
-                    combos = self._generate_all_combos(phases, self._max_num_phases)
+                    combos = generate_all_combos(phases, self._max_num_phases)
 
                 for c in combos:
                     combo_phases = set(c)
@@ -522,7 +562,7 @@ class ReactionNetwork:
         if net_rxn in paths_to_try:
             paths_to_try.remove(net_rxn)
 
-        trial_combos = list(self._generate_all_combos(paths_to_try, max_num_combos))
+        trial_combos = list(generate_all_combos(paths_to_try, max_num_combos))
         unbalanced_paths = []
 
         self.logger.info("Building possible total pathways...")
@@ -630,11 +670,11 @@ class ReactionNetwork:
             phases = g.vp["entries"][v].entries
 
             if complex_loopback:
-                combos = self._generate_all_combos(
+                combos = generate_all_combos(
                     phases.union(self._precursors), self._max_num_phases
                 )
             else:
-                combos = self._generate_all_combos(phases, self._max_num_phases)
+                combos = generate_all_combos(phases, self._max_num_phases)
 
             for c in combos:
                 combo_phases = set(c)
@@ -775,7 +815,7 @@ class ReactionNetwork:
         if cost_function == "softplus":
             if max_mu_diff:
                 params = [energy, max_mu_diff]
-                weights = [1, 0.2]
+                weights = [1, 0.1]
             else:
                 params = [energy]
                 weights = [1.0]
@@ -997,26 +1037,6 @@ class ReactionNetwork:
                 is_balanced[i] = True
 
         return is_balanced, multiplicities
-
-    @staticmethod
-    def _generate_all_combos(entries, max_num_combos):
-        """
-        Helper static method for generating combination sets ranging from singular
-        length to maximum length specified by max_num_combos.
-
-        Args:
-            entries (list/set): list/set of all entry objects to combine
-            max_num_combos (int): upper limit for size of combinations of entries
-
-        Returns:
-            list: all combination sets
-        """
-        return chain.from_iterable(
-            [
-                combinations(entries, num_combos)
-                for num_combos in range(1, max_num_combos + 1)
-            ]
-        )
 
     @staticmethod
     def _softplus(params, weights, t=273):
