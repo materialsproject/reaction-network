@@ -14,6 +14,7 @@ from pymatgen.entries.computed_entries import ComputedEntry, GibbsComputedStruct
 from pymatgen.analysis.reaction_calculator import Reaction, ComputedReaction, \
     ReactionError
 from pymatgen.analysis.interface_reactions import InterfacialReactivity
+from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
 
 from rxn_network.helpers import *
 from rxn_network.analysis import *
@@ -454,6 +455,31 @@ class ReactionNetwork:
         return paths
 
     def find_intermediate_interfaces(self, intermediates, chempots=None):
+        def react(r1, r2, pd, grand_pd=None):
+            if grand_pd:
+                interface = InterfacialReactivity(
+                    r1,
+                    r2,
+                    grand_pd,
+                    norm=True,
+                    include_no_mixing_energy=False,
+                    pd_non_grand=pd,
+                    use_hull_energy=True
+                )
+            else:
+                interface = InterfacialReactivity(r1,
+                                                  r2,
+                                                  pd,
+                                                  norm=False,
+                                                  include_no_mixing_energy=False,
+                                                  pd_non_grand=None,
+                                                  use_hull_energy=True)
+
+            rxns = {rxn for _, _, _, rxn, _ in interface.get_kinks()}
+
+            return rxns
+
+
 
     def find_all_rxn_pathways(
         self, k=15, precursors=None, targets=None, max_num_combos=4,
