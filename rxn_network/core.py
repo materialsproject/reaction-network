@@ -38,6 +38,7 @@ class ReactionNetwork:
         entries,
         n=2,
         temp=300,
+        interpolate_comps=None,
         extend_entries=None,
         include_metastable=False,
         include_polymorphs=False,
@@ -114,6 +115,16 @@ class ReactionNetwork:
             raise ValueError(
                 "Cannot include chempot restriction for networks with greater than 10 elements!"
             )
+
+        if interpolate_comps:
+            interpolated_entries = []
+            for comp in interpolate_comps:
+                energy = self._pd.get_hull_energy(Composition(comp))
+                interpolated_entries.append(PDEntry(comp, energy,
+                                                    attribute="Interpolated"))
+            print("Interpolated entries:", "\n")
+            print(interpolated_entries)
+            self._filtered_entries.extend(interpolated_entries)
 
         if extend_entries:
             self._filtered_entries.extend(extend_entries)
@@ -204,11 +215,11 @@ class ReactionNetwork:
         else:
             precursors_entries = RxnEntries(precursors, "s")
 
-        o2_entry = None
-        o2_precursor = [e for e in self._precursors if e.composition.reduced_formula
-                        == "O2"]
-        if o2_precursor:
-            o2_entry = o2_precursor[0]
+        # o2_entry = None
+        # o2_precursor = [e for e in self._precursors if e.composition.reduced_formula
+        #                 == "O2"]
+        # if o2_precursor:
+        #     o2_entry = o2_precursor[0]
 
         g = gt.Graph()  # initialization of graph obj
 
@@ -273,39 +284,39 @@ class ReactionNetwork:
                 },
             )
             idx = idx + 2
-            if o2_entry:
-                entries.add(o2_entry)
-                reactants = RxnEntries(entries, "R")
-                products = RxnEntries(entries, "P")
-                chemsys = reactants.chemsys
-                if chemsys not in entries_dict:
-                    entries_dict[chemsys] = dict({"R": {}, "P": {}})
-
-                entries_dict[chemsys]["R"][reactants] = idx
-                self._update_vertex_properties(
-                    g,
-                    idx,
-                    {
-                        "entries": reactants,
-                        "type": 1,
-                        "bool": True,
-                        "path": False,
-                        "chemsys": chemsys,
-                    },
-                )
-                entries_dict[chemsys]["P"][products] = idx + 1
-                self._update_vertex_properties(
-                    g,
-                    idx + 1,
-                    {
-                        "entries": products,
-                        "type": 2,
-                        "bool": True,
-                        "path": False,
-                        "chemsys": chemsys,
-                    },
-                )
-                idx = idx + 2
+            # if o2_entry:
+            #     entries.add(o2_entry)
+            #     reactants = RxnEntries(entries, "R")
+            #     products = RxnEntries(entries, "P")
+            #     chemsys = reactants.chemsys
+            #     if chemsys not in entries_dict:
+            #         entries_dict[chemsys] = dict({"R": {}, "P": {}})
+            #
+            #     entries_dict[chemsys]["R"][reactants] = idx
+            #     self._update_vertex_properties(
+            #         g,
+            #         idx,
+            #         {
+            #             "entries": reactants,
+            #             "type": 1,
+            #             "bool": True,
+            #             "path": False,
+            #             "chemsys": chemsys,
+            #         },
+            #     )
+            #     entries_dict[chemsys]["P"][products] = idx + 1
+            #     self._update_vertex_properties(
+            #         g,
+            #         idx + 1,
+            #         {
+            #             "entries": products,
+            #             "type": 2,
+            #             "bool": True,
+            #             "path": False,
+            #             "chemsys": chemsys,
+            #         },
+            #     )
+            #     idx = idx + 2
 
         g.add_vertex(idx)  # add all precursors, reactant, and product vertices
         target_v = g.add_vertex()  # add target vertex
@@ -349,15 +360,16 @@ class ReactionNetwork:
                 else:
                     combos = generate_all_combos(phases, self._max_num_phases)
 
-                for c in combos:
-                    combo_phases = set(c)
-                    if combo_phases.issubset(self._precursors):
-                        continue
-                    combo_entry = RxnEntries(combo_phases, "R")
-                    loopback_v = g.vertex(
-                        entries_dict[combo_entry.chemsys]["R"][combo_entry]
-                    )
-                    edge_list.append([v, loopback_v, 0, None, True, False])
+                if complex_loopback:
+                    for c in combos:
+                        combo_phases = set(c)
+                        if combo_phases.issubset(self._precursors):
+                            continue
+                        combo_entry = RxnEntries(combo_phases, "R")
+                        loopback_v = g.vertex(
+                            entries_dict[combo_entry.chemsys]["R"][combo_entry]
+                        )
+                        edge_list.append([v, loopback_v, 0, None, True, False])
 
             for entry, v in vertices["R"].items():
                 phases = entry.entries
