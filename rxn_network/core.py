@@ -10,6 +10,7 @@ import graph_tool.all as gt
 import queue
 
 from pymatgen import Element
+from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.entries.computed_entries import ComputedEntry, GibbsComputedStructureEntry
 from pymatgen.analysis.reaction_calculator import Reaction, ComputedReaction, \
     ReactionError
@@ -156,6 +157,8 @@ class ReactionNetwork:
             )
         ]
 
+        self.entry_set = EntrySet(self._filtered_entries)
+
         # Graph variables used during graph creation
         self._precursors = None
         self._all_targets = None
@@ -216,12 +219,6 @@ class ReactionNetwork:
                 )
         else:
             precursors_entries = RxnEntries(precursors, "s")
-
-        # o2_entry = None
-        # o2_precursor = [e for e in self._precursors if e.composition.reduced_formula
-        #                 == "O2"]
-        # if o2_precursor:
-        #     o2_entry = o2_precursor[0]
 
         g = gt.Graph()  # initialization of graph obj
 
@@ -478,6 +475,14 @@ class ReactionNetwork:
             rxns = {rxn for _, _, _, rxn, _ in interface.get_kinks()}
 
             return rxns
+
+        for combo in generate_all_combos(intermediates, 2):
+            if len(combo) == 1:
+
+
+        entry_subset = self.entry_set.get_subset_in_chemsys(
+            if.chemsys.split("-")
+        )
 
 
 
