@@ -13,6 +13,7 @@ from pymatgen import Element
 from pymatgen.entries.computed_entries import ComputedEntry, GibbsComputedStructureEntry
 from pymatgen.analysis.reaction_calculator import Reaction, ComputedReaction, \
     ReactionError
+from pymatgen.analysis.interface_reactions import InterfacialReactivity
 
 from rxn_network.helpers import *
 from rxn_network.analysis import *
@@ -284,39 +285,6 @@ class ReactionNetwork:
                 },
             )
             idx = idx + 2
-            # if o2_entry:
-            #     entries.add(o2_entry)
-            #     reactants = RxnEntries(entries, "R")
-            #     products = RxnEntries(entries, "P")
-            #     chemsys = reactants.chemsys
-            #     if chemsys not in entries_dict:
-            #         entries_dict[chemsys] = dict({"R": {}, "P": {}})
-            #
-            #     entries_dict[chemsys]["R"][reactants] = idx
-            #     self._update_vertex_properties(
-            #         g,
-            #         idx,
-            #         {
-            #             "entries": reactants,
-            #             "type": 1,
-            #             "bool": True,
-            #             "path": False,
-            #             "chemsys": chemsys,
-            #         },
-            #     )
-            #     entries_dict[chemsys]["P"][products] = idx + 1
-            #     self._update_vertex_properties(
-            #         g,
-            #         idx + 1,
-            #         {
-            #             "entries": products,
-            #             "type": 2,
-            #             "bool": True,
-            #             "path": False,
-            #             "chemsys": chemsys,
-            #         },
-            #     )
-            #     idx = idx + 2
 
         g.add_vertex(idx)  # add all precursors, reactant, and product vertices
         target_v = g.add_vertex()  # add target vertex
@@ -484,6 +452,8 @@ class ReactionNetwork:
                 print(path, "\n")
 
         return paths
+
+    def find_intermediate_interfaces(self, intermediates, chempots=None):
 
     def find_all_rxn_pathways(
         self, k=15, precursors=None, targets=None, max_num_combos=4,
