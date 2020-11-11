@@ -5,6 +5,8 @@ from tqdm import tqdm
 import numpy as np
 from numba import njit, prange
 from numba.typed import List
+from pathos.pools import ProcessPool as Pool
+from functools import partial
 
 import graph_tool.all as gt
 import queue
@@ -14,8 +16,8 @@ from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.entries.computed_entries import ComputedEntry, GibbsComputedStructureEntry
 from pymatgen.analysis.reaction_calculator import Reaction, ComputedReaction, \
     ReactionError
-from pymatgen.analysis.interface_reactions import InterfacialReactivity
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
+
 
 from rxn_network.helpers import *
 from rxn_network.analysis import *
@@ -175,6 +177,105 @@ class ReactionNetwork:
             f"Initializing network with {len(self._filtered_entries)} "
             f"entries: \n{filtered_entries_str}"
         )
+
+    def create_graph_edges(self, chemsys, vertices, precursors_v):
+        elems = {Element(e) for e in chemsys.split("-")}
+        edge_list = []
+        for entry, v in vertices["R"].items():
+            phases = entry.entries
+
+            v = g.vertex(v)
+
+            if self.precursors_entries.description == "D" or phases.issubset(
+                self._precursors
+            ):
+                edge_list.append([precursors_v, v, 0, None, True, False])
+
+        for entry, v in vertices["P"].items():
+            phases = entry.entries
+            if self._current_target.issubset(phases):
+                edge_list.append([v, target_v, 0, None, True, False])
+
+            if complex_loopback:
+                combos = generate_all_combos(
+                    phases.union(self._precursors), self._max_num_phases
+                )
+            else:
+                combos = generate_all_combos(phases, self._max_num_phases)
+
+            if complex_loopback:
+                for c in combos:
+                    combo_phases = set(c)
+                    if combo_phases.issubset(self._precursors):
+                        continue
+                    combo_entry = RxnEntries(combo_phases, "R")
+                    loopback_v = g.vertex(
+                        entries_dict[combo_entry.chemsys]["R"][combo_entry]
+                    )
+                    edge_list.append([v, loopback_v, 0, None, True, False])
+
+        for entry, v in vertices["R"].items():
+            phases = entry.entries
+            if self._include_chempot_restriction:
+                reactant_mu_ranges = [self._entry_mu_ranges[e] for e in phases]
+                reactant_mu_span = {
+                    elem: (
+                        min([r[elem][0] for r in reactant_mu_ranges if elem in r]),
+                        max([r[elem][1] for r in reactant_mu_ranges if elem in r]),
+                    )
+                    for elem in elems
+                }
+
+            for other_entry, other_v in vertices["P"].items():
+                other_phases = other_entry.entries
+
+                if other_phases == phases:
+                    continue  # do not consider identity-like reactions (e.g. A + B -> A + B)
+
+                max_mu_diff = None
+                if self._include_chempot_restriction:
+                    product_mu_ranges = [
+                        self._entry_mu_ranges[e] for e in other_phases
+                    ]
+                    product_mu_span = {
+                        elem: (
+                            min(
+                                [p[elem][0] for p in product_mu_ranges if elem in p]
+                            ),
+                            max(
+                                [p[elem][1] for p in product_mu_ranges if elem in p]
+                            ),
+                        )
+                        for elem in elems
+                    }
+
+                    max_mu_diff = -np.inf
+                    for elem in product_mu_span:
+                        mu_diff = (product_mu_span[elem][0]
+                                   - reactant_mu_span[elem][1])
+                        if mu_diff > max_mu_diff:
+                            max_mu_diff = mu_diff
+
+                try:
+                    rxn = ComputedReaction(list(phases), list(other_phases))
+                except ReactionError:
+                    continue
+
+                if rxn._lowest_num_errors != 0:
+                    continue  # remove reaction which has components that
+                    # change sides or disappear
+
+                total_num_atoms = sum(
+                    [rxn.get_el_amount(elem) for elem in rxn.elements])
+                rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
+
+                if self._rxn_e_filter and rxn_energy > self._rxn_e_filter:
+                    continue
+
+                weight = self._get_rxn_cost(rxn, max_mu_diff)
+                edge_list.append(
+                    [g.vertex(v), g.vertex(other_v), weight, rxn, True, False]
+                )
 
     def generate_rxn_network(
         self,
@@ -451,43 +552,58 @@ class ReactionNetwork:
 
         return paths
 
-    def find_intermediate_interfaces(self, intermediates, chempots=None):
-        def react(r1, r2, pd, grand_pd=None):
-            if grand_pd:
-                interface = InterfacialReactivity(
-                    r1,
-                    r2,
-                    grand_pd,
-                    norm=True,
-                    include_no_mixing_energy=False,
-                    pd_non_grand=pd,
-                    use_hull_energy=True
-                )
+    def find_intermediate_rxns(self, intermediates, targets, chempots=None):
+        all_rxns = set()
+        combos = list(generate_all_combos(intermediates, 2))
+        for entries in tqdm(combos):
+            n = len(entries)
+            r1 = entries[0].composition.reduced_composition
+            chemsys = {str(el) for entry in entries for el in
+                       entry.composition.elements}
+            elem = None
+            if chempots:
+                elem = str(list(chempots.keys())[0])
+                chemsys.update(elem)
+                if chemsys == {elem}:
+                    continue
+
+            if n == 1:
+                r2 = entries[0].composition.reduced_composition
+            elif n == 2:
+                r2 = entries[1].composition.reduced_composition
             else:
-                interface = InterfacialReactivity(r1,
-                                                  r2,
-                                                  pd,
-                                                  norm=False,
-                                                  include_no_mixing_energy=False,
-                                                  pd_non_grand=None,
-                                                  use_hull_energy=True)
+                raise ValueError("Can't have an interface that is not 1 to 2 entries!")
 
-            rxns = {rxn for _, _, _, rxn, _ in interface.get_kinks()}
+            if chempots:
+                elem_comp = Composition(elem).reduced_composition
+                if r1 == elem_comp or r2 == elem_comp:
+                    continue
 
-            return rxns
+            entry_subset = self.entry_set.get_subset_in_chemsys(list(chemsys))
+            pd = PhaseDiagram(entry_subset)
+            grand_pd = None
+            if chempots:
+                grand_pd = GrandPotentialPhaseDiagram(entry_subset, chempots)
 
-        for combo in generate_all_combos(intermediates, 2):
-            if len(combo) == 1:
+            rxns = react_interface(r1, r2, pd, grand_pd)
+            rxns_filtered = {r for r in rxns if set(r._product_entries) & targets}
+            all_rxns.update(rxns_filtered)
 
+        return all_rxns
 
-        entry_subset = self.entry_set.get_subset_in_chemsys(
-            if.chemsys.split("-")
-        )
-
+    @staticmethod
+    def build_path(combo, net_rxn, net_rxn_all_comp, paths_to_all_targets):
+        path = None
+        if net_rxn_all_comp.issubset(
+                [comp for rxn in combo for comp in rxn.all_comp]
+        ):
+            path = BalancedPathway({p: paths_to_all_targets[p] for p in combo},
+                                   net_rxn, balance=True)
+        return path
 
 
     def find_all_rxn_pathways(
-        self, k=15, precursors=None, targets=None, max_num_combos=4,
+        self, k=15, precursors=None, targets=None, max_num_combos=4, chempots=None,
             consider_crossover_rxns=10, filter_interdependent=True
     ):
         """
@@ -552,76 +668,91 @@ class ReactionNetwork:
             }
             paths_to_all_targets.update(paths)
 
-        print("Rebuilding to find crossover paths...")
+        print("Finding crossover reactions paths...")
 
         if consider_crossover_rxns:
             precursors_and_targets = targets | self._precursors
             intermediates = {entry for rxn in paths_to_all_targets for entry in
                              rxn.all_entries} - precursors_and_targets
-            self.set_precursors(intermediates)
+            intermediate_rxns = self.find_intermediate_rxns(intermediates,
+                                                            targets, chempots)
+            paths = {rxn: self._get_rxn_cost(rxn) for rxn in intermediate_rxns}
+            if paths:
+                most_favorable_rxn = min(paths.keys(), key=lambda x: paths[x])
 
-            for target in targets:
-                print(f"Crossover paths to {target.composition.reduced_formula} \n")
-                self.set_target(target)
-                crossover_paths = self.find_k_shortest_paths(consider_crossover_rxns)
-                crossover_paths = {
-                    rxn: cost
-                    for path in crossover_paths
-                    for (rxn, cost) in zip(path.rxns, path.costs)
-                }
-                paths_to_all_targets.update(crossover_paths)
+                paths = {most_favorable_rxn: paths[most_favorable_rxn]}
+
+                paths_to_all_targets.update(paths)
+            paths_to_all_targets.update(
+                self.find_crossover_rxns(intermediates, targets)
+            )
 
         paths_to_try = list(paths_to_all_targets.keys())
         if net_rxn in paths_to_try:
             paths_to_try.remove(net_rxn)
 
-        trial_combos = list(generate_all_combos(paths_to_try, max_num_combos))
-        unbalanced_paths = []
+        build_path = partial(self.build_path, net_rxn=net_rxn,
+                             net_rxn_all_comp=net_rxn_all_comp,
+                             paths_to_all_targets=paths_to_all_targets)
+
+        trial_combos = generate_all_combos(paths_to_try, max_num_combos)
 
         self.logger.info("Building possible total pathways...")
 
-        for i, combo in enumerate(tqdm(trial_combos)):
-            if net_rxn_all_comp.issubset(
-                [comp for rxn in combo for comp in rxn.all_comp]
-            ):
-                unbalanced_paths.append(
-                    BalancedPathway(
-                        {p: paths_to_all_targets[p] for p in combo},
-                        net_rxn,
-                        balance=False,
-                    )
-                )
+        with Pool() as pool:
+            paths = [p for p in pool.map(build_path, trial_combos) if p and
+                                p.is_balanced]
 
-        if not unbalanced_paths:
-            raise ValueError("Cannot generate any viable trail pathways... check for "
+        if not paths:
+            raise ValueError("Cannot generate any viable trial pathways... check for "
                              "reactants which are missing from shortest paths.")
 
-        comp_matrices = List([p.comp_matrix for p in unbalanced_paths])
-        net_coeffs = List([p.net_coeffs for p in unbalanced_paths])
-
-        self.logger.info("Mass balancing...")
-
-        is_balanced, multiplicities = self._balance_all_paths(comp_matrices, net_coeffs)
-
-        balanced_total_paths = list(compress(unbalanced_paths, is_balanced))
-        balanced_multiplicities = list(compress(multiplicities, is_balanced))
-
-        for p, m in zip(balanced_total_paths, balanced_multiplicities):
-            p.set_multiplicities(m)
-            p.calculate_costs()
+        # comp_matrices = List([p.comp_matrix for p in unbalanced_paths])
+        # net_coeffs = List([p.net_coeffs for p in unbalanced_paths])
+        #
+        # self.logger.info("Mass balancing...")
+        #
+        # is_balanced, multiplicities = self._balance_all_paths(comp_matrices, net_coeffs)
+        #
+        # balanced_total_paths = list(compress(unbalanced_paths, is_balanced))
+        # balanced_multiplicities = list(compress(multiplicities, is_balanced))
+        #
+        # for p, m in zip(balanced_total_paths, balanced_multiplicities):
+        #     p.set_multiplicities(m)
+        #     p.calculate_costs()
 
         if filter_interdependent:
             final_paths = set()
-            for p in balanced_total_paths:
+            for p in paths:
                 interdependent, combined_rxn = find_interdependent_rxns(p, [c.composition
                                                                           for c in precursors])
                 if interdependent:
                     continue
                 final_paths.add(p)
         else:
-            final_paths = balanced_total_paths
-        analysis = PathwayAnalysis(self, balanced_total_paths)
-        return sorted(list(final_paths), key=lambda x: x.total_cost), analysis
+            final_paths = paths
+        #analysis = PathwayAnalysis(self, balanced_total_paths)
+        return sorted(list(final_paths), key=lambda x: x.total_cost)
+
+    def find_crossover_rxns(self, intermediates, targets):
+        all_crossover_rxns = dict()
+        for reactants_combo in generate_all_combos(
+                intermediates, self._max_num_phases
+        ):
+            for products_combo in generate_all_combos(
+                    targets, self._max_num_phases
+            ):
+                try:
+                    rxn = ComputedReaction(
+                        list(reactants_combo), list(products_combo)
+                    )
+                except ReactionError:
+                    continue
+                if rxn._lowest_num_errors > 0:
+                    continue
+                path = {rxn: self._get_rxn_cost(rxn)}
+                all_crossover_rxns.update(path)
+        return all_crossover_rxns
 
     def set_precursors(self, precursors=None, complex_loopback=True):
         """

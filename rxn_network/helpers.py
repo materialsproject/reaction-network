@@ -10,9 +10,11 @@ import numpy as np
 import json
 
 from pymatgen import Composition
-from pymatgen.analysis.phase_diagram import PhaseDiagram, PDEntry
-from pymatgen.analysis.reaction_calculator import Reaction, ReactionError
+from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDiagram, \
+    PDEntry
+from pymatgen.analysis.reaction_calculator import Reaction, ReactionError, ComputedReaction
 from pymatgen.entries.computed_entries import ComputedStructureEntry
+from pymatgen.analysis.interface_reactions import InterfacialReactivity
 
 from monty.json import MSONable, MontyDecoder
 
@@ -631,6 +633,49 @@ def generate_all_combos(entries, max_num_combos):
             for num_combos in range(1, max_num_combos + 1)
         ]
     )
+
+
+def react_interface(r1, r2, pd, grand_pd=None):
+    if grand_pd:
+        interface = InterfacialReactivity(
+            r1,
+            r2,
+            grand_pd,
+            norm=True,
+            include_no_mixing_energy=False,
+            pd_non_grand=pd,
+            use_hull_energy=True
+        )
+    else:
+        interface = InterfacialReactivity(r1,
+                                          r2,
+                                          pd,
+                                          norm=False,
+                                          include_no_mixing_energy=False,
+                                          pd_non_grand=None,
+                                          use_hull_energy=True)
+
+    entries = pd.all_entries
+    rxns = {get_computed_rxn(rxn, entries) for _, _, _, rxn,
+                                                _ in interface.get_kinks()}
+
+    return rxns
+
+
+def get_computed_rxn(rxn, entries):
+    reactants = [r.reduced_composition for r in rxn.reactants if not np.isclose(
+        rxn.get_coeff(r), 0)]
+    products = [p.reduced_composition for p in rxn.products if not np.isclose(
+        rxn.get_coeff(p), 0)]
+    reactant_entries = [get_entry_by_comp(r, entries) for r in reactants]
+    product_entries = [get_entry_by_comp(p, entries) for p in products]
+    return ComputedReaction(reactant_entries, product_entries)
+
+
+def get_entry_by_comp(comp, entry_set):
+    possible_entries = filter(lambda x: x.composition.reduced_composition
+                                                   == comp, entry_set)
+    return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
 
 
 def expand_pd(entries):
