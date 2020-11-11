@@ -1,11 +1,12 @@
 import logging
-from itertools import combinations, chain, groupby, compress
+from itertools import combinations, chain, groupby, compress, product
 from tqdm import tqdm
 
 import numpy as np
+import ray
 from numba import njit, prange
 from numba.typed import List
-from pathos.pools import ProcessPool as Pool
+from pathos.pools import ProcessPool, ThreadPool
 from functools import partial
 
 import graph_tool.all as gt
@@ -167,6 +168,7 @@ class ReactionNetwork:
         self._current_target = None
         self._cost_function = None
         self._complex_loopback = None
+        self._precursors_entries = None
         self._most_negative_rxn = None  # used in piecewise cost function
         self._g = None  # Graph object in graph-tool
 
@@ -178,104 +180,62 @@ class ReactionNetwork:
             f"entries: \n{filtered_entries_str}"
         )
 
-    def create_graph_edges(self, chemsys, vertices, precursors_v):
-        elems = {Element(e) for e in chemsys.split("-")}
-        edge_list = []
-        for entry, v in vertices["R"].items():
-            phases = entry.entries
+    def find_rxn_edge(self, combo):
+        entry = combo[0][0]
+        v = combo[0][1]
+        other_entry = combo[1][0]
+        other_v = combo[1][1]
 
-            v = g.vertex(v)
+        phases = entry.entries
+        other_phases = other_entry.entries
 
-            if self.precursors_entries.description == "D" or phases.issubset(
-                self._precursors
-            ):
-                edge_list.append([precursors_v, v, 0, None, True, False])
+        if other_phases == phases:
+            return  # do not consider identity-like reactions (e.g. A + B -> A + B)
 
-        for entry, v in vertices["P"].items():
-            phases = entry.entries
-            if self._current_target.issubset(phases):
-                edge_list.append([v, target_v, 0, None, True, False])
+        # max_mu_diff = None
+        # if self._include_chempot_restriction:
+        #     product_mu_ranges = [
+        #         self._entry_mu_ranges[e] for e in other_phases
+        #     ]
+        #     product_mu_span = {
+        #         elem: (
+        #             min(
+        #                 [p[elem][0] for p in product_mu_ranges if elem in p]
+        #             ),
+        #             max(
+        #                 [p[elem][1] for p in product_mu_ranges if elem in p]
+        #             ),
+        #         )
+        #         for elem in elems
+        #     }
+        #
+        #     max_mu_diff = -np.inf
+        #     for elem in product_mu_span:
+        #         mu_diff = (product_mu_span[elem][0]
+        #                    - reactant_mu_span[elem][1])
+        #         if mu_diff > max_mu_diff:
+        #             max_mu_diff = mu_diff
 
-            if complex_loopback:
-                combos = generate_all_combos(
-                    phases.union(self._precursors), self._max_num_phases
-                )
-            else:
-                combos = generate_all_combos(phases, self._max_num_phases)
+        try:
+            rxn = ComputedReaction(list(phases), list(other_phases))
+        except ReactionError:
+            return
 
-            if complex_loopback:
-                for c in combos:
-                    combo_phases = set(c)
-                    if combo_phases.issubset(self._precursors):
-                        continue
-                    combo_entry = RxnEntries(combo_phases, "R")
-                    loopback_v = g.vertex(
-                        entries_dict[combo_entry.chemsys]["R"][combo_entry]
-                    )
-                    edge_list.append([v, loopback_v, 0, None, True, False])
+        if rxn._lowest_num_errors != 0:
+            return  # remove reaction which has components that
+            # change sides or disappear
 
-        for entry, v in vertices["R"].items():
-            phases = entry.entries
-            if self._include_chempot_restriction:
-                reactant_mu_ranges = [self._entry_mu_ranges[e] for e in phases]
-                reactant_mu_span = {
-                    elem: (
-                        min([r[elem][0] for r in reactant_mu_ranges if elem in r]),
-                        max([r[elem][1] for r in reactant_mu_ranges if elem in r]),
-                    )
-                    for elem in elems
-                }
+        total_num_atoms = sum(
+            [rxn.get_el_amount(elem) for elem in rxn.elements])
+        rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
 
-            for other_entry, other_v in vertices["P"].items():
-                other_phases = other_entry.entries
+        if self._rxn_e_filter and rxn_energy > self._rxn_e_filter:
+            return
 
-                if other_phases == phases:
-                    continue  # do not consider identity-like reactions (e.g. A + B -> A + B)
+        weight = self._get_rxn_cost(rxn, max_mu_diff=None)
+        edge = [v, other_v, weight, rxn, True, False]
 
-                max_mu_diff = None
-                if self._include_chempot_restriction:
-                    product_mu_ranges = [
-                        self._entry_mu_ranges[e] for e in other_phases
-                    ]
-                    product_mu_span = {
-                        elem: (
-                            min(
-                                [p[elem][0] for p in product_mu_ranges if elem in p]
-                            ),
-                            max(
-                                [p[elem][1] for p in product_mu_ranges if elem in p]
-                            ),
-                        )
-                        for elem in elems
-                    }
-
-                    max_mu_diff = -np.inf
-                    for elem in product_mu_span:
-                        mu_diff = (product_mu_span[elem][0]
-                                   - reactant_mu_span[elem][1])
-                        if mu_diff > max_mu_diff:
-                            max_mu_diff = mu_diff
-
-                try:
-                    rxn = ComputedReaction(list(phases), list(other_phases))
-                except ReactionError:
-                    continue
-
-                if rxn._lowest_num_errors != 0:
-                    continue  # remove reaction which has components that
-                    # change sides or disappear
-
-                total_num_atoms = sum(
-                    [rxn.get_el_amount(elem) for elem in rxn.elements])
-                rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
-
-                if self._rxn_e_filter and rxn_energy > self._rxn_e_filter:
-                    continue
-
-                weight = self._get_rxn_cost(rxn, max_mu_diff)
-                edge_list.append(
-                    [g.vertex(v), g.vertex(other_v), weight, rxn, True, False]
-                )
+        return edge
 
     def generate_rxn_network(
         self,
@@ -320,6 +280,8 @@ class ReactionNetwork:
                 )
         else:
             precursors_entries = RxnEntries(precursors, "s")
+
+        self._precursors_entries = precursors_entries
 
         g = gt.Graph()  # initialization of graph obj
 
@@ -385,7 +347,7 @@ class ReactionNetwork:
             )
             idx = idx + 2
 
-        g.add_vertex(idx)  # add all precursors, reactant, and product vertices
+        g.add_vertex(idx)  # add ALL precursors, reactant, and product vertices
         target_v = g.add_vertex()  # add target vertex
         target_entries = RxnEntries(self._current_target, "t")
         self._update_vertex_properties(
@@ -402,107 +364,46 @@ class ReactionNetwork:
 
         self.logger.info("Generating reactions by chemical subsystem...")
 
-        edge_list = []
-        for chemsys, vertices in tqdm(entries_dict.items()):
-            elems = {Element(e) for e in chemsys.split("-")}
-            for entry, v in vertices["R"].items():
-                phases = entry.entries
+        all_edges = []
+        for chemsys, vertices in entries_dict.items():
+            #elems = {Element(e) for e in chemsys.split("-")}
 
-                v = g.vertex(v)
-
-                if precursors_entries.description == "D" or phases.issubset(
-                    self._precursors
-                ):
-                    edge_list.append([precursors_v, v, 0, None, True, False])
+            edge_list = [[precursors_v, v, 0, None, True, False] for entry, v in
+                         vertices["R"].items() if
+                         self._precursors_entries.description == "D" or
+                         entry.entries.issubset(self._precursors)]
 
             for entry, v in vertices["P"].items():
                 phases = entry.entries
                 if self._current_target.issubset(phases):
                     edge_list.append([v, target_v, 0, None, True, False])
 
-                if complex_loopback:
+                if self._complex_loopback:
                     combos = generate_all_combos(
                         phases.union(self._precursors), self._max_num_phases
                     )
                 else:
                     combos = generate_all_combos(phases, self._max_num_phases)
 
-                if complex_loopback:
+                if self._complex_loopback:
                     for c in combos:
                         combo_phases = set(c)
                         if combo_phases.issubset(self._precursors):
                             continue
                         combo_entry = RxnEntries(combo_phases, "R")
-                        loopback_v = g.vertex(
-                            entries_dict[combo_entry.chemsys]["R"][combo_entry]
-                        )
+                        loopback_v = entries_dict[combo_entry.chemsys]["R"][combo_entry]
                         edge_list.append([v, loopback_v, 0, None, True, False])
 
-            for entry, v in vertices["R"].items():
-                phases = entry.entries
-                if self._include_chempot_restriction:
-                    reactant_mu_ranges = [self._entry_mu_ranges[e] for e in phases]
-                    reactant_mu_span = {
-                        elem: (
-                            min([r[elem][0] for r in reactant_mu_ranges if elem in r]),
-                            max([r[elem][1] for r in reactant_mu_ranges if elem in r]),
-                        )
-                        for elem in elems
-                    }
+            reaction_edges = [edge for edge in map(self.find_rxn_edge, product(
+                vertices["R"].items(),
+                                                                      vertices["P"].items()))
+                              if edge]
 
-                for other_entry, other_v in vertices["P"].items():
-                    other_phases = other_entry.entries
-
-                    if other_phases == phases:
-                        continue  # do not consider identity-like reactions (e.g. A + B -> A + B)
-
-                    max_mu_diff = None
-                    if self._include_chempot_restriction:
-                        product_mu_ranges = [
-                            self._entry_mu_ranges[e] for e in other_phases
-                        ]
-                        product_mu_span = {
-                            elem: (
-                                min(
-                                    [p[elem][0] for p in product_mu_ranges if elem in p]
-                                ),
-                                max(
-                                    [p[elem][1] for p in product_mu_ranges if elem in p]
-                                ),
-                            )
-                            for elem in elems
-                        }
-
-                        max_mu_diff = -np.inf
-                        for elem in product_mu_span:
-                            mu_diff = (product_mu_span[elem][0]
-                                       - reactant_mu_span[elem][1])
-                            if mu_diff > max_mu_diff:
-                                max_mu_diff = mu_diff
-
-                    try:
-                        rxn = ComputedReaction(list(phases), list(other_phases))
-                    except ReactionError:
-                        continue
-
-                    if rxn._lowest_num_errors != 0:
-                        continue  # remove reaction which has components that
-                        # change sides or disappear
-
-                    total_num_atoms = sum(
-                        [rxn.get_el_amount(elem) for elem in rxn.elements])
-                    rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
-
-                    if self._rxn_e_filter and rxn_energy > self._rxn_e_filter:
-                        continue
-
-                    weight = self._get_rxn_cost(rxn, max_mu_diff)
-                    edge_list.append(
-                        [g.vertex(v), g.vertex(other_v), weight, rxn, True, False]
-                    )
+            all_edges.extend(edge_list)
+            all_edges.extend(reaction_edges)
 
         g.add_edge_list(
-            edge_list, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"], g.ep["path"]]
+            all_edges, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"], g.ep["path"]]
         )
 
         self.logger.info(
@@ -699,7 +600,7 @@ class ReactionNetwork:
 
         self.logger.info("Building possible total pathways...")
 
-        with Pool() as pool:
+        with ProcessPool() as pool:
             paths = [p for p in pool.map(build_path, trial_combos) if p and
                                 p.is_balanced]
 
