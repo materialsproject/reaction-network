@@ -1,6 +1,7 @@
 import logging
 from itertools import combinations, chain, groupby, compress, product
 from tqdm import tqdm
+import math
 
 import numpy as np
 import ray
@@ -14,7 +15,7 @@ import queue
 
 from pymatgen import Element
 from pymatgen.entries.entry_tools import EntrySet
-from pymatgen.entries.computed_entries import ComputedEntry, GibbsComputedStructureEntry
+from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.reaction_calculator import Reaction, ComputedReaction, \
     ReactionError
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
@@ -180,62 +181,101 @@ class ReactionNetwork:
             f"entries: \n{filtered_entries_str}"
         )
 
-    def find_rxn_edge(self, combo):
-        entry = combo[0][0]
-        v = combo[0][1]
-        other_entry = combo[1][0]
-        other_v = combo[1][1]
+        ray.init(ignore_reinit_error=True)
 
-        phases = entry.entries
-        other_phases = other_entry.entries
+    @staticmethod
+    @ray.remote
+    def find_rxn_edges(start, end, combos, cost_function, rxn_e_filter, temp):
+        edges = []
+        for combo in combos[start:end]:
+            entry = combo[0][0]
+            v = combo[0][1]
+            other_entry = combo[1][0]
+            other_v = combo[1][1]
 
-        if other_phases == phases:
-            return  # do not consider identity-like reactions (e.g. A + B -> A + B)
+            phases = entry.entries
+            other_phases = other_entry.entries
 
-        # max_mu_diff = None
-        # if self._include_chempot_restriction:
-        #     product_mu_ranges = [
-        #         self._entry_mu_ranges[e] for e in other_phases
-        #     ]
-        #     product_mu_span = {
-        #         elem: (
-        #             min(
-        #                 [p[elem][0] for p in product_mu_ranges if elem in p]
-        #             ),
-        #             max(
-        #                 [p[elem][1] for p in product_mu_ranges if elem in p]
-        #             ),
-        #         )
-        #         for elem in elems
-        #     }
-        #
-        #     max_mu_diff = -np.inf
-        #     for elem in product_mu_span:
-        #         mu_diff = (product_mu_span[elem][0]
-        #                    - reactant_mu_span[elem][1])
-        #         if mu_diff > max_mu_diff:
-        #             max_mu_diff = mu_diff
+            if other_phases == phases:
+                continue  # do not consider identity-like reactions (e.g. A + B -> A
+                # + B)
 
-        try:
-            rxn = ComputedReaction(list(phases), list(other_phases))
-        except ReactionError:
-            return
+            # max_mu_diff = None
+            # if self._include_chempot_restriction:
+            #     product_mu_ranges = [
+            #         self._entry_mu_ranges[e] for e in other_phases
+            #     ]
+            #     product_mu_span = {
+            #         elem: (
+            #             min(
+            #                 [p[elem][0] for p in product_mu_ranges if elem in p]
+            #             ),
+            #             max(
+            #                 [p[elem][1] for p in product_mu_ranges if elem in p]
+            #             ),
+            #         )
+            #         for elem in elems
+            #     }
+            #
+            #     max_mu_diff = -np.inf
+            #     for elem in product_mu_span:
+            #         mu_diff = (product_mu_span[elem][0]
+            #                    - reactant_mu_span[elem][1])
+            #         if mu_diff > max_mu_diff:
+            #             max_mu_diff = mu_diff
 
-        if rxn._lowest_num_errors != 0:
-            return  # remove reaction which has components that
-            # change sides or disappear
+            try:
+                rxn = ComputedReaction(list(phases), list(other_phases))
+            except ReactionError:
+                continue
 
-        total_num_atoms = sum(
-            [rxn.get_el_amount(elem) for elem in rxn.elements])
-        rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
+            if rxn._lowest_num_errors != 0:
+                continue  # remove reaction which has components that
+                # change sides or disappear
 
-        if self._rxn_e_filter and rxn_energy > self._rxn_e_filter:
-            return
+            total_num_atoms = sum(
+                [rxn.get_el_amount(elem) for elem in rxn.elements])
+            rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
 
-        weight = self._get_rxn_cost(rxn, max_mu_diff=None)
-        edge = [v, other_v, weight, rxn, True, False]
+            if rxn_e_filter and rxn_energy > rxn_e_filter:
+                continue
 
-        return edge
+            weight = get_rxn_cost(rxn, cost_function=cost_function,
+                                  temp=temp, max_mu_diff=None)
+            edge = [v, other_v, weight, rxn, True, False]
+            edges.append(edge)
+
+        return edges
+
+    @staticmethod
+    @ray.remote
+    def get_target_loopback_edges(start, end, entries, vertices, current_target,
+                                  target_v, precursors, max_num_phases, entries_dict,
+                                  complex_loopback):
+        edge_list = []
+        for entry, v in zip(entries[start:end], vertices[start:end]):
+            phases = entry.entries
+            if current_target.issubset(phases):
+                edge_list.append([v, target_v, 0, None, True, False])
+
+            if complex_loopback:
+                combos = generate_all_combos(
+                    phases.union(precursors), max_num_phases
+                )
+            else:
+                combos = generate_all_combos(phases, max_num_phases)
+
+            if complex_loopback:
+                for c in combos:
+                    combo_phases = set(c)
+                    if combo_phases.issubset(precursors):
+                        continue
+                    combo_entry = RxnEntries(combo_phases, "R")
+                    loopback_v = entries_dict[combo_entry.chemsys]["R"][combo_entry]
+
+                    edge_list.append([v, loopback_v, 0, None, True, False])
+
+        return edge_list
 
     def generate_rxn_network(
         self,
@@ -243,6 +283,7 @@ class ReactionNetwork:
         targets=None,
         cost_function="softplus",
         complex_loopback=True,
+        num_cores=6
     ):
         """
         Generates and stores the actual reaction network (weighted, directed graph)
@@ -364,42 +405,65 @@ class ReactionNetwork:
 
         self.logger.info("Generating reactions by chemical subsystem...")
 
+        cost_function_id = ray.put(self._cost_function)
+        rxn_e_filter_id = ray.put(self._rxn_e_filter)
+        temp_id = ray.put(self._temp)
+        complex_loopback_id = ray.put(self._complex_loopback)
+        current_target_id = ray.put(self._current_target)
+        max_num_phases_id = ray.put(self._max_num_phases)
+        target_v_id = ray.put(int(target_v))
+        precursors_id = ray.put(self._precursors)
+        entries_dict_id = ray.put(entries_dict)
+
         all_edges = []
-        for chemsys, vertices in entries_dict.items():
-            #elems = {Element(e) for e in chemsys.split("-")}
+        pbar = tqdm(entries_dict.items())
+        for chemsys, vertices in pbar:
+            pbar.set_description(f"Processing {chemsys}")
+            edge_list = [[precursors_v, v, 0, None, True, False]
+                         for entry, v in vertices["R"].items()
+                         if self._precursors_entries.description == "D" or
+                         entry.entries.issubset(self._precursors)
+                         ]
 
-            edge_list = [[precursors_v, v, 0, None, True, False] for entry, v in
-                         vertices["R"].items() if
-                         self._precursors_entries.description == "D" or
-                         entry.entries.issubset(self._precursors)]
+            product_entries = list(vertices["P"].keys())
+            product_vertices = list(vertices["P"].values())
 
-            for entry, v in vertices["P"].items():
-                phases = entry.entries
-                if self._current_target.issubset(phases):
-                    edge_list.append([v, target_v, 0, None, True, False])
+            product_entries_id = ray.put(product_entries)
+            product_vertices_id = ray.put(product_vertices)
 
-                if self._complex_loopback:
-                    combos = generate_all_combos(
-                        phases.union(self._precursors), self._max_num_phases
-                    )
-                else:
-                    combos = generate_all_combos(phases, self._max_num_phases)
+            num_entries = len(product_vertices)
+            batch_size = math.ceil(num_entries/num_cores)
+            num_batches = math.ceil(num_entries / batch_size)
 
-                if self._complex_loopback:
-                    for c in combos:
-                        combo_phases = set(c)
-                        if combo_phases.issubset(self._precursors):
-                            continue
-                        combo_entry = RxnEntries(combo_phases, "R")
-                        loopback_v = entries_dict[combo_entry.chemsys]["R"][combo_entry]
-                        edge_list.append([v, loopback_v, 0, None, True, False])
+            futures = ray.get([self.get_target_loopback_edges.remote(x*batch_size,
+                                                                     (x+1)*batch_size,
+                                                                     product_entries_id,
+                                                                     product_vertices_id,
+                                                                     current_target_id,
+                                                                     target_v_id,
+                                                                     precursors,
+                                                                     max_num_phases_id,
+                                                                     entries_dict_id,
+                                                                     complex_loopback_id)
+                               for x in range(num_batches+1)])
+            zero_cost_edges = [edge for edge_list in futures for edge in edge_list]
 
-            reaction_edges = [edge for edge in map(self.find_rxn_edge, product(
-                vertices["R"].items(),
-                                                                      vertices["P"].items()))
-                              if edge]
+            rxn_combos = list(product(vertices["R"].items(), vertices["P"].items()))
+            num_combos = len(rxn_combos)
+            batch_size = math.ceil(num_combos/num_cores)
+            num_batches = math.ceil(num_combos / batch_size)
+
+            combos_id = ray.put(rxn_combos)
+            futures = ray.get([self.find_rxn_edges.remote(x*batch_size,
+                                                          (x+1)*batch_size,
+                                                          combos_id,
+                                                          cost_function_id,
+                                                          rxn_e_filter_id, temp_id)
+                               for x in range(num_batches+1)])
+            reaction_edges = [edge for edge_list in futures for edge in edge_list]
 
             all_edges.extend(edge_list)
+            all_edges.extend(zero_cost_edges)
             all_edges.extend(reaction_edges)
 
         g.add_edge_list(
@@ -493,15 +557,15 @@ class ReactionNetwork:
         return all_rxns
 
     @staticmethod
-    def build_path(combo, net_rxn, net_rxn_all_comp, paths_to_all_targets):
-        path = None
-        if net_rxn_all_comp.issubset(
-                [comp for rxn in combo for comp in rxn.all_comp]
-        ):
-            path = BalancedPathway({p: paths_to_all_targets[p] for p in combo},
-                                   net_rxn, balance=True)
-        return path
+    @ray.remote
+    def build_path(start, end, combos, net_rxn, net_rxn_all_comp, paths_to_all_targets):
+        paths = [BalancedPathway({p: paths_to_all_targets[p] for p in combo},
+                                 net_rxn, balance=True) for combo in combos[
+                                                                     start:end] if
+                 net_rxn_all_comp.issubset([comp for rxn in combo for comp in rxn.all_comp])]
+        paths = [p for p in paths if p and p.is_balanced]
 
+        return paths
 
     def find_all_rxn_pathways(
         self, k=15, precursors=None, targets=None, max_num_combos=4, chempots=None,
@@ -577,7 +641,8 @@ class ReactionNetwork:
                              rxn.all_entries} - precursors_and_targets
             intermediate_rxns = self.find_intermediate_rxns(intermediates,
                                                             targets, chempots)
-            paths = {rxn: self._get_rxn_cost(rxn) for rxn in intermediate_rxns}
+            paths = {rxn: get_rxn_cost(rxn, self._cost_function, self.temp) for rxn
+                     in intermediate_rxns}
             if paths:
                 most_favorable_rxn = min(paths.keys(), key=lambda x: paths[x])
 
@@ -592,17 +657,26 @@ class ReactionNetwork:
         if net_rxn in paths_to_try:
             paths_to_try.remove(net_rxn)
 
-        build_path = partial(self.build_path, net_rxn=net_rxn,
-                             net_rxn_all_comp=net_rxn_all_comp,
-                             paths_to_all_targets=paths_to_all_targets)
+        trial_combos = list(generate_all_combos(paths_to_try, max_num_combos))
+        num_combos = len(trial_combos)
 
-        trial_combos = generate_all_combos(paths_to_try, max_num_combos)
+        self.logger.info(f"Balancing {num_combos} possible total pathways...")
 
-        self.logger.info("Building possible total pathways...")
+        combos_id = ray.put(trial_combos)
+        net_rxn_id = ray.put(net_rxn)
+        net_rxn_all_comp_id = ray.put(net_rxn_all_comp)
+        paths_to_all_targets_id = ray.put(paths_to_all_targets)
+        batch_size = 20000
 
-        with ProcessPool() as pool:
-            paths = [p for p in pool.map(build_path, trial_combos) if p and
-                                p.is_balanced]
+        num_batches = math.ceil(num_combos/batch_size)
+
+        paths = [p for p_list in ray.get([self.build_path.remote(x*batch_size,
+                                                  (x+1)*batch_size,
+                                                  combos_id,
+                                                  net_rxn_id,
+                                                  net_rxn_all_comp_id,
+                                                  paths_to_all_targets_id)
+                           for x in range(num_batches+1)]) for p in p_list]
 
         if not paths:
             raise ValueError("Cannot generate any viable trial pathways... check for "
@@ -651,7 +725,7 @@ class ReactionNetwork:
                     continue
                 if rxn._lowest_num_errors > 0:
                     continue
-                path = {rxn: self._get_rxn_cost(rxn)}
+                path = {rxn: get_rxn_cost(rxn, self._cost_function, self._temp)}
                 all_crossover_rxns.update(path)
         return all_crossover_rxns
 
@@ -796,7 +870,7 @@ class ReactionNetwork:
         self._cost_function = cost_function
 
         for e in gt.find_edge_range(g, g.ep["weight"], (1e-8, 1e8)):
-            g.ep["weight"][e] = self._get_rxn_cost(g.ep["rxn"][e])
+            g.ep["weight"][e] = get_rxn_cost(g.ep["rxn"][e],)
 
     def set_temp(self, temp):
         """
@@ -837,49 +911,11 @@ class ReactionNetwork:
                 list(g.vp["entries"][e.target()].entries),
             )
             g.ep["rxn"][e] = rxn
-            g.ep["weight"][e] = self._get_rxn_cost(rxn)
+            g.ep["weight"][e] = get_rxn_cost(rxn, self._cost_function, self.temp)
 
         self._precursors = {mapping[p] for p in self._precursors}
         self._all_targets = {mapping[t] for t in self._all_targets}
         self._current_target = {mapping[ct] for ct in self._current_target}
-
-
-    def _get_rxn_cost(self, rxn, max_mu_diff=None):
-        """Helper method which determines reaction cost/weight.
-
-        Args:
-            rxn (CalculatedReaction): the pymatgen CalculatedReaction object.
-
-        Returns:
-            float: cost/weight of individual reaction edge
-        """
-        total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
-        energy = rxn.calculated_reaction_energy / total_num_atoms
-        cost_function = self._cost_function
-
-        if cost_function == "softplus":
-            if max_mu_diff:
-                params = [energy, max_mu_diff]
-                weights = [1, 0.1]
-            else:
-                params = [energy]
-                weights = [1.0]
-            weight = self._softplus(params, weights, t=self._temp)
-        elif cost_function == "piecewise":
-            weight = energy
-
-            if weight < self._most_negative_rxn:
-                self._most_negative_rxn = weight
-            if weight >= 0:
-                weight = 2 * weight + 1
-        elif cost_function == "relu":
-            weight = energy
-            if weight < 0:
-                weight = 0
-        else:
-            weight = 0
-
-        return weight
 
     @staticmethod
     def _update_vertex_properties(g, v, prop_dict):
@@ -1082,22 +1118,6 @@ class ReactionNetwork:
                 is_balanced[i] = True
 
         return is_balanced, multiplicities
-
-    @staticmethod
-    def _softplus(params, weights, t=273):
-        """
-        Cost function (softplus).
-
-        Args:
-            params: list of cost function parameters (e.g. energy)
-            weights: list of weights corresponds to parameters of the cost function
-            t: temperature (K)
-
-        Returns:
-            float: cost (in a.u.)
-        """
-        weighted_params = np.dot(np.array(params), np.array(weights))
-        return np.log(1 + (273 / t) * np.exp(weighted_params))
 
     @property
     def g(self):
