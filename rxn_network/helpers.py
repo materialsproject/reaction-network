@@ -33,6 +33,8 @@ with open(os.path.join(os.path.dirname(__file__), "g_els.json")) as f:
     G_ELEMS = json.load(f)
 with open(os.path.join(os.path.dirname(__file__), "nist_gas_gf.json")) as f:
     G_GASES = json.load(f)
+with open(os.path.join(os.path.dirname(__file__), "compounds.json")) as f:
+    G_COMPOUNDS = json.load(f)
 
 
 class GibbsComputedStructureEntry(ComputedStructureEntry):
@@ -129,10 +131,10 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
             exp_data = True
             data = G_GASES[comp.reduced_formula]
             factor = comp.get_reduced_formula_and_factor()[1]
-        # elif comp.reduced_formula in G_COMPOUNDS.keys():
-        #     exp_data = True
-        #     data = G_COMPOUNDS[comp.reduced_formula]
-        #     factor = comp.get_reduced_formula_and_factor()[1]
+        elif comp.reduced_formula in G_COMPOUNDS.keys():
+            exp_data = True
+            data = G_COMPOUNDS[comp.reduced_formula]
+            factor = comp.get_reduced_formula_and_factor()[1]
 
         if exp_data:
             if self.interpolated:
