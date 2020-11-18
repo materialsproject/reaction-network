@@ -16,7 +16,6 @@ from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDia
 from pymatgen.analysis.reaction_calculator import Reaction, ReactionError, ComputedReaction
 from pymatgen.entries.computed_entries import ComputedStructureEntry
 from pymatgen.analysis.interface_reactions import InterfacialReactivity
-from typing import List
 from scipy.interpolate import interp1d
 
 from monty.json import MSONable, MontyEncoder, MontyDecoder
@@ -232,7 +231,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
     @classmethod
     def from_pd(
         cls, pd, temp=300, gibbs_model="SISSO"
-    ) -> List["GibbsComputedStructureEntry"]:
+    ):
         """
         Constructor method for initializing a list of GibbsComputedStructureEntry
         objects from an existing T = 0 K phase diagram composed of
@@ -272,7 +271,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
     @classmethod
     def from_entries(
         cls, entries, temp=300, gibbs_model="SISSO"
-    ) -> List["GibbsComputedStructureEntry"]:
+    ):
         """
         Constructor method for initializing GibbsComputedStructureEntry objects from
         T = 0 K ComputedStructureEntry objects, as acquired from a thermochemical

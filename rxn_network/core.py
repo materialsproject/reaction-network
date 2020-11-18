@@ -4,11 +4,12 @@ from tqdm import tqdm
 import math
 from pprint import pprint
 
+from ray.util.multiprocessing import Pool
+
 import numpy as np
 import ray
 from numba import njit, prange
 from numba.typed import List
-from pathos.pools import ProcessPool, ThreadPool
 from functools import partial
 
 import graph_tool.all as gt
@@ -295,7 +296,7 @@ class ReactionNetwork:
         targets=None,
         cost_function="softplus",
         complex_loopback=True,
-        num_cores=6,
+        num_cores=12,
     ):
         """
         Generates and stores the actual reaction network (weighted, directed graph)
@@ -591,29 +592,20 @@ class ReactionNetwork:
 
         return all_rxns
 
-    @staticmethod
-    @ray.remote
-    def screen_paths(start, end, combos, net_rxn_all_comp):
-        return [
-            combo
-            for combo in combos[start:end]
-            if net_rxn_all_comp.issubset(
-                [comp for rxn in combo for comp in rxn.all_comp]
-            )
-        ]
 
     @staticmethod
     @ray.remote
-    def build_paths(start, end, filtered_combos, net_rxn, paths_to_all_targets):
+    def build_paths(start, end, filtered_combos, net_rxn, net_rxn_all_comp,
+                    paths_to_all_targets):
         paths = [
             BalancedPathway(
-                {p: paths_to_all_targets[p] for p in combo}, net_rxn, balance=True
+                {p: paths_to_all_targets[p] for p in combo}, net_rxn, balance=False
             )
-            for combo in filtered_combos[start:end]
+            for combo in filtered_combos[start:end] if net_rxn_all_comp.issubset([
+                comp for rxn in combo for comp in rxn.all_comp])
         ]
-        paths = [p for p in paths if p and p.is_balanced]
-
-        return paths
+        print(f"Completed building {start}-{end} unbalanced paths.")
+        return [p for p in paths if p]
 
     def find_all_rxn_pathways(
         self,
@@ -624,6 +616,7 @@ class ReactionNetwork:
         chempots=None,
         consider_crossover_rxns=10,
         filter_interdependent=True,
+        num_cores=12
     ):
         """
         Builds the k shortest paths to provided targets and then seeks to combine
@@ -719,33 +712,15 @@ class ReactionNetwork:
         trial_combos = list(generate_all_combos(paths_to_try, max_num_combos))
         num_combos = len(trial_combos)
 
-        self.logger.info(f"Balancing {num_combos} possible total pathways...")
-
         combos_id = ray.put(trial_combos)
         net_rxn_id = ray.put(net_rxn)
         net_rxn_all_comp_id = ray.put(net_rxn_all_comp)
         paths_to_all_targets_id = ray.put(paths_to_all_targets)
-        batch_size = 50000
-
+        batch_size = int(num_combos / num_cores)
         num_batches = math.ceil(num_combos / batch_size)
 
-        filtered_combos = [
-            c
-            for c_list in ray.get(
-                [
-                    self.screen_paths.remote(
-                        x * batch_size,
-                        (x + 1) * batch_size,
-                        combos_id,
-                        net_rxn_all_comp_id,
-                    )
-                    for x in range(num_batches + 1)
-                ]
-            )
-            for c in c_list
-        ]
-
-        filtered_combos_id = ray.put(filtered_combos)
+        self.logger.info(f"Generating {num_combos} unfiltered paths with "
+                         f"batch size of {batch_size}...")
 
         paths = [
             p
@@ -754,11 +729,12 @@ class ReactionNetwork:
                     self.build_paths.remote(
                         x * batch_size,
                         (x + 1) * batch_size,
-                        filtered_combos_id,
+                        combos_id,
                         net_rxn_id,
+                        net_rxn_all_comp_id,
                         paths_to_all_targets_id,
                     )
-                    for x in range(num_batches + 1)
+                    for x in range(num_batches)
                 ]
             )
             for p in p_list
@@ -770,23 +746,32 @@ class ReactionNetwork:
                 "reactants which are missing from shortest paths."
             )
 
-        # comp_matrices = List([p.comp_matrix for p in unbalanced_paths])
-        # net_coeffs = List([p.net_coeffs for p in unbalanced_paths])
-        #
-        # self.logger.info("Mass balancing...")
-        #
-        # is_balanced, multiplicities = self._balance_all_paths(comp_matrices, net_coeffs)
-        #
-        # balanced_total_paths = list(compress(unbalanced_paths, is_balanced))
-        # balanced_multiplicities = list(compress(multiplicities, is_balanced))
-        #
-        # for p, m in zip(balanced_total_paths, balanced_multiplicities):
-        #     p.set_multiplicities(m)
-        #     p.calculate_costs()
+        comp_matrices = List([p.comp_matrix for p in paths])
+        net_coeffs = List([p.net_coeffs for p in paths])
+        comp_pseudo_inverse = List([0.0 * s for s in comp_matrices])
+        multiplicities = List([0.0 * c for c in net_coeffs])
+
+        n = len(comp_matrices)
+        is_balanced = List([False] * n)
+
+        self.logger.info(f"Mass balancing {len(paths)} possible paths...")
+
+        is_balanced, multiplicities = self._balance_all_paths(comp_matrices,
+                                                              net_coeffs,
+                                                              comp_pseudo_inverse,
+                                                              multiplicities,
+                                                              is_balanced, n)
+
+        balanced_total_paths = list(compress(paths, is_balanced))
+        balanced_multiplicities = list(compress(multiplicities, is_balanced))
+
+        for p, m in zip(balanced_total_paths, balanced_multiplicities):
+            p.set_multiplicities(m)
+            p.calculate_costs()
 
         if filter_interdependent:
             final_paths = set()
-            for p in paths:
+            for p in balanced_total_paths:
                 interdependent, combined_rxn = find_interdependent_rxns(
                     p, [c.composition for c in precursors]
                 )
@@ -794,8 +779,8 @@ class ReactionNetwork:
                     continue
                 final_paths.add(p)
         else:
-            final_paths = paths
-        # analysis = PathwayAnalysis(self, balanced_total_paths)
+            final_paths = balanced_total_paths
+
         return sorted(list(final_paths), key=lambda x: x.total_cost)
 
     def find_crossover_rxns(self, intermediates, targets):
@@ -1163,7 +1148,8 @@ class ReactionNetwork:
 
     @staticmethod
     @njit(parallel=True)
-    def _balance_all_paths(comp_matrices, net_coeffs, tol=1e-6):
+    def _balance_all_paths(comp_matrices, net_coeffs, comp_pseudo_inverse,
+                           multiplicities, is_balanced, n, tol=1e-6):
         """
         Fast solution for reaction multiplicities via mass balance stochiometric
         constraints. Parallelized using Numba.
@@ -1182,11 +1168,6 @@ class ReactionNetwork:
                 BalancedPathway objects were successfully balanced, and a list of all
                 multiplicities arrays.
         """
-        n = len(comp_matrices)
-        comp_pseudo_inverse = List([0.0 * s for s in comp_matrices])
-        multiplicities = List([0.0 * c for c in net_coeffs])
-        is_balanced = List([False] * n)
-
         for i in prange(n):
             comp_pseudo_inverse[i] = np.linalg.pinv(comp_matrices[i]).T
             multiplicities[i] = comp_pseudo_inverse[i] @ net_coeffs[i]
