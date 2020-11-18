@@ -538,16 +538,15 @@ class BalancedPathway(MSONable):
         self.rxn_dict = rxn_dict
         self.all_rxns = list(self.rxn_dict.keys())
         self.net_rxn = net_rxn
-        self.all_reactants = set()
-        self.all_products = set()
         self.is_balanced = False
         self.multiplicities = None
         self.total_cost = None
         self.average_cost = None
 
-        for rxn in self.rxn_dict.keys():
-            self.all_reactants.update(rxn.reactants)
-            self.all_products.update(rxn.products)
+        self.all_reactants = {reactants for rxn in self.rxn_dict.keys() for reactants in
+                              rxn.reactants}
+        self.all_products = {products for rxn in self.rxn_dict.keys() for products in
+                              rxn.products}
 
         self.all_comp = list(
             self.all_reactants | self.all_products | set(self.net_rxn.all_comp)
