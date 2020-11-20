@@ -1,13 +1,12 @@
 import logging
 from itertools import combinations, chain, groupby, compress, product
 from tqdm import tqdm
-import math
 from pprint import pprint
 
-from ray.util.multiprocessing import Pool
+from dask.distributed import Client, TimeoutError
+import dask.bag as db
 
 import numpy as np
-import ray
 from numba import njit, prange
 from numba.typed import List
 from functools import partial
@@ -187,8 +186,6 @@ class ReactionNetwork:
             f"entries: \n{filtered_entries_str}"
         )
 
-        ray.init(ignore_reinit_error=True)
-
     @staticmethod
     def find_rxn_edge(combo, cost_function, rxn_e_filter, temp):
         entry = combo[0][0]
@@ -329,6 +326,11 @@ class ReactionNetwork:
 
         self._precursors_entries = precursors_entries
 
+        try:
+            client = Client('tcp://localhost:8786', timeout=2)
+        except OSError:
+            client = Client()
+
         g = gt.Graph()  # initialization of graph obj
 
         # Create all property maps
@@ -412,7 +414,6 @@ class ReactionNetwork:
 
         all_edges = []
         pbar = tqdm(entries_dict.items())
-        pool = Pool()
 
         for chemsys, vertices in pbar:
             pbar.set_description(f"Processing {chemsys}")
@@ -441,32 +442,30 @@ class ReactionNetwork:
                 if edge
             ]
 
-            rxn_combos = list(product(vertices["R"].items(), vertices["P"].items()))
-
-            if len(vertices["P"]) <= 30:
-                apply_map = map
+            rxn_combos = list(product(vertices["R"].items(), vertices[
+                    "P"].items()))
+            find_rxn_edge = partial(
+                self.find_rxn_edge,
+                cost_function=cost_function,
+                rxn_e_filter=self._rxn_e_filter,
+                temp=self.temp,
+            )
+            if len(vertices["P"]) >= 30:
+                rxn_combos = db.from_sequence(rxn_combos)
+                reaction_edges = [
+                    edge
+                    for edge in rxn_combos.map(find_rxn_edge) if edge
+                ]
             else:
-                apply_map = pool.map
-
-            reaction_edges = [
-                edge
-                for edge in apply_map(
-                    partial(
-                        self.find_rxn_edge,
-                        cost_function=cost_function,
-                        rxn_e_filter=self._rxn_e_filter,
-                        temp=self.temp,
-                    ),
-                    rxn_combos,
-                )
-                if edge
-            ]
+                reaction_edges = [
+                    edge
+                    for edge in map(find_rxn_edge, rxn_combos)
+                    if edge
+                ]
 
             all_edges.extend(precursor_edges)
             all_edges.extend(target_edges)
             all_edges.extend(reaction_edges)
-
-        pool.close()
 
         g.add_edge_list(
             all_edges, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"], g.ep["path"]]
@@ -653,6 +652,11 @@ class ReactionNetwork:
                 "Net reaction must be balanceable to find all reaction pathways."
             )
 
+        try:
+            client = Client('tcp://localhost:8786', timeout=2)
+        except OSError:
+            client = Client()
+
         net_rxn_all_comp = set(net_rxn.all_comp)
         self.logger.info(f"NET RXN: {net_rxn} \n")
 
@@ -699,20 +703,20 @@ class ReactionNetwork:
 
         pprint(paths_to_all_targets)
 
-        trial_combos = list(generate_all_combos(paths_to_all_targets, max_num_combos))
+        trial_combos_list = list(generate_all_combos(paths_to_all_targets,
+                                                   max_num_combos))
+        self.logger.info(f"Generating and filtering from {len(trial_combos_list)} "
+                         f"possible paths...")
+        trial_combos = db.from_sequence(trial_combos_list)
 
-        self.logger.info(f"Generating {len(trial_combos)} unfiltered paths...")
-
-        with Pool() as pool:
-            path_arrays, indices = zip(*[
-                (arrays, idx)
-                for idx, arrays in enumerate(pool.map(
-                    partial(self.build_path_arrays,
-                            net_rxn=net_rxn, net_rxn_all_comp=net_rxn_all_comp),
-                    trial_combos)
-                )
-                if isinstance(arrays[0], np.ndarray)
-            ])
+        path_arrays, indices = zip(*[
+            (arrays, idx)
+            for idx, arrays in enumerate(trial_combos.map(
+                partial(self.build_path_arrays,
+                        net_rxn=net_rxn, net_rxn_all_comp=net_rxn_all_comp)
+            ))
+            if isinstance(arrays[0], np.ndarray)
+        ])
 
         if not path_arrays:
             raise ValueError(
@@ -739,7 +743,7 @@ class ReactionNetwork:
             n,
         )
 
-        trial_combos = [trial_combos[i] for i in indices]
+        trial_combos_list = [trial_combos_list[i] for i in indices]
 
         balanced_total_paths = [
             BalancedPathway(
@@ -752,7 +756,7 @@ class ReactionNetwork:
                 net_rxn,
                 balance=False,
             )
-            for combo in compress(trial_combos, is_balanced)
+            for combo in compress(trial_combos_list, is_balanced)
         ]
         balanced_multiplicities = list(compress(multiplicities, is_balanced))
 
