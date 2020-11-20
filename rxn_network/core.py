@@ -326,10 +326,10 @@ class ReactionNetwork:
 
         self._precursors_entries = precursors_entries
 
-        try:
-            client = Client('tcp://localhost:8786', timeout=2)
-        except OSError:
-            client = Client()
+        # try:
+        #     client = Client('tcp://localhost:8786', timeout=2)
+        # except OSError:
+        #     client = Client()
 
         g = gt.Graph()  # initialization of graph obj
 
@@ -652,10 +652,10 @@ class ReactionNetwork:
                 "Net reaction must be balanceable to find all reaction pathways."
             )
 
-        try:
-            client = Client('tcp://localhost:8786', timeout=2)
-        except OSError:
-            client = Client()
+        # try:
+        #     client = Client('tcp://localhost:8786', timeout=2)
+        # except OSError:
+        #     client = Client()
 
         net_rxn_all_comp = set(net_rxn.all_comp)
         self.logger.info(f"NET RXN: {net_rxn} \n")
