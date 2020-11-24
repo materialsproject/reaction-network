@@ -562,31 +562,26 @@ class ReactionNetwork:
 
     @staticmethod
     def filter_paths(combo, rxn_list, net_rxn_all_comp):
-        combo = [rxn_list[i] for i in combo]
-        combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in combo]))
-
-        valid = True
-        if not net_rxn_all_comp.issubset(combo_all_comp):
-            valid = False
-
-        return valid
+        combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in
+                                                  [rxn_list[i] for i in combo]]))
+        return net_rxn_all_comp.issubset(combo_all_comp)
 
     @staticmethod
     def build_path_arrays(combo, rxn_list, net_rxn, net_rxn_all_comp):
-        combo = [rxn_list[i] for i in combo]
-        combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in combo]))
+        rxns = [rxn_list[i] for i in combo]
+        combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in rxns]))
         all_comp = combo_all_comp | net_rxn_all_comp
         n_comp = len(all_comp)
         n_rxns = len(combo)
 
         comp_matrix = np.fromiter([rxn.get_coeff(comp) if comp in rxn.all_comp else 0.0
-                                   for rxn in combo for comp in all_comp], float,
+                                   for rxn in rxns for comp in all_comp], float,
                                   count=n_comp*n_rxns)
         comp_matrix = comp_matrix.reshape((n_rxns, n_comp))
         net_coeffs = np.fromiter([net_rxn.get_coeff(comp) if comp in net_rxn_all_comp
                                   else 0.0 for comp in all_comp], float, count=n_comp)
 
-        return comp_matrix, net_coeffs
+        return combo, comp_matrix, net_coeffs
 
     def find_all_rxn_pathways(
         self,
@@ -693,39 +688,35 @@ class ReactionNetwork:
         rxn_list = [r for r in paths_to_all_targets.keys()]
         pprint(rxn_list)
 
-        trial_combos_list = list(generate_all_combos(range(len(rxn_list)),
-                                                     max_num_combos))
-        self.logger.info(f"Generating and filtering from {len(trial_combos_list)} "
+        self.logger.info(f"Generating and filtering from "
                          f"possible paths...")
-        trial_combos = db.from_sequence(trial_combos_list, npartitions=12)
+        trial_combos = db.from_sequence(generate_all_combos(range(len(rxn_list)),
+                                                     max_num_combos))
+        results = (trial_combos
+            .filter(partial(self.filter_paths, rxn_list=rxn_list,
+                            net_rxn_all_comp=net_rxn_all_comp))
+            .map(partial(self.build_path_arrays,
+                         rxn_list=rxn_list,
+                         net_rxn=net_rxn, net_rxn_all_comp=net_rxn_all_comp)
+            ).compute())
 
-        path_arrays, indices = zip(*[
-            (arrays, idx)
-            for idx, arrays in enumerate(trial_combos.map(
-                partial(self.build_path_arrays,
-                        rxn_list=rxn_list,
-                        net_rxn=net_rxn, net_rxn_all_comp=net_rxn_all_comp)
-            ))
-            if isinstance(arrays[0], np.ndarray)
-        ])
+        combos, comp_matrices, net_coeffs = list(zip(*results))
 
-        return path_arrays
-
-        if not path_arrays:
+        if not comp_matrices:
             raise ValueError(
                 "Cannot generate any viable trial pathways... check for "
                 "reactants which are missing from shortest paths."
             )
 
-        comp_matrices = List([p[0] for p in path_arrays])
-        net_coeffs = List([p[1] for p in path_arrays])
+        comp_matrices = List(comp_matrices)
+        net_coeffs = List(net_coeffs)
         comp_pseudo_inverse = List([0.0 * s for s in comp_matrices])
         multiplicities = List([0.0 * c for c in net_coeffs])
 
         n = len(comp_matrices)
         is_balanced = List([False] * n)
 
-        self.logger.info(f"Mass balancing {len(path_arrays)} possible paths...")
+        self.logger.info(f"Mass balancing {n} possible paths...")
 
         is_balanced, multiplicities = self._balance_all_paths(
             comp_matrices,
@@ -735,8 +726,6 @@ class ReactionNetwork:
             is_balanced,
             n,
         )
-
-        trial_combos_list = [trial_combos_list[i] for i in indices]
 
         total_paths = [
             BalancedPathway(
@@ -748,7 +737,7 @@ class ReactionNetwork:
                 net_rxn,
                 balance=False,
             )
-            for combo in compress(trial_combos_list, is_balanced)
+            for combo in compress(combos, is_balanced)
         ]
 
         multiplicities = list(compress(multiplicities, is_balanced))
