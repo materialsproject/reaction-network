@@ -1,6 +1,6 @@
 import logging
 from itertools import combinations, chain, groupby, compress, product
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 from pprint import pprint
 
 from dask.distributed import Client, TimeoutError
@@ -17,16 +17,12 @@ import queue
 from pymatgen import Element
 from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.analysis.reaction_calculator import (
-    Reaction,
-    ComputedReaction,
-    ReactionError,
-)
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
 
 
 from rxn_network.helpers import *
 from rxn_network.analysis import *
+from rxn_network.reaction import *
 
 
 __author__ = "Matthew McDermott"
@@ -224,9 +220,8 @@ class ReactionNetwork:
         #         if mu_diff > max_mu_diff:
         #             max_mu_diff = mu_diff
 
-        try:
-            rxn = ComputedReaction(list(phases), list(other_phases))
-        except ReactionError:
+        rxn = ComputedReaction(list(phases), list(other_phases))
+        if not rxn._balanced:
             return
 
         if rxn._lowest_num_errors != 0:
@@ -325,11 +320,6 @@ class ReactionNetwork:
             precursors_entries = RxnEntries(precursors, "s")
 
         self._precursors_entries = precursors_entries
-
-        # try:
-        #     client = Client('tcp://localhost:8786', timeout=2)
-        # except OSError:
-        #     client = Client()
 
         g = gt.Graph()  # initialization of graph obj
 
@@ -450,7 +440,7 @@ class ReactionNetwork:
                 rxn_e_filter=self._rxn_e_filter,
                 temp=self.temp,
             )
-            if len(vertices["P"]) >= 30:
+            if len(vertices["P"]) >= 70:
                 rxn_combos = db.from_sequence(rxn_combos)
                 reaction_edges = [
                     edge
@@ -567,33 +557,25 @@ class ReactionNetwork:
         return all_rxns
 
     @staticmethod
-    def build_path_arrays(combo, net_rxn, net_rxn_all_comp):
-        all_reactants = [reactants for rxn in combo for reactants in rxn.reactants]
-        all_products = [products for rxn in combo for products in rxn.products]
+    def build_path_arrays(combo, rxn_list, net_rxn, net_rxn_all_comp):
+        combo = [rxn_list[i] for i in combo]
+        combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in combo]))
 
-        if not net_rxn_all_comp.issubset(all_reactants + all_products):
+        if not net_rxn_all_comp.issubset(combo_all_comp):
             return None, None
 
-        all_comp = set(all_reactants + all_products + net_rxn.all_comp)
+        all_comp = combo_all_comp | net_rxn_all_comp
+        n_comp = len(all_comp)
+        n_rxns = len(combo)
 
-        comp_matrices = np.array(
-            [
-                [
-                    rxn.get_coeff(comp) if comp in rxn.all_comp else 0
-                    for comp in all_comp
-                ]
-                for rxn in combo
-            ]
-        )
+        comp_matrix = np.fromiter([rxn.get_coeff(comp) if comp in rxn.all_comp else 0.0
+                                   for rxn in combo for comp in all_comp], float,
+                                  count=n_comp*n_rxns)
+        comp_matrix = comp_matrix.reshape((n_rxns, n_comp))
+        net_coeffs = np.fromiter([net_rxn.get_coeff(comp) if comp in net_rxn_all_comp
+                                  else 0.0 for comp in all_comp], float, count=n_comp)
 
-        net_coeffs = np.array(
-            [
-                net_rxn.get_coeff(comp) if comp in net_rxn.all_comp else 0
-                for comp in all_comp
-            ]
-        )
-
-        return comp_matrices, net_coeffs
+        return comp_matrix, net_coeffs
 
     def find_all_rxn_pathways(
         self,
@@ -652,11 +634,6 @@ class ReactionNetwork:
                 "Net reaction must be balanceable to find all reaction pathways."
             )
 
-        # try:
-        #     client = Client('tcp://localhost:8786', timeout=2)
-        # except OSError:
-        #     client = Client()
-
         net_rxn_all_comp = set(net_rxn.all_comp)
         self.logger.info(f"NET RXN: {net_rxn} \n")
 
@@ -701,10 +678,11 @@ class ReactionNetwork:
             )
         }
 
-        pprint(paths_to_all_targets)
+        rxn_list = [r for r in paths_to_all_targets.keys()]
+        pprint(rxn_list)
 
-        trial_combos_list = list(generate_all_combos(paths_to_all_targets,
-                                                   max_num_combos))
+        trial_combos_list = list(generate_all_combos(range(len(rxn_list)),
+                                                     max_num_combos))
         self.logger.info(f"Generating and filtering from {len(trial_combos_list)} "
                          f"possible paths...")
         trial_combos = db.from_sequence(trial_combos_list)
@@ -713,6 +691,7 @@ class ReactionNetwork:
             (arrays, idx)
             for idx, arrays in enumerate(trial_combos.map(
                 partial(self.build_path_arrays,
+                        rxn_list=rxn_list,
                         net_rxn=net_rxn, net_rxn_all_comp=net_rxn_all_comp)
             ))
             if isinstance(arrays[0], np.ndarray)
@@ -745,28 +724,28 @@ class ReactionNetwork:
 
         trial_combos_list = [trial_combos_list[i] for i in indices]
 
-        balanced_total_paths = [
+        total_paths = [
             BalancedPathway(
                 {
                     rxn: cost
-                    for rxn, cost in zip(
-                        combo, [paths_to_all_targets[r] for r in combo]
-                    )
+                    for rxn, cost in [(rxn_list[r], paths_to_all_targets[rxn_list[
+                    r]]) for r in combo]
                 },
                 net_rxn,
                 balance=False,
             )
             for combo in compress(trial_combos_list, is_balanced)
         ]
-        balanced_multiplicities = list(compress(multiplicities, is_balanced))
 
-        for p, m in zip(balanced_total_paths, balanced_multiplicities):
+        multiplicities = list(compress(multiplicities, is_balanced))
+
+        for p, m in zip(total_paths, multiplicities):
             p.set_multiplicities(m)
             p.calculate_costs()
 
         if filter_interdependent:
             final_paths = set()
-            for p in balanced_total_paths:
+            for p in total_paths:
                 interdependent, combined_rxn = find_interdependent_rxns(
                     p, [c.composition for c in precursors]
                 )
@@ -774,7 +753,7 @@ class ReactionNetwork:
                     continue
                 final_paths.add(p)
         else:
-            final_paths = balanced_total_paths
+            final_paths = total_paths
 
         return sorted(list(final_paths), key=lambda x: x.total_cost)
 

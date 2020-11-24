@@ -663,8 +663,8 @@ class BalancedPathway(MSONable):
                 [rxn.get_el_amount(elem) for elem in rxn.elements]
             )
             rxn_info += f"{rxn} (dG = {round(dg_per_atom,3)} eV/atom) \n"
-        rxn_info += f"\nAverage Cost: {round(self.average_cost,3)} \n" \
-                    f"Total Cost: {round(self.total_cost,3)}"
+        rxn_info += f"\nTotal Cost: {round(self.total_cost,3)} | Average Cost: " \
+                    f"{round(self.average_cost,3)}\n\n"
 
         return rxn_info
 
