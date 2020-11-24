@@ -4,6 +4,7 @@ from tqdm.notebook import tqdm
 from pprint import pprint
 
 from dask.distributed import Client, TimeoutError
+from dask.diagnostics import ProgressBar
 import dask.bag as db
 
 import numpy as np
@@ -51,6 +52,7 @@ class ReactionNetwork:
         include_polymorphs=False,
         include_chempot_restriction=False,
         filter_rxn_energies=0.5,
+        simple_entries=False
     ):
         """Initializes ReactionNetwork object with necessary preprocessing
         steps. This does not yet compute the graph. The preprocessing
@@ -107,6 +109,8 @@ class ReactionNetwork:
         self._gibbs_entries = GibbsComputedStructureEntry.from_entries(
             self._all_entries, self._temp
         )
+        if simple_entries:
+            self._gibbs_entries = [e.to_pd_entry() for e in self._gibbs_entries]
         self._pd_dict, self._filtered_entries = self._filter_entries(
             self._gibbs_entries, include_metastable, include_polymorphs
         )
@@ -128,7 +132,7 @@ class ReactionNetwork:
             for comp in interpolate_comps:
                 energy = self._pd.get_hull_energy(Composition(comp))
                 interpolated_entries.append(
-                    PDEntry(comp, energy, attribute="Interpolated")
+                    PDEntry(comp, energy, attribute={"interpolated": True})
                 )
             print("Interpolated entries:", "\n")
             print(interpolated_entries)
@@ -557,13 +561,20 @@ class ReactionNetwork:
         return all_rxns
 
     @staticmethod
-    def build_path_arrays(combo, rxn_list, net_rxn, net_rxn_all_comp):
+    def filter_paths(combo, rxn_list, net_rxn_all_comp):
         combo = [rxn_list[i] for i in combo]
         combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in combo]))
 
+        valid = True
         if not net_rxn_all_comp.issubset(combo_all_comp):
-            return None, None
+            valid = False
 
+        return valid
+
+    @staticmethod
+    def build_path_arrays(combo, rxn_list, net_rxn, net_rxn_all_comp):
+        combo = [rxn_list[i] for i in combo]
+        combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in combo]))
         all_comp = combo_all_comp | net_rxn_all_comp
         n_comp = len(all_comp)
         n_rxns = len(combo)
@@ -675,6 +686,7 @@ class ReactionNetwork:
             if not (
                 self._precursors.intersection(k._product_entries)
                 or self._all_targets.intersection(k._reactant_entries)
+                or len(k._product_entries) > 3
             )
         }
 
@@ -685,7 +697,7 @@ class ReactionNetwork:
                                                      max_num_combos))
         self.logger.info(f"Generating and filtering from {len(trial_combos_list)} "
                          f"possible paths...")
-        trial_combos = db.from_sequence(trial_combos_list)
+        trial_combos = db.from_sequence(trial_combos_list, npartitions=12)
 
         path_arrays, indices = zip(*[
             (arrays, idx)
@@ -696,6 +708,8 @@ class ReactionNetwork:
             ))
             if isinstance(arrays[0], np.ndarray)
         ])
+
+        return path_arrays
 
         if not path_arrays:
             raise ValueError(

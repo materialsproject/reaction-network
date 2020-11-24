@@ -36,6 +36,15 @@ with open(os.path.join(os.path.dirname(__file__), "compounds.json")) as f:
     G_COMPOUNDS = json.load(f)
 
 
+def _new_pdentry_hash(self):  # necessary fix, will be updated in pymatgen in future
+    data_md5 = hashlib.md5(f"{self.composition.formula}_"
+                           f"{self.energy}".encode('utf-8')).hexdigest()
+    return int(data_md5, 16)
+
+
+PDEntry.__hash__ = _new_pdentry_hash
+
+
 class GibbsComputedStructureEntry(ComputedStructureEntry):
     """
     An extension to ComputedStructureEntry which includes the estimated Gibbs
@@ -292,6 +301,11 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
         pd = PhaseDiagram(entries)
         return cls.from_pd(pd, temp, gibbs_model)
+
+    def to_pd_entry(self):
+        data = {"entry_id": self.entry_id}
+        data.update(self.data)
+        return PDEntry(self.composition, self.energy, self.name, data)
 
     def as_dict(self) -> dict:
         """
