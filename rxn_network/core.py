@@ -562,8 +562,7 @@ class ReactionNetwork:
 
     @staticmethod
     def filter_paths(combo, rxn_list, net_rxn_all_comp):
-        combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in
-                                                  [rxn_list[i] for i in combo]]))
+        combo_all_comp = set(chain.from_iterable([rxn_list[i].all_comp for i in combo]))
         return net_rxn_all_comp.issubset(combo_all_comp)
 
     @staticmethod
