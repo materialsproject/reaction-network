@@ -561,26 +561,30 @@ class ReactionNetwork:
         return all_rxns
 
     @staticmethod
-    def filter_paths(combo, rxn_list, net_rxn_all_comp):
-        combo_all_comp = set(chain.from_iterable([rxn_list[i].all_comp for i in combo]))
-        return net_rxn_all_comp.issubset(combo_all_comp)
+    def build_path_arrays(combos, rxn_list, net_rxn, net_rxn_all_comp):
+        comp_matrices = []
+        net_coeffs = []
+        used_combos = []
+        for combo in combos:
+            rxns = [rxn_list[i] for i in combo]
+            combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in rxns]))
+            if not net_rxn_all_comp.issubset(combo_all_comp):
+                continue
+            all_comp = combo_all_comp | net_rxn_all_comp
+            n_comp = len(all_comp)
+            n_rxns = len(combo)
 
-    @staticmethod
-    def build_path_arrays(combo, rxn_list, net_rxn, net_rxn_all_comp):
-        rxns = [rxn_list[i] for i in combo]
-        combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in rxns]))
-        all_comp = combo_all_comp | net_rxn_all_comp
-        n_comp = len(all_comp)
-        n_rxns = len(combo)
+            comp_matrix = np.fromiter([rxn.get_coeff(comp) if comp in rxn.all_comp else 0.0
+                                       for rxn in rxns for comp in all_comp], float,
+                                      count=n_comp*n_rxns)
+            comp_matrices.append(comp_matrix.reshape((n_rxns, n_comp)))
+            net_coeffs.append(np.fromiter([net_rxn.get_coeff(comp) if comp in
+                                                                 net_rxn_all_comp
+                                      else 0.0 for comp in all_comp], float,
+                                          count=n_comp))
+            used_combos.append(combo)
 
-        comp_matrix = np.fromiter([rxn.get_coeff(comp) if comp in rxn.all_comp else 0.0
-                                   for rxn in rxns for comp in all_comp], float,
-                                  count=n_comp*n_rxns)
-        comp_matrix = comp_matrix.reshape((n_rxns, n_comp))
-        net_coeffs = np.fromiter([net_rxn.get_coeff(comp) if comp in net_rxn_all_comp
-                                  else 0.0 for comp in all_comp], float, count=n_comp)
-
-        return combo, comp_matrix, net_coeffs
+        return used_combos, comp_matrices, net_coeffs
 
     def find_all_rxn_pathways(
         self,
@@ -689,17 +693,21 @@ class ReactionNetwork:
 
         self.logger.info(f"Generating and filtering from "
                          f"possible paths...")
-        trial_combos = db.from_sequence(generate_all_combos(range(len(rxn_list)),
-                                                     max_num_combos))
-        results = (trial_combos
-            .filter(partial(self.filter_paths, rxn_list=rxn_list,
-                            net_rxn_all_comp=net_rxn_all_comp))
-            .map(partial(self.build_path_arrays,
-                         rxn_list=rxn_list,
-                         net_rxn=net_rxn, net_rxn_all_comp=net_rxn_all_comp)
-            ).compute())
 
-        combos, comp_matrices, net_coeffs = list(zip(*results))
+        def divide_chunks(l, n):
+            for i in range(0, len(l), n):
+                yield l[i:i + n]
+
+        trial_combos = db.from_sequence(divide_chunks(list(generate_all_combos(range(
+            len(rxn_list)), max_num_combos)), 100000))
+
+        results = (trial_combos.map(self.build_path_arrays, rxn_list=rxn_list,
+                                    net_rxn=net_rxn,
+                                    net_rxn_all_comp=net_rxn_all_comp)).compute()
+
+        combos = [c for l in results for c in l[0]]
+        comp_matrices = [c for l in results for c in l[1]]
+        net_coeffs = [c for l in results for c in l[2]]
 
         if not comp_matrices:
             raise ValueError(
