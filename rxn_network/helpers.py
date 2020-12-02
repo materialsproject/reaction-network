@@ -81,7 +81,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
                 with the entry. Defaults to None.
             entry_id: An optional id to uniquely identify the entry.
         """
-        self.structure = structure
+        self._structure = structure
         self.formation_enthalpy = formation_enthalpy
         self.temp = temp
         self.interpolated = False
