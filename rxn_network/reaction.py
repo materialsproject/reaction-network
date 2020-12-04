@@ -319,7 +319,7 @@ class Reaction(BalancedReaction):
     the *FIRST* product (or products, if underdetermined) has a coefficient of one.
     """
 
-    def __init__(self, reactants, products):
+    def __init__(self, reactants, products, **kwargs):
         """
         Reactants and products to be specified as list of
         pymatgen.core.structure.Composition.  e.g., [comp1, comp2]
@@ -347,14 +347,22 @@ class Reaction(BalancedReaction):
         )  # an error = a component changing sides or disappearing
 
         self._balanced, self._coeffs = self._balance_coeffs(comp_matrix,
-                                                            num_constraints)
+                                                           num_constraints)
         self._els = all_elems
+
+        self.vector = None
 
         if self._balanced:
             self._reactants = [self._all_comp[i] for i in range(len(self._all_comp))
                                if self._coeffs[i] < 0]
             self._products = [self._all_comp[i] for i in range(len(self._all_comp)) if
                               self._coeffs[i] > 0]
+            num_entries = kwargs.get("num_entries")
+            indices = kwargs.get("entry_indices")
+            if num_entries and indices:
+                vector = np.zeros(num_entries)
+                vector[indices] = self._coeffs
+                self.vector = vector
 
     def _balance_coeffs(self, comp_matrix, max_num_constraints):
         first_product_idx = len(self._input_reactants)
@@ -449,7 +457,7 @@ class ComputedReaction(Reaction):
     energies.
     """
 
-    def __init__(self, reactant_entries, product_entries):
+    def __init__(self, reactant_entries, product_entries, **kwargs):
         """
         Args:
             reactant_entries ([ComputedEntry]): List of reactant_entries.
@@ -464,7 +472,13 @@ class ComputedReaction(Reaction):
         product_comp = [e.composition.get_reduced_composition_and_factor()[0]
                         for e in product_entries]
 
-        super().__init__(list(reactant_comp), list(product_comp))
+        num_entries = kwargs.get("num_entries")
+        indices = None
+        if num_entries:
+            indices = [e.entry_idx for e in self._all_entries]
+
+        super().__init__(reactant_comp, product_comp, entry_indices=indices,
+                         num_entries=num_entries)
 
     @property
     def all_entries(self):

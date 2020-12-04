@@ -7,6 +7,7 @@ from multiprocessing import Pool
 from dask.distributed import Client, TimeoutError
 from dask.diagnostics import ProgressBar
 import dask.bag as db
+import dask
 
 import numpy as np
 from numba import njit, prange
@@ -25,6 +26,7 @@ from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
 from rxn_network.helpers import *
 from rxn_network.analysis import *
 from rxn_network.reaction import *
+from rxn_network.entries import *
 
 
 __author__ = "Matthew McDermott"
@@ -41,9 +43,6 @@ class ReactionNetwork:
     between phase combinations (vertices) in a chemical system. Reaction
     pathway hypotheses are generated using pathfinding methods.
     """
-    rxn_list = None
-    net_rxn = None
-    net_rxn_all_comp = None
 
     def __init__(
         self,
@@ -145,6 +144,14 @@ class ReactionNetwork:
         if extend_entries:
             self._filtered_entries.extend(extend_entries)
 
+        for idx, e in enumerate(self._filtered_entries):
+            if not simple_entries:
+                e.entry_idx = idx
+            elif simple_entries:
+                e.data["entry_idx"] = idx
+
+        self.num_entries = len(self._filtered_entries)
+
         if include_chempot_restriction:
             for e in self._filtered_entries:
                 elems = e.composition.elements
@@ -171,6 +178,7 @@ class ReactionNetwork:
         ]
 
         self.entry_set = EntrySet(self._filtered_entries)
+        self.entry_indices = {e: idx for idx, e in enumerate(self._filtered_entries)}
 
         # Graph variables used during graph creation
         self._precursors = None
@@ -191,7 +199,7 @@ class ReactionNetwork:
         )
 
     @staticmethod
-    def find_rxn_edge(combo, cost_function, rxn_e_filter, temp):
+    def find_rxn_edge(combo, cost_function, rxn_e_filter, temp, num_entries):
         entry = combo[0][0]
         v = combo[0][1]
         other_entry = combo[1][0]
@@ -228,7 +236,8 @@ class ReactionNetwork:
         #         if mu_diff > max_mu_diff:
         #             max_mu_diff = mu_diff
 
-        rxn = ComputedReaction(list(phases), list(other_phases))
+        rxn = ComputedReaction(list(phases), list(other_phases),
+                               num_entries=num_entries)
         if not rxn._balanced:
             return
 
@@ -447,6 +456,7 @@ class ReactionNetwork:
                 cost_function=cost_function,
                 rxn_e_filter=self._rxn_e_filter,
                 temp=self.temp,
+                num_entries=self.num_entries
             )
             if len(vertices["P"]) >= 70:
                 rxn_combos = db.from_sequence(rxn_combos)
@@ -550,7 +560,7 @@ class ReactionNetwork:
             if chempots:
                 grand_pd = GrandPotentialPhaseDiagram(entry_subset, chempots)
 
-            rxns = react_interface(r1, r2, pd, grand_pd)
+            rxns = react_interface(r1, r2, pd, self.num_entries, grand_pd)
             rxns_filtered = {r for r in rxns if set(r._product_entries) & targets}
             if rxns_filtered:
                 most_favorable_rxn = min(
@@ -563,7 +573,6 @@ class ReactionNetwork:
                 all_rxns.add(most_favorable_rxn)
 
         return all_rxns
-
 
     def find_all_rxn_pathways(
         self,
@@ -615,14 +624,13 @@ class ReactionNetwork:
             self.set_precursors(precursors, self._complex_loopback)
 
         try:
-            net_rxn = ComputedReaction(list(precursors), list(targets))
-            net_rxn = Reaction.from_string(net_rxn.normalized_repr)
+            net_rxn = ComputedReaction(list(precursors), list(targets),
+                                       num_entries=self.num_entries)
         except ReactionError:
             raise ReactionError(
                 "Net reaction must be balanceable to find all reaction pathways."
             )
 
-        net_rxn_all_comp = set(net_rxn.all_comp)
         self.logger.info(f"NET RXN: {net_rxn} \n")
 
         for target in targets:
@@ -669,68 +677,49 @@ class ReactionNetwork:
 
         rxn_list = [r for r in paths_to_all_targets.keys()]
         pprint(rxn_list)
+        normalized_rxns = [Reaction.from_string(r.normalized_repr) for r in rxn_list]
 
-        self.logger.info(f"Generating and filtering from "
-                         f"possible paths...")
+        from itertools import zip_longest
 
-        def divide_chunks(l, n):
-            for i in range(0, len(l), n):
-                yield l[i:i + n]
+        def grouper(iterable, n, fillvalue=None):
+            args = [iter(iterable)] * n
+            return zip_longest(*args, fillvalue=fillvalue)
 
-        trial_combos = db.from_sequence(divide_chunks(list(generate_all_combos(range(
-            len(rxn_list)), max_num_combos)), 100000))
+        total_paths = []
+        for n in range(1, max_num_combos+1):
+            if n >= 4:
+                self.logger.info(f"Generating and filtering size {n} pathways...")
+            all_c_mats, all_m_mats = [], []
+            for combos in grouper(combinations(range(len(rxn_list)), n), 100000):
+                comp_matrices = np.stack([np.vstack([rxn_list[r].vector for r in combo])
+                                                       for combo in combos if combo])
 
-        results = (trial_combos.map(build_path_arrays, rxn_list=rxn_list,
-                                    net_rxn=net_rxn,
-                                    net_rxn_all_comp=net_rxn_all_comp)).compute()
+                c_mats, m_mats = self._balance_all_paths(comp_matrices,
+                                                         net_rxn.vector.reshape(-1, 1))
 
-        combos = [c for l in results for c in l[0]]
-        comp_matrices = [c for l in results for c in l[1]]
-        net_coeffs = [c for l in results for c in l[2]]
+                all_c_mats.append(c_mats)
+                all_m_mats.append(m_mats)
 
-        if not comp_matrices:
-            raise ValueError(
-                "Cannot generate any viable trial pathways... check for "
-                "reactants which are missing from shortest paths."
-            )
+            all_c_mats = list(chain.from_iterable(dask.compute(*all_c_mats)))
+            all_m_mats = list(chain.from_iterable(dask.compute(*all_m_mats)))
 
-        comp_matrices = List(comp_matrices)
-        net_coeffs = List(net_coeffs)
-        comp_pseudo_inverse = List([0.0 * s for s in comp_matrices])
-        multiplicities = List([0.0 * c for c in net_coeffs])
-
-        n = len(comp_matrices)
-        is_balanced = List([False] * n)
-
-        self.logger.info(f"Mass balancing {n} possible paths...")
-
-        is_balanced, multiplicities = self._balance_all_paths(
-            comp_matrices,
-            net_coeffs,
-            comp_pseudo_inverse,
-            multiplicities,
-            is_balanced,
-            n,
-        )
-
-        total_paths = [
-            BalancedPathway(
-                {
-                    rxn: cost
-                    for rxn, cost in [(rxn_list[r], paths_to_all_targets[rxn_list[
-                    r]]) for r in combo]
-                },
-                net_rxn,
-                balance=False,
-            )
-            for combo in compress(combos, is_balanced)
-        ]
-
-        multiplicities = list(compress(multiplicities, is_balanced))
-
-        for p, m in zip(total_paths, multiplicities):
-            p.set_multiplicities(m)
-            p.calculate_costs()
+            for c_mat, m_mat in zip(all_c_mats, all_m_mats):
+                rxn_dict = {}
+                for rxn_mat in c_mat:
+                    reactant_entries = [self._filtered_entries[i] for i in range(len(
+                        rxn_mat)) if rxn_mat[i] < 0]
+                    product_entries = [self._filtered_entries[i] for i in range(len(
+                        rxn_mat)) if rxn_mat[i] > 0]
+                    rxn = ComputedReaction(reactant_entries, product_entries,
+                                           entries=self.num_entries)
+                    cost = paths_to_all_targets[rxn_list[
+                        normalized_rxns.index(Reaction.from_string(
+                            rxn.normalized_repr))]]
+                    rxn_dict[rxn] = cost
+                p = BalancedPathway(rxn_dict, net_rxn, balance=False)
+                p.set_multiplicities(m_mat.flatten())
+                p.calculate_costs()
+                total_paths.append(p)
 
         if filter_interdependent:
             final_paths = set()
@@ -751,7 +740,9 @@ class ReactionNetwork:
         for reactants_combo in generate_all_combos(intermediates, self._max_num_phases):
             for products_combo in generate_all_combos(targets, self._max_num_phases):
                 try:
-                    rxn = ComputedReaction(list(reactants_combo), list(products_combo))
+                    rxn = ComputedReaction(list(reactants_combo),
+                                           list(products_combo),
+                                           num_entries=self.num_entries)
                 except ReactionError:
                     continue
                 if rxn._lowest_num_errors > 0:
@@ -1110,14 +1101,10 @@ class ReactionNetwork:
         return pd_dict, filtered_entries
 
     @staticmethod
-    @njit(parallel=True)
+    @dask.delayed(nout=2)
     def _balance_all_paths(
         comp_matrices,
         net_coeffs,
-        comp_pseudo_inverse,
-        multiplicities,
-        is_balanced,
-        n,
         tol=1e-6,
     ):
         """
@@ -1138,20 +1125,23 @@ class ReactionNetwork:
                 BalancedPathway objects were successfully balanced, and a list of all
                 multiplicities arrays.
         """
-        for i in prange(n):
-            comp_pseudo_inverse[i] = np.linalg.pinv(comp_matrices[i]).T
-            multiplicities[i] = comp_pseudo_inverse[i] @ net_coeffs[i]
-            solved_coeffs = comp_matrices[i].T @ multiplicities[i]
+        comp_pinvs = np.linalg.pinv(comp_matrices).transpose((0, 2, 1))
+        net_coeffs = np.stack([net_coeffs]*comp_pinvs.shape[0])
+        multiplicities = comp_pinvs @ net_coeffs
+        solved_coeffs = (comp_matrices.transpose((0, 2, 1)) @ multiplicities)
 
-            if (multiplicities[i] < tol).any():
-                is_balanced[i] = False
-            elif (
-                np.abs(solved_coeffs - net_coeffs[i])
-                <= (1e-08 + 1e-05 * np.abs(net_coeffs[i]))
-            ).all():
-                is_balanced[i] = True
+        nonzero = (multiplicities > tol).all(axis=1).any(axis=1)
+        comp_matrices = comp_matrices[nonzero]
+        multiplicities = multiplicities[nonzero]
+        net_coeffs = net_coeffs[nonzero]
+        solved_coeffs = solved_coeffs[nonzero]
 
-        return is_balanced, multiplicities
+        balanced = np.apply_along_axis(np.allclose, 1,
+                                       net_coeffs.reshape(len(net_coeffs),-1) -
+                                       solved_coeffs.reshape(len(solved_coeffs),-1),
+                                       b=0)
+
+        return comp_matrices[balanced], multiplicities[balanced]
 
     @property
     def g(self):
@@ -1187,29 +1177,3 @@ class ReactionNetwork:
             f"{'-'.join(sorted([str(e) for e in self._pd.elements]))}, "
             f"with Graph: {str(self._g)}"
         )
-
-
-def build_path_arrays(combos, rxn_list, net_rxn, net_rxn_all_comp):
-    comp_matrices = []
-    net_coeffs = []
-    used_combos = []
-    for combo in combos:
-        rxns = [rxn_list[i] for i in combo]
-        combo_all_comp = set(chain.from_iterable([rxn.all_comp for rxn in rxns]))
-        if not net_rxn_all_comp.issubset(combo_all_comp):
-            continue
-        all_comp = combo_all_comp | net_rxn_all_comp
-        n_comp = len(all_comp)
-        n_rxns = len(combo)
-
-        comp_matrix = np.fromiter([rxn.get_coeff(comp) if comp in rxn.all_comp else 0.0
-                                   for rxn in rxns for comp in all_comp], float,
-                                  count=n_comp * n_rxns)
-        comp_matrices.append(comp_matrix.reshape((n_rxns, n_comp)))
-        net_coeffs.append(np.fromiter([net_rxn.get_coeff(comp) if comp in
-                                                                  net_rxn_all_comp
-                                       else 0.0 for comp in all_comp], float,
-                                      count=n_comp))
-        used_combos.append(combo)
-
-    return used_combos, comp_matrices, net_coeffs
