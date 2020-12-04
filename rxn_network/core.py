@@ -12,6 +12,7 @@ import dask
 import numpy as np
 from numba import njit, prange
 from numba.typed import List
+from numba import int8
 from functools import partial
 
 import graph_tool.all as gt
@@ -687,15 +688,16 @@ class ReactionNetwork:
 
         total_paths = []
         for n in range(1, max_num_combos+1):
+            if n < 4:
+                continue
             if n >= 4:
                 self.logger.info(f"Generating and filtering size {n} pathways...")
             all_c_mats, all_m_mats = [], []
-            for combos in grouper(combinations(range(len(rxn_list)), n), 100000):
+            for combos in grouper(combinations(range(len(rxn_list)), n), 1000000):
                 comp_matrices = np.stack([np.vstack([rxn_list[r].vector for r in combo])
                                                        for combo in combos if combo])
 
-                c_mats, m_mats = self._balance_all_paths(comp_matrices,
-                                                         net_rxn.vector.reshape(-1, 1))
+                c_mats, m_mats = balance_path_arrays(comp_matrices, net_rxn.vector)
 
                 all_c_mats.append(c_mats)
                 all_m_mats.append(m_mats)
@@ -1100,49 +1102,6 @@ class ReactionNetwork:
 
         return pd_dict, filtered_entries
 
-    @staticmethod
-    @dask.delayed(nout=2)
-    def _balance_all_paths(
-        comp_matrices,
-        net_coeffs,
-        tol=1e-6,
-    ):
-        """
-        Fast solution for reaction multiplicities via mass balance stochiometric
-        constraints. Parallelized using Numba.
-
-        Args:
-            comp_matrices ([np.array]): list of numpy arrays containing stoichiometric
-                coefficients of all compositions in all reactions, for each trial
-                combination.
-            net_coeffs ([np.array]): list of numpy arrays containing stoichiometric
-                coefficients of net reaction.
-            tol (float): numerical tolerance for determining if a multiplicity is zero
-                (reaction was removed).
-
-        Returns:
-            ([bool],[np.array]): Tuple containing bool identifying which trial
-                BalancedPathway objects were successfully balanced, and a list of all
-                multiplicities arrays.
-        """
-        comp_pinvs = np.linalg.pinv(comp_matrices).transpose((0, 2, 1))
-        net_coeffs = np.stack([net_coeffs]*comp_pinvs.shape[0])
-        multiplicities = comp_pinvs @ net_coeffs
-        solved_coeffs = (comp_matrices.transpose((0, 2, 1)) @ multiplicities)
-
-        nonzero = (multiplicities > tol).all(axis=1).any(axis=1)
-        comp_matrices = comp_matrices[nonzero]
-        multiplicities = multiplicities[nonzero]
-        net_coeffs = net_coeffs[nonzero]
-        solved_coeffs = solved_coeffs[nonzero]
-
-        balanced = np.apply_along_axis(np.allclose, 1,
-                                       net_coeffs.reshape(len(net_coeffs),-1) -
-                                       solved_coeffs.reshape(len(solved_coeffs),-1),
-                                       b=0)
-
-        return comp_matrices[balanced], multiplicities[balanced]
-
     @property
     def g(self):
         return self._g
@@ -1177,3 +1136,65 @@ class ReactionNetwork:
             f"{'-'.join(sorted([str(e) for e in self._pd.elements]))}, "
             f"with Graph: {str(self._g)}"
         )
+
+
+@njit(parallel=True)
+def balance_path_arrays(
+    comp_matrices,
+    net_coeffs,
+    tol=1e-6,
+):
+    """
+    Fast solution for reaction multiplicities via mass balance stochiometric
+    constraints. Parallelized using Numba.
+
+    Args:
+        comp_matrices ([np.array]): list of numpy arrays containing stoichiometric
+            coefficients of all compositions in all reactions, for each trial
+            combination.
+        net_coeffs ([np.array]): list of numpy arrays containing stoichiometric
+            coefficients of net reaction.
+        tol (float): numerical tolerance for determining if a multiplicity is zero
+            (reaction was removed).
+
+    Returns:
+        ([bool],[np.array]): Tuple containing bool identifying which trial
+            BalancedPathway objects were successfully balanced, and a list of all
+            multiplicities arrays.
+    """
+    shape = comp_matrices.shape
+    net_coeff_filter = np.argwhere(net_coeffs != 0).flatten()
+    all_multiplicities = np.zeros((shape[0], shape[1]))
+    indices = np.zeros(shape[0])
+
+    for i in prange(shape[0]):
+        correct = True
+        for idx in net_coeff_filter:
+            if not comp_matrices[i][:, idx].any():
+                correct = False
+                break
+        if not correct:
+            continue
+
+        comp_pinv = np.linalg.pinv(comp_matrices[i]).T
+        multiplicities = comp_pinv @ net_coeffs
+        solved_coeffs = comp_matrices[i].T @ multiplicities
+
+        if (multiplicities < tol).any():
+            continue
+        elif not (np.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * np.abs(
+                net_coeffs))).all():
+            continue
+        all_multiplicities[i] = multiplicities
+        indices[i] = 1
+
+    filtered_indices = np.argwhere(indices != 0).flatten()
+    length = filtered_indices.shape[0]
+    filtered_comp_matrices = np.empty((length, shape[1], shape[2]))
+    filtered_multiplicities = np.empty((length, shape[1]))
+
+    for i, idx in enumerate(filtered_indices):
+        filtered_comp_matrices[i] = comp_matrices[idx]
+        filtered_multiplicities[i] = all_multiplicities[idx]
+
+    return filtered_comp_matrices, filtered_multiplicities
