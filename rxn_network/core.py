@@ -22,6 +22,7 @@ from pymatgen import Element
 from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
+from scipy.special import comb
 
 
 from rxn_network.helpers import *
@@ -686,12 +687,18 @@ class ReactionNetwork:
             args = [iter(iterable)] * n
             return zip_longest(*args, fillvalue=fillvalue)
 
+        num_rxns = len(rxn_list)
+
+        self.logger.info(f"Considering {num_rxns} reactions...")
+        batch_size = 500000
         total_paths = []
         for n in range(1, max_num_combos+1):
-            if n >= 4:
+            if n>=4:
                 self.logger.info(f"Generating and filtering size {n} pathways...")
             all_c_mats, all_m_mats = [], []
-            for combos in grouper(combinations(range(len(rxn_list)), n), 500000):
+            for combos in tqdm(grouper(combinations(range(num_rxns), n),
+                                       batch_size), total=int(comb(num_rxns,
+                                                                n)/batch_size)):
                 comp_matrices = np.stack([np.vstack([rxn_list[r].vector for r in combo])
                                                        for combo in combos if combo])
                 c_mats, m_mats = self._balance_path_arrays(comp_matrices,
