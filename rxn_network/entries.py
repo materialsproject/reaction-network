@@ -75,7 +75,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
                 with the entry. Defaults to None.
             entry_id: An optional id to uniquely identify the entry.
         """
-        self._structure = structure
+        self.structure = structure
         self.formation_enthalpy = formation_enthalpy
         self.temp = temp
         self.interpolated = False
@@ -299,7 +299,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         return cls.from_pd(pd, temp, gibbs_model)
 
     def to_pd_entry(self):
-        data = {"entry_id": self.entry_id, "entry_idx":None}
+        data = {"entry_id": self.entry_id, "entry_idx": None}
         data.update(self.data)
         return PDEntry(self.composition, self.energy, self.name, data)
 

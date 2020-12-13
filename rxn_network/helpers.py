@@ -7,8 +7,7 @@ import os
 from itertools import chain, combinations
 
 import numpy as np
-import json
-import hashlib
+from itertools import zip_longest
 
 from pymatgen import Composition, Structure
 from pymatgen.analysis.phase_diagram import PhaseDiagram
@@ -350,7 +349,10 @@ def expand_pd(entries):
 
     pd_dict = dict()
 
-    for e in sorted(entries, key=lambda x: len(x.composition.elements), reverse=True):
+    sorted_entries = sorted(entries, key=lambda x: len(x.composition.elements),
+                       reverse=True)
+
+    for e in sorted_entries:
         for chemsys in pd_dict.keys():
             if set(e.composition.chemical_system.split("-")).issubset(
                 chemsys.split("-")
@@ -474,3 +476,69 @@ def get_rxn_cost(rxn, cost_function="softplus", temp=273, max_mu_diff=None,
 
     return weight
 
+def grouper(iterable, n, fillvalue=None):
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
+
+def find_rxn_edges(combos, cost_function, rxn_e_filter, temp, num_entries):
+    edges = []
+    for combo in combos:
+        if not combo:
+            continue
+        entry = combo[0][0]
+        v = combo[0][1]
+        other_entry = combo[1][0]
+        other_v = combo[1][1]
+
+        phases = entry.entries
+        other_phases = other_entry.entries
+
+        if other_phases == phases:
+            continue  # do not consider identity-like reactions (e.g. A + B -> A
+            # + B)
+
+        # max_mu_diff = None
+        # if self._include_chempot_restriction:
+        #     product_mu_ranges = [
+        #         self._entry_mu_ranges[e] for e in other_phases
+        #     ]
+        #     product_mu_span = {
+        #         elem: (
+        #             min(
+        #                 [p[elem][0] for p in product_mu_ranges if elem in p]
+        #             ),
+        #             max(
+        #                 [p[elem][1] for p in product_mu_ranges if elem in p]
+        #             ),
+        #         )
+        #         for elem in elems
+        #     }
+        #
+        #     max_mu_diff = -np.inf
+        #     for elem in product_mu_span:
+        #         mu_diff = (product_mu_span[elem][0]
+        #                    - reactant_mu_span[elem][1])
+        #         if mu_diff > max_mu_diff:
+        #             max_mu_diff = mu_diff
+
+        rxn = ComputedReaction(list(phases), list(other_phases),
+                               num_entries=num_entries)
+        if not rxn._balanced:
+            continue
+
+        if rxn._lowest_num_errors != 0:
+            continue  # remove reaction which has components that
+            # change sides or disappear
+
+        total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
+        rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
+
+        if rxn_e_filter and rxn_energy > rxn_e_filter:
+            continue
+
+        weight = get_rxn_cost(
+            rxn, cost_function=cost_function, temp=temp, max_mu_diff=None
+        )
+        edges.append([v, other_v, weight, rxn, True, False])
+
+    return edges

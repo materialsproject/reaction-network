@@ -1,28 +1,21 @@
 import logging
+import inspect
 from itertools import combinations, chain, groupby, compress, product
 from tqdm import tqdm
 from pprint import pprint
 
-from multiprocessing import Pool
-from dask.distributed import Client, TimeoutError
-from dask.diagnostics import ProgressBar
-import dask.bag as db
-import dask
-
 import numpy as np
 from numba import njit, prange
-from numba.typed import List
-from numba import int8
 from functools import partial
 
 import graph_tool.all as gt
 import queue
 
-from pymatgen import Element
 from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
 from scipy.special import comb
+from dask import delayed, compute
 
 
 from rxn_network.helpers import *
@@ -57,7 +50,6 @@ class ReactionNetwork:
         include_polymorphs=False,
         include_chempot_restriction=False,
         filter_rxn_energies=0.5,
-        simple_entries=False
     ):
         """Initializes ReactionNetwork object with necessary preprocessing
         steps. This does not yet compute the graph. The preprocessing
@@ -111,13 +103,8 @@ class ReactionNetwork:
         self._elements = {
             elem for entry in self.all_entries for elem in entry.composition.elements
         }
-        self._gibbs_entries = GibbsComputedStructureEntry.from_entries(
-            self._all_entries, self._temp
-        )
-        if simple_entries:
-            self._gibbs_entries = [e.to_pd_entry() for e in self._gibbs_entries]
-        self._pd_dict, self._filtered_entries = self._filter_entries(
-            self._gibbs_entries, include_metastable, include_polymorphs
+        self._pd_dict, self._filtered_entries = \
+            self._filter_entries(entries, include_metastable, temp, include_polymorphs
         )
         self._entry_mu_ranges = {}
         self._pd = None
@@ -125,7 +112,7 @@ class ReactionNetwork:
 
         if (
             len(self._elements) <= 10
-        ):  # phase diagrams take considerable time to build >10 elems
+        ):  # phase diagrams take considerable time to build with 10+ elems
             self._pd = PhaseDiagram(self._filtered_entries)
         elif len(self._elements) > 10 and include_chempot_restriction:
             raise ValueError(
@@ -147,10 +134,7 @@ class ReactionNetwork:
             self._filtered_entries.extend(extend_entries)
 
         for idx, e in enumerate(self._filtered_entries):
-            if not simple_entries:
-                e.entry_idx = idx
-            elif simple_entries:
-                e.data["entry_idx"] = idx
+            e.entry_idx = idx
 
         self.num_entries = len(self._filtered_entries)
 
@@ -199,65 +183,6 @@ class ReactionNetwork:
             f"Initializing network with {len(self._filtered_entries)} "
             f"entries: \n{filtered_entries_str}"
         )
-
-    @staticmethod
-    def find_rxn_edge(combo, cost_function, rxn_e_filter, temp, num_entries):
-        entry = combo[0][0]
-        v = combo[0][1]
-        other_entry = combo[1][0]
-        other_v = combo[1][1]
-
-        phases = entry.entries
-        other_phases = other_entry.entries
-
-        if other_phases == phases:
-            return  # do not consider identity-like reactions (e.g. A + B -> A
-            # + B)
-
-        # max_mu_diff = None
-        # if self._include_chempot_restriction:
-        #     product_mu_ranges = [
-        #         self._entry_mu_ranges[e] for e in other_phases
-        #     ]
-        #     product_mu_span = {
-        #         elem: (
-        #             min(
-        #                 [p[elem][0] for p in product_mu_ranges if elem in p]
-        #             ),
-        #             max(
-        #                 [p[elem][1] for p in product_mu_ranges if elem in p]
-        #             ),
-        #         )
-        #         for elem in elems
-        #     }
-        #
-        #     max_mu_diff = -np.inf
-        #     for elem in product_mu_span:
-        #         mu_diff = (product_mu_span[elem][0]
-        #                    - reactant_mu_span[elem][1])
-        #         if mu_diff > max_mu_diff:
-        #             max_mu_diff = mu_diff
-
-        rxn = ComputedReaction(list(phases), list(other_phases),
-                               num_entries=num_entries)
-        if not rxn._balanced:
-            return
-
-        if rxn._lowest_num_errors != 0:
-            return  # remove reaction which has components that
-            # change sides or disappear
-
-        total_num_atoms = sum([rxn.get_el_amount(elem) for elem in rxn.elements])
-        rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
-
-        if rxn_e_filter and rxn_energy > rxn_e_filter:
-            return
-
-        weight = get_rxn_cost(
-            rxn, cost_function=cost_function, temp=temp, max_mu_diff=None
-        )
-
-        return [v, other_v, weight, rxn, True, False]
 
     @staticmethod
     def get_target_edges(
@@ -330,6 +255,7 @@ class ReactionNetwork:
 
         if not self._precursors:
             precursors_entries = RxnEntries(None, "d")  # use dummy precursors node
+
             if self._complex_loopback:
                 raise ValueError(
                     "Complex loopback can't be enabled when using a dummy precursors "
@@ -369,12 +295,18 @@ class ReactionNetwork:
             },
         )
 
+        target_chemsys = set(list(self._current_target)[
+            0].composition.chemical_system.split(
+            "-"))
         entries_dict = {}
         idx = 1
         for entries in self._all_entry_combos:
             reactants = RxnEntries(entries, "R")
             products = RxnEntries(entries, "P")
             chemsys = reactants.chemsys
+            if self._precursors_entries.description == "D" and \
+                    not target_chemsys.issubset(chemsys.split("-")):
+                continue
             if chemsys not in entries_dict:
                 entries_dict[chemsys] = dict({"R": {}, "P": {}})
 
@@ -451,28 +383,25 @@ class ReactionNetwork:
                 if edge
             ]
 
-            rxn_combos = list(product(vertices["R"].items(), vertices[
-                    "P"].items()))
-            find_rxn_edge = partial(
-                self.find_rxn_edge,
+            rxn_combos = product(vertices["R"].items(), vertices[
+                    "P"].items())
+            find_rxn_edges_func = partial(
+                find_rxn_edges,
                 cost_function=cost_function,
                 rxn_e_filter=self._rxn_e_filter,
                 temp=self.temp,
                 num_entries=self.num_entries
             )
-            if len(vertices["P"]) >= 70:
-                rxn_combos = db.from_sequence(rxn_combos)
-                reaction_edges = [
-                    edge
-                    for edge in rxn_combos.map(find_rxn_edge) if edge
-                ]
+            size = len(vertices["P"])
+            if size > 50:
+                batch_size = int((size**2)/100)
+                futures = []
+                for group in grouper(rxn_combos, batch_size):
+                    futures.append(delayed(find_rxn_edges_func)(group))
+                reaction_edges = [edge for edge_list in compute(*futures) for
+                                  edge in edge_list]
             else:
-                reaction_edges = [
-                    edge
-                    for edge in map(find_rxn_edge, rxn_combos)
-                    if edge
-                ]
-
+                reaction_edges = find_rxn_edges_func(rxn_combos)
             all_edges.extend(precursor_edges)
             all_edges.extend(target_edges)
             all_edges.extend(reaction_edges)
@@ -680,12 +609,6 @@ class ReactionNetwork:
         rxn_list = [r for r in paths_to_all_targets.keys()]
         pprint(rxn_list)
         normalized_rxns = [Reaction.from_string(r.normalized_repr) for r in rxn_list]
-
-        from itertools import zip_longest
-
-        def grouper(iterable, n, fillvalue=None):
-            args = [iter(iterable)] * n
-            return zip_longest(*args, fillvalue=fillvalue)
 
         num_rxns = len(rxn_list)
 
@@ -942,6 +865,37 @@ class ReactionNetwork:
         self._all_targets = {mapping[t] for t in self._all_targets}
         self._current_target = {mapping[ct] for ct in self._current_target}
 
+    def save(self, file_name=None):
+        precursors_str = "_".join(sorted([e.composition.reduced_formula for e in
+                                          self._precursors]))
+        targets_str = "_".join(sorted([e.composition.reduced_formula for e in
+                                       self._all_targets]))
+        if not file_name:
+            file_name = f"network_{'-'.join(sorted([str(e) for e in self._elements]))}" \
+                   f"_{precursors_str}_to_{targets_str}.gt"
+        for name, val in inspect.getmembers(self, lambda a: not (inspect.isroutine(a))):
+            if name == "_g":
+                continue
+            if name[0] != "_" or name[1] == "_":
+                continue
+
+            print(name)
+            data_type = type(val).__name__
+            print(data_type)
+            if data_type not in ["str","int","float","bool"]:
+                data_type="object"
+            if data_type =="str":
+                data_type="string"
+            self._g.gp[name] = self._g.new_graph_property(data_type, val)
+
+        self._g.save(file_name)
+
+    @classmethod
+    def load(cls, file_name):
+        #g = gt.load_graph(file_name)
+        pass
+
+
     @staticmethod
     def _update_vertex_properties(g, v, prop_dict):
         """
@@ -1115,7 +1069,7 @@ class ReactionNetwork:
         return filtered_comp_matrices, filtered_multiplicities
 
     @staticmethod
-    def _filter_entries(all_entries, e_above_hull, include_polymorphs):
+    def _filter_entries(all_entries, e_above_hull, temp, include_polymorphs=False):
         """
         Helper method for filtering entries by specified energy above hull
 
@@ -1132,40 +1086,25 @@ class ReactionNetwork:
                 less than the specified e_above_hull.
         """
         pd_dict = expand_pd(all_entries)
-        energies_above_hull = dict()
+        pd_dict = {chemsys: PhaseDiagram(GibbsComputedStructureEntry.from_pd(pd, temp))
+                   for chemsys, pd in pd_dict.items()}
 
-        for entry in all_entries:
-            for chemsys, phase_diag in pd_dict.items():
-                if set(entry.composition.chemical_system.split("-")).issubset(
-                    chemsys.split("-")
-                ):
-                    energies_above_hull[entry] = phase_diag.get_e_above_hull(entry)
-                    break
+        filtered_entries = set()
+        all_comps = dict()
+        for chemsys, pd in pd_dict.items():
+            for entry in pd.all_entries:
+                if entry in filtered_entries or pd.get_e_above_hull(entry) > \
+                        e_above_hull:
+                    continue
+                formula = entry.composition.reduced_formula
+                if not include_polymorphs and (formula in all_comps):
+                    if all_comps[formula].energy_per_atom < entry.energy_per_atom:
+                        continue
+                    filtered_entries.remove(all_comps[formula])
+                all_comps[formula] = entry
+                filtered_entries.add(entry)
 
-        if e_above_hull == 0:
-            filtered_entries = [e[0] for e in energies_above_hull.items() if e[1] == 0]
-        else:
-            filtered_entries = [
-                e[0] for e in energies_above_hull.items() if e[1] <= e_above_hull
-            ]
-
-        if not include_polymorphs:
-            filtered_entries_no_polymorphs = []
-            all_comp = {
-                entry.composition.reduced_composition for entry in filtered_entries
-            }
-            for comp in all_comp:
-                polymorphs = [
-                    entry
-                    for entry in filtered_entries
-                    if entry.composition.reduced_composition == comp
-                ]
-                min_entry = min(polymorphs, key=lambda x: x.energy_per_atom)
-                filtered_entries_no_polymorphs.append(min_entry)
-
-            filtered_entries = filtered_entries_no_polymorphs
-
-        return pd_dict, filtered_entries
+        return pd_dict, list(filtered_entries)
 
     @property
     def g(self):
