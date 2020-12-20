@@ -16,9 +16,9 @@ from monty.json import MSONable, MontyEncoder, MontyDecoder
 
 __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2020, Matthew McDermott"
-__version__ = "0.1"
+__version__ = "0.2"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "July 20, 2020"
+__date__ = "December 20, 2020"
 
 
 with open(os.path.join(os.path.dirname(__file__), "g_els.json")) as f:

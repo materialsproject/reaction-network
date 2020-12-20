@@ -26,9 +26,9 @@ from rxn_network.entries import *
 
 __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2020, Matthew McDermott"
-__version__ = "0.1"
+__version__ = "0.2"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "July 20, 2020"
+__date__ = "December 20, 2020"
 
 
 class ReactionNetwork:
@@ -52,10 +52,7 @@ class ReactionNetwork:
         filter_rxn_energies=0.5,
     ):
         """Initializes ReactionNetwork object with necessary preprocessing
-        steps. This does not yet compute the graph. The preprocessing
-        steps currently include: generating the phase diagram and/or
-        energies above hull for filtering (using estimated Gibbs free
-        energies of formation at specified temperature).
+        steps. This does not yet compute the graph.
 
         Args:
             entries ([ComputedStructureEntry]): list of ComputedStructureEntry-
@@ -103,8 +100,8 @@ class ReactionNetwork:
         self._elements = {
             elem for entry in self.all_entries for elem in entry.composition.elements
         }
-        self._pd_dict, self._filtered_entries = \
-            self._filter_entries(entries, include_metastable, temp, include_polymorphs
+        self._pd_dict, self._filtered_entries = self._filter_entries(
+            entries, include_metastable, temp, include_polymorphs
         )
         self._entry_mu_ranges = {}
         self._pd = None
@@ -227,10 +224,8 @@ class ReactionNetwork:
         complex_loopback=True,
     ):
         """
-        Generates and stores the actual reaction network (weighted, directed graph)
-        using graph-tool. In practice, the main iterative loop will start taking
-        a significant amount of time (i.e. over 60 secs) when using  >50 phases.
-        As of now, temperature must be selected from [300, 400, 500, ... 2000 K].
+        Generates and stores the reaction network (weighted, directed graph)
+        using graph-tool.
 
         Args:
             precursors ([ComputedEntry]): entries for all phases which serve as the
@@ -266,13 +261,12 @@ class ReactionNetwork:
 
         self._precursors_entries = precursors_entries
 
-        g = gt.Graph()  # initialization of graph obj
+        g = gt.Graph()  # initialization of graph obj in graph-tool
 
-        # Create all property maps
         g.vp["entries"] = g.new_vertex_property("object")
         g.vp["type"] = g.new_vertex_property(
             "int"
-        )  # 0: precursors, 1: reactants, 2: products, 3: target
+        )  # Type 0: precursors, 1: reactants, 2: products, 3: target
         g.vp["bool"] = g.new_vertex_property("bool")
         g.vp["path"] = g.new_vertex_property("bool")  # whether node is part of path
         g.vp["chemsys"] = g.new_vertex_property("string")
@@ -295,17 +289,19 @@ class ReactionNetwork:
             },
         )
 
-        target_chemsys = set(list(self._current_target)[
-            0].composition.chemical_system.split(
-            "-"))
+        target_chemsys = set(
+            list(self._current_target)[0].composition.chemical_system.split("-")
+        )
         entries_dict = {}
         idx = 1
         for entries in self._all_entry_combos:
             reactants = RxnEntries(entries, "R")
             products = RxnEntries(entries, "P")
             chemsys = reactants.chemsys
-            if self._precursors_entries.description == "D" and \
-                    not target_chemsys.issubset(chemsys.split("-")):
+            if (
+                self._precursors_entries.description == "D"
+                and not target_chemsys.issubset(chemsys.split("-"))
+            ):
                 continue
             if chemsys not in entries_dict:
                 entries_dict[chemsys] = dict({"R": {}, "P": {}})
@@ -322,6 +318,13 @@ class ReactionNetwork:
                     "chemsys": chemsys,
                 },
             )
+
+            if self._precursors_entries == "D" and not self._all_targets.issubset(
+                entries
+            ):
+                idx = idx + 1
+                continue
+
             entries_dict[chemsys]["P"][products] = idx + 1
             self._update_vertex_properties(
                 g,
@@ -383,23 +386,23 @@ class ReactionNetwork:
                 if edge
             ]
 
-            rxn_combos = product(vertices["R"].items(), vertices[
-                    "P"].items())
+            rxn_combos = product(vertices["R"].items(), vertices["P"].items())
             find_rxn_edges_func = partial(
                 find_rxn_edges,
                 cost_function=cost_function,
                 rxn_e_filter=self._rxn_e_filter,
                 temp=self.temp,
-                num_entries=self.num_entries
+                num_entries=self.num_entries,
             )
             size = len(vertices["P"])
             if size > 50:
-                batch_size = int((size**2)/100)
+                batch_size = int((size ** 2) / 100)
                 futures = []
                 for group in grouper(rxn_combos, batch_size):
                     futures.append(delayed(find_rxn_edges_func)(group))
-                reaction_edges = [edge for edge_list in compute(*futures) for
-                                  edge in edge_list]
+                reaction_edges = [
+                    edge for edge_list in compute(*futures) for edge in edge_list
+                ]
             else:
                 reaction_edges = find_rxn_edges_func(rxn_combos)
             all_edges.extend(precursor_edges)
@@ -555,8 +558,9 @@ class ReactionNetwork:
             self.set_precursors(precursors, self._complex_loopback)
 
         try:
-            net_rxn = ComputedReaction(list(precursors), list(targets),
-                                       num_entries=self.num_entries)
+            net_rxn = ComputedReaction(
+                list(precursors), list(targets), num_entries=self.num_entries
+            )
         except ReactionError:
             raise ReactionError(
                 "Net reaction must be balanceable to find all reaction pathways."
@@ -615,32 +619,50 @@ class ReactionNetwork:
         self.logger.info(f"Considering {num_rxns} reactions...")
         batch_size = 500000
         total_paths = []
-        for n in range(1, max_num_combos+1):
-            if n>=4:
+        for n in range(1, max_num_combos + 1):
+            if n >= 4:
                 self.logger.info(f"Generating and filtering size {n} pathways...")
             all_c_mats, all_m_mats = [], []
-            for combos in tqdm(grouper(combinations(range(num_rxns), n),
-                                       batch_size), total=int(comb(num_rxns,
-                                                                n)/batch_size)):
-                comp_matrices = np.stack([np.vstack([rxn_list[r].vector for r in combo])
-                                                       for combo in combos if combo])
-                c_mats, m_mats = self._balance_path_arrays(comp_matrices,
-                                                           net_rxn.vector)
+            for combos in tqdm(
+                grouper(combinations(range(num_rxns), n), batch_size),
+                total=int(comb(num_rxns, n) / batch_size),
+            ):
+                comp_matrices = np.stack(
+                    [
+                        np.vstack([rxn_list[r].vector for r in combo])
+                        for combo in combos
+                        if combo
+                    ]
+                )
+                c_mats, m_mats = self._balance_path_arrays(
+                    comp_matrices, net_rxn.vector
+                )
                 all_c_mats.extend(c_mats)
                 all_m_mats.extend(m_mats)
 
             for c_mat, m_mat in zip(all_c_mats, all_m_mats):
                 rxn_dict = {}
                 for rxn_mat in c_mat:
-                    reactant_entries = [self._filtered_entries[i] for i in range(len(
-                        rxn_mat)) if rxn_mat[i] < 0]
-                    product_entries = [self._filtered_entries[i] for i in range(len(
-                        rxn_mat)) if rxn_mat[i] > 0]
-                    rxn = ComputedReaction(reactant_entries, product_entries,
-                                           entries=self.num_entries)
-                    cost = paths_to_all_targets[rxn_list[
-                        normalized_rxns.index(Reaction.from_string(
-                            rxn.normalized_repr))]]
+                    reactant_entries = [
+                        self._filtered_entries[i]
+                        for i in range(len(rxn_mat))
+                        if rxn_mat[i] < 0
+                    ]
+                    product_entries = [
+                        self._filtered_entries[i]
+                        for i in range(len(rxn_mat))
+                        if rxn_mat[i] > 0
+                    ]
+                    rxn = ComputedReaction(
+                        reactant_entries, product_entries, entries=self.num_entries
+                    )
+                    cost = paths_to_all_targets[
+                        rxn_list[
+                            normalized_rxns.index(
+                                Reaction.from_string(rxn.normalized_repr)
+                            )
+                        ]
+                    ]
                     rxn_dict[rxn] = cost
                 p = BalancedPathway(rxn_dict, net_rxn, balance=False)
                 p.set_multiplicities(m_mat.flatten())
@@ -666,9 +688,11 @@ class ReactionNetwork:
         for reactants_combo in generate_all_combos(intermediates, self._max_num_phases):
             for products_combo in generate_all_combos(targets, self._max_num_phases):
                 try:
-                    rxn = ComputedReaction(list(reactants_combo),
-                                           list(products_combo),
-                                           num_entries=self.num_entries)
+                    rxn = ComputedReaction(
+                        list(reactants_combo),
+                        list(products_combo),
+                        num_entries=self.num_entries,
+                    )
                 except ReactionError:
                     continue
                 if rxn._lowest_num_errors > 0:
@@ -866,13 +890,17 @@ class ReactionNetwork:
         self._current_target = {mapping[ct] for ct in self._current_target}
 
     def save(self, file_name=None):
-        precursors_str = "_".join(sorted([e.composition.reduced_formula for e in
-                                          self._precursors]))
-        targets_str = "_".join(sorted([e.composition.reduced_formula for e in
-                                       self._all_targets]))
+        precursors_str = "_".join(
+            sorted([e.composition.reduced_formula for e in self._precursors])
+        )
+        targets_str = "_".join(
+            sorted([e.composition.reduced_formula for e in self._all_targets])
+        )
         if not file_name:
-            file_name = f"network_{'-'.join(sorted([str(e) for e in self._elements]))}" \
-                   f"_{precursors_str}_to_{targets_str}.gt"
+            file_name = (
+                f"network_{'-'.join(sorted([str(e) for e in self._elements]))}"
+                f"_{precursors_str}_to_{targets_str}.gt"
+            )
         for name, val in inspect.getmembers(self, lambda a: not (inspect.isroutine(a))):
             if name == "_g":
                 continue
@@ -882,19 +910,18 @@ class ReactionNetwork:
             print(name)
             data_type = type(val).__name__
             print(data_type)
-            if data_type not in ["str","int","float","bool"]:
-                data_type="object"
-            if data_type =="str":
-                data_type="string"
+            if data_type not in ["str", "int", "float", "bool"]:
+                data_type = "object"
+            if data_type == "str":
+                data_type = "string"
             self._g.gp[name] = self._g.new_graph_property(data_type, val)
 
         self._g.save(file_name)
 
     @classmethod
     def load(cls, file_name):
-        #g = gt.load_graph(file_name)
+        # g = gt.load_graph(file_name)
         pass
-
 
     @staticmethod
     def _update_vertex_properties(g, v, prop_dict):
@@ -1006,9 +1033,8 @@ class ReactionNetwork:
 
     @staticmethod
     @njit(parallel=True)
-    def _balance_path_arrays(comp_matrices,
-                             net_coeffs,
-                             tol=1e-6,
+    def _balance_path_arrays(
+        comp_matrices, net_coeffs, tol=1e-6,
     ):
         """
         Fast solution for reaction multiplicities via mass balance stochiometric
@@ -1050,8 +1076,10 @@ class ReactionNetwork:
 
             if (multiplicities < tol).any():
                 continue
-            elif not (np.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * np.abs(
-                    net_coeffs))).all():
+            elif not (
+                np.abs(solved_coeffs - net_coeffs)
+                <= (1e-08 + 1e-05 * np.abs(net_coeffs))
+            ).all():
                 continue
             all_multiplicities[i] = multiplicities
             indices[i] = True
@@ -1086,15 +1114,19 @@ class ReactionNetwork:
                 less than the specified e_above_hull.
         """
         pd_dict = expand_pd(all_entries)
-        pd_dict = {chemsys: PhaseDiagram(GibbsComputedStructureEntry.from_pd(pd, temp))
-                   for chemsys, pd in pd_dict.items()}
+        pd_dict = {
+            chemsys: PhaseDiagram(GibbsComputedStructureEntry.from_pd(pd, temp))
+            for chemsys, pd in pd_dict.items()
+        }
 
         filtered_entries = set()
         all_comps = dict()
         for chemsys, pd in pd_dict.items():
             for entry in pd.all_entries:
-                if entry in filtered_entries or pd.get_e_above_hull(entry) > \
-                        e_above_hull:
+                if (
+                    entry in filtered_entries
+                    or pd.get_e_above_hull(entry) > e_above_hull
+                ):
                     continue
                 formula = entry.composition.reduced_formula
                 if not include_polymorphs and (formula in all_comps):

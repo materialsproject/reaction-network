@@ -16,11 +16,12 @@ from pymatgen.analysis.interface_reactions import InterfacialReactivity
 
 from monty.json import MSONable, MontyEncoder, MontyDecoder
 
+
 __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2020, Matthew McDermott"
-__version__ = "0.1"
+__version__ = "0.2"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "July 20, 2020"
+__date__ = "December 20, 2020"
 
 
 class RxnPathway(MSONable):
@@ -476,9 +477,11 @@ def get_rxn_cost(rxn, cost_function="softplus", temp=273, max_mu_diff=None,
 
     return weight
 
+
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
+
 
 def find_rxn_edges(combos, cost_function, rxn_e_filter, temp, num_entries):
     edges = []
