@@ -17,7 +17,7 @@ class PathwayAnalysis(MSONable):
     objects generated during the reaction pathway pathfinding process.
     """
 
-    def __init__(self, rxn_network, balanced_combined_paths):
+    def __init__(self, precursors, targets, balanced_combined_paths):
         """
         Args:
             rxn_network (ReactionNetwork): the ReactionNetwork object.
@@ -25,8 +25,8 @@ class PathwayAnalysis(MSONable):
                 objects which have been successfully balanced.
         """
         self._balanced_combined_paths = balanced_combined_paths
-        self._precursors = rxn_network.precursors
-        self._targets = rxn_network.all_targets
+        self._precursors = precursors
+        self._targets = targets
         self._intermediate_count = self.count_intermediates()
 
     def count_intermediates(self):

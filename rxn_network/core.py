@@ -394,7 +394,8 @@ class ReactionNetwork:
             all_edges.extend(precursor_edges)
             all_edges.extend(target_edges)
 
-        db = bag.from_sequence(chain.from_iterable(all_rxn_combos))
+        db = bag.from_sequence(chain.from_iterable(all_rxn_combos),
+                               partition_size=100000)
         reaction_edges = db.map_partitions(find_rxn_edges,
                                            cost_function=cost_function,
                                            rxn_e_filter=self._rxn_e_filter,
