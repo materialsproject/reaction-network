@@ -10,12 +10,13 @@ from functools import partial
 
 import graph_tool.all as gt
 import queue
+from time import time
 
 from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
 from scipy.special import comb
-from dask import delayed, compute
+from dask import delayed, compute, bag
 
 
 from rxn_network.helpers import *
@@ -357,10 +358,11 @@ class ReactionNetwork:
         self.logger.info("Generating reactions by chemical subsystem...")
 
         all_edges = []
-        pbar = tqdm(entries_dict.items())
 
-        for chemsys, vertices in pbar:
-            pbar.set_description(f"Processing {chemsys}")
+        all_rxn_combos = []
+        start_time = time()
+
+        for chemsys, vertices in entries_dict.items():
             precursor_edges = [
                 [precursors_v, v, 0, None, True, False]
                 for entry, v in vertices["R"].items()
@@ -387,32 +389,28 @@ class ReactionNetwork:
             ]
 
             rxn_combos = product(vertices["R"].items(), vertices["P"].items())
-            find_rxn_edges_func = partial(
-                find_rxn_edges,
-                cost_function=cost_function,
-                rxn_e_filter=self._rxn_e_filter,
-                temp=self.temp,
-                num_entries=self.num_entries,
-            )
-            size = len(vertices["P"])
-            if size > 50:
-                batch_size = int((size ** 2) / 100)
-                futures = []
-                for group in grouper(rxn_combos, batch_size):
-                    futures.append(delayed(find_rxn_edges_func)(group))
-                reaction_edges = [
-                    edge for edge_list in compute(*futures) for edge in edge_list
-                ]
-            else:
-                reaction_edges = find_rxn_edges_func(rxn_combos)
+            all_rxn_combos.append(rxn_combos)
+
             all_edges.extend(precursor_edges)
             all_edges.extend(target_edges)
-            all_edges.extend(reaction_edges)
+
+        db = bag.from_sequence(chain.from_iterable(all_rxn_combos))
+        reaction_edges = db.map_partitions(find_rxn_edges,
+                                           cost_function=cost_function,
+                                           rxn_e_filter=self._rxn_e_filter,
+                                           temp=self.temp,
+                                           num_entries=self.num_entries).compute()
+
+        all_edges.extend(reaction_edges)
 
         g.add_edge_list(
             all_edges, eprops=[g.ep["weight"], g.ep["rxn"], g.ep["bool"], g.ep["path"]]
         )
 
+        end_time = time()
+        self.logger.info(
+            f"Graph creation took {round(end_time - start_time,1)} seconds."
+        )
         self.logger.info(
             f"Created graph with {g.num_vertices()} nodes and {g.num_edges()} edges."
         )
