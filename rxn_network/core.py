@@ -320,7 +320,8 @@ class ReactionNetwork:
                 },
             )
 
-            if self._precursors_entries == "D" and not self._all_targets.issubset(
+            if self._precursors_entries.description == "D" and not \
+                    self._all_targets.issubset(
                 entries
             ):
                 idx = idx + 1
