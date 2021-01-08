@@ -25,8 +25,8 @@ class PathwayAnalysis(MSONable):
                 objects which have been successfully balanced.
         """
         self._balanced_combined_paths = balanced_combined_paths
-        self._precursors = precursors
-        self._targets = targets
+        self._precursors = set(precursors)
+        self._targets = set(targets)
         self._intermediate_count = self.count_intermediates()
 
     def count_intermediates(self):

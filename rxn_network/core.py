@@ -666,7 +666,6 @@ class ReactionNetwork:
                     rxn_dict[rxn] = cost
                 p = BalancedPathway(rxn_dict, net_rxn, balance=False)
                 p.set_multiplicities(m_mat.flatten())
-                p.calculate_costs()
                 total_paths.append(p)
 
         if filter_interdependent:

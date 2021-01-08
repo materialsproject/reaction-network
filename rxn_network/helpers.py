@@ -4,10 +4,10 @@ info in the Reaction Network core module.
 """
 
 import os
-from itertools import chain, combinations
+from itertools import chain, combinations, zip_longest
 
 import numpy as np
-from itertools import zip_longest
+from functools import cached_property
 
 from pymatgen import Composition, Structure
 from pymatgen.analysis.phase_diagram import PhaseDiagram
@@ -98,12 +98,11 @@ class BalancedPathway(MSONable):
                 methods.
         """
         self.rxn_dict = rxn_dict
-        self.all_rxns = list(self.rxn_dict.keys())
         self.net_rxn = net_rxn
+        self.balance = balance
+        self.all_rxns = list(self.rxn_dict.keys())
         self.is_balanced = False
         self.multiplicities = None
-        self.total_cost = None
-        self.average_cost = None
 
         self.all_reactants = {reactants for rxn in self.rxn_dict.keys() for reactants in
                               rxn.reactants}
@@ -122,9 +121,6 @@ class BalancedPathway(MSONable):
             )
             self.set_multiplicities(multiplicities)
 
-        if self.is_balanced:
-            self.calculate_costs()
-
     def set_multiplicities(self, multiplicities):
         """
         Stores the provided multiplicities (e.g. if solved for outside of object
@@ -138,15 +134,17 @@ class BalancedPathway(MSONable):
             for (rxn, multiplicity) in zip(self.all_rxns, multiplicities)
         }
 
-    def calculate_costs(self):
-        """
-        Calculates and sets total and average cost of all pathways using the reaction
-        dict.
-        """
-        self.total_cost = sum(
-            [mult * self.rxn_dict[rxn] for (rxn, mult) in self.multiplicities.items()]
-        )
-        self.average_cost = self.total_cost / len(self.rxn_dict)
+    @cached_property
+    def total_cost(self):
+        if self.is_balanced:
+            return sum([self.multiplicities[r]*self.rxn_dict[r] for r in
+                        self.rxn_dict])/sum(list(self.multiplicities.values()))
+
+    @cached_property
+    def average_cost(self):
+        if self.is_balanced:
+            return sum([self.multiplicities[r]*self.rxn_dict[r] for r in
+                        self.rxn_dict])/sum(list(self.multiplicities.values())) / len(self.rxn_dict)
 
     @staticmethod
     def _balance_rxns(comp_matrix, net_coeffs, tol=1e-6):
@@ -211,6 +209,19 @@ class BalancedPathway(MSONable):
                 for rxn in all_rxns
             ]
         )
+
+    def as_dict(self):
+        return {
+            "@module": self.__class__.__module__,
+            "@class": self.__class__.__name__,
+            "rxn_dict": self.rxn_dict,
+            "net_rxn": self.net_rxn,
+            "balance": self.balance
+        }
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(d["rxn_dict"], d["net_rxn"], d["balance"])
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
