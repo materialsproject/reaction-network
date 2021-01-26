@@ -1,20 +1,9 @@
-.. Reaction Network documentation master file, created by
-   sphinx-quickstart on Fri Jul  3 13:28:24 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-.. image:: images/logo.png
-	:align: center
-	:alt: Reaction Network Logo
-
-Introduction
-================
+# [Reaction Network](docs/images/logo.png)
 
 Reaction network (rxn-network) is a Python package for predicting chemical reaction
 pathways in solid-state materials synthesis using graph theory.
 
-Installing rxn-network
-================
+# Installing rxn-network
 
 The rxn-network package has several dependencies, most of which can be installed
 through PyPI. However, graph-tool must be installed through a more customized method;
@@ -37,45 +26,22 @@ And then to finally install an editable version of the package:
 
     pip install -e .
 
-Demo
-================
+# Demo
 A demo Jupyter notebook (demo.ipynb) contains the code necessary to replicate the
 results of the paper and is a good starting template for using the rxn-network package.
 
 
-How to cite rxn-network
-================
+# How to cite rxn-network
 
 The following paper explains the methodology of the rxn-network package.
 It is currently under review, but a preprint is accessible via:
 
 https://assets.researchsquare.com/files/rs-38000/v1_stamped.pdf
 
-Acknowledgements
-================
+# Acknowledgements
 
 This work was supported as part of GENESIS: A Next Generation Synthesis Center, an
 Energy Frontier Research Center funded by the U.S. Department of Energy, Office of
 Science, Basic Energy Sciences under Award Number DE-SC0019212.
 
 Learn more about the GENESIS EFRC here: https://www.stonybrook.edu/genesis/
-
-Core module
-================
-
-.. automodule:: rxn_network.core
-	:members:
-	:undoc-members:
-	:show-inheritance:
-
-Helpers module
-================
-
-.. automodule:: rxn_network.helpers
-	:members:
-	:undoc-members:
-	:show-inheritance:
-
-.. toctree::
-	:maxdepth: 2
-	:caption: Contents:
