@@ -1,6 +1,5 @@
 from monty.serialization import loadfn
 
-
-compounds = loadfn("compounds.json")
-g_els = loadfn("g_els.json")
-nist_gas_gf = loadfn("nist_gas_gf.json")
+G_COMPOUNDS = loadfn("compounds.json")
+G_ELEMS = loadfn("g_els.json")
+G_GASES = loadfn("nist_gas_gf.json")

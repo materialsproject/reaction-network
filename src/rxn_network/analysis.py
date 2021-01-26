@@ -1,8 +1,7 @@
 from collections import Counter
-from monty.json import MSONable
 
 import matplotlib.pyplot as plt
-
+from monty.json import MSONable
 
 __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2020, Matthew McDermott"

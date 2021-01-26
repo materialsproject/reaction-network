@@ -10,17 +10,14 @@ in developing the majority of this module.
 
 import logging
 import re
-from itertools import combinations, chain
+from itertools import chain, combinations
 
 import numpy as np
 from monty.fractions import gcd_float
-from monty.json import MSONable
-from monty.json import MontyDecoder
-from uncertainties import ufloat
-
+from monty.json import MontyDecoder, MSONable
 from pymatgen.core.composition import Composition
 from pymatgen.entries.computed_entries import ComputedEntry
-
+from uncertainties import ufloat
 
 logger = logging.getLogger(__name__)
 
@@ -68,10 +65,12 @@ class BalancedReaction(MSONable):
                 self._all_comp.append(c)
                 self._coeffs.append(coeff)
 
-        self._reactants = [self._all_comp[i] for i in range(len(self._all_comp))
-                           if self._coeffs[i] < 0]
-        self._products = [self._all_comp[i] for i in range(len(self._all_comp)) if
-                          self._coeffs[i] > 0]
+        self._reactants = [
+            self._all_comp[i] for i in range(len(self._all_comp)) if self._coeffs[i] < 0
+        ]
+        self._products = [
+            self._all_comp[i] for i in range(len(self._all_comp)) if self._coeffs[i] > 0
+        ]
 
     def calculate_energy(self, energies):
         """
@@ -346,17 +345,24 @@ class Reaction(BalancedReaction):
             np.inf
         )  # an error = a component changing sides or disappearing
 
-        self._balanced, self._coeffs = self._balance_coeffs(comp_matrix,
-                                                           num_constraints)
+        self._balanced, self._coeffs = self._balance_coeffs(
+            comp_matrix, num_constraints
+        )
         self._els = all_elems
 
         self.vector = None
 
         if self._balanced:
-            self._reactants = [self._all_comp[i] for i in range(len(self._all_comp))
-                               if self._coeffs[i] < 0]
-            self._products = [self._all_comp[i] for i in range(len(self._all_comp)) if
-                              self._coeffs[i] > 0]
+            self._reactants = [
+                self._all_comp[i]
+                for i in range(len(self._all_comp))
+                if self._coeffs[i] < 0
+            ]
+            self._products = [
+                self._all_comp[i]
+                for i in range(len(self._all_comp))
+                if self._coeffs[i] > 0
+            ]
             num_entries = kwargs.get("num_entries")
             indices = kwargs.get("entry_indices")
             if num_entries and indices:
@@ -466,19 +472,24 @@ class ComputedReaction(Reaction):
         self._reactant_entries = reactant_entries
         self._product_entries = product_entries
         self._all_entries = reactant_entries + product_entries
-        reactant_comp = [e.composition.get_reduced_composition_and_factor()[0]
-                         for e in reactant_entries]
+        reactant_comp = [
+            e.composition.get_reduced_composition_and_factor()[0]
+            for e in reactant_entries
+        ]
 
-        product_comp = [e.composition.get_reduced_composition_and_factor()[0]
-                        for e in product_entries]
+        product_comp = [
+            e.composition.get_reduced_composition_and_factor()[0]
+            for e in product_entries
+        ]
 
         num_entries = kwargs.get("num_entries")
         indices = None
         if num_entries:
             indices = [e.entry_idx for e in self._all_entries]
 
-        super().__init__(reactant_comp, product_comp, entry_indices=indices,
-                         num_entries=num_entries)
+        super().__init__(
+            reactant_comp, product_comp, entry_indices=indices, num_entries=num_entries
+        )
 
     @property
     def all_entries(self):
@@ -521,9 +532,7 @@ class ComputedReaction(Reaction):
 
         for entry in self._reactant_entries + self._product_entries:
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()
-            energy_ufloat = ufloat(
-                entry.energy, entry.correction_uncertainty
-            )
+            energy_ufloat = ufloat(entry.energy, entry.correction_uncertainty)
             calc_energies[comp] = min(
                 calc_energies.get(comp, float("inf")), energy_ufloat / factor
             )

@@ -1,29 +1,42 @@
-import logging
 import inspect
-from itertools import combinations, chain, groupby, compress, product
-from tqdm import tqdm
-from pprint import pprint
-
-import numpy as np
-from numba import njit, prange
-from functools import partial
-
-import graph_tool.all as gt
+import logging
 import queue
+from functools import partial
+from itertools import chain, combinations, compress, groupby, product
+from pprint import pprint
 from time import time
 
-from pymatgen.entries.entry_tools import EntrySet
+import graph_tool.all as gt
+import numpy as np
+from dask import bag, compute, delayed
+from numba import njit, prange
+from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
+from pymatgen.core.composition import Composition
+from pymatgen.core.structure import Structure
 from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
+from pymatgen.entries.entry_tools import EntrySet
 from scipy.special import comb
-from dask import delayed, compute, bag
+from tqdm import tqdm
 
-
-from rxn_network.helpers import *
-from rxn_network.analysis import *
-from rxn_network.reaction import *
-from rxn_network.entries import *
-
+from rxn_network.analysis import PathwayAnalysis
+from rxn_network.entries import GibbsComputedStructureEntry, PDEntry, RxnEntries
+from rxn_network.helpers import (
+    BalancedPathway,
+    RxnPathway,
+    expand_pd,
+    find_interdependent_rxns,
+    find_rxn_edges,
+    generate_all_combos,
+    get_rxn_cost,
+    grouper,
+    react_interface,
+)
+from rxn_network.reaction import (
+    BalancedReaction,
+    ComputedReaction,
+    Reaction,
+    ReactionError,
+)
 
 __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2020, Matthew McDermott"
@@ -320,9 +333,9 @@ class ReactionNetwork:
                 },
             )
 
-            if self._precursors_entries.description == "D" and not \
-                    self._all_targets.issubset(
-                entries
+            if (
+                self._precursors_entries.description == "D"
+                and not self._all_targets.issubset(entries)
             ):
                 idx = idx + 1
                 continue
@@ -395,13 +408,16 @@ class ReactionNetwork:
             all_edges.extend(precursor_edges)
             all_edges.extend(target_edges)
 
-        db = bag.from_sequence(chain.from_iterable(all_rxn_combos),
-                               partition_size=100000)
-        reaction_edges = db.map_partitions(find_rxn_edges,
-                                           cost_function=cost_function,
-                                           rxn_e_filter=self._rxn_e_filter,
-                                           temp=self.temp,
-                                           num_entries=self.num_entries).compute()
+        db = bag.from_sequence(
+            chain.from_iterable(all_rxn_combos), partition_size=100000
+        )
+        reaction_edges = db.map_partitions(
+            find_rxn_edges,
+            cost_function=cost_function,
+            rxn_e_filter=self._rxn_e_filter,
+            temp=self.temp,
+            num_entries=self.num_entries,
+        ).compute()
 
         all_edges.extend(reaction_edges)
 
@@ -841,7 +857,9 @@ class ReactionNetwork:
         self._cost_function = cost_function
 
         for e in gt.find_edge_range(g, g.ep["weight"], (1e-8, 1e8)):
-            g.ep["weight"][e] = get_rxn_cost(g.ep["rxn"][e],)
+            g.ep["weight"][e] = get_rxn_cost(
+                g.ep["rxn"][e],
+            )
 
     def set_temp(self, temp):
         """
@@ -1033,7 +1051,9 @@ class ReactionNetwork:
     @staticmethod
     @njit(parallel=True)
     def _balance_path_arrays(
-        comp_matrices, net_coeffs, tol=1e-6,
+        comp_matrices,
+        net_coeffs,
+        tol=1e-6,
     ):
         """
         Fast solution for reaction multiplicities via mass balance stochiometric

@@ -4,18 +4,17 @@ info in the Reaction Network core module.
 """
 
 import os
+from functools import cached_property
 from itertools import chain, combinations, zip_longest
 
 import numpy as np
-from functools import cached_property
-
-from pymatgen import Composition, Structure
-from pymatgen.analysis.phase_diagram import PhaseDiagram
-from rxn_network.reaction import Reaction, ReactionError, ComputedReaction
+from monty.json import MontyDecoder, MontyEncoder, MSONable
 from pymatgen.analysis.interface_reactions import InterfacialReactivity
+from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.core.composition import Composition
+from pymatgen.core.structure import Structure
 
-from monty.json import MSONable, MontyEncoder, MontyDecoder
-
+from rxn_network.reaction import ComputedReaction, Reaction, ReactionError
 
 __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2020, Matthew McDermott"
@@ -104,10 +103,12 @@ class BalancedPathway(MSONable):
         self.is_balanced = False
         self.multiplicities = None
 
-        self.all_reactants = {reactants for rxn in self.rxn_dict.keys() for reactants in
-                              rxn.reactants}
-        self.all_products = {products for rxn in self.rxn_dict.keys() for products in
-                              rxn.products}
+        self.all_reactants = {
+            reactants for rxn in self.rxn_dict.keys() for reactants in rxn.reactants
+        }
+        self.all_products = {
+            products for rxn in self.rxn_dict.keys() for products in rxn.products
+        }
 
         self.all_comp = list(
             self.all_reactants | self.all_products | set(self.net_rxn.all_comp)
@@ -137,14 +138,18 @@ class BalancedPathway(MSONable):
     @cached_property
     def total_cost(self):
         if self.is_balanced:
-            return sum([self.multiplicities[r]*self.rxn_dict[r] for r in
-                        self.rxn_dict])/sum(list(self.multiplicities.values()))
+            return sum(
+                [self.multiplicities[r] * self.rxn_dict[r] for r in self.rxn_dict]
+            ) / sum(list(self.multiplicities.values()))
 
     @cached_property
     def average_cost(self):
         if self.is_balanced:
-            return sum([self.multiplicities[r]*self.rxn_dict[r] for r in
-                        self.rxn_dict])/sum(list(self.multiplicities.values())) / len(self.rxn_dict)
+            return (
+                sum([self.multiplicities[r] * self.rxn_dict[r] for r in self.rxn_dict])
+                / sum(list(self.multiplicities.values()))
+                / len(self.rxn_dict)
+            )
 
     @staticmethod
     def _balance_rxns(comp_matrix, net_coeffs, tol=1e-6):
@@ -216,7 +221,7 @@ class BalancedPathway(MSONable):
             "@class": self.__class__.__name__,
             "rxn_dict": self.rxn_dict,
             "net_rxn": self.net_rxn,
-            "balance": self.balance
+            "balance": self.balance,
         }
 
     @classmethod
@@ -236,8 +241,10 @@ class BalancedPathway(MSONable):
                 [rxn.get_el_amount(elem) for elem in rxn.elements]
             )
             rxn_info += f"{rxn} (dG = {round(dg_per_atom,3)} eV/atom) \n"
-        rxn_info += f"\nTotal Cost: {round(self.total_cost,3)} | Average Cost: " \
-                    f"{round(self.average_cost,3)}\n\n"
+        rxn_info += (
+            f"\nTotal Cost: {round(self.total_cost,3)} | Average Cost: "
+            f"{round(self.average_cost,3)}\n\n"
+        )
 
         return rxn_info
 
@@ -311,37 +318,48 @@ def react_interface(r1, r2, pd, num_entries, grand_pd=None):
             norm=True,
             include_no_mixing_energy=False,
             pd_non_grand=pd,
-            use_hull_energy=True
+            use_hull_energy=True,
         )
     else:
-        interface = InterfacialReactivity(r1,
-                                          r2,
-                                          pd,
-                                          norm=False,
-                                          include_no_mixing_energy=False,
-                                          pd_non_grand=None,
-                                          use_hull_energy=True)
+        interface = InterfacialReactivity(
+            r1,
+            r2,
+            pd,
+            norm=False,
+            include_no_mixing_energy=False,
+            pd_non_grand=None,
+            use_hull_energy=True,
+        )
 
     entries = pd.all_entries
-    rxns = {get_computed_rxn(rxn, entries, num_entries) for _, _, _, rxn,
-                                                _ in interface.get_kinks()}
+    rxns = {
+        get_computed_rxn(rxn, entries, num_entries)
+        for _, _, _, rxn, _ in interface.get_kinks()
+    }
 
     return rxns
 
 
 def get_computed_rxn(rxn, entries, num_entries):
-    reactants = [r.reduced_composition for r in rxn.reactants if not np.isclose(
-        rxn.get_coeff(r), 0)]
-    products = [p.reduced_composition for p in rxn.products if not np.isclose(
-        rxn.get_coeff(p), 0)]
+    reactants = [
+        r.reduced_composition
+        for r in rxn.reactants
+        if not np.isclose(rxn.get_coeff(r), 0)
+    ]
+    products = [
+        p.reduced_composition
+        for p in rxn.products
+        if not np.isclose(rxn.get_coeff(p), 0)
+    ]
     reactant_entries = [get_entry_by_comp(r, entries) for r in reactants]
     product_entries = [get_entry_by_comp(p, entries) for p in products]
     return ComputedReaction(reactant_entries, product_entries, num_entries=num_entries)
 
 
 def get_entry_by_comp(comp, entry_set):
-    possible_entries = filter(lambda x: x.composition.reduced_composition
-                                                   == comp, entry_set)
+    possible_entries = filter(
+        lambda x: x.composition.reduced_composition == comp, entry_set
+    )
     return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
 
 
@@ -361,8 +379,9 @@ def expand_pd(entries):
 
     pd_dict = dict()
 
-    sorted_entries = sorted(entries, key=lambda x: len(x.composition.elements),
-                       reverse=True)
+    sorted_entries = sorted(
+        entries, key=lambda x: len(x.composition.elements), reverse=True
+    )
 
     for e in sorted_entries:
         for chemsys in pd_dict.keys():
@@ -398,7 +417,7 @@ def find_interdependent_rxns(path, precursors, verbose=True):
 
     for combo in generate_all_combos(rxns, num_rxns):
         size = len(combo)
-        if any([set(rxn.reactants).issubset(precursors) for rxn in combo]) or size==1:
+        if any([set(rxn.reactants).issubset(precursors) for rxn in combo]) or size == 1:
             continue
         other_comp = {c for rxn in (rxns - set(combo)) for c in rxn.all_comp}
 
@@ -408,7 +427,7 @@ def find_interdependent_rxns(path, precursors, verbose=True):
             unique_reactants.append(set(rxn.reactants) - precursors)
             unique_products.append(set(rxn.products) - precursors)
 
-        overlap = [False]*size
+        overlap = [False] * size
         for i in range(size):
             for j in range(size):
                 if i == j:
@@ -427,7 +446,9 @@ def find_interdependent_rxns(path, precursors, verbose=True):
             combined_reactants = combined_reactants - shared
             combined_products = combined_products - shared
             try:
-                combined_rxn = Reaction(list(combined_reactants), list(combined_products))
+                combined_rxn = Reaction(
+                    list(combined_reactants), list(combined_products)
+                )
                 if verbose:
                     print(combined_rxn)
             except ReactionError:
@@ -452,8 +473,9 @@ def softplus(params, weights, t=273):
     return np.log(1 + (273 / t) * np.exp(weighted_params))
 
 
-def get_rxn_cost(rxn, cost_function="softplus", temp=273, max_mu_diff=None,
-                      most_negative_rxn=None):
+def get_rxn_cost(
+    rxn, cost_function="softplus", temp=273, max_mu_diff=None, most_negative_rxn=None
+):
     """Helper method which determines reaction cost/weight.
 
     Args:
@@ -535,8 +557,9 @@ def find_rxn_edges(combos, cost_function, rxn_e_filter, temp, num_entries):
         #         if mu_diff > max_mu_diff:
         #             max_mu_diff = mu_diff
 
-        rxn = ComputedReaction(list(phases), list(other_phases),
-                               num_entries=num_entries)
+        rxn = ComputedReaction(
+            list(phases), list(other_phases), num_entries=num_entries
+        )
         if not rxn._balanced:
             continue
 

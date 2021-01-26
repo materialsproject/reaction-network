@@ -1,37 +1,23 @@
-
+import hashlib
+import json
 import os
 from itertools import chain, combinations
 
 import numpy as np
-import json
-import hashlib
-
-from pymatgen import Composition, Structure
-from pymatgen.analysis.phase_diagram import PhaseDiagram, PDEntry
+from monty.json import MontyDecoder, MontyEncoder, MSONable
+from pymatgen.analysis.phase_diagram import PDEntry, PhaseDiagram
+from pymatgen.core.composition import Composition
+from pymatgen.core.structure import Structure
 from pymatgen.entries.computed_entries import ComputedStructureEntry
 from scipy.interpolate import interp1d
 
-from monty.json import MSONable, MontyEncoder, MontyDecoder
-
-
-__author__ = "Matthew McDermott"
-__copyright__ = "Copyright 2020, Matthew McDermott"
-__version__ = "0.2"
-__email__ = "mcdermott@lbl.gov"
-__date__ = "December 20, 2020"
-
-
-with open(os.path.join(os.path.dirname(__file__), "g_els.json")) as f:
-    G_ELEMS = json.load(f)
-with open(os.path.join(os.path.dirname(__file__), "nist_gas_gf.json")) as f:
-    G_GASES = json.load(f)
-with open(os.path.join(os.path.dirname(__file__), "compounds.json")) as f:
-    G_COMPOUNDS = json.load(f)
+from rxn_network.data import G_COMPOUNDS, G_ELEMS, G_GASES
 
 
 def _new_pdentry_hash(self):  # necessary fix, will be updated in pymatgen in future
-    data_md5 = hashlib.md5(f"{self.composition.formula}_"
-                           f"{self.energy}".encode('utf-8')).hexdigest()
+    data_md5 = hashlib.md5(
+        f"{self.composition.formula}_" f"{self.energy}".encode("utf-8")
+    ).hexdigest()
     return int(data_md5, 16)
 
 
@@ -55,7 +41,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         parameters: dict = None,
         data: dict = None,
         entry_id: object = None,
-        entry_idx: int = None
+        entry_idx: int = None,
     ):
         """
         Args:
@@ -233,9 +219,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         )
 
     @classmethod
-    def from_pd(
-        cls, pd, temp=300, gibbs_model="SISSO"
-    ):
+    def from_pd(cls, pd, temp=300, gibbs_model="SISSO"):
         """
         Constructor method for initializing a list of GibbsComputedStructureEntry
         objects from an existing T = 0 K phase diagram composed of
@@ -274,9 +258,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         return gibbs_entries
 
     @classmethod
-    def from_entries(
-        cls, entries, temp=300, gibbs_model="SISSO"
-    ):
+    def from_entries(cls, entries, temp=300, gibbs_model="SISSO"):
         """
         Constructor method for initializing GibbsComputedStructureEntry objects from
         T = 0 K ComputedStructureEntry objects, as acquired from a thermochemical
@@ -293,7 +275,6 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
                 entries with inclusion of Gibbs free energy of formation at the
                 specified temperature.
         """
-        from pymatgen.analysis.phase_diagram import PhaseDiagram
 
         pd = PhaseDiagram(entries)
         return cls.from_pd(pd, temp, gibbs_model)
@@ -350,16 +331,21 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return (self.composition == other.composition) and \
-                   (self.formation_enthalpy == other.formation_enthalpy) and \
-                   (self.entry_id == other.entry_id) and (self.temp == other.temp)
+            return (
+                (self.composition == other.composition)
+                and (self.formation_enthalpy == other.formation_enthalpy)
+                and (self.entry_id == other.entry_id)
+                and (self.temp == other.temp)
+            )
         else:
             return False
 
     def __hash__(self):
-        data_md5 = hashlib.md5(f"{self.composition}_"
-                               f"{self.formation_enthalpy}_{self.entry_id}_"
-                               f"{self.temp}".encode('utf-8')).hexdigest()
+        data_md5 = hashlib.md5(
+            f"{self.composition}_"
+            f"{self.formation_enthalpy}_{self.entry_id}_"
+            f"{self.temp}".encode("utf-8")
+        ).hexdigest()
         return int(data_md5, 16)
 
 
@@ -370,14 +356,19 @@ class CustomEntry(PDEntry):
         if not temp:
             temp = 300
 
-        super().__init__(composition, energy_dict[str(temp)], name=name,
-                         attribute=attribute)
+        super().__init__(
+            composition, energy_dict[str(temp)], name=name, attribute=attribute
+        )
         self.temp = temp
         self.energy_dict = energy_dict
 
     def set_temp(self, temp):
-        super().__init__(self.composition, self.energy_dict[str(temp)], name=self.name,
-                         attribute=self.attribute)
+        super().__init__(
+            self.composition,
+            self.energy_dict[str(temp)],
+            name=self.name,
+            attribute=self.attribute,
+        )
 
     def __repr__(self):
         return super().__repr__() + f" (T={self.temp} K)"
