@@ -63,25 +63,8 @@ class GibbsComputedEntry(ComputedEntry):
     def temperature(self):
         return self._temperature
 
-    @temperature.setter
-    def change_temperature(self, temperature: float):
-        " Update the temperature in this SISSO Gibbs corrected ComputedEntry "
-        self.energy_adjustments = [
-            adjustment
-            for adjustment in self.energy_adjustments
-            if adjustment.name != "Gibbs SISSO Correction"
-        ]
-
-        self._temperature = temperature
-
-        self.energy_adjustments.append(
-            ConstantEnergyAdjustment(
-                self.gf_sisso(),
-                name="Gibbs SISSO Correction",
-                description=f"Correction from the SISSO description of G^delta by Bartel et al at T={self.temperature}K",
-            )
-        )
-
+    # Matt: Add function to yield new entry at a different temperature
+    # Matt: paramterize this to take a temperature rather than using self.temperature
     def gf_sisso(self) -> float:
         """
         Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel
