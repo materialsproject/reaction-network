@@ -1,18 +1,23 @@
+import numpy as np
 from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import List
 
 from monty.json import MSONable
 
-from rxn_network.core.reaction import Reaction
 from pymatgen.entries import Entry
+from pymatgen.core.composition import Composition, Element
 
 
 class Reaction(MSONable, metaclass=ABCMeta):
     " Base definition for a Reaction "
 
     @abstractproperty
-    def energy(self):
-        " The energy of this reaction in eV per ??"
+    def reactants(self) -> List[Composition]:
+        " List of reactants for this reaction "
+
+    @abstractproperty
+    def products(self) -> List[Composition]:
+        " List of products for this reaction "
 
     @abstractproperty
     def coefficients(self) -> np.array:
@@ -21,16 +26,22 @@ class Reaction(MSONable, metaclass=ABCMeta):
         """
 
     @abstractproperty
+    def energy(self):
+        " The energy of this reaction in eV per ??"
+
+    @property
     def compositions(self) -> List[Composition]:
         """
         List of all compositions in the reaction.
         """
+        return self.reactants + self.products
 
-    @abstractproperty
+    @property
     def elements(self) -> List[Element]:
         """
         List of elements in the reaction
         """
+        return list(set(el for comp in self.compositions for el in comp.elements))
 
 
 class CostFunction(MSONable, metaclass=ABCMeta):
