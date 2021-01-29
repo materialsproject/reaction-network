@@ -533,30 +533,6 @@ def find_rxn_edges(combos, cost_function, rxn_e_filter, temp, num_entries):
             continue  # do not consider identity-like reactions (e.g. A + B -> A
             # + B)
 
-        # max_mu_diff = None
-        # if self._include_chempot_restriction:
-        #     product_mu_ranges = [
-        #         self._entry_mu_ranges[e] for e in other_phases
-        #     ]
-        #     product_mu_span = {
-        #         elem: (
-        #             min(
-        #                 [p[elem][0] for p in product_mu_ranges if elem in p]
-        #             ),
-        #             max(
-        #                 [p[elem][1] for p in product_mu_ranges if elem in p]
-        #             ),
-        #         )
-        #         for elem in elems
-        #     }
-        #
-        #     max_mu_diff = -np.inf
-        #     for elem in product_mu_span:
-        #         mu_diff = (product_mu_span[elem][0]
-        #                    - reactant_mu_span[elem][1])
-        #         if mu_diff > max_mu_diff:
-        #             max_mu_diff = mu_diff
-
         rxn = ComputedReaction(
             list(phases), list(other_phases), num_entries=num_entries
         )

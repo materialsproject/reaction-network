@@ -62,7 +62,6 @@ class ReactionNetwork:
         extend_entries=None,
         include_metastable=False,
         include_polymorphs=False,
-        include_chempot_restriction=False,
         filter_rxn_energies=0.5,
     ):
         """Initializes ReactionNetwork object with necessary preprocessing
@@ -95,11 +94,6 @@ class ReactionNetwork:
                 state polymorphs. Defaults to False. Note this is not useful
                 unless structural metrics are considered in the cost function
                 (to be added!)
-            include_chempot_restriction (bool): Whether or not to consider reactions to
-                those where the minimum possible μ of each element in the products
-                can not be higher than the maximum possible μ of each element in the
-                reactants. Seems to lead to more logical pathway predictions.
-                Defaults to False.
         """
         self.logger = logging.getLogger("ReactionNetwork")
         self.logger.setLevel("INFO")
@@ -110,7 +104,6 @@ class ReactionNetwork:
         self._temp = temp
         self._e_above_hull = include_metastable
         self._include_polymorphs = include_polymorphs
-        self._include_chempot_restriction = include_chempot_restriction
         self._elements = {
             elem for entry in self.all_entries for elem in entry.composition.elements
         }
@@ -125,10 +118,6 @@ class ReactionNetwork:
             len(self._elements) <= 10
         ):  # phase diagrams take considerable time to build with 10+ elems
             self._pd = PhaseDiagram(self._filtered_entries)
-        elif len(self._elements) > 10 and include_chempot_restriction:
-            raise ValueError(
-                "Cannot include chempot restriction for networks with greater than 10 elements!"
-            )
 
         if interpolate_comps:
             interpolated_entries = []
@@ -148,24 +137,6 @@ class ReactionNetwork:
             e.entry_idx = idx
 
         self.num_entries = len(self._filtered_entries)
-
-        if include_chempot_restriction:
-            for e in self._filtered_entries:
-                elems = e.composition.elements
-                chempot_ranges = {}
-                all_chempots = {e: [] for e in elems}
-                for simplex, chempots in self._pd.get_all_chempots(
-                    e.composition
-                ).items():
-                    for elem in elems:
-                        all_chempots[elem].append(chempots[elem])
-                for elem in elems:
-                    chempot_ranges[elem] = (
-                        min(all_chempots[elem]),
-                        max(all_chempots[elem]),
-                    )
-
-                self._entry_mu_ranges[e] = chempot_ranges
 
         self._all_entry_combos = [
             set(combo)
