@@ -14,9 +14,10 @@ import numpy as np
 from monty.fractions import gcd_float
 from monty.json import MontyDecoder, MSONable
 from pymatgen.core.composition import Composition, Element
+from rxn_network.core import Reaction
 
 
-class BasicReaction(MSONable):
+class BasicReaction(Reaction):
     """
     An object representing a basic chemical reaction.
     """
@@ -26,28 +27,32 @@ class BasicReaction(MSONable):
 
     def __init__(
         self,
-        reactants: Dict[Composition, float],
-        products: Dict[Composition, float],
+        reactant_coeffs: Dict[Composition, float],
+        product_coeffs: Dict[Composition, float],
         balanced: Optional[bool] = None,
     ):
         """
         Reactants and products to be specified as dict of {Composition: coeff}.
 
         Args:
-            reactants ({Composition: float}): Reactants as dict of
+            reactant_coeffs ({Composition: float}): Reactants as dict of
                 {Composition: amt}.
-            products ({Composition: float}): Products as dict of
+            product_coeffs ({Composition: float}): Products as dict of
                 {Composition: amt}.
         """
-        self.reactants = reactants
-        self.products = products
+        self.reactant_coeffs = reactant_coeffs
+        self.product_coeffs = product_coeffs
 
         if balanced is not None:
             self.balanced = balanced
         else:
             # sum reactants and products
-            all_reactants = sum([k * v for k, v in reactants.items()], Composition({}))
-            all_products = sum([k * v for k, v in products.items()], Composition({}))
+            all_reactants = sum(
+                [k * v for k, v in reactant_coeffs.items()], Composition({})
+            )
+            all_products = sum(
+                [k * v for k, v in product_coeffs.items()], Composition({})
+            )
 
             if not all_reactants.almost_equals(
                 all_products, rtol=0, atol=self.TOLERANCE
@@ -56,40 +61,37 @@ class BasicReaction(MSONable):
             else:
                 self.balanced = True
 
+    @property
+    def reactants(self) -> List[Composition]:
+        " List of reactants for this reaction "
+        return list(self.reactant_coeffs.keys())
+
+    @property
+    def products(self) -> List[Composition]:
+        " List of products for this reaction "
+        return list(self.product_coeffs.keys())
+
     @cached_property
     def coefficients(self) -> np.array:
         """
         Coefficients of the reaction
         """
         return np.concatenate(
-            np.array(self.reactants.values()) * -1 + np.array(self.products.values)
+            np.array(self.reactant_coeffs.values()) * -1
+            + np.array(self.product_coeffs.values)
         )
-
-    @cached_property
-    def compositions(self) -> List[Composition]:
-        """
-        List of all compositions in the reaction.
-        """
-        return list(self.reactants.keys) + list(self.products.keys())
-
-    @cached_property
-    def elements(self) -> List[Element]:
-        """
-        List of elements in the reaction
-        """
-        return list(set(el for comp in self.compositions for el in comp.elements))
 
     @property
     def energy(self) -> float:
         raise ValueError("No energy for a basic reaction")
 
-    def copy(self) -> "Reaction":
+    def copy(self) -> "BasicReaction":
         """
         Returns a copy of the Reaction object.
         """
-        return Reaction(self.reactants, self.products, self.balanced)
+        return BasicReaction(self.reactant_coeffs, self.product_coeffs, self.balanced)
 
-    def normalize_to(self, comp: Composition, factor: float = 1) -> "Reaction":
+    def normalize_to(self, comp: Composition, factor: float = 1) -> "BasicReaction":
         """
         Normalizes the reaction to one of the compositions.
         By default, normalizes such that the composition given has a
@@ -105,7 +107,9 @@ class BasicReaction(MSONable):
         self.coefficients *= scale_factor
         return self
 
-    def normalize_to_element(self, element: Element, factor: float = 1) -> "Reaction":
+    def normalize_to_element(
+        self, element: Element, factor: float = 1
+    ) -> "BasicReaction":
         """
         Normalizes the reaction to one of the elements.
         By default, normalizes such that the amount of the element is 1.
@@ -166,21 +170,8 @@ class BasicReaction(MSONable):
         """
         return self.normalized_repr_and_factor()[0]
 
-    def __eq__(self, other):
-        if other is None:
-            return False
-        for comp in self.compositions:
-            coeff2 = other.get_coeff(comp) if comp in other._all_comp else 0
-            if abs(self.get_coeff(comp) - coeff2) > self.TOLERANCE:
-                return False
-        return True
-
-    def __hash__(self):
-        # TODO: Fix this
-        return 7
-
     @classmethod
-    def _str_from_formulas(cls, coeffs, formulas):
+    def _str_from_formulas(cls, coeffs, formulas) -> str:
         reactant_str = []
         product_str = []
         for amt, formula in zip(coeffs, formulas):
@@ -216,7 +207,7 @@ class BasicReaction(MSONable):
     __repr__ = __str__
 
     @staticmethod
-    def from_string(rxn_string):
+    def from_string(rxn_string) -> "BasicReaction":
         """
         Generates a balanced reaction from a string. The reaction must
         already be balanced.
@@ -238,19 +229,15 @@ class BasicReaction(MSONable):
                 )
             }
 
-        return Reaction(get_comp_amt(rct_str), get_comp_amt(prod_str))
+        return BasicReaction(get_comp_amt(rct_str), get_comp_amt(prod_str))
 
     @classmethod
-    def balance(cls, reactants: List[Composition], products: List[Composition]):
+    def _balance_coeffs(
+        cls, reactants: List[Composition], products: List[Composition]
+    ) -> np.array:
         """
-        Reactants and products to be specified as list of
-        pymatgen.core.structure.Composition.  e.g., [comp1, comp2]
-
-        Args:
-            reactants ([Composition]): List of reactants.
-            products ([Composition]): List of products.
+        Balances the reaction and returns the new coefficient matrix
         """
-
         compositions = reactants + products
         num_comp = len(compositions)
 
@@ -282,7 +269,6 @@ class BasicReaction(MSONable):
             ]
         )
         best_soln = None
-        balanced = False
 
         for constraints in chain(product_constraints, reactant_constraints):
             n_constr = len(constraints)
@@ -300,7 +286,6 @@ class BasicReaction(MSONable):
             coeffs = np.matmul(np.linalg.pinv(comp_and_constraints), b)
 
             if np.allclose(np.matmul(comp_matrix, coeffs), np.zeros((num_elems, 1))):
-                balanced = True
                 expected_signs = np.array([-1] * len(reactants) + [+1] * len(products))
                 num_errors = np.sum(
                     np.multiply(expected_signs, coeffs.T) < cls.TOLERANCE
@@ -313,7 +298,23 @@ class BasicReaction(MSONable):
                     lowest_num_errors = num_errors
                     best_soln = coeffs
 
-        coeffs = np.squeeze(best_soln)
+        return np.squeeze(best_soln)
+
+    @classmethod
+    def balance(
+        cls, reactants: List[Composition], products: List[Composition]
+    ) -> "BasicReaction":
+        """
+        Reactants and products to be specified as list of
+        pymatgen.core.structure.Composition.  e.g., [comp1, comp2]
+
+        Args:
+            reactants ([Composition]): List of reactants.
+            products ([Composition]): List of products.
+        """
+        compositions = reactants + products
+
+        coeffs = cls._balance_coeffs(reactants, products)
 
         new_reactants = {
             comp: abs(num) for comp, num in zip(compositions, coeffs) if num < 0
@@ -322,6 +323,4 @@ class BasicReaction(MSONable):
             comp: abs(num) for comp, num in zip(compositions, coeffs) if num > 0
         }
 
-        return Reaction(
-            reactants=new_reactants, products=new_products, balanced=balanced
-        )
+        return cls(reactant_coeffs=new_reactants, product_coeffs=new_products)
