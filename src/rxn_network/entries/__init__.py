@@ -11,5 +11,5 @@ def _new_pdentry_hash(self):
 # necessary fix, will be updated in pymatgen in future
 PDEntry.__hash__ = _new_pdentry_hash
 
-from rxn_network.core.entries.gibbs import GibbsComputedEntry
-from rxn_network.core.entries.nist import NISTReferenceEntry
+from rxn_network.entries.gibbs import GibbsComputedEntry
+from rxn_network.entries.nist import NISTReferenceEntry
