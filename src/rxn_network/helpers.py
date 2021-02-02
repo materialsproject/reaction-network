@@ -137,19 +137,17 @@ class BalancedPathway(MSONable):
 
     @cached_property
     def total_cost(self):
-        if self.is_balanced:
-            return sum(
-                [self.multiplicities[r] * self.rxn_dict[r] for r in self.rxn_dict]
-            ) / sum(list(self.multiplicities.values()))
+        return sum(
+            [self.multiplicities[r] * self.rxn_dict[r] for r in self.rxn_dict]
+        ) / sum(list(self.multiplicities.values()))
 
     @cached_property
     def average_cost(self):
-        if self.is_balanced:
-            return (
-                sum([self.multiplicities[r] * self.rxn_dict[r] for r in self.rxn_dict])
-                / sum(list(self.multiplicities.values()))
-                / len(self.rxn_dict)
-            )
+        return (
+            sum([self.multiplicities[r] * self.rxn_dict[r] for r in self.rxn_dict])
+            / sum(list(self.multiplicities.values()))
+            / len(self.rxn_dict)
+        )
 
     @staticmethod
     def _balance_rxns(comp_matrix, net_coeffs, tol=1e-6):
