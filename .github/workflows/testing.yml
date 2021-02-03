@@ -1,0 +1,108 @@
+name: testing
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'docs/CHANGELOG.md'
+
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2.2.1
+      with:
+        python-version: 3.7
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-testing.txt
+
+    - name: Lint with pycodestyle
+      run: |
+        pip install pycodestyle
+        pycodestyle src/rxn_network
+
+    - name: Lint with mypy
+      run: |
+        mypy src/rxn_network
+
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 --count --show-source --statistics src/rxn_network
+        # exit-zero treats all errors as warnings.
+        flake8 --count --exit-zero --max-complexity=20 --statistics src/rxn_network
+
+  test:
+    strategy:
+      max-parallel: 6
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2.2.1
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-testing.txt
+        pip install -r requirements-optional.txt
+
+    - name: Test with pytest
+      run: |
+        pip install -e .
+        pytest
+
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-python@v2.2.1
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-docs.txt
+        pip install -e .
+
+    - name: Build
+      run: mkdocs build
+
+  merge-deps:
+    needs:
+      - lint
+      - test
+      - docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge me!
+        uses: ridedott/merge-me-action@master
+        with:
+          GITHUB_LOGIN: dependabot[bot]
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
