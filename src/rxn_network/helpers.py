@@ -217,14 +217,18 @@ class BalancedPathway(MSONable):
         return {
             "@module": self.__class__.__module__,
             "@class": self.__class__.__name__,
-            "rxn_dict": self.rxn_dict,
-            "net_rxn": self.net_rxn,
+            "rxns": [r.as_dict() for r in self.rxn_dict.keys()],
+            "costs": list(self.rxn_dict.values()),
+            "net_rxn": self.net_rxn.as_dict(),
             "balance": self.balance,
         }
 
     @classmethod
     def from_dict(cls, d):
-        return cls(d["rxn_dict"], d["net_rxn"], d["balance"])
+        rxns = [ComputedReaction.from_dict(r) for r in d["rxns"]]
+        net_rxn = ComputedReaction.from_dict(d["net_rxn"])
+        rxn_dict = dict(zip(rxns, d["costs"]))
+        return cls(rxn_dict, net_rxn, d["balance"])
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
