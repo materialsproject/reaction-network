@@ -12,6 +12,7 @@ from pymatgen.entries.computed_entries import ComputedStructureEntry
 from scipy.interpolate import interp1d
 
 from rxn_network.data import G_COMPOUNDS, G_ELEMS, G_GASES
+from typing import List, Optional
 
 
 def _new_pdentry_hash(self):  # necessary fix, will be updated in pymatgen in future
@@ -41,7 +42,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         parameters: dict = None,
         data: dict = None,
         entry_id: object = None,
-        entry_idx: int = None,
+        entry_idx: int = None
     ):
         """
         Args:
@@ -61,8 +62,15 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
                 with the entry. Defaults to None.
             entry_id: An optional id to uniquely identify the entry.
         """
-        self._structure = structure
-        self.formation_enthalpy = formation_enthalpy
+        super().__init__(
+            structure,
+            energy=formation_enthalpy,
+            correction=correction,
+            energy_adjustments=energy_adjustments,
+            parameters=parameters,
+            data=data,
+            entry_id=entry_id,
+        )
         self.temp = temp
         self.interpolated = False
 
@@ -73,7 +81,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
             self.interpolated = True
 
         if gibbs_model.lower() == "sisso":
-            gibbs_energy = self.gf_sisso()
+            self.gibbs_correction_fn = self.gf_sisso
         else:
             raise ValueError(
                 f"{gibbs_model} not a valid model. Please select from [" f"'SISSO']"
@@ -82,15 +90,26 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         self.gibbs_model = gibbs_model
         self.entry_idx = entry_idx
 
-        super().__init__(
-            structure,
-            energy=gibbs_energy,
-            correction=correction,
-            energy_adjustments=energy_adjustments,
-            parameters=parameters,
-            data=data,
-            entry_id=entry_id,
-        )
+    @property
+    def formation_enthalpy(self) -> float:
+        """
+        :return: the formation enthalpy energy of the entry.
+        """
+        return self._energy
+
+    @property
+    def gibbs_correction(self) -> float:
+        """
+        :return: the formation enthalpy energy of the entry.
+        """
+        return self.gibbs_correction_fn()
+
+    @property
+    def uncorrected_energy(self) -> float:
+        """
+        :return: the *uncorrected* energy of the entry after gibbs correction.
+        """
+        return self.formation_enthalpy + self.gibbs_correction
 
     def gf_sisso(self) -> float:
         """
@@ -108,9 +127,9 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         4168. https://doi.org/10.1038/s41467-018-06682-4
 
         Returns:
-            float: Gibbs free energy of formation (eV)
+            float: the entropic term of the Gibbs free energy of formation (eV)
         """
-        comp = self.structure.composition
+        comp = self.composition
 
         if comp.is_element:
             return self.formation_enthalpy
@@ -137,8 +156,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         reduced_mass = self._reduced_mass()
 
         return (
-            self.formation_enthalpy
-            + num_atoms * self._g_delta_sisso(vol_per_atom, reduced_mass, self.temp)
+            num_atoms * self._g_delta_sisso(vol_per_atom, reduced_mass, self.temp)
             - self._sum_g_i()
         )
 
@@ -150,7 +168,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         Returns:
              float: sum of weighted chemical potentials [eV]
         """
-        elems = self.structure.composition.get_el_amt_dict()
+        elems = self.composition.get_el_amt_dict()
 
         if self.interpolated:
             sum_g_i = 0
@@ -174,7 +192,7 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         Returns:
             float: reduced mass (amu)
         """
-        reduced_comp = self.structure.composition.reduced_composition
+        reduced_comp = self.composition.reduced_composition
         num_elems = len(reduced_comp.elements)
         elem_dict = reduced_comp.get_el_amt_dict()
 
@@ -219,7 +237,9 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
         )
 
     @classmethod
-    def from_pd(cls, pd, temp=300, gibbs_model="SISSO"):
+    def from_pd(
+        cls, pd, temp=300, gibbs_model="SISSO"
+    ) -> List["GibbsComputedStructureEntry"]:
         """
         Constructor method for initializing a list of GibbsComputedStructureEntry
         objects from an existing T = 0 K phase diagram composed of
@@ -254,11 +274,12 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
                         entry_id=entry.entry_id,
                     )
                 )
-
         return gibbs_entries
 
     @classmethod
-    def from_entries(cls, entries, temp=300, gibbs_model="SISSO"):
+    def from_entries(
+        cls, entries, temp=300, gibbs_model="SISSO"
+    ) -> List["GibbsComputedStructureEntry"]:
         """
         Constructor method for initializing GibbsComputedStructureEntry objects from
         T = 0 K ComputedStructureEntry objects, as acquired from a thermochemical
@@ -275,22 +296,16 @@ class GibbsComputedStructureEntry(ComputedStructureEntry):
                 entries with inclusion of Gibbs free energy of formation at the
                 specified temperature.
         """
+        from pymatgen.analysis.phase_diagram import PhaseDiagram
 
         pd = PhaseDiagram(entries)
         return cls.from_pd(pd, temp, gibbs_model)
-
-    def to_pd_entry(self):
-        data = {"entry_id": self.entry_id, "entry_idx": None}
-        data.update(self.data)
-        return PDEntry(self.composition, self.energy, self.name, data)
 
     def as_dict(self) -> dict:
         """
         :return: MSONAble dict.
         """
         d = super().as_dict()
-        d["@module"] = self.__class__.__module__
-        d["@class"] = self.__class__.__name__
         d["formation_enthalpy"] = self.formation_enthalpy
         d["temp"] = self.temp
         d["gibbs_model"] = self.gibbs_model

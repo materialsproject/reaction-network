@@ -6,21 +6,28 @@ Reaction network (rxn-network) is a Python package for predicting chemical react
 
 The rxn-network package has several software dependencies (listed in *requirements.txt*), most of which can be installed in less than a minute through PyPI. Note that graph-tool must be installed through a more customized method; please see https://graph-tool.skewed.de/ for more details, particularly if using a Windows based machine. 
 
-Hence we recommend the following installation procedure which first creates a new conda environment:
+Hence we recommend the following installation procedure. First create a new conda 
+environment named *gt* and activate it:
 
     conda create -n gt python=3.8
+    conda activate gt
 
-And then installs graph-tool through conda-forge:
+And then install graph-tool through conda-forge (this may take 1-2 minutes):
 
     conda install -c conda-forge graph-tool
 
-Then simply download (clone) the reaction-network code from this repository, navigate to its directory in terminal, and then run the following commands to install the requirements and an (editable) version of the package:
+Then simply download (clone) the reaction-network code from this repository, navigate to its directory in terminal, and run the following commands to install the requirements and an (editable) version of the package:
 
     pip install -r requirements.txt
     pip install -e .
 
 # Demo
-A demo Jupyter notebook (demo.ipynb) contains the instructions necessary to replicate the results of the paper and is a good starting template for using the rxn-network package on your own systems.
+A demo Jupyter notebook (demo.ipynb) contains the instructions necessary to 
+replicate the results of the paper and is a good starting template for using the 
+rxn-network package on your own systems. Simply start a Jupyter notebook server and 
+launch the notebook file:
+
+    jupyter notebook
 
 # How to cite rxn-network
 

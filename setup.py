@@ -27,12 +27,6 @@ setup(
     include_package_data=True,
     install_requires=[
         "setuptools",
-        "monty>=1.0.2",
-        "numba>=0.50.1"
-        "numpy>=1.18.4"
-        "pymatgen>=2020.4.29"
-        "scipy>=1.4.1"
-        "tqdm>=4.46.0",
     ],
     extra_requires={"demo": ["jupyter>=1.0.0"]},
     classifiers=[
