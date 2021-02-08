@@ -13,13 +13,13 @@ from numba import njit, prange
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.core.composition import Composition
 from pymatgen.core.structure import Structure
-from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.entries.computed_entries import ComputedEntry, GibbsComputedStructureEntry
 from pymatgen.entries.entry_tools import EntrySet
 from scipy.special import comb
 from tqdm import tqdm
 
 from rxn_network.analysis import PathwayAnalysis
-from rxn_network.entries import GibbsComputedStructureEntry, PDEntry, RxnEntries
+from rxn_network.entries import PDEntry, RxnEntries
 from rxn_network.helpers import (
     BalancedPathway,
     RxnPathway,
@@ -42,7 +42,6 @@ __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2020, Matthew McDermott"
 __version__ = "0.2"
 __email__ = "mcdermott@lbl.gov"
-__date__ = "December 20, 2020"
 
 
 class ReactionNetwork:
