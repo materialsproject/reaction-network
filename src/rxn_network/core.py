@@ -86,9 +86,9 @@ class Enumerator(MSONable, metaclass=ABCMeta):
 class Pathway(MSONable, metaclass=ABCMeta):
     " Base definition for a reaction pathway "
 
-
     @abstractproperty
     def reactions(self) -> List[Reaction]:
+        " List of reactions in this Pathway "
 
     @property
     def energy(self):
@@ -98,8 +98,6 @@ class Pathway(MSONable, metaclass=ABCMeta):
     def energy_per_atom(self):
         " Total energy per atom of this reaction pathway"
         return sum([rxn.energy_per_atom for rxn in self.reactions])
-   
-
 
 
 class ReactionNetwork(MSONable, metaclass=ABCMeta):
