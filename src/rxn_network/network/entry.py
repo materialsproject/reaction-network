@@ -1,13 +1,9 @@
-from typing import List
+" Basic Entry to hold multiple entries for the network book keeping "
 from enum import Enum, auto
+from typing import List
 
-import numpy as np
 from monty.json import MSONable
-from pymatgen.analysis.phase_diagram import PDEntry, PhaseDiagram
-from pymatgen.core.composition import Composition
-from pymatgen.core.structure import Structure
 from pymatgen.entries import Entry
-from scipy.interpolate import interp1d
 
 
 class NetworkEntryType(Enum):
@@ -54,8 +50,7 @@ class NetworkEntry(MSONable):
             if self.description == other.description:
                 if self.chemsys == other.chemsys:
                     return self.entries == other.entries
-        else:
-            return False
+        return False
 
     def __hash__(self):
         return hash((self.description, frozenset(self.entries)))
@@ -64,20 +59,22 @@ class NetworkEntry(MSONable):
 class DummyEntry(NetworkEntry):
     " A Dummy Entry that doesn't hold any info "
 
-    def __init__(self):
+    def __init__(self):  # pylint: disable=W0231
         " Dummy node doesn't need any parameters "
-        pass
 
     @property
     def entries(self):
+        " No entries in DummyEntry "
         return []
 
     @property
     def chemsys(self):
+        " No Chemsys to DummyEntry "
         return ""
 
     @property
     def description(self):
+        " DummyEntry is always of type Dummy "
         return NetworkEntryType.Dummy
 
     def __repr__(self):

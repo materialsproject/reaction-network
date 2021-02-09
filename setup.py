@@ -9,7 +9,7 @@ module_dir = Path(__file__).resolve().parent
 
 with open(module_dir / "README.md") as f:
     long_desc = f.read()
-    
+
 setup(
     name="reaction-network",
     use_scm_version=True,
@@ -45,7 +45,7 @@ setup(
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Scientific/Engineering :: Physics",
         "Topic :: Scientific/Engineering :: Chemistry",
-        "Topic :: Software Development :: Libraries :: Python Modules"
+        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     tests_require=["pytest"],
     python_requires=">=3.6",

@@ -10,4 +10,3 @@ dependencies:
     - pymatgen==2020.4.29
     - scipy==1.4.1
     - tqdm==4.46.0
-

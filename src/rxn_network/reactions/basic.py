@@ -4,7 +4,6 @@ This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.
 """
 
-import logging
 import re
 from functools import cached_property
 from itertools import chain, combinations
@@ -12,8 +11,8 @@ from typing import Dict, List, Optional
 
 import numpy as np
 from monty.fractions import gcd_float
-from monty.json import MontyDecoder, MSONable
 from pymatgen.core.composition import Composition, Element
+
 from rxn_network.core import Reaction
 
 
@@ -72,7 +71,7 @@ class BasicReaction(Reaction):
         return list(self.product_coeffs.keys())
 
     @cached_property
-    def coefficients(self) -> np.array:
+    def coefficients(self) -> np.array:  # pylint: disable = W0236
         """
         Coefficients of the reaction
         """

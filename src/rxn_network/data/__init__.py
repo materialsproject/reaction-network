@@ -1,4 +1,6 @@
+" Auxillary data for RXN Network "
 from pathlib import Path
+
 from monty.serialization import loadfn
 
 cwd = Path(__file__).parent.resolve()

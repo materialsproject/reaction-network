@@ -1,11 +1,12 @@
+" Specialized Entry to compute gibbs free Energy using the formalism of Bartel et al. 2018"
 import hashlib
 from itertools import combinations
-from typing import Optional, List
+from typing import List, Optional
+
 import numpy as np
 from monty.json import MontyDecoder
 from pymatgen.core.composition import Composition
-from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
+from pymatgen.entries.computed_entries import ComputedEntry, ConstantEnergyAdjustment
 from scipy.interpolate import interp1d
 
 from rxn_network.data import G_ELEMS
@@ -53,7 +54,8 @@ class GibbsComputedEntry(ComputedEntry):
             ConstantEnergyAdjustment(
                 self.gf_sisso(),
                 name="Gibbs SISSO Correction",
-                description=f"Correction from the SISSO description of G^delta by Bartel et al at T={self.temperature}K",
+                description="Correction from the SISSO description of G^delta by Bartel et al at"
+                f"T={self.temperature}K",
             )
         )
 
@@ -61,6 +63,7 @@ class GibbsComputedEntry(ComputedEntry):
 
     @property
     def temperature(self):
+        " The temperature for the entry "
         return self._temperature
 
     # Matt: Add function to yield new entry at a different temperature
@@ -173,10 +176,10 @@ class GibbsComputedEntry(ComputedEntry):
         """
         :return: MSONAble dict.
         """
-        d = super().as_dict()
-        d["volume_per_atom"] = self.volume_per_atom
-        d["temperature"] = self.temperature
-        return d
+        data = super().as_dict()
+        data["volume_per_atom"] = self.volume_per_atom
+        data["temperature"] = self.temperature
+        return data
 
     @classmethod
     def from_dict(cls, d) -> "GibbsComputedEntry":

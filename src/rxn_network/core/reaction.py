@@ -1,11 +1,10 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
-from functools import cached_property
+" Basic interface for a Reaction"
+from abc import ABCMeta, abstractproperty
 from typing import List
 
 import numpy as np
 from monty.json import MSONable
 from pymatgen.core.composition import Composition, Element
-from pymatgen.entries import Entry
 
 
 class Reaction(MSONable, metaclass=ABCMeta):

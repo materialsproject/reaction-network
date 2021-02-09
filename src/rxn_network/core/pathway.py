@@ -1,11 +1,8 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
-from functools import cached_property
+" Basic interface for a reaction Pathway "
+from abc import ABCMeta, abstractproperty
 from typing import List
 
-import numpy as np
 from monty.json import MSONable
-from pymatgen.core.composition import Composition, Element
-from pymatgen.entries import Entry
 
 from rxn_network.core.reaction import Reaction
 
@@ -19,6 +16,7 @@ class Pathway(MSONable, metaclass=ABCMeta):
 
     @property
     def entries(self):
+        " Entry objects in this Pathway "
         return {entry for rxn in self.reactions for entry in rxn.entries}
 
     @property
@@ -43,10 +41,12 @@ class Pathway(MSONable, metaclass=ABCMeta):
 
     @property
     def intermediates(self):
+        " Intermediates as entries in this reaction pathway "
         return self.all_products & self.all_reactants
 
     @property
     def energy(self):
+        " Total energy of this reaction pathway "
         return sum([rxn.energy for rxn in self.reactions])
 
     @property

@@ -1,9 +1,11 @@
+" A ComputedReaction class to generate from ComputedEntry objects "
+from typing import List
+
 import numpy as np
-from typing import List, Optional
 from pymatgen.entries import Entry
-from rxn_network.reactions.basic import BasicReaction
 from uncertainties import ufloat
-from monty.json import MontyDecoder, MontyEncoder
+
+from rxn_network.reactions.basic import BasicReaction
 
 
 class ComputedReaction(BasicReaction):
@@ -100,7 +102,9 @@ class ComputedReaction(BasicReaction):
         )
 
     @classmethod
-    def balance(cls, reactant_entries: List[Entry], product_entries: List[Entry]):
+    def balance(
+        cls, reactant_entries: List[Entry], product_entries: List[Entry]
+    ):  # pylint: disable = W0221
         """
         Balances and returns a new ComputedReaction
 

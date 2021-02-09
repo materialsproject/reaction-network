@@ -1,15 +1,9 @@
+" Implements an Entry that looks up NIST pre-tabulated Gibbs free energies "
 import hashlib
-import json
-import os
-from itertools import chain, combinations
-from typing import Optional, List
-import numpy as np
-from monty.json import MontyDecoder, MontyEncoder, MSONable
-from pymatgen.entries import Entry
+
+from monty.json import MontyDecoder
 from pymatgen.core.composition import Composition
-from pymatgen.core.structure import Structure
-from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
+from pymatgen.entries import Entry
 from scipy.interpolate import interp1d
 
 from rxn_network.data import G_COMPOUNDS, G_GASES
@@ -61,9 +55,9 @@ class NISTReferenceEntry(Entry):
         """
         :return: MSONAble dict.
         """
-        d = super().as_dict()
-        d["temperature"] = self.temperature
-        return d
+        data = super().as_dict()
+        data["temperature"] = self.temperature
+        return data
 
     @classmethod
     def from_dict(cls, d) -> "NISTReferenceEntry":
