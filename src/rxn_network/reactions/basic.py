@@ -42,15 +42,18 @@ class BasicReaction(Reaction):
         self.reactant_coeffs = reactant_coeffs
         self.product_coeffs = product_coeffs
 
+        if not reactant_coeffs or not product_coeffs:
+            balanced=False
+
         if balanced is not None:
             self.balanced = balanced
         else:
             # sum reactants and products
             all_reactants = sum(
-                [k * v for k, v in reactant_coeffs.items()], Composition({})
+                [k * abs(v) for k, v in reactant_coeffs.items()], Composition({})
             )
             all_products = sum(
-                [k * v for k, v in product_coeffs.items()], Composition({})
+                [k * abs(v) for k, v in product_coeffs.items()], Composition({})
             )
 
             if not all_reactants.almost_equals(
@@ -313,7 +316,7 @@ class BasicReaction(Reaction):
         """
         compositions = reactants + products
 
-        coeffs = cls._balance_coeffs(reactants, products)
+        coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)
 
         new_reactants = {
             comp: abs(num) for comp, num in zip(compositions, coeffs) if num < 0

@@ -12,7 +12,7 @@ class ComputedReaction(BasicReaction):
     """
     Convenience class to generate a reaction from ComputedEntry objects, with
     some additional attributes, such as a reaction energy based on computed
-    energies. Will balance the reaction
+    energies. Will balance the reaction.
     """
 
     def __init__(
@@ -20,6 +20,7 @@ class ComputedReaction(BasicReaction):
         reactant_entries: List[Entry],
         product_entries: List[Entry],
         coefficients: np.array,
+        **kwargs
     ):
         """
         Args:
@@ -30,20 +31,24 @@ class ComputedReaction(BasicReaction):
         self.product_entries = product_entries
         self.coefficients = coefficients
 
+        self.lowest_num_errors = kwargs.get("lowest_num_errors", None)
+
         all_entries = reactant_entries + product_entries
 
-        # Matt: why do you reduce the composition here? Does it affect the balancing?
-        reactant_coeffs = {
-            e.composition.reduced_composition()
-            for e, c in zip(all_entries, coefficients)
-            if c < 0
-        }
+        reactant_coeffs = None
+        product_coeffs = None
 
-        product_coeffs = {
-            e.composition.reduced_composition()
-            for e, c in zip(all_entries, coefficients)
-            if c > 0
-        }
+        if coefficients.any():
+            reactant_coeffs = {
+                e.composition.reduced_composition: c
+                for e, c in zip(all_entries, coefficients)
+                if c < 0
+            }
+            product_coeffs = {
+                e.composition.reduced_composition: c
+                for e, c in zip(all_entries, coefficients)
+                if c > 0
+            }
 
         super().__init__(reactant_coeffs, product_coeffs)
 
@@ -116,13 +121,14 @@ class ComputedReaction(BasicReaction):
             products ([Composition]): List of products.
         """
 
-        reactant_comps = {e.composition.reduced_composition() for e in reactant_entries}
-
-        product_comps = {e.composition.reduced_composition() for e in product_entries}
-        coefficients = cls._balance_coeffs(reactant_comps, product_comps)
+        reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
+        product_comps = [e.composition.reduced_composition for e in product_entries]
+        coefficients, lowest_num_errors = cls._balance_coeffs(reactant_comps,
+                                                           product_comps)
 
         return cls(
             reactant_entries=reactant_entries,
             product_entries=product_entries,
             coefficients=coefficients,
+            lowest_num_errors=lowest_num_errors
         )
