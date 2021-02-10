@@ -1,44 +1,32 @@
 from typing import List
 from itertools import chain, combinations, compress, groupby, product
+from math import comb
+from more_itertools import powerset
+import numpy as np
 from rxn_network.core import Enumerator, Reaction
+from rxn_network.reactions import ComputedReaction
+from rxn_network.enumerators.utils import get_entry_combinations, get_total_chemsys, group_by_chemsys
 
 
 class BasicEnumerator(Enumerator):
-    def __init__(self, entries, n=2):
-        self.entries = entries
+    def __init__(self, n=2):
         self.n = n
-        self.combos = combinations(entries, n)
 
-    def enumerate(self, entries) -> List[Reaction]:
-        edges = []
-        for combo in combos:
-            phases = entry.entries
-            other_phases = other_entry.entries
+    def enumerate(self, entries, remove_unbalanced=True) -> List[Reaction]:
+        combos = get_entry_combinations(entries, self.n)
+        combo_dict = group_by_chemsys(combos)
 
-            if other_phases == phases:
-                continue  # do not consider identity-like reactions (e.g. A + B -> A
-                # + B)
+        rxns = []
+        for chemsys, selected_combos in combo_dict.items():
+            for reactants, products in combinations(selected_combos, 2):
+                forward_rxn = ComputedReaction(reactants, products)
+                backward_rxn = ComputedReaction(products, reactants)
+                rxns.append(forward_rxn)
+                rxns.append(backward_rxn)
+        if remove_unbalanced:
+            rxns = [r for r in rxns if r.balanced]
 
-            rxn = ComputedReaction(
-                list(phases), list(other_phases), num_entries=num_entries
-            )
-            if not rxn._balanced:
-                continue
+        return rxns
 
-            if rxn._lowest_num_errors != 0:
-                continue  # remove reaction which has components that
-                # change sides or disappear
-
-            total_num_atoms = sum(
-                [rxn.get_el_amount(elem) for elem in rxn.elements])
-            rxn_energy = rxn.calculated_reaction_energy / total_num_atoms
-
-            if rxn_e_filter and rxn_energy > rxn_e_filter:
-                continue
-
-            weight = get_rxn_cost(
-                rxn, cost_function=cost_function, temp=temp, max_mu_diff=None
-            )
-            edges.append([v, other_v, weight, rxn, True, False])
-
-        return edges
+    def estimate_num_reactions(self, entries) -> int:
+        return sum([comb(len(entries), i) for i in range(self.n)])**2

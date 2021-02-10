@@ -289,7 +289,7 @@ class CombinedPathway(BalancedPathway):
         return path_info
 
 
-def generate_all_combos(entries, max_num_combos):
+def powerset(entries, max_num_combos):
     """
     Helper static method for generating combination sets ranging from singular
     length to maximum length specified by max_num_combos.
@@ -415,7 +415,7 @@ def find_interdependent_rxns(path, precursors, verbose=True):
     if num_rxns == 1:
         return False, None
 
-    for combo in generate_all_combos(rxns, num_rxns):
+    for combo in powerset(rxns, num_rxns):
         size = len(combo)
         if any([set(rxn.reactants).issubset(precursors) for rxn in combo]) or size == 1:
             continue

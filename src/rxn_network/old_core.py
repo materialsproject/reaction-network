@@ -26,7 +26,7 @@ from rxn_network.helpers import (
     expand_pd,
     find_interdependent_rxns,
     find_rxn_edges,
-    generate_all_combos,
+    powerset,
     get_rxn_cost,
     grouper,
     react_interface,
@@ -169,7 +169,7 @@ class ReactionNetwork:
 
         self._all_entry_combos = [
             set(combo)
-            for combo in generate_all_combos(
+            for combo in powerset(
                 self._filtered_entries, self._max_num_phases
             )
         ]
@@ -214,9 +214,9 @@ class ReactionNetwork:
             edge_list.append([v, target_v, 0, None, True, False])
 
         if complex_loopback:
-            combos = generate_all_combos(phases.union(precursors), max_num_phases)
+            combos = powerset(phases.union(precursors), max_num_phases)
         else:
-            combos = generate_all_combos(phases, max_num_phases)
+            combos = powerset(phases, max_num_phases)
 
         if complex_loopback:
             for c in combos:
@@ -478,7 +478,7 @@ class ReactionNetwork:
 
     def find_intermediate_rxns(self, intermediates, targets, chempots=None):
         all_rxns = set()
-        combos = list(generate_all_combos(intermediates, 2))
+        combos = list(powerset(intermediates, 2))
         for entries in tqdm(combos):
             n = len(entries)
             r1 = entries[0].composition.reduced_composition
@@ -700,8 +700,8 @@ class ReactionNetwork:
 
     def find_crossover_rxns(self, intermediates, targets):
         all_crossover_rxns = dict()
-        for reactants_combo in generate_all_combos(intermediates, self._max_num_phases):
-            for products_combo in generate_all_combos(targets, self._max_num_phases):
+        for reactants_combo in powerset(intermediates, self._max_num_phases):
+            for products_combo in powerset(targets, self._max_num_phases):
                 try:
                     rxn = ComputedReaction(
                         list(reactants_combo),
@@ -776,11 +776,11 @@ class ReactionNetwork:
             phases = g.vp["entries"][v].entries
 
             if complex_loopback:
-                combos = generate_all_combos(
+                combos = powerset(
                     phases.union(self._precursors), self._max_num_phases
                 )
             else:
-                combos = generate_all_combos(phases, self._max_num_phases)
+                combos = powerset(phases, self._max_num_phases)
 
             for c in combos:
                 combo_phases = set(c)

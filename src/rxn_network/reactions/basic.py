@@ -232,7 +232,7 @@ class BasicReaction(Reaction):
 
     @classmethod
     def _balance_coeffs(
-        cls, reactants: List[Composition], products: List[Composition]
+        cls, reactants: List[Composition], products: List[Composition], robust=True
     ) -> np.array:
         """
         Balances the reaction and returns the new coefficient matrix
@@ -297,7 +297,7 @@ class BasicReaction(Reaction):
                     lowest_num_errors = num_errors
                     best_soln = coeffs
 
-        return np.squeeze(best_soln)
+        return np.squeeze(best_soln), lowest_num_errors
 
     @classmethod
     def balance(
