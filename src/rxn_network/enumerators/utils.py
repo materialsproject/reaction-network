@@ -5,17 +5,17 @@ from rxn_network.utils import limited_powerset
 from rxn_network.reactions.computed import ComputedReaction
 
 
-def get_total_chemsys(entries):
-    elements = sorted(
-        list({elem for entry in entries for elem in entry.composition.elements})
-    )
-    return "-".join([str(e) for e in elements])
+def get_total_chemsys(entries, open_elem=None):
+    elements = {elem for entry in entries for elem in entry.composition.elements}
+    if open_elem:
+        elements.add(open_elem)
+    return "-".join(sorted([str(e) for e in elements]))
 
 
-def group_by_chemsys(combos):
+def group_by_chemsys(combos, open_elem=None):
     combo_dict = {}
     for combo in combos:
-        key = get_total_chemsys(combo)
+        key = get_total_chemsys(combo, open_elem)
         if key in combo_dict:
             combo_dict[key].append(combo)
         else:

@@ -2,6 +2,7 @@ from typing import List
 from itertools import chain, combinations, compress, groupby, product
 from math import comb
 import numpy as np
+from pymatgen import Element
 from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDiagram
 from pymatgen.analysis.interface_reactions import InterfacialReactivity
 
@@ -18,10 +19,9 @@ from rxn_network.enumerators.utils import (
 
 class MinimizeGibbsEnumerator(Enumerator):
     """
-    Enumerator for finding all reactions between two reactants (+ optional open
-    element) that are predicted by thermodynamics, i.e., they appear when taking the
-    convex hull along a straight line connecting any two phases in G-x
-    phase space.
+    Enumerator for finding all reactions between two reactants that are predicted by
+    thermodynamics; i.e., they appear when taking the convex hull along a straight
+    line connecting any two phases in G-x phase space. Identity reactions are excluded.
     """
 
     def __init__(self):
@@ -69,19 +69,49 @@ class MinimizeGibbsEnumerator(Enumerator):
             )
 
         entries = pd.all_entries
-        rxns = [
-            get_computed_rxn(rxn, entries)
-            for _, _, _, rxn, _ in interface.get_kinks()
-        ]
+
+        rxns = []
+        for _, _, _, rxn, _ in interface.get_kinks():
+            rxn = get_computed_rxn(rxn, entries)
+            if rxn.is_identity:
+                continue
+            rxns.append(rxn)
 
         return rxns
 
 
-class MinimizeOpenGibbsEnumerator(MinimizeGibbsEnumerator):
-    def __init__(self, open_entries):
-        super().__init__()
-        self.open_entries = open_entries
+class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
+    """
+    Enumerator for finding all reactions between two reactants and an open element
+    that are predicted by thermodynamics; i.e., they appear when taking the
+    convex hull along a straight line connecting any two phases in Phi-x
+    phase space. Identity reactions are excluded.
+    """
 
-    def enumerate(self):
-        pass
+    def __init__(self, open_elem, chempot):
+        super().__init__()
+        self.open_elem = Element(open_elem)
+        self.chempot = chempot
+
+    def enumerate(self, entries):
+        open_entry = sorted(filter(lambda e: e.composition.elements == [
+            self.open_elem], entries), key=lambda e: e.energy_per_atom)[0]
+        entries_no_open = entries.copy()
+        entries_no_open.remove(open_entry)
+        combos = list(combinations(entries_no_open, 2))
+        combos_dict = group_by_chemsys(combos, self.open_elem)
+
+        rxns = []
+        for chemsys, combos in combos_dict.items():
+            chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
+            pd = PhaseDiagram(chemsys_entries)
+            grand_pd = GrandPotentialPhaseDiagram(entries, {self.open_elem:
+                                                                self.chempot})
+            for e1, e2 in combos:
+                predicted_rxns = self._react_interface(e1.composition, e2.composition,
+                                                      pd, grand_pd)
+                rxns.extend(predicted_rxns)
+
+        return rxns
+
 

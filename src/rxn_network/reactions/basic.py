@@ -91,7 +91,7 @@ class BasicReaction(Reaction):
     def is_identity(self):
         if set(self.reactants) != set(self.products):
             return False
-        if self.balanced == False:
+        if self.balanced == False:  # if not balanced, can not check coefficients
             return True
         return all([np.isclose(self.reactant_coeffs[c]*-1, self.product_coeffs[c]) for
                     c in self.reactant_coeffs])
