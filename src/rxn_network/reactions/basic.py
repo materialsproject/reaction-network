@@ -79,13 +79,22 @@ class BasicReaction(Reaction):
         Coefficients of the reaction
         """
         return np.concatenate(
-            np.array(self.reactant_coeffs.values()) * -1
+            np.array(self.reactant_coeffs.values())
             + np.array(self.product_coeffs.values)
         )
 
     @property
     def energy(self) -> float:
         raise ValueError("No energy for a basic reaction")
+
+    @property
+    def is_identity(self):
+        if set(self.reactants) != set(self.products):
+            return False
+        if self.balanced == False:
+            return True
+        return all([np.isclose(self.reactant_coeffs[c]*-1, self.product_coeffs[c]) for
+                    c in self.reactant_coeffs])
 
     def copy(self) -> "BasicReaction":
         """
@@ -225,8 +234,6 @@ class BasicReaction(Reaction):
         return self._str_from_comp(self.coefficients, self.compositions)[0]
 
     __repr__ = __str__
-
-
 
     @staticmethod
     def from_string(rxn_string) -> "BasicReaction":
