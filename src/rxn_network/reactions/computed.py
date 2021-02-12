@@ -27,13 +27,13 @@ class ComputedReaction(BasicReaction):
             reactant_entries ([ComputedEntry]): List of reactant_entries.
             product_entries ([ComputedEntry]): List of product_entries.
         """
-        self.reactant_entries = reactant_entries
-        self.product_entries = product_entries
+        self.reactant_entries = list(reactant_entries)
+        self.product_entries = list(product_entries)
         self.coefficients = coefficients
 
         self.lowest_num_errors = kwargs.get("lowest_num_errors", None)
 
-        all_entries = reactant_entries + product_entries
+        all_entries = self.reactant_entries + self.product_entries
 
         reactant_coeffs = None
         product_coeffs = None

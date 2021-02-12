@@ -203,10 +203,30 @@ class BasicReaction(Reaction):
             factor = 1
         return cls._str_from_formulas(r_coeffs, r_formulas), factor
 
+    # def __eq__(self, other):
+    #     if self is other:
+    #         return True
+    #     for comp in self.compositions:
+    #         coeff2 = other.get_coeff(comp) if comp in other.compositions else 0
+    #         if abs(self.get_coeff(comp) - coeff2) > self.TOLERANCE:
+    #             return False
+    #     return True
+
+    def __eq__(self, other):
+        if self is other:
+            return True
+        else:
+            return str(self) == str(other)
+
+    def __hash__(self):
+        return hash(str(self))
+
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]
 
     __repr__ = __str__
+
+
 
     @staticmethod
     def from_string(rxn_string) -> "BasicReaction":

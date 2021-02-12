@@ -1,8 +1,6 @@
+from itertools import permutations
 from rxn_network.utils import limited_powerset
 from rxn_network.reactions.computed import ComputedReaction
-
-def get_entry_combinations(entries, max_size=2):
-    return list(limited_powerset(entries, max_size))
 
 def get_total_chemsys(entries):
     elements = sorted(list({elem for entry in entries for elem in
