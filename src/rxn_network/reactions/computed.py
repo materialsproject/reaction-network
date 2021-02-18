@@ -41,12 +41,12 @@ class ComputedReaction(BasicReaction):
 
         if coefficients.any():
             reactant_coeffs = {
-                e.composition.reduced_composition: c
+                e.composition: c
                 for e, c in zip(all_entries, coefficients)
                 if c < 0
             }
             product_coeffs = {
-                e.composition.reduced_composition: c
+                e.composition: c
                 for e, c in zip(all_entries, coefficients)
                 if c > 0
             }

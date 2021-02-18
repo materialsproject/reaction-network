@@ -57,38 +57,37 @@ def get_entry_by_comp(comp, entries):
     return sorted(possible_entries, key=lambda e: e.energy_per_atom)[0]
 
 
+def get_entries_and_coeffs(comps, coeffs, entries):
+    found_entries = []
+    new_coeffs = []
+    for c, coeff in zip(comps, coeffs):
+        if np.isclose(coeff, 0):
+            continue
+        entry = get_entry_by_comp(c, entries)
+
+        ratio = c.get_reduced_composition_and_factor()[1] / \
+            entry.composition.get_reduced_composition_and_factor()[1]
+
+        found_entries.append(entry)
+        new_coeffs.append(coeff * ratio)
+    return found_entries, new_coeffs
+
+
 def get_computed_rxn(rxn, entries):
     rxn_coeffs = np.array(rxn.coeffs)
     reactant_coeffs = rxn_coeffs[rxn_coeffs < 0]
     product_coeffs = rxn_coeffs[rxn_coeffs > 0]
 
-    reactant_entries = []
-    product_entries  = []
-    coefficients = []
+    reactant_entries, reactant_new_coeffs = get_entries_and_coeffs(rxn.reactants,
+                                                                reactant_coeffs,
+                                                                entries)
 
-    for r, coeff in zip(rxn.reactants, reactant_coeffs):
-        if np.isclose(coeff, 0):
-            continue
-        entry = get_entry_by_comp(r, entries)
+    product_entries, product_new_coeffs = get_entries_and_coeffs(rxn.products,
+                                                               product_coeffs, entries)
 
-        ratio = r.get_reduced_composition_and_factor()[1] / \
-                 entry.composition.get_reduced_composition_and_factor()[1]
+    new_coeffs = np.array(reactant_new_coeffs + product_new_coeffs)
 
-        reactant_entries.append(entry)
-        coefficients.append(coeff * ratio)
-
-    for p, coeff in zip(rxn.products, product_coeffs):
-        if np.isclose(coeff, 0):
-            continue
-        entry = get_entry_by_comp(p, entries)
-
-        ratio = p.get_reduced_composition_and_factor()[1] / \
-            entry.composition.get_reduced_composition_and_factor()[1]
-
-        product_entries.append(entry)
-        coefficients.append(coeff * ratio)
-
-    rxn = ComputedReaction(reactant_entries, product_entries, np.array(coefficients))
+    rxn = ComputedReaction(reactant_entries, product_entries, new_coeffs)
     return rxn
 
 
@@ -96,40 +95,16 @@ def get_open_computed_rxn(rxn, entries, open_entry, chempots):
     rxn_coeffs = np.array(rxn.coeffs)
     reactant_coeffs = rxn_coeffs[rxn_coeffs < 0]
     product_coeffs = rxn_coeffs[rxn_coeffs > 0]
-    open_comp = open_entry.composition.reduced_composition
 
-    reactant_entries = []
-    product_entries  = []
-    coefficients = []
+    reactant_entries, reactant_new_coeffs = get_entries_and_coeffs(rxn.reactants,
+                                                                reactant_coeffs,
+                                                                entries)
 
-    for r, coeff in zip(rxn.reactants, reactant_coeffs):
-        if np.isclose(coeff, 0):
-            continue
-        if r.reduced_composition == open_comp:
-            entry = open_entry
-        else:
-            entry = get_entry_by_comp(r, entries)
+    product_entries, product_new_coeffs = get_entries_and_coeffs(rxn.products,
+                                                               product_coeffs, entries)
 
-        ratio = r.get_reduced_composition_and_factor()[1] / \
-                 entry.composition.get_reduced_composition_and_factor()[1]
+    new_coeffs = np.array(reactant_new_coeffs + product_new_coeffs)
 
-        reactant_entries.append(entry)
-        coefficients.append(coeff * ratio)
+    rxn = OpenComputedReaction(reactant_entries, product_entries, new_coeffs, chempots)
 
-    for p, coeff in zip(rxn.products, product_coeffs):
-        if np.isclose(coeff, 0):
-            continue
-        if p.reduced_composition == open_comp:
-            entry = open_entry
-        else:
-            entry = get_entry_by_comp(p, entries)
-
-        ratio = p.get_reduced_composition_and_factor()[1] / \
-            entry.composition.get_reduced_composition_and_factor()[1]
-
-        product_entries.append(entry)
-        coefficients.append(coeff * ratio)
-
-    rxn = OpenComputedReaction(reactant_entries, product_entries, np.array(
-        coefficients), chempots)
     return rxn

@@ -81,7 +81,7 @@ class MinimizeGibbsEnumerator(Enumerator):
 
             if rxn.is_identity:
                 continue
-            rxns.append(rxn)
+            rxns.append(rxn.normalize_to(rxn.products[0]))
 
         return rxns
 
