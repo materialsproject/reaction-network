@@ -13,7 +13,8 @@ from rxn_network.enumerators.utils import (
     group_by_chemsys,
     filter_entries_by_chemsys,
     get_entry_by_comp,
-    get_computed_rxn
+    get_computed_rxn,
+    get_open_computed_rxn
 )
 
 
@@ -46,7 +47,7 @@ class MinimizeGibbsEnumerator(Enumerator):
         return comb(len(entries), 2)
 
     @staticmethod
-    def _react_interface(r1, r2, pd, grand_pd=None):
+    def _react_interface(r1, r2, pd, grand_pd=None, open_entry=None):
         if grand_pd:
             interface = InterfacialReactivity(
                 r1,
@@ -57,6 +58,9 @@ class MinimizeGibbsEnumerator(Enumerator):
                 pd_non_grand=pd,
                 use_hull_energy=True,
             )
+            use_original_comps = True
+            chempots = grand_pd.chempots
+
         else:
             interface = InterfacialReactivity(
                 r1,
@@ -68,11 +72,13 @@ class MinimizeGibbsEnumerator(Enumerator):
                 use_hull_energy=True,
             )
 
-        entries = pd.all_entries
-
         rxns = []
         for _, _, _, rxn, _ in interface.get_kinks():
-            rxn = get_computed_rxn(rxn, entries)
+            if grand_pd:
+                rxn = get_open_computed_rxn(rxn, pd.all_entries, open_entry, chempots)
+            else:
+                rxn = get_computed_rxn(rxn, pd.all_entries)
+
             if rxn.is_identity:
                 continue
             rxns.append(rxn)
@@ -109,7 +115,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
                                                                 self.chempot})
             for e1, e2 in combos:
                 predicted_rxns = self._react_interface(e1.composition, e2.composition,
-                                                      pd, grand_pd)
+                                                      pd, grand_pd, open_entry)
                 rxns.extend(predicted_rxns)
 
         return rxns

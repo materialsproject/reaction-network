@@ -88,6 +88,10 @@ class BasicReaction(Reaction):
         raise ValueError("No energy for a basic reaction")
 
     @property
+    def energy_per_atom(self) -> float:
+        raise ValueError("No energy (per atom) for a basic reaction")
+
+    @property
     def is_identity(self):
         if set(self.reactants) != set(self.products):
             return False
@@ -211,15 +215,6 @@ class BasicReaction(Reaction):
         else:
             factor = 1
         return cls._str_from_formulas(r_coeffs, r_formulas), factor
-
-    # def __eq__(self, other):
-    #     if self is other:
-    #         return True
-    #     for comp in self.compositions:
-    #         coeff2 = other.get_coeff(comp) if comp in other.compositions else 0
-    #         if abs(self.get_coeff(comp) - coeff2) > self.TOLERANCE:
-    #             return False
-    #     return True
 
     def __eq__(self, other):
         if self is other:

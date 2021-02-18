@@ -2,7 +2,7 @@ from itertools import permutations
 import numpy as np
 from pymatgen.entries.computed_entries import ComputedEntry
 from rxn_network.utils import limited_powerset
-from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.reactions.computed import ComputedReaction, OpenComputedReaction
 
 
 def get_total_chemsys(entries, open_elem=None):
@@ -50,24 +50,86 @@ def filter_entries_by_chemsys(entries, chemsys):
 
 
 def get_entry_by_comp(comp, entries):
+    comp = comp.reduced_composition
     possible_entries = filter(
-        lambda x: x.composition.reduced_composition == comp, entries
+        lambda e: e.composition.reduced_composition == comp, entries
     )
-    return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
+    return sorted(possible_entries, key=lambda e: e.energy_per_atom)[0]
 
 
 def get_computed_rxn(rxn, entries):
-    reactants = [
-        r.reduced_composition
-        for r in rxn.reactants
-        if not np.isclose(rxn.get_coeff(r), 0)
-    ]
-    products = [
-        p.reduced_composition
-        for p in rxn.products
-        if not np.isclose(rxn.get_coeff(p), 0)
-    ]
-    reactant_entries = [get_entry_by_comp(r, entries) for r in reactants]
-    product_entries = [get_entry_by_comp(p, entries) for p in products]
+    rxn_coeffs = np.array(rxn.coeffs)
+    reactant_coeffs = rxn_coeffs[rxn_coeffs < 0]
+    product_coeffs = rxn_coeffs[rxn_coeffs > 0]
 
-    return ComputedReaction.balance(reactant_entries, product_entries)
+    reactant_entries = []
+    product_entries  = []
+    coefficients = []
+
+    for r, coeff in zip(rxn.reactants, reactant_coeffs):
+        if np.isclose(coeff, 0):
+            continue
+        entry = get_entry_by_comp(r, entries)
+
+        ratio = r.get_reduced_composition_and_factor()[1] / \
+                 entry.composition.get_reduced_composition_and_factor()[1]
+
+        reactant_entries.append(entry)
+        coefficients.append(coeff * ratio)
+
+    for p, coeff in zip(rxn.products, product_coeffs):
+        if np.isclose(coeff, 0):
+            continue
+        entry = get_entry_by_comp(p, entries)
+
+        ratio = p.get_reduced_composition_and_factor()[1] / \
+            entry.composition.get_reduced_composition_and_factor()[1]
+
+        product_entries.append(entry)
+        coefficients.append(coeff * ratio)
+
+    rxn = ComputedReaction(reactant_entries, product_entries, np.array(coefficients))
+    return rxn
+
+
+def get_open_computed_rxn(rxn, entries, open_entry, chempots):
+    rxn_coeffs = np.array(rxn.coeffs)
+    reactant_coeffs = rxn_coeffs[rxn_coeffs < 0]
+    product_coeffs = rxn_coeffs[rxn_coeffs > 0]
+    open_comp = open_entry.composition.reduced_composition
+
+    reactant_entries = []
+    product_entries  = []
+    coefficients = []
+
+    for r, coeff in zip(rxn.reactants, reactant_coeffs):
+        if np.isclose(coeff, 0):
+            continue
+        if r.reduced_composition == open_comp:
+            entry = open_entry
+        else:
+            entry = get_entry_by_comp(r, entries)
+
+        ratio = r.get_reduced_composition_and_factor()[1] / \
+                 entry.composition.get_reduced_composition_and_factor()[1]
+
+        reactant_entries.append(entry)
+        coefficients.append(coeff * ratio)
+
+    for p, coeff in zip(rxn.products, product_coeffs):
+        if np.isclose(coeff, 0):
+            continue
+        if p.reduced_composition == open_comp:
+            entry = open_entry
+        else:
+            entry = get_entry_by_comp(p, entries)
+
+        ratio = p.get_reduced_composition_and_factor()[1] / \
+            entry.composition.get_reduced_composition_and_factor()[1]
+
+        product_entries.append(entry)
+        coefficients.append(coeff * ratio)
+
+    rxn = OpenComputedReaction(reactant_entries, product_entries, np.array(
+        coefficients), chempots)
+    return rxn
