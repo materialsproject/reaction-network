@@ -71,15 +71,19 @@ class BasicEnumerator(Enumerator):
 
     def _get_rxns(self, reactants, products, remove_unbalanced, remove_changed):
         forward_rxn = ComputedReaction.balance(reactants, products)
-        if (
-                (remove_unbalanced and not (forward_rxn.balanced))
-            or (remove_changed and forward_rxn.lowest_num_errors != 0)
+        if (remove_unbalanced and not (forward_rxn.balanced)) or (
+            remove_changed and forward_rxn.lowest_num_errors != 0
         ):
             forward_rxn = None
             backward_rxn = None
         else:
+            backward_coefficients = np.array(
+                [-1 * coeff for coeff in forward_rxn.reactant_coeffs.values()]
+                + [-1 * coeff for coeff in forward_rxn.product_coeffs.values()]
+            )
             backward_rxn = ComputedReaction(
-                products, reactants, -1 * forward_rxn.coefficients
+                forward_rxn.product_entries, forward_rxn.reactant_entries,
+                backward_coefficients
             )
         return forward_rxn, backward_rxn
 

@@ -26,42 +26,34 @@ class BasicReaction(Reaction):
 
     def __init__(
         self,
-        reactant_coeffs: Dict[Composition, float],
-        product_coeffs: Dict[Composition, float],
+        compositions: List[Composition],
+        coefficients: List[float],
         balanced: Optional[bool] = None,
+        **kwargs
     ):
-        """
-        Reactants and products to be specified as dict of {Composition: coeff}.
+        self._compositions = compositions
+        self._coefficients = np.array(coefficients)
+        self.reactant_coeffs = {comp: coeff for comp, coeff in zip(compositions,
+                                                                   coefficients) if \
+                coeff < 0}
+        self.product_coeffs = {comp: coeff for comp, coeff in zip(compositions,
+                                                                   coefficients) if \
+                coeff > 0}
+        self.lowest_num_errors = kwargs.get("lowest_num_errors", None)
 
-        Args:
-            reactant_coeffs ({Composition: float}): Reactants as dict of
-                {Composition: amt}.
-            product_coeffs ({Composition: float}): Products as dict of
-                {Composition: amt}.
-        """
-        self.reactant_coeffs = reactant_coeffs
-        self.product_coeffs = product_coeffs
+        sum_reactants = sum(
+            [k * abs(v) for k, v in self.reactant_coeffs.items()], Composition({})
+        )
+        sum_products = sum(
+            [k * abs(v) for k, v in self.product_coeffs.items()], Composition({})
+        )
 
-        if not reactant_coeffs or not product_coeffs:
-            balanced=False
-
-        if balanced is not None:
-            self.balanced = balanced
+        if not sum_reactants.almost_equals(
+                sum_products, rtol=0, atol=self.TOLERANCE
+        ):
+            self.balanced = False
         else:
-            # sum reactants and products
-            all_reactants = sum(
-                [k * abs(v) for k, v in reactant_coeffs.items()], Composition({})
-            )
-            all_products = sum(
-                [k * abs(v) for k, v in product_coeffs.items()], Composition({})
-            )
-
-            if not all_reactants.almost_equals(
-                all_products, rtol=0, atol=self.TOLERANCE
-            ):
-                self.balanced = False
-            else:
-                self.balanced = True
+            self.balanced = True
 
     @property
     def reactants(self) -> List[Composition]:
@@ -73,15 +65,16 @@ class BasicReaction(Reaction):
         " List of products for this reaction "
         return list(self.product_coeffs.keys())
 
-    @cached_property
+    @property
+    def compositions(self):
+        return self._compositions
+
+    @property
     def coefficients(self) -> np.array:  # pylint: disable = W0236
         """
         Coefficients of the reaction
         """
-        return np.concatenate(
-            np.array(self.reactant_coeffs.values())
-            + np.array(self.product_coeffs.values)
-        )
+        return self._coefficients
 
     @property
     def energy(self) -> float:
@@ -340,11 +333,4 @@ class BasicReaction(Reaction):
 
         coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)
 
-        new_reactants = {
-            comp: abs(num) for comp, num in zip(compositions, coeffs) if num < 0
-        }
-        new_products = {
-            comp: abs(num) for comp, num in zip(compositions, coeffs) if num > 0
-        }
-
-        return cls(reactant_coeffs=new_reactants, product_coeffs=new_products)
+        return cls(compositions, coeffs)

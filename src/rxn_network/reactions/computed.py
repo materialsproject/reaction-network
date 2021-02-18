@@ -19,8 +19,7 @@ class ComputedReaction(BasicReaction):
 
     def __init__(
         self,
-        reactant_entries: List[Entry],
-        product_entries: List[Entry],
+        entries: List[Entry],
         coefficients: np.array,
         **kwargs
     ):
@@ -29,29 +28,14 @@ class ComputedReaction(BasicReaction):
             reactant_entries ([ComputedEntry]): List of reactant_entries.
             product_entries ([ComputedEntry]): List of product_entries.
         """
-        self.reactant_entries = list(reactant_entries)
-        self.product_entries = list(product_entries)
-        self.coefficients = coefficients
-        self.lowest_num_errors = kwargs.get("lowest_num_errors", None)
+        self._entries = entries
+        self.reactant_entries = [entry for entry, coeff in zip(entries, coefficients)
+                                 if coeff < 0]
+        self.product_entries = [entry for entry, coeff in zip(entries, coefficients)
+                                 if coeff > 0]
+        compositions = [e.composition.reduced_composition for e in entries]
 
-        all_entries = self.reactant_entries + self.product_entries
-
-        reactant_coeffs = None
-        product_coeffs = None
-
-        if coefficients.any():
-            reactant_coeffs = {
-                e.composition.reduced_composition: c
-                for e, c in zip(all_entries, coefficients)
-                if c < 0
-            }
-            product_coeffs = {
-                e.composition.reduced_composition: c
-                for e, c in zip(all_entries, coefficients)
-                if c > 0
-            }
-
-        super().__init__(reactant_coeffs, product_coeffs)
+        super().__init__(compositions, coefficients, **kwargs)
 
     @property
     def entries(self):
@@ -59,9 +43,8 @@ class ComputedReaction(BasicReaction):
         Equivalent of all_comp but returns entries, in the same order as the
         coefficients.
 
-        #Matt: do you needed it ordered by coefficients? all_comp was not ordered as such
         """
-        return self.reactant_entries + self.product_entries
+        return self._entries
 
     @property
     def energy(self) -> float:
@@ -71,7 +54,7 @@ class ComputedReaction(BasicReaction):
         """
         calc_energies = {}
 
-        for entry in self.reactant_entries + self.product_entries:
+        for entry in self._entries:
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()
             calc_energies[comp] = min(
                 calc_energies.get(comp, float("inf")), entry.energy / factor
@@ -103,7 +86,7 @@ class ComputedReaction(BasicReaction):
 
         calc_energies = {}
 
-        for entry in self.reactant_entries + self.product_entries:
+        for entry in self._entries:
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()
             energy_ufloat = ufloat(entry.energy, entry.correction_uncertainty)
             calc_energies[comp] = min(
@@ -137,8 +120,7 @@ class ComputedReaction(BasicReaction):
                                                            product_comps)
 
         return cls(
-            reactant_entries=reactant_entries,
-            product_entries=product_entries,
+            entries=reactant_entries+product_entries,
             coefficients=coefficients,
             lowest_num_errors=lowest_num_errors
         )
@@ -151,8 +133,7 @@ class OpenComputedReaction(ComputedReaction):
     """
     def __init__(
         self,
-        reactant_entries: List[Entry],
-        product_entries: List[Entry],
+        entries: List[Entry],
         coefficients: np.array,
         chempots,
         **kwargs
@@ -162,7 +143,7 @@ class OpenComputedReaction(ComputedReaction):
             reactant_entries ([ComputedEntry]): List of reactant_entries.
             product_entries ([ComputedEntry]): List of product_entries.
         """
-        super().__init__(reactant_entries, product_entries, coefficients, **kwargs)
+        super().__init__(entries, coefficients, **kwargs)
 
         self.chempots = chempots
         self.open_elems = list(chempots.keys())
@@ -171,7 +152,7 @@ class OpenComputedReaction(ComputedReaction):
         self.grand_coefficients = []
 
         self.reactant_grand_entries = []
-        for e, coeff in zip(reactant_entries, self.reactant_coeffs.values()):
+        for e, coeff in zip(self.reactant_entries, self.reactant_coeffs.values()):
             comp = e.composition.reduced_composition
             if len(comp.elements) == 1 and comp.elements[0] in \
                     self.open_elems:
@@ -181,7 +162,7 @@ class OpenComputedReaction(ComputedReaction):
             self.grand_compositions.append(comp)
 
         self.product_grand_entries = []
-        for e, coeff in zip(product_entries, self.product_coeffs.values()):
+        for e, coeff in zip(self.product_entries, self.product_coeffs.values()):
             comp = e.composition.reduced_composition
             if len(comp.elements) == 1 and comp.elements[0] in \
                     self.open_elems:
@@ -249,8 +230,7 @@ class OpenComputedReaction(ComputedReaction):
                                                            product_comps)
 
         return cls(
-            reactant_entries=reactant_entries,
-            product_entries=product_entries,
+            entries= reactant_entries+product_entries,
             coefficients=coefficients,
             chempots=chempots,
             lowest_num_errors=lowest_num_errors
