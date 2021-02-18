@@ -14,7 +14,7 @@ from rxn_network.enumerators.utils import (
     filter_entries_by_chemsys,
     get_entry_by_comp,
     get_computed_rxn,
-    get_open_computed_rxn
+    get_open_computed_rxn,
 )
 
 
@@ -37,8 +37,9 @@ class MinimizeGibbsEnumerator(Enumerator):
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
             for e1, e2 in combos:
-                predicted_rxns = self._react_interface(e1.composition, e2.composition,
-                                                      pd)
+                predicted_rxns = self._react_interface(
+                    e1.composition, e2.composition, pd
+                )
                 rxns.extend(predicted_rxns)
 
         return list(set(rxns))
@@ -101,8 +102,10 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         self.chempot = chempot
 
     def enumerate(self, entries):
-        open_entry = sorted(filter(lambda e: e.composition.elements == [
-            self.open_elem], entries), key=lambda e: e.energy_per_atom)[0]
+        open_entry = sorted(
+            filter(lambda e: e.composition.elements == [self.open_elem], entries),
+            key=lambda e: e.energy_per_atom,
+        )[0]
         entries_no_open = entries.copy()
         entries_no_open.remove(open_entry)
         combos = list(combinations(entries_no_open, 2))
@@ -112,13 +115,13 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         for chemsys, combos in combos_dict.items():
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
-            grand_pd = GrandPotentialPhaseDiagram(entries, {self.open_elem:
-                                                                self.chempot})
+            grand_pd = GrandPotentialPhaseDiagram(
+                entries, {self.open_elem: self.chempot}
+            )
             for e1, e2 in combos:
-                predicted_rxns = self._react_interface(e1.composition, e2.composition,
-                                                      pd, grand_pd, open_entry)
+                predicted_rxns = self._react_interface(
+                    e1.composition, e2.composition, pd, grand_pd, open_entry
+                )
                 rxns.extend(predicted_rxns)
 
         return list(set(rxns))
-
-

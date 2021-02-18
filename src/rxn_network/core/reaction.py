@@ -60,4 +60,3 @@ class Reaction(MSONable, metaclass=ABCMeta):
     def energy_per_atom(self) -> float:
         " The energy per atom of this reaction in eV "
         return self.energy / self.num_atoms
-

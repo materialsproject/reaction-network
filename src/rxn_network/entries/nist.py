@@ -18,9 +18,7 @@ class NISTReferenceEntry(Entry):
     REFERENCES = {**G_COMPOUNDS.keys(), **G_GASES.keys()}
 
     def __init__(
-        self,
-        composition: Composition,
-        temperature: float = 300,
+        self, composition: Composition, temperature: float = 300,
     ):
         """
         Args:

@@ -32,8 +32,9 @@ class NetworkEntry(MSONable):
                 "D" (dummy)
         """
         self.entries = set(entries)
-        self.elements = sorted(list({elem for entry in entries for elem in
-                                            entry.composition.elements}))
+        self.elements = sorted(
+            list({elem for entry in entries for elem in entry.composition.elements})
+        )
         self.chemsys = "-".join([str(e) for e in self.elements])
         self.dim = len(self.chemsys)
         self.description = description

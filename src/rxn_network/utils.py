@@ -1,5 +1,6 @@
 from itertools import chain, combinations
 
+
 def limited_powerset(iterable, max_size):
     """
     Helper method for generating subsets ranging from singular
@@ -13,8 +14,5 @@ def limited_powerset(iterable, max_size):
         list: all combination sets up to maximum size
     """
     return chain.from_iterable(
-        [
-            combinations(iterable, num_combos)
-            for num_combos in range(1, max_size + 1)
-        ]
+        [combinations(iterable, num_combos) for num_combos in range(1, max_size + 1)]
     )

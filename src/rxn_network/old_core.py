@@ -169,9 +169,7 @@ class ReactionNetwork:
 
         self._all_entry_combos = [
             set(combo)
-            for combo in powerset(
-                self._filtered_entries, self._max_num_phases
-            )
+            for combo in powerset(self._filtered_entries, self._max_num_phases)
         ]
 
         self.entry_set = EntrySet(self._filtered_entries)
@@ -776,9 +774,7 @@ class ReactionNetwork:
             phases = g.vp["entries"][v].entries
 
             if complex_loopback:
-                combos = powerset(
-                    phases.union(self._precursors), self._max_num_phases
-                )
+                combos = powerset(phases.union(self._precursors), self._max_num_phases)
             else:
                 combos = powerset(phases, self._max_num_phases)
 
@@ -857,9 +853,7 @@ class ReactionNetwork:
         self._cost_function = cost_function
 
         for e in gt.find_edge_range(g, g.ep["weight"], (1e-8, 1e8)):
-            g.ep["weight"][e] = get_rxn_cost(
-                g.ep["rxn"][e],
-            )
+            g.ep["weight"][e] = get_rxn_cost(g.ep["rxn"][e],)
 
     def set_temp(self, temp):
         """
@@ -1051,9 +1045,7 @@ class ReactionNetwork:
     @staticmethod
     @njit(parallel=True)
     def _balance_path_arrays(
-        comp_matrices,
-        net_coeffs,
-        tol=1e-6,
+        comp_matrices, net_coeffs, tol=1e-6,
     ):
         """
         Fast solution for reaction multiplicities via mass balance stochiometric

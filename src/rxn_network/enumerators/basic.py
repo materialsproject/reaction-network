@@ -77,8 +77,9 @@ class BasicEnumerator(Enumerator):
             forward_rxn = None
             backward_rxn = None
         else:
-            backward_rxn = ComputedReaction(forward_rxn.entries,
-                                            forward_rxn.coefficients*-1)
+            backward_rxn = ComputedReaction(
+                forward_rxn.entries, forward_rxn.coefficients * -1
+            )
         return forward_rxn, backward_rxn
 
 

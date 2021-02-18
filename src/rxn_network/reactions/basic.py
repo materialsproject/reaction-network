@@ -51,7 +51,9 @@ class BasicReaction(Reaction):
                 [k * abs(v) for k, v in self.product_coeffs.items()], Composition({})
             )
 
-            if not sum_reactants.almost_equals(sum_products, rtol=0, atol=self.TOLERANCE):
+            if not sum_reactants.almost_equals(
+                sum_products, rtol=0, atol=self.TOLERANCE
+            ):
                 self.balanced = False
             else:
                 self.balanced = True
@@ -117,11 +119,11 @@ class BasicReaction(Reaction):
             comp (Composition): Composition to normalize to
             factor (float): Factor to normalize to. Defaults to 1.
         """
-        scale_factor = abs(
-            1 / self.coefficients[self.compositions.index(comp)] * factor
-        )
-        self.coefficients *= scale_factor
-        return self
+        all_comp = self.compositions
+        coeffs = self.coefficients
+        scale_factor = abs(1 / coeffs[self.compositions.index(comp)] * factor)
+        coeffs *= scale_factor
+        return BasicRaction(all_comp, coeffs)
 
     def normalize_to_element(
         self, element: Element, factor: float = 1
@@ -142,8 +144,8 @@ class BasicReaction(Reaction):
             / 2
         )
         scale_factor = factor / current_el_amount
-        self.coefficients *= scale_factor
-        return self
+        coeffs *= scale_factor
+        return BasicReaction(all_comp, coeffs)
 
     def get_el_amount(self, element: Element) -> float:
         """
@@ -185,6 +187,19 @@ class BasicReaction(Reaction):
         to lowest common factors.
         """
         return self.normalized_repr_and_factor()[0]
+
+    @staticmethod
+    def _reduce(coeffs, compositions):
+        r_coeffs = np.zeros(len(coeffs))
+        r_comps = []
+        for i, (amt, comp) in enumerate(zip(coeffs, compositions)):
+            comp, factor = comp.get_reduced_composition_and_factor()
+            r_coeffs[i] = amt * factor
+            r_comps.append(comp)
+
+        factor = 1 / gcd_float(np.abs(r_coeffs))
+        r_coeffs *= factor
+        return r_coeffs, r_comps, factor
 
     @classmethod
     def _str_from_formulas(cls, coeffs, formulas) -> str:
@@ -233,10 +248,12 @@ class BasicReaction(Reaction):
 
     @staticmethod
     def _from_coeff_dicts(reactant_coeffs, product_coeffs):
-        reactant_comps, r_coefs = zip(*[(comp, -1*coeff) for comp, coeff \
-                in reactant_coeffs.items()])
-        product_comps, p_coefs = zip(*[(comp, coeff) for comp, coeff \
-                in product_coeffs.items()])
+        reactant_comps, r_coefs = zip(
+            *[(comp, -1 * coeff) for comp, coeff in reactant_coeffs.items()]
+        )
+        product_comps, p_coefs = zip(
+            *[(comp, coeff) for comp, coeff in product_coeffs.items()]
+        )
         return BasicReaction(reactant_comps + product_comps, r_coefs + p_coefs)
 
     @staticmethod
