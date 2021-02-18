@@ -17,22 +17,19 @@ class ComputedReaction(BasicReaction):
     energies. Will balance the reaction.
     """
 
-    def __init__(
-        self,
-        entries: List[Entry],
-        coefficients: np.array,
-        **kwargs
-    ):
+    def __init__(self, entries: List[Entry], coefficients: List[float], **kwargs):
         """
         Args:
             reactant_entries ([ComputedEntry]): List of reactant_entries.
             product_entries ([ComputedEntry]): List of product_entries.
         """
         self._entries = entries
-        self.reactant_entries = [entry for entry, coeff in zip(entries, coefficients)
-                                 if coeff < 0]
-        self.product_entries = [entry for entry, coeff in zip(entries, coefficients)
-                                 if coeff > 0]
+        self.reactant_entries = [
+            entry for entry, coeff in zip(entries, coefficients) if coeff < 0
+        ]
+        self.product_entries = [
+            entry for entry, coeff in zip(entries, coefficients) if coeff > 0
+        ]
         compositions = [e.composition.reduced_composition for e in entries]
 
         super().__init__(compositions, coefficients, **kwargs)
@@ -76,7 +73,6 @@ class ComputedReaction(BasicReaction):
         """
         return self.energy / self.num_atoms
 
-
     @property
     def energy_uncertainty(self):
         """
@@ -116,13 +112,16 @@ class ComputedReaction(BasicReaction):
         """
         reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
         product_comps = [e.composition.reduced_composition for e in product_entries]
-        coefficients, lowest_num_errors = cls._balance_coeffs(reactant_comps,
-                                                           product_comps)
+        coefficients, lowest_num_errors = cls._balance_coeffs(
+            reactant_comps, product_comps
+        )
+        if not coefficients.any():
+            coefficients = []
 
         return cls(
-            entries=reactant_entries+product_entries,
+            entries=list(reactant_entries) + list(product_entries),
             coefficients=coefficients,
-            lowest_num_errors=lowest_num_errors
+            lowest_num_errors=lowest_num_errors,
         )
 
 
@@ -131,12 +130,9 @@ class OpenComputedReaction(ComputedReaction):
     Extends the ComputedReaction class to add support for "open" reactions,
     where the reaction energy is calculated as a change in grand potential.
     """
+
     def __init__(
-        self,
-        entries: List[Entry],
-        coefficients: np.array,
-        chempots,
-        **kwargs
+        self, entries: List[Entry], coefficients: np.array, chempots, **kwargs
     ):
         """
         Args:
@@ -154,8 +150,7 @@ class OpenComputedReaction(ComputedReaction):
         self.reactant_grand_entries = []
         for e, coeff in zip(self.reactant_entries, self.reactant_coeffs.values()):
             comp = e.composition.reduced_composition
-            if len(comp.elements) == 1 and comp.elements[0] in \
-                    self.open_elems:
+            if len(comp.elements) == 1 and comp.elements[0] in self.open_elems:
                 continue
             self.reactant_grand_entries.append(GrandPotPDEntry(e, chempots))
             self.grand_coefficients.append(coeff)
@@ -164,8 +159,7 @@ class OpenComputedReaction(ComputedReaction):
         self.product_grand_entries = []
         for e, coeff in zip(self.product_entries, self.product_coeffs.values()):
             comp = e.composition.reduced_composition
-            if len(comp.elements) == 1 and comp.elements[0] in \
-                    self.open_elems:
+            if len(comp.elements) == 1 and comp.elements[0] in self.open_elems:
                 continue
             self.product_grand_entries.append(GrandPotPDEntry(e, chempots))
             self.grand_coefficients.append(coeff)
@@ -197,8 +191,10 @@ class OpenComputedReaction(ComputedReaction):
         """
         List of elements in the reaction
         """
-        return list(set(el for comp in self.compositions for el in comp.elements) -
-                    set(self.open_elems))
+        return list(
+            set(el for comp in self.compositions for el in comp.elements)
+            - set(self.open_elems)
+        )
 
     @property
     def energy_per_atom(self) -> float:
@@ -208,7 +204,6 @@ class OpenComputedReaction(ComputedReaction):
             atoms in the reaction.
         """
         return self.energy / self.num_atoms
-
 
     @classmethod
     def balance(
@@ -226,12 +221,16 @@ class OpenComputedReaction(ComputedReaction):
         """
         reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
         product_comps = [e.composition.reduced_composition for e in product_entries]
-        coefficients, lowest_num_errors = cls._balance_coeffs(reactant_comps,
-                                                           product_comps)
+        coefficients, lowest_num_errors = cls._balance_coeffs(
+            reactant_comps, product_comps
+        )
+
+        if not coefficients.any():
+            coefficients = []
 
         return cls(
-            entries= reactant_entries+product_entries,
-            coefficients=coefficients,
+            entries=list(reactant_entries) + list(product_entries),
+            coefficients=list(coefficients),
             chempots=chempots,
-            lowest_num_errors=lowest_num_errors
+            lowest_num_errors=lowest_num_errors,
         )

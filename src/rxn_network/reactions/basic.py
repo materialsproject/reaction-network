@@ -31,29 +31,33 @@ class BasicReaction(Reaction):
         balanced: Optional[bool] = None,
         **kwargs
     ):
+
         self._compositions = compositions
         self._coefficients = np.array(coefficients)
-        self.reactant_coeffs = {comp: coeff for comp, coeff in zip(compositions,
-                                                                   coefficients) if \
-                coeff < 0}
-        self.product_coeffs = {comp: coeff for comp, coeff in zip(compositions,
-                                                                   coefficients) if \
-                coeff > 0}
-        self.lowest_num_errors = kwargs.get("lowest_num_errors", None)
+        self.reactant_coeffs = {
+            comp: coeff for comp, coeff in zip(compositions, coefficients) if coeff < 0
+        }
+        self.product_coeffs = {
+            comp: coeff for comp, coeff in zip(compositions, coefficients) if coeff > 0
+        }
 
-        sum_reactants = sum(
-            [k * abs(v) for k, v in self.reactant_coeffs.items()], Composition({})
-        )
-        sum_products = sum(
-            [k * abs(v) for k, v in self.product_coeffs.items()], Composition({})
-        )
-
-        if not sum_reactants.almost_equals(
-                sum_products, rtol=0, atol=self.TOLERANCE
-        ):
-            self.balanced = False
+        if balanced is not None:
+            self.balanced = balanced
         else:
-            self.balanced = True
+            sum_reactants = sum(
+                [k * abs(v) for k, v in self.reactant_coeffs.items()], Composition({})
+            )
+            sum_products = sum(
+                [k * abs(v) for k, v in self.product_coeffs.items()], Composition({})
+            )
+
+            if not sum_reactants.almost_equals(sum_products, rtol=0, atol=self.TOLERANCE):
+                self.balanced = False
+            else:
+                self.balanced = True
+
+        #  if reaction came from balance() method, store this information
+        self.lowest_num_errors = kwargs.get("lowest_num_errors", None)
 
     @property
     def reactants(self) -> List[Composition]:
@@ -66,7 +70,7 @@ class BasicReaction(Reaction):
         return list(self.product_coeffs.keys())
 
     @property
-    def compositions(self):
+    def compositions(self) -> List[Composition]:
         return self._compositions
 
     @property
@@ -90,14 +94,18 @@ class BasicReaction(Reaction):
             return False
         if self.balanced == False:  # if not balanced, can not check coefficients
             return True
-        return all([np.isclose(self.reactant_coeffs[c]*-1, self.product_coeffs[c]) for
-                    c in self.reactant_coeffs])
+        return all(
+            [
+                np.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
+                for c in self.reactant_coeffs
+            ]
+        )
 
     def copy(self) -> "BasicReaction":
         """
         Returns a copy of the Reaction object.
         """
-        return BasicReaction(self.reactant_coeffs, self.product_coeffs, self.balanced)
+        return BasicReaction(self.compositions, self.coefficients, self.balanced)
 
     def normalize_to(self, comp: Composition, factor: float = 1) -> "BasicReaction":
         """
@@ -224,6 +232,14 @@ class BasicReaction(Reaction):
     __repr__ = __str__
 
     @staticmethod
+    def _from_coeff_dicts(reactant_coeffs, product_coeffs):
+        reactant_comps, r_coefs = zip(*[(comp, -1*coeff) for comp, coeff \
+                in reactant_coeffs.items()])
+        product_comps, p_coefs = zip(*[(comp, coeff) for comp, coeff \
+                in product_coeffs.items()])
+        return BasicReaction(reactant_comps + product_comps, r_coefs + p_coefs)
+
+    @staticmethod
     def from_string(rxn_string) -> "BasicReaction":
         """
         Generates a balanced reaction from a string. The reaction must
@@ -246,7 +262,10 @@ class BasicReaction(Reaction):
                 )
             }
 
-        return BasicReaction(get_comp_amt(rct_str), get_comp_amt(prod_str))
+        reactant_coeffs = get_comp_amt(rct_str)
+        product_coeffs = get_comp_amt(prod_str)
+
+        return BasicReaction._from_coeff_dicts(reactant_coeffs, product_coeffs)
 
     @classmethod
     def _balance_coeffs(
@@ -330,7 +349,6 @@ class BasicReaction(Reaction):
             products ([Composition]): List of products.
         """
         compositions = reactants + products
-
         coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)
 
         return cls(compositions, coeffs)

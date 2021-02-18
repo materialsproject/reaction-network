@@ -20,7 +20,7 @@ from tqdm import tqdm
 
 from rxn_network.analysis import PathwayAnalysis
 from rxn_network.entries import GibbsComputedStructureEntry, PDEntry, RxnEntries
-from rxn_network.helpers import (
+from rxn_network.old_helpers import (
     BalancedPathway,
     RxnPathway,
     expand_pd,

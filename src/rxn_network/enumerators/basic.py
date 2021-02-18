@@ -77,14 +77,8 @@ class BasicEnumerator(Enumerator):
             forward_rxn = None
             backward_rxn = None
         else:
-            backward_coefficients = np.array(
-                [-1 * coeff for coeff in forward_rxn.reactant_coeffs.values()]
-                + [-1 * coeff for coeff in forward_rxn.product_coeffs.values()]
-            )
-            backward_rxn = ComputedReaction(
-                forward_rxn.product_entries, forward_rxn.reactant_entries,
-                backward_coefficients
-            )
+            backward_rxn = ComputedReaction(forward_rxn.entries,
+                                            forward_rxn.coefficients*-1)
         return forward_rxn, backward_rxn
 
 
