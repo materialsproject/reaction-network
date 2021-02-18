@@ -41,7 +41,7 @@ class MinimizeGibbsEnumerator(Enumerator):
                                                       pd)
                 rxns.extend(predicted_rxns)
 
-        return rxns
+        return list(set(rxns))
 
     def estimate_num_reactions(self, entries) -> int:
         return comb(len(entries), 2)
@@ -53,7 +53,7 @@ class MinimizeGibbsEnumerator(Enumerator):
                 r1,
                 r2,
                 grand_pd,
-                norm=False,
+                norm=True,
                 include_no_mixing_energy=False,
                 pd_non_grand=pd,
                 use_hull_energy=True,
@@ -75,13 +75,14 @@ class MinimizeGibbsEnumerator(Enumerator):
         rxns = []
         for _, _, _, rxn, _ in interface.get_kinks():
             if grand_pd:
-                rxn = get_open_computed_rxn(rxn, pd.all_entries, open_entry, chempots)
+                rxn = get_open_computed_rxn(rxn, pd.all_entries, chempots)
             else:
                 rxn = get_computed_rxn(rxn, pd.all_entries)
 
-            if rxn.is_identity:
+            if rxn.is_identity or rxn.lowest_num_errors > 0:
                 continue
-            rxns.append(rxn.normalize_to(rxn.products[0]))
+
+            rxns.append(rxn)
 
         return rxns
 
@@ -118,6 +119,6 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
                                                       pd, grand_pd, open_entry)
                 rxns.extend(predicted_rxns)
 
-        return rxns
+        return list(set(rxns))
 
 

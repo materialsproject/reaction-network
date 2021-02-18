@@ -6,6 +6,15 @@ from rxn_network.reactions.computed import ComputedReaction, OpenComputedReactio
 
 
 def get_total_chemsys(entries, open_elem=None):
+    """
+
+    Args:
+        entries:
+        open_elem:
+
+    Returns:
+
+    """
     elements = {elem for entry in entries for elem in entry.composition.elements}
     if open_elem:
         elements.add(open_elem)
@@ -13,6 +22,15 @@ def get_total_chemsys(entries, open_elem=None):
 
 
 def group_by_chemsys(combos, open_elem=None):
+    """
+
+    Args:
+        combos:
+        open_elem:
+
+    Returns:
+
+    """
     combo_dict = {}
     for combo in combos:
         key = get_total_chemsys(combo, open_elem)
@@ -25,6 +43,16 @@ def group_by_chemsys(combos, open_elem=None):
 
 
 def stabilize_entries(pd, entries_to_adjust, tol=1e-6):
+    """
+
+    Args:
+        pd:
+        entries_to_adjust:
+        tol:
+
+    Returns:
+
+    """
     indices = [pd.all_entries.index(entry) for entry in entries_to_adjust]
     new_entries = []
     for idx, entry in zip(indices, entries_to_adjust):
@@ -39,6 +67,15 @@ def stabilize_entries(pd, entries_to_adjust, tol=1e-6):
 
 
 def filter_entries_by_chemsys(entries, chemsys):
+    """
+
+    Args:
+        entries:
+        chemsys:
+
+    Returns:
+
+    """
     chemsys = set(chemsys.split("-"))
     filtered_entries = list(
         filter(
@@ -50,61 +87,52 @@ def filter_entries_by_chemsys(entries, chemsys):
 
 
 def get_entry_by_comp(comp, entries):
-    comp = comp.reduced_composition
+    """
+
+    Args:
+        comp:
+        entries:
+
+    Returns:
+
+    """
     possible_entries = filter(
-        lambda e: e.composition.reduced_composition == comp, entries
+        lambda e: e.composition.reduced_composition == comp.reduced_composition, entries
     )
     return sorted(possible_entries, key=lambda e: e.energy_per_atom)[0]
 
 
-def get_entries_and_coeffs(comps, coeffs, entries):
-    found_entries = []
-    new_coeffs = []
-    for c, coeff in zip(comps, coeffs):
-        if np.isclose(coeff, 0):
-            continue
-        entry = get_entry_by_comp(c, entries)
-
-        ratio = c.get_reduced_composition_and_factor()[1] / \
-            entry.composition.get_reduced_composition_and_factor()[1]
-
-        found_entries.append(entry)
-        new_coeffs.append(coeff * ratio)
-    return found_entries, new_coeffs
-
-
 def get_computed_rxn(rxn, entries):
-    rxn_coeffs = np.array(rxn.coeffs)
-    reactant_coeffs = rxn_coeffs[rxn_coeffs < 0]
-    product_coeffs = rxn_coeffs[rxn_coeffs > 0]
+    """
 
-    reactant_entries, reactant_new_coeffs = get_entries_and_coeffs(rxn.reactants,
-                                                                reactant_coeffs,
-                                                                entries)
+    Args:
+        rxn:
+        entries:
 
-    product_entries, product_new_coeffs = get_entries_and_coeffs(rxn.products,
-                                                               product_coeffs, entries)
+    Returns:
 
-    new_coeffs = np.array(reactant_new_coeffs + product_new_coeffs)
+    """
+    reactant_entries = [get_entry_by_comp(r, entries) for r in rxn.reactants]
+    product_entries = [get_entry_by_comp(p, entries) for p in rxn.products]
 
-    rxn = ComputedReaction(reactant_entries, product_entries, new_coeffs)
+    rxn = ComputedReaction.balance(reactant_entries, product_entries)
     return rxn
 
 
-def get_open_computed_rxn(rxn, entries, open_entry, chempots):
-    rxn_coeffs = np.array(rxn.coeffs)
-    reactant_coeffs = rxn_coeffs[rxn_coeffs < 0]
-    product_coeffs = rxn_coeffs[rxn_coeffs > 0]
+def get_open_computed_rxn(rxn, entries, chempots):
+    """
 
-    reactant_entries, reactant_new_coeffs = get_entries_and_coeffs(rxn.reactants,
-                                                                reactant_coeffs,
-                                                                entries)
+    Args:
+        rxn:
+        entries:
+        chempots:
 
-    product_entries, product_new_coeffs = get_entries_and_coeffs(rxn.products,
-                                                               product_coeffs, entries)
+    Returns:
 
-    new_coeffs = np.array(reactant_new_coeffs + product_new_coeffs)
+    """
+    reactant_entries = [get_entry_by_comp(r, entries) for r in rxn.reactants]
+    product_entries = [get_entry_by_comp(p, entries) for p in rxn.products]
 
-    rxn = OpenComputedReaction(reactant_entries, product_entries, new_coeffs, chempots)
+    rxn = OpenComputedReaction.balance(reactant_entries, product_entries, chempots)
 
     return rxn

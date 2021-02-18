@@ -55,7 +55,7 @@ class BasicEnumerator(Enumerator):
                     rxns.append(forward_rxn)
                     rxns.append(backward_rxn)
 
-        return rxns
+        return list(set(rxns))
 
     def estimate_num_reactions(self, entries: List[ComputedEntry]) -> int:
         """
@@ -72,8 +72,7 @@ class BasicEnumerator(Enumerator):
     def _get_rxns(self, reactants, products, remove_unbalanced, remove_changed):
         forward_rxn = ComputedReaction.balance(reactants, products)
         if (
-            remove_unbalanced
-            and not (forward_rxn.balanced)
+                (remove_unbalanced and not (forward_rxn.balanced))
             or (remove_changed and forward_rxn.lowest_num_errors != 0)
         ):
             forward_rxn = None
