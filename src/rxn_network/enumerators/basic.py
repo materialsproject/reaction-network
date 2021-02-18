@@ -20,8 +20,10 @@ class BasicEnumerator(Enumerator):
     maximum reactant/product cardinality (n).
     """
 
-    def __init__(self, n):
+    def __init__(self, n: int,
+                 target: ComputedEntry = None):
         self.n = n
+        self.target = target
 
     def enumerate(
         self,
@@ -45,9 +47,16 @@ class BasicEnumerator(Enumerator):
         combos = list(limited_powerset(entries, self.n))
         combos_dict = group_by_chemsys(combos)
 
+        if self.target:
+            target_elems = {str(e) for e in target.composition.elements}
+
         rxns = []
         for chemsys, selected_combos in combos_dict.items():
+            if self.target and not target_elems.issubset(chemsys.split("-")):
+                continue
             for reactants, products in combinations(selected_combos, 2):
+                if self.target and self.target not in products:
+                    continue
                 forward_rxn, backward_rxn = self._get_rxns(
                     reactants, products, remove_unbalanced, remove_changed
                 )
