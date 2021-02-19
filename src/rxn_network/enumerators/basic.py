@@ -20,8 +20,7 @@ class BasicEnumerator(Enumerator):
     maximum reactant/product cardinality (n).
     """
 
-    def __init__(self, n: int,
-                 target: ComputedEntry = None):
+    def __init__(self, n: int = 2, target: ComputedEntry = None):
         self.n = n
         self.target = target
 
@@ -48,21 +47,15 @@ class BasicEnumerator(Enumerator):
         combos_dict = group_by_chemsys(combos)
 
         if self.target:
-            target_elems = {str(e) for e in target.composition.elements}
+            target_elems = {str(e) for e in self.target.composition.elements}
 
         rxns = []
         for chemsys, selected_combos in combos_dict.items():
             if self.target and not target_elems.issubset(chemsys.split("-")):
                 continue
-            for reactants, products in combinations(selected_combos, 2):
-                if self.target and self.target not in products:
-                    continue
-                forward_rxn, backward_rxn = self._get_rxns(
-                    reactants, products, remove_unbalanced, remove_changed
-                )
-                if forward_rxn:
-                    rxns.append(forward_rxn)
-                    rxns.append(backward_rxn)
+            rxn_iter = combinations(selected_combos, 2)
+            rxns.extend(self._filter_and_get_rxns(rxn_iter, self.target,
+                                             remove_unbalanced, remove_changed))
 
         return list(set(rxns))
 
@@ -78,18 +71,37 @@ class BasicEnumerator(Enumerator):
         """
         return sum([comb(len(entries), i) for i in range(self.n)]) ** 2
 
-    def _get_rxns(self, reactants, products, remove_unbalanced, remove_changed):
-        forward_rxn = ComputedReaction.balance(reactants, products)
-        if (remove_unbalanced and not (forward_rxn.balanced)) or (
-            remove_changed and forward_rxn.lowest_num_errors != 0
-        ):
-            forward_rxn = None
-            backward_rxn = None
-        else:
-            backward_rxn = ComputedReaction(
-                forward_rxn.entries, forward_rxn.coefficients * -1
-            )
-        return forward_rxn, backward_rxn
+    @staticmethod
+    def _filter_and_get_rxns(rxn_iter, target, remove_unbalanced, remove_changed):
+        rxns = []
+        for reactants, products in rxn_iter:
+            r = set(reactants)
+            p = set(products)
+
+            if r & p:  # do not allow repeated phases
+                continue
+            if target and target not in r | p:
+                continue
+
+            forward_rxn = ComputedReaction.balance(r, p)
+
+            if (remove_unbalanced and not (forward_rxn.balanced)) or (
+                    remove_changed and forward_rxn.lowest_num_errors != 0
+            ):
+                forward_rxn = None
+                backward_rxn = None
+            else:
+                backward_rxn = ComputedReaction(
+                    forward_rxn.entries, forward_rxn.coefficients * -1
+                )
+
+            if forward_rxn:
+                if not target or target in p:
+                    rxns.append(forward_rxn)
+                if not target or target in r:
+                    rxns.append(backward_rxn)
+
+        return rxns
 
 
 class BasicOpenEnumerator(BasicEnumerator):
@@ -98,8 +110,9 @@ class BasicOpenEnumerator(BasicEnumerator):
     maximum reactant/product cardinality (n), with any number of open phases.
     """
 
-    def __init__(self, n, open_entries):
-        super().__init__(n)
+    def __init__(self, n: int, open_entries: List[ComputedEntry], target: ComputedEntry = None):
+        super().__init__(n, target)
+
         self.open_entries = open_entries
 
     def enumerate(self, entries, remove_unbalanced=True, remove_changed=True):
@@ -116,22 +129,19 @@ class BasicOpenEnumerator(BasicEnumerator):
         combos_dict = group_by_chemsys(combos)
         combos_open_dict = group_by_chemsys(combos_with_open)
 
+        if self.target:
+            target_elems = {str(e) for e in self.target.composition.elements}
+
         rxns = []
         for chemsys, selected_combos in combos_dict.items():
             if chemsys not in combos_open_dict:
                 continue
+            if self.target and not target_elems.issubset(chemsys.split("-")):
+                continue
             selected_open_combos = combos_open_dict[chemsys]
-            for reactants, products in product(selected_combos, selected_open_combos):
-                forward_rxn, backward_rxn = self._get_rxns(
-                    reactants, products, remove_unbalanced, remove_changed
-                )
-                if forward_rxn:
-                    rxns.append(forward_rxn)
-                    rxns.append(backward_rxn)
+            rxn_iter = product(selected_combos, selected_open_combos)
 
-        closed_entries = [e for e in entries if e not in self.open_entries]
-        simple_rxns = super().enumerate(
-            closed_entries, remove_unbalanced, remove_changed
-        )
+            rxns.extend(self._filter_and_get_rxns(rxn_iter, self.target,
+                                             remove_unbalanced, remove_changed))
 
-        return rxns + simple_rxns
+        return list(set(rxns))

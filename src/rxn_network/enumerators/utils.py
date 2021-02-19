@@ -2,7 +2,8 @@ from itertools import permutations
 import numpy as np
 from pymatgen.entries.computed_entries import ComputedEntry
 from rxn_network.utils import limited_powerset
-from rxn_network.reactions.computed import ComputedReaction, OpenComputedReaction
+from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.reactions.open import OpenComputedReaction
 
 
 def get_total_chemsys(entries, open_elem=None):
