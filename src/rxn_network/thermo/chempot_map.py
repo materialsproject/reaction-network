@@ -1,69 +1,38 @@
 " A chemical potential diagram class."
 import numpy as np
 from scipy.spatial import HalfspaceIntersection, ConvexHull, KDTree
+from monty.json import MSONable
 
-from rxn_network.thermodynamics.chempot_layouts import default_chempot_layout_3d, default_chempot_annotation_layout
+from rxn_network.thermo.chempot_layouts import default_chempot_layout_3d, default_chempot_annotation_layout
+from rxn_network.thermo.utils import simple_pca, get_centroid_2d
 
 import plotly.express as px
 import plotly.graph_objects as go
 
+from pymatgen import Element
 from pymatgen.util.coord import Simplex
+from pymatgen.analysis.phase_diagram import PhaseDiagram, PDPlotter
 
 
-class ChempotMap:
-    def __init__(self, pd, limits: dict = None, default_limit: float = -15.0):
-        self.n = pd.dim
+class ChempotMap(MSONable):
+    def __init__(self, pd: PhaseDiagram, limits: dict = None, default_limit: float =
+    -15.0):
         self.pd = pd
+        self.limits = limits
         self.default_limit = default_limit
 
-        lims = np.array([[default_limit, 0]] * self.n)
-        for idx, elem in enumerate(pd.elements):
-            if limits and elem in limits:
-                lims[idx, :] = limits[elem]
+        self.dim = pd.dim
 
-        data = pd.qhull_data
-        hyperplanes = np.insert(data, [0],
-                                (1 - np.sum(data[:, :-1], axis=1)).reshape(-1, 1),
-                                axis=1)
-        hyperplanes[:, -1] = hyperplanes[:, -1] * -1  # flip to all positive energies
-        entries = pd.qhull_entries
-
-        border_hyperplanes = np.array(([[0] * (self.n + 1)] * (2 * self.n)))
-
-        for idx, limit in enumerate(lims):
-            border_hyperplanes[2 * idx, idx] = -1
-            border_hyperplanes[2 * idx, -1] = limit[0]
-            border_hyperplanes[(2 * idx) + 1, idx] = 1
-            border_hyperplanes[(2 * idx) + 1, -1] = limit[1]
-
-        hs_hyperplanes = np.vstack([hyperplanes, border_hyperplanes])
-
-        interior_point = np.average(lims, axis=1).tolist()
-        hs_int = HalfspaceIntersection(hs_hyperplanes, np.array(interior_point))
-        self.hs_int = hs_int
-
-        # organize the boundary points by entry
-        domains = {entry.composition.reduced_formula: [] for entry in entries}
-        entries_by_comp = dict()
-        for intersection, facet in zip(hs_int.intersections,
-                                       hs_int.dual_facets):
-            for v in facet:
-                if v < len(entries):
-                    this_entry = entries[v]
-                    formula = this_entry.composition.reduced_formula
-                    entries_by_comp[formula] = this_entry
-                    domains[formula].append(intersection)
-
-        self.entries_by_comp = entries_by_comp
-        self.entries = entries
+        domains = self.calculate_domains()
         self.domains = {k: np.array(v) for k, v in domains.items() if v}
 
-    def get_chempot_range_map_plot(self, elements: list = None,
-                                   comps: list = None, comps_mode="mesh",
-                                   comps_colors=None, label_stable=True,
-                                   shade_energy=True):
+    def get_plot(self, elements: list = None,
+                                   comps: list = [], comps_mode="mesh",
+                                   comps_colors = None, label_stable=True,
+                                   shade_energy = True):
         if not comps_colors:
             comps_colors = px.colors.qualitative.Dark2
+
 
         if not elements:
             elements = self.pd.elements[:3]
@@ -82,7 +51,7 @@ class ChempotMap:
         comps_reduced = [Composition(comp).reduced_composition for comp in comps]
 
         for formula, points in domains.items():
-            entry = self.entries_by_comp[formula]
+            entry = self.entry_dict[formula]
             points_3d = np.array(points[:, elem_indices])
             contains_target_elems = set(entry.composition.elements).issubset(
                 elements)
@@ -150,9 +119,9 @@ class ChempotMap:
 
 
         layout = default_chempot_layout_3d.copy()
-        layout["scene"].update({"xaxis": self.get_chempot_axis_layout(elements[0]),
-                                "yaxis": self.get_chempot_axis_layout(elements[1]),
-                                "zaxis": self.get_chempot_axis_layout(elements[2])})
+        layout["scene"].update({"xaxis": self._get_chempot_axis_layout(elements[0]),
+                                "yaxis": self._get_chempot_axis_layout(elements[1]),
+                                "zaxis": self._get_chempot_axis_layout(elements[2])})
         if label_stable:
             layout["scene"].update({"annotations": annotations})
 
@@ -198,6 +167,14 @@ class ChempotMap:
 
         return fig
 
+    @property
+    def entries(self):
+        return self.pd.stable_entries
+
+    @property
+    def entry_dict(self):
+        return {e.composition.reduced_formula: e for e in self.entries}
+
     def shortest_domain_distance(self, f1, f2):
         pts1 = self.domains[f1]
         pts2 = self.domains[f2]
@@ -219,8 +196,47 @@ class ChempotMap:
 
         return diff.min(axis=0)
 
+    def calculate_domains(self):
+        lims = np.array([[self.default_limit, 0]] * self.dim)
+        for idx, elem in enumerate(self.pd.elements):
+            if self.limits and elem in self.limits:
+                lims[idx, :] = limits[elem]
+
+        data = self.pd.qhull_data
+        hyperplanes = np.insert(data, [0],
+                                (1 - np.sum(data[:, :-1], axis=1)).reshape(-1, 1),
+                                axis=1)
+        hyperplanes[:, -1] = hyperplanes[:, -1] * -1  # flip to all positive energies
+        entries = self.pd.qhull_entries
+
+        border_hyperplanes = np.array(([[0] * (self.dim + 1)] * (2 * self.dim)))
+
+        for idx, limit in enumerate(lims):
+            border_hyperplanes[2 * idx, idx] = -1
+            border_hyperplanes[2 * idx, -1] = limit[0]
+            border_hyperplanes[(2 * idx) + 1, idx] = 1
+            border_hyperplanes[(2 * idx) + 1, -1] = limit[1]
+
+        hs_hyperplanes = np.vstack([hyperplanes, border_hyperplanes])
+
+        interior_point = np.average(lims, axis=1).tolist()
+        hs_int = HalfspaceIntersection(hs_hyperplanes, np.array(interior_point))
+
+        # organize the boundary points by entry
+        domains = {entry.composition.reduced_formula: [] for entry in self.entries}
+        entries_by_comp = dict()
+        for intersection, facet in zip(hs_int.intersections,
+                                       hs_int.dual_facets):
+            for v in facet:
+                if v < len(entries):
+                    this_entry = entries[v]
+                    formula = this_entry.composition.reduced_formula
+                    domains[formula].append(intersection)
+
+        return domains
+
     @staticmethod
-    def get_chempot_axis_layout(element):
+    def _get_chempot_axis_layout(element):
         return dict(
             title=f"μ<sub>{str(element)}</sub> - μ<sub>"
                   f"{str(element)}</sub><sup>o</sup> (eV)",
@@ -232,81 +248,3 @@ class ChempotMap:
             showline=True,
             backgroundcolor="rgba(0,0,0,0)")
 
-
-def simple_pca(data, k=2):
-    data = data - np.mean(data.T, axis=1)  # centering the data
-    cov = np.cov(data.T)  # calculating covariance matrix
-    v, w = np.linalg.eig(cov)  # performing eigendecomposition
-    idx = v.argsort()[::-1]  # sorting the components
-    v = v[idx]
-    w = w[:, idx]
-    scores = data.dot(w[:, :k])
-
-    return scores, v[:k], w[:, :k]
-
-
-def get_centroid_2d(vertices):
-    """ vertices must be in order"""
-    n = len(vertices)
-    cx = 0
-    cy = 0
-    a = 0
-
-    for i in range(0, n - 1):
-        xi = vertices[i, 0]
-        yi = vertices[i, 1]
-        xi_p = vertices[i + 1, 0]
-        yi_p = vertices[i + 1, 1]
-        common_term = xi * yi_p - xi_p * yi
-
-        cx += (xi + xi_p) * common_term
-        cy += (yi + yi_p) * common_term
-        a += common_term
-
-    prefactor = 0.5 / (6 * a)
-    return np.array([prefactor * cx, prefactor * cy])
-
-
-def check_chempot_bounds(pd, rxn):
-    phases = rxn._reactant_entries
-    other_phases = rxn._product_entries
-
-    entry_mu_ranges = {}
-
-    for e in phases + other_phases:
-        elems = e.composition.elements
-        chempot_ranges = {}
-        all_chempots = {e: [] for e in elems}
-        for simplex, chempots in pd.get_all_chempots(e.composition).items():
-            for elem in elems:
-                all_chempots[elem].append(chempots[elem])
-        for elem in elems:
-            chempot_ranges[elem] = (min(all_chempots[elem]), max(all_chempots[elem]))
-
-        entry_mu_ranges[e] = chempot_ranges
-
-    elems = {elem for phase in phases + other_phases for elem in
-             phase.composition.elements}
-
-    reactant_mu_ranges = [entry_mu_ranges[e] for e in phases]
-    reactant_mu_span = {
-        elem: (min([r[elem][0] for r in reactant_mu_ranges if elem in r]),
-               max([r[elem][1] for r in reactant_mu_ranges if elem in r])) for elem in
-        elems}
-
-    product_mu_ranges = [entry_mu_ranges[e] for e in other_phases]
-    product_mu_span = {elem: (min([p[elem][0] for p in product_mu_ranges if elem in p]),
-                              max([p[elem][1] for p in product_mu_ranges if elem in p]))
-                       for elem in elems}
-
-    print(reactant_mu_span)
-    print(product_mu_span)
-
-    out_of_bounds = False
-    for elem in product_mu_span:
-        if not out_of_bounds:
-            if product_mu_span[elem][0] > (reactant_mu_span[elem][1] + 1e-5):
-                out_of_bounds = True
-        else:
-            break
-    return out_of_bounds

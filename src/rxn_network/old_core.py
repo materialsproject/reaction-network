@@ -75,7 +75,7 @@ class ReactionNetwork:
                 pymatgen. Entries should have same compatability (e.g.
                 MPCompability) for phase diagram generation.
             n (int): maximum number of phases allowed on each side of the
-                reaction (default 2). Note that n > 2 leads to significant (
+                reaction (default 2). Note that dim > 2 leads to significant (
                 and often intractable) combinatorial explosion.
             temp (int): Temperature (in Kelvin) used for estimating Gibbs
                 free energy of formation, as well as scaling the cost function

@@ -17,7 +17,7 @@ from rxn_network.utils import limited_powerset
 class BasicEnumerator(Enumerator):
     """
     Enumerator for finding all simple reactions within a set of entries, up to a
-    maximum reactant/product cardinality (n).
+    maximum reactant/product cardinality (dim).
     """
 
     def __init__(self, n: int = 2, target: ComputedEntry = None):
@@ -107,7 +107,7 @@ class BasicEnumerator(Enumerator):
 class BasicOpenEnumerator(BasicEnumerator):
     """
     Enumerator for finding all simple reactions within a set of entries, up to a
-    maximum reactant/product cardinality (n), with any number of open phases.
+    maximum reactant/product cardinality (dim), with any number of open phases.
     """
 
     def __init__(self, n: int, open_entries: List[ComputedEntry], target: ComputedEntry = None):

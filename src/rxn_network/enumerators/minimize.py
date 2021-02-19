@@ -21,7 +21,7 @@ from rxn_network.enumerators.utils import (
 class MinimizeGibbsEnumerator(Enumerator):
     """
     Enumerator for finding all reactions between two reactants that are predicted by
-    thermodynamics; i.e., they appear when taking the convex hull along a straight
+    thermo; i.e., they appear when taking the convex hull along a straight
     line connecting any two phases in G-x phase space. Identity reactions are excluded.
     """
 
@@ -91,7 +91,7 @@ class MinimizeGibbsEnumerator(Enumerator):
 class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     """
     Enumerator for finding all reactions between two reactants and an open element
-    that are predicted by thermodynamics; i.e., they appear when taking the
+    that are predicted by thermo; i.e., they appear when taking the
     convex hull along a straight line connecting any two phases in Phi-x
     phase space. Identity reactions are excluded.
     """
