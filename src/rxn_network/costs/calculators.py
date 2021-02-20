@@ -13,12 +13,13 @@ class ChempotDistanceCalculator(Calculator):
     """
     Calculates the chemical potential distance for a reaction (in eV/atom).
     """
-    def __init__(self):
-        pass
+    def __init__(self, cpd: ChempotDiagram, name="chempot_distance"):
+        self.cpd = cpd
+        self.name = name
 
-    def calculate(self, rxn: ComputedReaction, cpd: ChempotDiagram) -> float:
+    def calculate(self, rxn: ComputedReaction) -> float:
         distances = [
-            cpd.shortest_domain_distance(
+            self.cpd.shortest_domain_distance(
                 combo[0].composition.reduced_formula,
                 combo[1].composition.reduced_formula,
             )
@@ -27,3 +28,12 @@ class ChempotDistanceCalculator(Calculator):
 
         max_distance = max(distances)
         return max_distance
+
+    def decorate(self, rxn: ComputedReaction) -> ComputedReaction:
+        if rxn.data:
+            data = rxn.data.copy()
+        else:
+            data = {}
+        data[self.name] = self.calculate(rxn)
+        return ComputedReaction(rxn.entries, rxn.coefficients, data=data,
+                                lowest_num_errors=rxn.lowest_num_errors)

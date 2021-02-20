@@ -1,4 +1,89 @@
 import numpy as np
+from pymatgen.entries.computed_entries import GibbsComputedStructureEntry
+from pymatgen.analysis.phase_diagram import PhaseDiagram
+
+
+def expand_pd(entries):
+    """
+    Helper method for expanding a single PhaseDiagram into a set of smaller phase
+    diagrams, indexed by chemical subsystem. This is an absolutely necessary
+    approach when considering chemical systems which contain > ~10 elements,
+    due to limitations of the ConvexHull algorithm.
+    Args:
+        entries ([ComputedEntry]): list of ComputedEntry-like objects for building
+            phase diagram.
+    Returns:
+        Dictionary of PhaseDiagram objects indexed by chemical subsystem string;
+        e.g. {"Li-Mn-O": <PhaseDiagram object>, "C-Y": <PhaseDiagram object>, ...}
+    """
+
+    pd_dict = dict()
+
+    sorted_entries = sorted(
+        entries, key=lambda x: len(x.composition.elements), reverse=True
+    )
+
+    for e in sorted_entries:
+        for chemsys in pd_dict.keys():
+            if set(e.composition.chemical_system.split("-")).issubset(
+                chemsys.split("-")
+            ):
+                break
+        else:
+            pd_dict[e.composition.chemical_system] = PhaseDiagram(
+                list(
+                    filter(
+                        lambda x: set(x.composition.elements).issubset(
+                            e.composition.elements
+                        ),
+                        entries,
+                    )
+                )
+            )
+
+    return pd_dict
+
+
+def filter_entries(all_entries, e_above_hull, temp, include_polymorphs=False):
+    """
+    Helper method for filtering entries by specified energy above hull
+
+    Args:
+        all_entries ([ComputedEntry]): List of ComputedEntry-like objects to be
+            filtered
+        e_above_hull (float): Thermodynamic stability threshold (energy above hull)
+            [eV/atom]
+        include_polymorphs (bool): whether to include higher energy polymorphs of
+            existing structures
+
+    Returns:
+        [ComputedEntry]: list of all entries with energies above hull equal to or
+            less than the specified e_above_hull.
+    """
+    pd_dict = expand_pd(all_entries)
+    pd_dict = {
+        chemsys: PhaseDiagram(GibbsComputedStructureEntry.from_pd(pd, temp))
+        for chemsys, pd in pd_dict.items()
+    }
+
+    filtered_entries = set()
+    all_comps = dict()
+    for chemsys, pd in pd_dict.items():
+        for entry in pd.all_entries:
+            if (
+                    entry in filtered_entries
+                    or pd.get_e_above_hull(entry) > e_above_hull
+            ):
+                continue
+            formula = entry.composition.reduced_formula
+            if not include_polymorphs and (formula in all_comps):
+                if all_comps[formula].energy_per_atom < entry.energy_per_atom:
+                    continue
+                filtered_entries.remove(all_comps[formula])
+            all_comps[formula] = entry
+            filtered_entries.add(entry)
+
+    return pd_dict, list(filtered_entries)
 
 
 def simple_pca(data, k=2):

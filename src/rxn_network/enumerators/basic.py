@@ -1,9 +1,12 @@
-from typing import List
+from typing import List, Optional
 from itertools import chain, combinations, compress, groupby, product
 from math import comb
 import numpy as np
+from tqdm import tqdm
 
+from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.entries.entry_tools import EntrySet
 
 from rxn_network.core import Enumerator, Reaction, Calculator
 from rxn_network.reactions import ComputedReaction
@@ -11,6 +14,9 @@ from rxn_network.enumerators.utils import (
     get_total_chemsys,
     group_by_chemsys,
 )
+
+from rxn_network.thermo.chempot_diagram import ChempotDiagram
+from rxn_network.costs.calculators import ChempotDistanceCalculator
 from rxn_network.utils import limited_powerset
 
 
@@ -20,14 +26,19 @@ class BasicEnumerator(Enumerator):
     maximum reactant/product cardinality (dim).
     """
 
-    def __init__(self, n: int = 2, target: ComputedEntry = None):
+    def __init__(
+        self,
+        n: int = 2,
+        calculators: Optional[List[Calculator]]=None,
+        target: Optional[ComputedEntry] = None,
+    ):
         self.n = n
+        self.calculators = calculators
         self.target = target
 
     def enumerate(
         self,
         entries: List[ComputedEntry],
-        calculators: List[Calculator],
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
     ) -> List[Reaction]:
@@ -46,17 +57,30 @@ class BasicEnumerator(Enumerator):
 
         combos = list(limited_powerset(entries, self.n))
         combos_dict = group_by_chemsys(combos)
+        entries = EntrySet(entries)
 
         if self.target:
             target_elems = {str(e) for e in self.target.composition.elements}
 
         rxns = []
-        for chemsys, selected_combos in combos_dict.items():
+        for chemsys, selected_combos in tqdm(combos_dict.items()):
+            calculators = []
+            #  TODO: make this calculator check/initialization less awkward
+            if ChempotDistanceCalculator or "ChempotDistanceCalculator" in self.calculators:
+                pd = PhaseDiagram(entries.get_subset_in_chemsys(chemsys.split("-")))
+                cpd = ChempotDiagram(pd, default_limit=-50)
+                calculators.append(ChempotDistanceCalculator(cpd))
+
             if self.target and not target_elems.issubset(chemsys.split("-")):
                 continue
+
             rxn_iter = combinations(selected_combos, 2)
-            rxns.extend(self._filter_and_get_rxns(rxn_iter, self.target,
-                                             remove_unbalanced, remove_changed))
+            rxns.extend(
+                self._filter_and_get_rxns(
+                    rxn_iter, self.target, calculators, remove_unbalanced,
+                    remove_changed
+                )
+            )
 
         return list(set(rxns))
 
@@ -72,8 +96,8 @@ class BasicEnumerator(Enumerator):
         """
         return sum([comb(len(entries), i) for i in range(self.n)]) ** 2
 
-    @staticmethod
-    def _filter_and_get_rxns(rxn_iter, target, remove_unbalanced, remove_changed):
+    def _filter_and_get_rxns(self, rxn_iter, target, calculators, remove_unbalanced,
+                             remove_changed):
         rxns = []
         for reactants, products in rxn_iter:
             r = set(reactants)
@@ -87,7 +111,7 @@ class BasicEnumerator(Enumerator):
             forward_rxn = ComputedReaction.balance(r, p)
 
             if (remove_unbalanced and not (forward_rxn.balanced)) or (
-                    remove_changed and forward_rxn.lowest_num_errors != 0
+                remove_changed and forward_rxn.lowest_num_errors != 0
             ):
                 forward_rxn = None
                 backward_rxn = None
@@ -98,11 +122,19 @@ class BasicEnumerator(Enumerator):
 
             if forward_rxn:
                 if not target or target in p:
+                    forward_rxn = self._apply_calculators(forward_rxn, calculators)
                     rxns.append(forward_rxn)
                 if not target or target in r:
+                    backward_rxn = self._apply_calculators(backward_rxn, calculators)
                     rxns.append(backward_rxn)
 
         return rxns
+
+    @staticmethod
+    def _apply_calculators(rxn, calculators):
+        for calc in calculators:
+            rxn = calc.decorate(rxn)
+        return rxn
 
 
 class BasicOpenEnumerator(BasicEnumerator):
@@ -111,8 +143,11 @@ class BasicOpenEnumerator(BasicEnumerator):
     maximum reactant/product cardinality (dim), with any number of open phases.
     """
 
-    def __init__(self, n: int, open_entries: List[ComputedEntry], target: ComputedEntry = None):
-        super().__init__(n, target)
+    def __init__(
+        self, n: int, open_entries: List[ComputedEntry], calculators: Optional[List[
+                Calculator]]=None, target: ComputedEntry = None
+    ):
+        super().__init__(n, calculators, target)
 
         self.open_entries = open_entries
 
@@ -130,19 +165,36 @@ class BasicOpenEnumerator(BasicEnumerator):
         combos_dict = group_by_chemsys(combos)
         combos_open_dict = group_by_chemsys(combos_with_open)
 
+        entries = EntrySet(entries)
+
         if self.target:
-            target_elems = {str(e) for e in self.target.composition.elements}
+            target_elems = {e.symbol for e in self.target.composition.elements}
 
         rxns = []
-        for chemsys, selected_combos in combos_dict.items():
+        for chemsys, selected_combos in tqdm(combos_dict.items()):
             if chemsys not in combos_open_dict:
                 continue
             if self.target and not target_elems.issubset(chemsys.split("-")):
                 continue
+
+            calculators = []
+            #  TODO: make this calculator check/initialization less awkward
+            if ChempotDistanceCalculator or "ChempotDistanceCalculator" in self.calculators:
+                pd = PhaseDiagram(entries.get_subset_in_chemsys(chemsys.split("-")))
+                cpd = ChempotDiagram(pd, default_limit=-50)
+                calculators.append(ChempotDistanceCalculator(cpd))
+
+            if self.target and not target_elems.issubset(chemsys.split("-")):
+                continue
+
             selected_open_combos = combos_open_dict[chemsys]
             rxn_iter = product(selected_combos, selected_open_combos)
 
-            rxns.extend(self._filter_and_get_rxns(rxn_iter, self.target,
-                                             remove_unbalanced, remove_changed))
+            rxns.extend(
+                self._filter_and_get_rxns(
+                    rxn_iter, self.target, calculators, remove_unbalanced,
+                    remove_changed
+                )
+            )
 
         return list(set(rxns))
