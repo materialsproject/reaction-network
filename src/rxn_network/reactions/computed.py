@@ -1,5 +1,5 @@
 " A ComputedReaction class to generate from ComputedEntry objects "
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 import numpy as np
 from pymatgen import Element
@@ -17,11 +17,15 @@ class ComputedReaction(BasicReaction):
     energies. Will balance the reaction.
     """
 
-    def __init__(self, entries: List[Entry], coefficients: List[float], **kwargs):
+    def __init__(self, entries: List[Entry],
+                 coefficients: List[float],
+                 data: Optional[Dict] = None,
+                 lowest_num_errors: Optional[int] = None
+                 ):
         """
         Args:
-            reactant_entries ([ComputedEntry]): List of reactant_entries.
-            product_entries ([ComputedEntry]): List of product_entries.
+            entries([ComputedEntry]): List of ComputedEntry objects.
+            coefficients([float]): List of reaction coefficients.
         """
         self._entries = entries
         self.reactant_entries = [
@@ -32,7 +36,8 @@ class ComputedReaction(BasicReaction):
         ]
         compositions = [e.composition.reduced_composition for e in entries]
 
-        super().__init__(compositions, coefficients, **kwargs)
+        super().__init__(compositions, coefficients, data=data,
+                         lowest_num_errors=lowest_num_errors)
 
     @property
     def entries(self):
@@ -98,7 +103,9 @@ class ComputedReaction(BasicReaction):
 
     @classmethod
     def balance(
-        cls, reactant_entries: List[Entry], product_entries: List[Entry]
+        cls, reactant_entries: List[Entry],
+            product_entries: List[Entry],
+            data: Optional[Dict] = None
     ):  # pylint: disable = W0221
         """
         Balances and returns a new ComputedReaction
@@ -121,5 +128,6 @@ class ComputedReaction(BasicReaction):
         return cls(
             entries=list(reactant_entries) + list(product_entries),
             coefficients=coefficients,
+            data=data,
             lowest_num_errors=lowest_num_errors,
         )

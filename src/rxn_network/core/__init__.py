@@ -11,13 +11,20 @@ from pymatgen.entries import Entry
 from rxn_network.core.pathway import Pathway
 from rxn_network.core.reaction import Reaction
 
+class Calculator(MSONable, metaclass=ABCMeta):
+    " Base definition for a property calculator "
+
+    @abstractmethod
+    def calculate(self, rxn: Reaction) -> float:
+        " Evaluates the specified property of a reaction"
+
 
 class CostFunction(MSONable, metaclass=ABCMeta):
     " Base definition for a cost function "
 
     @abstractmethod
     def evaluate(self, rxn: Reaction) -> float:
-        " Evaluates the cost function on a reaction "
+        " Evaluates the total cost function on a reaction "
 
 
 class Enumerator(MSONable, metaclass=ABCMeta):

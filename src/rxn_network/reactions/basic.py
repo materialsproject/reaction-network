@@ -29,7 +29,8 @@ class BasicReaction(Reaction):
         compositions: List[Composition],
         coefficients: List[float],
         balanced: Optional[bool] = None,
-        **kwargs
+        data: Optional[Dict] = None,
+        lowest_num_errors: Optional[int] = None,
     ):
 
         self._compositions = compositions
@@ -58,8 +59,8 @@ class BasicReaction(Reaction):
             else:
                 self.balanced = True
 
-        #  if reaction came from balance() method, store this information
-        self.lowest_num_errors = kwargs.get("lowest_num_errors", None)
+        self.data = data
+        self.lowest_num_errors = lowest_num_errors
 
     @property
     def reactants(self) -> List[Composition]:
@@ -355,7 +356,8 @@ class BasicReaction(Reaction):
 
     @classmethod
     def balance(
-        cls, reactants: List[Composition], products: List[Composition]
+        cls, reactants: List[Composition], products: List[Composition],
+            data: Optional[Dict]=None
     ) -> "BasicReaction":
         """
         Reactants and products to be specified as list of
@@ -368,4 +370,4 @@ class BasicReaction(Reaction):
         compositions = reactants + products
         coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)
 
-        return cls(compositions, coeffs)
+        return cls(compositions, coeffs, data=data, lowest_num_errors=lowest_num_errors)

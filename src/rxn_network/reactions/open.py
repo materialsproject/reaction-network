@@ -77,15 +77,6 @@ class OpenComputedReaction(ComputedReaction):
             - set(self.open_elems)
         )
 
-    @property
-    def energy_per_atom(self) -> float:
-        """
-        Returns (float):
-            The calculated reaction energy in eV, divided by the total number of
-            atoms in the reaction.
-        """
-        return self.energy / self.num_atoms
-
     @classmethod
     def balance(
         cls, reactant_entries: List[Entry], product_entries: List[Entry], chempots

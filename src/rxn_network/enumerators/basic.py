@@ -5,7 +5,7 @@ import numpy as np
 
 from pymatgen.entries.computed_entries import ComputedEntry
 
-from rxn_network.core import Enumerator, Reaction
+from rxn_network.core import Enumerator, Reaction, Calculator
 from rxn_network.reactions import ComputedReaction
 from rxn_network.enumerators.utils import (
     get_total_chemsys,
@@ -27,6 +27,7 @@ class BasicEnumerator(Enumerator):
     def enumerate(
         self,
         entries: List[ComputedEntry],
+        calculators: List[Calculator],
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
     ) -> List[Reaction]:
