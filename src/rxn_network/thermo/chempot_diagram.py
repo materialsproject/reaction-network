@@ -54,7 +54,7 @@ class ChempotDiagram(MSONable):
         lims = np.array([[self.default_limit, 0]] * self.dim)
         for idx, elem in enumerate(self.pd.elements):
             if self.limits and elem in self.limits:
-                lims[idx, :] = limits[elem]
+                lims[idx, :] = self.limits[elem]
 
         data = self.pd.qhull_data
         hyperplanes = np.insert(

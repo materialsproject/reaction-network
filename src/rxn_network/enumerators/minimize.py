@@ -1,13 +1,18 @@
-from typing import List
+from typing import List, Optional
 from itertools import chain, combinations, compress, groupby, product
 from math import comb
 import numpy as np
+from tqdm import tqdm
+
 from pymatgen import Element
 from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDiagram
+from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.interface_reactions import InterfacialReactivity
 
 from rxn_network.core import Enumerator, Reaction
 from rxn_network.reactions import ComputedReaction
+from rxn_network.thermo.chempot_diagram import ChempotDiagram
+from rxn_network.costs.calculators import Calculator, ChempotDistanceCalculator
 from rxn_network.enumerators.utils import (
     get_total_chemsys,
     group_by_chemsys,
@@ -25,20 +30,40 @@ class MinimizeGibbsEnumerator(Enumerator):
     line connecting any two phases in G-x phase space. Identity reactions are excluded.
     """
 
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        target: Optional[ComputedEntry] = None,
+        calculators: Optional[List[Calculator]] = None,
+    ):
+        self.target = target
+        self.calculators = calculators
 
     def enumerate(self, entries):
+        if self.target:
+            target_elems = {str(e) for e in self.target.composition.elements}
+
         combos = list(combinations(entries, 2))
         combos_dict = group_by_chemsys(combos)
 
         rxns = []
-        for chemsys, combos in combos_dict.items():
+        for chemsys, combos in tqdm(combos_dict.items()):
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
+
+            calculators = []
+            if (
+                ChempotDistanceCalculator in self.calculators
+                or "ChempotDistanceCalculator" in self.calculators
+            ):
+                cpd = ChempotDiagram(pd, default_limit=-50)
+                calculators.append(ChempotDistanceCalculator(cpd))
+
+            if self.target and not target_elems.issubset(chemsys.split("-")):
+                continue
+
             for e1, e2 in combos:
                 predicted_rxns = self._react_interface(
-                    e1.composition, e2.composition, pd
+                    e1.composition, e2.composition, pd, calculators=calculators
                 )
                 rxns.extend(predicted_rxns)
 
@@ -47,8 +72,9 @@ class MinimizeGibbsEnumerator(Enumerator):
     def estimate_num_reactions(self, entries) -> int:
         return comb(len(entries), 2)
 
-    @staticmethod
-    def _react_interface(r1, r2, pd, grand_pd=None, open_entry=None):
+    def _react_interface(
+        self, r1, r2, pd, grand_pd=None, open_entry=None, calculators=None
+    ):
         if grand_pd:
             interface = InterfacialReactivity(
                 r1,
@@ -83,6 +109,10 @@ class MinimizeGibbsEnumerator(Enumerator):
             if rxn.is_identity or rxn.lowest_num_errors > 0:
                 continue
 
+            if self.target and self.target not in rxn.product_entries:
+                continue
+
+            rxn = self._apply_calculators(rxn, calculators)
             rxns.append(rxn)
 
         return rxns
@@ -96,12 +126,18 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     phase space. Identity reactions are excluded.
     """
 
-    def __init__(self, open_elem, chempot):
-        super().__init__()
+    def __init__(
+        self, open_elem, chempot, target: Optional[ComputedEntry] = None,
+        calculators: Optional[List[Calculator]] = None,
+    ):
+        super().__init__(target=target, calculators=calculators)
         self.open_elem = Element(open_elem)
         self.chempot = chempot
 
     def enumerate(self, entries):
+        if self.target:
+            target_elems = {str(e) for e in self.target.composition.elements}
+
         open_entry = sorted(
             filter(lambda e: e.composition.elements == [self.open_elem], entries),
             key=lambda e: e.energy_per_atom,
@@ -112,15 +148,33 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         combos_dict = group_by_chemsys(combos, self.open_elem)
 
         rxns = []
-        for chemsys, combos in combos_dict.items():
+        for chemsys, combos in tqdm(combos_dict.items()):
+            print(chemsys)
+            if self.target and not target_elems.issubset(chemsys.split("-")):
+                continue
+
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
+
+            calculators = []
+            if (
+                ChempotDistanceCalculator in self.calculators
+                or "ChempotDistanceCalculator" in self.calculators
+            ):
+                cpd = ChempotDiagram(pd, default_limit=-50)
+                calculators.append(ChempotDistanceCalculator(cpd))
+
             grand_pd = GrandPotentialPhaseDiagram(
                 entries, {self.open_elem: self.chempot}
             )
             for e1, e2 in combos:
                 predicted_rxns = self._react_interface(
-                    e1.composition, e2.composition, pd, grand_pd, open_entry
+                    e1.composition,
+                    e2.composition,
+                    pd,
+                    grand_pd,
+                    open_entry,
+                    calculators,
                 )
                 rxns.extend(predicted_rxns)
 

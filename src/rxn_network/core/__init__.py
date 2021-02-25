@@ -38,6 +38,12 @@ class Enumerator(MSONable, metaclass=ABCMeta):
     def estimate_num_reactions(self, entries) -> int:
         " Estimate of the number of reactions from a list of entires "
 
+    @staticmethod
+    def _apply_calculators(rxn, calculators):
+        for calc in calculators:
+            rxn = calc.decorate(rxn)
+        return rxn
+
 
 class ReactionNetwork(MSONable, metaclass=ABCMeta):
     " Base definition for a reaction network "

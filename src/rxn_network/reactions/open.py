@@ -1,9 +1,10 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 import numpy as np
 
 from pymatgen import Element
 from pymatgen.entries import Entry
+from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from rxn_network.reactions.computed import ComputedReaction
 
 class OpenComputedReaction(ComputedReaction):
@@ -13,14 +14,15 @@ class OpenComputedReaction(ComputedReaction):
     """
 
     def __init__(
-        self, entries: List[Entry], coefficients: np.array, chempots, **kwargs
+        self, entries: List[Entry], coefficients: np.array, chempots, data: Optional[
+                Dict] = None, lowest_num_errors=None
     ):
         """
         Args:
             reactant_entries ([ComputedEntry]): List of reactant_entries.
             product_entries ([ComputedEntry]): List of product_entries.
         """
-        super().__init__(entries, coefficients, **kwargs)
+        super().__init__(entries, coefficients, data, lowest_num_errors)
 
         self.chempots = chempots
         self.open_elems = list(chempots.keys())
@@ -79,7 +81,8 @@ class OpenComputedReaction(ComputedReaction):
 
     @classmethod
     def balance(
-        cls, reactant_entries: List[Entry], product_entries: List[Entry], chempots
+        cls, reactant_entries: List[Entry], product_entries: List[Entry], chempots,
+            data=None
     ):  # pylint: disable = W0221
         """
         Balances and returns a new OpenComputedReaction
@@ -104,5 +107,6 @@ class OpenComputedReaction(ComputedReaction):
             entries=list(reactant_entries) + list(product_entries),
             coefficients=list(coefficients),
             chempots=chempots,
+            data=data,
             lowest_num_errors=lowest_num_errors,
         )
