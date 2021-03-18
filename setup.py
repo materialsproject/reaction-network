@@ -18,7 +18,7 @@ setup(
     long_description=long_desc,
     long_description_content_type="text/markdown",
     url="https://github.com/GENESIS-EFRC/reaction-network",
-    author="Matt McDermott",
+    author="Matthew J. McDermott",
     license="modified BSD",
     packages=find_packages("src"),
     package_dir={"": "src"},

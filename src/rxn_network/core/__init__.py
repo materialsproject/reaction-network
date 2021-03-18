@@ -11,6 +11,7 @@ from pymatgen.entries import Entry
 from rxn_network.core.pathway import Pathway
 from rxn_network.core.reaction import Reaction
 
+
 class Calculator(MSONable, metaclass=ABCMeta):
     " Base definition for a property calculator "
 
@@ -37,6 +38,10 @@ class Enumerator(MSONable, metaclass=ABCMeta):
     @abstractmethod
     def estimate_num_reactions(self, entries) -> int:
         " Estimate of the number of reactions from a list of entires "
+
+    @staticmethod
+    def _initialize_calculators(calculators, entries):
+        return [c.from_entries(entries) for c in calculators]
 
     @staticmethod
     def _apply_calculators(rxn, calculators):

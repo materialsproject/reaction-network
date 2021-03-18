@@ -17,14 +17,14 @@ from rxn_network.enumerators.utils import (
 )
 
 from rxn_network.thermo.chempot_diagram import ChempotDiagram
-from rxn_network.costs.calculators import ChempotDistanceCalculator
+import rxn_network.costs.calculators as calcs
 from rxn_network.utils import limited_powerset
 
 
 class BasicEnumerator(Enumerator):
     """
     Enumerator for finding all simple reactions within a set of entries, up to a
-    maximum reactant/product cardinality (dim).
+    maximum reactant/product cardinality (n).
     """
 
     def __init__(
@@ -34,6 +34,12 @@ class BasicEnumerator(Enumerator):
         target: Optional[ComputedEntry] = None,
     ):
         self.n = n
+        if not calculators:
+            calculators = []
+        else:
+            calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in
+                           calculators]
+
         self.calculators = calculators
         self.target = target
 
@@ -44,7 +50,8 @@ class BasicEnumerator(Enumerator):
         remove_changed: bool = True,
     ) -> List[Reaction]:
         """
-        Calculate all possible reactions given a list of entries.
+        Calculate all possible reactions given a list of entries. If the enumerator
+        was initialized with a target, only reactions to this target will be considered.
 
         Args:
             entries: A list of all entries to consider
@@ -55,7 +62,6 @@ class BasicEnumerator(Enumerator):
         Returns:
             List of reactions.
         """
-
         combos = list(limited_powerset(entries, self.n))
         combos_dict = group_by_chemsys(combos)
 
@@ -67,19 +73,13 @@ class BasicEnumerator(Enumerator):
             if self.target and not target_elems.issubset(chemsys.split("-")):
                 continue
 
-            calculators = []
-            #  TODO: make this calculator check/initialization less awkward
-            if (
-                ChempotDistanceCalculator in self.calculators
-                or "ChempotDistanceCalculator" in self.calculators
-            ):
-                pd = PhaseDiagram(filter_entries_by_chemsys(entries, chemsys))
-                cpd = ChempotDiagram(pd, default_limit=-50)
-                calculators.append(ChempotDistanceCalculator(cpd))
+            filtered_entries = filter_entries_by_chemsys(entries, chemsys)
+            calculators = self._initialize_calculators(self.calculators,
+                                                       filtered_entries)
 
             rxn_iter = combinations(selected_combos, 2)
             rxns.extend(
-                self._filter_and_get_rxns(
+                self._get_rxns(
                     rxn_iter,
                     self.target,
                     calculators,
@@ -102,7 +102,7 @@ class BasicEnumerator(Enumerator):
         """
         return sum([comb(len(entries), i) for i in range(self.n)]) ** 2
 
-    def _filter_and_get_rxns(
+    def _get_rxns(
         self, rxn_iter, target, calculators, remove_unbalanced, remove_changed
     ):
         rxns = []
@@ -141,7 +141,7 @@ class BasicEnumerator(Enumerator):
 class BasicOpenEnumerator(BasicEnumerator):
     """
     Enumerator for finding all simple reactions within a set of entries, up to a
-    maximum reactant/product cardinality (dim), with any number of open phases.
+    maximum reactant/product cardinality (n), with any number of open phases.
     """
 
     def __init__(
@@ -181,15 +181,9 @@ class BasicOpenEnumerator(BasicEnumerator):
             if self.target and not target_elems.issubset(chemsys.split("-")):
                 continue
 
-            calculators = []
-            #  TODO: make this calculator check/initialization less awkward
-            if (
-                ChempotDistanceCalculator in self.calculators
-                or "ChempotDistanceCalculator" in self.calculators
-            ):
-                pd = PhaseDiagram(entries.get_subset_in_chemsys(chemsys.split("-")))
-                cpd = ChempotDiagram(pd, default_limit=-50)
-                calculators.append(ChempotDistanceCalculator(cpd))
+            filtered_entries = filter_entries_by_chemsys(entries, chemsys)
+            calculators = self._initialize_calculators(self.calculators,
+                                                       filtered_entries)
 
             if self.target and not target_elems.issubset(chemsys.split("-")):
                 continue
@@ -198,7 +192,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             rxn_iter = product(selected_combos, selected_open_combos)
 
             rxns.extend(
-                self._filter_and_get_rxns(
+                self._get_rxns(
                     rxn_iter,
                     self.target,
                     calculators,

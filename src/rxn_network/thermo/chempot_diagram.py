@@ -25,7 +25,7 @@ class ChempotDiagram(MSONable):
     """
     The chemical potential diagram is the mathematical dual (intensive analog) to the
     traditional compositional phase diagram. To create the diagram, convex
-    minimization is performed in E-μ space by taking the lower convex envelope of
+    minimization is performed in E vs. μ space by taking the lower convex envelope of
     hyperplanes. Accordingly, "points" on the standard phase diagram become
     "domains" in chemical potential space.
     """
@@ -274,9 +274,7 @@ class ChempotDiagram(MSONable):
     @cached_property
     def entry_dict(self) -> Dict[str, ComputedEntry]:
         """
-
         Conversion dictionary between reduced formula and ComputedEntry
-
         """
         return {e.composition.reduced_formula: e for e in self.entries}
 
@@ -298,6 +296,9 @@ class ChempotDiagram(MSONable):
         return min(tree.query(pts2)[0])
 
     def shortest_elemental_domain_distances(self, f1, f2) -> float:
+        """
+        TODO: Use with caution; this function may not yet make sense geometrically!
+        """
         pts1 = self.domains[f1]
         pts2 = self.domains[f2]
         pts1 = pts1[~np.isclose(pts1, self.default_limit).any(axis=1)]

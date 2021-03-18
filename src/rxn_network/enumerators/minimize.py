@@ -50,13 +50,8 @@ class MinimizeGibbsEnumerator(Enumerator):
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
 
-            calculators = []
-            if (
-                ChempotDistanceCalculator in self.calculators
-                or "ChempotDistanceCalculator" in self.calculators
-            ):
-                cpd = ChempotDiagram(pd, default_limit=-50)
-                calculators.append(ChempotDistanceCalculator(cpd))
+            calculators = self._initialize_calculators(self.calculators,
+                                                       chemsys_entries)
 
             if self.target and not target_elems.issubset(chemsys.split("-")):
                 continue
@@ -156,16 +151,11 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
 
-            calculators = []
-            if (
-                ChempotDistanceCalculator in self.calculators
-                or "ChempotDistanceCalculator" in self.calculators
-            ):
-                cpd = ChempotDiagram(pd, default_limit=-50)
-                calculators.append(ChempotDistanceCalculator(cpd))
+            calculators = self._initialize_calculators(self.calculators,
+                                                       fchemsys_entries)
 
             grand_pd = GrandPotentialPhaseDiagram(
-                entries, {self.open_elem: self.chempot}
+                chemsys_entries, {self.open_elem: self.chempot}
             )
             for e1, e2 in combos:
                 predicted_rxns = self._react_interface(
