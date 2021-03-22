@@ -1,5 +1,5 @@
 from monty.json import MSONable
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.analysis.phase_diagram import PhaseDiagram
@@ -9,7 +9,7 @@ from rxn_network.entries.nist import NISTReferenceEntry
 
 
 class GibbsEntrySet(EntrySet):
-    def __init__(self, entries: List[GibbsComputedEntry, NISTReferenceEntry]):
+    def __init__(self, entries: List[Union[GibbsComputedEntry, NISTReferenceEntry]]):
         super().__init__(entries)
 
     @classmethod

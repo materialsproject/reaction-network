@@ -15,7 +15,7 @@ class NISTReferenceEntry(Entry):
     #TODO Citation
     """
 
-    REFERENCES = {**G_COMPOUNDS, **G_GASES}.keys()
+    REFERENCES = {**G_COMPOUNDS, **G_GASES}
 
     def __init__(
         self, composition: Composition, temperature: float = 300,
@@ -69,8 +69,8 @@ class NISTReferenceEntry(Entry):
 
     def __repr__(self):
         output = [
-            f"NISTReferenceEntry {self._formula} - {self.temperature}",
-            f"Gibbs Free Energy (Formation) = {self.energy:.4f}",
+            f"NISTReferenceEntry | {self._formula}",
+            f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
         ]
         return "\n".join(output)
 

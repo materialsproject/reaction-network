@@ -230,8 +230,8 @@ class GibbsComputedEntry(ComputedEntry):
 
     def __repr__(self):
         output = [
-            f"GibbsComputedEntry {self.entry_id} - {self.composition.formula}",
-            f"Gibbs Free Energy (Formation) = {self.energy:.4f}",
+            f"GibbsComputedEntry | {self.entry_id} | {self.composition.formula}",
+            f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
         ]
         return "\n".join(output)
 
