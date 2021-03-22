@@ -1,4 +1,4 @@
-" Specialized Entry to compute gibbs free Energy using the formalism of Bartel et al. 2018"
+" Specialized entry to compute Gibbs Free Energy using the formalism of Bartel et al. 2018"
 import hashlib
 from itertools import combinations
 from typing import List, Optional
@@ -22,13 +22,15 @@ class GibbsComputedEntry(ComputedEntry):
     """
 
     def __init__(
-        self,
-        composition: Composition,
-        formation_energy_per_atom: float,
-        volume_per_atom: float,
-        temperature: float,
-        energy_adjustments: Optional[List] = None,
-        **kwargs,
+            self,
+            composition: Composition,
+            formation_energy_per_atom: float,
+            volume_per_atom: float,
+            temperature: float,
+            energy_adjustments: Optional[List] = None,
+            parameters: dict = None,
+            data: dict = None,
+            entry_id: object = None,
     ):
         """
         Args:
@@ -36,10 +38,12 @@ class GibbsComputedEntry(ComputedEntry):
             formation_energy_per_atom (float): the formation enthalpy, dHf (at 298 K)
             volume_per_atom (float): the volume per atom in Angstrom^3
         """
-        self._composition = composition
+        self._composition = Composition(composition)
         self.formation_energy_per_atom = formation_energy_per_atom
         self.volume_per_atom = volume_per_atom
         self.temperature = temperature
+
+        num_atoms = self.composition.num_atoms
 
         if temperature < 300 or temperature > 2000:
             raise ValueError("Temperature must be selected from range: [300, 2000] K.")
@@ -56,17 +60,18 @@ class GibbsComputedEntry(ComputedEntry):
         energy_adjustments.append(
             ConstantEnergyAdjustment(
                 self.gf_sisso(temperature),
+                uncertainty=0.05 * num_atoms,  # descriptor has ~50 meV/atom MAD
                 name="Gibbs SISSO Correction",
                 description="Correction from the SISSO description of G^delta by "
                             "Bartel et al."
             )
         )
 
-        num_atoms = self.composition.num_atoms
         formation_energy = num_atoms * formation_energy_per_atom
 
         super().__init__(composition=composition, energy=formation_energy,
-                         energy_adjustments=energy_adjustments, **kwargs)
+                         energy_adjustments=energy_adjustments,
+                         parameters=parameters, data=data, entry_id=entry_id)
 
     def gf_sisso(self, temperature) -> float:
         """
@@ -91,9 +96,9 @@ class GibbsComputedEntry(ComputedEntry):
         reduced_mass = self._reduced_mass(self.composition)
 
         return (
-            num_atoms
-            * self._g_delta_sisso(self.volume_per_atom, reduced_mass, temperature)
-            - self._sum_g_i(self.composition, temperature)
+                num_atoms
+                * self._g_delta_sisso(self.volume_per_atom, reduced_mass, temperature)
+                - self._sum_g_i(self.composition, temperature)
         )
 
     @staticmethod
@@ -171,11 +176,30 @@ class GibbsComputedEntry(ComputedEntry):
         """
 
         return (
-            (-2.48e-4 * np.log(volume_per_atom) - 8.94e-5 * reduced_mass /
-             volume_per_atom) * temp
-            + 0.181 * np.log(temp)
-            - 0.882
+                (-2.48e-4 * np.log(volume_per_atom) - 8.94e-5 * reduced_mass /
+                 volume_per_atom) * temp
+                + 0.181 * np.log(temp)
+                - 0.882
         )
+
+    @classmethod
+    def from_structure(cls, structure, formation_energy_per_atom, temperature,
+                       **kwargs):
+        composition = structure.composition
+        volume_per_atom = structure.volume / structure.num_sites
+        entry = cls(composition=composition,
+                    formation_energy_per_atom=formation_energy_per_atom,
+                    volume_per_atom=volume_per_atom,
+                    temperature=temperature
+                    )
+        return entry
+
+    def set_temperature(self, new_temperature):
+        new_entry_dict = self.as_dict()
+        new_entry_dict["temperature"] = new_temperature
+
+        new_entry = self.from_dict(new_entry_dict)
+        return new_entry
 
     def as_dict(self) -> dict:
         """
@@ -183,6 +207,7 @@ class GibbsComputedEntry(ComputedEntry):
         """
         data = super().as_dict()
         data["volume_per_atom"] = self.volume_per_atom
+        data["formation_energy_per_atom"] = self.formation_energy_per_atom
         data["temperature"] = self.temperature
         return data
 
@@ -193,8 +218,15 @@ class GibbsComputedEntry(ComputedEntry):
         :return: GibbsComputedEntry
         """
         dec = MontyDecoder()
-        new_d = dec.process_decoded(d)
-        return cls(**new_d)
+        entry = cls(composition=d["composition"],
+                    formation_energy_per_atom=d["formation_energy_per_atom"],
+                    volume_per_atom=d["volume_per_atom"],
+                    temperature=d["temperature"],
+                    energy_adjustments=dec.process_decoded(d["energy_adjustments"]),
+                    parameters=d["parameters"],
+                    data=d["data"],
+                    entry_id=d["entry_id"])
+        return entry
 
     def __repr__(self):
         output = [
@@ -206,10 +238,10 @@ class GibbsComputedEntry(ComputedEntry):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return (
-                (self.entry_id == other.entry_id)
-                and (self.temperature == other.temperature)
-                and (self.composition == other.composition)
-                and (self.energy == other.energy)
+                    (self.entry_id == other.entry_id)
+                    and (self.temperature == other.temperature)
+                    and (self.composition == other.composition)
+                    and (self.energy == other.energy)
             )
         return False
 

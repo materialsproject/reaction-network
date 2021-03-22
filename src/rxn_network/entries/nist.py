@@ -15,7 +15,7 @@ class NISTReferenceEntry(Entry):
     #TODO Citation
     """
 
-    REFERENCES = {**G_COMPOUNDS.keys(), **G_GASES.keys()}
+    REFERENCES = {**G_COMPOUNDS, **G_GASES}.keys()
 
     def __init__(
         self, composition: Composition, temperature: float = 300,
