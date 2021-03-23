@@ -8,8 +8,8 @@ from monty.json import MSONable
 from pymatgen.core.composition import Composition, Element
 from pymatgen.entries import Entry
 
-from rxn_network.core.pathway import Pathway
 from rxn_network.core.reaction import Reaction
+from rxn_network.core.pathway import Pathway
 
 
 class Calculator(MSONable, metaclass=ABCMeta):
@@ -41,7 +41,7 @@ class Enumerator(MSONable, metaclass=ABCMeta):
 
     @staticmethod
     def _initialize_calculators(calculators, entries):
-        return [c.from_entries(entries) for c in calculators]
+        " "
 
     @staticmethod
     def _apply_calculators(rxn, calculators):

@@ -190,7 +190,7 @@ class GibbsComputedEntry(ComputedEntry):
         entry = cls(composition=composition,
                     formation_energy_per_atom=formation_energy_per_atom,
                     volume_per_atom=volume_per_atom,
-                    temperature=temperature
+                    temperature=temperature, **kwargs
                     )
         return entry
 

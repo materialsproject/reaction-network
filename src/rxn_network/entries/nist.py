@@ -11,10 +11,17 @@ from rxn_network.data import G_COMPOUNDS, G_GASES
 
 class NISTReferenceEntry(Entry):
     """
-    Makes a reference entry using parameters from tabulated NIST values
-    #TODO Citation
-    """
+    An Entry class for NIST-JANAF experimental reference data. Given a composition,
+    the Gibbs free energy of formation, dGf(T) from tabulated values (G_GASES,
+    G_COMPOUNDS).
 
+    Reference:
+
+    Malcolm W. Chase Jr. NIST-JANAF thermochemical tables. Fourth edition.
+    Washington, DC : American Chemical Society;  New York : American Institute of
+    Physics for the National Institute of Standards and Technology, 1998.
+
+    """
     REFERENCES = {**G_COMPOUNDS, **G_GASES}
 
     def __init__(
@@ -22,32 +29,52 @@ class NISTReferenceEntry(Entry):
     ):
         """
         Args:
+            composition (Composition): pymatgen Composition object
             temperature (float): Temperature in Kelvin. If temperature is not selected from
-                one of [300, 400, 500, ... 2000 K], then free energies will
-                be interpolated. Defaults to 300 K.
+                one of [300, 400, 500, ... 2000 K], then free energies will be
+                interpolated. Defaults to 300 K.
         """
         formula = composition.reduced_formula
 
         if formula not in NISTReferenceEntry.REFERENCES:
-            raise ValueError("Formula must be in NIST Referecne table to initialize")
+            raise ValueError("Formula must be in NIST-JANAF thermochemical tables")
 
         if temperature < 300 or temperature > 2000:
             raise ValueError("Temperature must be selected from range: [300, 2000] K.")
 
+        energy = self.get_nist_energy(formula, temperature)
+
         self.temperature = temperature
         self._formula = formula
+        self.name = formula
 
-        # TODO: Supplying energy here is a bug of the pymatgen Entry implementation
-        super().__init__(composition.reduced_composition, energy=0)
+        super().__init__(composition.reduced_composition, energy)
 
     @property
-    def energy(self):
-        data = NISTReferenceEntry.REFERENCES[self._formula]
-        if self.temperature % 100 > 0:
-            g_interp = interp1d([int(t) for t in data.keys()], list(data.values()))
-            return g_interp(self.temperature)
+    def energy(self) -> float:
+        """
+        :return: the energy of the entry.
+        """
+        return self._energy
 
-        return data[str(self.temperature)]
+    @staticmethod
+    def get_nist_energy(formula: str, temperature: float):
+        """
+        Convenience method for accessing and interpolating NIST-JANAF data.
+
+        Args:
+            formula:
+            temperature:
+
+        Returns:
+
+        """
+        data = NISTReferenceEntry.REFERENCES[formula]
+        if temperature % 100 > 0:
+            g_interp = interp1d([int(t) for t in data.keys()], list(data.values()))
+            return g_interp(temperature)
+
+        return data[str(temperature)]
 
     def as_dict(self) -> dict:
         """

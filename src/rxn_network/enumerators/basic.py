@@ -36,9 +36,6 @@ class BasicEnumerator(Enumerator):
         self.n = n
         if not calculators:
             calculators = []
-        else:
-            calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in
-                           calculators]
 
         self.calculators = calculators
         self.target = target
@@ -136,6 +133,12 @@ class BasicEnumerator(Enumerator):
                     rxns.append(backward_rxn)
 
         return rxns
+
+    @staticmethod
+    def _initialize_calculators(calculators, entries):
+        calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in
+                           calculators]
+        return [c.from_entries(entries) for c in calculators]
 
 
 class BasicOpenEnumerator(BasicEnumerator):
