@@ -7,6 +7,7 @@ from pymatgen.entries import Entry
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from rxn_network.reactions.computed import ComputedReaction
 
+
 class OpenComputedReaction(ComputedReaction):
     """
     Extends the ComputedReaction class to add support for "open" reactions,

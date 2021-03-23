@@ -1,9 +1,11 @@
-from monty.json import MSONable
+from monty.json import MSONable, MontyDecoder
 from typing import List, Optional, Union
 from tqdm import tqdm
 
+from pymatgen.core import Composition
 from pymatgen.entries.entry_tools import EntrySet
-from pymatgen.entries.computed_entries import ComputedStructureEntry
+from pymatgen.entries.computed_entries import ComputedStructureEntry, \
+    ConstantEnergyAdjustment
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 
 from rxn_network.entries.gibbs import GibbsComputedEntry
@@ -16,6 +18,7 @@ class GibbsEntrySet(EntrySet):
     An extension of pymatgen's EntrySet to include factory methods for constructing
     GibbsComputedEntry objects from zero-temperature ComputedStructureEntry objects.
     """
+
     def __init__(self, entries: List[Union[GibbsComputedEntry, NISTReferenceEntry]]):
         super().__init__(entries)
 
@@ -54,17 +57,57 @@ class GibbsEntrySet(EntrySet):
         return filtered_entries
 
     def get_min_entry_by_formula(self, formula):
+        """
+
+        Args:
+            formula:
+
+        Returns:
+
+        """
         comp = Composition(formula).reduced_composition
         possible_entries = filter(
             lambda x: x.composition.reduced_composition == comp, self.entries
         )
         return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
 
-    def stabilize_entry(self, entry):
-        pd = PhaseDiagram
+    def stabilize_entry(self, entry, tol=1e-6):
+        """
+
+        Args:
+            entry:
+            tol:
+
+        Returns:
+
+        """
+        chemsys = [str(e) for e in entry.composition.elements]
+        entries = self.get_subset_in_chemsys(chemsys)
+        pd = PhaseDiagram(entries)
+
+        e_above_hull = -pd.get_e_above_hull(entry) * entry.composition.num_atoms - tol
+        adjustment = ConstantEnergyAdjustment(value=e_above_hull,
+                                              name="Stabilization Adjustment",
+                                              description="Shifts energy so that "
+                                                          "entry is on the convex hull")
+
+        entry_dict = entry.as_dict()
+        entry_dict["energy_adjustments"].append(adjustment)
+        new_entry = MontyDecoder().process_decoded(entry_dict)
+
+        return new_entry
 
     @classmethod
     def from_pd(cls, pd: PhaseDiagram, temperature: float) -> 'GibbsEntrySet':
+        """
+
+        Args:
+            pd:
+            temperature:
+
+        Returns:
+
+        """
         gibbs_entries = []
         for entry in pd.all_entries:
             if entry.composition.is_element and entry not in pd.el_refs.values():
@@ -80,19 +123,20 @@ class GibbsEntrySet(EntrySet):
 
                 new_entry = GibbsComputedEntry.from_structure(structure=structure,
                                                               formation_energy_per_atom=formation_energy_per_atom,
-                                               temperature=temperature,
-                                               energy_adjustments=None,
-                                               parameters=entry.parameters,
-                                               data=entry.data,
-                                               entry_id=entry.entry_id,
-                                               )
+                                                              temperature=temperature,
+                                                              energy_adjustments=None,
+                                                              parameters=entry.parameters,
+                                                              data=entry.data,
+                                                              entry_id=entry.entry_id,
+                                                              )
 
             gibbs_entries.append(new_entry)
 
         return cls(gibbs_entries)
 
     @classmethod
-    def from_entries(cls, entries: List[ComputedStructureEntry], temperature: float) -> 'GibbsEntrySet':
+    def from_entries(cls, entries: List[ComputedStructureEntry],
+                     temperature: float) -> 'GibbsEntrySet':
         """
         Constructor method for initializing GibbsEntrySet from
         T = 0 K ComputedStructureEntry objects, as acquired from a thermochemical
