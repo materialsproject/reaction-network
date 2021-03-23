@@ -1,8 +1,10 @@
 import json
 from monty.json import MontyEncoder
+from monty.serialization import dumpfn
 
 from fireworks import explicit_serialize, FiretaskBase, FWAction
 from rxn_network.firetasks.utils import get_logger, env_chk
+from rxn_network.entries.entry_set import GibbsEntrySet
 
 logger = get_logger(__name__)
 
@@ -11,14 +13,21 @@ class RunEnumerators(FiretaskBase):
     required_params = ["enumerators", "entries"]
 
     def run_task(self, fw_spec):
-        enumerators = self.get("enumerators")
-        entries = self.get("entries")
+        enumerators = self["enumerators"]
+        entries = GibbsEntrySet(self["entries"]["entries"])
+        chemsys = "-".join(sorted(list(entries.chemsys)))
+
+        metadata = {}
+        metadata["chemsys"] = chemsys
+        metadata["enumerators"] = enumerators
+        metadata["targets"] = [enumerator.target for enumerator in enumerators]
+        metadata["entries"] = entries
 
         results = []
         for enumerator in enumerators:
             rxns = enumerator.enumerate(entries)
             results.extend(rxns)
 
-        with open("rxns.json", "w") as fp:
-            json.dump(task_doc, fp, cls=MontyEncoder)
+        dumpfn(results, "rxns.json")
+        dumpfn(metadata, "metadata.json")
 

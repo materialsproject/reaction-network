@@ -1,3 +1,5 @@
+"Utility Fireworks functions borrowed from the atomate package."
+
 import logging
 import os
 import sys
@@ -9,22 +11,6 @@ def env_chk(val, fw_spec, strict=True, default=None):
     env_chk() is a way to set different values for a property depending
     on the worker machine. For example, you might have slightly different
     executable names or scratch directories on different machines.
-
-    env_chk() works using the principles of the FWorker env in FireWorks.
-
-    This helper method translates string "val" that looks like this:
-    ">>ENV_KEY<<"
-    to the contents of:
-    fw_spec["_fw_env"][ENV_KEY]
-
-    Otherwise, the string "val" is interpreted literally and passed-through as is.
-
-    The fw_spec["_fw_env"] is in turn set by the FWorker. For more details,
-    see: https://materialsproject.github.io/fireworks/worker_tutorial.html
-
-    Since the fw_env can be set differently for each FireWorker, one can
-    use this method to translate a single "val" into multiple possibilities,
-    thus achieving different behavior on different machines.
 
     Args:
         val: any value, with ">><<" notation reserved for special env lookup values

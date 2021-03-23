@@ -53,6 +53,16 @@ class GibbsEntrySet(EntrySet):
 
         return filtered_entries
 
+    def get_min_entry_by_formula(self, formula):
+        comp = Composition(formula).reduced_composition
+        possible_entries = filter(
+            lambda x: x.composition.reduced_composition == comp, self.entries
+        )
+        return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
+
+    def stabilize_entry(self, entry):
+        pd = PhaseDiagram
+
     @classmethod
     def from_pd(cls, pd: PhaseDiagram, temperature: float) -> 'GibbsEntrySet':
         gibbs_entries = []
@@ -112,4 +122,3 @@ class GibbsEntrySet(EntrySet):
             new_entries.update(gibbs_set)
 
         return cls(new_entries)
-

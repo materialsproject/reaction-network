@@ -42,7 +42,7 @@ class BasicEnumerator(Enumerator):
 
     def enumerate(
         self,
-        entries: List[ComputedEntry],
+        entries: EntrySet,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
     ) -> List[Reaction]:
@@ -139,6 +139,12 @@ class BasicEnumerator(Enumerator):
         calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in
                            calculators]
         return [c.from_entries(entries) for c in calculators]
+
+    @staticmethod
+    def _initialize_targets(targets, entry_set):
+        targets = [entry_set.get_min_entry_by_formula(t) for t in targets]
+
+        return targets
 
 
 class BasicOpenEnumerator(BasicEnumerator):
