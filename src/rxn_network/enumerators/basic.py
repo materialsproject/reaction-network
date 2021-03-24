@@ -6,7 +6,6 @@ from tqdm import tqdm
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.entries.entry_tools import EntrySet
 
 from rxn_network.core import Enumerator, Reaction, Calculator
 from rxn_network.reactions import ComputedReaction
@@ -16,6 +15,7 @@ from rxn_network.enumerators.utils import (
     group_by_chemsys,
 )
 
+from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.thermo.chempot_diagram import ChempotDiagram
 import rxn_network.costs.calculators as calcs
 from rxn_network.utils import limited_powerset
@@ -37,12 +37,11 @@ class BasicEnumerator(Enumerator):
         if not calculators:
             calculators = []
 
-        self.calculators = calculators
-        self.target = target
+        super().__init__(calculators, target)
 
     def enumerate(
         self,
-        entries: EntrySet,
+        entries: GibbsEntrySet,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
     ) -> List[Reaction]:
@@ -59,15 +58,26 @@ class BasicEnumerator(Enumerator):
         Returns:
             List of reactions.
         """
+        entries = GibbsEntrySet(entries)
+
+        target = None
+        if self.target:
+            target = self._initialize_target(self.target, entries)
+            entries.add(target)
+            target_elems = {str(e) for e in target.composition.elements}
+
+        if "ChempotDistanceCalculator" in self.calculators:
+            entries = entries.filter_by_stability(e_above_hull=0.0)
+            self.logger.info("Filtering by stable entries due to use of "
+                             "ChempotDistanceCalculator")
+
         combos = list(limited_powerset(entries, self.n))
         combos_dict = group_by_chemsys(combos)
 
-        if self.target:
-            target_elems = {str(e) for e in self.target.composition.elements}
 
         rxns = []
         for chemsys, selected_combos in tqdm(combos_dict.items()):
-            if self.target and not target_elems.issubset(chemsys.split("-")):
+            if target and not target_elems.issubset(chemsys.split("-")):
                 continue
 
             filtered_entries = filter_entries_by_chemsys(entries, chemsys)
@@ -78,7 +88,7 @@ class BasicEnumerator(Enumerator):
             rxns.extend(
                 self._get_rxns(
                     rxn_iter,
-                    self.target,
+                    target,
                     calculators,
                     remove_unbalanced,
                     remove_changed,
@@ -141,10 +151,9 @@ class BasicEnumerator(Enumerator):
         return [c.from_entries(entries) for c in calculators]
 
     @staticmethod
-    def _initialize_targets(targets, entry_set):
-        targets = [entry_set.get_min_entry_by_formula(t) for t in targets]
-
-        return targets
+    def _initialize_target(target, entry_set):
+        target = entry_set.stabilize_entry(entry_set.get_min_entry_by_formula(target))
+        return target
 
 
 class BasicOpenEnumerator(BasicEnumerator):
@@ -178,7 +187,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         combos_dict = group_by_chemsys(combos)
         combos_open_dict = group_by_chemsys(combos_with_open)
 
-        entries = EntrySet(entries)
+        entries = GibbsEntrySet(entries)
 
         if self.target:
             target_elems = {e.symbol for e in self.target.composition.elements}

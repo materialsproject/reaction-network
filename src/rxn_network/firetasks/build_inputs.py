@@ -15,8 +15,8 @@ from maggma.stores import MongoStore
 from rxn_network.firetasks.utils import get_logger, env_chk
 from rxn_network.entries.entry_set import GibbsEntrySet
 
-logger = get_logger(__name__)
 
+logger = get_logger(__name__)
 
 
 class EntriesFromMPRester(FiretaskBase):

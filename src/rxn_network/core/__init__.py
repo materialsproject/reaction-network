@@ -2,6 +2,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from functools import cached_property
 from typing import List
+import logging
 
 import numpy as np
 from monty.json import MSONable
@@ -30,6 +31,12 @@ class CostFunction(MSONable, metaclass=ABCMeta):
 
 class Enumerator(MSONable, metaclass=ABCMeta):
     " Base definition for a reaction enumeration methodology "
+
+    def __init__(self, calculators, target):
+        self.logger = logging.getLogger(str(self.__class__.__name__))
+        self.logger.setLevel("INFO")
+        self.calculators = calculators
+        self.target = target
 
     @abstractmethod
     def enumerate(self, entries) -> List[Reaction]:

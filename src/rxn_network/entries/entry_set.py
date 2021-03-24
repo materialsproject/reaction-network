@@ -54,7 +54,7 @@ class GibbsEntrySet(EntrySet):
                 all_comps[formula] = entry
                 filtered_entries.add(entry)
 
-        return filtered_entries
+        return self.__class__(filtered_entries)
 
     def get_min_entry_by_formula(self, formula):
         """
@@ -84,16 +84,20 @@ class GibbsEntrySet(EntrySet):
         chemsys = [str(e) for e in entry.composition.elements]
         entries = self.get_subset_in_chemsys(chemsys)
         pd = PhaseDiagram(entries)
+        e_above_hull = pd.get_e_above_hull(entry)
 
-        e_above_hull = -pd.get_e_above_hull(entry) * entry.composition.num_atoms - tol
-        adjustment = ConstantEnergyAdjustment(value=e_above_hull,
-                                              name="Stabilization Adjustment",
-                                              description="Shifts energy so that "
-                                                          "entry is on the convex hull")
+        if e_above_hull == 0.0:
+            new_entry = entry
+        else:
+            e_adj = -pd.get_e_above_hull(entry) * entry.composition.num_atoms - tol
+            adjustment = ConstantEnergyAdjustment(value=e_adj,
+                                                  name="Stabilization Adjustment",
+                                                  description="Shifts energy so that "
+                                                              "entry is on the convex hull")
 
-        entry_dict = entry.as_dict()
-        entry_dict["energy_adjustments"].append(adjustment)
-        new_entry = MontyDecoder().process_decoded(entry_dict)
+            entry_dict = entry.as_dict()
+            entry_dict["energy_adjustments"].append(adjustment)
+            new_entry = MontyDecoder().process_decoded(entry_dict)
 
         return new_entry
 
