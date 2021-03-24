@@ -1,4 +1,4 @@
-" Specialized entry to compute Gibbs Free Energy using the formalism of Bartel et al. 2018"
+" Specialized entry to estimate Gibbs Free Energy"
 import hashlib
 from itertools import combinations
 from typing import List, Optional
@@ -15,7 +15,8 @@ from rxn_network.data import G_ELEMS
 class GibbsComputedEntry(ComputedEntry):
     """
     An extension to ComputedEntry which estimates the Gibbs free energy of formation
-    of solids via a machine-learned model.
+    of solids using energy adjustments from a model, such as the machine learned
+    SISSO descriptor from Bartel et al. (2018).
 
     WARNING: This descriptor only applies to solids. See NISTEntry for common
     gases (e.g. CO2) where possible.
@@ -35,7 +36,7 @@ class GibbsComputedEntry(ComputedEntry):
         """
         Args:
             composition (Composition): the composition of the structure
-            formation_energy_per_atom (float): the formation enthalpy, dHf (at 298 K)
+            formation_energy_per_atom (float): the formation enthalpy, dHf (T=298 K)
             volume_per_atom (float): the volume per atom in Angstrom^3
         """
         self._composition = Composition(composition)
@@ -59,11 +60,10 @@ class GibbsComputedEntry(ComputedEntry):
 
         energy_adjustments.append(
             ConstantEnergyAdjustment(
-                self.gf_sisso(temperature),
+                self.gibbs_adjustment(temperature),
                 uncertainty=0.05 * num_atoms,  # descriptor has ~50 meV/atom MAD
                 name="Gibbs SISSO Correction",
-                description="Correction from the SISSO description of G^delta by "
-                            "Bartel et al."
+                description=f"Gibbs correction: dGf({self.temperature} K) - dHf (298 K)"
             )
         )
 
@@ -73,10 +73,21 @@ class GibbsComputedEntry(ComputedEntry):
                          energy_adjustments=energy_adjustments,
                          parameters=parameters, data=data, entry_id=entry_id)
 
-    def gf_sisso(self, temperature) -> float:
+    def set_temperature(self, new_temperature):
+        new_entry_dict = self.as_dict()
+        new_entry_dict["temperature"] = new_temperature
+
+        new_entry = self.from_dict(new_entry_dict)
+        return new_entry
+
+    def gibbs_adjustment(self, temperature) -> float:
         """
-        Gibbs Free Energy of formation as calculated by SISSO descriptor from Bartel
-        et al. (2018). Units: eV (not normalized)
+        Returns the difference between the predicted Gibbs formation energy and the
+        formation enthalpy at 298 K, i.e., dGf(T) - dHf(298 K). Calculated using
+        SISSO descriptor from Bartel et al. (2018) and elemental chemical potentials
+        (FactSage).
+
+        Units: eV (not normalized)
 
         Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
         Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
@@ -99,6 +110,29 @@ class GibbsComputedEntry(ComputedEntry):
                 num_atoms
                 * self._g_delta_sisso(self.volume_per_atom, reduced_mass, temperature)
                 - self._sum_g_i(self.composition, temperature)
+        )
+
+    @staticmethod
+    def _g_delta_sisso(volume_per_atom, reduced_mass, temp) -> float:
+        """
+        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
+        Bartel et al. (2018).
+
+        Args:
+            vol_per_atom (float): volume per atom [Å^3/atom]
+            reduced_mass (float) - reduced mass as calculated with pair-wise sum formula
+                [amu]
+            temp (float) - Temperature [K]
+
+        Returns:
+            float: G^delta
+        """
+
+        return (
+                (-2.48e-4 * np.log(volume_per_atom) - 8.94e-5 * reduced_mass /
+                 volume_per_atom) * temp
+                + 0.181 * np.log(temp)
+                - 0.882
         )
 
     @staticmethod
@@ -133,7 +167,8 @@ class GibbsComputedEntry(ComputedEntry):
     @staticmethod
     def _reduced_mass(composition) -> float:
         """
-        Reduced mass as calculated via Eq. 6 in Bartel et al. (2018)
+        Reduced mass as calculated via Eq. 6 in Bartel et al. (2018), to be used in
+        SISSO descriptor equation.
 
         Returns:
             float: reduced mass (amu)
@@ -159,29 +194,6 @@ class GibbsComputedEntry(ComputedEntry):
 
         return reduced_mass
 
-    @staticmethod
-    def _g_delta_sisso(volume_per_atom, reduced_mass, temp) -> float:
-        """
-        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
-        Bartel et al. (2018).
-
-        Args:
-            vol_per_atom (float): volume per atom [Å^3/atom]
-            reduced_mass (float) - reduced mass as calculated with pair-wise sum formula
-                [amu]
-            temp (float) - Temperature [K]
-
-        Returns:
-            float: G^delta
-        """
-
-        return (
-                (-2.48e-4 * np.log(volume_per_atom) - 8.94e-5 * reduced_mass /
-                 volume_per_atom) * temp
-                + 0.181 * np.log(temp)
-                - 0.882
-        )
-
     @classmethod
     def from_structure(cls, structure, formation_energy_per_atom, temperature,
                        **kwargs):
@@ -193,13 +205,6 @@ class GibbsComputedEntry(ComputedEntry):
                     temperature=temperature, **kwargs
                     )
         return entry
-
-    def set_temperature(self, new_temperature):
-        new_entry_dict = self.as_dict()
-        new_entry_dict["temperature"] = new_temperature
-
-        new_entry = self.from_dict(new_entry_dict)
-        return new_entry
 
     def as_dict(self) -> dict:
         """

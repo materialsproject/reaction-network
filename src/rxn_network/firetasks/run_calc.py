@@ -6,7 +6,9 @@ from fireworks import explicit_serialize, FiretaskBase, FWAction
 from rxn_network.firetasks.utils import get_logger, env_chk
 from rxn_network.entries.entry_set import GibbsEntrySet
 
+
 logger = get_logger(__name__)
+
 
 @explicit_serialize
 class RunEnumerators(FiretaskBase):
@@ -14,7 +16,14 @@ class RunEnumerators(FiretaskBase):
 
     def run_task(self, fw_spec):
         enumerators = self["enumerators"]
-        entries = GibbsEntrySet(self["entries"]["entries"])
+        entries = self.get("entries", None)
+
+        if not entries:
+            entries = fw_spec['entries']
+        else:
+            entries = entries["entries"]
+
+        entries = GibbsEntrySet(entries)
         chemsys = "-".join(sorted(list(entries.chemsys)))
 
         metadata = {}
@@ -31,3 +40,7 @@ class RunEnumerators(FiretaskBase):
         dumpfn(results, "rxns.json")
         dumpfn(metadata, "metadata.json")
 
+
+@explicit_serialize
+class RunNetwork(FiretaskBase):
+    pass

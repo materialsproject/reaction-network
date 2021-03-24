@@ -19,6 +19,7 @@ from rxn_network.entries.entry_set import GibbsEntrySet
 logger = get_logger(__name__)
 
 
+@explicit_serialize
 class EntriesFromMPRester(FiretaskBase):
     required_params = ["chemsys", "temperature", "e_above_hull", ]
     optional_params = ["include_polymorphs"]
@@ -32,24 +33,25 @@ class EntriesFromMPRester(FiretaskBase):
         with MPRester() as mpr:
             entries = mpr.get_entries_in_chemsys(elements=chemsys,
                                                  inc_structure=True)
+
         entries = process_entries(entries, temperature, e_above_hull, include_polymorphs)
-        return FWAction(update_spec=entries)
+        return FWAction(update_spec={"entries":entries})
 
 
 @explicit_serialize
 class EntriesFromDb(FiretaskBase):
-    required_params = ["db_file", "chemsys", "e_above_hull", "temperature"]
+    required_params = ["entry_db_file", "chemsys", "e_above_hull", "temperature"]
     optional_params = ["include_polymorphs"]
 
     def run_task(self, fw_spec):
-        db_file = env_chk(self.get("db_file"), fw_spec)
+        db_file = self["entry_db_file"]
 
         get_all_entries_in_chemsys(self["chemsys"])
 
         d = {}
 
         entries = process_entries(entries, temperature, e_above_hull, include_polymorphs)
-        return FWAction(update_spec=entries)
+        return FWAction(update_spec={"entries":entries})
 
 
 def process_entries(entries, temperature, e_above_hull, include_polymorphs):

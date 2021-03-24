@@ -9,17 +9,17 @@ class EnumeratorFW(Firework):
     """
     Firework for running a list of enumerators (which outputs a list of reactions).
     """
-    def __init__(self, enumerators, entries_or_spec=None, db_file=None,
-                 entry_db_file=None, parents=None):
+    def __init__(self, enumerators, entries=None, chemsys=None,
+                 temperature=None, e_above_hull=None, db_file=None, entry_db_file=None,
+                 include_polymorphs=False, parents=None):
 
         tasks = []
 
-        if type(entries_or_spec) == dict:
-            chemsys = entries_or_spec.get("chemsys")
-            e_above_hull = entries_or_spec.get("e_above_hull")
-            temperature = entries_or_spec.get("temperature")
-            include_polymorphs = entries_or_spec.get("include_polymorphs", False)
-
+        entry_set = None
+        if entries:
+            entry_set = GibbsEntrySet(entries)
+            chemsys = "-".join(sorted(list(entry_set.chemsys)))
+        else:
             if entry_db_file:
                 entry_task = EntriesFromDb(chemsys=chemsys,
                                            temperature=temperature,
@@ -31,12 +31,8 @@ class EnumeratorFW(Firework):
                                                  e_above_hull=e_above_hull,
                                                  include_polymorphs=include_polymorphs)
             tasks.append(entry_task)
-        else:
-            entry_set = GibbsEntrySet(entries)
 
         targets = [enumerator.target for enumerator in enumerators]
-
-        chemsys = "-".join(sorted(list(entry_set.chemsys)))
         fw_name = f"Reaction Enumeration (Target: {targets}): {chemsys}"
 
         tasks.append(RunEnumerators(enumerators=enumerators, entries=entry_set,
@@ -44,6 +40,7 @@ class EnumeratorFW(Firework):
         tasks.append(ReactionsToDb(db_file=db_file, calc_dir="."))
 
         super().__init__(tasks, parents=parents, name=fw_name)
+
 
 class NetworkFW(Firework):
     pass
