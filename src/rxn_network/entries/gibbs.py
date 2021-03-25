@@ -44,7 +44,7 @@ class GibbsComputedEntry(ComputedEntry):
         self.volume_per_atom = volume_per_atom
         self.temperature = temperature
 
-        num_atoms = self.composition.num_atoms
+        num_atoms = self._composition.num_atoms
 
         if temperature < 300 or temperature > 2000:
             raise ValueError("Temperature must be selected from range: [300, 2000] K.")
@@ -100,16 +100,16 @@ class GibbsComputedEntry(ComputedEntry):
         Returns:
             float: the correction to Gibbs free energy of formation (eV) from DFT energy
         """
-        if self.composition.is_element:
+        if self._composition.is_element:
             return 0
 
-        num_atoms = self.composition.num_atoms
-        reduced_mass = self._reduced_mass(self.composition)
+        num_atoms = self._composition.num_atoms
+        reduced_mass = self._reduced_mass(self._composition)
 
         return (
                 num_atoms
                 * self._g_delta_sisso(self.volume_per_atom, reduced_mass, temperature)
-                - self._sum_g_i(self.composition, temperature)
+                - self._sum_g_i(self._composition, temperature)
         )
 
     @staticmethod

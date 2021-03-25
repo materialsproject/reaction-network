@@ -49,7 +49,7 @@ class EntriesFromMPRester(FiretaskBase):
 
         with MPRester() as mpr:
             entries = mpr.get_entries_in_chemsys(elements=chemsys,
-                                                 inc_structure=True)
+                                                 inc_structure="fiinal")
 
         entries = process_entries(entries, temperature, e_above_hull, include_polymorphs)
         return FWAction(update_spec={"entries":entries})
@@ -84,7 +84,7 @@ class EntriesFromDb(FiretaskBase):
 
         with MongoStore.from_db_file(db_file) as db:
             entries = get_all_entries_in_chemsys(db, self["chemsys"],
-                                                 inc_structure=True)
+                                                 inc_structure="final")
 
         entries = process_entries(entries, temperature, e_above_hull, include_polymorphs)
         return FWAction(update_spec={"entries":entries})

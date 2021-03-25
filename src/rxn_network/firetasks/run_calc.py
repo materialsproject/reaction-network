@@ -5,6 +5,7 @@ from monty.serialization import dumpfn
 from fireworks import explicit_serialize, FiretaskBase, FWAction
 from rxn_network.firetasks.utils import get_logger, env_chk
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.reactions.reaction_set import ReactionSet
 
 
 logger = get_logger(__name__)
@@ -30,12 +31,13 @@ class RunEnumerators(FiretaskBase):
         metadata["chemsys"] = chemsys
         metadata["enumerators"] = enumerators
         metadata["targets"] = [enumerator.target for enumerator in enumerators]
-        metadata["entries"] = entries
 
         results = []
         for enumerator in enumerators:
             rxns = enumerator.enumerate(entries)
             results.extend(rxns)
+
+        results = ReactionSet.from_rxns(rxns, entries)
 
         dumpfn(results, "rxns.json")
         dumpfn(metadata, "metadata.json")

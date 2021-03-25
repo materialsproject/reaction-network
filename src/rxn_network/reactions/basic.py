@@ -189,6 +189,14 @@ class BasicReaction(Reaction):
         """
         return self.normalized_repr_and_factor()[0]
 
+    def get_vector(self, entry_indices, num_entries):
+        entry_indices = np.array(entry_indices)
+
+        vector = np.zeros(num_entries)
+        vector[entry_indices] = self._coefficients
+
+        return vector
+
     @staticmethod
     def _reduce(coeffs, compositions):
         r_coeffs = np.zeros(len(coeffs))

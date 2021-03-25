@@ -27,7 +27,7 @@ class ComputedReaction(BasicReaction):
             entries([ComputedEntry]): List of ComputedEntry objects.
             coefficients([float]): List of reaction coefficients.
         """
-        self._entries = entries
+        self._entries = list(entries)
         self.reactant_entries = [
             entry for entry, coeff in zip(entries, coefficients) if coeff < 0
         ]
