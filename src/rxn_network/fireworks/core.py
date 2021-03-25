@@ -21,7 +21,8 @@ class EnumeratorFW(Firework):
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
             if entry_db_file:
-                entry_task = EntriesFromDb(chemsys=chemsys,
+                entry_task = EntriesFromDb(entry_db_file=entry_db_file,
+                                           chemsys=chemsys,
                                            temperature=temperature,
                                            e_above_hull=e_above_hull,
                                            include_polymorphs=include_polymorphs)

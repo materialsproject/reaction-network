@@ -21,7 +21,24 @@ logger = get_logger(__name__)
 
 @explicit_serialize
 class EntriesFromMPRester(FiretaskBase):
-    required_params = ["chemsys", "temperature", "e_above_hull", ]
+    """
+    Acquire ComputedStructureEntry objects from the Materials Project database.
+    Automatically builds GibbsComputedEntry objects at specified temperature and
+    filters by e_above_hull stability.
+
+    Note: the PMG_MAPI_KEY enviornment variable must be properly configured on the
+    computing resource.
+
+    Required params:
+        chemsys (str):
+        temperature (float):
+        e_above_hull (float):
+
+    Optional params:
+        include_polymorphs (bool):
+
+    """
+    required_params = ["chemsys", "temperature", "e_above_hull"]
     optional_params = ["include_polymorphs"]
 
     def run_task(self, fw_spec):
@@ -40,15 +57,34 @@ class EntriesFromMPRester(FiretaskBase):
 
 @explicit_serialize
 class EntriesFromDb(FiretaskBase):
-    required_params = ["entry_db_file", "chemsys", "e_above_hull", "temperature"]
+    """
+    Acquire ComputedStructureEntry objects from a custom materials MongoDB.
+    Automatically builds GibbsComputedEntry objects at specified temperature and
+    filters by e_above_hull stability.
+
+    Required params:
+        entry_db_file (str):
+        chemsys (str):
+        temperature (float):
+        e_above_hull (float):
+
+    Optional params:
+        include_polymorphs (bool):
+
+    """
+    required_params = ["entry_db_file", "chemsys", "temperature", "e_above_hull", ]
     optional_params = ["include_polymorphs"]
 
     def run_task(self, fw_spec):
         db_file = self["entry_db_file"]
+        chemsys = self["chemsys"]
+        temperature = self["temperature"]
+        e_above_hull = self["e_above_hull"]
+        include_polymorphs = self.get("include_polymorphs", False)
 
-        get_all_entries_in_chemsys(self["chemsys"])
-
-        d = {}
+        with MongoStore.from_db_file(db_file) as db:
+            entries = get_all_entries_in_chemsys(db, self["chemsys"],
+                                                 inc_structure=True)
 
         entries = process_entries(entries, temperature, e_above_hull, include_polymorphs)
         return FWAction(update_spec={"entries":entries})
@@ -130,7 +166,7 @@ def get_entries(
     criteria.update({"deprecated": False})
 
     entries = []
-    for d in db.find(criteria, props):
+    for d in db.query(criteria, props):
         d["potcar_symbols"] = [
             "%s %s" % (d["pseudo_potential"]["functional"], l)
             for l in d["pseudo_potential"].get("labels", [])

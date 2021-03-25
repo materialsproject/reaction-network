@@ -34,6 +34,7 @@ class NISTReferenceEntry(Entry):
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
         """
+        composition = Composition(composition)
         formula = composition.reduced_formula
 
         if formula not in NISTReferenceEntry.REFERENCES:
@@ -90,9 +91,8 @@ class NISTReferenceEntry(Entry):
         :param d: Dict representation.
         :return: NISTReferenceEntry
         """
-        dec = MontyDecoder()
-        new_d = dec.process_decoded(d)
-        return cls(**new_d)
+        return cls(composition=d["composition"],
+                   temperature=d["temperature"])
 
     def __repr__(self):
         output = [
