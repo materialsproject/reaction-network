@@ -76,7 +76,7 @@ class EntriesFromDb(FiretaskBase):
     optional_params = ["include_polymorphs"]
 
     def run_task(self, fw_spec):
-        db_file = self["entry_db_file"]
+        db_file = env_chk(self["entry_db_file"], fw_spec)
         chemsys = self["chemsys"]
         temperature = self["temperature"]
         e_above_hull = self["e_above_hull"]

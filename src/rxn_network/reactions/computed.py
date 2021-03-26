@@ -108,7 +108,7 @@ class ComputedReaction(BasicReaction):
             data: Optional[Dict] = None
     ):  # pylint: disable = W0221
         """
-        Balances and returns a new ComputedReaction
+        Balances and returns a new ComputedReaction.
 
         Reactants and products to be specified as list of
         pymatgen.core.structure.Composition.  e.g., [comp1, comp2]
