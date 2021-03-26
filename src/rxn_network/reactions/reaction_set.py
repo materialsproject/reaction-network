@@ -18,13 +18,9 @@ class ReactionSet(MSONable):
     @cached_property
     def rxns(self):
         rxns = []
-        all_entries = np.array(self.entries)
-        for vec in self.array:
-            indices = vec.nonzero()
-            coefficients = vec[indices]
-            entries = all_entries[indices]
-            rxns.append(ComputedReaction(entries=entries, coefficients=coefficients))
-
+        for indices, coeffs in zip(self.all_indices, self.all_coeffs):
+            entries = [self.entries[i] for i in indices]
+            rxns.append(ComputedReaction(entries=entries, coefficients=coeffs))
         return rxns
 
     @classmethod
@@ -34,13 +30,12 @@ class ReactionSet(MSONable):
 
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
         n = len(entries)
-        arr = []
+        all_indices, all_coeffs = [], []
         for rxn in rxns:
-            entry_indices = [entries.index(e) for e in rxn.entries]
-            arr.append(rxn.get_vector(entry_indices, n))
-        arr = np.array(arr)
+            all_indices.append([entries.index(e) for e in rxn.entries])
+            all_coeffs.append(list(rxn.coefficients))
 
-        return cls(array=arr, entries=entries)
+        return cls(entries=entries, all_indices=all_indices, all_coeffs=all_coeffs)
 
     @staticmethod
     def _get_unique_entries(rxns):
