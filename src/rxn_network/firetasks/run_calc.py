@@ -26,11 +26,18 @@ class RunEnumerators(FiretaskBase):
 
         entries = GibbsEntrySet(entries)
         chemsys = "-".join(sorted(list(entries.chemsys)))
+        target = enumerators[0].target
+        added_elems = None
+        if target:
+            added_elems = entries.chemsys - {str(e) for e in Composition(
+                target).elements}
+            added_elems = "-".join(sorted(list(added_elems)))
 
         metadata = {}
         metadata["chemsys"] = chemsys
         metadata["enumerators"] = enumerators
-        metadata["targets"] = [enumerator.target for enumerator in enumerators]
+        metadata["target"] = target
+        metadata["added_elems"] = added_elems
 
         results = []
         for enumerator in enumerators:

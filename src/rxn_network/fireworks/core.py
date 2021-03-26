@@ -33,8 +33,11 @@ class EnumeratorFW(Firework):
                                                  include_polymorphs=include_polymorphs)
             tasks.append(entry_task)
 
-        targets = [enumerator.target for enumerator in enumerators]
-        fw_name = f"Reaction Enumeration (Target: {targets}): {chemsys}"
+        targets = {enumerator.target for enumerator in enumerators}
+        if len(targets) != 1:
+            raise ValueError("Enumerators contain different targets!")
+        target = targets.pop()
+        fw_name = f"Reaction Enumeration (Target: {target}): {chemsys}"
 
         tasks.append(RunEnumerators(enumerators=enumerators, entries=entry_set,
                                     chemsys=chemsys))
