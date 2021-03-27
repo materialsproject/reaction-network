@@ -73,7 +73,7 @@ class NISTReferenceEntry(Entry):
         data = NISTReferenceEntry.REFERENCES[formula]
         if temperature % 100 > 0:
             g_interp = interp1d([float(t) for t in data.keys()], list(data.values()))
-            return g_interp(temperature)
+            return g_interp(temperature)[()]
 
         return data[str(temperature)]
 
