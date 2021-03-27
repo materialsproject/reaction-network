@@ -3,6 +3,7 @@ from monty.json import MontyEncoder
 from monty.serialization import dumpfn
 
 from fireworks import explicit_serialize, FiretaskBase, FWAction
+from pymatgen.core import Composition
 from rxn_network.firetasks.utils import get_logger, env_chk
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.reaction_set import ReactionSet
