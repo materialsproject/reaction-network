@@ -10,10 +10,13 @@ class ReactionSet(MSONable):
     """
     A lightweight class for storing large sets of ComputedReaction objects.
     """
-    def __init__(self, entries, all_indices, all_coeffs):
+    def __init__(self, entries, all_indices, all_coeffs, all_data=None):
         self.entries = entries
         self.all_indices = all_indices
         self.all_coeffs = all_coeffs
+        if not all_data:
+            all_data = []
+        self.all_data = all_data
 
     @cached_property
     def rxns(self):
@@ -22,6 +25,9 @@ class ReactionSet(MSONable):
             entries = [self.entries[i] for i in indices]
             rxns.append(ComputedReaction(entries=entries, coefficients=coeffs))
         return rxns
+
+    def calculate_costs(self, cf):
+        return [cf.evaluate(rxn) for rxn in self.rxns]
 
     @classmethod
     def from_rxns(cls, rxns, entries=None):
@@ -34,8 +40,10 @@ class ReactionSet(MSONable):
         for rxn in rxns:
             all_indices.append([entries.index(e) for e in rxn.entries])
             all_coeffs.append(list(rxn.coefficients))
+            all_data.append(rxn.data)
 
-        return cls(entries=entries, all_indices=all_indices, all_coeffs=all_coeffs)
+        return cls(entries=entries, all_indices=all_indices, all_coeffs=all_coeffs,
+                   all_data=all_data)
 
     @staticmethod
     def _get_unique_entries(rxns):
