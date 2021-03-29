@@ -101,6 +101,10 @@ class ComputedReaction(BasicReaction):
             ]
         )
 
+    @property
+    def energy_uncertainty_per_atom(self):
+        return self.energy_uncertainty / self.num_atoms
+
     @classmethod
     def balance(
         cls, reactant_entries: List[Entry],

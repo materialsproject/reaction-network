@@ -77,6 +77,23 @@ class NISTReferenceEntry(Entry):
 
         return data[str(temperature)]
 
+    @property
+    def correction_uncertainty(self) -> float:
+        """
+        Returns:
+            float: the uncertainty of the energy adjustments applied to the entry, in eV
+        """
+        return 0
+
+    @property
+    def correction_uncertainty_per_atom(self) -> float:
+        """
+        Returns:
+            float: the uncertainty of the energy adjustments applied to the entry,
+                normalized by atoms (units of eV/atom)
+        """
+        return 0
+
     def as_dict(self) -> dict:
         """
         :return: MSONAble dict.

@@ -1,9 +1,11 @@
 from typing import List, Dict, Optional
-from functools import cached_property
+from functools import lru_cache
 import numpy as np
 from monty.json import MSONable
+from pymatgen.core import Element
 
 from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.reactions.open import OpenComputedReaction
 
 
 class ReactionSet(MSONable):
@@ -18,12 +20,19 @@ class ReactionSet(MSONable):
             all_data = []
         self.all_data = all_data
 
-    @cached_property
-    def rxns(self):
+    @lru_cache(1)
+    def get_rxns(self, open_elem, chempot=0):
         rxns = []
-        for indices, coeffs in zip(self.all_indices, self.all_coeffs):
+        chempots = {Element(open_elem):chempot}
+        for indices, coeffs, data in zip(self.all_indices, self.all_coeffs,
+                                         self.all_data):
             entries = [self.entries[i] for i in indices]
-            rxns.append(ComputedReaction(entries=entries, coefficients=coeffs))
+            if chempots:
+                rxns.append(OpenComputedReaction(entries=entries, coefficients=coeffs,
+                                         data=data, chempots=chempots))
+            else:
+                rxns.append(ComputedReaction(entries=entries, coefficients=coeffs,
+                                         data=data))
         return rxns
 
     def calculate_costs(self, cf):

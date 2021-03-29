@@ -45,7 +45,7 @@ class RunEnumerators(FiretaskBase):
             rxns = enumerator.enumerate(entries)
             results.extend(rxns)
 
-        results = ReactionSet.from_rxns(rxns, entries)
+        results = ReactionSet.from_rxns(results, entries)
 
         dumpfn(results, "rxns.json")
         dumpfn(metadata, "metadata.json")
