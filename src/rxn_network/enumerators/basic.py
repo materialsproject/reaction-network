@@ -24,7 +24,7 @@ from rxn_network.utils import limited_powerset
 class BasicEnumerator(Enumerator):
     """
     Enumerator for finding all simple reactions within a set of entries, up to a
-    maximum reactant/product cardinality (n).
+    maximum reactant and product cardinality (n).
     """
 
     def __init__(
@@ -73,7 +73,6 @@ class BasicEnumerator(Enumerator):
 
         combos = list(limited_powerset(entries, self.n))
         combos_dict = group_by_chemsys(combos)
-
 
         rxns = []
         for chemsys, selected_combos in tqdm(combos_dict.items()):
@@ -174,9 +173,23 @@ class BasicOpenEnumerator(BasicEnumerator):
         self.open_entries = open_entries
 
     def enumerate(self, entries, remove_unbalanced=True, remove_changed=True):
+        entries = GibbsEntrySet(entries)
+
+        target = None
+        if self.target:
+            target = self._initialize_target(self.target, entries)
+            entries.add(target)
+            target_elems = {str(e) for e in target.composition.elements}
+
+        if "ChempotDistanceCalculator" in self.calculators:
+            entries = entries.filter_by_stability(e_above_hull=0.0)
+            self.logger.info("Filtering by stable entries due to use of "
+                             "ChempotDistanceCalculator")
+
         combos = [set(c) for c in limited_powerset(entries, self.n)]
+        open_entries = self._initialize_open_entries(self.open_entries, entries)
         open_combos = [
-            set(c) for c in limited_powerset(self.open_entries, len(self.open_entries))
+            set(c) for c in limited_powerset(open_entries, len(open_entries))
         ]
         combos_with_open = [
             combo | open_combo
@@ -187,23 +200,18 @@ class BasicOpenEnumerator(BasicEnumerator):
         combos_dict = group_by_chemsys(combos)
         combos_open_dict = group_by_chemsys(combos_with_open)
 
-        entries = GibbsEntrySet(entries)
-
-        if self.target:
-            target_elems = {e.symbol for e in self.target.composition.elements}
-
         rxns = []
         for chemsys, selected_combos in tqdm(combos_dict.items()):
             if chemsys not in combos_open_dict:
                 continue
-            if self.target and not target_elems.issubset(chemsys.split("-")):
+            if target and not target_elems.issubset(chemsys.split("-")):
                 continue
 
             filtered_entries = filter_entries_by_chemsys(entries, chemsys)
             calculators = self._initialize_calculators(self.calculators,
                                                        filtered_entries)
 
-            if self.target and not target_elems.issubset(chemsys.split("-")):
+            if target and not target_elems.issubset(chemsys.split("-")):
                 continue
 
             selected_open_combos = combos_open_dict[chemsys]
@@ -212,7 +220,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             rxns.extend(
                 self._get_rxns(
                     rxn_iter,
-                    self.target,
+                    target,
                     calculators,
                     remove_unbalanced,
                     remove_changed,
@@ -220,3 +228,9 @@ class BasicOpenEnumerator(BasicEnumerator):
             )
 
         return list(set(rxns))
+
+    @staticmethod
+    def _initialize_open_entries(open_entries, entry_set):
+        open_entries = [entry_set.get_min_entry_by_formula(e) for e in open_entries]
+        return open_entries
+
