@@ -195,6 +195,7 @@ class ChempotDiagram(MSONable):
                 "zaxis": self._get_chempot_axis_layout(elements[2]),
             }
         )
+        layout["scene"]["annotations"] = None
         if label_stable:
             layout["scene"].update({"annotations": annotations})
 
@@ -211,7 +212,12 @@ class ChempotDiagram(MSONable):
 
         extra_phases = []
 
-        for idx, (formula, coords) in enumerate(extra_domains.items()):
+        for idx, formula in enumerate(formulas):
+            try:
+                coords = extra_domains[formula]
+            except KeyError:
+                continue
+
             points_3d = coords[:, :3]
             entry = self.entry_dict[formula]
             if "mesh" in formula_mode:
@@ -318,11 +324,12 @@ class ChempotDiagram(MSONable):
     @staticmethod
     def _get_chempot_axis_layout(element):
         return dict(
-            title=f"μ<sub>{str(element)}</sub> - μ<sub>"
-            f"{str(element)}</sub><sup>o</sup> (eV)",
+            #title=f"μ<sub>{str(element)}</sub> - μ<sub>"
+            #f"{str(element)}</sub><sup>o</sup> (eV)",
+            title="",
             titlefont={"size": 30},
-            gridcolor="#e8e8e8",
-            gridwidth=3.5,
+            gridcolor="#dbdbdb",
+            gridwidth=5.0,
             tickfont={"size": 16},
             ticks="inside",
             ticklen=14,

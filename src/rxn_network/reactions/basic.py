@@ -244,8 +244,11 @@ class BasicReaction(Reaction):
     def __eq__(self, other):
         if self is other:
             return True
+        elif str(self) == str(other):
+            return True
         else:
-            return str(self) == str(other)
+            return ((set(self.reactants) == set(other.reactants))
+                    & (set(self.products) == set(other.products)))
 
     def __hash__(self):
         return hash(str(self))
