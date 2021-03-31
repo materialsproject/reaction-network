@@ -251,7 +251,7 @@ class BasicReaction(Reaction):
                     & (set(self.products) == set(other.products)))
 
     def __hash__(self):
-        return hash(str(self))
+        return hash("-".join([e.reduced_formula for e in sorted(self.compositions)]))
 
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]
