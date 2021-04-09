@@ -76,7 +76,8 @@ class BasicEnumerator(Enumerator):
 
         rxns = []
         for chemsys, selected_combos in tqdm(combos_dict.items()):
-            if target and not target_elems.issubset(chemsys.split("-")):
+            elems = chemsys.split("-")
+            if (target and not target_elems.issubset(elems)) or len(elems) >= 10:
                 continue
 
             filtered_entries = filter_entries_by_chemsys(entries, chemsys)
