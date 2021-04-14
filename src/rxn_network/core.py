@@ -40,8 +40,7 @@ from rxn_network.reaction import (
 
 __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2021, Matthew McDermott"
-__version__ = "0.2"
-__email__ = "mcdermott@lbl.gov"
+__version__ = "1.1"
 
 
 class ReactionNetwork:

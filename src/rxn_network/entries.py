@@ -13,8 +13,6 @@ from pymatgen.entries.computed_entries import (
     GibbsComputedStructureEntry,
 )
 from scipy.interpolate import interp1d
-
-from rxn_network.data import G_COMPOUNDS, G_ELEMS, G_GASES
 from typing import List, Optional
 
 

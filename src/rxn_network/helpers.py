@@ -18,9 +18,6 @@ from rxn_network.reaction import ComputedReaction, Reaction, ReactionError
 
 __author__ = "Matthew McDermott"
 __copyright__ = "Copyright 2021, Matthew McDermott"
-__version__ = "0.2"
-__email__ = "mcdermott@lbl.gov"
-__date__ = "December 20, 2020"
 
 
 class RxnPathway(MSONable):
