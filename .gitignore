@@ -107,16 +107,4 @@ venv.bak/
 
 \.idea/
 
-dask-worker-space/dask-worker-space/
-
-dask-worker-space/global.lock
-
-dask-worker-space/purge.lock
-
-dask-worker-space/worker-gpoiuuoi.dirlock
-
-dask-worker-space/worker-qyxqh131.dirlock
-
-dask-worker-space/worker-t1nqh58x.dirlock
-
-dask-worker-space/worker-vdbiky6j.dirlock
+dask-worker-space/

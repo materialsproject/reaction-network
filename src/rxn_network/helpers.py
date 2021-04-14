@@ -10,7 +10,7 @@ from itertools import chain, combinations, zip_longest
 import numpy as np
 from monty.json import MontyDecoder, MontyEncoder, MSONable
 from pymatgen.analysis.interface_reactions import InterfacialReactivity
-from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDiagram
 from pymatgen.core.composition import Composition
 from pymatgen.core.structure import Structure
 
@@ -313,15 +313,19 @@ def generate_all_combos(entries, max_num_combos):
 
 def react_interface(r1, r2, pd, num_entries, grand_pd=None):
     """
+    Calculate thermodynamically predicted reactions at the interface between two
+    materials.
 
     Args:
-        r1:
-        r2:
-        pd:
-        num_entries:
-        grand_pd:
+        r1 (Composition): first reactant
+        r2 (Composition): second reactant
+        pd (PhaseDiagram): pymatgen phase diagram object
+        num_entries (int): total number of entries in system, used in building reaction
+            vector
+        grand_pd (GrandPotentialPhaseDiagram): pymatgen grand pot. phase diagram object
 
     Returns:
+        [ComputedReaction]: List of computed reacitons
 
     """
     if grand_pd:
@@ -356,11 +360,13 @@ def react_interface(r1, r2, pd, num_entries, grand_pd=None):
 
 def get_computed_rxn(rxn, entries, num_entries):
     """
+    Given a normal Reaction object, finds the ComputedReaction object.
 
     Args:
-        rxn:
-        entries:
-        num_entries:
+        rxn (Reaction): chemical reaction object (without entries)
+        entries ([ComputedEntry]): list of possible computed entries
+        num_entries (int): total number of entries in system, used in building reaction
+            vector
 
     Returns:
 
