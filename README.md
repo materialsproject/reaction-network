@@ -2,10 +2,12 @@
 
 Reaction network (rxn-network) is a Python package for predicting chemical reaction pathways in solid-state materials synthesis using graph networks.
 
-# Manuscript
+# Manuscript & Results
 This version/release of the rxn-network package was used in the accompanying manuscript, which is under review at Nature Communciations:
 
 McDermott, M.J., Dwaraknath, S.S., and Persson, K.A. (2021). A graph-based network for predicting chemical reaction pathways in solid-state materials synthesis.
+
+This version of the repository includes results from the paper in the _results_ folder.
 
 ##### Note: This code is in active development, and edits to the the code will be available here as new releases in the future.
 
