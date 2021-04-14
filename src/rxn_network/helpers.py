@@ -366,7 +366,7 @@ def get_computed_rxn(rxn, entries, num_entries):
             vector
 
     Returns:
-
+        ComputedReaction: the computed reaction version of the supplied reaction object.
     """
     reactants = [
         r.reduced_composition
@@ -385,13 +385,14 @@ def get_computed_rxn(rxn, entries, num_entries):
 
 def get_entry_by_comp(comp, entry_set):
     """
+    Given a composition, find the entry within the supplied entry set.
 
     Args:
-        comp:
-        entry_set:
+        comp (Composition): reduced composition
+        entry_set ([Entry]): List/set of entry objects
 
     Returns:
-
+        (Entry): entry object
     """
     possible_entries = filter(
         lambda x: x.composition.reduced_composition == comp, entry_set
@@ -442,16 +443,17 @@ def expand_pd(entries):
 
 def find_interdependent_rxns(path, precursors, verbose=True):
     """
-
+    Helper method for identifying which pathways are "interdependent", i.e. whether they
+        contain reaction steps which mutaully depend on each other.
     Args:
-        path:
+        path (RxnPathway): reaction pathway object
         precursors:
-        verbose:
+        verbose (bool): optional, print interdependent reactions to console
 
     Returns:
 
     """
-    precursors = set(precursors)
+    precursors = {Composition(p) for p in precursors}
     interdependent = False
     combined_rxn = None
 
@@ -558,32 +560,25 @@ def get_rxn_cost(
 
 
 def grouper(iterable, n, fillvalue=None):
-    """
-
-    Args:
-        iterable:
-        n:
-        fillvalue:
-
-    Returns:
-
-    """
+    """ Simple grouping of iterable, as given by more-itertools recipes"""
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
 
 def find_rxn_edges(combos, cost_function, rxn_e_filter, temp, num_entries):
     """
+    Main method for finding all reaction edges when building reaction network.
 
     Args:
-        combos:
-        cost_function:
-        rxn_e_filter:
-        temp:
-        num_entries:
+        combos ([tuple]): list of possible combinations, where each each combo is a
+            tuple of two entry/vertex tuples.
+        cost_function (str): cost function for getting reaction cost
+        rxn_e_filter (float): Energy filter for removing reactions above a threshold
+        temp (float): temperature in Kelvin
+        num_entries (int): number of entries, used for computing reaction vector
 
     Returns:
-
+        List of network edges to be added to network via graph-tool.
     """
     edges = []
     for combo in combos:

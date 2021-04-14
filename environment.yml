@@ -4,4 +4,11 @@ channels:
 dependencies:
   - python=3.8
   - graph-tool==2.31
-  - pip: requirements_docs.txt
+  - pip:
+    - dask[complete]>=2.30.0
+    - mkdocs-material>=7.0.0
+    - mkdocs-minify-plugin>=0.4.0
+    - mkdocstrings>=0.15.0
+    - numba>=0.50.1
+    - pymatgen==2021.2.8
+    - tqdm>=4.56.0
