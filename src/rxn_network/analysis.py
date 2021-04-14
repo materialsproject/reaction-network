@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from monty.json import MSONable
 
 __author__ = "Matthew McDermott"
-__copyright__ = "Copyright 2020, Matthew McDermott"
+__copyright__ = "Copyright 2021, Matthew McDermott"
 __version__ = "0.2"
 __email__ = "mcdermott@lbl.gov"
 __date__ = "December 20, 2020"

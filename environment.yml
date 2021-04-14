@@ -5,9 +5,8 @@ dependencies:
   - python=3.8
   - graph-tool==2.31
   - pip:
-    - numba==0.50.1
-    - numpy==1.18.4
-    - pymatgen==2020.4.29
-    - scipy==1.4.1
-    - tqdm==4.46.0
-
+    - dask[complete]>=2.30.0
+    - jupyter==1.0.0
+    - numba>=0.50.1
+    - pymatgen==2021.2.8
+    - tqdm>=4.56.0

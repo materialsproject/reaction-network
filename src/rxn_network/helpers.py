@@ -17,7 +17,7 @@ from pymatgen.core.structure import Structure
 from rxn_network.reaction import ComputedReaction, Reaction, ReactionError
 
 __author__ = "Matthew McDermott"
-__copyright__ = "Copyright 2020, Matthew McDermott"
+__copyright__ = "Copyright 2021, Matthew McDermott"
 __version__ = "0.2"
 __email__ = "mcdermott@lbl.gov"
 __date__ = "December 20, 2020"
@@ -312,6 +312,18 @@ def generate_all_combos(entries, max_num_combos):
 
 
 def react_interface(r1, r2, pd, num_entries, grand_pd=None):
+    """
+
+    Args:
+        r1:
+        r2:
+        pd:
+        num_entries:
+        grand_pd:
+
+    Returns:
+
+    """
     if grand_pd:
         interface = InterfacialReactivity(
             r1,
@@ -343,6 +355,16 @@ def react_interface(r1, r2, pd, num_entries, grand_pd=None):
 
 
 def get_computed_rxn(rxn, entries, num_entries):
+    """
+
+    Args:
+        rxn:
+        entries:
+        num_entries:
+
+    Returns:
+
+    """
     reactants = [
         r.reduced_composition
         for r in rxn.reactants
@@ -359,6 +381,15 @@ def get_computed_rxn(rxn, entries, num_entries):
 
 
 def get_entry_by_comp(comp, entry_set):
+    """
+
+    Args:
+        comp:
+        entry_set:
+
+    Returns:
+
+    """
     possible_entries = filter(
         lambda x: x.composition.reduced_composition == comp, entry_set
     )
@@ -407,6 +438,16 @@ def expand_pd(entries):
 
 
 def find_interdependent_rxns(path, precursors, verbose=True):
+    """
+
+    Args:
+        path:
+        precursors:
+        verbose:
+
+    Returns:
+
+    """
     precursors = set(precursors)
     interdependent = False
     combined_rxn = None
@@ -514,11 +555,33 @@ def get_rxn_cost(
 
 
 def grouper(iterable, n, fillvalue=None):
+    """
+
+    Args:
+        iterable:
+        n:
+        fillvalue:
+
+    Returns:
+
+    """
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
 
 def find_rxn_edges(combos, cost_function, rxn_e_filter, temp, num_entries):
+    """
+
+    Args:
+        combos:
+        cost_function:
+        rxn_e_filter:
+        temp:
+        num_entries:
+
+    Returns:
+
+    """
     edges = []
     for combo in combos:
         if not combo:

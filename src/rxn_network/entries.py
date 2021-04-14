@@ -8,18 +8,22 @@ from monty.json import MontyDecoder, MontyEncoder, MSONable
 from pymatgen.analysis.phase_diagram import PDEntry, PhaseDiagram
 from pymatgen.core.composition import Composition
 from pymatgen.core.structure import Structure
-from pymatgen.entries.computed_entries import ComputedStructureEntry, GibbsComputedStructureEntry
+from pymatgen.entries.computed_entries import (
+    ComputedStructureEntry,
+    GibbsComputedStructureEntry,
+)
 from scipy.interpolate import interp1d
 
 from rxn_network.data import G_COMPOUNDS, G_ELEMS, G_GASES
 from typing import List, Optional
 
 
-def _new_pdentry_hash(self):  # necessary fix, will be updated in pymatgen in future
+def _new_pdentry_hash(self):  # necessary fix, will be updated in future versions
     data_md5 = hashlib.md5(
         f"{self.composition.formula}_" f"{self.energy}".encode("utf-8")
     ).hexdigest()
     return int(data_md5, 16)
+
 
 def _new_gibbsentry_hash(self):
     data_md5 = hashlib.md5(
@@ -29,12 +33,25 @@ def _new_gibbsentry_hash(self):
     ).hexdigest()
     return int(data_md5, 16)
 
+
 PDEntry.__hash__ = _new_pdentry_hash
 GibbsComputedStructureEntry.__hash__ = _new_gibbsentry_hash
 
 
 class CustomEntry(PDEntry):
+    """
+
+    """
     def __init__(self, composition, energy_dict, temp=None, name=None, attribute=None):
+        """
+
+        Args:
+            composition:
+            energy_dict:
+            temp:
+            name:
+            attribute:
+        """
         composition = Composition(composition)
 
         if not temp:

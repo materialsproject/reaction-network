@@ -39,7 +39,7 @@ from rxn_network.reaction import (
 )
 
 __author__ = "Matthew McDermott"
-__copyright__ = "Copyright 2020, Matthew McDermott"
+__copyright__ = "Copyright 2021, Matthew McDermott"
 __version__ = "0.2"
 __email__ = "mcdermott@lbl.gov"
 
@@ -53,15 +53,15 @@ class ReactionNetwork:
     """
 
     def __init__(
-            self,
-            entries,
-            n=2,
-            temp=300,
-            interpolate_comps=None,
-            extend_entries=None,
-            include_metastable=False,
-            include_polymorphs=False,
-            filter_rxn_energies=0.5,
+        self,
+        entries,
+        n=2,
+        temp=300,
+        interpolate_comps=None,
+        extend_entries=None,
+        include_metastable=False,
+        include_polymorphs=False,
+        filter_rxn_energies=0.5,
     ):
         """Initializes ReactionNetwork object with necessary preprocessing
         steps. This does not yet compute the graph.
@@ -93,6 +93,8 @@ class ReactionNetwork:
                 state polymorphs. Defaults to False. Note this is not useful
                 unless structural metrics are considered in the cost function
                 (to be added!)
+            filter_rxn_energies (float): Energy filter. Reactions with
+                energy_per_atom > filter will be excluded from network.
         """
         self.logger = logging.getLogger("ReactionNetwork")
         self.logger.setLevel("INFO")
@@ -114,7 +116,7 @@ class ReactionNetwork:
         self._rxn_e_filter = filter_rxn_energies
 
         if (
-                len(self._elements) <= 10
+            len(self._elements) <= 10
         ):  # phase diagrams take considerable time to build with 10+ elems
             self._pd = PhaseDiagram(self._filtered_entries)
 
@@ -167,13 +169,13 @@ class ReactionNetwork:
 
     @staticmethod
     def get_target_edges(
-            vertex,
-            current_target,
-            target_v,
-            precursors,
-            max_num_phases,
-            entries_dict,
-            complex_loopback,
+        vertex,
+        current_target,
+        target_v,
+        precursors,
+        max_num_phases,
+        entries_dict,
+        complex_loopback,
     ):
         entry = vertex[0]
         v = vertex[1]
@@ -201,11 +203,11 @@ class ReactionNetwork:
         return edge_list
 
     def generate_rxn_network(
-            self,
-            precursors=None,
-            targets=None,
-            cost_function="softplus",
-            complex_loopback=True,
+        self,
+        precursors=None,
+        targets=None,
+        cost_function="softplus",
+        complex_loopback=True,
     ):
         """
         Generates and stores the reaction network (weighted, directed graph)
@@ -283,8 +285,8 @@ class ReactionNetwork:
             products = RxnEntries(entries, "P")
             chemsys = reactants.chemsys
             if (
-                    self._precursors_entries.description == "D"
-                    and not target_chemsys.issubset(chemsys.split("-"))
+                self._precursors_entries.description == "D"
+                and not target_chemsys.issubset(chemsys.split("-"))
             ):
                 continue
             if chemsys not in entries_dict:
@@ -304,8 +306,8 @@ class ReactionNetwork:
             )
 
             if (
-                    self._precursors_entries.description == "D"
-                    and not self._all_targets.issubset(entries)
+                self._precursors_entries.description == "D"
+                and not self._all_targets.issubset(entries)
             ):
                 idx = idx + 1
                 continue
@@ -351,7 +353,7 @@ class ReactionNetwork:
                 [precursors_v, v, 0, None, True, False]
                 for entry, v in vertices["R"].items()
                 if self._precursors_entries.description == "D"
-                   or entry.entries.issubset(self._precursors)
+                or entry.entries.issubset(self._precursors)
             ]
 
             target_edges = [
@@ -430,7 +432,7 @@ class ReactionNetwork:
                 g.vp["path"][v] = True
 
                 if (
-                        g.vp["type"][v] == 2
+                    g.vp["type"][v] == 2
                 ):  # add rxn step if current node in path is a product
                     e = g.edge(path[step - 1], v)
                     g.ep["path"][e] = True  # mark this edge as occurring on a path
@@ -447,6 +449,16 @@ class ReactionNetwork:
         return paths
 
     def find_intermediate_rxns(self, intermediates, targets, chempots=None):
+        """
+
+        Args:
+            intermediates:
+            targets:
+            chempots:
+
+        Returns:
+
+        """
         all_rxns = set()
         combos = list(generate_all_combos(intermediates, 2))
         for entries in tqdm(combos):
@@ -486,8 +498,8 @@ class ReactionNetwork:
                 most_favorable_rxn = min(
                     rxns_filtered,
                     key=lambda x: (
-                            x.calculated_reaction_energy
-                            / sum([x.get_el_amount(elem) for elem in x.elements])
+                        x.calculated_reaction_energy
+                        / sum([x.get_el_amount(elem) for elem in x.elements])
                     ),
                 )
                 all_rxns.add(most_favorable_rxn)
@@ -495,14 +507,14 @@ class ReactionNetwork:
         return all_rxns
 
     def find_all_rxn_pathways(
-            self,
-            k=15,
-            precursors=None,
-            targets=None,
-            max_num_combos=4,
-            chempots=None,
-            consider_crossover_rxns=10,
-            filter_interdependent=True,
+        self,
+        k=15,
+        precursors=None,
+        targets=None,
+        max_num_combos=4,
+        chempots=None,
+        consider_crossover_rxns=10,
+        filter_interdependent=True,
     ):
         """
         Builds the k shortest paths to provided targets and then seeks to combine
@@ -517,14 +529,18 @@ class ReactionNetwork:
             k (int): Number of shortest paths to calculate to each target (i.e. if
                 there are 3 targets and k=15, then 3x15 = 45 paths will be generated
                 and the reactions from these will be combined.
-            targets ([ComputedEntries]): list of all target ComputedEntry objects;
+            precursors ([ComputedEntry]): list of all precursor ComputedEntry
+                objects; defaults to precursors provided when network was created.
+            targets ([ComputedEntry]): list of all target ComputedEntry objects;
                 defaults to targets provided when network was created.
             max_num_combos (int): upper limit on how many reactions to consider at a
                 time (default 4).
+            chempots ({Element: float}):
             consider_crossover_rxns (bool): Whether to consider "crossover" reactions
                 between intermediates in other pathways. This can be crucial for
                 generating realistic predictions and it is highly recommended;
                 generally the added computational cost is extremely low.
+            filter_interdependent (bool):
 
         Returns:
             ([CombinedPathway], PathwayAnalysis): Tuple containing list of
@@ -570,9 +586,8 @@ class ReactionNetwork:
 
         if consider_crossover_rxns:
             intermediates = {
-                                entry for rxn in paths_to_all_targets for entry in
-                                rxn.all_entries
-                            } - targets
+                entry for rxn in paths_to_all_targets for entry in rxn.all_entries
+            } - targets
             intermediate_rxns = self.find_intermediate_rxns(
                 intermediates, targets, chempots
             )
@@ -591,9 +606,9 @@ class ReactionNetwork:
             k: v
             for k, v in paths_to_all_targets.items()
             if not (
-                    self._precursors.intersection(k._product_entries)
-                    or self._all_targets.intersection(k._reactant_entries)
-                    or len(k._product_entries) > 3
+                self._precursors.intersection(k._product_entries)
+                or self._all_targets.intersection(k._reactant_entries)
+                or len(k._product_entries) > 3
             )
         }
 
@@ -611,8 +626,8 @@ class ReactionNetwork:
                 self.logger.info(f"Generating and filtering size {n} pathways...")
             all_c_mats, all_m_mats = [], []
             for combos in tqdm(
-                    grouper(combinations(range(num_rxns), n), batch_size),
-                    total=int(comb(num_rxns, n) / batch_size),
+                grouper(combinations(range(num_rxns), n), batch_size),
+                total=int(comb(num_rxns, n) / batch_size),
             ):
                 comp_matrices = np.stack(
                     [
@@ -670,6 +685,15 @@ class ReactionNetwork:
         return sorted(list(final_paths), key=lambda x: x.total_cost)
 
     def find_crossover_rxns(self, intermediates, targets):
+        """
+
+        Args:
+            intermediates:
+            targets:
+
+        Returns:
+
+        """
         all_crossover_rxns = dict()
         for reactants_combo in generate_all_combos(intermediates, self._max_num_phases):
             for products_combo in generate_all_combos(targets, self._max_num_phases):
@@ -739,7 +763,7 @@ class ReactionNetwork:
             remove_edges.extend(list(v.in_edges()))
 
             if precursors_entries.description == "D" or phases.issubset(
-                    self._precursors
+                self._precursors
             ):
                 new_edges.append([new_precursors_v, v, 0, None, True, False])
 
@@ -828,9 +852,7 @@ class ReactionNetwork:
         self._cost_function = cost_function
 
         for e in gt.find_edge_range(g, g.ep["weight"], (1e-8, 1e8)):
-            g.ep["weight"][e] = get_rxn_cost(
-                g.ep["rxn"][e],
-            )
+            g.ep["weight"][e] = get_rxn_cost(g.ep["rxn"][e],)
 
     def set_temp(self, temp):
         """
@@ -877,40 +899,6 @@ class ReactionNetwork:
         self._all_targets = {mapping[t] for t in self._all_targets}
         self._current_target = {mapping[ct] for ct in self._current_target}
 
-    def save(self, file_name=None):
-        precursors_str = "_".join(
-            sorted([e.composition.reduced_formula for e in self._precursors])
-        )
-        targets_str = "_".join(
-            sorted([e.composition.reduced_formula for e in self._all_targets])
-        )
-        if not file_name:
-            file_name = (
-                f"network_{'-'.join(sorted([str(e) for e in self._elements]))}"
-                f"_{precursors_str}_to_{targets_str}.gt"
-            )
-        for name, val in inspect.getmembers(self, lambda a: not (inspect.isroutine(a))):
-            if name == "_g":
-                continue
-            if name[0] != "_" or name[1] == "_":
-                continue
-
-            print(name)
-            data_type = type(val).__name__
-            print(data_type)
-            if data_type not in ["str", "int", "float", "bool"]:
-                data_type = "object"
-            if data_type == "str":
-                data_type = "string"
-            self._g.gp[name] = self._g.new_graph_property(data_type, val)
-
-        self._g.save(file_name)
-
-    @classmethod
-    def load(cls, file_name):
-        # g = gt.load_graph(file_name)
-        pass
-
     @staticmethod
     def _update_vertex_properties(g, v, prop_dict):
         """
@@ -934,7 +922,7 @@ class ReactionNetwork:
 
     @staticmethod
     def _yens_ksp(
-            g, num_k, precursors_v, target_v, edge_prop="bool", weight_prop="weight"
+        g, num_k, precursors_v, target_v, edge_prop="bool", weight_prop="weight"
     ):
         """
         Yen's Algorithm for k-shortest paths. Inspired by igraph implementation by
@@ -1022,9 +1010,7 @@ class ReactionNetwork:
     @staticmethod
     @njit(parallel=True)
     def _balance_path_arrays(
-            comp_matrices,
-            net_coeffs,
-            tol=1e-6,
+        comp_matrices, net_coeffs, tol=1e-6,
     ):
         """
         Fast solution for reaction multiplicities via mass balance stochiometric
@@ -1067,8 +1053,8 @@ class ReactionNetwork:
             if (multiplicities < tol).any():
                 continue
             elif not (
-                    np.abs(solved_coeffs - net_coeffs)
-                    <= (1e-08 + 1e-05 * np.abs(net_coeffs))
+                np.abs(solved_coeffs - net_coeffs)
+                <= (1e-08 + 1e-05 * np.abs(net_coeffs))
             ).all():
                 continue
             all_multiplicities[i] = multiplicities
@@ -1114,8 +1100,8 @@ class ReactionNetwork:
         for chemsys, pd in pd_dict.items():
             for entry in pd.all_entries:
                 if (
-                        entry in filtered_entries
-                        or pd.get_e_above_hull(entry) > e_above_hull
+                    entry in filtered_entries
+                    or pd.get_e_above_hull(entry) > e_above_hull
                 ):
                     continue
                 formula = entry.composition.reduced_formula
@@ -1162,4 +1148,3 @@ class ReactionNetwork:
             f"{'-'.join(sorted([str(e) for e in self._pd.elements]))}, "
             f"with Graph: {str(self._g)}"
         )
-
