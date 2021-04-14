@@ -16,6 +16,12 @@ mkdocs:
   configuration: mkdocs.yml
   fail_on_warning: false
 
+python:
+  version: 3.8
+  install:
+    - method: pip
+      path: .
+
 # Optionally build your docs in additional formats such as PDF
 formats:
   - pdf

@@ -447,11 +447,13 @@ def find_interdependent_rxns(path, precursors, verbose=True):
         contain reaction steps which mutaully depend on each other.
     Args:
         path (RxnPathway): reaction pathway object
-        precursors:
+        precursors ([str]): List of formulas/compositions of precursors
         verbose (bool): optional, print interdependent reactions to console
 
     Returns:
-
+        (bool, Reaction): Tuple denoting whether the pathway is interdependent and
+            the combined reaction represented by the interdependent steps (if it is
+            possible to make one)
     """
     precursors = {Composition(p) for p in precursors}
     interdependent = False
@@ -515,7 +517,7 @@ def softplus(params, weights, t=273):
         t: temperature (K)
 
     Returns:
-        float: cost (in a.u.)
+        float: cost (in arb. units)
     """
     weighted_params = np.dot(np.array(params), np.array(weights))
     return np.log(1 + (273 / t) * np.exp(weighted_params))
