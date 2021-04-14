@@ -3,7 +3,5 @@ channels:
   - conda-forge
 dependencies:
   - python=3.8
-  - pip:
-    - mkdocs-material>=7.0.0
-    - mkdocs-minify-plugin>=0.4.0
-    - mkdocstrings
+  - graph-tool==2.31
+  - pip: requirements_docs.txt
