@@ -1,8 +1,8 @@
-<img alt="Reaction Network" src="docs/images/logo.png" width="600">
+<img alt="Reaction Network" src="images/logo.png" width="600">
 
 Reaction network (rxn-network) is a Python package for predicting chemical reaction pathways in solid-state materials synthesis using graph networks.
 
-# Manuscript & Results
+## Manuscript & Results
 This version/release of the rxn-network package was used in the accompanying manuscript, which is under review at Nature Communciations:
 
 McDermott, M.J., Dwaraknath, S.S., and Persson, K.A. (2021). A graph-based network for predicting chemical reaction pathways in solid-state materials synthesis.
@@ -11,7 +11,7 @@ This version of the repository includes results from the paper in the _results_ 
 
 ##### Note: This code is in active development, and edits to the the code will be available here as new releases in the future.
 
-# Installing rxn-network
+## Installing rxn-network
 
 The rxn-network package has several software dependencies (see the *requirements.txt* file), most of which can be installed in less than a minute through PyPI. Note that graph-tool must be installed through a more customized method; please see https://graph-tool.skewed.de/ for more details, particularly if using a Windows based machine. 
 
@@ -29,13 +29,13 @@ Then simply download (clone) the reaction-network code from this repository, nav
     pip install -r requirements.txt
     pip install -e .
 
-# Demo
+## Demo
 A demo Jupyter notebook (demo.ipynb) contains the instructions necessary to replicate the results of the manuscript and is a good starting template for using the rxn-network package on your own systems. Simply start a Jupyter notebook server and launch the notebook file.
 
-# Contact
+## Contact
 For questions concerning this project, please either raise an Issue on the Github repository or contact the maintainer via email: mcdermott *[at]* lbl.gov.
 
-# Acknowledgement
+## Acknowledgement
 
 This work was supported as part of GENESIS: A Next Generation Synthesis Center, an 
 Energy Frontier Research Center funded by the U.S. Department of Energy, Office of Science, Basic Energy Sciences under Award Number DE-SC0019212.
