@@ -20,6 +20,7 @@ class PathwayAnalysis(MSONable):
         """
         Args:
             rxn_network (ReactionNetwork): the ReactionNetwork object.
+            targets ([ComputedEntry]): list of target entries.
             balanced_combined_paths ([BalancedPathway]): list of reaction pathway
                 objects which have been successfully balanced.
         """

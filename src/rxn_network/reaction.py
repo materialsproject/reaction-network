@@ -1,5 +1,3 @@
-# coding: utf-8
-
 """
 This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.

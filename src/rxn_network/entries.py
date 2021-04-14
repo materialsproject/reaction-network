@@ -38,43 +38,6 @@ PDEntry.__hash__ = _new_pdentry_hash
 GibbsComputedStructureEntry.__hash__ = _new_gibbsentry_hash
 
 
-class CustomEntry(PDEntry):
-    """
-
-    """
-    def __init__(self, composition, energy_dict, temp=None, name=None, attribute=None):
-        """
-
-        Args:
-            composition:
-            energy_dict:
-            temp:
-            name:
-            attribute:
-        """
-        composition = Composition(composition)
-
-        if not temp:
-            temp = 300
-
-        super().__init__(
-            composition, energy_dict[str(temp)], name=name, attribute=attribute
-        )
-        self.temp = temp
-        self.energy_dict = energy_dict
-
-    def set_temp(self, temp):
-        super().__init__(
-            self.composition,
-            self.energy_dict[str(temp)],
-            name=self.name,
-            attribute=self.attribute,
-        )
-
-    def __repr__(self):
-        return super().__repr__() + f" (T={self.temp} K)"
-
-
 class RxnEntries(MSONable):
     """
     Helper class for describing combinations of ComputedEntry-like objects in context

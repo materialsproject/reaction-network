@@ -79,7 +79,7 @@ class ReactionNetwork:
                 free energy of formation, as well as scaling the cost function
                 later during network generation. Must select from [300, 400,
                 500, ... 2000] K.
-            extend entries([ComputedStructureEntry]): list of
+            extend_entries ([ComputedStructureEntry]): list of
                 ComputedStructureEntry-like objects which will be included in
                 the network even after filtering for thermodynamic stability.
                 Helpful if target phase has a significantly high energy above
@@ -167,41 +167,6 @@ class ReactionNetwork:
             f"entries: \n{filtered_entries_str}"
         )
 
-    @staticmethod
-    def get_target_edges(
-        vertex,
-        current_target,
-        target_v,
-        precursors,
-        max_num_phases,
-        entries_dict,
-        complex_loopback,
-    ):
-        entry = vertex[0]
-        v = vertex[1]
-
-        edge_list = []
-        phases = entry.entries
-        if current_target.issubset(phases):
-            edge_list.append([v, target_v, 0, None, True, False])
-
-        if complex_loopback:
-            combos = generate_all_combos(phases.union(precursors), max_num_phases)
-        else:
-            combos = generate_all_combos(phases, max_num_phases)
-
-        if complex_loopback:
-            for c in combos:
-                combo_phases = set(c)
-                if combo_phases.issubset(precursors):
-                    continue
-                combo_entry = RxnEntries(combo_phases, "R")
-                loopback_v = entries_dict[combo_entry.chemsys]["R"][combo_entry]
-
-                edge_list.append([v, loopback_v, 0, None, True, False])
-
-        return edge_list
-
     def generate_rxn_network(
         self,
         precursors=None,
@@ -215,7 +180,7 @@ class ReactionNetwork:
 
         Args:
             precursors ([ComputedEntry]): entries for all phases which serve as the
-                main reactants; if None,a "dummy" node is used to represent any
+                main reactants; if None, a "dummy" node is used to represent any
                 possible set of precursors.
             targets ([ComputedEntry]): entries for all phases which are the final
                 products; if None, a "dummy" node is used to represent any possible
@@ -360,7 +325,7 @@ class ReactionNetwork:
                 edge
                 for edge_list in map(
                     partial(
-                        self.get_target_edges,
+                        self._get_target_edges,
                         current_target=self._current_target,
                         target_v=int(target_v),
                         precursors=self._precursors,
@@ -448,64 +413,6 @@ class ReactionNetwork:
 
         return paths
 
-    def find_intermediate_rxns(self, intermediates, targets, chempots=None):
-        """
-
-        Args:
-            intermediates:
-            targets:
-            chempots:
-
-        Returns:
-
-        """
-        all_rxns = set()
-        combos = list(generate_all_combos(intermediates, 2))
-        for entries in tqdm(combos):
-            n = len(entries)
-            r1 = entries[0].composition.reduced_composition
-            chemsys = {
-                str(el) for entry in entries for el in entry.composition.elements
-            }
-            elem = None
-            if chempots:
-                elem = str(list(chempots.keys())[0])
-                chemsys.update(elem)
-                if chemsys == {elem}:
-                    continue
-
-            if n == 1:
-                r2 = entries[0].composition.reduced_composition
-            elif n == 2:
-                r2 = entries[1].composition.reduced_composition
-            else:
-                raise ValueError("Can't have an interface that is not 1 to 2 entries!")
-
-            if chempots:
-                elem_comp = Composition(elem).reduced_composition
-                if r1 == elem_comp or r2 == elem_comp:
-                    continue
-
-            entry_subset = self.entry_set.get_subset_in_chemsys(list(chemsys))
-            pd = PhaseDiagram(entry_subset)
-            grand_pd = None
-            if chempots:
-                grand_pd = GrandPotentialPhaseDiagram(entry_subset, chempots)
-
-            rxns = react_interface(r1, r2, pd, self.num_entries, grand_pd)
-            rxns_filtered = {r for r in rxns if set(r._product_entries) & targets}
-            if rxns_filtered:
-                most_favorable_rxn = min(
-                    rxns_filtered,
-                    key=lambda x: (
-                        x.calculated_reaction_energy
-                        / sum([x.get_el_amount(elem) for elem in x.elements])
-                    ),
-                )
-                all_rxns.add(most_favorable_rxn)
-
-        return all_rxns
-
     def find_all_rxn_pathways(
         self,
         k=15,
@@ -535,7 +442,8 @@ class ReactionNetwork:
                 defaults to targets provided when network was created.
             max_num_combos (int): upper limit on how many reactions to consider at a
                 time (default 4).
-            chempots ({Element: float}):
+            chempots ({Element: float}): dictionary of chemical potentials, used for
+                identifying intermediate reactions open to a specific element
             consider_crossover_rxns (bool): Whether to consider "crossover" reactions
                 between intermediates in other pathways. This can be crucial for
                 generating realistic predictions and it is highly recommended;
@@ -686,13 +594,15 @@ class ReactionNetwork:
 
     def find_crossover_rxns(self, intermediates, targets):
         """
+        Identifies possible "crossover" reactions (i.e., reactions where the
+            predicted intermediate phases result in one or more targets phases.
 
         Args:
-            intermediates:
-            targets:
+            intermediates ([ComputedEntry]): List of intermediate entries
+            targets ([ComputedEntry]): List of target entries
 
         Returns:
-
+            [ComputedReaction]: List of crossover reactions
         """
         all_crossover_rxns = dict()
         for reactants_combo in generate_all_combos(intermediates, self._max_num_phases):
@@ -710,6 +620,70 @@ class ReactionNetwork:
                 path = {rxn: get_rxn_cost(rxn, self._cost_function, self._temp)}
                 all_crossover_rxns.update(path)
         return all_crossover_rxns
+
+    def find_intermediate_rxns(self, intermediates, targets, chempots=None):
+        """
+        Identifies thermodynamically predicted reactions from intermediate to one or
+        more targets using interfacial reaction method. This method has the unique benefit (
+        compared to the find_crossover_rxns method) of identifying reactions open to a
+        specfic element or producing 3 or more products.
+
+        Args:
+            intermediates ([ComputedEntry]): List of intermediate entries
+            targets ([ComputedEntry]): List of target entries
+            chempots ({Element: float}): Dictionary of chemical potentials used to
+                create grand potential phase diagram by which interfacial reactions are
+                predicted.
+
+        Returns:
+            [ComputedReaction]: List of intermediate reactions
+        """
+        all_rxns = set()
+        combos = list(generate_all_combos(intermediates, 2))
+        for entries in tqdm(combos):
+            n = len(entries)
+            r1 = entries[0].composition.reduced_composition
+            chemsys = {
+                str(el) for entry in entries for el in entry.composition.elements
+            }
+            elem = None
+            if chempots:
+                elem = str(list(chempots.keys())[0])
+                chemsys.update(elem)
+                if chemsys == {elem}:
+                    continue
+
+            if n == 1:
+                r2 = entries[0].composition.reduced_composition
+            elif n == 2:
+                r2 = entries[1].composition.reduced_composition
+            else:
+                raise ValueError("Can't have an interface that is not 1 to 2 entries!")
+
+            if chempots:
+                elem_comp = Composition(elem).reduced_composition
+                if r1 == elem_comp or r2 == elem_comp:
+                    continue
+
+            entry_subset = self.entry_set.get_subset_in_chemsys(list(chemsys))
+            pd = PhaseDiagram(entry_subset)
+            grand_pd = None
+            if chempots:
+                grand_pd = GrandPotentialPhaseDiagram(entry_subset, chempots)
+
+            rxns = react_interface(r1, r2, pd, self.num_entries, grand_pd)
+            rxns_filtered = {r for r in rxns if set(r._product_entries) & targets}
+            if rxns_filtered:
+                most_favorable_rxn = min(
+                    rxns_filtered,
+                    key=lambda x: (
+                        x.calculated_reaction_energy
+                        / sum([x.get_el_amount(elem) for elem in x.elements])
+                    ),
+                )
+                all_rxns.add(most_favorable_rxn)
+
+        return all_rxns
 
     def set_precursors(self, precursors=None, complex_loopback=True):
         """
@@ -854,50 +828,40 @@ class ReactionNetwork:
         for e in gt.find_edge_range(g, g.ep["weight"], (1e-8, 1e8)):
             g.ep["weight"][e] = get_rxn_cost(g.ep["rxn"][e],)
 
-    def set_temp(self, temp):
-        """
-        Sets new temperature parameter of network by recomputing
-        GibbsComputedStructureEntry objects and edge weights. Does not re-filter
-        for thermodynamic stability, as this would essentially
-        require full initialization of a newobject.
+    @staticmethod
+    def _get_target_edges(
+        vertex,
+        current_target,
+        target_v,
+        precursors,
+        max_num_phases,
+        entries_dict,
+        complex_loopback,
+    ):
+        entry = vertex[0]
+        v = vertex[1]
 
-        Args:
-            temp (int): temperature in Kelvin; must be selected from
-                [300, 400, 500, ... 2000] K.
+        edge_list = []
+        phases = entry.entries
+        if current_target.issubset(phases):
+            edge_list.append([v, target_v, 0, None, True, False])
 
-        Returns:
-            None
-        """
-        g = self._g
-        self._temp = temp
-        old_entries = self._filtered_entries
-        self._filtered_entries = GibbsComputedStructureEntry.from_entries(
-            self._filtered_entries, self._temp
-        )
-        mapping = dict()
-        for old_e in old_entries:
-            for new_e in self._filtered_entries:
-                if old_e.structure == new_e.structure:
-                    mapping[old_e] = new_e
-                    break
+        if complex_loopback:
+            combos = generate_all_combos(phases.union(precursors), max_num_phases)
+        else:
+            combos = generate_all_combos(phases, max_num_phases)
 
-        for v in g.vertices():
-            current_entries = g.vp["entries"][v]
-            new_phases = [mapping[e] for e in current_entries.entries]
-            new_entries = RxnEntries(new_phases, current_entries.description)
-            g.vp["entries"][v] = new_entries
+        if complex_loopback:
+            for c in combos:
+                combo_phases = set(c)
+                if combo_phases.issubset(precursors):
+                    continue
+                combo_entry = RxnEntries(combo_phases, "R")
+                loopback_v = entries_dict[combo_entry.chemsys]["R"][combo_entry]
 
-        for e in gt.find_edge_range(g, g.ep["weight"], (1e-8, 1e8)):
-            rxn = ComputedReaction(
-                list(g.vp["entries"][e.source()].entries),
-                list(g.vp["entries"][e.target()].entries),
-            )
-            g.ep["rxn"][e] = rxn
-            g.ep["weight"][e] = get_rxn_cost(rxn, self._cost_function, self.temp)
+                edge_list.append([v, loopback_v, 0, None, True, False])
 
-        self._precursors = {mapping[p] for p in self._precursors}
-        self._all_targets = {mapping[t] for t in self._all_targets}
-        self._current_target = {mapping[ct] for ct in self._current_target}
+        return edge_list
 
     @staticmethod
     def _update_vertex_properties(g, v, prop_dict):
