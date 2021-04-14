@@ -1,4 +1,4 @@
-<img alt="Reaction Network" src="docs/images/logo.png" width="600">
+<img alt="Reaction Network" src="logo.png" width="600">
 
 Reaction network (rxn-network) is a Python package for predicting chemical reaction pathways in solid-state materials synthesis using graph networks.
 
