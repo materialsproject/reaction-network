@@ -56,16 +56,16 @@ class ChempotDistanceCalculator(Calculator):
         Returns:
 
         """
-        if rxn.data:
-            data = rxn.data.copy()
-        else:
-            data = {}
-        data[self.name] = self.calculate(rxn)
-        return ComputedReaction(rxn.entries, rxn.coefficients, data=data,
-                                lowest_num_errors=rxn.lowest_num_errors)
+        if not rxn.data:
+            rxn.data = {}
+
+        rxn.data[self.name] = self.calculate(rxn)
+
+        return rxn
 
     @classmethod
-    def from_entries(cls, entries, distance_type="max", name="chempot_distance"):
+    def from_entries(cls, entries, distance_type="max", name="chempot_distance",
+                     cpd_kws: dict=None):
         """
 
         Args:

@@ -18,7 +18,7 @@ from pymatgen.entries.entry_tools import EntrySet
 from scipy.special import comb
 from tqdm import tqdm
 
-from rxn_network.analysis import PathwayAnalysis
+from rxn_network.old_analysis import PathwayAnalysis
 from rxn_network.entries import GibbsComputedStructureEntry, PDEntry, RxnEntries
 from rxn_network.old_helpers import (
     BalancedPathway,
