@@ -2,7 +2,7 @@
 from typing import List, Dict, Optional
 
 import numpy as np
-from pymatgen import Element
+from pymatgen.core.composition import Element
 from pymatgen.entries import Entry
 from pymatgen.analysis.phase_diagram import PDEntry, GrandPotPDEntry
 from uncertainties import ufloat
@@ -100,6 +100,13 @@ class ComputedReaction(BasicReaction):
                 for amt, c in zip(self.coefficients, self.compositions)
             ]
         )
+
+    def copy(self) -> "ComputedReaction":
+        """
+        Returns a copy of the Reaction object.
+        """
+        return ComputedReaction(self.entries, self.coefficients,
+                                self.data, self.lowest_num_errors)
 
     @property
     def energy_uncertainty_per_atom(self):

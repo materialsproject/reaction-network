@@ -15,7 +15,7 @@ from rxn_network.thermo.utils import simple_pca, get_centroid_2d
 import plotly.express as px
 import plotly.graph_objects as go
 
-from pymatgen import Composition, Element
+from pymatgen.core.composition import Composition, Element
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.util.coord import Simplex
 from pymatgen.analysis.phase_diagram import PhaseDiagram, PDPlotter

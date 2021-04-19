@@ -106,9 +106,19 @@ class BasicReaction(Reaction):
 
     def copy(self) -> "BasicReaction":
         """
-        Returns a copy of the Reaction object.
+        Returns a copy of the BasicReaction object.
         """
-        return BasicReaction(self.compositions, self.coefficients, self.balanced)
+        return BasicReaction(self.compositions, self.coefficients, self.balanced,
+                             self.data, self.lowest_num_errors)
+
+    def reverse(self) -> "Reaction":
+        """
+        Returns: a copy of the original Reaction object where original reactants are
+        new products, and vice versa.
+        """
+        copy = self.copy()
+        copy._coefficients = -1 * copy._coefficients
+        return copy
 
     def normalize_to(self, comp: Composition, factor: float = 1) -> "BasicReaction":
         """

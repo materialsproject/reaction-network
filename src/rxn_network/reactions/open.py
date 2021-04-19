@@ -2,7 +2,7 @@ from typing import List, Dict, Optional
 
 import numpy as np
 
-from pymatgen import Element
+from pymatgen.core.composition import Element
 from pymatgen.entries import Entry
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from rxn_network.reactions.computed import ComputedReaction
@@ -79,6 +79,16 @@ class OpenComputedReaction(ComputedReaction):
             set(el for comp in self.compositions for el in comp.elements)
             - set(self.open_elems)
         )
+
+    def copy(self) -> "OpenComputedReaction":
+        """
+        Returns a copy of the OpenComputedReaction object.
+        """
+        return OpenComputedReaction(self.entries,
+                                    self.coefficients,
+                                    self.chempots,
+                                    self.data,
+                                    self.lowest_num_errors)
 
     @classmethod
     def balance(
