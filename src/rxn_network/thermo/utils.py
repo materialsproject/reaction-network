@@ -120,19 +120,27 @@ def check_chempot_bounds(pd, rxn):
 
         entry_mu_ranges[e] = chempot_ranges
 
-    elems = {elem for phase in phases + other_phases for elem in
-             phase.composition.elements}
+    elems = {
+        elem for phase in phases + other_phases for elem in phase.composition.elements
+    }
 
     reactant_mu_ranges = [entry_mu_ranges[e] for e in phases]
     reactant_mu_span = {
-        elem: (min([r[elem][0] for r in reactant_mu_ranges if elem in r]),
-               max([r[elem][1] for r in reactant_mu_ranges if elem in r])) for elem in
-        elems}
+        elem: (
+            min([r[elem][0] for r in reactant_mu_ranges if elem in r]),
+            max([r[elem][1] for r in reactant_mu_ranges if elem in r]),
+        )
+        for elem in elems
+    }
 
     product_mu_ranges = [entry_mu_ranges[e] for e in other_phases]
-    product_mu_span = {elem: (min([p[elem][0] for p in product_mu_ranges if elem in p]),
-                              max([p[elem][1] for p in product_mu_ranges if elem in p]))
-                       for elem in elems}
+    product_mu_span = {
+        elem: (
+            min([p[elem][0] for p in product_mu_ranges if elem in p]),
+            max([p[elem][1] for p in product_mu_ranges if elem in p]),
+        )
+        for elem in elems
+    }
 
     out_of_bounds = False
     for elem in product_mu_span:

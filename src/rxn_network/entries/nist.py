@@ -22,6 +22,7 @@ class NISTReferenceEntry(Entry):
     Physics for the National Institute of Standards and Technology, 1998.
 
     """
+
     REFERENCES = {**G_COMPOUNDS, **G_GASES}
 
     def __init__(
@@ -109,8 +110,7 @@ class NISTReferenceEntry(Entry):
         :param d: Dict representation.
         :return: NISTReferenceEntry
         """
-        return cls(composition=d["composition"],
-                   temperature=d["temperature"])
+        return cls(composition=d["composition"], temperature=d["temperature"])
 
     def __repr__(self):
         output = [

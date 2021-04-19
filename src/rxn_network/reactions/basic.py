@@ -18,7 +18,8 @@ from rxn_network.core import Reaction
 
 class BasicReaction(Reaction):
     """
-    An object representing a basic chemical reaction.
+    An object representing a basic chemical reaction: compositions and their
+    coefficients.
     """
 
     # Tolerance for determining if a particular component fraction is > 0.
@@ -32,7 +33,24 @@ class BasicReaction(Reaction):
         data: Optional[Dict] = None,
         lowest_num_errors: Optional[int] = None,
     ):
+        """
+        A BasicReaction object is defined by a list of compositions and their
+        corresponding coefficients, where a negative coefficient refers to a
+        reactant, and a positive coefficient refers to a product.
 
+        Args:
+            compositions: List of composition objects (pymatgen).
+            coefficients: List of coefficients, where negative coeff distinguishes a
+                reactant.
+            balanced: Whether the reaction is stoichiometricaly balanced or not
+                (see construction via balance() method).
+            data: Optional corresponding data in dictionary format; often used to store
+                various calculated parameters.
+            lowest_num_errors: the minimum number of errors reported by the reaction
+                balancing algorithm (see the balance() method). A number of errors
+                >= 1 means that the reaction may be different than intended (some
+                phases may be shuffled or removed entirely).
+        """
         self._compositions = compositions
         self._coefficients = np.array(coefficients)
         self.reactant_coeffs = {
@@ -74,25 +92,27 @@ class BasicReaction(Reaction):
 
     @property
     def compositions(self) -> List[Composition]:
+        " List of composition objects for this reaction "
         return self._compositions
 
     @property
     def coefficients(self) -> np.array:  # pylint: disable = W0236
-        """
-        Coefficients of the reaction
-        """
+        " Array of reaction coefficients "
         return self._coefficients
 
     @property
     def energy(self) -> float:
-        raise ValueError("No energy for a basic reaction")
+        " The energy of this reaction "
+        raise ValueError("No energy for a basic reaction!")
 
     @property
     def energy_per_atom(self) -> float:
-        raise ValueError("No energy (per atom) for a basic reaction")
+        " The energy per atom of this reaction"
+        raise ValueError("No energy (per atom) for a basic reaction!")
 
     @property
     def is_identity(self):
+        " Returns True if the reaction has identical reactants and products"
         if set(self.reactants) != set(self.products):
             return False
         if self.balanced == False:  # if not balanced, can not check coefficients
@@ -105,15 +125,18 @@ class BasicReaction(Reaction):
         )
 
     def copy(self) -> "BasicReaction":
-        """
-        Returns a copy of the BasicReaction object.
-        """
-        return BasicReaction(self.compositions, self.coefficients, self.balanced,
-                             self.data, self.lowest_num_errors)
+        " Returns a copy of the BasicReaction object "
+        return BasicReaction(
+            self.compositions,
+            self.coefficients,
+            self.balanced,
+            self.data,
+            self.lowest_num_errors,
+        )
 
     def reverse(self) -> "Reaction":
         """
-        Returns: a copy of the original Reaction object where original reactants are
+        Returns a copy of the original Reaction object where original reactants are
         new products, and vice versa.
         """
         copy = self.copy()
@@ -122,13 +145,14 @@ class BasicReaction(Reaction):
 
     def normalize_to(self, comp: Composition, factor: float = 1) -> "BasicReaction":
         """
-        Normalizes the reaction to one of the compositions.
-        By default, normalizes such that the composition given has a
-        coefficient of 1. Another factor can be specified.
+        Normalizes the reaction to one of the compositions via the provided factor.
+
+        By default, normalizes such that the composition given has a coefficient of
+        1.
 
         Args:
-            comp (Composition): Composition to normalize to
-            factor (float): Factor to normalize to. Defaults to 1.
+            comp: Composition object to normalize to
+            factor: factor to normalize to. Defaults to 1.
         """
         all_comp = self.compositions
         coeffs = self.coefficients
@@ -249,8 +273,9 @@ class BasicReaction(Reaction):
         elif str(self) == str(other):
             return True
         else:
-            return ((set(self.reactants) == set(other.reactants))
-                    & (set(self.products) == set(other.products)))
+            return (set(self.reactants) == set(other.reactants)) & (
+                set(self.products) == set(other.products)
+            )
 
     def __hash__(self):
         return hash("-".join([e.reduced_formula for e in sorted(self.compositions)]))
@@ -369,8 +394,10 @@ class BasicReaction(Reaction):
 
     @classmethod
     def balance(
-        cls, reactants: List[Composition], products: List[Composition],
-            data: Optional[Dict]=None
+        cls,
+        reactants: List[Composition],
+        products: List[Composition],
+        data: Optional[Dict] = None,
     ) -> "BasicReaction":
         """
         Reactants and products to be specified as list of

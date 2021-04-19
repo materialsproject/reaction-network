@@ -1,6 +1,6 @@
 " A chemical potential diagram class."
 from functools import cached_property
-from typing import List, Dict
+from typing import List, Dict, Optional
 import numpy as np
 from scipy.spatial import HalfspaceIntersection, ConvexHull, KDTree
 from scipy.spatial.qhull import QhullError
@@ -31,14 +31,15 @@ class ChempotDiagram(MSONable):
     """
 
     def __init__(
-        self, pd: PhaseDiagram, limits: dict = None, default_limit: float = -15.0
+        self, pd: PhaseDiagram, limits: Optional[Dict[Element, float]] = None,
+            default_limit: Optional[float] = -15.0
     ):
         """
         Args:
-            pd (PhaseDiagram): pymatgen phase diagram object
-            limits (dict): chemical potential value chosen for bordering elemental
+            pd: Phase diagram object (pymatgen).
+            limits: Chemical potential value chosen for bordering elemental
                 hyperplanes; constrains the space over which the domains are calculated
-            default_limit (float): default minimum limit for unspecified elements
+            default_limit (float): Default minimum limit for unspecified elements.
         """
         self.pd = pd
         self.limits = limits
@@ -324,8 +325,8 @@ class ChempotDiagram(MSONable):
     @staticmethod
     def _get_chempot_axis_layout(element):
         return dict(
-            #title=f"μ<sub>{str(element)}</sub> - μ<sub>"
-            #f"{str(element)}</sub><sup>o</sup> (eV)",
+            # title=f"μ<sub>{str(element)}</sub> - μ<sub>"
+            # f"{str(element)}</sub><sup>o</sup> (eV)",
             title="",
             titlefont={"size": 30},
             gridcolor="#dbdbdb",

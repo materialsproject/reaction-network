@@ -9,9 +9,32 @@ class EnumeratorFW(Firework):
     """
     Firework for running a list of enumerators (which outputs a list of reactions).
     """
-    def __init__(self, enumerators, entries=None, chemsys=None,
-                 temperature=None, e_above_hull=None, db_file=None, entry_db_file=None,
-                 include_polymorphs=False, parents=None):
+
+    def __init__(
+        self,
+        enumerators,
+        entries=None,
+        chemsys=None,
+        temperature=None,
+        e_above_hull=None,
+        db_file=None,
+        entry_db_file=None,
+        include_polymorphs=False,
+        parents=None,
+    ):
+        """
+
+        Args:
+            enumerators:
+            entries:
+            chemsys:
+            temperature:
+            e_above_hull:
+            db_file:
+            entry_db_file:
+            include_polymorphs:
+            parents:
+        """
 
         tasks = []
 
@@ -21,16 +44,20 @@ class EnumeratorFW(Firework):
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
             if entry_db_file:
-                entry_task = EntriesFromDb(entry_db_file=entry_db_file,
-                                           chemsys=chemsys,
-                                           temperature=temperature,
-                                           e_above_hull=e_above_hull,
-                                           include_polymorphs=include_polymorphs)
+                entry_task = EntriesFromDb(
+                    entry_db_file=entry_db_file,
+                    chemsys=chemsys,
+                    temperature=temperature,
+                    e_above_hull=e_above_hull,
+                    include_polymorphs=include_polymorphs,
+                )
             else:
-                entry_task = EntriesFromMPRester(chemsys=chemsys,
-                                                 temperature=temperature,
-                                                 e_above_hull=e_above_hull,
-                                                 include_polymorphs=include_polymorphs)
+                entry_task = EntriesFromMPRester(
+                    chemsys=chemsys,
+                    temperature=temperature,
+                    e_above_hull=e_above_hull,
+                    include_polymorphs=include_polymorphs,
+                )
             tasks.append(entry_task)
 
         targets = {enumerator.target for enumerator in enumerators}
@@ -39,8 +66,9 @@ class EnumeratorFW(Firework):
         target = targets.pop()
         fw_name = f"Reaction Enumeration (Target: {target}): {chemsys}"
 
-        tasks.append(RunEnumerators(enumerators=enumerators, entries=entry_set,
-                                    chemsys=chemsys))
+        tasks.append(
+            RunEnumerators(enumerators=enumerators, entries=entry_set, chemsys=chemsys)
+        )
         tasks.append(ReactionsToDb(db_file=db_file, calc_dir="."))
 
         super().__init__(tasks, parents=parents, name=fw_name)

@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 
+
 def env_chk(val, fw_spec, strict=True, default=None):
     """
     Code borrowed from the atomate package.
@@ -24,14 +25,17 @@ def env_chk(val, fw_spec, strict=True, default=None):
 
     if isinstance(val, str) and val.startswith(">>") and val.endswith("<<"):
         if strict:
-            return fw_spec['_fw_env'][val[2:-2]]
-        return fw_spec.get('_fw_env', {}).get(val[2:-2], default)
+            return fw_spec["_fw_env"][val[2:-2]]
+        return fw_spec.get("_fw_env", {}).get(val[2:-2], default)
     return val
 
 
-def get_logger(name, level=logging.DEBUG,
-               log_format='%(asctime)s %(levelname)s %(name)s %(message)s',
-               stream=sys.stdout):
+def get_logger(
+    name,
+    level=logging.DEBUG,
+    log_format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    stream=sys.stdout,
+):
     """Helper method for acquiring logger; code borrowed from the atomate package."""
 
     logger = logging.getLogger(name)

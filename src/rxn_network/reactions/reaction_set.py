@@ -12,6 +12,7 @@ class ReactionSet(MSONable):
     """
     A lightweight class for storing large sets of ComputedReaction objects.
     """
+
     def __init__(self, entries, all_indices, all_coeffs, all_data=None):
         self.entries = entries
         self.all_indices = all_indices
@@ -23,16 +24,24 @@ class ReactionSet(MSONable):
     @lru_cache(1)
     def get_rxns(self, open_elem, chempot=0):
         rxns = []
-        chempots = {Element(open_elem):chempot}
-        for indices, coeffs, data in zip(self.all_indices, self.all_coeffs,
-                                         self.all_data):
+        chempots = {Element(open_elem): chempot}
+        for indices, coeffs, data in zip(
+            self.all_indices, self.all_coeffs, self.all_data
+        ):
             entries = [self.entries[i] for i in indices]
             if chempots:
-                rxns.append(OpenComputedReaction(entries=entries, coefficients=coeffs,
-                                         data=data, chempots=chempots))
+                rxns.append(
+                    OpenComputedReaction(
+                        entries=entries,
+                        coefficients=coeffs,
+                        data=data,
+                        chempots=chempots,
+                    )
+                )
             else:
-                rxns.append(ComputedReaction(entries=entries, coefficients=coeffs,
-                                         data=data))
+                rxns.append(
+                    ComputedReaction(entries=entries, coefficients=coeffs, data=data)
+                )
         return rxns
 
     def calculate_costs(self, cf):
@@ -51,8 +60,12 @@ class ReactionSet(MSONable):
             all_coeffs.append(list(rxn.coefficients))
             all_data.append(rxn.data)
 
-        return cls(entries=entries, all_indices=all_indices, all_coeffs=all_coeffs,
-                   all_data=all_data)
+        return cls(
+            entries=entries,
+            all_indices=all_indices,
+            all_coeffs=all_coeffs,
+            all_data=all_data,
+        )
 
     @staticmethod
     def _get_unique_entries(rxns):

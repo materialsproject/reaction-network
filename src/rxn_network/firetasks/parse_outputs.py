@@ -14,6 +14,10 @@ logger = get_logger(__name__)
 
 @explicit_serialize
 class ReactionsToDb(FiretaskBase):
+    """
+    Stores calculated reactions (rxns.json) and their metadata (metadata.json) in a
+    MongoDB.
+    """
     def run_task(self, fw_spec):
         calc_dir = self.get("calc_dir", os.getcwd())
         db_file = env_chk(self.get("db_file"), fw_spec)
@@ -22,8 +26,10 @@ class ReactionsToDb(FiretaskBase):
         rxns = loadfn("rxns.json")
         metadata = loadfn("metadata.json")
 
-        d["name"] = f"Reaction Enumeration (Target: " \
-                    f"{metadata['target']}): {metadata['chemsys']}"
+        d["name"] = (
+            f"Reaction Enumeration (Target: "
+            f"{metadata['target']}): {metadata['chemsys']}"
+        )
         d["rxns"] = jsanitize(rxns, strict=True)
         d["metadata"] = jsanitize(metadata, strict=True)
 
@@ -40,6 +46,9 @@ class ReactionsToDb(FiretaskBase):
 
 @explicit_serialize
 class NetworkToDb(FiretaskBase):
+    """
+    Stores calculated reaction network in a MongoDB.
+    """
     def run_task(self, fw_spec):
         db_file = env_chk(self.get("db_file"), fw_spec)
         db = MongoStore.from_db_file(db_file)

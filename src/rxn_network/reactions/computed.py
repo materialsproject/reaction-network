@@ -17,11 +17,13 @@ class ComputedReaction(BasicReaction):
     energies. Will balance the reaction.
     """
 
-    def __init__(self, entries: List[Entry],
-                 coefficients: List[float],
-                 data: Optional[Dict] = None,
-                 lowest_num_errors: Optional[int] = None
-                 ):
+    def __init__(
+        self,
+        entries: List[Entry],
+        coefficients: List[float],
+        data: Optional[Dict] = None,
+        lowest_num_errors: Optional[int] = None,
+    ):
         """
         Args:
             entries([ComputedEntry]): List of ComputedEntry objects.
@@ -36,8 +38,9 @@ class ComputedReaction(BasicReaction):
         ]
         compositions = [e.composition.reduced_composition for e in entries]
 
-        super().__init__(compositions, coefficients, data=data,
-                         lowest_num_errors=lowest_num_errors)
+        super().__init__(
+            compositions, coefficients, data=data, lowest_num_errors=lowest_num_errors
+        )
 
     @property
     def entries(self):
@@ -105,8 +108,9 @@ class ComputedReaction(BasicReaction):
         """
         Returns a copy of the Reaction object.
         """
-        return ComputedReaction(self.entries, self.coefficients,
-                                self.data, self.lowest_num_errors)
+        return ComputedReaction(
+            self.entries, self.coefficients, self.data, self.lowest_num_errors
+        )
 
     @property
     def energy_uncertainty_per_atom(self):
@@ -114,9 +118,10 @@ class ComputedReaction(BasicReaction):
 
     @classmethod
     def balance(
-        cls, reactant_entries: List[Entry],
-            product_entries: List[Entry],
-            data: Optional[Dict] = None
+        cls,
+        reactant_entries: List[Entry],
+        product_entries: List[Entry],
+        data: Optional[Dict] = None,
     ):  # pylint: disable = W0221
         """
         Balances and returns a new ComputedReaction.

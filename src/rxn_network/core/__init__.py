@@ -18,7 +18,11 @@ class Calculator(MSONable, metaclass=ABCMeta):
 
     @abstractmethod
     def calculate(self, rxn: Reaction) -> float:
-        " Evaluates the specified property of a reaction"
+        "Evaluates the specified property of a reaction"
+
+    @abstractmethod
+    def decorate(self, rxn: Reaction) -> "Reaction":
+        "Evaluates the specified prop. of a reaction and stores it in the reaction data"
 
 
 class CostFunction(MSONable, metaclass=ABCMeta):
@@ -32,11 +36,11 @@ class CostFunction(MSONable, metaclass=ABCMeta):
 class Enumerator(MSONable, metaclass=ABCMeta):
     " Base definition for a reaction enumeration methodology "
 
-    def __init__(self, calculators, target):
+    def __init__(self, target, calculators):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
-        self.calculators = calculators
         self.target = target
+        self.calculators = calculators
 
     @abstractmethod
     def enumerate(self, entries) -> List[Reaction]:
@@ -45,16 +49,6 @@ class Enumerator(MSONable, metaclass=ABCMeta):
     @abstractmethod
     def estimate_num_reactions(self, entries) -> int:
         " Estimate of the number of reactions from a list of entires "
-
-    @staticmethod
-    def _initialize_calculators(calculators, entries):
-        " "
-
-    @staticmethod
-    def _apply_calculators(rxn, calculators):
-        for calc in calculators:
-            rxn = calc.decorate(rxn)
-        return rxn
 
 
 class ReactionNetwork(MSONable, metaclass=ABCMeta):

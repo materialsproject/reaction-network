@@ -1,9 +1,31 @@
 from itertools import permutations
 import numpy as np
 from pymatgen.entries.computed_entries import ComputedEntry
+import rxn_network.costs.calculators as calcs
 from rxn_network.utils import limited_powerset
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
+
+
+def initialize_target(target, entry_set):
+    target = entry_set.stabilize_entry(entry_set.get_min_entry_by_formula(target))
+    return target
+
+
+def initialize_open_entries(open_entries, entry_set):
+    open_entries = [entry_set.get_min_entry_by_formula(e) for e in open_entries]
+    return open_entries
+
+
+def initialize_calculators(calculators, entries):
+    calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in calculators]
+    return [c.from_entries(entries) for c in calculators]
+
+
+def apply_calculators(rxn, calculators):
+    for calc in calculators:
+        rxn = calc.decorate(rxn)
+    return rxn
 
 
 def get_total_chemsys(entries, open_elem=None):

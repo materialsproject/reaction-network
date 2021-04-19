@@ -21,7 +21,7 @@ class RunEnumerators(FiretaskBase):
         entries = self.get("entries", None)
 
         if not entries:
-            entries = fw_spec['entries']
+            entries = fw_spec["entries"]
         else:
             entries = entries["entries"]
 
@@ -30,8 +30,9 @@ class RunEnumerators(FiretaskBase):
         target = enumerators[0].target
         added_elems = None
         if target:
-            added_elems = entries.chemsys - {str(e) for e in Composition(
-                target).elements}
+            added_elems = entries.chemsys - {
+                str(e) for e in Composition(target).elements
+            }
             added_elems = "-".join(sorted(list(added_elems)))
 
         metadata = {}

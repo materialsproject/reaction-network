@@ -4,8 +4,10 @@ from tqdm import tqdm
 
 from pymatgen.core import Composition
 from pymatgen.entries.entry_tools import EntrySet
-from pymatgen.entries.computed_entries import ComputedStructureEntry, \
-    ConstantEnergyAdjustment
+from pymatgen.entries.computed_entries import (
+    ComputedStructureEntry,
+    ConstantEnergyAdjustment,
+)
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 
 from rxn_network.entries.gibbs import GibbsComputedEntry
@@ -40,8 +42,8 @@ class GibbsEntrySet(EntrySet):
         for chemsys, pd in pd_dict.items():
             for entry in pd.all_entries:
                 if (
-                        entry in filtered_entries
-                        or pd.get_e_above_hull(entry) > e_above_hull
+                    entry in filtered_entries
+                    or pd.get_e_above_hull(entry) > e_above_hull
                 ):
                     continue
 
@@ -90,10 +92,11 @@ class GibbsEntrySet(EntrySet):
             new_entry = entry
         else:
             e_adj = -pd.get_e_above_hull(entry) * entry.composition.num_atoms - tol
-            adjustment = ConstantEnergyAdjustment(value=e_adj,
-                                                  name="Stabilization Adjustment",
-                                                  description="Shifts energy so that "
-                                                              "entry is on the convex hull")
+            adjustment = ConstantEnergyAdjustment(
+                value=e_adj,
+                name="Stabilization Adjustment",
+                description="Shifts energy so that " "entry is on the convex hull",
+            )
 
             entry_dict = entry.as_dict()
             entry_dict["energy_adjustments"].append(adjustment)
@@ -102,7 +105,7 @@ class GibbsEntrySet(EntrySet):
         return new_entry
 
     @classmethod
-    def from_pd(cls, pd: PhaseDiagram, temperature: float) -> 'GibbsEntrySet':
+    def from_pd(cls, pd: PhaseDiagram, temperature: float) -> "GibbsEntrySet":
         """
 
         Args:
@@ -119,28 +122,31 @@ class GibbsEntrySet(EntrySet):
             composition = entry.composition
 
             if composition.reduced_formula in NISTReferenceEntry.REFERENCES:
-                new_entry = NISTReferenceEntry(composition=composition,
-                                               temperature=temperature)
+                new_entry = NISTReferenceEntry(
+                    composition=composition, temperature=temperature
+                )
             else:
                 structure = entry.structure
                 formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
 
-                new_entry = GibbsComputedEntry.from_structure(structure=structure,
-                                                              formation_energy_per_atom=formation_energy_per_atom,
-                                                              temperature=temperature,
-                                                              energy_adjustments=None,
-                                                              parameters=entry.parameters,
-                                                              data=entry.data,
-                                                              entry_id=entry.entry_id,
-                                                              )
+                new_entry = GibbsComputedEntry.from_structure(
+                    structure=structure,
+                    formation_energy_per_atom=formation_energy_per_atom,
+                    temperature=temperature,
+                    energy_adjustments=None,
+                    parameters=entry.parameters,
+                    data=entry.data,
+                    entry_id=entry.entry_id,
+                )
 
             gibbs_entries.append(new_entry)
 
         return cls(gibbs_entries)
 
     @classmethod
-    def from_entries(cls, entries: List[ComputedStructureEntry],
-                     temperature: float) -> 'GibbsEntrySet':
+    def from_entries(
+        cls, entries: List[ComputedStructureEntry], temperature: float
+    ) -> "GibbsEntrySet":
         """
         Constructor method for initializing GibbsEntrySet from
         T = 0 K ComputedStructureEntry objects, as acquired from a thermochemical

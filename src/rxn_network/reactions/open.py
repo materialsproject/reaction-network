@@ -15,8 +15,12 @@ class OpenComputedReaction(ComputedReaction):
     """
 
     def __init__(
-        self, entries: List[Entry], coefficients: np.array, chempots, data: Optional[
-                Dict] = None, lowest_num_errors=None
+        self,
+        entries: List[Entry],
+        coefficients: np.array,
+        chempots,
+        data: Optional[Dict] = None,
+        lowest_num_errors=None,
     ):
         """
         Args:
@@ -84,16 +88,21 @@ class OpenComputedReaction(ComputedReaction):
         """
         Returns a copy of the OpenComputedReaction object.
         """
-        return OpenComputedReaction(self.entries,
-                                    self.coefficients,
-                                    self.chempots,
-                                    self.data,
-                                    self.lowest_num_errors)
+        return OpenComputedReaction(
+            self.entries,
+            self.coefficients,
+            self.chempots,
+            self.data,
+            self.lowest_num_errors,
+        )
 
     @classmethod
     def balance(
-        cls, reactant_entries: List[Entry], product_entries: List[Entry], chempots,
-            data=None
+        cls,
+        reactant_entries: List[Entry],
+        product_entries: List[Entry],
+        chempots,
+        data=None,
     ):  # pylint: disable = W0221
         """
         Balances and returns a new OpenComputedReaction

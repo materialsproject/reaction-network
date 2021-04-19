@@ -38,6 +38,7 @@ class EntriesFromMPRester(FiretaskBase):
         include_polymorphs (bool):
 
     """
+
     required_params = ["chemsys", "temperature", "e_above_hull"]
     optional_params = ["include_polymorphs"]
 
@@ -48,11 +49,14 @@ class EntriesFromMPRester(FiretaskBase):
         include_polymorphs = self.get("include_polymorphs", False)
 
         with MPRester() as mpr:
-            entries = mpr.get_entries_in_chemsys(elements=chemsys,
-                                                 inc_structure="fiinal")
+            entries = mpr.get_entries_in_chemsys(
+                elements=chemsys, inc_structure="fiinal"
+            )
 
-        entries = process_entries(entries, temperature, e_above_hull, include_polymorphs)
-        return FWAction(update_spec={"entries":entries})
+        entries = process_entries(
+            entries, temperature, e_above_hull, include_polymorphs
+        )
+        return FWAction(update_spec={"entries": entries})
 
 
 @explicit_serialize
@@ -72,7 +76,13 @@ class EntriesFromDb(FiretaskBase):
         include_polymorphs (bool):
 
     """
-    required_params = ["entry_db_file", "chemsys", "temperature", "e_above_hull", ]
+
+    required_params = [
+        "entry_db_file",
+        "chemsys",
+        "temperature",
+        "e_above_hull",
+    ]
     optional_params = ["include_polymorphs"]
 
     def run_task(self, fw_spec):
@@ -83,29 +93,32 @@ class EntriesFromDb(FiretaskBase):
         include_polymorphs = self.get("include_polymorphs", False)
 
         with MongoStore.from_db_file(db_file) as db:
-            entries = get_all_entries_in_chemsys(db, self["chemsys"],
-                                                 inc_structure="final")
+            entries = get_all_entries_in_chemsys(
+                db, self["chemsys"], inc_structure="final"
+            )
 
-        entries = process_entries(entries, temperature, e_above_hull, include_polymorphs)
-        return FWAction(update_spec={"entries":entries})
+        entries = process_entries(
+            entries, temperature, e_above_hull, include_polymorphs
+        )
+        return FWAction(update_spec={"entries": entries})
 
 
 def process_entries(entries, temperature, e_above_hull, include_polymorphs):
-    entry_set = GibbsEntrySet.from_entries(entries=entries,
-                                           temperature=temperature)
-    entry_set = entry_set.filter_by_stability(e_above_hull=e_above_hull,
-                                              include_polymorphs=include_polymorphs)
+    entry_set = GibbsEntrySet.from_entries(entries=entries, temperature=temperature)
+    entry_set = entry_set.filter_by_stability(
+        e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
+    )
     return entry_set
 
 
 def get_entries(
-        db,
-        chemsys_formula_id_criteria,
-        compatible_only=True,
-        inc_structure=None,
-        property_data=None,
-        conventional_unit_cell=False,
-        sort_by_e_above_hull=False,
+    db,
+    chemsys_formula_id_criteria,
+    compatible_only=True,
+    inc_structure=None,
+    property_data=None,
+    conventional_unit_cell=False,
+    sort_by_e_above_hull=False,
 ):
     """
     Get a list of ComputedEntries or ComputedStructureEntries corresponding
@@ -184,9 +197,7 @@ def get_entries(
             )
         else:
             prim = Structure.from_dict(
-                d["initial_structure"]
-                if inc_structure == "initial"
-                else d["structure"]
+                d["initial_structure"] if inc_structure == "initial" else d["structure"]
             )
             if conventional_unit_cell:
                 s = SpacegroupAnalyzer(prim).get_conventional_standard_structure()
@@ -211,14 +222,15 @@ def get_entries(
     return entries
 
 
-def get_all_entries_in_chemsys(db,
-                           elements,
-                           compatible_only=True,
-                           inc_structure=None,
-                           property_data=None,
-                           conventional_unit_cell=False,
-                           n=1000
-                           ):
+def get_all_entries_in_chemsys(
+    db,
+    elements,
+    compatible_only=True,
+    inc_structure=None,
+    property_data=None,
+    conventional_unit_cell=False,
+    n=1000,
+):
     """
     Helper method for getting all entries in a total chemical system by querying
     database for all sub-chemical systems. Code adadpted from pymatgen.ext.matproj
@@ -251,7 +263,7 @@ def get_all_entries_in_chemsys(db,
 
     def divide_chunks(l, n):
         for i in range(0, len(l), n):
-            yield l[i:i + n]
+            yield l[i : i + n]
 
     if isinstance(elements, str):
         elements = elements.split("-")
@@ -266,19 +278,24 @@ def get_all_entries_in_chemsys(db,
 
         entries = []
         for chemsys_group in all_chemsyses:
-            entries.extend(get_entries(db,
-                                       {"chemsys": {"$in": chemsys_group}},
-                                       compatible_only=compatible_only,
-                                       inc_structure=inc_structure,
-                                       property_data=property_data,
-                                       conventional_unit_cell=conventional_unit_cell,
-                                       ))
+            entries.extend(
+                get_entries(
+                    db,
+                    {"chemsys": {"$in": chemsys_group}},
+                    compatible_only=compatible_only,
+                    inc_structure=inc_structure,
+                    property_data=property_data,
+                    conventional_unit_cell=conventional_unit_cell,
+                )
+            )
     else:
-        entries = get_entries(db, {
-            "elements": {"$not": {"$elemMatch": {"$nin": elements}}}},
-                              compatible_only=compatible_only,
-                              inc_structure=inc_structure,
-                              property_data=property_data,
-                              conventional_unit_cell=conventional_unit_cell)
+        entries = get_entries(
+            db,
+            {"elements": {"$not": {"$elemMatch": {"$nin": elements}}}},
+            compatible_only=compatible_only,
+            inc_structure=inc_structure,
+            property_data=property_data,
+            conventional_unit_cell=conventional_unit_cell,
+        )
 
     return entries

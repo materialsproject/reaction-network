@@ -7,9 +7,11 @@ default_chempot_layout_3d = dict(
     showlegend=True,
     legend=dict(
         orientation="v",
-        x=0.1, y=0.99,
+        x=0.1,
+        y=0.99,
         traceorder="reversed",
-        xanchor="left", yanchor="top"
+        xanchor="left",
+        yanchor="top",
     ),
     scene_camera=dict(projection=dict(type="orthographic")),
     scene=dict(),

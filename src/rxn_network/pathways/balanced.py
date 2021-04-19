@@ -2,7 +2,6 @@
 This module implements a basic Reaction Pathway
 """
 
-
 from typing import List, Optional, Union
 
 import numpy as np

@@ -35,8 +35,7 @@ class MinimizeGibbsEnumerator(Enumerator):
         target: Optional[ComputedEntry] = None,
         calculators: Optional[List[Calculator]] = None,
     ):
-        self.target = target
-        self.calculators = calculators
+        super().__init__(target, calculators)
 
     def enumerate(self, entries):
         if self.target:
@@ -50,8 +49,9 @@ class MinimizeGibbsEnumerator(Enumerator):
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
 
-            calculators = self._initialize_calculators(self.calculators,
-                                                       chemsys_entries)
+            calculators = self._initialize_calculators(
+                self.calculators, chemsys_entries
+            )
 
             if self.target and not target_elems.issubset(chemsys.split("-")):
                 continue
@@ -122,7 +122,10 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     """
 
     def __init__(
-        self, open_elem, chempot, target: Optional[ComputedEntry] = None,
+        self,
+        open_elem,
+        chempot,
+        target: Optional[ComputedEntry] = None,
         calculators: Optional[List[Calculator]] = None,
     ):
         super().__init__(target=target, calculators=calculators)
@@ -151,8 +154,9 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
 
-            calculators = self._initialize_calculators(self.calculators,
-                                                       fchemsys_entries)
+            calculators = self._initialize_calculators(
+                self.calculators, fchemsys_entries
+            )
 
             grand_pd = GrandPotentialPhaseDiagram(
                 chemsys_entries, {self.open_elem: self.chempot}

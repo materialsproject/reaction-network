@@ -23,15 +23,15 @@ class GibbsComputedEntry(ComputedEntry):
     """
 
     def __init__(
-            self,
-            composition: Composition,
-            formation_energy_per_atom: float,
-            volume_per_atom: float,
-            temperature: float,
-            energy_adjustments: Optional[List] = None,
-            parameters: dict = None,
-            data: dict = None,
-            entry_id: object = None,
+        self,
+        composition: Composition,
+        formation_energy_per_atom: float,
+        volume_per_atom: float,
+        temperature: float,
+        energy_adjustments: Optional[List] = None,
+        parameters: dict = None,
+        data: dict = None,
+        entry_id: object = None,
     ):
         """
         Args:
@@ -63,15 +63,20 @@ class GibbsComputedEntry(ComputedEntry):
                 self.gibbs_adjustment(temperature),
                 uncertainty=0.05 * num_atoms,  # descriptor has ~50 meV/atom MAD
                 name="Gibbs SISSO Correction",
-                description=f"Gibbs correction: dGf({self.temperature} K) - dHf (298 K)"
+                description=f"Gibbs correction: dGf({self.temperature} K) - dHf (298 K)",
             )
         )
 
         formation_energy = num_atoms * formation_energy_per_atom
 
-        super().__init__(composition=composition, energy=formation_energy,
-                         energy_adjustments=energy_adjustments,
-                         parameters=parameters, data=data, entry_id=entry_id)
+        super().__init__(
+            composition=composition,
+            energy=formation_energy,
+            energy_adjustments=energy_adjustments,
+            parameters=parameters,
+            data=data,
+            entry_id=entry_id,
+        )
 
     def set_temperature(self, new_temperature):
         new_entry_dict = self.as_dict()
@@ -106,11 +111,9 @@ class GibbsComputedEntry(ComputedEntry):
         num_atoms = self._composition.num_atoms
         reduced_mass = self._reduced_mass(self._composition)
 
-        return (
-                num_atoms
-                * self._g_delta_sisso(self.volume_per_atom, reduced_mass, temperature)
-                - self._sum_g_i(self._composition, temperature)
-        )
+        return num_atoms * self._g_delta_sisso(
+            self.volume_per_atom, reduced_mass, temperature
+        ) - self._sum_g_i(self._composition, temperature)
 
     @staticmethod
     def _g_delta_sisso(volume_per_atom, reduced_mass, temp) -> float:
@@ -129,10 +132,13 @@ class GibbsComputedEntry(ComputedEntry):
         """
 
         return (
-                (-2.48e-4 * np.log(volume_per_atom) - 8.94e-5 * reduced_mass /
-                 volume_per_atom) * temp
-                + 0.181 * np.log(temp)
-                - 0.882
+            (
+                -2.48e-4 * np.log(volume_per_atom)
+                - 8.94e-5 * reduced_mass / volume_per_atom
+            )
+            * temp
+            + 0.181 * np.log(temp)
+            - 0.882
         )
 
     @staticmethod
@@ -156,10 +162,7 @@ class GibbsComputedEntry(ComputedEntry):
                 sum_g_i += amt * g_interp(temperature)
         else:
             sum_g_i = sum(
-                [
-                    amt * G_ELEMS[str(temperature)][elem]
-                    for elem, amt in elems.items()
-                ]
+                [amt * G_ELEMS[str(temperature)][elem] for elem, amt in elems.items()]
             )
 
         return sum_g_i
@@ -195,15 +198,18 @@ class GibbsComputedEntry(ComputedEntry):
         return reduced_mass
 
     @classmethod
-    def from_structure(cls, structure, formation_energy_per_atom, temperature,
-                       **kwargs):
+    def from_structure(
+        cls, structure, formation_energy_per_atom, temperature, **kwargs
+    ):
         composition = structure.composition
         volume_per_atom = structure.volume / structure.num_sites
-        entry = cls(composition=composition,
-                    formation_energy_per_atom=formation_energy_per_atom,
-                    volume_per_atom=volume_per_atom,
-                    temperature=temperature, **kwargs
-                    )
+        entry = cls(
+            composition=composition,
+            formation_energy_per_atom=formation_energy_per_atom,
+            volume_per_atom=volume_per_atom,
+            temperature=temperature,
+            **kwargs,
+        )
         return entry
 
     def as_dict(self) -> dict:
@@ -223,14 +229,16 @@ class GibbsComputedEntry(ComputedEntry):
         :return: GibbsComputedEntry
         """
         dec = MontyDecoder()
-        entry = cls(composition=d["composition"],
-                    formation_energy_per_atom=d["formation_energy_per_atom"],
-                    volume_per_atom=d["volume_per_atom"],
-                    temperature=d["temperature"],
-                    energy_adjustments=dec.process_decoded(d["energy_adjustments"]),
-                    parameters=d["parameters"],
-                    data=d["data"],
-                    entry_id=d["entry_id"])
+        entry = cls(
+            composition=d["composition"],
+            formation_energy_per_atom=d["formation_energy_per_atom"],
+            volume_per_atom=d["volume_per_atom"],
+            temperature=d["temperature"],
+            energy_adjustments=dec.process_decoded(d["energy_adjustments"]),
+            parameters=d["parameters"],
+            data=d["data"],
+            entry_id=d["entry_id"],
+        )
         return entry
 
     def __repr__(self):
@@ -243,10 +251,10 @@ class GibbsComputedEntry(ComputedEntry):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return (
-                    (self.entry_id == other.entry_id)
-                    and (self.temperature == other.temperature)
-                    and (self.composition == other.composition)
-                    and (self.energy == other.energy)
+                (self.entry_id == other.entry_id)
+                and (self.temperature == other.temperature)
+                and (self.composition == other.composition)
+                and (self.energy == other.energy)
             )
         return False
 
