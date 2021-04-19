@@ -1,4 +1,4 @@
-" An entry set class for acquiring entries with Gibbs Formation Energies"
+" An entry set class for acquiring entries with Gibbs formation energies"
 from monty.json import MSONable, MontyDecoder
 from typing import List, Optional, Union
 from tqdm import tqdm

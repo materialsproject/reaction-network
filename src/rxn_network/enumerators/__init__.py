@@ -1,1 +1,1 @@
-"Implementations of Reaction Network Enumerators"
+"Implementations of reaction enumerators"

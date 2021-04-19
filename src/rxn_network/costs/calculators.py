@@ -68,7 +68,7 @@ class ChempotDistanceCalculator(Calculator):
         storing the value within the reaction's data dictionary.
 
         Args:
-            rxn: the reaction object
+            rxn: The reaction object.
 
         Returns:
             The reaction object, modified in place

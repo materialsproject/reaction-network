@@ -32,23 +32,27 @@ class BasicEnumerator(Enumerator):
 
     def __init__(
         self,
-        n: int = 2,
         target: Optional[str] = None,
         calculators: Optional[List[str]] = None,
+        n: int = 2,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
     ):
         """
+        Supplied target and calculator parameters are automatically initialized as
+        objects during enumeration.
+
         Args:
-            n: maximum reactant/product cardinality; i.e., largest possible number of
-                entries on either side of the reaction.
-            target: (optional) formula of target; only reactions which make this target
-                will be enumerated
-            calculators: (optional) list of Calculator object names; see calculators
+            target: Optional formula of target; only reactions which make this target
+                will be enumerated.
+            calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator])
-            remove_unbalanced: Whether to remove reactions which are unbalanced
+            n: Maximum reactant/product cardinality; i.e., largest possible number of
+                entries on either side of the reaction. Defaults to 2.
+            remove_unbalanced: Whether to remove reactions which are unbalanced.
+                Defaults to True.
             remove_changed: Whether to remove reactions which can only be balanced by
-                removing a reactant/product or having it change sides
+                removing a reactant/product or having it change sides. Defaults to True.
         """
         if not calculators:
             calculators = []
@@ -156,28 +160,46 @@ class BasicOpenEnumerator(BasicEnumerator):
 
     def __init__(
         self,
-        n: int,
-        open_entries: List[ComputedEntry],
-        target: ComputedEntry = None,
+        open_entries: List[str],
+        target: Optional[str] = None,
         calculators: Optional[List[Calculator]] = None,
+        n: int = 2,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
     ):
         """
+        Supplied target and calculator parameters are automatically initialized as
+        objects during enumeration.
 
         Args:
-            n:
-            open_entries:
-            target:
-            calculators:
-            remove_unbalanced: Whether to remove reactions which are unbalanced
+            open_entries: List of formulas of open entries (e.g. ["O2"])
+            target: Optional formula of target; only reactions which make this target
+                will be enumerated.
+            calculators: Optional list of Calculator object names; see calculators
+                module for options (e.g., ["ChempotDistanceCalculator]).
+            n: Maximum reactant/product cardinality; i.e., largest possible number of
+                entries on either side of the reaction.
+            remove_unbalanced: Whether to remove reactions which are unbalanced.
+                Defaults to True
             remove_changed: Whether to remove reactions which can only be balanced by
-                removing a reactant/product or having it change sides
+                removing a reactant/product or having it change sides. Defaults to True.
         """
         super().__init__(n, target, calculators, remove_unbalanced, remove_changed)
         self.open_entries = open_entries
 
-    def enumerate(self, entries):
+    def enumerate(self, entries: GibbsEntrySet) -> List[ComputedReaction]:
+        """
+        Calculate all possible reactions given a set of entries. If the enumerator
+        was initialized with a target, only reactions to this target will be considered.
+
+        Args:
+            entries: the set of all entries to enumerate from
+
+        Returns:
+            List of unique computed reactions. Note: this does not return
+            OpenComputedReaction objects (this can be calculated using the
+            ReactionSet class).
+        """
         entries = GibbsEntrySet(entries)
 
         target = None

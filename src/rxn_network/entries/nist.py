@@ -19,7 +19,6 @@ class NISTReferenceEntry(Entry):
         Malcolm W. Chase Jr. NIST-JANAF thermochemical tables. Fourth edition.
         Washington, DC : American Chemical Society;  New York : American Institute of
         Physics for the National Institute of Standards and Technology, 1998.
-
     """
 
     REFERENCES = {**G_COMPOUNDS, **G_GASES}
@@ -56,20 +55,20 @@ class NISTReferenceEntry(Entry):
 
     @property
     def energy(self) -> float:
-        " The energy of the entry"
+        "The energy of the entry"
         return self._energy
 
     @staticmethod
-    def get_nist_energy(formula: str, temperature: float):
+    def get_nist_energy(formula: str, temperature: float) -> float:
         """
         Convenience method for accessing and interpolating NIST-JANAF data.
 
         Args:
-            formula:
-            temperature:
+            formula: Chemical formula by which to search NIST-JANAF data.
+            temperature: Absolute temperature [K].
 
         Returns:
-
+            Gibbs free energy of formation of formula at specified temperature [eV]
         """
         data = NISTReferenceEntry.REFERENCES[formula]
         if temperature % 100 > 0:
@@ -80,35 +79,23 @@ class NISTReferenceEntry(Entry):
 
     @property
     def correction_uncertainty(self) -> float:
-        """
-        Returns:
-            float: the uncertainty of the energy adjustments applied to the entry, in eV
-        """
+        " Uncertainty of NIST-JANAF data is not supplied."
         return 0
 
     @property
     def correction_uncertainty_per_atom(self) -> float:
-        """
-        Returns:
-            float: the uncertainty of the energy adjustments applied to the entry,
-                normalized by atoms (units of eV/atom)
-        """
+        " Uncertainty of NIST-JANAF data is not supplied."
         return 0
 
     def as_dict(self) -> dict:
-        """
-        :return: MSONAble dict.
-        """
+        " Returns an MSONable dict. "
         data = super().as_dict()
         data["temperature"] = self.temperature
         return data
 
     @classmethod
     def from_dict(cls, d) -> "NISTReferenceEntry":
-        """
-        :param d: Dict representation.
-        :return: NISTReferenceEntry
-        """
+        " Returns NISTReferenceEntry constructed from MSONable dict."
         return cls(composition=d["composition"], temperature=d["temperature"])
 
     def __repr__(self):
