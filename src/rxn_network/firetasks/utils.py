@@ -6,8 +6,12 @@ import sys
 from typing import Optional
 
 
-def env_chk(val: str, fw_spec: dict,
-            strict: Optional[bool] = True, default: Optional[str]=None):
+def env_chk(
+    val: str,
+    fw_spec: dict,
+    strict: Optional[bool] = True,
+    default: Optional[str] = None,
+):
     """
     Code borrowed from the atomate package.
 

@@ -59,7 +59,10 @@ class BasicEnumerator(Enumerator):
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
 
-    def enumerate(self, entries: GibbsEntrySet,) -> List[ComputedReaction]:
+    def enumerate(
+        self,
+        entries: GibbsEntrySet,
+    ) -> List[ComputedReaction]:
         """
         Calculate all possible reactions given a set of entries. If the enumerator
         was initialized with a target, only reactions to this target will be considered.

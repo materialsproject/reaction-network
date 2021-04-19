@@ -1,4 +1,4 @@
-" Specialized Entry types for the RXN Network "
+" Entry and entry set classes used in reaction enumeration / networks "
 
 from rxn_network.entries.gibbs import (  # pylint: disable=C0413
     GibbsComputedEntry,  # noqa: E402

@@ -26,6 +26,7 @@ class RunEnumerators(FiretaskBase):
             methods
 
     """
+
     required_params = ["enumerators", "entries"]
 
     def run_task(self, fw_spec):

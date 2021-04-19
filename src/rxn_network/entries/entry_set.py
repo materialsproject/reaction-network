@@ -1,3 +1,4 @@
+" An entry set class for acquiring entries with Gibbs Formation Energies"
 from monty.json import MSONable, MontyDecoder
 from typing import List, Optional, Union
 from tqdm import tqdm
@@ -5,11 +6,11 @@ from tqdm import tqdm
 from pymatgen.core import Composition
 from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.entries.computed_entries import (
+    ComputedEntry,
     ComputedStructureEntry,
-    ConstantEnergyAdjustment,
+    ConstantEnergyAdjustment
 )
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-
 from rxn_network.entries.gibbs import GibbsComputedEntry
 from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd
@@ -23,21 +24,29 @@ class GibbsEntrySet(EntrySet):
 
     def __init__(self, entries: List[Union[GibbsComputedEntry, NISTReferenceEntry]]):
         """
+        The supplied collection of entries will automatically be converted to a set of
+        unique entries.
 
         Args:
-            entries:
+            entries: A collection of entry objects that will make up the entry set.
         """
         super().__init__(entries)
 
-    def filter_by_stability(self, e_above_hull, include_polymorphs=False):
+    def filter_by_stability(self, e_above_hull: float,
+                            include_polymorphs: Optional[bool] = False):
         """
+        Filter the entry set by a metastability (energy above hull) cutoff.
 
         Args:
-            e_above_hull:
-            include_polymorphs:
+            e_above_hull: Energy above hull, the cutoff describing the allowed
+                metastability of the entries as determined via phase diagram
+                construction.
+            include_polymorphs: optional specification of whether to include
+                metastable polymorphs. Defaults to False.
 
         Returns:
-
+            A new GibbsEntrySet where the entries have been filtered by an energy
+            cutoff (e_above_hull) via phase diagram construction.
         """
         pd_dict = expand_pd(self.entries)
 
@@ -63,14 +72,15 @@ class GibbsEntrySet(EntrySet):
 
         return self.__class__(filtered_entries)
 
-    def get_min_entry_by_formula(self, formula):
+    def get_min_entry_by_formula(self, formula: str) -> ComputedEntry:
         """
+        Helper method for acquiring the ground state entry with the specified formula.
 
         Args:
-            formula:
+            formula: The chemical formula of the desired entry.
 
         Returns:
-
+            Ground state computed entry object.
         """
         comp = Composition(formula).reduced_composition
         possible_entries = filter(
@@ -78,15 +88,18 @@ class GibbsEntrySet(EntrySet):
         )
         return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
 
-    def stabilize_entry(self, entry, tol=1e-6):
+    def stabilize_entry(self, entry: ComputedEntry, tol: float =1e-6) -> ComputedEntry:
         """
+        Helper method for lowering the energy of a single entry such that it is just
+        barely stable on the phase diagram.
 
         Args:
-            entry:
-            tol:
+            entry: A computed entry object.
+            tol: The numerical padding added to the energy correction to guarantee
+                that it is determined to be stable during phase diagram construction.
 
         Returns:
-
+            A new ComputedEntry with energy adjustment making it appear to be stable.
         """
         chemsys = [str(e) for e in entry.composition.elements]
         entries = self.get_subset_in_chemsys(chemsys)
@@ -96,7 +109,7 @@ class GibbsEntrySet(EntrySet):
         if e_above_hull == 0.0:
             new_entry = entry
         else:
-            e_adj = -pd.get_e_above_hull(entry) * entry.composition.num_atoms - tol
+            e_adj = -1*pd.get_e_above_hull(entry) * entry.composition.num_atoms - tol
             adjustment = ConstantEnergyAdjustment(
                 value=e_adj,
                 name="Stabilization Adjustment",
@@ -112,12 +125,16 @@ class GibbsEntrySet(EntrySet):
     @classmethod
     def from_pd(cls, pd: PhaseDiagram, temperature: float) -> "GibbsEntrySet":
         """
+        Constructor method for building a GibbsEntrySet from an existing phase diagram.
 
         Args:
-            pd:
-            temperature:
+            pd: Phase Diagram object (pymatgen)
+            temperature: Temperature [K] for determining Gibbs Free Energy of
+                formation, dGf(T)
 
         Returns:
+            A GibbsEntrySet containing a collection of GibbsComputedEntry and
+            experimental reference entry objects at the specified temperature.
 
         """
         gibbs_entries = []
@@ -153,22 +170,21 @@ class GibbsEntrySet(EntrySet):
         cls, entries: List[ComputedStructureEntry], temperature: float
     ) -> "GibbsEntrySet":
         """
-        Constructor method for initializing GibbsEntrySet from
-        T = 0 K ComputedStructureEntry objects, as acquired from a thermochemical
-        database e.g. The Materials Project.
+        Constructor method for initializing GibbsEntrySet from T = 0 K
+        ComputedStructureEntry objects, as acquired from a thermochemical
+        database e.g. The Materials Project. Automatically expands the phase
+        diagram for large chemical systems (10 or more elements) to avoid limitations
+        of Qhull.
 
         Args:
-            entries ([ComputedStructureEntry]): List of ComputedStructureEntry objects,
-                as downloaded from The Materials Project API.
-            temp (float): Temperature [K] for estimating Gibbs free energy of formation.
-            gibbs_model (str): Gibbs model to use; currently the only option is "SISSO".
+            entries: List of ComputedStructureEntry objects, as downloaded from The
+                Materials Project API.
+            temperature: Temperature for estimating Gibbs free energy of formation [K]
 
         Returns:
-            [GibbsComputedStructureEntry]: list of new entries which replace the orig.
-                entries with inclusion of Gibbs free energy of formation at the
-                specified temperature.
+            A GibbsEntrySet containing a collection of GibbsComputedEntry and
+            experimental reference entry objects at the specified temperature.
         """
-
         e_set = EntrySet(entries)
         new_entries = set()
         if len(e_set.chemsys) <= 9:  # Qhull algorithm struggles beyond 9 dimensions

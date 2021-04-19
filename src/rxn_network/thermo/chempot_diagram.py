@@ -32,8 +32,10 @@ class ChempotDiagram(MSONable):
     """
 
     def __init__(
-        self, pd: PhaseDiagram, limits: Optional[Dict[Element, float]] = None,
-            default_limit: Optional[float] = -15.0
+        self,
+        pd: PhaseDiagram,
+        limits: Optional[Dict[Element, float]] = None,
+        default_limit: Optional[float] = -15.0,
     ):
         """
         Args:

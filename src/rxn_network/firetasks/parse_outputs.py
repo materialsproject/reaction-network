@@ -20,6 +20,7 @@ class ReactionsToDb(FiretaskBase):
     Stores calculated reactions (rxns.json) and their metadata (metadata.json) in a
     MongoDB.
     """
+
     def run_task(self, fw_spec):
         calc_dir = self.get("calc_dir", os.getcwd())
         db_file = env_chk(self.get("db_file"), fw_spec)
@@ -51,6 +52,7 @@ class NetworkToDb(FiretaskBase):
     """
     Stores calculated reaction network in a MongoDB.
     """
+
     def run_task(self, fw_spec):
         db_file = env_chk(self.get("db_file"), fw_spec)
         db = MongoStore.from_db_file(db_file)

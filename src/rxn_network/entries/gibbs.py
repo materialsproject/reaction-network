@@ -6,6 +6,7 @@ from typing import List, Optional
 import numpy as np
 from monty.json import MontyDecoder
 from pymatgen.core.composition import Composition
+from pymatgen.core.structure import Structure
 from pymatgen.entries.computed_entries import ComputedEntry, ConstantEnergyAdjustment
 from scipy.interpolate import interp1d
 
@@ -15,8 +16,8 @@ from rxn_network.data import G_ELEMS
 class GibbsComputedEntry(ComputedEntry):
     """
     An extension to ComputedEntry which estimates the Gibbs free energy of formation
-    of solids using energy adjustments from a model, such as the machine learned
-    SISSO descriptor from Bartel et al. (2018).
+    of solids using energy adjustments from the machine-learned SISSO descriptor from
+    Bartel et al. (2018).
 
     WARNING: This descriptor only applies to solids. See
     entries.nist.NISTReferenceEntry for common gases (e.g. CO2).
@@ -29,21 +30,30 @@ class GibbsComputedEntry(ComputedEntry):
         volume_per_atom: float,
         temperature: float,
         energy_adjustments: Optional[List] = None,
-        parameters: dict = None,
-        data: dict = None,
-        entry_id: object = None,
+        parameters: Optional[dict] = None,
+        data: Optional[dict] = None,
+        entry_id: Optional[object] = None,
     ):
         """
 
+        A new computed entry object is returned with a supplied energy correction
+        representing the difference between the formation enthalpy at T=0K and the
+        Gibbs formation energy at the specified temperature.
+
         Args:
-            composition:
-            formation_energy_per_atom:
-            volume_per_atom:
-            temperature:
-            energy_adjustments:
-            parameters:
-            data:
-            entry_id:
+            composition: The composition object (pymatgen)
+            formation_energy_per_atom: Calculated formation enthalpy, dH, at T = 298 K,
+                normalized to the total number of atoms in the composition.
+            volume_per_atom: The total volume of the associated structure divided by
+                the total number of atoms.
+            temperature: Temperature [K] by which to acquire dGf(T), must be selected
+                from a range of [300, 2000] K.  If temperature is not selected from
+                one of [300, 400, 500, ... 2000 K], then free energies will be
+                interpolated.
+            energy_adjustments: Optional list of energy adjustments
+            parameters: Optional list of calculation parameters
+            data: Optional dictionary containing entry data
+            entry_id: Optional entry-id, such as the entry's mp-id
         """
         self._composition = Composition(composition)
         self.formation_energy_per_atom = formation_energy_per_atom
@@ -84,14 +94,15 @@ class GibbsComputedEntry(ComputedEntry):
             entry_id=entry_id,
         )
 
-    def set_temperature(self, new_temperature):
+    def set_temperature(self, new_temperature: float) -> "GibbsComputedEntry":
         """
-
+        Return a copy of the GibbsComputedEntry at the new specified temperature.
+        
         Args:
-            new_temperature:
+            new_temperature: The new temperature to use [K]
 
         Returns:
-
+            A copy of the GibbsComputedEntry at the new specified temperature.
         """
         new_entry_dict = self.as_dict()
         new_entry_dict["temperature"] = new_temperature
@@ -115,9 +126,9 @@ class GibbsComputedEntry(ComputedEntry):
         4168. https://doi.org/10.1038/s41467-018-06682-4
 
         Args:
-            temperature: the temperature [K]
+            temperature: The absolute temperature [K].
         Returns:
-            The correction to Gibbs free energy of formation (eV) from DFT energy
+            The correction to Gibbs free energy of formation (eV) from DFT energy.
         """
         if self._composition.is_element:
             return 0
@@ -130,9 +141,9 @@ class GibbsComputedEntry(ComputedEntry):
         ) - self._sum_g_i(self._composition, temperature)
 
     @staticmethod
-    def _g_delta_sisso(volume_per_atom: float,
-                       reduced_mass: float,
-                       temp: float) -> float:
+    def _g_delta_sisso(
+        volume_per_atom: float, reduced_mass: float, temp: float
+    ) -> float:
         """
         G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
         Bartel et al. (2018).
@@ -159,11 +170,8 @@ class GibbsComputedEntry(ComputedEntry):
     @staticmethod
     def _sum_g_i(composition, temperature) -> float:
         """
-        Sum of the stoichiometrically weighted chemical potentials of the elements
+        Sum of the stoichiometrically weighted chemical potentials [eV] of the elements
         at specified temperature, as acquired from "elements.json".
-
-        Returns:
-             Ssum of weighted chemical potentials [eV]
         """
         elems = composition.get_el_amt_dict()
 
@@ -183,13 +191,10 @@ class GibbsComputedEntry(ComputedEntry):
         return sum_g_i
 
     @staticmethod
-    def _reduced_mass(composition) -> float:
+    def _reduced_mass(composition: Composition) -> float:
         """
-        Reduced mass as calculated via Eq. 6 in Bartel et al. (2018), to be used in
-        SISSO descriptor equation.
-
-        Returns:
-            Rreduced mass [amu]
+        Reduced mass [amu] as calculated via Eq. 6 in Bartel et al. (2018),
+        to be used in SISSO descriptor equation.
         """
         reduced_comp = composition.reduced_composition
         num_elems = len(reduced_comp.elements)
@@ -214,18 +219,21 @@ class GibbsComputedEntry(ComputedEntry):
 
     @classmethod
     def from_structure(
-        cls, structure, formation_energy_per_atom, temperature, **kwargs
-    ):
+        cls, structure: Structure, formation_energy_per_atom: float, temperature:
+            float, **kwargs) -> "GibbsComputedEntry":
         """
+        Constructor method for building a GibbsComputedEntry from a structure, 
+        formation enthalpy, and temperature.
 
         Args:
-            structure:
-            formation_energy_per_atom:
-            temperature:
-            **kwargs:
+            structure: Structure object (pymatgen)
+            formation_energy_per_atom: Formation enthalpy at T = 298 K associated 
+                with structure
+            temperature: Desired temperature [K] for acquiring dGf(T)
+            **kwargs: Optional kwargs to be passed to init method of GibbsComputedEntry
 
         Returns:
-
+            A new GibbsComputedEntry object
         """
         composition = structure.composition
         volume_per_atom = structure.volume / structure.num_sites

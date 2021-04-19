@@ -1,9 +1,7 @@
 " A calculator class for determining chemical potential distance of reactions "
 
 from typing import List, Optional
-
 from itertools import product
-
 import numpy as np
 
 from rxn_network.core import Calculator
@@ -67,7 +65,7 @@ class ChempotDistanceCalculator(Calculator):
     def decorate(self, rxn: ComputedReaction) -> ComputedReaction:
         """
         Decorates the reaction (in place) with the chemical potential distance by
-        storing the value within ComputedReaction.data.
+        storing the value within the reaction's data dictionary.
 
         Args:
             rxn: the reaction object
@@ -92,15 +90,17 @@ class ChempotDistanceCalculator(Calculator):
     ):
         """
         Convenience constructor which first builds the ChempotDiagram
-        object from the entry objects.
+        object from a list of entry objects.
 
         Args:
             entries: entry objects used to build the ChempotDiagram
             mu_func: the name of the function used to process the interfacial
                 chemical potential distances into a single value describing the whole
                 reaction.
-            cpd_kws: (optional) kwargs passed to the ChempotDiagram constructor
-            name: the data dictionary key by which to store the calculated value.
+            cpd_kws: optional kwargs passed to the ChempotDiagram constructor.
+                Default kwarg is default_limit = -50.
+            name: the data dictionary key by which to store the calculated value,
+                defaults to "chempot_distance"
 
         Returns:
             A ChempotDistanceCalculator object
@@ -111,4 +111,5 @@ class ChempotDistanceCalculator(Calculator):
 
     @property
     def mu_func(self):
+        " Returns the function used to process the interfacial chempot distances "
         return self._mu_func

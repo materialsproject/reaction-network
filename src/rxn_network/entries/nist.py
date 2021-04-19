@@ -12,8 +12,8 @@ from rxn_network.data import G_COMPOUNDS, G_GASES
 class NISTReferenceEntry(Entry):
     """
     An Entry class for NIST-JANAF experimental reference data. Given a composition,
-    the Gibbs free energy of formation, dGf(T) from tabulated values (G_GASES,
-    G_COMPOUNDS).
+    automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
+    reference values (G_GASES, G_COMPOUNDS).
 
     Reference:
         Malcolm W. Chase Jr. NIST-JANAF thermochemical tables. Fourth edition.
@@ -25,11 +25,13 @@ class NISTReferenceEntry(Entry):
     REFERENCES = {**G_COMPOUNDS, **G_GASES}
 
     def __init__(
-        self, composition: Composition, temperature: float = 300,
+        self,
+        composition: Composition,
+        temperature: float
     ):
         """
         Args:
-            composition: Composition object (in pymatgen).
+            composition: Composition object (pymatgen).
             temperature: Temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.

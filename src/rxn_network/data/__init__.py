@@ -1,7 +1,8 @@
-""" Experimental Gibbs free energy data from NIST-JANAF (compounds, gases) and
-FactSage (elements)"""
+"""
+Experimental Gibbs free energy data from NIST-JANAF (compounds, gases) and FactSage (
+elements)
+"""
 from pathlib import Path
-
 from monty.serialization import loadfn
 
 cwd = Path(__file__).parent.resolve()
