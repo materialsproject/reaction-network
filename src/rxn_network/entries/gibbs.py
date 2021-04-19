@@ -18,8 +18,8 @@ class GibbsComputedEntry(ComputedEntry):
     of solids using energy adjustments from a model, such as the machine learned
     SISSO descriptor from Bartel et al. (2018).
 
-    WARNING: This descriptor only applies to solids. See NISTEntry for common
-    gases (e.g. CO2) where possible.
+    WARNING: This descriptor only applies to solids. See
+    entries.nist.NISTReferenceEntry for common gases (e.g. CO2).
     """
 
     def __init__(
@@ -34,10 +34,16 @@ class GibbsComputedEntry(ComputedEntry):
         entry_id: object = None,
     ):
         """
+
         Args:
-            composition (Composition): the composition of the structure
-            formation_energy_per_atom (float): the formation enthalpy, dHf (T=298 K)
-            volume_per_atom (float): the volume per atom in Angstrom^3
+            composition:
+            formation_energy_per_atom:
+            volume_per_atom:
+            temperature:
+            energy_adjustments:
+            parameters:
+            data:
+            entry_id:
         """
         self._composition = Composition(composition)
         self.formation_energy_per_atom = formation_energy_per_atom
@@ -79,13 +85,21 @@ class GibbsComputedEntry(ComputedEntry):
         )
 
     def set_temperature(self, new_temperature):
+        """
+
+        Args:
+            new_temperature:
+
+        Returns:
+
+        """
         new_entry_dict = self.as_dict()
         new_entry_dict["temperature"] = new_temperature
 
         new_entry = self.from_dict(new_entry_dict)
         return new_entry
 
-    def gibbs_adjustment(self, temperature) -> float:
+    def gibbs_adjustment(self, temperature: float) -> float:
         """
         Returns the difference between the predicted Gibbs formation energy and the
         formation enthalpy at 298 K, i.e., dGf(T) - dHf(298 K). Calculated using
@@ -101,9 +115,9 @@ class GibbsComputedEntry(ComputedEntry):
         4168. https://doi.org/10.1038/s41467-018-06682-4
 
         Args:
-            temperature (float): temperature
+            temperature: the temperature [K]
         Returns:
-            float: the correction to Gibbs free energy of formation (eV) from DFT energy
+            The correction to Gibbs free energy of formation (eV) from DFT energy
         """
         if self._composition.is_element:
             return 0
@@ -116,16 +130,17 @@ class GibbsComputedEntry(ComputedEntry):
         ) - self._sum_g_i(self._composition, temperature)
 
     @staticmethod
-    def _g_delta_sisso(volume_per_atom, reduced_mass, temp) -> float:
+    def _g_delta_sisso(volume_per_atom: float,
+                       reduced_mass: float,
+                       temp: float) -> float:
         """
         G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
         Bartel et al. (2018).
 
         Args:
-            vol_per_atom (float): volume per atom [Å^3/atom]
-            reduced_mass (float) - reduced mass as calculated with pair-wise sum formula
-                [amu]
-            temp (float) - Temperature [K]
+            vol_per_atom: volume per atom [Å^3/atom]
+            reduced_mass: reduced mass as calculated with pair-wise sum formula [amu]
+            temp: Temperature [K]
 
         Returns:
             float: G^delta
@@ -148,7 +163,7 @@ class GibbsComputedEntry(ComputedEntry):
         at specified temperature, as acquired from "elements.json".
 
         Returns:
-             float: sum of weighted chemical potentials [eV]
+             Ssum of weighted chemical potentials [eV]
         """
         elems = composition.get_el_amt_dict()
 
@@ -174,7 +189,7 @@ class GibbsComputedEntry(ComputedEntry):
         SISSO descriptor equation.
 
         Returns:
-            float: reduced mass (amu)
+            Rreduced mass [amu]
         """
         reduced_comp = composition.reduced_composition
         num_elems = len(reduced_comp.elements)
@@ -201,6 +216,17 @@ class GibbsComputedEntry(ComputedEntry):
     def from_structure(
         cls, structure, formation_energy_per_atom, temperature, **kwargs
     ):
+        """
+
+        Args:
+            structure:
+            formation_energy_per_atom:
+            temperature:
+            **kwargs:
+
+        Returns:
+
+        """
         composition = structure.composition
         volume_per_atom = structure.volume / structure.num_sites
         entry = cls(
@@ -213,9 +239,7 @@ class GibbsComputedEntry(ComputedEntry):
         return entry
 
     def as_dict(self) -> dict:
-        """
-        :return: MSONAble dict.
-        """
+        " Returns an MSONable dict. "
         data = super().as_dict()
         data["volume_per_atom"] = self.volume_per_atom
         data["formation_energy_per_atom"] = self.formation_energy_per_atom
@@ -224,10 +248,7 @@ class GibbsComputedEntry(ComputedEntry):
 
     @classmethod
     def from_dict(cls, d) -> "GibbsComputedEntry":
-        """
-        :param d: Dict representation.
-        :return: GibbsComputedEntry
-        """
+        " Returns a GibbsComputedEntry object from MSONable dictionary "
         dec = MontyDecoder()
         entry = cls(
             composition=d["composition"],

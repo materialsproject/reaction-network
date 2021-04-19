@@ -1,3 +1,5 @@
+" Firetasks for storing enumerated reaction or network data into a MongoDB."
+
 import os
 import json
 import datetime

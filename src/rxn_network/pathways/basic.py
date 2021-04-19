@@ -1,6 +1,4 @@
-"""
-This module implements a basic Reaction Pathway
-"""
+" A basic reaction pathway class"
 
 from typing import List, Optional
 

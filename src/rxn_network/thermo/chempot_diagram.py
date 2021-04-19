@@ -1,4 +1,5 @@
-" A chemical potential diagram class."
+" A chemical potential diagram class"
+
 from functools import cached_property
 from typing import List, Dict, Optional
 import numpy as np
@@ -97,6 +98,19 @@ class ChempotDiagram(MSONable):
         label_stable=True,
         shade_energy=True,
     ) -> go.Scatter3d:
+        """
+
+        Args:
+            elements:
+            formulas:
+            formula_mode:
+            formula_colors:
+            label_stable:
+            shade_energy:
+
+        Returns:
+
+        """
 
         if not formula_colors:
             formula_colors = px.colors.qualitative.Dark2
@@ -276,13 +290,12 @@ class ChempotDiagram(MSONable):
 
     @property
     def entries(self) -> List[ComputedEntry]:
+        " Returns chempot diagram entries (i.e., stable entries of phase diagram) "
         return self.pd.stable_entries
 
     @cached_property
     def entry_dict(self) -> Dict[str, ComputedEntry]:
-        """
-        Conversion dictionary between reduced formula and ComputedEntry
-        """
+        """ Mapping between reduced formula and ComputedEntry """
         return {e.composition.reduced_formula: e for e in self.entries}
 
     def shortest_domain_distance(self, f1: str, f2: str) -> float:
@@ -320,6 +333,7 @@ class ChempotDiagram(MSONable):
 
     @property
     def chemical_system(self) -> str:
+        " Returns the chemical system (A-B-C-...) of diagram object "
         return "-".join(sorted([e.symbol for e in self.pd.elements]))
 
     @staticmethod

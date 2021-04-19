@@ -1,4 +1,5 @@
 " Basic interface for a Reaction"
+
 from abc import ABCMeta, abstractproperty
 from typing import List
 

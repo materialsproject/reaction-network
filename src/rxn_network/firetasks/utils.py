@@ -3,9 +3,11 @@
 import logging
 import os
 import sys
+from typing import Optional
 
 
-def env_chk(val, fw_spec, strict=True, default=None):
+def env_chk(val: str, fw_spec: dict,
+            strict: Optional[bool] = True, default: Optional[str]=None):
     """
     Code borrowed from the atomate package.
 
@@ -15,8 +17,8 @@ def env_chk(val, fw_spec, strict=True, default=None):
 
     Args:
         val: any value, with ">><<" notation reserved for special env lookup values
-        fw_spec: (dict) fw_spec where one can find the _fw_env keys
-        strict (bool): if True, errors if env format (>><<) specified but cannot be found in fw_spec
+        fw_spec: fw_spec where one can find the _fw_env keys
+        strict: if True, errors if env format (>><<) specified but cannot be found in fw_spec
         default: if val is None or env cannot be found in non-strict mode,
                  return default
     """
@@ -31,17 +33,24 @@ def env_chk(val, fw_spec, strict=True, default=None):
 
 
 def get_logger(
-    name,
+    name: str,
     level=logging.DEBUG,
     log_format="%(asctime)s %(levelname)s %(name)s %(message)s",
     stream=sys.stdout,
 ):
-    """Helper method for acquiring logger; code borrowed from the atomate package."""
+    """
+    Code borrowed from the atomate package.
+
+    Helper method for acquiring logger."""
 
     logger = logging.getLogger(name)
     logger.setLevel(level)
+
     formatter = logging.Formatter(log_format)
+
     sh = logging.StreamHandler(stream=stream)
     sh.setFormatter(formatter)
+
     logger.addHandler(sh)
+
     return logger

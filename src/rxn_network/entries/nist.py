@@ -16,10 +16,9 @@ class NISTReferenceEntry(Entry):
     G_COMPOUNDS).
 
     Reference:
-
-    Malcolm W. Chase Jr. NIST-JANAF thermochemical tables. Fourth edition.
-    Washington, DC : American Chemical Society;  New York : American Institute of
-    Physics for the National Institute of Standards and Technology, 1998.
+        Malcolm W. Chase Jr. NIST-JANAF thermochemical tables. Fourth edition.
+        Washington, DC : American Chemical Society;  New York : American Institute of
+        Physics for the National Institute of Standards and Technology, 1998.
 
     """
 
@@ -30,8 +29,8 @@ class NISTReferenceEntry(Entry):
     ):
         """
         Args:
-            composition (Composition): pymatgen Composition object
-            temperature (float): Temperature in Kelvin. If temperature is not selected from
+            composition: Composition object (in pymatgen).
+            temperature: Temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
         """
@@ -55,9 +54,7 @@ class NISTReferenceEntry(Entry):
 
     @property
     def energy(self) -> float:
-        """
-        :return: the energy of the entry.
-        """
+        " The energy of the entry"
         return self._energy
 
     @staticmethod

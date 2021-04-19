@@ -1,4 +1,5 @@
-" Core interfaces for RXN Network"
+" Core interfaces for the reaction-network package. "
+
 from abc import ABCMeta, abstractmethod, abstractproperty
 from functools import cached_property
 from typing import List

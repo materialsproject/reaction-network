@@ -1,3 +1,5 @@
+" Firetasks for running enumeration and network calculations."
+
 import json
 from monty.json import MontyEncoder
 from monty.serialization import dumpfn
@@ -14,6 +16,16 @@ logger = get_logger(__name__)
 
 @explicit_serialize
 class RunEnumerators(FiretaskBase):
+    """
+    Run a list of enumerators on a provided set of computed entries and dump the
+    calculated ComputedReaction objects to a file (rxns.json). Metadata is stored as metadata.json.
+
+    Required params:
+        enumerators (List[Enumerator]): Enumerators to run
+        entries (List[ComputedEntry]): Computed entries to be fed into enumerate()
+            methods
+
+    """
     required_params = ["enumerators", "entries"]
 
     def run_task(self, fw_spec):

@@ -1,7 +1,11 @@
+" Firetasks for acquiring ComputedEntry data from MPRester or another materials MongoDB"
+
 import os
 import json
 import datetime
 import itertools
+from typing import Union
+
 from monty.json import MontyDecoder, jsanitize
 from monty.serialization import loadfn
 
@@ -104,6 +108,17 @@ class EntriesFromDb(FiretaskBase):
 
 
 def process_entries(entries, temperature, e_above_hull, include_polymorphs):
+    """
+
+    Args:
+        entries:
+        temperature:
+        e_above_hull:
+        include_polymorphs:
+
+    Returns:
+
+    """
     entry_set = GibbsEntrySet.from_entries(entries=entries, temperature=temperature)
     entry_set = entry_set.filter_by_stability(
         e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
@@ -112,8 +127,8 @@ def process_entries(entries, temperature, e_above_hull, include_polymorphs):
 
 
 def get_entries(
-    db,
-    chemsys_formula_id_criteria,
+    db: str,
+    chemsys_formula_id_criteria: Union[str, dict],
     compatible_only=True,
     inc_structure=None,
     property_data=None,
@@ -126,6 +141,7 @@ def get_entries(
     from pymatgen.ext.matproj.
 
     Args:
+        db:
         chemsys_formula_id_criteria (str/dict): A chemical system
             (e.g., Li-Fe-O), or formula (e.g., Fe2O3) or materials_id
             (e.g., mp-1234) or full Mongo-style dict criteria.

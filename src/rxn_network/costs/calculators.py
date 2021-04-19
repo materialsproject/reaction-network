@@ -1,3 +1,5 @@
+" A calculator class for determining chemical potential distance of reactions "
+
 from typing import List, Optional
 
 from itertools import product
@@ -8,6 +10,7 @@ from rxn_network.core import Calculator
 from rxn_network.reactions import ComputedReaction
 from rxn_network.thermo.chempot_diagram import ChempotDiagram
 
+from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 
 
@@ -24,7 +27,6 @@ class ChempotDistanceCalculator(Calculator):
         name: Optional[str] = "chempot_distance",
     ):
         """
-
         Args:
             cpd: the chemical potential diagram
             mu_func: the name of the function used to process the interfacial
@@ -83,7 +85,7 @@ class ChempotDistanceCalculator(Calculator):
     @classmethod
     def from_entries(
         cls,
-        entries,
+        entries: List[ComputedEntry],
         mu_func: Optional[str] = "max",
         cpd_kws: Optional[dict] = {"default_limit": -50},
         name: Optional[str] = "chempot_distance",

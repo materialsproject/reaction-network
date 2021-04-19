@@ -22,6 +22,11 @@ class GibbsEntrySet(EntrySet):
     """
 
     def __init__(self, entries: List[Union[GibbsComputedEntry, NISTReferenceEntry]]):
+        """
+
+        Args:
+            entries:
+        """
         super().__init__(entries)
 
     def filter_by_stability(self, e_above_hull, include_polymorphs=False):

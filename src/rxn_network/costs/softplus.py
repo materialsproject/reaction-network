@@ -1,3 +1,5 @@
+" Implementation of the softplus cost function"
+
 from typing import List
 import numpy as np
 
@@ -12,19 +14,28 @@ class Softplus(CostFunction):
         params: List[str] = ["energy_per_atom"],
         weights: List[float] = [1.0],
     ):
+        """
 
+        Args:
+            temp: Temperature, in Kelvin.
+            params: List of data dictionary keys for function parameters used in the
+                softplus function.
+            weights: List of corresponding values by which to weight the
+                function parameters.
+        """
         self.temp = temp
         self.params = params
         self.weights = np.array(weights)
 
     def evaluate(self, rxn: ComputedReaction) -> float:
         """
-        Calculates cost of reaction based on initialized weights/parameters.
+        Calculates cost of reaction based on the initialized parameters and weights.
+
         Args:
-            rxn (ComputedReaction): Reaction object
+            rxn: A computed reaction.
 
         Returns:
-            Cost
+            The cost of the reaction.
         """
         values = []
         for p in self.params:
@@ -43,6 +54,7 @@ class Softplus(CostFunction):
 
     @staticmethod
     def _softplus(x, t):
+        " The mathematical formula for the softplus function"
         return np.log(1 + (273 / t) * np.exp(x))
 
     def __repr__(self):

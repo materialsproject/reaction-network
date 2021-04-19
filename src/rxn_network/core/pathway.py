@@ -1,4 +1,5 @@
 " Basic interface for a reaction Pathway "
+
 from abc import ABCMeta, abstractproperty
 from typing import List
 

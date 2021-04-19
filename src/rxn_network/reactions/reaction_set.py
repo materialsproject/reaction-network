@@ -14,6 +14,14 @@ class ReactionSet(MSONable):
     """
 
     def __init__(self, entries, all_indices, all_coeffs, all_data=None):
+        """
+
+        Args:
+            entries:
+            all_indices:
+            all_coeffs:
+            all_data:
+        """
         self.entries = entries
         self.all_indices = all_indices
         self.all_coeffs = all_coeffs
@@ -23,6 +31,15 @@ class ReactionSet(MSONable):
 
     @lru_cache(1)
     def get_rxns(self, open_elem, chempot=0):
+        """
+
+        Args:
+            open_elem:
+            chempot:
+
+        Returns:
+
+        """
         rxns = []
         chempots = {Element(open_elem): chempot}
         for indices, coeffs, data in zip(
@@ -45,10 +62,27 @@ class ReactionSet(MSONable):
         return rxns
 
     def calculate_costs(self, cf):
+        """
+
+        Args:
+            cf:
+
+        Returns:
+
+        """
         return [cf.evaluate(rxn) for rxn in self.rxns]
 
     @classmethod
     def from_rxns(cls, rxns, entries=None):
+        """
+
+        Args:
+            rxns:
+            entries:
+
+        Returns:
+
+        """
         if not entries:
             entries = cls._get_unique_entries(rxns)
 
@@ -69,6 +103,7 @@ class ReactionSet(MSONable):
 
     @staticmethod
     def _get_unique_entries(rxns):
+        " Return only unique entries from reactions"
         entries = set()
         for r in rxns:
             entries.update(r.entries)
