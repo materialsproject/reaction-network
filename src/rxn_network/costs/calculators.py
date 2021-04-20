@@ -111,5 +111,5 @@ class ChempotDistanceCalculator(Calculator):
 
     @property
     def mu_func(self):
-        " Returns the function used to process the interfacial chempot distances "
+        " Returns the function used to process the interfacial mu distances "
         return self._mu_func

@@ -1,7 +1,7 @@
 " An entry set class for acquiring entries with Gibbs formation energies"
 from monty.json import MSONable, MontyDecoder
 from typing import List, Optional, Union
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from pymatgen.core import Composition
 from pymatgen.entries.entry_tools import EntrySet
@@ -33,7 +33,7 @@ class GibbsEntrySet(EntrySet):
         super().__init__(entries)
 
     def filter_by_stability(self, e_above_hull: float,
-                            include_polymorphs: Optional[bool] = False):
+                            include_polymorphs: Optional[bool] = False) -> "GibbsEntrySet":
         """
         Filter the entry set by a metastability (energy above hull) cutoff.
 

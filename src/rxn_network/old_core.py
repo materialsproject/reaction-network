@@ -127,7 +127,7 @@ class ReactionNetwork:
             self._pd = PhaseDiagram(self._filtered_entries)
         elif len(self._elements) > 10 and include_chempot_restriction:
             raise ValueError(
-                "Cannot include chempot restriction for networks with greater than 10 elements!"
+                "Cannot include mu restriction for networks with greater than 10 elements!"
             )
 
         if interpolate_comps:

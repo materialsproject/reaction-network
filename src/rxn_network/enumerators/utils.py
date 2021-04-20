@@ -8,21 +8,57 @@ from rxn_network.reactions.open import OpenComputedReaction
 
 
 def initialize_target(target, entry_set):
+    """
+
+    Args:
+        target:
+        entry_set:
+
+    Returns:
+
+    """
     target = entry_set.stabilize_entry(entry_set.get_min_entry_by_formula(target))
     return target
 
 
 def initialize_open_entries(open_entries, entry_set):
+    """
+
+    Args:
+        open_entries:
+        entry_set:
+
+    Returns:
+
+    """
     open_entries = [entry_set.get_min_entry_by_formula(e) for e in open_entries]
     return open_entries
 
 
 def initialize_calculators(calculators, entries):
+    """
+
+    Args:
+        calculators:
+        entries:
+
+    Returns:
+
+    """
     calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in calculators]
     return [c.from_entries(entries) for c in calculators]
 
 
 def apply_calculators(rxn, calculators):
+    """
+
+    Args:
+        rxn:
+        calculators:
+
+    Returns:
+
+    """
     for calc in calculators:
         rxn = calc.decorate(rxn)
     return rxn

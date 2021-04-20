@@ -41,6 +41,10 @@ class Enumerator(MSONable, metaclass=ABCMeta):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
         self.target = target
+
+        if not calculators:
+            calculators = []
+
         self.calculators = calculators
 
     @abstractmethod

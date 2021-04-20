@@ -292,7 +292,7 @@ class ChempotDiagram(MSONable):
 
     @property
     def entries(self) -> List[ComputedEntry]:
-        " Returns chempot diagram entries (i.e., stable entries of phase diagram) "
+        " Returns mu diagram entries (i.e., stable entries of phase diagram) "
         return self.pd.stable_entries
 
     @cached_property

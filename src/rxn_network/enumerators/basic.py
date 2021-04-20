@@ -2,7 +2,7 @@ from typing import List, Optional
 from itertools import chain, combinations, compress, groupby, product
 from math import comb
 import numpy as np
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
@@ -54,9 +54,6 @@ class BasicEnumerator(Enumerator):
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
         """
-        if not calculators:
-            calculators = []
-
         super().__init__(target, calculators)
 
         self.n = n
@@ -184,7 +181,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
         """
-        super().__init__(n, target, calculators, remove_unbalanced, remove_changed)
+        super().__init__(target, calculators, n, remove_unbalanced, remove_changed)
         self.open_entries = open_entries
 
     def enumerate(self, entries: GibbsEntrySet) -> List[ComputedReaction]:
@@ -211,7 +208,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         if "ChempotDistanceCalculator" in self.calculators:
             entries = entries.filter_by_stability(e_above_hull=0.0)
             self.logger.info(
-                "Filtering by stable entries due to use of " "ChempotDistanceCalculator"
+                "Filtering by stable entries due to use of 'ChempotDistanceCalculator'"
             )
 
         combos = [set(c) for c in limited_powerset(entries, self.n)]
