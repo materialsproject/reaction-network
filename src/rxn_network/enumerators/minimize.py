@@ -14,6 +14,9 @@ from rxn_network.reactions import ComputedReaction
 from rxn_network.thermo.chempot_diagram import ChempotDiagram
 from rxn_network.costs.calculators import Calculator, ChempotDistanceCalculator
 from rxn_network.enumerators.utils import (
+    initialize_target,
+    initialize_calculators,
+    apply_calculators,
     get_total_chemsys,
     group_by_chemsys,
     filter_entries_by_chemsys,
@@ -26,20 +29,42 @@ from rxn_network.enumerators.utils import (
 class MinimizeGibbsEnumerator(Enumerator):
     """
     Enumerator for finding all reactions between two reactants that are predicted by
-    thermo; i.e., they appear when taking the convex hull along a straight
-    line connecting any two phases in G-x phase space. Identity reactions are excluded.
+    thermodynamics; i.e., they appear when taking the convex hull along a straight
+    line connecting any two phases in G-x phase space. Identity reactions are
+    automatically excluded.
     """
 
     def __init__(
         self,
-        target: Optional[ComputedEntry] = None,
-        calculators: Optional[List[Calculator]] = None,
+        target: Optional[str] = None,
+        calculators: Optional[List[str]] = None,
     ):
+        """
+        Args:
+            target: Optional formula of target; only reactions which make this target
+                will be enumerated.
+            calculators: Optional list of Calculator object names; see calculators
+                module for options (e.g., ["ChempotDistanceCalculator])
+        """
+
         super().__init__(target, calculators)
 
     def enumerate(self, entries):
+        """
+        Calculate all possible reactions given a set of entries. If the enumerator
+        was initialized with a target, only reactions to this target will be considered.
+
+        Args:
+            entries: the set of all entries to enumerate from
+
+        Returns:
+            List of unique computed reactions.
+        """
+        target = None
         if self.target:
-            target_elems = {str(e) for e in self.target.composition.elements}
+            target = initialize_target(self.target, entries)
+            entries.add(target)
+            target_elems = {str(e) for e in target.composition.elements}
 
         combos = list(combinations(entries, 2))
         combos_dict = group_by_chemsys(combos)
@@ -49,9 +74,7 @@ class MinimizeGibbsEnumerator(Enumerator):
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
 
-            calculators = self._initialize_calculators(
-                self.calculators, chemsys_entries
-            )
+            calculators = initialize_calculators(self.calculators, chemsys_entries)
 
             if self.target and not target_elems.issubset(chemsys.split("-")):
                 continue
@@ -64,12 +87,10 @@ class MinimizeGibbsEnumerator(Enumerator):
 
         return list(set(rxns))
 
-    def estimate_num_reactions(self, entries) -> int:
-        return comb(len(entries), 2)
-
     def _react_interface(
         self, r1, r2, pd, grand_pd=None, open_entry=None, calculators=None
     ):
+        " Simple API for InterfacialReactivity module from pymatgen. "
         if grand_pd:
             interface = InterfacialReactivity(
                 r1,
@@ -133,8 +154,12 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         self.chempot = chempot
 
     def enumerate(self, entries):
+        target = None
         if self.target:
-            target_elems = {str(e) for e in self.target.composition.elements}
+            target = initialize_target(self.target, entries)
+            entries.add(target)
+            target_elems = {str(e) for e in target.composition.elements}
+
 
         open_entry = sorted(
             filter(lambda e: e.composition.elements == [self.open_elem], entries),
@@ -154,9 +179,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
 
-            calculators = self._initialize_calculators(
-                self.calculators, fchemsys_entries
-            )
+            calculators = initialize_calculators(self.calculators, chemsys_entries)
 
             grand_pd = GrandPotentialPhaseDiagram(
                 chemsys_entries, {self.open_elem: self.chempot}

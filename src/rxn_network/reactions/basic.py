@@ -202,7 +202,7 @@ class BasicReaction(Reaction):
             / 2
         )
 
-    def get_coeff(self, comp):
+    def get_coeff(self, comp: Composition):
         """
         Returns coefficient for a particular composition
         """
@@ -401,11 +401,12 @@ class BasicReaction(Reaction):
     ) -> "BasicReaction":
         """
         Reactants and products to be specified as list of
-        pymatgen.core.structure.Composition.  e.g., [comp1, comp2]
+        pymatgen.core.Composition. e.g., [comp1, comp2]
 
         Args:
-            reactants ([Composition]): List of reactants.
-            products ([Composition]): List of products.
+            reactants: List of reactants.
+            products: List of products.
+            data: Optional dictionary containing extra data about the reaction.
         """
         compositions = reactants + products
         coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)

@@ -1,4 +1,5 @@
 from itertools import chain, combinations
+from pathlib import Path
 
 
 def limited_powerset(iterable, max_size):
@@ -16,3 +17,6 @@ def limited_powerset(iterable, max_size):
     return chain.from_iterable(
         [combinations(iterable, num_combos) for num_combos in range(1, max_size + 1)]
     )
+
+def get_project_root() -> Path:
+    return Path(__file__).parent.parent.parent

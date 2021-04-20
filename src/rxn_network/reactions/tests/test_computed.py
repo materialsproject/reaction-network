@@ -5,7 +5,7 @@ from pymatgen.core.composition import Composition
 from rxn_network.reactions.basic import BasicReaction
 
 
-class CoomputedReactionTest(unittest.TestCase):
+class ComputedReactionTest(unittest.TestCase):
     def test_init(self):
         pass
 
