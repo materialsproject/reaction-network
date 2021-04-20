@@ -94,7 +94,7 @@ class GibbsComputedEntry(ComputedEntry):
             entry_id=entry_id,
         )
 
-    def set_temperature(self, new_temperature: float) -> "GibbsComputedEntry":
+    def get_new_temperature(self, new_temperature: float) -> "GibbsComputedEntry":
         """
         Return a copy of the GibbsComputedEntry at the new specified temperature.
         

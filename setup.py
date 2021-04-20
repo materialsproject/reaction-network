@@ -14,11 +14,14 @@ setup(
     name="reaction-network",
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    description="Solid state reaction networks",
+    description="Reaction-network is a Python package for predicting likely inorganic "
+                "chemical reaction pathways using graph theory.",
     long_description=long_desc,
     long_description_content_type="text/markdown",
     url="https://github.com/GENESIS-EFRC/reaction-network",
-    author="Matthew J. McDermott",
+    author="Matthew McDermott",
+    author_email="mcdermott@lbl.gov",
+    maintainer="Matthew McDermott",
     license="modified BSD",
     packages=find_packages("src"),
     package_dir={"": "src"},
@@ -27,17 +30,18 @@ setup(
     include_package_data=True,
     install_requires=[
         "setuptools",
-        "monty>=1.0.2",
-        "numba>=0.50.1"
-        "numpy>=1.18.4"
-        "pymatgen>=2020.4.29"
-        "scipy>=1.4.1"
-        "tqdm>=4.46.0",
+        "dask>=2021.4.0",
+        "fireworks>=1.9.5",
+        "maggma>=0.26.0",
+        "numba>= 0.52.0",
+        "pymatgen>=2020.12.31"
     ],
     extra_requires={"demo": ["jupyter>=1.0.0"]},
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
