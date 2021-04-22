@@ -37,9 +37,10 @@ class CostFunction(MSONable, metaclass=ABCMeta):
 class Enumerator(MSONable, metaclass=ABCMeta):
     " Base definition for a reaction enumeration methodology "
 
-    def __init__(self, target, calculators):
+    def __init__(self, precursors, target, calculators):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
+        self.precursors = precursors
         self.target = target
 
         if not calculators:

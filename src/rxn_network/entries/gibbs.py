@@ -97,7 +97,7 @@ class GibbsComputedEntry(ComputedEntry):
     def get_new_temperature(self, new_temperature: float) -> "GibbsComputedEntry":
         """
         Return a copy of the GibbsComputedEntry at the new specified temperature.
-        
+
         Args:
             new_temperature: The new temperature to use [K]
 
@@ -219,15 +219,19 @@ class GibbsComputedEntry(ComputedEntry):
 
     @classmethod
     def from_structure(
-        cls, structure: Structure, formation_energy_per_atom: float, temperature:
-            float, **kwargs) -> "GibbsComputedEntry":
+        cls,
+        structure: Structure,
+        formation_energy_per_atom: float,
+        temperature: float,
+        **kwargs,
+    ) -> "GibbsComputedEntry":
         """
-        Constructor method for building a GibbsComputedEntry from a structure, 
+        Constructor method for building a GibbsComputedEntry from a structure,
         formation enthalpy, and temperature.
 
         Args:
             structure: Structure object (pymatgen)
-            formation_energy_per_atom: Formation enthalpy at T = 298 K associated 
+            formation_energy_per_atom: Formation enthalpy at T = 298 K associated
                 with structure
             temperature: Desired temperature [K] for acquiring dGf(T)
             **kwargs: Optional kwargs to be passed to init method of GibbsComputedEntry

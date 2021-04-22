@@ -15,6 +15,7 @@ class Softplus(CostFunction):
     approaches a linear scaling as the input goes to positive infinity. This is an
     especially useful mapping for applying it to determine costs in reaction networks.
     """
+
     def __init__(
         self,
         temp: float = 300,

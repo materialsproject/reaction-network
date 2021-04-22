@@ -8,7 +8,7 @@ from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.entries.computed_entries import (
     ComputedEntry,
     ComputedStructureEntry,
-    ConstantEnergyAdjustment
+    ConstantEnergyAdjustment,
 )
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from rxn_network.entries.gibbs import GibbsComputedEntry
@@ -32,8 +32,9 @@ class GibbsEntrySet(EntrySet):
         """
         super().__init__(entries)
 
-    def filter_by_stability(self, e_above_hull: float,
-                            include_polymorphs: Optional[bool] = False) -> "GibbsEntrySet":
+    def filter_by_stability(
+        self, e_above_hull: float, include_polymorphs: Optional[bool] = False
+    ) -> "GibbsEntrySet":
         """
         Filter the entry set by a metastability (energy above hull) cutoff.
 
@@ -88,7 +89,7 @@ class GibbsEntrySet(EntrySet):
         )
         return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
 
-    def stabilize_entry(self, entry: ComputedEntry, tol: float =1e-6) -> ComputedEntry:
+    def stabilize_entry(self, entry: ComputedEntry, tol: float = 1e-6) -> ComputedEntry:
         """
         Helper method for lowering the energy of a single entry such that it is just
         barely stable on the phase diagram.
@@ -109,7 +110,7 @@ class GibbsEntrySet(EntrySet):
         if e_above_hull == 0.0:
             new_entry = entry
         else:
-            e_adj = -1*pd.get_e_above_hull(entry) * entry.composition.num_atoms - tol
+            e_adj = -1 * pd.get_e_above_hull(entry) * entry.composition.num_atoms - tol
             adjustment = ConstantEnergyAdjustment(
                 value=e_adj,
                 name="Stabilization Adjustment",

@@ -23,11 +23,7 @@ class NISTReferenceEntry(Entry):
 
     REFERENCES = {**G_COMPOUNDS, **G_GASES}
 
-    def __init__(
-        self,
-        composition: Composition,
-        temperature: float
-    ):
+    def __init__(self, composition: Composition, temperature: float):
         """
         Args:
             composition: Composition object (pymatgen).

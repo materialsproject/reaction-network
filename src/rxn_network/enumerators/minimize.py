@@ -15,7 +15,7 @@ from rxn_network.reactions import ComputedReaction
 from rxn_network.thermo.chempot_diagram import ChempotDiagram
 from rxn_network.costs.calculators import Calculator, ChempotDistanceCalculator
 from rxn_network.enumerators.utils import (
-    initialize_target,
+    initialize_entry,
     initialize_calculators,
     apply_calculators,
     get_total_chemsys,
@@ -37,17 +37,19 @@ class MinimizeGibbsEnumerator(Enumerator):
 
     def __init__(
         self,
+        precursors: Optional[List[str]] = None,
         target: Optional[str] = None,
         calculators: Optional[List[str]] = None,
     ):
         """
         Args:
+            precursors: Optional formulas of precursors. Must be of size 2.
             target: Optional formula of target; only reactions which make this target
                 will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator])
         """
-        super().__init__(target, calculators)
+        super().__init__(precursors, target, calculators)
 
     def enumerate(self, entries):
         """
@@ -64,10 +66,18 @@ class MinimizeGibbsEnumerator(Enumerator):
 
         target = None
         if self.target:
-            target = initialize_target(self.target, entries)
+            target = initialize_entry(self.target, entries)
             entries.add(target)
             target_elems = {str(e) for e in target.composition.elements}
-        self.target = target
+
+        precursors = None
+        if self.precursors:
+            precursors = {initialize_entry(f, entries) for f in self.precursors}
+            for p in precursors:
+                entries.add(p)
+            precursor_elems = {
+                str(elem) for p in precursors for elem in p.composition.elements
+            }
 
         if "ChempotDistanceCalculator" in self.calculators:
             entries = entries.filter_by_stability(e_above_hull=0.0)
@@ -80,14 +90,21 @@ class MinimizeGibbsEnumerator(Enumerator):
 
         rxns = []
         for chemsys, combos in tqdm(combos_dict.items()):
+            elems = chemsys.split("-")
+            if (
+                (target and not target_elems.issubset(elems))
+                or (precursors and not precursor_elems.issuperset(elems))
+                or len(elems) >= 10
+            ):
+                continue
+
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
             pd = PhaseDiagram(chemsys_entries)
             calculators = initialize_calculators(self.calculators, chemsys_entries)
 
-            if self.target and not target_elems.issubset(chemsys.split("-")):
-                continue
-
             for e1, e2 in combos:
+                if precursors and {e1, e2} != precursors:
+                    continue
                 predicted_rxns = self._react_interface(
                     e1.composition, e2.composition, pd, calculators=calculators
                 )
@@ -166,6 +183,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         self,
         open_elem: Element,
         mu: float,
+        precursors: Optional[List[str]] = None,
         target: Optional[str] = None,
         calculators: Optional[str] = None,
     ):
@@ -178,10 +196,9 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
 
         target = None
         if self.target:
-            target = initialize_target(self.target, entries)
+            target = initialize_entry(self.target, entries)
             entries.add(target)
             target_elems = {str(e) for e in target.composition.elements}
-        self.target = target
 
         if "ChempotDistanceCalculator" in self.calculators:
             entries = entries.filter_by_stability(e_above_hull=0.0)
@@ -212,6 +229,8 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
                 chemsys_entries, {self.open_elem: self.mu}
             )
             for e1, e2 in combos:
+                if precursors and {e1, e2} != precursors:
+                    continue
                 predicted_rxns = self._react_interface(
                     e1.composition,
                     e2.composition,

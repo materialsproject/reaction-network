@@ -7,18 +7,18 @@ from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 
 
-def initialize_target(target, entry_set):
+def initialize_entry(formula, entry_set):
     """
 
     Args:
-        target:
+        formula:
         entry_set:
 
     Returns:
 
     """
-    target = entry_set.stabilize_entry(entry_set.get_min_entry_by_formula(target))
-    return target
+    entry = entry_set.stabilize_entry(entry_set.get_min_entry_by_formula(formula))
+    return entry
 
 
 def initialize_open_entries(open_entries, entry_set):
