@@ -9,7 +9,8 @@ from typing import Union
 from monty.json import MontyDecoder, jsanitize
 from monty.serialization import loadfn
 
-from pymatgen import MPRester, Structure
+from pymatgen.ext.matproj import MPRester
+from pymatgen.core.structure import Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
 
@@ -87,7 +88,8 @@ class EntriesFromDb(FiretaskBase):
         "temperature",
         "e_above_hull",
     ]
-    optional_params = ["include_polymorphs"]
+    optional_params = ["include_polymorphs", "inc_structure", "compatible_only",
+                       "property_data"]
 
     def run_task(self, fw_spec):
         db_file = env_chk(self["entry_db_file"], fw_spec)
@@ -95,10 +97,14 @@ class EntriesFromDb(FiretaskBase):
         temperature = self["temperature"]
         e_above_hull = self["e_above_hull"]
         include_polymorphs = self.get("include_polymorphs", False)
+        inc_structure = self.get("inc_structure", "final")
+        compatible_only = self.get("compatible_only", None)
+        property_data = self.get("property_data", None)
 
         with MongoStore.from_db_file(db_file) as db:
             entries = get_all_entries_in_chemsys(
-                db, self["chemsys"], inc_structure="final"
+                db, self["chemsys"], inc_structure=inc_structure,
+                compatible_only=compatible_only, property_data=property_data
             )
 
         entries = process_entries(

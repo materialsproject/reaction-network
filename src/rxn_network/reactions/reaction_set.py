@@ -30,7 +30,7 @@ class ReactionSet(MSONable):
         self.all_data = all_data
 
     @lru_cache(1)
-    def get_rxns(self, open_elem, chempot=0):
+    def get_rxns(self, open_elem=None, chempot=0):
         """
 
         Args:
@@ -41,7 +41,9 @@ class ReactionSet(MSONable):
 
         """
         rxns = []
-        chempots = {Element(open_elem): chempot}
+        chempots=None
+        if open_elem:
+            chempots = {Element(open_elem): chempot}
         for indices, coeffs, data in zip(
             self.all_indices, self.all_coeffs, self.all_data
         ):
