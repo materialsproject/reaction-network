@@ -341,9 +341,8 @@ class ChempotDiagram(MSONable):
     @staticmethod
     def _get_chempot_axis_layout(element):
         return dict(
-            # title=f"μ<sub>{str(element)}</sub> - μ<sub>"
-            # f"{str(element)}</sub><sup>o</sup> (eV)",
-            title="",
+            title=f"μ<sub>{str(element)}</sub> - μ<sub>"
+            f"{str(element)}</sub><sup>o</sup> (eV)",
             titlefont={"size": 30},
             gridcolor="#dbdbdb",
             gridwidth=5.0,

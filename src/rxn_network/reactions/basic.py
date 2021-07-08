@@ -124,6 +124,10 @@ class BasicReaction(Reaction):
             ]
         )
 
+    @property
+    def chemical_system(self):
+        return "-".join(sorted([str(el) for el in self.elements]))
+
     def copy(self) -> "BasicReaction":
         " Returns a copy of the BasicReaction object "
         return BasicReaction(

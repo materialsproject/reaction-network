@@ -104,7 +104,8 @@ class EntriesFromDb(FiretaskBase):
         with MongoStore.from_db_file(db_file) as db:
             entries = get_all_entries_in_chemsys(
                 db, self["chemsys"], inc_structure=inc_structure,
-                compatible_only=compatible_only, property_data=property_data
+                compatible_only=compatible_only, property_data=property_data,
+                use_premade_entries=True
             )
 
         entries = process_entries(
@@ -138,6 +139,7 @@ def get_entries(
     compatible_only=True,
     inc_structure=None,
     property_data=None,
+    use_premade_entries=False,
     conventional_unit_cell=False,
     sort_by_e_above_hull=False,
 ):
@@ -180,7 +182,7 @@ def get_entries(
         "potcar_symbols",
         "oxide_type",
     ]
-    props = ["final_energy", "unit_cell_formula", "task_id"] + params
+    props = ["energy", "unit_cell_formula", "task_id"] + params
     if sort_by_e_above_hull:
         if property_data and "e_above_hull" not in property_data:
             property_data.append("e_above_hull")
@@ -198,47 +200,66 @@ def get_entries(
         criteria = MPRester.parse_criteria(chemsys_formula_id_criteria)
     else:
         criteria = chemsys_formula_id_criteria
-    criteria.update({"deprecated": False})
+
+    if use_premade_entries:
+        props = ["entries", "deprecated"]
 
     entries = []
     for d in db.query(criteria, props):
-        d["potcar_symbols"] = [
-            "%s %s" % (d["pseudo_potential"]["functional"], l)
-            for l in d["pseudo_potential"].get("labels", [])
-        ]
-        data = {"oxide_type": d["oxide_type"]}
-        if property_data:
-            data.update({k: d[k] for k in property_data})
-        if not inc_structure:
-            e = ComputedEntry(
-                d["unit_cell_formula"],
-                d["final_energy"],
-                parameters={k: d[k] for k in params},
-                data=data,
-                entry_id=d["task_id"],
-            )
-        else:
-            prim = Structure.from_dict(
-                d["initial_structure"] if inc_structure == "initial" else d["structure"]
-            )
-            if conventional_unit_cell:
-                s = SpacegroupAnalyzer(prim).get_conventional_standard_structure()
-                energy = d["final_energy"] * (len(s) / len(prim))
+        if d.get("deprecated"):
+            continue
+        if use_premade_entries:
+            ent = d["entries"]
+            if ent.get("GGA"):
+                e = ComputedStructureEntry.from_dict(ent["GGA"])
+            elif ent.get("GGA+U"):
+                e = ComputedStructureEntry.from_dict(ent["GGA+U"])
             else:
-                s = prim.copy()
-                energy = d["final_energy"]
-            e = ComputedStructureEntry(
-                s,
-                energy,
-                parameters={k: d[k] for k in params},
-                data=data,
-                entry_id=d["task_id"],
-            )
+                print(f"Missing entry for {d['_id']}")
+                continue
+        else:
+            d["potcar_symbols"] = [
+                "%s %s" % (d["pseudo_potential"]["functional"], l) for l in
+                d["pseudo_potential"].get("labels", [])
+            ]
+            data = {"oxide_type": d["oxide_type"]}
+            if property_data:
+                data.update({k: d[k] for k in property_data})
+            if not inc_structure:
+                e = ComputedEntry(
+                    d["unit_cell_formula"],
+                    d["energy"],
+                    parameters={k: d[k] for k in params},
+                    data=data,
+                    entry_id=d["task_id"],
+                )
+
+            else:
+                prim = d["initial_structure"] if inc_structure == "initial" else d[
+                    "structure"]
+                if conventional_unit_cell:
+                    s = SpacegroupAnalyzer(prim).get_conventional_standard_structure()
+                    energy = d["energy"] * (len(s) / len(prim))
+                else:
+                    s = prim.copy()
+                    energy = d["energy"]
+                e = ComputedStructureEntry(
+                    s,
+                    energy,
+                    parameters={k: d[k] for k in params},
+                    data=data,
+                    entry_id=d["task_id"],
+                )
         entries.append(e)
     if compatible_only:
-        from pymatgen.entries.compatibility import MaterialsProjectCompatibility
+        from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 
-        entries = MaterialsProjectCompatibility().process_entries(entries)
+        # suppress the warning about missing oxidation states
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore",
+                                    message="Failed to guess oxidation states.*")
+            entries = MaterialsProject2020Compatibility().process_entries(entries,
+                                                                          clean=True)
     if sort_by_e_above_hull:
         entries = sorted(entries, key=lambda entry: entry.data["e_above_hull"])
     return entries
@@ -250,6 +271,7 @@ def get_all_entries_in_chemsys(
     compatible_only=True,
     inc_structure=None,
     property_data=None,
+    use_premade_entries=False,
     conventional_unit_cell=False,
     n=1000,
 ):
@@ -307,6 +329,7 @@ def get_all_entries_in_chemsys(
                     compatible_only=compatible_only,
                     inc_structure=inc_structure,
                     property_data=property_data,
+                    use_premade_entries=use_premade_entries,
                     conventional_unit_cell=conventional_unit_cell,
                 )
             )
@@ -317,6 +340,7 @@ def get_all_entries_in_chemsys(
             compatible_only=compatible_only,
             inc_structure=inc_structure,
             property_data=property_data,
+            use_premade_entries=use_premade_entries,
             conventional_unit_cell=conventional_unit_cell,
         )
 
