@@ -207,8 +207,6 @@ def get_entries(
 
     entries = []
     for d in db.query(criteria, props):
-        print(d)
-
         if d.get("deprecated"):
             continue
         if use_premade_entries:
