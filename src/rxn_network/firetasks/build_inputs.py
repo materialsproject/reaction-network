@@ -4,6 +4,7 @@ import os
 import json
 import datetime
 import itertools
+import warnings
 from typing import Union
 
 from monty.json import MontyDecoder, jsanitize
@@ -256,7 +257,10 @@ def get_entries(
     if compatible_only:
         from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 
-        entries = MaterialsProject2020Compatibility().process_entries(entries,
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore",
+                                    message="Failed to guess oxidation states.*")
+            entries = MaterialsProject2020Compatibility().process_entries(entries,
                                                                       clean=True)
     if sort_by_e_above_hull:
         entries = sorted(entries, key=lambda entry: entry.data["e_above_hull"])
