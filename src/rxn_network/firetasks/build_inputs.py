@@ -98,14 +98,14 @@ class EntriesFromDb(FiretaskBase):
         e_above_hull = self["e_above_hull"]
         include_polymorphs = self.get("include_polymorphs", False)
         inc_structure = self.get("inc_structure", "final")
-        compatible_only = self.get("compatible_only", None)
+        compatible_only = self.get("compatible_only", True)
         property_data = self.get("property_data", None)
 
         with MongoStore.from_db_file(db_file) as db:
             entries = get_all_entries_in_chemsys(
                 db, self["chemsys"], inc_structure=inc_structure,
                 compatible_only=compatible_only, property_data=property_data,
-                use_premade_entries=True
+                use_premade_entries=False
             )
 
         entries = process_entries(
@@ -182,7 +182,7 @@ def get_entries(
         "potcar_symbols",
         "oxide_type",
     ]
-    props = ["energy", "unit_cell_formula", "task_id"] + params
+    props = ["final_energy", "unit_cell_formula", "task_id"] + params
     if sort_by_e_above_hull:
         if property_data and "e_above_hull" not in property_data:
             property_data.append("e_above_hull")
@@ -219,8 +219,8 @@ def get_entries(
                 continue
         else:
             d["potcar_symbols"] = [
-                "%s %s" % (d["pseudo_potential"]["functional"], l) for l in
-                d["pseudo_potential"].get("labels", [])
+                "%s %s" % (d["pseudo_potential"]["functional"], l)
+                for l in d["pseudo_potential"].get("labels", [])
             ]
             data = {"oxide_type": d["oxide_type"]}
             if property_data:
@@ -228,21 +228,22 @@ def get_entries(
             if not inc_structure:
                 e = ComputedEntry(
                     d["unit_cell_formula"],
-                    d["energy"],
+                    d["final_energy"],
                     parameters={k: d[k] for k in params},
                     data=data,
                     entry_id=d["task_id"],
                 )
-
             else:
-                prim = d["initial_structure"] if inc_structure == "initial" else d[
-                    "structure"]
+                prim = Structure.from_dict(
+                    d["initial_structure"] if inc_structure == "initial" else d[
+                        "structure"]
+                )
                 if conventional_unit_cell:
                     s = SpacegroupAnalyzer(prim).get_conventional_standard_structure()
-                    energy = d["energy"] * (len(s) / len(prim))
+                    energy = d["final_energy"] * (len(s) / len(prim))
                 else:
                     s = prim.copy()
-                    energy = d["energy"]
+                    energy = d["final_energy"]
                 e = ComputedStructureEntry(
                     s,
                     energy,
@@ -254,12 +255,8 @@ def get_entries(
     if compatible_only:
         from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 
-        # suppress the warning about missing oxidation states
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore",
-                                    message="Failed to guess oxidation states.*")
-            entries = MaterialsProject2020Compatibility().process_entries(entries,
-                                                                          clean=True)
+        entries = MaterialsProject2020Compatibility().process_entries(entries,
+                                                                      clean=True)
     if sort_by_e_above_hull:
         entries = sorted(entries, key=lambda entry: entry.data["e_above_hull"])
     return entries
