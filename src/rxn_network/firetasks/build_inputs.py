@@ -175,6 +175,7 @@ def get_entries(
         List of ComputedEntry or ComputedStructureEntry objects.
     """
     params = [
+        "deprecated",
         "run_type",
         "is_hubbard",
         "pseudo_potential",
@@ -206,6 +207,8 @@ def get_entries(
 
     entries = []
     for d in db.query(criteria, props):
+        print(d)
+
         if d.get("deprecated"):
             continue
         if use_premade_entries:
