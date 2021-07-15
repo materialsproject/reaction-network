@@ -21,7 +21,7 @@ class ChempotDistanceCalculator(Calculator):
     def __init__(
         self,
         cpd: ChempotDiagram,
-        mu_func: Optional[str] = "max",
+        mu_func: Optional[str] = "sum",
         name: Optional[str] = "chempot_distance",
     ):
         """
@@ -39,6 +39,8 @@ class ChempotDistanceCalculator(Calculator):
             self._mu_func = max
         elif mu_func == "mean":
             self._mu_func = np.mean
+        elif mu_func == "sum":
+            self._mu_func = np.sum
 
     def calculate(self, rxn: ComputedReaction) -> float:
         """

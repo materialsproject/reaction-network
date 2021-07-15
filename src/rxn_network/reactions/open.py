@@ -18,7 +18,7 @@ class OpenComputedReaction(ComputedReaction):
         self,
         entries: List[Entry],
         coefficients: np.array,
-        chempots,
+        chempots: Dict[Element, float],
         data: Optional[Dict] = None,
         lowest_num_errors=None,
     ):
@@ -130,3 +130,7 @@ class OpenComputedReaction(ComputedReaction):
             data=data,
             lowest_num_errors=lowest_num_errors,
         )
+
+    def __repr__(self):
+        cp = f"({','.join([f'mu_{e}={m}' for e, m in self.chempots.items()])})"
+        return f"{super().__repr__()} {cp}"

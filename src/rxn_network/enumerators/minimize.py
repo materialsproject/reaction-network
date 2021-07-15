@@ -43,7 +43,7 @@ class MinimizeGibbsEnumerator(Enumerator):
     ):
         """
         Args:
-            precursors: Optional formulas of precursors. Must be of size 2.
+            precursors: Optional formulas of precursors.
             target: Optional formula of target; only reactions which make this target
                 will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
@@ -187,7 +187,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         target: Optional[str] = None,
         calculators: Optional[str] = None,
     ):
-        super().__init__(target=target, calculators=calculators)
+        super().__init__(precursors=precursors, target=target, calculators=calculators)
         self.open_elem = Element(open_elem)
         self.mu = mu
 
@@ -199,6 +199,15 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             target = initialize_entry(self.target, entries)
             entries.add(target)
             target_elems = {str(e) for e in target.composition.elements}
+
+        precursors = None
+        if self.precursors:
+            precursors = {initialize_entry(f, entries) for f in self.precursors}
+            for p in precursors:
+                entries.add(p)
+            precursor_elems = {
+                str(elem) for p in precursors for elem in p.composition.elements
+            }
 
         if "ChempotDistanceCalculator" in self.calculators:
             entries = entries.filter_by_stability(e_above_hull=0.0)
@@ -217,7 +226,12 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
 
         rxns = []
         for chemsys, combos in tqdm(combos_dict.items()):
-            if self.target and not target_elems.issubset(chemsys.split("-")):
+            elems = chemsys.split("-")
+            if (
+                (target and not target_elems.issubset(elems))
+                or (precursors and not precursor_elems.issuperset(elems))
+                or len(elems) >= 10
+            ):
                 continue
 
             chemsys_entries = filter_entries_by_chemsys(entries, chemsys)

@@ -8,9 +8,9 @@ from pymatgen.entries import Entry
 
 class NetworkEntryType(Enum):
     " Describes the Network Entry Type "
+    Starter = auto()
     Reactants = auto()
     Products = auto()
-    Starter = auto()
     Target = auto()
     Dummy = auto()
 
@@ -18,8 +18,7 @@ class NetworkEntryType(Enum):
 class NetworkEntry(MSONable):
     """
     Helper class for describing combinations of ComputedEntry-like objects in context
-    of a reaction network. Necessary for implementation in NetworkX (and useful
-    for other network packages!)
+    of a reaction network.
     """
 
     def __init__(self, entries: List[Entry], description: NetworkEntryType):

@@ -57,7 +57,7 @@ class Enumerator(MSONable, metaclass=ABCMeta):
         " Estimate of the number of reactions from a list of entires "
 
 
-class ReactionNetwork(MSONable, metaclass=ABCMeta):
+class Network(MSONable, metaclass=ABCMeta):
     " Base definition for a reaction network "
 
     def __init__(self, entries: List[Entry], enumerators, cost_function):
@@ -67,5 +67,9 @@ class ReactionNetwork(MSONable, metaclass=ABCMeta):
         self.cost_function = cost_function
 
     @abstractmethod
-    def find_best_rxn_pathways(self, precursors, targets, num=15):
+    def build(self):
+        "Construct the network from the supplied enumerators"
+
+    @abstractmethod
+    def find_best_pathways(self, precursors, targets, num=15):
         " Find the N best reaction pathways "
