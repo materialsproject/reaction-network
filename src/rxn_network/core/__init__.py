@@ -70,6 +70,6 @@ class Network(MSONable, metaclass=ABCMeta):
     def build(self):
         "Construct the network from the supplied enumerators"
 
-    @abstractmethod
-    def find_best_pathways(self, precursors, targets, num=15):
-        " Find the N best reaction pathways "
+    # @abstractmethod
+    # def find_best_pathways(self, precursors, targets, num=15):
+    #     " Find the N best reaction pathways "

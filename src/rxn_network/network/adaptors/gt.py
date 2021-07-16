@@ -3,8 +3,8 @@ from queue import PriorityQueue
 from graph_tool import Graph, Vertex, GraphView
 from graph_tool.topology import shortest_path
 
-DEFAULT_VERTEX_PROPS = {"entry":"object"}
-DEFAULT_EDGE_PROPS = {"rxn":"object", "cost":"double"}
+DEFAULT_VERTEX_PROPS = {"entry":"object", "type":"int"}
+DEFAULT_EDGE_PROPS = {"rxn":"object", "cost":"double", "type":"string"}
 
 
 def initialize_graph(vertex_props: Dict[str, str]=None,
@@ -62,7 +62,7 @@ def yens_ksp(
         precursors_v: Vertex,
         target_v: Vertex,
         edge_prop: str="bool",
-        weight_prop: str="weight"
+        cost_prop: str= "cost"
 ):
     """
     Yen's Algorithm for k-shortest paths, adopted for graph-tool. Utilizes GraphView
@@ -80,7 +80,7 @@ def yens_ksp(
         target_v: graph-tool vertex object containing target.
         edge_prop: name of edge property map which allows for filtering edges.
             Defaults to the word "bool".
-        weight_prop: name of edge property map that stores edge weights/costs.
+        cost_prop: name of edge property map that stores edge weights/costs.
             Defaults to the word "weight".
     Returns:
         List of lists of graph vertices corresponding to each shortest path
@@ -91,10 +91,10 @@ def yens_ksp(
         """Calculates path cost given a list of vertices."""
         cost = 0
         for j in range(len(vertices) - 1):
-            cost += g.ep[weight_prop][g.edge(vertices[j], vertices[j + 1])]
+            cost += g.ep[cost_prop][g.edge(vertices[j], vertices[j + 1])]
         return cost
 
-    path = shortest_path(g, precursors_v, target_v, weights=g.ep[weight_prop])[0]
+    path = shortest_path(g, precursors_v, target_v, weights=g.ep[cost_prop])[0]
 
     if not path:
         return []
@@ -102,6 +102,8 @@ def yens_ksp(
     a_costs = [path_cost(path)]
 
     b = PriorityQueue()  # automatically sorts by path cost (priority)
+
+    g.ep["bool"] = g.new_edge_property("bool", val=True)
 
     for k in range(1, num_k):
         try:
@@ -126,7 +128,7 @@ def yens_ksp(
 
             gv = GraphView(g, efilt=g.ep[edge_prop])
             spur_path = shortest_path(
-                gv, spur_v, target_v, weights=g.ep[weight_prop]
+                gv, spur_v, target_v, weights=g.ep[cost_prop]
             )[0]
 
             for e in filtered_edges:

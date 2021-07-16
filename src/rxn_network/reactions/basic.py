@@ -143,9 +143,8 @@ class BasicReaction(Reaction):
         Returns a copy of the original Reaction object where original reactants are
         new products, and vice versa.
         """
-        copy = self.copy()
-        copy._coefficients = -1 * copy._coefficients
-        return copy
+        return Reaction(self.compositions, -1*self.coefficients, self.balanced,
+                        self.data, self.lowest_num_errors)
 
     def normalize_to(self, comp: Composition, factor: float = 1) -> "BasicReaction":
         """
@@ -282,7 +281,8 @@ class BasicReaction(Reaction):
             )
 
     def __hash__(self):
-        return hash("-".join([e.reduced_formula for e in sorted(self.compositions)]))
+        return hash("-".join([e.reduced_formula for e in sorted(
+            self.reactants)] + [e.reduced_formula for e in sorted(self.products)]))
 
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]

@@ -96,6 +96,10 @@ class OpenComputedReaction(ComputedReaction):
             self.lowest_num_errors,
         )
 
+    def reverse(self):
+        return OpenComputedReaction(self.entries, -1*self.coefficients,
+                                  self.chempots, self.data, self.lowest_num_errors)
+
     @classmethod
     def balance(
         cls,

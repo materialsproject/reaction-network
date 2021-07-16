@@ -29,12 +29,12 @@ def get_rxn_nodes_and_edges(rxns):
 def get_loopback_edges(g, nodes):
     edges = []
     for idx1, p in enumerate(nodes):
-        if p.description != NetworkEntryType.Products:
+        if p.description.value != NetworkEntryType.Products.value:
             continue
         for idx2, r in enumerate(nodes):
-            if r.description != NetworkEntryType.Reactants:
+            if r.description.value != NetworkEntryType.Reactants.value:
                 continue
             if p.entries == r.entries:
-                edges.append([g.vertex(idx1), g.vertex(idx2), 0.0, None])
+                edges.append((g.vertex(idx1), g.vertex(idx2), 0.0, None, "loopback"))
 
     return edges

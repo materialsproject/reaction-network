@@ -1,5 +1,21 @@
 import numpy as np
 from numba import njit, prange
+from rxn_network.pathways.basic import BasicPathway
+from rxn_network.pathways.balanced import BalancedPathway
+from rxn_network.network.entry import NetworkEntryType
+
+def shortest_path_to_reaction_pathway(g, path):
+    rxns = []
+    costs = []
+
+    for step, v in enumerate(path):
+        if (g.vp["type"][v] == NetworkEntryType.Products.value):
+            e = g.edge(path[step - 1], v)
+
+            rxns.append(g.ep["rxn"][e])
+            costs.append(g.ep["cost"][e])
+
+    return BasicPathway(rxns, costs)
 
 
 @njit(parallel=True)
