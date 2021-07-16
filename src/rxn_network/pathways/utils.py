@@ -1,97 +1,121 @@
-from queue import PriorityQueue
-from graph_tool import Graph, Vertex, GraphView
-from graph_tool.topology import shortest_path
+import numpy as np
+from numba import njit, prange
 
 
-def yens_ksp(
-        g: Graph,
-        num_k: int,
-        precursors_v: Vertex,
-        target_v: Vertex,
-        edge_prop: str="bool",
-        weight_prop: str="weight"
+@njit(parallel=True)
+def balance_path_arrays(
+        comp_matrices,
+        net_coeffs,
+        tol=1e-6,
 ):
     """
-    Yen's Algorithm for k-shortest paths, adopted for graph-tool. Utilizes GraphView
-    objects to speed up filtering. Inspired by igraph implementation by
-    Antonin Lenfant.
-
-    Ref: Jin Y. Yen, "Finding the K Shortest Loopless Paths
-    in a Network", Management Science, Vol. 17, No. 11, Theory Series (Jul.,
-    1971), pp. 712-716.
+    Fast solution for reaction multiplicities via mass balance stochiometric
+    constraints. Parallelized using Numba.
 
     Args:
-        g: the graph-tool graph object.
-        num_k: number of k shortest paths that should be found.
-        precursors_v: graph-tool vertex object containing precursors.
-        target_v: graph-tool vertex object containing target.
-        edge_prop: name of edge property map which allows for filtering edges.
-            Defaults to the word "bool".
-        weight_prop: name of edge property map that stores edge weights/costs.
-            Defaults to the word "weight".
+        comp_matrices ([np.array]): list of numpy arrays containing stoichiometric
+            coefficients of all compositions in all reactions, for each trial
+            combination.
+        net_coeffs ([np.array]): list of numpy arrays containing stoichiometric
+            coefficients of net reaction.
+        tol (float): numerical tolerance for determining if a multiplicity is zero
+            (reaction was removed).
+
     Returns:
-        List of lists of graph vertices corresponding to each shortest path
-            (sorted in increasing order by cost).
+        ([bool],[np.array]): Tuple containing bool identifying which trial
+            BalancedPathway objects were successfully balanced, and a list of all
+            multiplicities arrays.
     """
+    shape = comp_matrices.shape
+    net_coeff_filter = np.argwhere(net_coeffs != 0).flatten()
+    len_net_coeff_filter = len(net_coeff_filter)
+    all_multiplicities = np.zeros((shape[0], shape[1]), np.float64)
+    indices = np.full(shape[0], False)
 
-    def path_cost(vertices):
-        """Calculates path cost given a list of vertices."""
-        cost = 0
-        for j in range(len(vertices) - 1):
-            cost += g.ep[weight_prop][g.edge(vertices[j], vertices[j + 1])]
-        return cost
+    for i in prange(shape[0]):
+        correct = True
+        for j in range(len_net_coeff_filter):
+            idx = net_coeff_filter[j]
+            if not comp_matrices[i][:, idx].any():
+                correct = False
+                break
+        if not correct:
+            continue
 
-    path = shortest_path(g, precursors_v, target_v, weights=g.ep[weight_prop])[0]
+        comp_pinv = np.linalg.pinv(comp_matrices[i]).T
+        multiplicities = comp_pinv @ net_coeffs
+        solved_coeffs = comp_matrices[i].T @ multiplicities
 
-    if not path:
-        return []
-    a = [path]
-    a_costs = [path_cost(path)]
+        if (multiplicities < tol).any():
+            continue
+        elif not (
+                np.abs(solved_coeffs - net_coeffs)
+                <= (1e-08 + 1e-05 * np.abs(net_coeffs))
+        ).all():
+            continue
+        all_multiplicities[i] = multiplicities
+        indices[i] = True
 
-    b = PriorityQueue()  # automatically sorts by path cost (priority)
+    filtered_indices = np.argwhere(indices != 0).flatten()
+    length = filtered_indices.shape[0]
+    filtered_comp_matrices = np.empty((length, shape[1], shape[2]), np.float64)
+    filtered_multiplicities = np.empty((length, shape[1]), np.float64)
 
-    for k in range(1, num_k):
-        try:
-            prev_path = a[k - 1]
-        except IndexError:
-            print(f"Identified only k={k} paths before exiting. \n")
-            break
+    for i in range(length):
+        idx = filtered_indices[i]
+        filtered_comp_matrices[i] = comp_matrices[idx]
+        filtered_multiplicities[i] = all_multiplicities[idx]
 
-        for i in range(len(prev_path) - 1):
-            spur_v = prev_path[i]
-            root_path = prev_path[:i]
+    return filtered_comp_matrices, filtered_multiplicities
 
-            filtered_edges = []
+def find_interdependent_rxns(path, precursors, verbose=True):
+    precursors = set(precursors)
+    interdependent = False
+    combined_rxn = None
 
-            for path in a:
-                if len(path) - 1 > i and root_path == path[:i]:
-                    e = g.edge(path[i], path[i + 1])
-                    if not e:
-                        continue
-                    g.ep[edge_prop][e] = False
-                    filtered_edges.append(e)
+    rxns = set(path.all_rxns)
+    num_rxns = len(rxns)
 
-            gv = GraphView(g, efilt=g.ep[edge_prop])
-            spur_path = shortest_path(
-                gv, spur_v, target_v, weights=g.ep[weight_prop]
-            )[0]
+    if num_rxns == 1:
+        return False, None
 
-            for e in filtered_edges:
-                g.ep[edge_prop][e] = True
+    for combo in powerset(rxns, num_rxns):
+        size = len(combo)
+        if any([set(rxn.reactants).issubset(precursors) for rxn in combo]) or size == 1:
+            continue
+        other_comp = {c for rxn in (rxns - set(combo)) for c in rxn.all_comp}
 
-            if spur_path:
-                total_path = root_path + spur_path
-                total_path_cost = path_cost(total_path)
-                b.put((total_path_cost, total_path))
+        unique_reactants = []
+        unique_products = []
+        for rxn in combo:
+            unique_reactants.append(set(rxn.reactants) - precursors)
+            unique_products.append(set(rxn.products) - precursors)
 
-        while True:
+        overlap = [False] * size
+        for i in range(size):
+            for j in range(size):
+                if i == j:
+                    continue
+                overlapping_phases = unique_reactants[i] & unique_products[j]
+                if overlapping_phases and (overlapping_phases not in other_comp):
+                    overlap[i] = True
+
+        if all(overlap):
+            interdependent = True
+
+            combined_reactants = {c for p in combo for c in p.reactants}
+            combined_products = {c for p in combo for c in p.products}
+            shared = combined_reactants & combined_products
+
+            combined_reactants = combined_reactants - shared
+            combined_products = combined_products - shared
             try:
-                cost_, path_ = b.get(block=False)
-            except queue.Empty:
-                break
-            if path_ not in a:
-                a.append(path_)
-                a_costs.append(cost_)
-                break
+                combined_rxn = Reaction(
+                    list(combined_reactants), list(combined_products)
+                )
+                if verbose:
+                    print(combined_rxn)
+            except ReactionError:
+                print("Could not combine interdependent reactions!")
 
-    return a
+    return interdependent, combined_rxn

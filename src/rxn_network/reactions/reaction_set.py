@@ -63,7 +63,7 @@ class ReactionSet(MSONable):
                 )
         return rxns
 
-    def calculate_costs(self, cf):
+    def calculate_costs(self, cf, open_elem=None, chempot=0):
         """
 
         Args:
@@ -72,7 +72,7 @@ class ReactionSet(MSONable):
         Returns:
 
         """
-        return [cf.evaluate(rxn) for rxn in self.rxns]
+        return [cf.evaluate(rxn) for rxn in self.get_rxns(open_elem, chempot)]
 
     @classmethod
     def from_rxns(cls, rxns, entries=None):

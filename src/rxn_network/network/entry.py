@@ -8,7 +8,7 @@ from pymatgen.entries import Entry
 
 class NetworkEntryType(Enum):
     " Describes the Network Entry Type "
-    Starter = auto()
+    Precursors = auto()
     Reactants = auto()
     Products = auto()
     Target = auto()
@@ -41,7 +41,7 @@ class NetworkEntry(MSONable):
     def __repr__(self):
         formulas = [entry.composition.reduced_formula for entry in self.entries]
         formulas.sort()
-        return f"{self.description}: {','.join(formulas)}"
+        return f"{self.description.name}: {','.join(formulas)}"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
