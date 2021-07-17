@@ -18,6 +18,9 @@ def limited_powerset(iterable, max_size):
         [combinations(iterable, num_combos) for num_combos in range(1, max_size + 1)]
     )
 
+def grouper(iterable, n, fillvalue=None):
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
 
 def get_project_root() -> Path:
     return Path(__file__).parent.parent.parent

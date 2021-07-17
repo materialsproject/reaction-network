@@ -19,11 +19,11 @@ class BasicPathway(Pathway):
             costs ([float]): list of corresponding costs for each reaction.
         """
         self._reactions = reactions
-        self.costs = costs
 
-    @property
-    def reactions(self) -> List[Reaction]:
-        return self._reactions
+        if not costs:
+            costs = []
+
+        self.costs = costs
 
     def __repr__(self):
         path_info = ""

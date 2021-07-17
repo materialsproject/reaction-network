@@ -24,11 +24,8 @@ class NetworkEntry(MSONable):
     def __init__(self, entries: List[Entry], description: NetworkEntryType):
         """
         Args:
-            entries [ComputedEntry]: list of ComputedEntry-like objects
-            description (str): Node type, as selected from:
-                "R" (reactants), "P" (products),
-                "S" (starters/precursors), "T" (target),
-                "D" (dummy)
+           entries: list of ComputedEntry-like objects
+            description: Node type
         """
         self.entries = set(entries)
         self.elements = sorted(

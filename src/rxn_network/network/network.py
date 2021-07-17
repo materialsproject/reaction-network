@@ -1,5 +1,6 @@
 "Implementation of reaction network interface"
 from typing import List
+import logging
 import graph_tool.all as gt
 
 from rxn_network.core import Entry
@@ -7,6 +8,7 @@ from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.core import Network
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.pathways.utils import shortest_path_to_reaction_pathway
 from rxn_network.network.utils import get_rxn_nodes_and_edges, get_loopback_edges
 from rxn_network.network.adaptors.gt import initialize_graph, yens_ksp, \
@@ -22,14 +24,9 @@ class ReactionNetwork(Network):
                  chempot=None
     ):
         super().__init__(entries=entries, enumerators=enumerators, cost_function=cost_function)
-
         self.open_elem = open_elem
         self.chempot = chempot
         self.chemsys = "-".join(sorted(entries.chemsys))
-
-        self._g = None
-        self.precursors = None
-        self.target = None
 
     def build(self):
         rxn_set = self._get_rxns()
@@ -137,8 +134,24 @@ class ReactionNetwork(Network):
 
         return paths
 
-    def find_balanced_pathways(self):
-        pass
+    def find_balanced_pathways(self, targets, k=15, max_num_combos=4):
+        net_rxn = ComputedReaction.balance(self.precursors, list(targets))
+        if not net_rxn.balanced:
+            raise ValueError(
+                "Net reaction must be balanceable to find all reaction pathways."
+            )
+
+        self.logger.info(f"NET RXN: {net_rxn} \n")
+
+        paths = []
+        for target in targets:
+            self.set_target(target)
+            print(f"PATHS to {target.composition.reduced_formula} \n")
+            print("--------------------------------------- \n")
+            pathways = self.find_basic_pathways(k=k)
+            paths.extend(pathways)
+
+        return pathways
 
     def _get_rxns(self) -> ReactionSet:
         rxns = []

@@ -1,18 +1,21 @@
 " Basic interface for a reaction Pathway "
 
-from abc import ABCMeta, abstractproperty
+from abc import ABCMeta, abstractproperty, abstractmethod
 from typing import List
 
 from monty.json import MSONable
 
 from rxn_network.core.reaction import Reaction
+from rxn_network.pathways.balanced import BalancedPathway
+
 
 
 class Pathway(MSONable, metaclass=ABCMeta):
     " Base definition for a reaction pathway "
 
-    @abstractproperty
+    @property
     def reactions(self) -> List[Reaction]:
+        return self._reactions
         " List of reactions in this Pathway "
 
     @property
@@ -28,7 +31,11 @@ class Pathway(MSONable, metaclass=ABCMeta):
     @property
     def all_products(self):
         " Entries serving as a product in any sub reaction "
-        return {entry for rxn in self.reactions for entry in rxn.reactants}
+        return {entry for rxn in self.reactions for entry in rxn.products}
+
+    @property
+    def compositions(self):
+        return list(self.all_reactants | self.all_products)
 
     @property
     def reactants(self):
@@ -54,3 +61,16 @@ class Pathway(MSONable, metaclass=ABCMeta):
     def energy_per_atom(self):
         " Total energy per atom of this reaction pathway"
         return sum([rxn.energy_per_atom for rxn in self.reactions])
+
+
+class Solver(MSONable, metaclass=ABCMeta):
+    def __init__(self, entries, reactions, costs):
+        self.logger = logging.getLogger(str(self.__class__.__name__))
+        self.logger.setLevel("INFO")
+        self.entries = entries
+        self.reactions = reactions
+        self.costs = costs
+
+    @abstractmethod
+    def solve(self, net_rxn) -> List[BalancedPathway]:
+        "Solve paths"

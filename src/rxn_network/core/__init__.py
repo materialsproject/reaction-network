@@ -11,7 +11,7 @@ from pymatgen.core.composition import Composition, Element
 from pymatgen.entries import Entry
 
 from rxn_network.core.reaction import Reaction
-from rxn_network.core.pathway import Pathway
+from rxn_network.core.pathway import Pathway, Solver
 
 
 class Calculator(MSONable, metaclass=ABCMeta):
@@ -61,15 +61,16 @@ class Network(MSONable, metaclass=ABCMeta):
     " Base definition for a reaction network "
 
     def __init__(self, entries: List[Entry], enumerators, cost_function):
-
+        self.logger = logging.getLogger(str(self.__class__.__name__))
+        self.logger.setLevel("INFO")
         self.entries = entries
         self.enumerators = enumerators
         self.cost_function = cost_function
+        self._g = None
+        self.precursors = None
+        self.target = None
 
     @abstractmethod
     def build(self):
         "Construct the network from the supplied enumerators"
 
-    # @abstractmethod
-    # def find_best_pathways(self, precursors, targets, num=15):
-    #     " Find the N best reaction pathways "

@@ -1,11 +1,12 @@
 " A balanced reaction pathway class"
-
+from functools import cached_property
 from typing import List, Optional, Union
 
 import numpy as np
 
 from rxn_network.core import Pathway, Reaction
 from rxn_network.pathways.basic import BasicPathway
+from rxn_network.pathways.utils import balance_path_arrays
 
 
 class BalancedPathway(BasicPathway):
@@ -20,6 +21,7 @@ class BalancedPathway(BasicPathway):
         reactions: List[Reaction],
         coefficients: List[float],
         costs: Optional[List[float]] = None,
+        balanced: Optional[bool] = None,
     ):
         """
         Args:
@@ -29,6 +31,11 @@ class BalancedPathway(BasicPathway):
         """
         self.coefficients = coefficients
         super().__init__(reactions=reactions, costs=costs)
+
+        if balanced is not None:
+            self.balanced = balanced
+        else:
+            self.balanced = False
 
     def __eq__(self, other):
         if super().__eq__(other):
@@ -43,11 +50,47 @@ class BalancedPathway(BasicPathway):
     def balance(
         cls,
         pathway_sets: Union[List[Pathway], List[List[Reaction]]],
-        net_reaction: Reaction,
+        net_reaction: Reaction, tol=1e-6
     ):
         """
         Balances multiple reaction pathways to a net reaction
         """
-        raise NotImplementedError(
-            "Matt please implement using your numba optimized method"
+
+        comp_pseudo_inverse = np.linalg.pinv(comp_matrix).T
+        coefficients = comp_pseudo_inverse @ net_coeffs
+
+        is_balanced = False
+
+        if (coefficients < tol).any():
+            is_balanced = False
+        elif np.allclose(comp_matrix.T @ multiplicities, net_coeffs):
+            is_balanced = True
+
+        return cls(reactions, coefficients, costs)
+
+    @staticmethod
+    def comp_matrix(self):
+        """
+        Internal method for getting the composition matrix used in the balancing
+        procedure.
+        """
+        return np.array(
+            [
+                [
+                    rxn.get_coeff(comp) if comp in rxn.all_comp else 0
+                    for comp in self.compositions
+                ]
+                for rxn in self.reactions
+            ]
+        )
+
+    def get_coeff_vector_for_rxn(self, rxn):
+        """
+        Internal method for getting the net reaction coefficients vector.
+        """
+        return np.array(
+            [
+                rxn.get_coeff(comp) if comp in rxn.compositions else 0
+                for comp in self.compositions
+            ]
         )
