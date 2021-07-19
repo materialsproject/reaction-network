@@ -3,6 +3,7 @@ from numba import njit, prange
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.network.entry import NetworkEntryType
 
+
 def shortest_path_to_reaction_pathway(g, path):
     rxns = []
     costs = []
@@ -82,55 +83,3 @@ def balance_path_arrays(
         filtered_multiplicities[i] = all_multiplicities[idx]
 
     return filtered_comp_matrices, filtered_multiplicities
-
-def find_interdependent_rxns(path, precursors, verbose=True):
-    precursors = set(precursors)
-    interdependent = False
-    combined_rxn = None
-
-    rxns = set(path.all_rxns)
-    num_rxns = len(rxns)
-
-    if num_rxns == 1:
-        return False, None
-
-    for combo in powerset(rxns, num_rxns):
-        size = len(combo)
-        if any([set(rxn.reactants).issubset(precursors) for rxn in combo]) or size == 1:
-            continue
-        other_comp = {c for rxn in (rxns - set(combo)) for c in rxn.all_comp}
-
-        unique_reactants = []
-        unique_products = []
-        for rxn in combo:
-            unique_reactants.append(set(rxn.reactants) - precursors)
-            unique_products.append(set(rxn.products) - precursors)
-
-        overlap = [False] * size
-        for i in range(size):
-            for j in range(size):
-                if i == j:
-                    continue
-                overlapping_phases = unique_reactants[i] & unique_products[j]
-                if overlapping_phases and (overlapping_phases not in other_comp):
-                    overlap[i] = True
-
-        if all(overlap):
-            interdependent = True
-
-            combined_reactants = {c for p in combo for c in p.reactants}
-            combined_products = {c for p in combo for c in p.products}
-            shared = combined_reactants & combined_products
-
-            combined_reactants = combined_reactants - shared
-            combined_products = combined_products - shared
-            try:
-                combined_rxn = Reaction(
-                    list(combined_reactants), list(combined_products)
-                )
-                if verbose:
-                    print(combined_rxn)
-            except ReactionError:
-                print("Could not combine interdependent reactions!")
-
-    return interdependent, combined_rxn

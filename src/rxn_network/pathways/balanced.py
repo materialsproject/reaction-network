@@ -5,8 +5,10 @@ from typing import List, Optional, Union
 import numpy as np
 
 from rxn_network.core import Pathway, Reaction
+from rxn_network.reactions.basic import BasicReaction
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.pathways.utils import balance_path_arrays
+from rxn_network.utils import limited_powerset
 
 
 class BalancedPathway(BasicPathway):
@@ -93,6 +95,61 @@ class BalancedPathway(BasicPathway):
                 for comp in self.compositions
             ]
         )
+
+    def contains_interdependent_rxns(self, precursors):
+        precursors = set(precursors)
+        interdependent = False
+        combined_rxn = None
+
+        rxns = set(self.reactions)
+        num_rxns = len(rxns)
+
+        if num_rxns == 1:
+            return False, None
+
+        for combo in limited_powerset(rxns, num_rxns):
+            size = len(combo)
+            if any([set(rxn.reactants).issubset(precursors) for rxn in
+                    combo]) or size == 1:
+                continue
+
+            other_comp = {c for rxn in (rxns - set(combo)) for c in rxn.compositions}
+
+            unique_reactants = []
+            unique_products = []
+            for rxn in combo:
+                unique_reactants.append(set(rxn.reactants) - precursors)
+                unique_products.append(set(rxn.products) - precursors)
+
+            overlap = [False] * size
+            for i in range(size):
+                for j in range(size):
+                    if i == j:
+                        continue
+                    overlapping_phases = unique_reactants[i] & unique_products[j]
+                    if overlapping_phases and (overlapping_phases not in other_comp):
+                        overlap[i] = True
+
+            if all(overlap):
+                interdependent = True
+
+                combined_reactants = {c for p in combo for c in p.reactants}
+                combined_products = {c for p in combo for c in p.products}
+                shared = combined_reactants & combined_products
+
+                combined_reactants = combined_reactants - shared
+                combined_products = combined_products - shared
+
+                try:
+                    r = BasicReaction.balance(
+                        list(combined_reactants), list(combined_products)
+                    )
+                    if r.balanced:
+                        combined_rxn = r
+                except:
+                    continue
+
+        return interdependent, combined_rxn
 
     @property
     def average_cost(self):

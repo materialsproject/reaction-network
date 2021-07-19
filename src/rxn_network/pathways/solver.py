@@ -17,7 +17,8 @@ class PathwaySolver(Solver):
         super().__init__(entries=entries, pathways=pathways)
         self.cost_function = cost_function
 
-    def solve(self, net_rxn, max_num_combos=4, find_intermediate_rxns=True):
+    def solve(self, net_rxn, max_num_combos=4, find_intermediate_rxns=True,
+              filter_interdependent=True):
         entries = list(self.entries)
         precursors = net_rxn.reactant_entries
         targets = net_rxn.product_entries
@@ -26,7 +27,7 @@ class PathwaySolver(Solver):
         costs = self.costs.copy()
 
         if find_intermediate_rxns:
-            self.logger("Identifying reactions between intermediates...")
+            self.logger.info("Identifying reactions between intermediates...")
             intermediate_rxns = self._find_intermediate_rxns(precursors, targets)
             intermediate_costs = [self.cost_function.evaluate(r) for r in \
                     intermediate_rxns]
@@ -38,14 +39,21 @@ class PathwaySolver(Solver):
         self.logger
         paths = []
         for n in range(1, max_num_combos + 1):
+            total = int(comb(len(reactions), n) / self.BATCH_SIZE)+1
+            groups = grouper(combinations(range(len(reactions)), n), self.BATCH_SIZE)
+
+            pbar = groups
             if n >= 4:
                 self.logger.info(f"Generating and filtering size {n} pathways...")
+                pbar = tqdm(
+                    groups,
+                    total=total,
+                    desc="PathwaySolver")
 
             all_c_mats, all_m_mats = [], []
-            for combos in tqdm(
-                grouper(combinations(range(len(reactions)), n), self.BATCH_SIZE),
-                total=int(comb(len(reactions), n) / self.BATCH_SIZE)+1,
-            ):
+            for idx, combos in enumerate(pbar):
+                if n>=4:
+                    pbar.set_description(f"{self.BATCH_SIZE*idx}/{total*self.BATCH_SIZE}")
                 comp_matrices = np.stack(
                     [
                         np.vstack([self.build_idx_vector(reactions[r]) for r in
@@ -84,7 +92,17 @@ class PathwaySolver(Solver):
                                     balanced=True)
                 paths.append(p)
 
-        return sorted(list(set(paths)), key=lambda p: p.average_cost)
+        filtered_paths = []
+        if filter_interdependent:
+            precursor_comps = [p.composition for p in precursors]
+            for p in paths:
+                interdependent, _ = p.contains_interdependent_rxns(precursor_comps)
+                if not interdependent:
+                    filtered_paths.append(p)
+        else:
+            filtered_paths = paths
+
+        return sorted(list(set(filtered_paths)), key=lambda p: p.average_cost)
 
     def _find_intermediate_rxns(self, precursors, targets):
         rxns = []

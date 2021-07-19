@@ -82,6 +82,8 @@ class ReactionNetwork(Network):
                 for v2 in g.vertices():
                     entry2 = g.vp["entry"][v2]
                     if entry2.description.value == NetworkEntryType.Reactants.value:
+                        if precursors.issuperset(entry2.entries):
+                            continue
                         if precursors.union(entry.entries).issuperset(entry2.entries):
                             add_edges.append((v, v2, 0.0, None, "loopback_precursors"))
 
@@ -134,7 +136,7 @@ class ReactionNetwork(Network):
 
         return paths
 
-    def find_balanced_pathways(self, targets, k=15, max_num_combos=4):
+    def find_balanced_pathways(self, targets, k=15):
         net_rxn = ComputedReaction.balance(self.precursors, list(targets))
         if not net_rxn.balanced:
             raise ValueError(
@@ -151,7 +153,7 @@ class ReactionNetwork(Network):
             pathways = self.find_basic_pathways(k=k)
             paths.extend(pathways)
 
-        return pathways
+        return paths
 
     def _get_rxns(self) -> ReactionSet:
         rxns = []
