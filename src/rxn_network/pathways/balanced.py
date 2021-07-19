@@ -44,7 +44,7 @@ class BalancedPathway(BasicPathway):
         return False
 
     def __hash__(self):
-        return hash(tuple(self.reactions, self.coefficients))
+        return hash((tuple(self.reactions), tuple(self.coefficients)))
 
     @classmethod
     def balance(
@@ -68,7 +68,6 @@ class BalancedPathway(BasicPathway):
 
         return cls(reactions, coefficients, costs)
 
-    @staticmethod
     def comp_matrix(self):
         """
         Internal method for getting the composition matrix used in the balancing
@@ -94,3 +93,16 @@ class BalancedPathway(BasicPathway):
                 for comp in self.compositions
             ]
         )
+
+    @property
+    def average_cost(self):
+        return np.dot(self.coefficients, self.costs)/sum(self.coefficients)
+
+    def __repr__(self):
+        path_info = ""
+        for rxn in self.reactions:
+            path_info += f"{rxn} (dG = {round(rxn.energy_per_atom, 3)} eV/atom) \n"
+
+        path_info += f"Average Cost: {round(self.average_cost,3)}"
+
+        return path_info

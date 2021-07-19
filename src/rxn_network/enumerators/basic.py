@@ -105,7 +105,9 @@ class BasicEnumerator(Enumerator):
         combos_dict = group_by_chemsys(combos)
 
         rxns = []
-        for chemsys, selected_combos in tqdm(combos_dict.items()):
+        pbar = tqdm(combos_dict.items(), desc="BasicEnumerator")
+        for chemsys, selected_combos in pbar:
+            pbar.set_description(f"{chemsys}")
             elems = chemsys.split("-")
             if (
                 (target and not target_elems.issubset(elems))
@@ -146,7 +148,7 @@ class BasicEnumerator(Enumerator):
                 continue
             if target and target not in all_phases:
                 continue
-            if precursors and not precursors.issubset(all_phases):
+            if precursors and not r.issubset(precursors):
                 continue
 
             forward_rxn = ComputedReaction.balance(r, p)
@@ -161,11 +163,11 @@ class BasicEnumerator(Enumerator):
 
             if forward_rxn:
                 if not target or target in p:
-                    if not precursors or precursors == (r-open):
+                    if not precursors or (r-open).issubset(precursors):
                         forward_rxn = apply_calculators(forward_rxn, calculators)
                         rxns.append(forward_rxn)
                 if not target or target in r:
-                    if not precursors or precursors == (p-open):
+                    if not precursors or (p-open).issubset(precursors):
                         backward_rxn = apply_calculators(backward_rxn, calculators)
                         rxns.append(backward_rxn)
 

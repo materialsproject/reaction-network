@@ -46,6 +46,7 @@ class NISTReferenceEntry(Entry):
         self._formula = formula
         self.name = formula
         self.entry_id = "NISTReferenceEntry"
+        self.data = {}
 
         super().__init__(composition.reduced_composition, energy)
 

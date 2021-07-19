@@ -31,6 +31,7 @@ class GibbsEntrySet(EntrySet):
             entries: A collection of entry objects that will make up the entry set.
         """
         super().__init__(entries)
+        self.build_indices()
 
     def filter_by_stability(
         self, e_above_hull: float, include_polymorphs: Optional[bool] = False
@@ -72,6 +73,10 @@ class GibbsEntrySet(EntrySet):
                 filtered_entries.add(entry)
 
         return self.__class__(filtered_entries)
+
+    def build_indices(self):
+        for idx, e in enumerate(self.entries):
+            e.data.update({"idx":idx})
 
     def get_min_entry_by_formula(self, formula: str) -> ComputedEntry:
         """

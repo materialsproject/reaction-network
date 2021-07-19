@@ -1,7 +1,6 @@
 import numpy as np
 from numba import njit, prange
 from rxn_network.pathways.basic import BasicPathway
-from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.network.entry import NetworkEntryType
 
 def shortest_path_to_reaction_pathway(g, path):

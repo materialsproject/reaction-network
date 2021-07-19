@@ -30,7 +30,7 @@ class BasicPathway(Pathway):
         for rxn in self.reactions:
             path_info += f"{rxn} (dG = {round(rxn.energy_per_atom, 3)} eV/atom) \n"
 
-        path_info += f"Total Energy: {round(self.energy_per_atom,3)}"
+        path_info += f"Total Cost: {round(self.total_cost,3)}"
 
         return path_info
 
@@ -47,3 +47,7 @@ class BasicPathway(Pathway):
 
     def __hash__(self):
         return hash(tuple(self.reactions))
+
+    @property
+    def total_cost(self):
+        return sum(self.costs)
