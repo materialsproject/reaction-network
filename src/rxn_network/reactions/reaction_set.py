@@ -41,7 +41,7 @@ class ReactionSet(MSONable):
 
         """
         rxns = []
-        chempots=None
+        chempots = None
         if open_elem:
             chempots = {Element(open_elem): chempot}
         for indices, coeffs, data in zip(

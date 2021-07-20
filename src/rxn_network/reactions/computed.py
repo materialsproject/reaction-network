@@ -113,8 +113,9 @@ class ComputedReaction(BasicReaction):
         )
 
     def reverse(self):
-        return ComputedReaction(self.entries, -1*self.coefficients,
-                        self.data, self.lowest_num_errors)
+        return ComputedReaction(
+            self.entries, -1 * self.coefficients, self.data, self.lowest_num_errors
+        )
 
     @property
     def energy_uncertainty_per_atom(self):

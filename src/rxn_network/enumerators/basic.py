@@ -89,8 +89,9 @@ class BasicEnumerator(Enumerator):
 
         precursors = None
         if self.precursors:
-            precursors = {initialize_entry(f, entries, stabilize=False) for f in
-                          self.precursors}
+            precursors = {
+                initialize_entry(f, entries, stabilize=False) for f in self.precursors
+            }
             for p in precursors:
                 if p not in entries:
                     entries.add(p)
@@ -164,11 +165,11 @@ class BasicEnumerator(Enumerator):
 
             if forward_rxn:
                 if not target or target in p:
-                    if not precursors or (r-open).issubset(precursors):
+                    if not precursors or (r - open).issubset(precursors):
                         forward_rxn = apply_calculators(forward_rxn, calculators)
                         rxns.append(forward_rxn)
                 if not target or target in r:
-                    if not precursors or (p-open).issubset(precursors):
+                    if not precursors or (p - open).issubset(precursors):
                         backward_rxn = apply_calculators(backward_rxn, calculators)
                         rxns.append(backward_rxn)
 
@@ -209,8 +210,9 @@ class BasicOpenEnumerator(BasicEnumerator):
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
         """
-        super().__init__(precursors, target, calculators, n, remove_unbalanced,
-                         remove_changed)
+        super().__init__(
+            precursors, target, calculators, n, remove_unbalanced, remove_changed
+        )
         self.open_entries = open_entries
 
     def enumerate(self, entries: GibbsEntrySet) -> List[ComputedReaction]:
@@ -253,8 +255,9 @@ class BasicOpenEnumerator(BasicEnumerator):
 
         combos = [set(c) for c in limited_powerset(entries, self.n)]
         open_entries = initialize_open_entries(self.open_entries, entries)
-        open_entry_elems = {str(elem) for entry in open_entries for elem in
-                            entry.composition.elements}
+        open_entry_elems = {
+            str(elem) for entry in open_entries for elem in entry.composition.elements
+        }
         if precursors:
             precursor_elems = precursor_elems | open_entry_elems
         open_combos = [
@@ -290,7 +293,10 @@ class BasicOpenEnumerator(BasicEnumerator):
             selected_open_combos = combos_open_dict[chemsys]
             rxn_iter = product(selected_combos, selected_open_combos)
 
-            rxns.extend(self._get_rxns(rxn_iter, precursors, target, calculators,
-                                       open=open_entries))
+            rxns.extend(
+                self._get_rxns(
+                    rxn_iter, precursors, target, calculators, open=open_entries
+                )
+            )
 
         return list(set(rxns))

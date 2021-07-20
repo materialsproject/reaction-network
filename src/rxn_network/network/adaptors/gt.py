@@ -3,12 +3,13 @@ from queue import PriorityQueue
 from graph_tool import Graph, Vertex, GraphView
 from graph_tool.topology import shortest_path
 
-DEFAULT_VERTEX_PROPS = {"entry":"object", "type":"int"}
-DEFAULT_EDGE_PROPS = {"rxn":"object", "cost":"double", "type":"string"}
+DEFAULT_VERTEX_PROPS = {"entry": "object", "type": "int"}
+DEFAULT_EDGE_PROPS = {"rxn": "object", "cost": "double", "type": "string"}
 
 
-def initialize_graph(vertex_props: Dict[str, str]=None,
-                     edge_props: Dict[str,str]=None) -> Graph:
+def initialize_graph(
+    vertex_props: Dict[str, str] = None, edge_props: Dict[str, str] = None
+) -> Graph:
     """
 
     Args:
@@ -57,12 +58,12 @@ def update_vertex_props(g, v, prop_dict):
 
 
 def yens_ksp(
-        g: Graph,
-        num_k: int,
-        precursors_v: Vertex,
-        target_v: Vertex,
-        edge_prop: str="bool",
-        cost_prop: str= "cost"
+    g: Graph,
+    num_k: int,
+    precursors_v: Vertex,
+    target_v: Vertex,
+    edge_prop: str = "bool",
+    cost_prop: str = "cost",
 ):
     """
     Yen's Algorithm for k-shortest paths, adopted for graph-tool. Utilizes GraphView
@@ -127,9 +128,7 @@ def yens_ksp(
                     filtered_edges.append(e)
 
             gv = GraphView(g, efilt=g.ep[edge_prop])
-            spur_path = shortest_path(
-                gv, spur_v, target_v, weights=g.ep[cost_prop]
-            )[0]
+            spur_path = shortest_path(gv, spur_v, target_v, weights=g.ep[cost_prop])[0]
 
             for e in filtered_edges:
                 g.ep[edge_prop][e] = True
@@ -150,6 +149,7 @@ def yens_ksp(
                 break
 
     return a
+
 
 @staticmethod
 def update_vertex_properties(g, v, prop_dict):

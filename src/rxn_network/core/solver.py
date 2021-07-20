@@ -13,8 +13,9 @@ class Solver(MSONable, metaclass=ABCMeta):
 
         self._entries = entries
         self._pathways = pathways
-        self._reactions = list({rxn for path in self._pathways for rxn in
-                                path.reactions})
+        self._reactions = list(
+            {rxn for path in self._pathways for rxn in path.reactions}
+        )
 
         self._costs = [cost for path in self._pathways for cost in path.costs]
 

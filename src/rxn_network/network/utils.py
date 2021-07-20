@@ -5,8 +5,7 @@ def get_rxn_nodes_and_edges(rxns):
     nodes, edges = [], []
 
     for rxn in rxns:
-        reactant_node = NetworkEntry(rxn.reactant_entries,
-                                     NetworkEntryType.Reactants)
+        reactant_node = NetworkEntry(rxn.reactant_entries, NetworkEntryType.Reactants)
         product_node = NetworkEntry(rxn.product_entries, NetworkEntryType.Products)
 
         if reactant_node not in nodes:

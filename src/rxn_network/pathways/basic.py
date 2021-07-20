@@ -56,7 +56,7 @@ class BasicPathway(Pathway):
         costs = []
 
         for step, v in enumerate(path):
-            if (g.vp["type"][v] == NetworkEntryType.Products.value):
+            if g.vp["type"][v] == NetworkEntryType.Products.value:
                 e = g.edge(path[step - 1], v)
 
                 rxns.append(g.ep["rxn"][e])

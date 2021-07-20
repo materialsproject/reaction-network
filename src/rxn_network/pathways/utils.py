@@ -4,9 +4,9 @@ from numba import njit, prange
 
 @njit(parallel=True)
 def balance_path_arrays(
-        comp_matrices,
-        net_coeffs,
-        tol=1e-6,
+    comp_matrices,
+    net_coeffs,
+    tol=1e-6,
 ):
     """
     Fast solution for reaction multiplicities via mass balance stochiometric
@@ -49,8 +49,7 @@ def balance_path_arrays(
         if (multiplicities < tol).any():
             continue
         elif not (
-                np.abs(solved_coeffs - net_coeffs)
-                <= (1e-08 + 1e-05 * np.abs(net_coeffs))
+            np.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * np.abs(net_coeffs))
         ).all():
             continue
         all_multiplicities[i] = multiplicities

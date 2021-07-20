@@ -76,7 +76,7 @@ class GibbsEntrySet(EntrySet):
 
     def build_indices(self):
         for idx, e in enumerate(self.entries):
-            e.data.update({"idx":idx})
+            e.data.update({"idx": idx})
 
     def get_min_entry_by_formula(self, formula: str) -> ComputedEntry:
         """

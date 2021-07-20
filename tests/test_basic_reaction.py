@@ -31,8 +31,10 @@ def test_complex_balance():
 def test_is_identity(prebalanced_rxn):
     rxn1 = BasicReaction.balance([Composition("YMnO3")], [Composition("YMnO3")])
 
-    rxn2 = BasicReaction.balance([Composition("YMnO3"), Composition("O2")],
-                                 [Composition("YMnO3"), Composition("O2")])
+    rxn2 = BasicReaction.balance(
+        [Composition("YMnO3"), Composition("O2")],
+        [Composition("YMnO3"), Composition("O2")],
+    )
 
     assert rxn1.is_identity is True
     assert rxn2.is_identity is True

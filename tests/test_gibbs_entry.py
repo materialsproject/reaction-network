@@ -25,8 +25,8 @@ def entry(structure):
         formation_energy_per_atom=-2.436,
         temperature=300,
         parameters=None,
-            entry_id="Test LiFe4P4O16 structure",
-        )
+        entry_id="Test LiFe4P4O16 structure",
+    )
     return entry
 
 
@@ -64,9 +64,9 @@ def test_gf_sisso(entries_temps_dict):
 
 def test_interpolation(structure):
     temp = 450
-    e = GibbsComputedEntry.from_structure(structure=structure,
-                                          formation_energy_per_atom=-2.436,
-                                          temperature=temp)
+    e = GibbsComputedEntry.from_structure(
+        structure=structure, formation_energy_per_atom=-2.436, temperature=temp
+    )
     assert e.energy == approx(-53.7243542548528)
 
 
@@ -85,5 +85,6 @@ def test_normalize(entries_temps_dict):
     num_atoms = 25
     for e in entries_temps_dict.values():
         normed_entry = e.normalize(mode="atom")
-        assert e.uncorrected_energy == approx(normed_entry.uncorrected_energy *
-                                              num_atoms)
+        assert e.uncorrected_energy == approx(
+            normed_entry.uncorrected_energy * num_atoms
+        )

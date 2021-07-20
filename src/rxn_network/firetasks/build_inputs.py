@@ -89,8 +89,12 @@ class EntriesFromDb(FiretaskBase):
         "temperature",
         "e_above_hull",
     ]
-    optional_params = ["include_polymorphs", "inc_structure", "compatible_only",
-                       "property_data"]
+    optional_params = [
+        "include_polymorphs",
+        "inc_structure",
+        "compatible_only",
+        "property_data",
+    ]
 
     def run_task(self, fw_spec):
         db_file = env_chk(self["entry_db_file"], fw_spec)
@@ -104,9 +108,12 @@ class EntriesFromDb(FiretaskBase):
 
         with MongoStore.from_db_file(db_file) as db:
             entries = get_all_entries_in_chemsys(
-                db, self["chemsys"], inc_structure=inc_structure,
-                compatible_only=compatible_only, property_data=property_data,
-                use_premade_entries=False
+                db,
+                self["chemsys"],
+                inc_structure=inc_structure,
+                compatible_only=compatible_only,
+                property_data=property_data,
+                use_premade_entries=False,
             )
 
         entries = process_entries(
@@ -237,8 +244,9 @@ def get_entries(
                 )
             else:
                 prim = Structure.from_dict(
-                    d["initial_structure"] if inc_structure == "initial" else d[
-                        "structure"]
+                    d["initial_structure"]
+                    if inc_structure == "initial"
+                    else d["structure"]
                 )
                 if conventional_unit_cell:
                     s = SpacegroupAnalyzer(prim).get_conventional_standard_structure()
@@ -258,10 +266,12 @@ def get_entries(
         from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore",
-                                    message="Failed to guess oxidation states.*")
-            entries = MaterialsProject2020Compatibility().process_entries(entries,
-                                                                      clean=True)
+            warnings.filterwarnings(
+                "ignore", message="Failed to guess oxidation states.*"
+            )
+            entries = MaterialsProject2020Compatibility().process_entries(
+                entries, clean=True
+            )
     if sort_by_e_above_hull:
         entries = sorted(entries, key=lambda entry: entry.data["e_above_hull"])
     return entries

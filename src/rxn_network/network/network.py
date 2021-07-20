@@ -10,19 +10,25 @@ from rxn_network.pathways.basic import BasicPathway
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.network.utils import get_rxn_nodes_and_edges, get_loopback_edges
-from rxn_network.network.adaptors.gt import initialize_graph, yens_ksp, \
-    update_vertex_props
+from rxn_network.network.adaptors.gt import (
+    initialize_graph,
+    yens_ksp,
+    update_vertex_props,
+)
 
 
 class ReactionNetwork(Network):
-    def __init__(self,
-                 entries: GibbsEntrySet,
-                 enumerators,
-                 cost_function,
-                 open_elem=None,
-                 chempot=None
+    def __init__(
+        self,
+        entries: GibbsEntrySet,
+        enumerators,
+        cost_function,
+        open_elem=None,
+        chempot=None,
     ):
-        super().__init__(entries=entries, enumerators=enumerators, cost_function=cost_function)
+        super().__init__(
+            entries=entries, enumerators=enumerators, cost_function=cost_function
+        )
         self.open_elem = open_elem
         self.chempot = chempot
         self.chemsys = "-".join(sorted(entries.chemsys))
@@ -32,7 +38,7 @@ class ReactionNetwork(Network):
         costs = rxn_set.calculate_costs(self.cost_function)
         rxns = rxn_set.get_rxns(self.open_elem, self.chempot)
 
-        nodes, rxn_edges  = get_rxn_nodes_and_edges(rxns)
+        nodes, rxn_edges = get_rxn_nodes_and_edges(rxns)
 
         g = initialize_graph()
         g.add_vertex(len(nodes))
@@ -49,9 +55,7 @@ class ReactionNetwork(Network):
         loopback_edges = get_loopback_edges(g, nodes)
         edge_list.extend(loopback_edges)
 
-        g.add_edge_list(
-            edge_list, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]]
-        )
+        g.add_edge_list(edge_list, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
         self._g = g
         self.nodes = nodes
         self.rxn_edges = rxn_edges
@@ -121,8 +125,9 @@ class ReactionNetwork(Network):
         g = self._g
         paths = []
 
-        precursors_v = gt.find_vertex(g, g.vp["type"],
-                                      NetworkEntryType.Precursors.value)[0]
+        precursors_v = gt.find_vertex(
+            g, g.vp["type"], NetworkEntryType.Precursors.value
+        )[0]
         target_v = gt.find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
 
         for path in yens_ksp(g, k, precursors_v, target_v):
@@ -170,6 +175,3 @@ class ReactionNetwork(Network):
             f"{self.chemsys}, "
             f"with Graph: {str(self._g)}"
         )
-
-
-

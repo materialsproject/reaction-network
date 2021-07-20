@@ -53,7 +53,8 @@ class BalancedPathway(BasicPathway):
     def balance(
         cls,
         pathway_sets: Union[List[Pathway], List[List[Reaction]]],
-        net_reaction: Reaction, tol=1e-6
+        net_reaction: Reaction,
+        tol=1e-6,
     ):
         """
         Balances multiple reaction pathways to a net reaction
@@ -110,8 +111,10 @@ class BalancedPathway(BasicPathway):
 
         for combo in limited_powerset(rxns, num_rxns):
             size = len(combo)
-            if any([set(rxn.reactants).issubset(precursors) for rxn in
-                    combo]) or size == 1:
+            if (
+                any([set(rxn.reactants).issubset(precursors) for rxn in combo])
+                or size == 1
+            ):
                 continue
 
             other_comp = {c for rxn in (rxns - set(combo)) for c in rxn.compositions}
@@ -154,7 +157,7 @@ class BalancedPathway(BasicPathway):
 
     @property
     def average_cost(self):
-        return np.dot(self.coefficients, self.costs)/sum(self.coefficients)
+        return np.dot(self.coefficients, self.costs) / sum(self.coefficients)
 
     def __repr__(self):
         path_info = ""

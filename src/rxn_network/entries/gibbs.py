@@ -1,4 +1,4 @@
-" Specialized entry to estimate Gibbs Free Energy"
+" Specialized entry to estimate Gibbs Free Energy for a solid"
 import hashlib
 from itertools import combinations
 from typing import List, Optional
