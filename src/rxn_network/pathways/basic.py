@@ -2,7 +2,9 @@
 
 from typing import List, Optional
 
-from rxn_network.core import Pathway, Reaction
+from rxn_network.core import Pathway
+from rxn_network.core import Reaction
+from rxn_network.network.entry import NetworkEntryType
 
 
 class BasicPathway(Pathway):
@@ -47,6 +49,20 @@ class BasicPathway(Pathway):
 
     def __hash__(self):
         return hash(tuple(self.reactions))
+
+    @classmethod
+    def from_graph_path(cls, g, path):
+        rxns = []
+        costs = []
+
+        for step, v in enumerate(path):
+            if (g.vp["type"][v] == NetworkEntryType.Products.value):
+                e = g.edge(path[step - 1], v)
+
+                rxns.append(g.ep["rxn"][e])
+                costs.append(g.ep["cost"][e])
+
+        return cls(reactions=rxns, costs=costs)
 
     @property
     def total_cost(self):

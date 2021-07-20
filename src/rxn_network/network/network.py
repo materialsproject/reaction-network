@@ -3,13 +3,12 @@ from typing import List
 import logging
 import graph_tool.all as gt
 
-from rxn_network.core import Entry
-from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.core import Network
+from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
+from rxn_network.pathways.basic import BasicPathway
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.pathways.utils import shortest_path_to_reaction_pathway
 from rxn_network.network.utils import get_rxn_nodes_and_edges, get_loopback_edges
 from rxn_network.network.adaptors.gt import initialize_graph, yens_ksp, \
     update_vertex_props
@@ -102,9 +101,7 @@ class ReactionNetwork(Network):
         target_v = g.add_vertex()
         target_entry = NetworkEntry([target], NetworkEntryType.Target)
         props = {"entry": target_entry, "type": target_entry.description.value}
-        update_vertex_props(g,
-                            target_v,
-                            props)
+        update_vertex_props(g, target_v, props)
 
         add_edges = []
         for v in g.vertices():
@@ -129,7 +126,7 @@ class ReactionNetwork(Network):
         target_v = gt.find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
 
         for path in yens_ksp(g, k, precursors_v, target_v):
-            paths.append(shortest_path_to_reaction_pathway(g, path))
+            paths.append(BasicPathway.from_graph_path(g, path))
 
         for path in paths:
             print(path, "\n")

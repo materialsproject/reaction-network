@@ -112,8 +112,7 @@ class PathwaySolver(Solver):
 
         if not targets:
             be = BasicEnumerator(precursors=intermediate_formulas)
-            rxns = BasicEnumerator(precursors=intermediate_formulas).enumerate(
-                self.entries)
+            rxns = be.enumerate(self.entries)
         else:
             for target in targets:
                 be = BasicEnumerator(precursors=intermediate_formulas,

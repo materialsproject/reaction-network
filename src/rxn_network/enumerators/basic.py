@@ -6,8 +6,9 @@ from tqdm.auto import tqdm
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.core.composition import Composition
 
-from rxn_network.core import Enumerator, Reaction, Calculator
+from rxn_network.core import Enumerator, Calculator, Reaction
 from rxn_network.reactions import ComputedReaction
 from rxn_network.enumerators.utils import (
     initialize_entry,
@@ -82,18 +83,21 @@ class BasicEnumerator(Enumerator):
 
         target = None
         if self.target:
-            target = initialize_entry(self.target, entries)
+            target = initialize_entry(self.target, entries, stabilize=False)
             entries.add(target)
             target_elems = {str(elem) for elem in target.composition.elements}
 
         precursors = None
         if self.precursors:
-            precursors = {initialize_entry(f, entries) for f in self.precursors}
+            precursors = {initialize_entry(f, entries, stabilize=False) for f in
+                          self.precursors}
             for p in precursors:
-                entries.add(p)
+                if p not in entries:
+                    entries.add(p)
             precursor_elems = {
                 str(elem) for p in precursors for elem in p.composition.elements
             }
+
 
         if "ChempotDistanceCalculator" in self.calculators:
             entries = entries.filter_by_stability(e_above_hull=0.0)
@@ -144,12 +148,19 @@ class BasicEnumerator(Enumerator):
             p = set(products)
             all_phases = r | p | open
 
+            t = {e.composition.reduced_formula for e in r}
+            if t == {"LiMnO2","YClO"}:
+                print({e.composition.reduced_formula for e in p})
             if r & p:  # do not allow repeated phases
                 continue
             if target and target not in all_phases:
                 continue
             if precursors and not r.issubset(precursors):
                 continue
+
+            if t == {"LiMnO2","YClO"}:
+                print(r)
+
 
             forward_rxn = ComputedReaction.balance(r, p)
 
