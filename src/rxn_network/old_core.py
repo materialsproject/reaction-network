@@ -25,9 +25,9 @@ from rxn_network.old_helpers import (
     expand_pd,
     find_interdependent_rxns,
     find_rxn_edges,
-    powerset,
     get_rxn_cost,
     grouper,
+    powerset,
     react_interface,
 )
 from rxn_network.reaction import (

@@ -1,30 +1,30 @@
-from typing import List, Optional
 from itertools import chain, combinations, compress, groupby, product
 from math import comb
+from typing import List, Optional
+
 import numpy as np
+from pymatgen.analysis.interface_reactions import InterfacialReactivity
+from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
+from pymatgen.core.composition import Element
+from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm.auto import tqdm
 
-from pymatgen.core.composition import Element
-from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDiagram
-from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.analysis.interface_reactions import InterfacialReactivity
-
 from rxn_network.core import Enumerator, Reaction
-from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.reactions import ComputedReaction
-from rxn_network.thermo.chempot_diagram import ChempotDiagram
 from rxn_network.costs.calculators import Calculator, ChempotDistanceCalculator
+from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import (
-    initialize_entry,
-    initialize_calculators,
     apply_calculators,
+    filter_entries_by_chemsys,
+    get_computed_rxn,
+    get_entry_by_comp,
+    get_open_computed_rxn,
     get_total_chemsys,
     group_by_chemsys,
-    filter_entries_by_chemsys,
-    get_entry_by_comp,
-    get_computed_rxn,
-    get_open_computed_rxn,
+    initialize_calculators,
+    initialize_entry,
 )
+from rxn_network.reactions import ComputedReaction
+from rxn_network.thermo.chempot_diagram import ChempotDiagram
 
 
 class MinimizeGibbsEnumerator(Enumerator):

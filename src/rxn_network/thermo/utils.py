@@ -1,8 +1,8 @@
-from typing import List, Dict, Tuple
-import numpy as np
+from typing import Dict, List, Tuple
 
-from pymatgen.entries import Entry
+import numpy as np
 from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.entries import Entry
 
 
 def expand_pd(entries: List[Entry]) -> Dict[str, PhaseDiagram]:

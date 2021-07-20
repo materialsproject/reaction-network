@@ -1,8 +1,9 @@
 from fireworks import Firework
-from rxn_network.firetasks.build_inputs import EntriesFromDb, EntriesFromMPRester
-from rxn_network.firetasks.run_calc import RunEnumerators
-from rxn_network.firetasks.parse_outputs import ReactionsToDb
+
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.firetasks.build_inputs import EntriesFromDb, EntriesFromMPRester
+from rxn_network.firetasks.parse_outputs import ReactionsToDb
+from rxn_network.firetasks.run_calc import RunEnumerators
 
 
 class EnumeratorFW(Firework):

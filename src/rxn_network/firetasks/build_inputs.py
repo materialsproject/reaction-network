@@ -1,26 +1,23 @@
 " Firetasks for acquiring ComputedEntry data from MPRester or another materials MongoDB"
 
-import os
-import json
 import datetime
 import itertools
+import json
+import os
 import warnings
 from typing import Union
 
-from monty.json import MontyDecoder, jsanitize
-from monty.serialization import loadfn
-
-from pymatgen.ext.matproj import MPRester
-from pymatgen.core.structure import Structure
-from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
-
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore
+from monty.json import MontyDecoder, jsanitize
+from monty.serialization import loadfn
+from pymatgen.core.structure import Structure
+from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
+from pymatgen.ext.matproj import MPRester
+from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
-from rxn_network.firetasks.utils import get_logger, env_chk
 from rxn_network.entries.entry_set import GibbsEntrySet
-
+from rxn_network.firetasks.utils import env_chk, get_logger
 
 logger = get_logger(__name__)
 

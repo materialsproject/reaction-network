@@ -1,12 +1,15 @@
 " Basic interface for a pathway Solver "
+import logging
 from abc import ABCMeta, abstractmethod
 from typing import List
-import logging
+
 from monty.json import MSONable
-from rxn_network.pathways.balanced import BalancedPathway
+
+from rxn_network.core.pathway import Pathway
 
 
 class Solver(MSONable, metaclass=ABCMeta):
+    " Base definition for a pathway solver class. "
     def __init__(self, entries, pathways):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
@@ -20,7 +23,7 @@ class Solver(MSONable, metaclass=ABCMeta):
         self._costs = [cost for path in self._pathways for cost in path.costs]
 
     @abstractmethod
-    def solve(self, net_rxn) -> List[BalancedPathway]:
+    def solve(self, net_rxn) -> List[Pathway]:
         "Solve paths"
 
     @property

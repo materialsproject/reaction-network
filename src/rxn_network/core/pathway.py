@@ -1,6 +1,6 @@
 " Basic interface for a reaction Pathway "
 import logging
-from abc import ABCMeta, abstractproperty, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import List
 
 from monty.json import MSONable

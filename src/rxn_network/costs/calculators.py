@@ -1,15 +1,15 @@
 " A calculator class for determining chemical potential distance of reactions "
 
-from typing import List, Optional
 from itertools import product
+from typing import List, Optional
+
 import numpy as np
+from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core import Calculator
 from rxn_network.reactions import ComputedReaction
 from rxn_network.thermo.chempot_diagram import ChempotDiagram
-
-from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.analysis.phase_diagram import PhaseDiagram
 
 
 class ChempotDistanceCalculator(Calculator):

@@ -2,12 +2,10 @@
 from pathlib import Path
 
 import pytest
+from monty.serialization import loadfn
 from pytest import approx
 
-from monty.serialization import loadfn
-
 from rxn_network.entries.gibbs import GibbsComputedEntry
-
 
 TEST_FILES_PATH = Path(__file__).parent / "test_files"
 

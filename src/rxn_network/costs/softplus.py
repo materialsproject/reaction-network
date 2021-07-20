@@ -1,6 +1,7 @@
 " Implementation of the softplus cost function"
 
 from typing import List
+
 import numpy as np
 
 from rxn_network.core import CostFunction

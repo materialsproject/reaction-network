@@ -2,8 +2,7 @@
 
 from typing import List, Optional
 
-from rxn_network.core import Pathway
-from rxn_network.core import Reaction
+from rxn_network.core import Pathway, Reaction
 from rxn_network.network.entry import NetworkEntryType
 
 

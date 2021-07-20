@@ -1,23 +1,29 @@
 "Implementation of reaction network interface"
-from typing import List
 import logging
+from typing import List
+
 import graph_tool.all as gt
 
 from rxn_network.core import Network
 from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.network.entry import NetworkEntry, NetworkEntryType
-from rxn_network.pathways.basic import BasicPathway
-from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.network.utils import get_rxn_nodes_and_edges, get_loopback_edges
 from rxn_network.network.adaptors.gt import (
     initialize_graph,
-    yens_ksp,
     update_vertex_props,
+    yens_ksp,
 )
+from rxn_network.network.entry import NetworkEntry, NetworkEntryType
+from rxn_network.network.utils import get_loopback_edges, get_rxn_nodes_and_edges
+from rxn_network.pathways.basic import BasicPathway
+from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.reactions.reaction_set import ReactionSet
 
 
 class ReactionNetwork(Network):
+    """
+    Main reaction network class for building graphs of reactions and performing
+    pathfinding.
+    """
+
     def __init__(
         self,
         entries: GibbsEntrySet,
@@ -31,9 +37,13 @@ class ReactionNetwork(Network):
         )
         self.open_elem = open_elem
         self.chempot = chempot
-        self.chemsys = "-".join(sorted(entries.chemsys))
 
     def build(self):
+        """
+
+        Returns:
+
+        """
         rxn_set = self._get_rxns()
         costs = rxn_set.calculate_costs(self.cost_function)
         rxns = rxn_set.get_rxns(self.open_elem, self.chempot)
@@ -56,18 +66,58 @@ class ReactionNetwork(Network):
         edge_list.extend(loopback_edges)
 
         g.add_edge_list(edge_list, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
+
         self._g = g
-        self.nodes = nodes
-        self.rxn_edges = rxn_edges
+
+    def find_pathways(self, targets, k=15):
+        """
+
+        Args:
+            targets:
+            k:
+
+        Returns:
+
+        """
+        if not self.precursors:
+            raise AttributeError("Must call set_precursors() before pathfinding!")
+
+        paths = []
+        for target in targets:
+            if type(target) == str:
+                target = self.entries.get_min_entry_by_formula(target)
+            self.set_target(target)
+            print(f"PATHS to {target.composition.reduced_formula} \n")
+            print("--------------------------------------- \n")
+            pathways = self._shortest_paths(k=k)
+            paths.extend(pathways)
+
+        return paths
 
     def set_precursors(self, precursors):
+        """
+
+        Args:
+            precursors:
+
+        Returns:
+
+        """
+        g = self._g
+
         precursors = set(precursors)
         if precursors == self.precursors:
             return
+        elif self.precursors:
+            precursors_v = gt.find_vertex(g, g.vp["type"],
+                                          NetworkEntryType.Precursors.value)[0]
+            g.remove_vertex(precursors_v)
+            loopback_edges = gt.find_edge(g, g.ep["type"], "loopback_precursors")
+            for e in loopback_edges:
+                g.remove_edge(e)
         elif not all([p in self.entries for p in precursors]):
             raise ValueError("One or more precursors are not included in network!")
 
-        g = self._g
         precursors_v = g.add_vertex()
         precursors_entry = NetworkEntry(precursors, NetworkEntryType.Precursors)
         props = {"entry": precursors_entry, "type": precursors_entry.description.value}
@@ -95,10 +145,18 @@ class ReactionNetwork(Network):
         self.precursors = precursors
 
     def set_target(self, target):
+        """
+
+        Args:
+            target:
+
+        Returns:
+
+        """
         g = self._g
         if target == self.target:
             return
-        elif self.target:
+        elif self.target or target==None:
             target_v = gt.find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
             g.remove_vertex(target_v)
 
@@ -121,7 +179,8 @@ class ReactionNetwork(Network):
 
         self.target = target
 
-    def find_basic_pathways(self, k=15):
+    def _shortest_paths(self, k=15):
+        " Finds the k shortest paths using Yen's algorithm and returns BasicPathways"
         g = self._g
         paths = []
 
@@ -138,26 +197,8 @@ class ReactionNetwork(Network):
 
         return paths
 
-    def find_balanced_pathways(self, targets, k=15):
-        net_rxn = ComputedReaction.balance(self.precursors, list(targets))
-        if not net_rxn.balanced:
-            raise ValueError(
-                "Net reaction must be balanceable to find all reaction pathways."
-            )
-
-        self.logger.info(f"NET RXN: {net_rxn} \n")
-
-        paths = []
-        for target in targets:
-            self.set_target(target)
-            print(f"PATHS to {target.composition.reduced_formula} \n")
-            print("--------------------------------------- \n")
-            pathways = self.find_basic_pathways(k=k)
-            paths.extend(pathways)
-
-        return paths
-
     def _get_rxns(self) -> ReactionSet:
+        " Gets reaction set by running all enumerators"
         rxns = []
         for enumerator in self.enumerators:
             rxns.extend(enumerator.enumerate(self.entries))
@@ -168,6 +209,10 @@ class ReactionNetwork(Network):
     @property
     def graph(self):
         return self._g
+
+    @property
+    def chemsys(self):
+        return "-".join(sorted(self.entries.chemsys))
 
     def __repr__(self):
         return (

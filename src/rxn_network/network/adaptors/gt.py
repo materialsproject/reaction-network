@@ -1,6 +1,7 @@
-from typing import Dict
 from queue import PriorityQueue
-from graph_tool import Graph, Vertex, GraphView
+from typing import Dict
+
+from graph_tool import Graph, GraphView, Vertex
 from graph_tool.topology import shortest_path
 
 DEFAULT_VERTEX_PROPS = {"entry": "object", "type": "int"}

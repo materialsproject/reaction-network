@@ -1,10 +1,12 @@
 from itertools import permutations
+
 import numpy as np
 from pymatgen.entries.computed_entries import ComputedEntry
+
 import rxn_network.costs.calculators as calcs
-from rxn_network.utils import limited_powerset
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
+from rxn_network.utils import limited_powerset
 
 
 def initialize_entry(formula, entry_set, stabilize=True):

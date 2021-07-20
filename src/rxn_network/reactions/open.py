@@ -1,10 +1,10 @@
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 import numpy as np
-
+from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.core.composition import Element
 from pymatgen.entries import Entry
-from pymatgen.analysis.phase_diagram import GrandPotPDEntry
+
 from rxn_network.reactions.computed import ComputedReaction
 
 

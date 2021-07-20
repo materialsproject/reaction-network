@@ -1,25 +1,24 @@
 " A chemical potential diagram class"
 
 from functools import cached_property
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
 import numpy as np
-from scipy.spatial import HalfspaceIntersection, ConvexHull, KDTree
-from scipy.spatial.qhull import QhullError
-from monty.json import MSONable
-
-from rxn_network.thermo.chempot_layouts import (
-    default_chempot_layout_3d,
-    default_chempot_annotation_layout,
-)
-from rxn_network.thermo.utils import simple_pca, get_centroid_2d
-
 import plotly.express as px
 import plotly.graph_objects as go
-
+from monty.json import MSONable
+from pymatgen.analysis.phase_diagram import PDPlotter, PhaseDiagram
 from pymatgen.core.composition import Composition, Element
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.util.coord import Simplex
-from pymatgen.analysis.phase_diagram import PhaseDiagram, PDPlotter
+from scipy.spatial import ConvexHull, HalfspaceIntersection, KDTree
+from scipy.spatial.qhull import QhullError
+
+from rxn_network.thermo.chempot_layouts import (
+    default_chempot_annotation_layout,
+    default_chempot_layout_3d,
+)
+from rxn_network.thermo.utils import get_centroid_2d, simple_pca
 
 
 class ChempotDiagram(MSONable):

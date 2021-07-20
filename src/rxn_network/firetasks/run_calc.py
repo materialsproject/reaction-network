@@ -1,15 +1,15 @@
 " Firetasks for running enumeration and network calculations."
 
 import json
+
+from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.json import MontyEncoder
 from monty.serialization import dumpfn
-
-from fireworks import explicit_serialize, FiretaskBase, FWAction
 from pymatgen.core import Composition
-from rxn_network.firetasks.utils import get_logger, env_chk
-from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.reactions.reaction_set import ReactionSet
 
+from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.firetasks.utils import env_chk, get_logger
+from rxn_network.reactions.reaction_set import ReactionSet
 
 logger = get_logger(__name__)
 
@@ -42,6 +42,7 @@ class RunEnumerators(FiretaskBase):
         chemsys = "-".join(sorted(list(entries.chemsys)))
         target = enumerators[0].target
         added_elems = None
+
         if target:
             added_elems = entries.chemsys - {
                 str(e) for e in Composition(target).elements

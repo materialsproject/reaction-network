@@ -1,7 +1,7 @@
 """ Test for BasicReaction. Some tests adapted from pymatgen. """
 import pytest
-
 from pymatgen.core.composition import Composition
+
 from rxn_network.reactions.basic import BasicReaction
 
 

@@ -1,10 +1,10 @@
 " A ComputedReaction class to generate from ComputedEntry objects "
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 import numpy as np
+from pymatgen.analysis.phase_diagram import GrandPotPDEntry, PDEntry
 from pymatgen.core.composition import Element
 from pymatgen.entries import Entry
-from pymatgen.analysis.phase_diagram import PDEntry, GrandPotPDEntry
 from uncertainties import ufloat
 
 from rxn_network.reactions.basic import BasicReaction

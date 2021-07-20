@@ -1,7 +1,7 @@
-import graphistry
-import pyintergraph
-import networkx as nx
 import graph_tool.all as gt
+import graphistry
+import networkx as nx
+import pyintergraph
 
 
 def plot_network(g):

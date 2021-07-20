@@ -1,16 +1,17 @@
 " An entry set class for acquiring entries with Gibbs formation energies"
-from monty.json import MSONable, MontyDecoder
 from typing import List, Optional, Union
-from tqdm.auto import tqdm
 
+from monty.json import MontyDecoder, MSONable
+from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core import Composition
-from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.entries.computed_entries import (
     ComputedEntry,
     ComputedStructureEntry,
     ConstantEnergyAdjustment,
 )
-from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.entries.entry_tools import EntrySet
+from tqdm.auto import tqdm
+
 from rxn_network.entries.gibbs import GibbsComputedEntry
 from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd

@@ -45,7 +45,8 @@ def get_logger(
     """
     Code borrowed from the atomate package.
 
-    Helper method for acquiring logger."""
+    Helper method for acquiring logger.
+    """
 
     logger = logging.getLogger(name)
     logger.setLevel(level)

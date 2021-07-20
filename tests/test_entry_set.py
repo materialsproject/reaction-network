@@ -2,13 +2,11 @@
 from pathlib import Path
 
 import pytest
-from pytest import approx
-
 from monty.serialization import loadfn
 from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pytest import approx
 
 from rxn_network.entries.entry_set import GibbsEntrySet
-
 
 TEST_FILES_PATH = Path(__file__).parent / "test_files"
 

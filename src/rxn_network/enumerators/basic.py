@@ -1,26 +1,25 @@
-from typing import List, Optional
 from itertools import chain, combinations, compress, groupby, product
 from math import comb
+from typing import List, Optional
+
 import numpy as np
+from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.core.composition import Composition
+from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm.auto import tqdm
 
-from pymatgen.analysis.phase_diagram import PhaseDiagram
-from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.core.composition import Composition
-
-from rxn_network.core import Enumerator, Calculator, Reaction
-from rxn_network.reactions import ComputedReaction
+from rxn_network.core import Calculator, Enumerator, Reaction
+from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import (
-    initialize_entry,
-    initialize_open_entries,
-    initialize_calculators,
     apply_calculators,
     filter_entries_by_chemsys,
     get_total_chemsys,
     group_by_chemsys,
+    initialize_calculators,
+    initialize_entry,
+    initialize_open_entries,
 )
-
-from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.reactions import ComputedReaction
 from rxn_network.thermo.chempot_diagram import ChempotDiagram
 from rxn_network.utils import limited_powerset
 
@@ -63,6 +62,9 @@ class BasicEnumerator(Enumerator):
         self.n = n
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
+        self.stabilize=False
+        if "ChempotDistanceCalculator" in self.calculators:
+            self.stabilize=True
 
     def enumerate(
         self,
@@ -83,14 +85,14 @@ class BasicEnumerator(Enumerator):
 
         target = None
         if self.target:
-            target = initialize_entry(self.target, entries, stabilize=False)
+            target = initialize_entry(self.target, entries, self.stabilize)
             entries.add(target)
             target_elems = {str(elem) for elem in target.composition.elements}
 
         precursors = None
         if self.precursors:
             precursors = {
-                initialize_entry(f, entries, stabilize=False) for f in self.precursors
+                initialize_entry(f, entries, self.stabilize) for f in self.precursors
             }
             for p in precursors:
                 if p not in entries:
@@ -99,7 +101,7 @@ class BasicEnumerator(Enumerator):
                 str(elem) for p in precursors for elem in p.composition.elements
             }
 
-        if "ChempotDistanceCalculator" in self.calculators:
+        if self.stabilize:
             entries = entries.filter_by_stability(e_above_hull=0.0)
             self.logger.info(
                 "Filtering by stable entries due to use of " "ChempotDistanceCalculator"
@@ -141,6 +143,10 @@ class BasicEnumerator(Enumerator):
         return sum([comb(len(entries), i) for i in range(self.n)]) ** 2
 
     def _get_rxns(self, rxn_iter, precursors, target, calculators, open=[]):
+        """
+        Returns reactions from an iterable representing the combination of 2 sets
+        of phases
+        """
         rxns = []
         open = set(open)
         for reactants, products in rxn_iter:

@@ -1,13 +1,15 @@
-from tqdm.notebook import tqdm
-import numpy as np
 from itertools import chain, combinations, compress, groupby, product
+
+import numpy as np
+from scipy.special import comb
+from tqdm.notebook import tqdm
+
 from rxn_network.core import Pathway, Reaction, Solver
 from rxn_network.enumerators.basic import BasicEnumerator
-from rxn_network.utils import grouper
-from rxn_network.pathways.utils import balance_path_arrays
 from rxn_network.pathways.balanced import BalancedPathway
+from rxn_network.pathways.utils import balance_path_arrays
 from rxn_network.reactions.computed import ComputedReaction
-from scipy.special import comb
+from rxn_network.utils import grouper
 
 
 class PathwaySolver(Solver):
@@ -31,6 +33,13 @@ class PathwaySolver(Solver):
 
         reactions = self.reactions.copy()
         costs = self.costs.copy()
+
+        if not net_rxn.balanced:
+            raise ValueError(
+                "Net reaction must be balanceable to find all reaction pathways."
+            )
+
+        self.logger.info(f"NET RXN: {net_rxn} \n")
 
         if find_intermediate_rxns:
             self.logger.info("Identifying reactions between intermediates...")
@@ -106,7 +115,7 @@ class PathwaySolver(Solver):
 
         return sorted(list(set(filtered_paths)), key=lambda p: p.average_cost)
 
-    def _find_intermediate_rxns(self, precursors, targets):
+    def _find_intermediate_rxns(self, precursors, targets, energy_cutoff=0.05):
         rxns = []
         intermediates = {e for rxn in self.reactions for e in rxn.entries}
         intermediates = intermediates - set(precursors) - set(targets)
@@ -117,11 +126,15 @@ class PathwaySolver(Solver):
             rxns = be.enumerate(self.entries)
         else:
             for target in targets:
+                self.logger.info(f"Finding intermediate reactions to "
+                                 f"{target.composition.reduced_formula}...")
                 be = BasicEnumerator(
                     precursors=intermediate_formulas,
                     target=target.composition.reduced_formula,
                 )
-                rxns.extend(be.enumerate(self.entries))
+                int_rxns = be.enumerate(self.entries)
+                rxns.extend([rxn for rxn in int_rxns if rxn.energy_per_atom <
+                             energy_cutoff])
 
         return rxns
 

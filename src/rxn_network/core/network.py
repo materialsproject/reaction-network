@@ -1,9 +1,12 @@
 " Basic interface for a reaction Network "
 import logging
 from abc import ABCMeta, abstractmethod
-from monty.json import MSONable
 from typing import List
+
+from monty.json import MSONable
 from pymatgen.entries import Entry
+
+from rxn_network.core.pathway import Pathway
 
 
 class Network(MSONable, metaclass=ABCMeta):
@@ -22,3 +25,16 @@ class Network(MSONable, metaclass=ABCMeta):
     @abstractmethod
     def build(self):
         "Construct the network from the supplied enumerators"
+
+    @abstractmethod
+    def find_pathways(self) -> List[Pathway]:
+        "Find reaction pathways"
+
+    @abstractmethod
+    def set_precursors(self):
+        "Set the phases used as precursors in the network"
+
+    @abstractmethod
+    def set_target(self):
+        "Set the phase used as a target in the network"
+

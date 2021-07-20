@@ -1,5 +1,6 @@
-from typing import List, Dict, Optional
 from functools import lru_cache
+from typing import Dict, List, Optional
+
 import numpy as np
 from monty.json import MSONable
 from pymatgen.core import Element
