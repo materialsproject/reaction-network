@@ -1,5 +1,7 @@
+" Basic interface for a pathway Solver "
 from abc import ABCMeta, abstractmethod
 from typing import List
+import logging
 from monty.json import MSONable
 from rxn_network.pathways.balanced import BalancedPathway
 

@@ -276,7 +276,8 @@ class GibbsComputedEntry(ComputedEntry):
 
     def __repr__(self):
         output = [
-            f"GibbsComputedEntry | {self.entry_id} | {self.composition.formula}",
+            f"GibbsComputedEntry | {self.entry_id} | {self.composition.formula} "
+            f"({self.composition.reduced_formula})",
             f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
         ]
         return "\n".join(output)

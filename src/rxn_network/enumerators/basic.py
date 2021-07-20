@@ -98,7 +98,6 @@ class BasicEnumerator(Enumerator):
                 str(elem) for p in precursors for elem in p.composition.elements
             }
 
-
         if "ChempotDistanceCalculator" in self.calculators:
             entries = entries.filter_by_stability(e_above_hull=0.0)
             self.logger.info(
@@ -148,19 +147,10 @@ class BasicEnumerator(Enumerator):
             p = set(products)
             all_phases = r | p | open
 
-            t = {e.composition.reduced_formula for e in r}
-            if t == {"LiMnO2","YClO"}:
-                print({e.composition.reduced_formula for e in p})
             if r & p:  # do not allow repeated phases
                 continue
             if target and target not in all_phases:
                 continue
-            if precursors and not r.issubset(precursors):
-                continue
-
-            if t == {"LiMnO2","YClO"}:
-                print(r)
-
 
             forward_rxn = ComputedReaction.balance(r, p)
 

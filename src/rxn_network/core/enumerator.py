@@ -1,5 +1,7 @@
+" Basic interface for a reaction Enumerator "
 from abc import ABCMeta, abstractmethod
 from typing import List
+import logging
 from monty.json import MSONable
 from rxn_network.core.reaction import Reaction
 

@@ -36,7 +36,6 @@ class PathwaySolver(Solver):
                     reactions.append(r)
                     costs.append(c)
 
-        self.logger
         paths = []
         for n in range(1, max_num_combos + 1):
             total = int(comb(len(reactions), n) / self.BATCH_SIZE)+1

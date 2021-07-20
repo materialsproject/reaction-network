@@ -1,3 +1,4 @@
+" Basic interface for a reaction Network "
 import logging
 from abc import ABCMeta, abstractmethod
 from monty.json import MSONable
