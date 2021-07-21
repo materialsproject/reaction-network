@@ -1,5 +1,4 @@
 " A calculator class for determining chemical potential distance of reactions "
-
 from itertools import product
 from typing import List, Optional
 

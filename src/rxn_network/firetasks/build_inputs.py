@@ -1,5 +1,4 @@
 " Firetasks for acquiring ComputedEntry data from MPRester or another materials MongoDB"
-
 import datetime
 import itertools
 import json

@@ -253,10 +253,10 @@ class BasicOpenEnumerator(BasicEnumerator):
                 str(elem) for p in precursors for elem in p.composition.elements
             }
 
-        if "ChempotDistanceCalculator" in self.calculators:
+        if self.stabilize:
             entries = entries.filter_by_stability(e_above_hull=0.0)
             self.logger.info(
-                "Filtering by stable entries due to use of 'ChempotDistanceCalculator'"
+                "Filtering by stable entries due to use of " "ChempotDistanceCalculator"
             )
 
         combos = [set(c) for c in limited_powerset(entries, self.n)]

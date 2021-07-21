@@ -1,5 +1,4 @@
 " Firetasks for running enumeration and network calculations."
-
 import json
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
