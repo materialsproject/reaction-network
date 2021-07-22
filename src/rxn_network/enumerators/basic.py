@@ -62,9 +62,9 @@ class BasicEnumerator(Enumerator):
         self.n = n
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
-        self.stabilize=False
+        self.stabilize = False
         if "ChempotDistanceCalculator" in self.calculators:
-            self.stabilize=True
+            self.stabilize = True
 
     def enumerate(
         self,
@@ -278,8 +278,10 @@ class BasicOpenEnumerator(BasicEnumerator):
         combos_dict = group_by_chemsys(combos)
         combos_open_dict = group_by_chemsys(combos_with_open)
 
+        pbar = tqdm(combos_dict.items(), desc="BasicOpenEnumerator")
         rxns = []
-        for chemsys, selected_combos in tqdm(combos_dict.items()):
+        for chemsys, selected_combos in pbar:
+            pbar.set_description(f"{chemsys}")
             elems = chemsys.split("-")
             if chemsys not in combos_open_dict:
                 continue

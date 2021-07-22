@@ -84,6 +84,10 @@ class NISTReferenceEntry(Entry):
         " Uncertainty of NIST-JANAF data is not supplied."
         return 0
 
+    @property
+    def is_experimental(self) -> bool:
+        return True
+
     def as_dict(self) -> dict:
         " Returns an MSONable dict. "
         data = super().as_dict()

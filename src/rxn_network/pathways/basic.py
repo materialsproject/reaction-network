@@ -66,3 +66,7 @@ class BasicPathway(Pathway):
     @property
     def total_cost(self):
         return sum(self.costs)
+
+    @property
+    def is_experimental(self):
+        return all([e.is_experimental for e in self.entries])

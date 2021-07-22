@@ -250,6 +250,10 @@ class GibbsComputedEntry(ComputedEntry):
         )
         return entry
 
+    @property
+    def is_experimental(self):
+        return bool(self.data.get("icsd_ids"))
+
     def as_dict(self) -> dict:
         " Returns an MSONable dict. "
         data = super().as_dict()

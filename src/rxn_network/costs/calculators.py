@@ -1,5 +1,5 @@
 " A calculator class for determining chemical potential distance of reactions "
-from itertools import product
+from itertools import product, chain, combinations
 from typing import List, Optional
 
 import numpy as np
@@ -35,7 +35,7 @@ class ChempotDistanceCalculator(Calculator):
         self.name = name
 
         if mu_func == "max":
-            self._mu_func = max
+            self._mu_func = np.max
         elif mu_func == "mean":
             self._mu_func = np.mean
         elif mu_func == "sum":
@@ -52,12 +52,14 @@ class ChempotDistanceCalculator(Calculator):
         Returns:
             The chemical potential distance of the reaction.
         """
+        combos = chain(product(rxn.reactant_entries, rxn.product_entries),
+                       combinations(rxn.product_entries, 2))
         distances = [
             self.cpd.shortest_domain_distance(
                 combo[0].composition.reduced_formula,
                 combo[1].composition.reduced_formula,
             )
-            for combo in product(rxn.reactant_entries, rxn.product_entries)
+            for combo in combos
         ]
 
         distance = self._mu_func(distances)

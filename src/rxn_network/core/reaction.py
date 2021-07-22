@@ -53,7 +53,7 @@ class Reaction(MSONable, metaclass=ABCMeta):
         )
 
     @abstractproperty
-    def energy(self):
+    def energy(self) -> float:
         " The energy of this reaction in total eV "
 
     @property

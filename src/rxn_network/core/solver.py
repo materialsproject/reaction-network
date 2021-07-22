@@ -5,11 +5,14 @@ from typing import List
 
 from monty.json import MSONable
 
+from pymatgen.entries.entry_tools import EntrySet
 from rxn_network.core.pathway import Pathway
+from rxn_network.core.reaction import Reaction
 
 
 class Solver(MSONable, metaclass=ABCMeta):
     " Base definition for a pathway solver class. "
+
     def __init__(self, entries, pathways):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
@@ -27,25 +30,25 @@ class Solver(MSONable, metaclass=ABCMeta):
         "Solve paths"
 
     @property
-    def entries(self):
+    def entries(self) -> EntrySet:
         return self._entries
 
     @property
-    def pathways(self):
+    def pathways(self) -> List[Pathway]:
         return self._pathways
 
     @property
-    def reactions(self):
+    def reactions(self) -> List[Reaction]:
         return self._reactions
 
     @property
-    def costs(self):
+    def costs(self) -> List[float]:
         return self._costs
 
     @property
-    def num_rxns(self):
+    def num_rxns(self) -> int:
         return len(self.reactions)
 
     @property
-    def num_entries(self):
+    def num_entries(self) -> int:
         return len(self._entries)

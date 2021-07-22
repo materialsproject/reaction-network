@@ -1,32 +1,47 @@
 from itertools import chain, combinations, compress, groupby, product
 
+from typing import List
+
 import numpy as np
 from scipy.special import comb
 from tqdm.notebook import tqdm
 
-from rxn_network.core import Pathway, Reaction, Solver
-from rxn_network.enumerators.basic import BasicEnumerator
+from pymatgen.entries.entry_tools import EntrySet
+from rxn_network.core import CostFunction, Pathway, Reaction, Solver
+from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.utils import balance_path_arrays
 from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import grouper
 
 
 class PathwaySolver(Solver):
     BATCH_SIZE = 500000
 
-    def __init__(self, entries, pathways, cost_function):
+    def __init__(
+        self,
+        entries: EntrySet,
+        pathways: List[Pathway],
+        cost_function: CostFunction,
+        open_elem: str = None,
+        chempot: float = None,
+    ):
 
         super().__init__(entries=entries, pathways=pathways)
         self.cost_function = cost_function
+        self.open_elem = open_elem
+        self.chempot = chempot
 
     def solve(
         self,
-        net_rxn,
-        max_num_combos=4,
-        find_intermediate_rxns=True,
-        filter_interdependent=True,
+        net_rxn: Reaction,
+        max_num_combos: int = 4,
+        find_intermediate_rxns: bool = True,
+        intermediate_rxn_energy_cutoff: float = 0.0,
+        filter_interdependent: bool = True,
     ):
+
         entries = list(self.entries)
         precursors = net_rxn.reactant_entries
         targets = net_rxn.product_entries
@@ -43,7 +58,7 @@ class PathwaySolver(Solver):
 
         if find_intermediate_rxns:
             self.logger.info("Identifying reactions between intermediates...")
-            intermediate_rxns = self._find_intermediate_rxns(precursors, targets)
+            intermediate_rxns = self._find_intermediate_rxns(precursors, targets, intermediate_rxn_energy_cutoff)
             intermediate_costs = [
                 self.cost_function.evaluate(r) for r in intermediate_rxns
             ]
@@ -59,7 +74,7 @@ class PathwaySolver(Solver):
 
             pbar = groups
             if n >= 4:
-                self.logger.info(f"Generating and filtering size {n} pathways...")
+                self.logger.info(f"Solving for balanced pathways of size {n} ...")
                 pbar = tqdm(groups, total=total, desc="PathwaySolver")
 
             all_c_mats, all_m_mats = [], []
@@ -113,9 +128,10 @@ class PathwaySolver(Solver):
         else:
             filtered_paths = paths
 
-        return sorted(list(set(filtered_paths)), key=lambda p: p.average_cost)
+        filtered_paths = sorted(list(set(filtered_paths)), key=lambda p: p.average_cost)
+        return filtered_paths
 
-    def _find_intermediate_rxns(self, precursors, targets, energy_cutoff=0.05):
+    def _find_intermediate_rxns(self, precursors, targets, energy_cutoff):
         rxns = []
         intermediates = {e for rxn in self.reactions for e in rxn.entries}
         intermediates = intermediates - set(precursors) - set(targets)
@@ -126,15 +142,32 @@ class PathwaySolver(Solver):
             rxns = be.enumerate(self.entries)
         else:
             for target in targets:
-                self.logger.info(f"Finding intermediate reactions to "
-                                 f"{target.composition.reduced_formula}...")
+                self.logger.info(
+                    f"Finding intermediate reactions to "
+                    f"{target.composition.reduced_formula}..."
+                )
                 be = BasicEnumerator(
                     precursors=intermediate_formulas,
                     target=target.composition.reduced_formula,
                 )
                 int_rxns = be.enumerate(self.entries)
-                rxns.extend([rxn for rxn in int_rxns if rxn.energy_per_atom <
-                             energy_cutoff])
+                rxns.extend(int_rxns)
+
+                if self.open_elem:
+                    boe = BasicOpenEnumerator(
+                        open_entries=[self.open_elem],
+                        precursors=intermediate_formulas,
+                        target=target.composition.reduced_formula,
+                    )
+
+                    int_rxns_open = boe.enumerate(self.entries)
+                    rxns.extend(int_rxns_open)
+
+        rxns = ReactionSet.from_rxns(rxns, self.entries).get_rxns(
+            open_elem=self.open_elem, chempot=self.chempot
+        )
+        rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxns))
+        self.logger.info(f"Found {len(rxns)} intermediate reactions!")
 
         return rxns
 

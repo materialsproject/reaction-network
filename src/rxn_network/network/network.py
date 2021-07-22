@@ -11,6 +11,8 @@ from rxn_network.network.adaptors.gt import (
     update_vertex_props,
     yens_ksp,
 )
+
+from rxn_network.core import CostFunction, Enumerator
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.utils import get_loopback_edges, get_rxn_nodes_and_edges
 from rxn_network.pathways.basic import BasicPathway
@@ -27,10 +29,10 @@ class ReactionNetwork(Network):
     def __init__(
         self,
         entries: GibbsEntrySet,
-        enumerators,
-        cost_function,
-        open_elem=None,
-        chempot=None,
+        enumerators: List[Enumerator],
+        cost_function: CostFunction,
+        open_elem: str = None,
+        chempot: float = None,
     ):
         super().__init__(
             entries=entries, enumerators=enumerators, cost_function=cost_function
@@ -48,6 +50,7 @@ class ReactionNetwork(Network):
         costs = rxn_set.calculate_costs(self.cost_function)
         rxns = rxn_set.get_rxns(self.open_elem, self.chempot)
 
+        self.logger.info("Building graph from reactions...")
         nodes, rxn_edges = get_rxn_nodes_and_edges(rxns)
 
         g = initialize_graph()
@@ -62,8 +65,7 @@ class ReactionNetwork(Network):
             v2 = g.vertex(edge[1])
             edge_list.append((v1, v2, cost, rxn, "reaction"))
 
-        loopback_edges = get_loopback_edges(g, nodes)
-        edge_list.extend(loopback_edges)
+        edge_list.extend(get_loopback_edges(g, nodes))
 
         g.add_edge_list(edge_list, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
 
@@ -109,8 +111,9 @@ class ReactionNetwork(Network):
         if precursors == self.precursors:
             return
         elif self.precursors:
-            precursors_v = gt.find_vertex(g, g.vp["type"],
-                                          NetworkEntryType.Precursors.value)[0]
+            precursors_v = gt.find_vertex(
+                g, g.vp["type"], NetworkEntryType.Precursors.value
+            )[0]
             g.remove_vertex(precursors_v)
             loopback_edges = gt.find_edge(g, g.ep["type"], "loopback_precursors")
             for e in loopback_edges:
@@ -156,7 +159,7 @@ class ReactionNetwork(Network):
         g = self._g
         if target == self.target:
             return
-        elif self.target or target==None:
+        elif self.target or target == None:
             target_v = gt.find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
             g.remove_vertex(target_v)
 

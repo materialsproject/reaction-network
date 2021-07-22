@@ -2,6 +2,14 @@ from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 
 
 def get_rxn_nodes_and_edges(rxns):
+    """
+
+    Args:
+        rxns:
+
+    Returns:
+
+    """
     nodes, edges = [], []
 
     for rxn in rxns:
@@ -26,6 +34,15 @@ def get_rxn_nodes_and_edges(rxns):
 
 
 def get_loopback_edges(g, nodes):
+    """
+
+    Args:
+        g:
+        nodes:
+
+    Returns:
+
+    """
     edges = []
     for idx1, p in enumerate(nodes):
         if p.description.value != NetworkEntryType.Products.value:
