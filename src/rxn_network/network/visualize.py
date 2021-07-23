@@ -6,23 +6,27 @@ import numpy as np
 import matplotlib.cm
 
 
-def plot_network(graph, vertex_cmap="jet", edge_cmap="PuBuGn_r",
-                 output=None, cost_pos_scale_factor=10):
+def plot_network(
+    graph,
+    vertex_cmap="jet",
+    edge_cmap="PuBuGn_r",
+    output=None,
+    cost_pos_scale_factor=10,
+):
     g = graph.copy()
 
     costs = np.array(g.ep["cost"].get_array().tolist())
 
-    edge_weights= gt.prop_to_size(g.new_edge_property("float",
-                                                      cost_pos_scale_factor*costs),
-                                  mi=0.1,
-                                  ma=30)
+    edge_weights = gt.prop_to_size(
+        g.new_edge_property("float", cost_pos_scale_factor * costs), mi=0.1, ma=30
+    )
 
     deg = gt.prop_to_size(g.degree_property_map("total"), mi=0.1, ma=15)
     layout = gt.sfdp_layout(g, vweight=deg, eweight=edge_weights)
 
-    chemsys_names = [g.vp["entry"][v].chemsys for v in  g.vertices()]
+    chemsys_names = [g.vp["entry"][v].chemsys for v in g.vertices()]
 
-    edge_width = [1.2 if g.ep["cost"][e] !=0 else 0.1 for e in g.edges()]
+    edge_width = [1.2 if g.ep["cost"][e] != 0 else 0.1 for e in g.edges()]
     edge_width = g.new_edge_property("float", edge_width)
 
     color_func_v = _get_cmap_string(vertex_cmap, domain=sorted(chemsys_names))
@@ -30,8 +34,8 @@ def plot_network(graph, vertex_cmap="jet", edge_cmap="PuBuGn_r",
     vertex_colors = g.new_vertex_property("vector<float>", vertex_colors)
 
     avg_cost = np.mean(costs)
-    vmin = avg_cost - 0.8*avg_cost
-    vmax = avg_cost + 0.8*avg_cost
+    vmin = avg_cost - 0.8 * avg_cost
+    vmax = avg_cost + 0.8 * avg_cost
     norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
     edge_cmap = matplotlib.cm.get_cmap(edge_cmap)
     edge_cmap = matplotlib.cm.ScalarMappable(norm=norm, cmap=edge_cmap)
@@ -44,11 +48,16 @@ def plot_network(graph, vertex_cmap="jet", edge_cmap="PuBuGn_r",
         d = np.sqrt(sum((layout[e.source()].a - layout[e.target()].a) ** 2)) / 20
         control[e] = [0.0, 0.0, 0.3, d, 0.7, d, 1.0, 0.0]
 
-    return gt.graph_draw(g, pos=layout, vertex_fill_color=vertex_colors,
-                         edge_color=edge_colors, edge_pen_width=edge_width,
-                         vertex_size=deg,
-                         edge_control_points=control,
-                         output=output)
+    return gt.graph_draw(
+        g,
+        pos=layout,
+        vertex_fill_color=vertex_colors,
+        edge_color=edge_colors,
+        edge_pen_width=edge_width,
+        vertex_size=deg,
+        edge_control_points=control,
+        output=output,
+    )
 
 
 def plot_network_on_graphistry(graph):

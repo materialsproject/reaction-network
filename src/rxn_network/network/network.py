@@ -1,6 +1,6 @@
 "Implementation of reaction network interface"
 import logging
-from typing import List
+from typing import List, Optional
 
 import graph_tool.all as gt
 
@@ -31,9 +31,21 @@ class ReactionNetwork(Network):
         entries: GibbsEntrySet,
         enumerators: List[Enumerator],
         cost_function: CostFunction,
-        open_elem: str = None,
-        chempot: float = None,
+        open_elem: Optional[str] = None,
+        chempot: Optional[float] = None,
     ):
+        """
+        Initialize a ReactionNetwork object for a set of entires, enumerator,
+        and cost function. The network can be constructed by calling build().
+
+        Args:
+            entries: iterable of entry-like objects
+            enumerators: iterable of enumerators which will be called during the
+                build of the network
+            cost_function: the function used to calculate the cost of each reaction edge
+            open_elem: Optional name of an element that is kept open during reaction
+            chempot: Optional associated chemical potential of open element
+        """
         super().__init__(
             entries=entries, enumerators=enumerators, cost_function=cost_function
         )
@@ -42,8 +54,11 @@ class ReactionNetwork(Network):
 
     def build(self):
         """
+        Construct the reaction network graph object and store under the "graph"
+        attribute. Does NOT initialize precursors or target; you must call set_precursors() or
+        set_target() to do so.
 
-        Returns:
+        Returns: None
 
         """
         rxn_set = self._get_rxns()
@@ -71,15 +86,17 @@ class ReactionNetwork(Network):
 
         self._g = g
 
-    def find_pathways(self, targets, k=15):
+    def find_pathways(self, targets: List[str], k: float = 15) -> List[BasicPathway]:
         """
 
+        Find the k-shortest paths to a provided list of 1 or more targets.
+
         Args:
-            targets:
-            k:
+            targets: List of the formulas of each target
+            k: Number of shortest paths to find for each target
 
         Returns:
-
+            List of BasicPathway objects to all provided targets.
         """
         if not self.precursors:
             raise AttributeError("Must call set_precursors() before pathfinding!")

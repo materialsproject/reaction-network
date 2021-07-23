@@ -142,8 +142,9 @@ class OpenComputedReaction(ComputedReaction):
 
     @property
     def total_chemical_system(self):
-        return "-".join(sorted([str(e) for e in set(self.elements) | set(
-            self.open_elems)]))
+        return "-".join(
+            sorted([str(e) for e in set(self.elements) | set(self.open_elems)])
+        )
 
     def __repr__(self):
         cp = f"({','.join([f'mu_{e}={m}' for e, m in self.chempots.items()])})"

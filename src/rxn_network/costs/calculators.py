@@ -52,8 +52,10 @@ class ChempotDistanceCalculator(Calculator):
         Returns:
             The chemical potential distance of the reaction.
         """
-        combos = chain(product(rxn.reactant_entries, rxn.product_entries),
-                       combinations(rxn.product_entries, 2))
+        combos = chain(
+            product(rxn.reactant_entries, rxn.product_entries),
+            combinations(rxn.product_entries, 2),
+        )
         distances = [
             self.cpd.shortest_domain_distance(
                 combo[0].composition.reduced_formula,

@@ -58,7 +58,9 @@ class PathwaySolver(Solver):
 
         if find_intermediate_rxns:
             self.logger.info("Identifying reactions between intermediates...")
-            intermediate_rxns = self._find_intermediate_rxns(precursors, targets, intermediate_rxn_energy_cutoff)
+            intermediate_rxns = self._find_intermediate_rxns(
+                precursors, targets, intermediate_rxn_energy_cutoff
+            )
             intermediate_costs = [
                 self.cost_function.evaluate(r) for r in intermediate_rxns
             ]
