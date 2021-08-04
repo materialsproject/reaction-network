@@ -18,15 +18,15 @@ def plot_network(
     costs = np.array(g.ep["cost"].get_array().tolist())
 
     edge_weights = gt.prop_to_size(
-        g.new_edge_property("float", cost_pos_scale_factor * costs), mi=0.1, ma=30
+        g.new_edge_property("float", cost_pos_scale_factor * costs), mi=0.1, ma=35
     )
 
-    deg = gt.prop_to_size(g.degree_property_map("total"), mi=0.1, ma=15)
+    deg = gt.prop_to_size(g.degree_property_map("total"), mi=0.5, ma=22)
     layout = gt.sfdp_layout(g, vweight=deg, eweight=edge_weights)
 
     chemsys_names = [g.vp["entry"][v].chemsys for v in g.vertices()]
 
-    edge_width = [1.2 if g.ep["cost"][e] != 0 else 0.1 for e in g.edges()]
+    edge_width = [1.4 if g.ep["cost"][e] != 0 else 0.1 for e in g.edges()]
     edge_width = g.new_edge_property("float", edge_width)
 
     color_func_v = _get_cmap_string(vertex_cmap, domain=sorted(chemsys_names))
