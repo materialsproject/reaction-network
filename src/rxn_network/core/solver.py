@@ -19,11 +19,18 @@ class Solver(MSONable, metaclass=ABCMeta):
 
         self._entries = entries
         self._pathways = pathways
-        self._reactions = list(
-            {rxn for path in self._pathways for rxn in path.reactions}
-        )
 
-        self._costs = [cost for path in self._pathways for cost in path.costs]
+        rxns = []
+        costs = []
+
+        for path in self._pathways:
+            for rxn, cost in zip(path.reactions, path.costs):
+                if rxn not in rxns:
+                    rxns.append(rxn)
+                    costs.append(cost)
+
+        self._reactions = rxns
+        self._costs = costs
 
     @abstractmethod
     def solve(self, net_rxn) -> List[Pathway]:

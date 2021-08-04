@@ -2,7 +2,7 @@
 import logging
 from typing import List, Optional
 
-import graph_tool.all as gt
+from graph_tool.util import find_vertex, find_edge
 
 from rxn_network.core import Network
 from rxn_network.entries.entry_set import GibbsEntrySet
@@ -128,11 +128,11 @@ class ReactionNetwork(Network):
         if precursors == self.precursors:
             return
         elif self.precursors:
-            precursors_v = gt.find_vertex(
+            precursors_v = find_vertex(
                 g, g.vp["type"], NetworkEntryType.Precursors.value
             )[0]
             g.remove_vertex(precursors_v)
-            loopback_edges = gt.find_edge(g, g.ep["type"], "loopback_precursors")
+            loopback_edges = find_edge(g, g.ep["type"], "loopback_precursors")
             for e in loopback_edges:
                 g.remove_edge(e)
         elif not all([p in self.entries for p in precursors]):
@@ -177,7 +177,8 @@ class ReactionNetwork(Network):
         if target == self.target:
             return
         elif self.target or target == None:
-            target_v = gt.find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
+            target_v = find_vertex(g, g.vp["type"],
+                                       NetworkEntryType.Target.value)[0]
             g.remove_vertex(target_v)
 
         target_v = g.add_vertex()
@@ -204,10 +205,11 @@ class ReactionNetwork(Network):
         g = self._g
         paths = []
 
-        precursors_v = gt.find_vertex(
+        precursors_v = find_vertex(
             g, g.vp["type"], NetworkEntryType.Precursors.value
         )[0]
-        target_v = gt.find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
+        target_v = find_vertex(g, g.vp["type"],
+                                       NetworkEntryType.Target.value)[0]
 
         for path in yens_ksp(g, k, precursors_v, target_v):
             paths.append(BasicPathway.from_graph_path(g, path))

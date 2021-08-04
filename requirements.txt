@@ -1,4 +1,3 @@
-dask==2021.4.0
 fireworks==1.9.7
 maggma>=0.26.0
 numba==0.53.1
