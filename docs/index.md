@@ -1,43 +1,50 @@
-<img alt="Reaction Network" src="images/logo.png" width="600">
+# ![Reaction Network](images/logo.png)
 
-Reaction network (rxn-network) is a Python package for predicting chemical reaction pathways in solid-state materials synthesis using graph networks.
+Reaction network (rxn-network) is a Python package for predicting chemical reaction
+pathways in solid-state materials synthesis using graph theory.
 
-## Manuscript & Results
-This version/release of the rxn-network package was used in the accompanying manuscript, which is under review at Nature Communciations:
+# Installing rxn-network
 
-McDermott, M.J., Dwaraknath, S.S., and Persson, K.A. (2021). A graph-based network for predicting chemical reaction pathways in solid-state materials synthesis.
+The rxn-network package has several dependencies, most of which can be installed
+through PyPI. However, graph-tool must be installed through a more customized method;
+please see https://graph-tool.skewed.de/ for more details. We recommend the
+following installation procedure to create a new conda environment:
 
-This version of the repository includes results from the paper in the _results_ folder.
+    conda create -n gt python=3.9
 
-##### Note: This code is in active development, and edits to the the code will be available here as new releases in the future.
-
-## Installing rxn-network
-
-The rxn-network package has several software dependencies (see the *requirements.txt* file), most of which can be installed in less than a minute through PyPI. Note that graph-tool must be installed through a more customized method; please see https://graph-tool.skewed.de/ for more details, particularly if using a Windows based machine. 
-
-We recommend the following installation procedure for those using an OSX or Linux based machine. First create a new conda environment (here named *gt*) and activate it:
-
-    conda create -n gt python=3.8
-    conda activate gt
-
-And then install graph-tool through conda-forge (this may take 1-2 minutes):
+And then install graph-tool through conda-forge:
 
     conda install -c conda-forge graph-tool
 
-Then simply download (clone) the reaction-network code from this repository, navigate to its directory and run the following commands to install the requirements and an (editable) version of the package:
+To install an editable version of the rxn-network code, simply download (clone) the
+code from this repository, navigate to its directory in terminal, and then run the
+following command to install the requirements:
 
     pip install -r requirements.txt
+
+And then to finally install an editable version of the package:
+
     pip install -e .
 
-## Demo
-A demo Jupyter notebook (demo.ipynb) contains the instructions necessary to replicate the results of the manuscript and is a good starting template for using the rxn-network package on your own systems. Simply start a Jupyter notebook server and launch the notebook file.
+# Demo
+A demo Jupyter notebook (demo.ipynb) contains the code necessary to replicate the
+results of the paper and is a good starting template for using the rxn-network package.
 
-## Contact
-For questions concerning this project, please either raise an Issue on the Github repository or contact the maintainer via email: mcdermott *[at]* lbl.gov.
+**Note: this needs to be updated!**
 
-## Acknowledgement
 
-This work was supported as part of GENESIS: A Next Generation Synthesis Center, an 
-Energy Frontier Research Center funded by the U.S. Department of Energy, Office of Science, Basic Energy Sciences under Award Number DE-SC0019212.
+# How to cite rxn-network
+
+The following paper explains the methodology of the rxn-network package:
+
+*McDermott, M. J., Dwaraknath, S. S., and Persson, K. A. (2021). A graph-based network for predicting chemical reaction pathways in solid-state materials synthesis. Nature Communications, 12(1). https://doi.org/10.1038/s41467-021-23339-x*
+
+
+
+# Acknowledgements
+
+This work was supported as part of GENESIS: A Next Generation Synthesis Center, an
+Energy Frontier Research Center funded by the U.S. Department of Energy, Office of
+Science, Basic Energy Sciences under Award Number DE-SC0019212.
 
 Learn more about the GENESIS EFRC here: https://www.stonybrook.edu/genesis/
