@@ -1,4 +1,4 @@
-dask[complete]==2.30.0
+dask[complete]==2021.7.2
 jupyter==1.0.0
 numba==0.50.1
 pymatgen==2021.2.8
