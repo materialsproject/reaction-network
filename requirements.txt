@@ -1,4 +1,4 @@
 fireworks==1.9.7
 maggma>=0.26.0
 numba==0.53.1
-pymatgen==2022.0.10
+pymatgen==2022.0.11
