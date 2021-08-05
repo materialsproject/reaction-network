@@ -28,7 +28,7 @@ setup(
     install_requires=[
         "setuptools",
         "dask[complete]>=2.30.0",
-        "jupyter==1.0.0",
+        "jupyter>=1.0.0",
         "numba>=0.50.1",
         "pymatgen>=2021.2.8",
         "tqdm>=4.56.0",
