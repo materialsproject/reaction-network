@@ -1,12 +1,11 @@
 from itertools import chain, combinations, compress, groupby, product
-
 from typing import List
 
 import numpy as np
+from pymatgen.entries.entry_tools import EntrySet
 from scipy.special import comb
 from tqdm.notebook import tqdm
 
-from pymatgen.entries.entry_tools import EntrySet
 from rxn_network.core import CostFunction, Pathway, Reaction, Solver
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.pathways.balanced import BalancedPathway

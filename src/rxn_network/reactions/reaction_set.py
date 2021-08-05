@@ -106,7 +106,7 @@ class ReactionSet(MSONable):
 
     @staticmethod
     def _get_unique_entries(rxns):
-        " Return only unique entries from reactions"
+        "Return only unique entries from reactions"
         entries = set()
         for r in rxns:
             entries.update(r.entries)

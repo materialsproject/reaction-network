@@ -61,7 +61,7 @@ class Softplus(CostFunction):
 
     @staticmethod
     def _softplus(x: float, t: float) -> float:
-        " The mathematical formula for the softplus function"
+        "The mathematical formula for the softplus function"
         return np.log(1 + (273 / t) * np.exp(x))
 
     def __repr__(self):

@@ -1,4 +1,4 @@
-from queue import PriorityQueue, Empty
+from queue import Empty, PriorityQueue
 from typing import Dict
 
 from graph_tool import Graph, GraphView, Vertex

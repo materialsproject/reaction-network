@@ -8,15 +8,15 @@ from pymatgen.core.composition import Composition, Element
 
 
 class Reaction(MSONable, metaclass=ABCMeta):
-    " Base definition for a Reaction "
+    "Base definition for a Reaction"
 
     @abstractproperty
     def reactants(self) -> List[Composition]:
-        " List of reactants for this reaction "
+        "List of reactants for this reaction"
 
     @abstractproperty
     def products(self) -> List[Composition]:
-        " List of products for this reaction "
+        "List of products for this reaction"
 
     @abstractproperty
     def coefficients(self) -> np.array:
@@ -40,7 +40,7 @@ class Reaction(MSONable, metaclass=ABCMeta):
 
     @property
     def num_atoms(self) -> float:
-        " Total number of atoms in this reaction "
+        "Total number of atoms in this reaction"
         return (
             sum(
                 [
@@ -54,9 +54,9 @@ class Reaction(MSONable, metaclass=ABCMeta):
 
     @abstractproperty
     def energy(self) -> float:
-        " The energy of this reaction in total eV "
+        "The energy of this reaction in total eV"
 
     @property
     def energy_per_atom(self) -> float:
-        " The energy per atom of this reaction in eV "
+        "The energy per atom of this reaction in eV"
         return self.energy / self.num_atoms

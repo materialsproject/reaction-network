@@ -127,7 +127,7 @@ class MinimizeGibbsEnumerator(Enumerator):
     def _react_interface(
         self, r1, r2, pd, grand_pd=None, open_entry=None, calculators=None
     ):
-        " Simple API for InterfacialReactivity module from pymatgen. "
+        "Simple API for InterfacialReactivity module from pymatgen."
         if grand_pd:
             interface = InterfacialReactivity(
                 r1,

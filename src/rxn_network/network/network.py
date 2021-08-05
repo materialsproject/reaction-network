@@ -2,17 +2,15 @@
 import logging
 from typing import List, Optional
 
-from graph_tool.util import find_vertex, find_edge
+from graph_tool.util import find_edge, find_vertex
 
-from rxn_network.core import Network
+from rxn_network.core import CostFunction, Enumerator, Network
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.network.adaptors.gt import (
     initialize_graph,
     update_vertex_props,
     yens_ksp,
 )
-
-from rxn_network.core import CostFunction, Enumerator
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.utils import get_loopback_edges, get_rxn_nodes_and_edges
 from rxn_network.pathways.basic import BasicPathway
@@ -177,8 +175,7 @@ class ReactionNetwork(Network):
         if target == self.target:
             return
         elif self.target or target == None:
-            target_v = find_vertex(g, g.vp["type"],
-                                       NetworkEntryType.Target.value)[0]
+            target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
             g.remove_vertex(target_v)
 
         target_v = g.add_vertex()
@@ -201,15 +198,14 @@ class ReactionNetwork(Network):
         self.target = target
 
     def _shortest_paths(self, k=15):
-        " Finds the k shortest paths using Yen's algorithm and returns BasicPathways"
+        "Finds the k shortest paths using Yen's algorithm and returns BasicPathways"
         g = self._g
         paths = []
 
-        precursors_v = find_vertex(
-            g, g.vp["type"], NetworkEntryType.Precursors.value
-        )[0]
-        target_v = find_vertex(g, g.vp["type"],
-                                       NetworkEntryType.Target.value)[0]
+        precursors_v = find_vertex(g, g.vp["type"], NetworkEntryType.Precursors.value)[
+            0
+        ]
+        target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
 
         for path in yens_ksp(g, k, precursors_v, target_v):
             paths.append(BasicPathway.from_graph_path(g, path))
@@ -220,7 +216,7 @@ class ReactionNetwork(Network):
         return paths
 
     def _get_rxns(self) -> ReactionSet:
-        " Gets reaction set by running all enumerators"
+        "Gets reaction set by running all enumerators"
         rxns = []
         for enumerator in self.enumerators:
             rxns.extend(enumerator.enumerate(self.entries))

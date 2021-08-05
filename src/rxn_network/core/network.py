@@ -10,7 +10,7 @@ from rxn_network.core.pathway import Pathway
 
 
 class Network(MSONable, metaclass=ABCMeta):
-    " Base definition for a reaction network "
+    "Base definition for a reaction network"
 
     def __init__(self, entries: List[Entry], enumerators, cost_function):
         self.logger = logging.getLogger(str(self.__class__.__name__))

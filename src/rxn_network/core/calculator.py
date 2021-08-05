@@ -7,7 +7,7 @@ from rxn_network.core.reaction import Reaction
 
 
 class Calculator(MSONable, metaclass=ABCMeta):
-    " Base definition for a property calculator "
+    "Base definition for a property calculator"
 
     @abstractmethod
     def calculate(self, rxn: Reaction) -> float:

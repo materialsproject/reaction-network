@@ -82,37 +82,37 @@ class BasicReaction(Reaction):
 
     @property
     def reactants(self) -> List[Composition]:
-        " List of reactants for this reaction "
+        "List of reactants for this reaction"
         return list(self.reactant_coeffs.keys())
 
     @property
     def products(self) -> List[Composition]:
-        " List of products for this reaction "
+        "List of products for this reaction"
         return list(self.product_coeffs.keys())
 
     @property
     def compositions(self) -> List[Composition]:
-        " List of composition objects for this reaction "
+        "List of composition objects for this reaction"
         return self._compositions
 
     @property
     def coefficients(self) -> np.array:  # pylint: disable = W0236
-        " Array of reaction coefficients "
+        "Array of reaction coefficients"
         return self._coefficients
 
     @property
     def energy(self) -> float:
-        " The energy of this reaction "
+        "The energy of this reaction"
         raise ValueError("No energy for a basic reaction!")
 
     @property
     def energy_per_atom(self) -> float:
-        " The energy per atom of this reaction"
+        "The energy per atom of this reaction"
         raise ValueError("No energy (per atom) for a basic reaction!")
 
     @property
     def is_identity(self):
-        " Returns True if the reaction has identical reactants and products"
+        "Returns True if the reaction has identical reactants and products"
         if set(self.reactants) != set(self.products):
             return False
         if self.balanced == False:  # if not balanced, can not check coefficients
@@ -129,7 +129,7 @@ class BasicReaction(Reaction):
         return "-".join(sorted([str(el) for el in self.elements]))
 
     def copy(self) -> "BasicReaction":
-        " Returns a copy of the BasicReaction object "
+        "Returns a copy of the BasicReaction object"
         return BasicReaction(
             self.compositions,
             self.coefficients,

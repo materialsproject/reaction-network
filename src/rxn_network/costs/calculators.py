@@ -1,5 +1,5 @@
 " A calculator class for determining chemical potential distance of reactions "
-from itertools import product, chain, combinations
+from itertools import chain, combinations, product
 from typing import List, Optional
 
 import numpy as np
@@ -116,5 +116,5 @@ class ChempotDistanceCalculator(Calculator):
 
     @property
     def mu_func(self):
-        " Returns the function used to process the interfacial mu distances "
+        "Returns the function used to process the interfacial mu distances"
         return self._mu_func

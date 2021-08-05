@@ -1,6 +1,6 @@
 import graph_tool.all as gt
-import numpy as np
 import matplotlib.cm
+import numpy as np
 
 
 def plot_network(
@@ -63,8 +63,10 @@ def plot_network_on_graphistry(graph):
         import networkx as nx
         import pyintergraph
     except ImportError:
-        print("Must install optional dependencies: pygraphistry, networkx, "
-              "and pyintergraph!")
+        print(
+            "Must install optional dependencies: pygraphistry, networkx, "
+            "and pyintergraph!"
+        )
 
     nx_graph = pyintergraph.gt2nx(graph)
     mapping = {}

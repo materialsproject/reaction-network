@@ -9,7 +9,7 @@ from rxn_network.core.reaction import Reaction
 
 
 class Enumerator(MSONable, metaclass=ABCMeta):
-    " Base definition for a reaction enumeration methodology "
+    "Base definition for a reaction enumeration methodology"
 
     def __init__(self, precursors, target, calculators):
         self.logger = logging.getLogger(str(self.__class__.__name__))
@@ -24,8 +24,8 @@ class Enumerator(MSONable, metaclass=ABCMeta):
 
     @abstractmethod
     def enumerate(self, entries) -> List[Reaction]:
-        " Enumerates the potential reactions from the list of entries "
+        "Enumerates the potential reactions from the list of entries"
 
     @abstractmethod
     def estimate_num_reactions(self, entries) -> int:
-        " Estimate of the number of reactions from a list of entires "
+        "Estimate of the number of reactions from a list of entires"

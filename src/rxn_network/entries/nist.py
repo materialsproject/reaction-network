@@ -76,12 +76,12 @@ class NISTReferenceEntry(Entry):
 
     @property
     def correction_uncertainty(self) -> float:
-        " Uncertainty of NIST-JANAF data is not supplied."
+        "Uncertainty of NIST-JANAF data is not supplied."
         return 0
 
     @property
     def correction_uncertainty_per_atom(self) -> float:
-        " Uncertainty of NIST-JANAF data is not supplied."
+        "Uncertainty of NIST-JANAF data is not supplied."
         return 0
 
     @property
@@ -89,14 +89,14 @@ class NISTReferenceEntry(Entry):
         return True
 
     def as_dict(self) -> dict:
-        " Returns an MSONable dict. "
+        "Returns an MSONable dict."
         data = super().as_dict()
         data["temperature"] = self.temperature
         return data
 
     @classmethod
     def from_dict(cls, d) -> "NISTReferenceEntry":
-        " Returns NISTReferenceEntry constructed from MSONable dict."
+        "Returns NISTReferenceEntry constructed from MSONable dict."
         return cls(composition=d["composition"], temperature=d["temperature"])
 
     def __repr__(self):

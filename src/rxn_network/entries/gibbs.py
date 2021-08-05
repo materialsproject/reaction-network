@@ -255,7 +255,7 @@ class GibbsComputedEntry(ComputedEntry):
         return bool(self.data.get("icsd_ids"))
 
     def as_dict(self) -> dict:
-        " Returns an MSONable dict. "
+        "Returns an MSONable dict."
         data = super().as_dict()
         data["volume_per_atom"] = self.volume_per_atom
         data["formation_energy_per_atom"] = self.formation_energy_per_atom
@@ -264,7 +264,7 @@ class GibbsComputedEntry(ComputedEntry):
 
     @classmethod
     def from_dict(cls, d) -> "GibbsComputedEntry":
-        " Returns a GibbsComputedEntry object from MSONable dictionary "
+        "Returns a GibbsComputedEntry object from MSONable dictionary"
         dec = MontyDecoder()
         entry = cls(
             composition=d["composition"],

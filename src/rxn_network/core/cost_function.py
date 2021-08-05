@@ -7,8 +7,8 @@ from rxn_network.core.reaction import Reaction
 
 
 class CostFunction(MSONable, metaclass=ABCMeta):
-    " Base definition for a cost function "
+    "Base definition for a cost function"
 
     @abstractmethod
     def evaluate(self, rxn: Reaction) -> float:
-        " Evaluates the total cost function on a reaction "
+        "Evaluates the total cost function on a reaction"

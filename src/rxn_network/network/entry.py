@@ -7,7 +7,7 @@ from pymatgen.entries import Entry
 
 
 class NetworkEntryType(Enum):
-    " Describes the Network Entry Type "
+    "Describes the Network Entry Type"
     Precursors = auto()
     Reactants = auto()
     Products = auto()
@@ -52,24 +52,24 @@ class NetworkEntry(MSONable):
 
 
 class DummyEntry(NetworkEntry):
-    " A Dummy Entry that doesn't hold any info "
+    "A Dummy Entry that doesn't hold any info"
 
     def __init__(self):  # pylint: disable=W0231
-        " Dummy node doesn't need any parameters "
+        "Dummy node doesn't need any parameters"
 
     @property
     def entries(self):
-        " No entries in DummyEntry "
+        "No entries in DummyEntry"
         return []
 
     @property
     def chemsys(self):
-        " No Chemsys to DummyEntry "
+        "No Chemsys to DummyEntry"
         return ""
 
     @property
     def description(self):
-        " DummyEntry is always of type Dummy "
+        "DummyEntry is always of type Dummy"
         return NetworkEntryType.Dummy
 
     def __repr__(self):

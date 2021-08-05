@@ -4,14 +4,14 @@ from abc import ABCMeta, abstractmethod
 from typing import List
 
 from monty.json import MSONable
-
 from pymatgen.entries.entry_tools import EntrySet
+
 from rxn_network.core.pathway import Pathway
 from rxn_network.core.reaction import Reaction
 
 
 class Solver(MSONable, metaclass=ABCMeta):
-    " Base definition for a pathway solver class. "
+    "Base definition for a pathway solver class."
 
     def __init__(self, entries, pathways):
         self.logger = logging.getLogger(str(self.__class__.__name__))

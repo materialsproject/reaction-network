@@ -26,7 +26,7 @@ And then to finally install an editable version of the package:
 
     pip install -e .
 
-# Demo 
+# Demo
 A demo Jupyter notebook (demo.ipynb) contains the code necessary to replicate the
 results of the paper and is a good starting template for using the rxn-network package.
 
