@@ -127,22 +127,7 @@ class BalancedPathway(BasicPathway):
             if all(overlap):
                 interdependent = True
 
-                combined_reactants = {c for p in combo for c in p.reactants}
-                combined_products = {c for p in combo for c in p.products}
-                shared = combined_reactants & combined_products
-
-                combined_reactants = combined_reactants - shared
-                combined_products = combined_products - shared
-
-                r = BasicReaction.balance(
-                    list(combined_reactants), list(combined_products)
-                )
-                if r.balanced:
-                    combined_rxn = r
-                else:
-                    continue
-
-        return interdependent, combined_rxn
+        return interdependent
 
     @property
     def average_cost(self):
