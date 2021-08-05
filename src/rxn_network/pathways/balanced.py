@@ -91,7 +91,6 @@ class BalancedPathway(BasicPathway):
     def contains_interdependent_rxns(self, precursors):
         precursors = set(precursors)
         interdependent = False
-        combined_rxn = None
 
         rxns = set(self.reactions)
         num_rxns = len(rxns)
