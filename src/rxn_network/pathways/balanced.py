@@ -56,20 +56,11 @@ class BalancedPathway(BasicPathway):
         tol=1e-6,
     ):
         """
+        TODO: Implement this method
         Balances multiple reaction pathways to a net reaction
         """
 
-        comp_pseudo_inverse = np.linalg.pinv(comp_matrix).T
-        coefficients = comp_pseudo_inverse @ net_coeffs
-
-        is_balanced = False
-
-        if (coefficients < tol).any():
-            is_balanced = False
-        elif np.allclose(comp_matrix.T @ multiplicities, net_coeffs):
-            is_balanced = True
-
-        return cls(reactions, coefficients, costs)
+        pass
 
     def comp_matrix(self):
         """
@@ -143,13 +134,12 @@ class BalancedPathway(BasicPathway):
                 combined_reactants = combined_reactants - shared
                 combined_products = combined_products - shared
 
-                try:
-                    r = BasicReaction.balance(
-                        list(combined_reactants), list(combined_products)
-                    )
-                    if r.balanced:
-                        combined_rxn = r
-                except:
+                r = BasicReaction.balance(
+                    list(combined_reactants), list(combined_products)
+                )
+                if r.balanced:
+                    combined_rxn = r
+                else:
                     continue
 
         return interdependent, combined_rxn

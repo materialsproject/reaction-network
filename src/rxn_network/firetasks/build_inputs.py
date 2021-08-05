@@ -105,7 +105,7 @@ class EntriesFromDb(FiretaskBase):
         with MongoStore.from_db_file(db_file) as db:
             entries = get_all_entries_in_chemsys(
                 db,
-                self["chemsys"],
+                chemsys,
                 inc_structure=inc_structure,
                 compatible_only=compatible_only,
                 property_data=property_data,
@@ -137,7 +137,7 @@ def process_entries(entries, temperature, e_above_hull, include_polymorphs):
     return entry_set
 
 
-def get_entries(
+def get_entries(  # noqa: C901
     db: str,
     chemsys_formula_id_criteria: Union[str, dict],
     compatible_only=True,

@@ -115,7 +115,7 @@ class BasicReaction(Reaction):
         "Returns True if the reaction has identical reactants and products"
         if set(self.reactants) != set(self.products):
             return False
-        if self.balanced == False:  # if not balanced, can not check coefficients
+        if self.balanced is False:  # if not balanced, can not check coefficients
             return True
         return all(
             [
@@ -166,7 +166,7 @@ class BasicReaction(Reaction):
         coeffs = self.coefficients
         scale_factor = abs(1 / coeffs[self.compositions.index(comp)] * factor)
         coeffs *= scale_factor
-        return BasicRaction(all_comp, coeffs)
+        return BasicReaction(all_comp, coeffs)
 
     def normalize_to_element(
         self, element: Element, factor: float = 1

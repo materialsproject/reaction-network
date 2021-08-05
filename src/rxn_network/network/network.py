@@ -174,7 +174,7 @@ class ReactionNetwork(Network):
         g = self._g
         if target == self.target:
             return
-        elif self.target or target == None:
+        elif self.target or target is None:
             target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
             g.remove_vertex(target_v)
 

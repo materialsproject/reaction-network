@@ -90,7 +90,6 @@ class ReactionSet(MSONable):
             entries = cls._get_unique_entries(rxns)
 
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
-        n = len(entries)
         all_indices, all_coeffs, all_data = [], [], []
         for rxn in rxns:
             all_indices.append([entries.index(e) for e in rxn.entries])

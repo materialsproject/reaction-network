@@ -21,7 +21,6 @@ class ReactionsToDb(FiretaskBase):
     """
 
     def run_task(self, fw_spec):
-        calc_dir = self.get("calc_dir", os.getcwd())
         db_file = env_chk(self.get("db_file"), fw_spec)
 
         d = {}
@@ -53,5 +52,4 @@ class NetworkToDb(FiretaskBase):
     """
 
     def run_task(self, fw_spec):
-        db_file = env_chk(self.get("db_file"), fw_spec)
-        db = MongoStore.from_db_file(db_file)
+        pass

@@ -138,7 +138,6 @@ class MinimizeGibbsEnumerator(Enumerator):
                 pd_non_grand=pd,
                 use_hull_energy=True,
             )
-            use_original_comps = True
             chempots = grand_pd.chempots
 
         else:

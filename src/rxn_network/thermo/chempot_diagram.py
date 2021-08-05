@@ -90,7 +90,7 @@ class ChempotDiagram(MSONable):
 
         return {k: np.array(v) for k, v in domains.items() if v}
 
-    def get_plot(
+    def get_plot(  # noqa: C901
         self,
         elements: list = None,
         formulas: list = [],
@@ -157,7 +157,7 @@ class ChempotDiagram(MSONable):
             try:
                 domain = ConvexHull(points_3d)
                 ann_loc = np.mean(points_3d.T, axis=1)
-            except QhullError as e:
+            except QhullError:
                 points_2d, v, w = simple_pca(points_3d, k=2)
                 domain = ConvexHull(points_2d)
                 centroid_2d = get_centroid_2d(points_2d[domain.vertices])
