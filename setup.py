@@ -30,8 +30,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "setuptools",
-        "dask>=2021.4.0",
-        "fireworks>=1.9.5",
+        "fireworks>=1.9.7",
         "maggma>=0.26.0",
         "numba>= 0.52.0",
         "pymatgen>=2022.0.10",
@@ -52,5 +51,5 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     tests_require=["pytest"],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
 )

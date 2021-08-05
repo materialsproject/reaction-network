@@ -1,4 +1,4 @@
-from queue import PriorityQueue
+from queue import PriorityQueue, Empty
 from typing import Dict
 
 from graph_tool import Graph, GraphView, Vertex
@@ -111,7 +111,7 @@ def yens_ksp(
         try:
             prev_path = a[k - 1]
         except IndexError:
-            print(f"Identified only k={k} paths before exiting. \n")
+            print(f"Identified only k={k-1} paths before exiting. \n")
             break
 
         for i in range(len(prev_path) - 1):
@@ -142,7 +142,7 @@ def yens_ksp(
         while True:
             try:
                 cost_, path_ = b.get(block=False)
-            except queue.Empty:
+            except Empty:
                 break
             if path_ not in a:
                 a.append(path_)
