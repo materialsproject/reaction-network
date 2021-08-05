@@ -123,7 +123,7 @@ class PathwaySolver(Solver):
         if filter_interdependent:
             precursor_comps = [p.composition for p in precursors]
             for p in paths:
-                interdependent, _ = p.contains_interdependent_rxns(precursor_comps)
+                interdependent = p.contains_interdependent_rxns(precursor_comps)
                 if not interdependent:
                     filtered_paths.append(p)
         else:
