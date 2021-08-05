@@ -7,12 +7,6 @@ theme:
 
 nav:
   - Home: index.md
-  - Reference:
-      - Core: core.md
-      - Helpers: helpers.md
-      - Analysis: analysis.md
-      - Entries: entries.md
-      - Reaction: reaction.md
 
 site_url: https://github.com/GENESIS-EFRC/reaction-network
 repo_url: https://github.com/GENESIS-EFRC/reaction-network/
