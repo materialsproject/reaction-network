@@ -1,3 +1,7 @@
+"""
+Functions for visualizing/plotting reaction networks.
+"""
+
 import graph_tool.all as gt
 import matplotlib.cm
 import numpy as np

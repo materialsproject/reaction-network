@@ -1,3 +1,8 @@
+"""
+Implements a reaction pathway solver class which efficiently solves mass balance
+equations using matrix operations.
+"""
+
 from itertools import chain, combinations, compress, groupby, product
 from typing import List
 

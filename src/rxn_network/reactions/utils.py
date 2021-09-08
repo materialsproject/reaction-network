@@ -1,5 +1,9 @@
+"""
+Utility functions used in the reaction classes.
+"""
+
 import numpy as np
-from pymatgen import Element
+from pymatgen.core.composition import Element
 
 
 def is_separable_rxn(rxn, target_comp, added_elems):

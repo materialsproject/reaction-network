@@ -1,4 +1,6 @@
-" A balanced reaction pathway class"
+"""
+Implements a class for storing balanced reaction pathways.
+"""
 from functools import cached_property
 from typing import List, Optional, Union
 

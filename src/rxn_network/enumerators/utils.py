@@ -1,3 +1,6 @@
+"""
+Helpful utility functions used by the enumerator classes.
+"""
 from itertools import permutations
 
 import numpy as np

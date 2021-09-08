@@ -1,3 +1,7 @@
+"""
+This module implements two types of basic reaction enumerators, with or without the
+option of an open entry
+"""
 from itertools import chain, combinations, compress, groupby, product
 from math import comb
 from typing import List, Optional
@@ -20,7 +24,7 @@ from rxn_network.enumerators.utils import (
     initialize_open_entries,
 )
 from rxn_network.reactions import ComputedReaction
-from rxn_network.thermo.chempot_diagram import ChempotDiagram
+from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 from rxn_network.utils import limited_powerset
 
 

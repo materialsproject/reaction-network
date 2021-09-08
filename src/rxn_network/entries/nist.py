@@ -1,4 +1,6 @@
-" Implements an Entry that looks up NIST pre-tabulated Gibbs free energies "
+"""
+Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
+"""
 import hashlib
 
 from monty.json import MontyDecoder

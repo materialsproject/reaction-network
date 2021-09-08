@@ -1,4 +1,6 @@
-" Basic interface for a cost function "
+"""
+Basic interface for a cost function
+"""
 from abc import ABCMeta, abstractmethod
 
 from monty.json import MSONable

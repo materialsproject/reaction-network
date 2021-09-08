@@ -1,4 +1,7 @@
-" Basic Entry to hold multiple entries for the network book keeping "
+"""
+Entry objects used in a Network. This holds multiple entries and can be used as data
+for a graph node.
+"""
 from enum import Enum, auto
 from typing import List
 

@@ -1,3 +1,7 @@
+"""
+Utility functions used in reaction pathway balancing.
+"""
+
 import numpy as np
 from numba import njit, prange
 

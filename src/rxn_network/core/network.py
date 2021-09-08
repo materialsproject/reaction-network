@@ -1,4 +1,6 @@
-" Basic interface for a reaction Network "
+"""
+Basic interface for a (reaction) Network
+"""
 import logging
 from abc import ABCMeta, abstractmethod
 from typing import List

@@ -7,7 +7,7 @@ from pytest import approx
 
 from rxn_network.entries.gibbs import GibbsComputedEntry
 
-TEST_FILES_PATH = Path(__file__).parent / "test_files"
+TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 
 
 @pytest.fixture

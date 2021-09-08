@@ -1,3 +1,8 @@
+"""
+Implements a class for conveniently and efficiently storing sets of ComputedReaction
+objects which share entries.
+"""
+
 from functools import lru_cache
 from typing import Dict, List, Optional
 

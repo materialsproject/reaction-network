@@ -1,6 +1,9 @@
-from typing import Dict, List, Tuple
+"""
+Utility functions used in the thermodynamic analysis classes.
+"""
 
-import numpy as np
+from typing import Dict, List
+
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries import Entry
 
@@ -44,62 +47,6 @@ def expand_pd(entries: List[Entry]) -> Dict[str, PhaseDiagram]:
             )
 
     return pd_dict
-
-
-def simple_pca(data: np.array, k: int = 2) -> Tuple[np.array, np.array, np.array]:
-    """
-    A barebones implementation of principal component analysis (PCA) utilized in
-    the ChemicalPotentialDiagram class.
-
-    Args:
-        data: array of observations
-        k: Number of principal components returned
-
-    Returns:
-        tuple: Projected data, eigenvalues, eigenvectors
-    """
-    data = data - np.mean(data.T, axis=1)  # centering the data
-    cov = np.cov(data.T)  # calculating covariance matrix
-    v, w = np.linalg.eig(cov)  # performing eigendecomposition
-    idx = v.argsort()[::-1]  # sorting the components
-    v = v[idx]
-    w = w[:, idx]
-    scores = data.dot(w[:, :k])
-
-    return scores, v[:k], w[:, :k]
-
-
-def get_centroid_2d(vertices: np.array):
-    """
-    A barebones implementation of the formula for calculating the centroid of a 2D
-    polygon.
-
-    **NOTE**: vertices must be ordered circumfrentially!
-
-    Args:
-        vertices:
-
-    Returns:
-
-    """
-    n = len(vertices)
-    cx = 0
-    cy = 0
-    a = 0
-
-    for i in range(0, n - 1):
-        xi = vertices[i, 0]
-        yi = vertices[i, 1]
-        xi_p = vertices[i + 1, 0]
-        yi_p = vertices[i + 1, 1]
-        common_term = xi * yi_p - xi_p * yi
-
-        cx += (xi + xi_p) * common_term
-        cy += (yi + yi_p) * common_term
-        a += common_term
-
-    prefactor = 0.5 / (6 * a)
-    return np.array([prefactor * cx, prefactor * cy])
 
 
 def check_chempot_bounds(pd, rxn):

@@ -1,4 +1,7 @@
-" A basic reaction pathway class"
+"""
+Implements a class for storing (unbalanced/unconstrained) collection of reactions
+forming a reaction pathway.
+"""
 
 from typing import List, Optional
 

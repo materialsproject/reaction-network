@@ -1,4 +1,7 @@
-" A ComputedReaction class to generate from ComputedEntry objects "
+"""
+A reaction class that builds reactions based on ComputedEntry objects and provides
+information about reaction thermodynamics.
+"""
 from typing import Dict, List, Optional
 
 import numpy as np

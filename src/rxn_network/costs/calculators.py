@@ -1,4 +1,6 @@
-" A calculator class for determining chemical potential distance of reactions "
+"""
+A calculator class for determining chemical potential distance of reactions
+"""
 from itertools import chain, combinations, product
 from typing import List, Optional
 
@@ -8,18 +10,26 @@ from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core import Calculator
 from rxn_network.reactions import ComputedReaction
-from rxn_network.thermo.chempot_diagram import ChempotDiagram
+from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 
 class ChempotDistanceCalculator(Calculator):
     """
     Calculator for determining the "chemical potential distance" for a reaction
     (in eV/atom).
+
+    For more information on this specific implementation of the algorithm,
+    please cite/reference the paper below:
+
+    Todd, Paul K., McDermott, M.J., et al. “Selectivity in yttrium manganese oxide
+    synthesis via local chemical potentials in hyperdimensional phase space.”
+    ArXiv:2104.05986 [Cond-Mat], Apr. 2021. arXiv.org, http://arxiv.org/abs/2104.05986
+
     """
 
     def __init__(
         self,
-        cpd: ChempotDiagram,
+        cpd: ChemicalPotentialDiagram,
         mu_func: Optional[str] = "sum",
         name: Optional[str] = "chempot_distance",
     ):
@@ -94,15 +104,15 @@ class ChempotDistanceCalculator(Calculator):
         name: Optional[str] = "chempot_distance",
     ):
         """
-        Convenience constructor which first builds the ChempotDiagram
+        Convenience constructor which first builds the ChemicalPotentialDiagram
         object from a list of entry objects.
 
         Args:
-            entries: entry objects used to build the ChempotDiagram
+            entries: entry objects used to build the ChemicalPotentialDiagram
             mu_func: the name of the function used to process the interfacial
                 chemical potential distances into a single value describing the whole
                 reaction.
-            cpd_kws: optional kwargs passed to the ChempotDiagram constructor.
+            cpd_kws: optional kwargs passed to the ChemicalPotentialDiagram constructor.
                 Default kwarg is default_limit = -50.
             name: the data dictionary key by which to store the calculated value,
                 defaults to "chempot_distance"
@@ -111,7 +121,7 @@ class ChempotDistanceCalculator(Calculator):
             A ChempotDistanceCalculator object
         """
         pd = PhaseDiagram(entries)
-        cpd = ChempotDiagram(pd, **cpd_kws)
+        cpd = ChemicalPotentialDiagram(pd, **cpd_kws)
         return cls(cpd, mu_func, name)
 
     @property

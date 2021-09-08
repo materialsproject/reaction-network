@@ -1,4 +1,7 @@
-"Implementation of reaction network interface"
+"""
+Implementation of an actual reaction network interface.
+"""
+
 import logging
 from typing import List, Optional
 
@@ -14,7 +17,6 @@ from rxn_network.network.adaptors.gt import (
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.utils import get_loopback_edges, get_rxn_nodes_and_edges
 from rxn_network.pathways.basic import BasicPathway
-from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 
 

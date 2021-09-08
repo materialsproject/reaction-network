@@ -24,7 +24,7 @@ from rxn_network.enumerators.utils import (
     initialize_entry,
 )
 from rxn_network.reactions import ComputedReaction
-from rxn_network.thermo.chempot_diagram import ChempotDiagram
+from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 
 class MinimizeGibbsEnumerator(Enumerator):

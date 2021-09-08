@@ -1,4 +1,6 @@
-" Basic interface for a pathway Solver "
+"""
+Basic interface for a reaction pathway Solver
+"""
 import logging
 from abc import ABCMeta, abstractmethod
 from typing import List

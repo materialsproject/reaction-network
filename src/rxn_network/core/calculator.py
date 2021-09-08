@@ -1,4 +1,6 @@
-" Basic interface for a reaction cost Calculator"
+"""
+Basic interface for a reaction cost Calculator
+"""
 from abc import ABCMeta, abstractmethod
 
 from monty.json import MSONable

@@ -1,3 +1,7 @@
+"""
+Graph-related functions specific to the graph-tool library. Used in the network module.
+"""
+
 from queue import Empty, PriorityQueue
 from typing import Dict
 

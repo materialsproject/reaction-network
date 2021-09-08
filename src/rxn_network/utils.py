@@ -1,3 +1,5 @@
+""" Utility functions used throughout the reaction-network package."""
+
 from itertools import chain, combinations, zip_longest
 from pathlib import Path
 
