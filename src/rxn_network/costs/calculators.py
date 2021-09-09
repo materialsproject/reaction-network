@@ -5,7 +5,6 @@ from itertools import chain, combinations, product
 from typing import List, Optional
 
 import numpy as np
-from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core import Calculator
@@ -100,8 +99,8 @@ class ChempotDistanceCalculator(Calculator):
         cls,
         entries: List[ComputedEntry],
         mu_func: Optional[str] = "max",
-        cpd_kws: Optional[dict] = {"default_limit": -50},
         name: Optional[str] = "chempot_distance",
+        **kwargs
     ):
         """
         Convenience constructor which first builds the ChemicalPotentialDiagram
@@ -113,15 +112,17 @@ class ChempotDistanceCalculator(Calculator):
                 chemical potential distances into a single value describing the whole
                 reaction.
             cpd_kws: optional kwargs passed to the ChemicalPotentialDiagram constructor.
-                Default kwarg is default_limit = -50.
+                Default kwarg is default_min_limit = -50.
             name: the data dictionary key by which to store the calculated value,
                 defaults to "chempot_distance"
 
         Returns:
             A ChempotDistanceCalculator object
         """
-        pd = PhaseDiagram(entries)
-        cpd = ChemicalPotentialDiagram(pd, **cpd_kws)
+        if not kwargs.get("default_min_limit"):
+            kwargs["default_min_limit"] = - 50
+
+        cpd = ChemicalPotentialDiagram(entries, **kwargs)
         return cls(cpd, mu_func, name)
 
     @property

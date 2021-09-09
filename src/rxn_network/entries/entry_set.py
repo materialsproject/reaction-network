@@ -3,7 +3,7 @@ An entry set class for acquiring entries with Gibbs formation energies
 """
 from typing import List, Optional, Union
 
-from monty.json import MontyDecoder, MSONable
+from monty.json import MontyDecoder
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core import Composition
 from pymatgen.entries.computed_entries import (
