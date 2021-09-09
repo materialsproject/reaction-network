@@ -8,8 +8,6 @@ import numpy as np
 
 from rxn_network.core import Pathway, Reaction
 from rxn_network.pathways.basic import BasicPathway
-from rxn_network.pathways.utils import balance_path_arrays
-from rxn_network.reactions.basic import BasicReaction
 from rxn_network.utils import limited_powerset
 
 

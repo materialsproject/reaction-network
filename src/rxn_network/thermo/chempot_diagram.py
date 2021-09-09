@@ -35,10 +35,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
                 unspecified elements within the "limits" argument. This results in
                 default limits of (default_min_limit, 0)
         """
-        super().__init__(entries=entries,
-                         limits=limits,
-                         default_min_limit=default_min_limit
-                         )
+        super().__init__(
+            entries=entries, limits=limits, default_min_limit=default_min_limit
+        )
 
     def shortest_domain_distance(self, f1: str, f2: str) -> float:
         """
@@ -72,4 +71,3 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         diff = diff.reshape(-1, num_elems)
 
         return diff.min(axis=0)
-

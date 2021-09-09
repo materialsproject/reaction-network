@@ -41,4 +41,3 @@ class Network(MSONable, metaclass=ABCMeta):
     @abstractmethod
     def set_target(self):
         """Set the phase used as a target in the network"""
-

@@ -13,6 +13,7 @@ class Reaction(MSONable, metaclass=ABCMeta):
     """
     Base definition for a Reaction
     """
+
     @property
     @abstractmethod
     def reactants(self) -> List[Composition]:
@@ -59,5 +60,5 @@ class Reaction(MSONable, metaclass=ABCMeta):
 
     @property
     def energy_per_atom(self) -> float:
-        "The energy per atom of this reaction in eV"
+        """The energy per atom of this reaction in eV"""
         return self.energy / self.num_atoms

@@ -55,8 +55,8 @@ class ReactionNetwork(Network):
     def build(self):
         """
         Construct the reaction network graph object and store under the "graph"
-        attribute. Does NOT initialize precursors or target; you must call set_precursors() or
-        set_target() to do so.
+        attribute. Does NOT initialize precursors or target; you must call set_precursors()
+        or set_target() to do so.
 
         Returns: None
 

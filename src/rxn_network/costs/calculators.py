@@ -120,7 +120,7 @@ class ChempotDistanceCalculator(Calculator):
             A ChempotDistanceCalculator object
         """
         if not kwargs.get("default_min_limit"):
-            kwargs["default_min_limit"] = - 50
+            kwargs["default_min_limit"] = -50
 
         cpd = ChemicalPotentialDiagram(entries, **kwargs)
         return cls(cpd, mu_func, name)

@@ -4,9 +4,6 @@ information about reaction thermodynamics.
 """
 from typing import Dict, List, Optional
 
-import numpy as np
-from pymatgen.analysis.phase_diagram import GrandPotPDEntry, PDEntry
-from pymatgen.core.composition import Element
 from pymatgen.entries import Entry
 from uncertainties import ufloat
 
@@ -17,7 +14,7 @@ class ComputedReaction(BasicReaction):
     """
     Convenience class to generate a reaction from ComputedEntry objects, with
     some additional attributes, such as a reaction energy based on computed
-    energies. Will balance the reaction.
+    energies. This class also balances the reaction.
     """
 
     def __init__(
