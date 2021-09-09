@@ -13,7 +13,9 @@ from rxn_network.core.reaction import Reaction
 
 
 class Solver(MSONable, metaclass=ABCMeta):
-    "Base definition for a pathway solver class."
+    """
+    Base definition for a pathway solver class
+    """
 
     def __init__(self, entries, pathways):
         self.logger = logging.getLogger(str(self.__class__.__name__))
@@ -36,28 +38,34 @@ class Solver(MSONable, metaclass=ABCMeta):
 
     @abstractmethod
     def solve(self, net_rxn) -> List[Pathway]:
-        "Solve paths"
+        """Solve paths"""
 
     @property
     def entries(self) -> EntrySet:
+        """Entry set used in solver"""
         return self._entries
 
     @property
     def pathways(self) -> List[Pathway]:
+        """Pathways used in solver class"""
         return self._pathways
 
     @property
     def reactions(self) -> List[Reaction]:
+        """Reactions used in solver class"""
         return self._reactions
 
     @property
     def costs(self) -> List[float]:
+        """ Costs used in solver class"""
         return self._costs
 
     @property
     def num_rxns(self) -> int:
+        """Length of reaction list"""
         return len(self.reactions)
 
     @property
     def num_entries(self) -> int:
+        """Length of entry list"""
         return len(self._entries)
