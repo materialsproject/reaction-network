@@ -406,8 +406,8 @@ class BasicReaction(Reaction):
 
         return " + ".join(reactant_str) + " -> " + " + ".join(product_str)
 
-    @staticmethod
-    def _str_from_comp(coeffs, compositions, reduce=False):
+    @classmethod
+    def _str_from_comp(cls, coeffs, compositions, reduce=False):
         r_coeffs = np.zeros(len(coeffs))
         r_formulas = []
         for i, (amt, comp) in enumerate(zip(coeffs, compositions)):
@@ -419,7 +419,7 @@ class BasicReaction(Reaction):
             r_coeffs *= factor
         else:
             factor = 1
-        return BasicReaction._str_from_formulas(r_coeffs, r_formulas), factor
+        return cls._str_from_formulas(r_coeffs, r_formulas), factor
 
     def __eq__(self, other):
         if self is other:
