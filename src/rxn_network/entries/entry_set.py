@@ -34,7 +34,9 @@ class GibbsEntrySet(EntrySet):
             entries: A collection of entry objects that will make up the entry set.
         """
         super().__init__(entries)
-        self.entries_list = list(entries)
+        self.entries_list = list(
+            sorted(entries, key=lambda e: e.composition.reduced_formula)
+        )
         self.build_indices()
 
     def filter_by_stability(

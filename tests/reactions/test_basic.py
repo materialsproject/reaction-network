@@ -177,17 +177,19 @@ def test_from_string(pre_balanced_rxn):
 
 
 def test_chemical_system(pre_balanced_rxn):
-    complex_rxn = BasicReaction.from_formulas(["LiCoO2", "Be", "Na"],
-                                    ["La2O3", "Co2O3", "Li2O", "LiF", "CoF3"])
+    complex_rxn = BasicReaction.from_formulas(
+        ["LiCoO2", "Be", "Na"], ["La2O3", "Co2O3", "Li2O", "LiF", "CoF3"]
+    )
     assert pre_balanced_rxn.chemical_system == "Fe-O"
-    assert complex_rxn.chemical_system == 'Be-Co-F-La-Li-Na-O'
+    assert complex_rxn.chemical_system == "Be-Co-F-La-Li-Na-O"
 
 
 def test_balanced():
     rxn_unbalanced = BasicReaction.from_formulas(["MnO2", "Y2O3"], ["YMn2O5"])
     rxn_balanced = BasicReaction.from_formulas(["YClO", "LiMnO2"], ["YMnO3", "LiCl"])
-    rxn_balanced_2 = BasicReaction.from_formulas(["Li", "Na2O", "FeCl2", "Y2O3"],
-                                                 ["YCl3", "Fe2O3", "NaCl", "Li2O"])
+    rxn_balanced_2 = BasicReaction.from_formulas(
+        ["Li", "Na2O", "FeCl2", "Y2O3"], ["YCl3", "Fe2O3", "NaCl", "Li2O"]
+    )
 
     assert rxn_unbalanced.balanced is False
     assert rxn_balanced.balanced is True

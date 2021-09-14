@@ -28,7 +28,7 @@ class NetworkEntry(MSONable):
     def __init__(self, entries: List[Entry], description: NetworkEntryType):
         """
         Args:
-           entries: list of ComputedEntry-like objects
+            entries: list of ComputedEntry-like objects
             description: Node type
         """
         self.entries = set(entries)

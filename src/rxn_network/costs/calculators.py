@@ -38,7 +38,7 @@ class ChempotDistanceCalculator(Calculator):
             mu_func: the name of the function used to process the interfacial
                 chemical potential distances into a single value describing the whole
                 reaction.
-            name: the data dictionary key by which to store the calculated value.
+            name: the data dictionary key with which to store the calculated value.
         """
         self.cpd = cpd
         self.name = name
@@ -73,7 +73,7 @@ class ChempotDistanceCalculator(Calculator):
             for combo in combos
         ]
 
-        distance = self._mu_func(distances)
+        distance = float(self._mu_func(distances))
         return distance
 
     def decorate(self, rxn: ComputedReaction) -> ComputedReaction:
@@ -98,10 +98,10 @@ class ChempotDistanceCalculator(Calculator):
     def from_entries(
         cls,
         entries: List[ComputedEntry],
-        mu_func: Optional[str] = "max",
+        mu_func: Optional[str] = "sum",
         name: Optional[str] = "chempot_distance",
         **kwargs
-    ):
+    ) -> "ChempotDistanceCalculator":
         """
         Convenience constructor which first builds the ChemicalPotentialDiagram
         object from a list of entry objects.
@@ -122,10 +122,10 @@ class ChempotDistanceCalculator(Calculator):
         if not kwargs.get("default_min_limit"):
             kwargs["default_min_limit"] = -50
 
-        cpd = ChemicalPotentialDiagram(entries, **kwargs)
+        cpd = ChemicalPotentialDiagram(entries=entries, **kwargs)
         return cls(cpd, mu_func, name)
 
     @property
     def mu_func(self):
-        "Returns the function used to process the interfacial mu distances"
+        """Returns the function used to process the interfacial mu distances"""
         return self._mu_func

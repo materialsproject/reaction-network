@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 from monty.serialization import loadfn
-from pytest import approx
 
 from rxn_network.entries.gibbs import GibbsComputedEntry
 
@@ -23,7 +22,7 @@ def entry(structure):
         formation_energy_per_atom=-2.436,
         temperature=300,
         parameters=None,
-        entry_id="Test LiFe4P4O16 structure",
+        entry_id="LiFe4P4O16 test structure",
     )
     return entry
 
@@ -57,7 +56,7 @@ def test_gf_sisso(entries_temps_dict):
     }
     entry_energies = {t: e.energy for t, e in entries_temps_dict.items()}
 
-    assert entry_energies == approx(test_energies)
+    assert entry_energies == pytest.approx(test_energies)
 
 
 def test_interpolation(structure):
@@ -65,14 +64,14 @@ def test_interpolation(structure):
     e = GibbsComputedEntry.from_structure(
         structure=structure, formation_energy_per_atom=-2.436, temperature=temp
     )
-    assert e.energy == approx(-53.7243542548528)
+    assert e.energy == pytest.approx(-53.7243542548528)
 
 
 def test_to_from_dict(entry):
     d = entry.as_dict()
     e = GibbsComputedEntry.from_dict(d)
     assert e == entry
-    assert e.energy == approx(entry.energy)
+    assert e.energy == pytest.approx(entry.energy)
 
 
 def test_str(entry):
@@ -83,6 +82,6 @@ def test_normalize(entries_temps_dict):
     num_atoms = 25
     for e in entries_temps_dict.values():
         normed_entry = e.normalize(mode="atom")
-        assert e.uncorrected_energy == approx(
+        assert e.uncorrected_energy == pytest.approx(
             normed_entry.uncorrected_energy * num_atoms
         )
