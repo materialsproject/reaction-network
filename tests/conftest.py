@@ -24,4 +24,5 @@ def pytest_itemcollected(item):
 
 @pytest.fixture(scope="session")
 def computed_rxn():
+    """ 2 YOCl + 2 NaMnO2 + 0.5 O2 -> Y2Mn2O7 + 2 NaCl"""
     return loadfn(TEST_FILES_PATH / "computed_rxn.json.gz")

@@ -54,11 +54,13 @@ class BasicReaction(Reaction):
         self._coefficients = np.array(coefficients)
 
         self.reactant_coeffs = {
-            comp: coeff for comp, coeff in zip(self._compositions, self._coefficients)
+            comp: coeff
+            for comp, coeff in zip(self._compositions, self._coefficients)
             if coeff < 0
         }
         self.product_coeffs = {
-            comp: coeff for comp, coeff in zip(self._compositions, self._coefficients)
+            comp: coeff
+            for comp, coeff in zip(self._compositions, self._coefficients)
             if coeff > 0
         }
 
@@ -105,11 +107,13 @@ class BasicReaction(Reaction):
             balanced = False
             coeffs = np.zeros(len(compositions))
 
-        return cls(compositions=compositions,
-                   coefficients=coeffs,
-                   balanced=balanced,
-                   data=data,
-                   lowest_num_errors=lowest_num_errors)
+        return cls(
+            compositions=compositions,
+            coefficients=coeffs,
+            balanced=balanced,
+            data=data,
+            lowest_num_errors=lowest_num_errors,
+        )
 
     def normalize_to(self, comp: Composition, factor: float = 1) -> "BasicReaction":
         """
@@ -235,8 +239,9 @@ class BasicReaction(Reaction):
         return cls._from_coeff_dicts(reactant_coeffs, product_coeffs)
 
     @classmethod
-    def from_formulas(cls, reactants: List[str],
-                      products: List[str]) -> "BasicReaction":
+    def from_formulas(
+        cls, reactants: List[str], products: List[str]
+    ) -> "BasicReaction":
         """
 
         Args:
@@ -311,8 +316,8 @@ class BasicReaction(Reaction):
         return self.normalized_repr_and_factor()[0]
 
     @classmethod
-    def _balance_coeffs(cls, reactants: List[Composition],
-                        products: List[Composition], robust=True
+    def _balance_coeffs(
+        cls, reactants: List[Composition], products: List[Composition], robust=True
     ) -> np.array:
         """
         Balances the reaction and returns the new coefficient matrix

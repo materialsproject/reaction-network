@@ -1,6 +1,5 @@
 """ Tests for Softplus """
 import pytest
-from pathlib import Path
 from rxn_network.costs.softplus import Softplus
 
 
