@@ -57,7 +57,6 @@ class OpenComputedReaction(ComputedReaction):
 
         self.grand_entries = grand_entries
 
-
     @classmethod
     def balance(
         cls,
@@ -110,11 +109,11 @@ class OpenComputedReaction(ComputedReaction):
         calc_energies = {}
 
         for entry in self.grand_entries:
+            attr = "composition"
             if type(entry) == GrandPotPDEntry:
-                (comp, factor) = entry.original_comp.get_reduced_composition_and_factor()
-            else:
-                (comp, factor) = entry.composition.get_reduced_composition_and_factor()
+                attr = "original_comp"
 
+            comp, factor = getattr(entry, attr).get_reduced_composition_and_factor()
             calc_energies[comp] = min(
                 calc_energies.get(comp, float("inf")), entry.energy / factor
             )
@@ -125,6 +124,7 @@ class OpenComputedReaction(ComputedReaction):
                 for amt, c in zip(self.coefficients, self.compositions)
             ]
         )
+
     @property
     def elements(self) -> List[Element]:
         """
