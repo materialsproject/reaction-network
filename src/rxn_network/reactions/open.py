@@ -88,10 +88,12 @@ class OpenComputedReaction(ComputedReaction):
 
         entries = list(reactant_entries) + list(product_entries)
 
-        args = {"entries": entries,
-                "coefficients": list(coefficients),
-                "data": data,
-                "lowest_num_errors": lowest_num_errors}
+        args = {
+            "entries": entries,
+            "coefficients": list(coefficients),
+            "data": data,
+            "lowest_num_errors": lowest_num_errors,
+        }
 
         if not chempots:
             rxn = ComputedReaction(**args)
@@ -136,7 +138,10 @@ class OpenComputedReaction(ComputedReaction):
         )
 
     @property
-    def total_chemical_system(self):
+    def total_chemical_system(self) -> str:
+        """
+        Chemical system string, including open elements
+        """
         return "-".join(
             sorted([str(e) for e in set(self.elements) | set(self.open_elems)])
         )
@@ -154,6 +159,11 @@ class OpenComputedReaction(ComputedReaction):
         )
 
     def reverse(self):
+        """
+
+        Returns a copy of reaction with reactants/products swapped
+
+        """
         return OpenComputedReaction(
             self.entries,
             -1 * self.coefficients,

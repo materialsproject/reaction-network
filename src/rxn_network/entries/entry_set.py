@@ -209,3 +209,6 @@ class GibbsEntrySet(EntrySet):
             new_entries.update(gibbs_set)
 
         return cls(new_entries)
+
+    def copy(self) -> "GibbsEntrySet":
+        return GibbsEntrySet(entries=self.entries)

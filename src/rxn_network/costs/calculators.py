@@ -5,7 +5,7 @@ from itertools import chain, combinations, product
 from typing import List, Optional
 
 import numpy as np
-from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.analysis.phase_diagram import PDEntry
 
 from rxn_network.core import Calculator
 from rxn_network.reactions import ComputedReaction
@@ -23,7 +23,6 @@ class ChempotDistanceCalculator(Calculator):
     Todd, Paul K., McDermott, M.J., et al. “Selectivity in yttrium manganese oxide
     synthesis via local chemical potentials in hyperdimensional phase space.”
     ArXiv:2104.05986 [Cond-Mat], Apr. 2021. arXiv.org, http://arxiv.org/abs/2104.05986
-
     """
 
     def __init__(
@@ -97,7 +96,7 @@ class ChempotDistanceCalculator(Calculator):
     @classmethod
     def from_entries(
         cls,
-        entries: List[ComputedEntry],
+        entries: List[PDEntry],
         mu_func: Optional[str] = "sum",
         name: Optional[str] = "chempot_distance",
         **kwargs
@@ -111,10 +110,10 @@ class ChempotDistanceCalculator(Calculator):
             mu_func: the name of the function used to process the interfacial
                 chemical potential distances into a single value describing the whole
                 reaction.
-            cpd_kws: optional kwargs passed to the ChemicalPotentialDiagram constructor.
-                Default kwarg is default_min_limit = -50.
             name: the data dictionary key by which to store the calculated value,
                 defaults to "chempot_distance"
+            **kwargs: optional kwargs passed to ChemicalPotentialDiagram; defaults to
+                "default_min_limit"=-50
 
         Returns:
             A ChempotDistanceCalculator object

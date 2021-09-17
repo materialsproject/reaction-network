@@ -339,7 +339,7 @@ class BasicReaction(Reaction):
 
         first_product_idx = len(reactants)
 
-        # start with simplest product constraints, work towards most complex reactant constraints
+        # start with simplest product constraints, work to more complex constraints
         product_constraints = chain.from_iterable(
             [
                 combinations(range(first_product_idx, num_comp), n_constr)
@@ -437,8 +437,7 @@ class BasicReaction(Reaction):
             )
 
     def __hash__(self):
-        return hash(
-            "-".join(
+        return hash("-".join(
                 [e.reduced_formula for e in sorted(self.reactants)]
                 + [e.reduced_formula for e in sorted(self.products)]
             )
@@ -447,4 +446,5 @@ class BasicReaction(Reaction):
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]
 
-    __repr__ = __str__
+    def __repr__(self):
+        return self.__str__()

@@ -7,12 +7,12 @@ from itertools import chain, combinations, compress, groupby, product
 from typing import List
 
 import numpy as np
-from pymatgen.entries.entry_tools import EntrySet
 from scipy.special import comb
 from tqdm.notebook import tqdm
 
 from rxn_network.core import CostFunction, Pathway, Reaction, Solver
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
+from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.utils import balance_path_arrays
 from rxn_network.reactions.computed import ComputedReaction
@@ -25,7 +25,7 @@ class PathwaySolver(Solver):
 
     def __init__(
         self,
-        entries: EntrySet,
+        entries: GibbsEntrySet,
         pathways: List[Pathway],
         cost_function: CostFunction,
         open_elem: str = None,
@@ -39,14 +39,14 @@ class PathwaySolver(Solver):
 
     def solve(
         self,
-        net_rxn: Reaction,
+        net_rxn: ComputedReaction,
         max_num_combos: int = 4,
         find_intermediate_rxns: bool = True,
         intermediate_rxn_energy_cutoff: float = 0.0,
         filter_interdependent: bool = True,
     ):
 
-        entries = list(self.entries)
+        entries = self.entries.entries_list
         precursors = net_rxn.reactant_entries
         targets = net_rxn.product_entries
 
@@ -116,8 +116,9 @@ class PathwaySolver(Solver):
                         reactant_entries,
                         product_entries,
                     )
-                    path_rxns.append(rxn)
-                    path_costs.append(costs[reactions.index(rxn)])
+                    if rxn.lowest_num_errors == 0:
+                        path_rxns.append(rxn)
+                        path_costs.append(costs[reactions.index(rxn)])
 
                 p = BalancedPathway(
                     path_rxns, m_mat.flatten(), path_costs, balanced=True

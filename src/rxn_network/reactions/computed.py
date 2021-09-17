@@ -4,6 +4,7 @@ information about reaction thermodynamics.
 """
 from typing import Dict, List, Optional
 
+import numpy as np
 from pymatgen.entries.computed_entries import ComputedEntry
 from uncertainties import ufloat
 
@@ -156,3 +157,13 @@ class ComputedReaction(BasicReaction):
         return ComputedReaction(
             self.entries, -1 * self.coefficients, self.data, self.lowest_num_errors
         )
+
+    def __hash__(self):
+        return BasicReaction.__hash__(self)
+
+    def __eq__(self, other):
+        eq = BasicReaction.__eq__(self, other)
+        if not eq:
+            return False
+        else:
+            return np.isclose(self.energy_per_atom, other.energy_per_atom)
