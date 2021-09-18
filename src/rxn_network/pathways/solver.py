@@ -73,6 +73,10 @@ class PathwaySolver(Solver):
                     reactions.append(r)
                     costs.append(c)
 
+        net_rxn_vector = self.build_idx_vector(net_rxn)
+        if net_rxn in reactions:
+            reactions.remove(net_rxn)
+
         paths = []
         for n in range(1, max_num_combos + 1):
             total = int(comb(len(reactions), n) / self.BATCH_SIZE) + 1
@@ -97,7 +101,7 @@ class PathwaySolver(Solver):
                     ]
                 )
                 c_mats, m_mats = balance_path_arrays(
-                    comp_matrices, self.build_idx_vector(net_rxn)
+                    comp_matrices, net_rxn_vector
                 )
                 all_c_mats.extend(c_mats)
                 all_m_mats.extend(m_mats)
@@ -106,19 +110,16 @@ class PathwaySolver(Solver):
                 path_rxns = []
                 path_costs = []
                 for rxn_mat in c_mat:
-                    reactant_entries = [
-                        entries[i] for i in range(len(rxn_mat)) if rxn_mat[i] < 0
-                    ]
-                    product_entries = [
-                        entries[i] for i in range(len(rxn_mat)) if rxn_mat[i] > 0
-                    ]
-                    rxn = ComputedReaction.balance(
-                        reactant_entries,
-                        product_entries,
-                    )
-                    if rxn.lowest_num_errors == 0:
+                    entries, coeffs = zip(*[(entries[idx], c) for idx, c in enumerate(
+                        rxn_mat)])
+
+                    rxn = ComputedReaction(entries=entries, coefficients=coeffs)
+                    try:
                         path_rxns.append(rxn)
                         path_costs.append(costs[reactions.index(rxn)])
+                    except Exception as e:
+                        print(e)
+                        continue
 
                 p = BalancedPathway(
                     path_rxns, m_mat.flatten(), path_costs, balanced=True

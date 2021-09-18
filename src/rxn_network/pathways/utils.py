@@ -24,11 +24,6 @@ def balance_path_arrays(
             coefficients of net reaction.
         tol (float): numerical tolerance for determining if a multiplicity is zero
             (reaction was removed).
-
-    Returns:
-        ([bool],[np.array]): Tuple containing bool identifying which trial
-            BalancedPathway objects were successfully balanced, and a list of all
-            multiplicities arrays.
     """
     shape = comp_matrices.shape
     net_coeff_filter = np.argwhere(net_coeffs != 0).flatten()
