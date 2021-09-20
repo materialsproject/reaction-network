@@ -8,21 +8,19 @@ from numba import njit, prange
 
 @njit(parallel=True)
 def balance_path_arrays(
-    comp_matrices,
-    net_coeffs,
-    tol=1e-6,
+    comp_matrices: np.array,
+    net_coeffs: np.array,
+    tol: float = 1e-6,
 ):
     """
     Fast solution for reaction multiplicities via mass balance stochiometric
     constraints. Parallelized using Numba.
 
     Args:
-        comp_matrices ([np.array]): list of numpy arrays containing stoichiometric
-            coefficients of all compositions in all reactions, for each trial
-            combination.
-        net_coeffs ([np.array]): list of numpy arrays containing stoichiometric
-            coefficients of net reaction.
-        tol (float): numerical tolerance for determining if a multiplicity is zero
+        comp_matrices: Array containing stoichiometric coefficients of all
+            compositions in all reactions, for each trial combination.
+        net_coeffs: Array containing stoichiometric coefficients of net reaction.
+        tol: numerical tolerance for determining if a multiplicity is zero
             (reaction was removed).
     """
     shape = comp_matrices.shape

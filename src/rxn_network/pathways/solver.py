@@ -100,6 +100,8 @@ class PathwaySolver(Solver):
                         if combo
                     ]
                 )
+                if n==3:
+                    return comp_matrices, net_rxn_vector
                 c_mats, m_mats = balance_path_arrays(
                     comp_matrices, net_rxn_vector
                 )
