@@ -436,7 +436,8 @@ class BasicReaction(Reaction):
             )
 
     def __hash__(self):
-        return hash("-".join(
+        return hash(
+            "-".join(
                 [e.reduced_formula for e in sorted(self.reactants)]
                 + [e.reduced_formula for e in sorted(self.products)]
             )

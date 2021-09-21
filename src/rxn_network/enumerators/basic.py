@@ -96,6 +96,7 @@ class BasicEnumerator(Enumerator):
                 (target and not target_elems.issubset(elems))
                 or (precursors and not precursor_elems.issuperset(elems))
                 or len(elems) >= 10
+                or len(elems) == 1
             ):
                 continue
 
@@ -143,9 +144,8 @@ class BasicEnumerator(Enumerator):
 
             forward_rxn = ComputedReaction.balance(r, p)
 
-            if (
-                (self.remove_unbalanced and not (forward_rxn.balanced))
-                or (self.remove_changed and forward_rxn.lowest_num_errors != 0)
+            if (self.remove_unbalanced and not (forward_rxn.balanced)) or (
+                self.remove_changed and forward_rxn.lowest_num_errors != 0
             ):
                 continue
 
@@ -173,7 +173,8 @@ class BasicEnumerator(Enumerator):
             for p in precursors:
                 if p not in entries:
                     old_entry = entries_updated.get_min_entry_by_formula(
-                        p.composition.reduced_formula)
+                        p.composition.reduced_formula
+                    )
                     entries_updated.remove(old_entry)
                     entries_updated.add(p)
 
@@ -185,9 +186,7 @@ class BasicEnumerator(Enumerator):
 
         if self.stabilize:
             entries_updated = entries_updated.filter_by_stability(e_above_hull=0.0)
-            self.logger.info(
-                "Filtering by stable entries!"
-            )
+            self.logger.info("Filtering by stable entries!")
 
         return entries_updated, precursors, target
 
@@ -253,10 +252,14 @@ class BasicOpenEnumerator(BasicEnumerator):
         open_entries = initialize_open_entries(self.open_entries, entries)
         open_entry_elems = get_elems_set(open_entries)
 
-        precursor_elems = (get_elems_set(precursors) | open_entry_elems if precursors
-                           else None)
-        target_elems = ({e.name for e in target.composition.elements} |
-                        open_entry_elems if target else None)
+        precursor_elems = (
+            get_elems_set(precursors) | open_entry_elems if precursors else None
+        )
+        target_elems = (
+            {e.name for e in target.composition.elements} | open_entry_elems
+            if target
+            else None
+        )
 
         combos = [set(c) for c in limited_powerset(entries, self.n)]
 

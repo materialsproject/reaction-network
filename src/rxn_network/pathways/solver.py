@@ -100,11 +100,9 @@ class PathwaySolver(Solver):
                         if combo
                     ]
                 )
-                if n==3:
+                if n == 3:
                     return comp_matrices, net_rxn_vector
-                c_mats, m_mats = balance_path_arrays(
-                    comp_matrices, net_rxn_vector
-                )
+                c_mats, m_mats = balance_path_arrays(comp_matrices, net_rxn_vector)
                 all_c_mats.extend(c_mats)
                 all_m_mats.extend(m_mats)
 
@@ -112,8 +110,9 @@ class PathwaySolver(Solver):
                 path_rxns = []
                 path_costs = []
                 for rxn_mat in c_mat:
-                    entries, coeffs = zip(*[(entries[idx], c) for idx, c in enumerate(
-                        rxn_mat)])
+                    entries, coeffs = zip(
+                        *[(entries[idx], c) for idx, c in enumerate(rxn_mat)]
+                    )
 
                     rxn = ComputedReaction(entries=entries, coefficients=coeffs)
                     try:

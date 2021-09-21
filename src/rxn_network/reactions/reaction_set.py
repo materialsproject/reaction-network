@@ -64,16 +64,12 @@ class ReactionSet(MSONable):
         if open_elem:
             chempots = {Element(open_elem): chempot}
 
-        for indices, coeffs, data in zip(
-            self.indices, self.coeffs, self.all_data
-        ):
+        for indices, coeffs, data in zip(self.indices, self.coeffs, self.all_data):
             entries = [self.entries[i] for i in indices]
             if chempots:
                 rxn = OpenComputedReaction(
-                        entries=entries,
-                        coefficients=coeffs,
-                        data=data,
-                        chempots=chempots)
+                    entries=entries, coefficients=coeffs, data=data, chempots=chempots
+                )
             else:
                 rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
             rxns.append(rxn)
@@ -93,12 +89,17 @@ class ReactionSet(MSONable):
             open_elem: Open element, e.g. "O2"
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
         """
-        return [cf.evaluate(rxn) for rxn in self.get_rxns(open_elem=open_elem,
-                                                          chempot=chempot)]
+        return [
+            cf.evaluate(rxn)
+            for rxn in self.get_rxns(open_elem=open_elem, chempot=chempot)
+        ]
 
     @classmethod
-    def from_rxns(cls, rxns: List[Union[ComputedReaction, OpenComputedReaction]],
-                  entries: Optional[List[ComputedEntry]] = None) -> "ReactionSet":
+    def from_rxns(
+        cls,
+        rxns: List[Union[ComputedReaction, OpenComputedReaction]],
+        entries: Optional[List[ComputedEntry]] = None,
+    ) -> "ReactionSet":
         """
         Initiate a ReactionSet object from a list of reactions. Including a list of
         unique entries saves some computation time.

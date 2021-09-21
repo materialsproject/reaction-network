@@ -10,8 +10,9 @@ def softplus_with_attr():
 
 @pytest.fixture(scope="module")
 def softplus_with_attr_and_param():
-    return Softplus(temp=800, params=["energy_per_atom", "test_param"],
-                    weights=[0.3, 0.7])
+    return Softplus(
+        temp=800, params=["energy_per_atom", "test_param"], weights=[0.3, 0.7]
+    )
 
 
 def test_evaluate(softplus_with_attr, softplus_with_attr_and_param, computed_rxn):
@@ -29,4 +30,3 @@ def test_missing_parameter(softplus_with_attr_and_param, computed_rxn):
     with pytest.raises(ValueError) as error:
         assert softplus_with_attr_and_param.evaluate(computed_rxn)
     assert str(error.value) == "Reaction is missing parameter test_param!"
-

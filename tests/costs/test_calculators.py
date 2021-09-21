@@ -14,8 +14,11 @@ from rxn_network.reactions.computed import ComputedReaction
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 
 answers = {
-    "0.5 Y2O3 + 0.5 Mn2O3 -> YMnO3": {np.sum: 0.480008216, np.max: 0.480008216, np.mean:
-        0.240004108},
+    "0.5 Y2O3 + 0.5 Mn2O3 -> YMnO3": {
+        np.sum: 0.480008216,
+        np.max: 0.480008216,
+        np.mean: 0.240004108,
+    },
     "2 YClO + 2 NaMnO2 + 0.5 O2 -> Y2Mn2O7 + 2 NaCl": {
         np.sum: 1.369790046,
         np.max: 1.369790045,
@@ -24,7 +27,7 @@ answers = {
 }
 
 
-@pytest.fixture(params=["Cl-Mn-Na-O-Y_entries.json.gz"], scope="session")
+@pytest.fixture(params=["Cl-Mn-Na-O-Y_entries.json.gz"])
 def entries(request):
     entries = loadfn(TEST_FILES_PATH / request.param)
     return GibbsEntrySet(entries)
@@ -34,8 +37,7 @@ def entries(request):
     params=[
         [["Y2O3", "Mn2O3"], ["YMnO3"]],
         [["YOCl", "NaMnO2", "O2"], ["Y2Mn2O7", "NaCl"]],
-    ],
-    scope="session",
+    ]
 )
 def rxn(entries, request):
     reactants = request.param[0]
@@ -50,7 +52,7 @@ def mu_func(request):
     return request.param
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def cpd(entries):
     return ChemicalPotentialDiagram(entries)
 

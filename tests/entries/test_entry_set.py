@@ -1,31 +1,8 @@
 """ Tests for GibbsEntrySet. """
-from pathlib import Path
-
 import pytest
-from monty.serialization import loadfn
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 
 from rxn_network.entries.entry_set import GibbsEntrySet
-
-TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
-
-
-@pytest.fixture(
-    params=[
-        "Mn-O-Y_entries.json.gz",
-        "Fe-Li-O-P_entries.json.gz",
-    ],
-    scope="session",
-)
-def mp_entries(request):
-    mp_entries = loadfn(TEST_FILES_PATH / request.param)
-    return mp_entries
-
-
-@pytest.fixture
-def gibbs_entries(mp_entries):
-    entries = GibbsEntrySet.from_entries(mp_entries, temperature=1000)
-    return entries
 
 
 @pytest.mark.parametrize(
@@ -334,7 +311,11 @@ def test_get_min_entry_by_formula(gibbs_entries):
     chemsys = "-".join(sorted(gibbs_entries.chemsys))
 
     f_id = [("YMnO3", "mp-19385"), ("Mn2O3", "mp-1172875"), ("MnO2", "mp-1279979")]
-    f_id2 = [("LiFePO4", "mp-756958"), ("Fe2O3", "mp-19770"), ("Li2O", "NISTReferenceEntry")]
+    f_id2 = [
+        ("LiFePO4", "mp-756958"),
+        ("Fe2O3", "mp-19770"),
+        ("Li2O", "NISTReferenceEntry"),
+    ]
 
     test_formulas = None
     if chemsys == "Mn-O-Y":

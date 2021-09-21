@@ -19,30 +19,39 @@ def chempot(request):
 def open_computed_rxn(computed_rxn, element, chempot):
     chempots = {Element(element): chempot}
 
-    return OpenComputedReaction(entries=computed_rxn.entries,
-                                coefficients=computed_rxn.coefficients,
-                                chempots=chempots,
-                                data=computed_rxn.data,
-                                lowest_num_errors=computed_rxn.lowest_num_errors)
+    return OpenComputedReaction(
+        entries=computed_rxn.entries,
+        coefficients=computed_rxn.coefficients,
+        chempots=chempots,
+        data=computed_rxn.data,
+        lowest_num_errors=computed_rxn.lowest_num_errors,
+    )
 
 
 def test_energy(open_computed_rxn):
     open_elem = list(open_computed_rxn.chempots.keys())[0]
     chempot = list(open_computed_rxn.chempots.values())[0]
 
-    expected = {"Na": {0: -2.701048424999957,
-                       -2: -2.701048424999957,
-                       -4: -2.701048424999957,
-                       -6: -2.701048424999957},
-                "Mn": {0: -2.701048424999957,
-                       -2: -2.701048424999957,
-                       -4: -2.701048424999957,
-                       -6: -2.701048424999957},
-                "O": {0: -2.701048424999957,
-                      -2: -0.7010484249999713,
-                      -4: 1.2989515750000287,
-                      -6: 3.2989515750000145}
-                }
+    expected = {
+        "Na": {
+            0: -2.701048424999957,
+            -2: -2.701048424999957,
+            -4: -2.701048424999957,
+            -6: -2.701048424999957,
+        },
+        "Mn": {
+            0: -2.701048424999957,
+            -2: -2.701048424999957,
+            -4: -2.701048424999957,
+            -6: -2.701048424999957,
+        },
+        "O": {
+            0: -2.701048424999957,
+            -2: -0.7010484249999713,
+            -4: 1.2989515750000287,
+            -6: 3.2989515750000145,
+        },
+    }
 
     assert open_computed_rxn.energy == pytest.approx(expected[open_elem.name][chempot])
 
@@ -57,9 +66,11 @@ def test_num_atoms(open_computed_rxn):
 def test_elements(open_computed_rxn):
     open_elem = list(open_computed_rxn.chempots.keys())[0]
 
-    expected = {"Na": {Element(e) for e in ["Mn", "O", "Y", "Cl"]},
-                "Mn": {Element(e) for e in ["Na", "O", "Y", "Cl"]},
-                "O": {Element(e) for e in ["Na", "Mn", "Y", "Cl"]}}
+    expected = {
+        "Na": {Element(e) for e in ["Mn", "O", "Y", "Cl"]},
+        "Mn": {Element(e) for e in ["Na", "O", "Y", "Cl"]},
+        "O": {Element(e) for e in ["Na", "Mn", "Y", "Cl"]},
+    }
 
     assert set(open_computed_rxn.elements) == expected[open_elem.name]
 

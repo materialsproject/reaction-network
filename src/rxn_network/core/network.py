@@ -31,7 +31,7 @@ class Network(MSONable, metaclass=ABCMeta):
         """Construct the network from the supplied enumerators"""
 
     @abstractmethod
-    def find_pathways(self) -> List[Pathway]:
+    def find_pathways(self, target, k) -> List[Pathway]:
         """Find reaction pathways"""
 
     @abstractmethod

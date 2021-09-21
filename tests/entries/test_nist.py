@@ -30,16 +30,28 @@ def test_invalid_temperature():
 
 
 def test_energy(entries):
-    expected_energies = [-4.087606831162386, -4.095773877778095, -4.101640055931004,
-                         -4.105267551255239, -4.107236763002682, -4.107910440705754]
+    expected_energies = [
+        -4.087606831162386,
+        -4.095773877778095,
+        -4.101640055931004,
+        -4.105267551255239,
+        -4.107236763002682,
+        -4.107910440705754,
+    ]
     actual_energies = [entry.energy for entry in entries.values()]
 
     assert actual_energies == pytest.approx(expected_energies)
 
 
 def test_energy_per_atom(entries):
-    expected_energies = [-1.362535610387462, -1.365257959259365, -1.3672133519770011,
-                         -1.3684225170850797, -1.369078921000894, -1.3693034802352513]
+    expected_energies = [
+        -1.362535610387462,
+        -1.365257959259365,
+        -1.3672133519770011,
+        -1.3684225170850797,
+        -1.369078921000894,
+        -1.3693034802352513,
+    ]
     actual_energies = [entry.energy_per_atom for entry in entries.values()]
 
     assert actual_energies == pytest.approx(expected_energies)
