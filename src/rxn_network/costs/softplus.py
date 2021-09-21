@@ -6,7 +6,7 @@ from typing import List, Optional
 import numpy as np
 
 from rxn_network.core import CostFunction
-from rxn_network.reactions import ComputedReaction
+from rxn_network.reactions.computed import ComputedReaction
 
 
 class Softplus(CostFunction):

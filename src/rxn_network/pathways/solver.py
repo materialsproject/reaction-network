@@ -3,16 +3,16 @@ Implements a reaction pathway solver class which efficiently solves mass balance
 equations using matrix operations.
 """
 
-from itertools import chain, combinations, compress, groupby, product
+from itertools import combinations
 from typing import List
 
 import numpy as np
 from scipy.special import comb
 from tqdm.notebook import tqdm
 
-from rxn_network.core import CostFunction, Pathway, Reaction, Solver
-from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
+from rxn_network.core import CostFunction, Pathway, Solver
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.utils import balance_path_arrays
 from rxn_network.reactions.computed import ComputedReaction

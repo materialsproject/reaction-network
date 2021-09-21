@@ -7,8 +7,8 @@ from typing import List, Optional
 import numpy as np
 from pymatgen.analysis.phase_diagram import PDEntry
 
-from rxn_network.core import Calculator
-from rxn_network.reactions import ComputedReaction
+from rxn_network.core.calculator import Calculator
+from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 

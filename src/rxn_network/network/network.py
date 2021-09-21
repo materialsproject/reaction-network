@@ -8,7 +8,7 @@ from graph_tool.util import find_edge, find_vertex
 
 from rxn_network.core import CostFunction, Enumerator, Network
 from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.network.adaptors.gt import (
+from rxn_network.network.gt import (
     initialize_graph,
     update_vertex_props,
     yens_ksp,
@@ -199,7 +199,7 @@ class ReactionNetwork(Network):
         self.target = target
 
     def _shortest_paths(self, k=15):
-        "Finds the k shortest paths using Yen's algorithm and returns BasicPathways"
+        """Finds the k shortest paths using Yen's algorithm and returns BasicPathways"""
         g = self._g
         paths = []
 
@@ -209,7 +209,7 @@ class ReactionNetwork(Network):
         target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
 
         for path in yens_ksp(g, k, precursors_v, target_v):
-            paths.append(BasicPathway.from_graph_path(g, path))
+            paths.append(self._path_from_graph(g, path))
 
         for path in paths:
             print(path, "\n")
@@ -224,6 +224,20 @@ class ReactionNetwork(Network):
 
         rxns = ReactionSet.from_rxns(rxns, self.entries)
         return rxns
+
+    @staticmethod
+    def _path_from_graph(g, path):
+        rxns = []
+        costs = []
+
+        for step, v in enumerate(path):
+            if g.vp["type"][v] == NetworkEntryType.Products.value:
+                e = g.edge(path[step - 1], v)
+
+                rxns.append(g.ep["rxn"][e])
+                costs.append(g.ep["cost"][e])
+
+        return BasicPathway(reactions=rxns, costs=costs)
 
     @property
     def graph(self):

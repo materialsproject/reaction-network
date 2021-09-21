@@ -71,6 +71,7 @@ def plot_network_on_graphistry(graph):
             "Must install optional dependencies: pygraphistry, networkx, "
             "and pyintergraph!"
         )
+        return
 
     nx_graph = pyintergraph.gt2nx(graph)
     mapping = {}
