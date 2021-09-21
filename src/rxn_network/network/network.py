@@ -2,7 +2,6 @@
 Implementation of an actual reaction network interface.
 """
 
-import logging
 from typing import List, Optional
 
 from graph_tool.util import find_edge, find_vertex

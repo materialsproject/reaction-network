@@ -321,21 +321,52 @@ def test_filter_by_stability(e_above_hull, expected_phases, gibbs_entries):
 
 
 def test_build_indices(gibbs_entries):
-    pass
+    entries = gibbs_entries.copy()
+    entries.build_indices()
+
+    num_entries = len(entries)
+
+    indices = [e.data["idx"] for e in entries.entries_list]
+    assert indices == list(range(num_entries))
 
 
 def test_get_min_entry_by_formula(gibbs_entries):
-    pass
+    chemsys = "-".join(sorted(gibbs_entries.chemsys))
+
+    f_id = [("YMnO3", "mp-19385"), ("Mn2O3", "mp-1172875"), ("MnO2", "mp-1279979")]
+    f_id2 = [("LiFePO4", "mp-756958"), ("Fe2O3", "mp-19770"), ("Li2O", "NISTReferenceEntry")]
+
+    test_formulas = None
+    if chemsys == "Mn-O-Y":
+        test_formulas = f_id
+    elif chemsys == "Fe-Li-O-P":
+        test_formulas = f_id2
+
+    for f, entry_id in test_formulas:
+        assert gibbs_entries.get_min_entry_by_formula(f).entry_id == entry_id
 
 
 def test_stabilize_entry(gibbs_entries):
-    pass
+    chemsys = "-".join(sorted(gibbs_entries.chemsys))
+    entries = gibbs_entries.copy()
+
+    f1 = ["YMn3O6", "Mn2O5"]
+    f2 = ["LiP", "LiFeO3"]
+
+    test_formulas = None
+    if chemsys == "Mn-O-Y":
+        test_formulas = f1
+    elif chemsys == "Fe-Li-O-P":
+        test_formulas = f2
+
+    for f in test_formulas:
+        e = entries.get_min_entry_by_formula(f)
+        e_stable = entries.stabilize_entry(e)
+        entries.add(e_stable)
+
+        assert e_stable in PhaseDiagram(entries).stable_entries
 
 
 def test_from_pd(mp_entries):
     entries = GibbsEntrySet.from_pd(PhaseDiagram(mp_entries), temperature=1000)
     assert entries is not None
-
-
-def test_from_entries(mp_entries):
-    pass
