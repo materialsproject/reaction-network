@@ -3,10 +3,60 @@ site_description: Documentation for rxn_network
 copyright: Built by The GENESIS EFRC
 
 theme:
-  name: 'material'
+  name: null
+  custom_dir: 'cinder'
 
 nav:
   - Home: index.md
+  - Reference:
+      Core:
+        Calculator: reference/core/calculator.md
+        Cost Function: reference/core/softplus.md
+        Enumerator: reference/core/enumerator.md
+        Network: reference/core/network.md
+        Pathway: reference/core/pathway.md
+        Reaction: reference/core/reaction.md
+        Solver: reference/core/solver.md
+      Costs:
+        Calculators: reference/costs/calculators.md
+        Softplus: reference/costs/softplus.md
+      Data: reference/data/data.md
+      Entries:
+        Entry Set: reference/entries/entry_set.md
+        Gibbs: reference/entries/gibbs.md
+        Nist: reference/entries/nist.md
+      Enumerators:
+        Basic: reference/enumerators/basic.md
+        Minimize: reference/enumerators/minimize.md
+        Utils: reference/enumerators/utils.md
+      Firetasks:
+        Build Inputs: reference/firetasks/build_inputs.md
+        Parse Outputs: reference/firetasks/parse_outputs.md
+        Run Calc: reference/firetasks/run_calc.md
+        Utils: reference/firetasks/utils.md
+      Fireworks:
+        Core: reference/fireworks/core.md
+      Network:
+        Entry: reference/network/entry.md
+        Graph-tool: reference/network/gt.md
+        Network: reference/network/network.md
+        Utils: reference/network/utils.md
+        Visualize: reference/visualize/visualize.md
+      Pathways:
+        Balanced: reference/pathways/balanced.md
+        Basic: reference/pathways/basic.md
+        Solver: reference/pathways/solver.md
+        Utils: reference/pathways/utils.md
+      Reactions:
+        Basic: reference/reactions/basic.md
+        Computed: reference/reactions/computed.md
+        Open: reference/reactions/open.md
+        Reaction Set: reference/reactions/reaction_set.md
+        Utils: reference/reactions/utils.md
+      Thermo:
+        Chempot Diagram: reference/thermo/chempot_diagram.md
+        Utils: reference/thermo/utils.md
+  - CHANGELOG: CHANGELOG.md
 
 site_url: https://github.com/GENESIS-EFRC/reaction-network
 repo_url: https://github.com/GENESIS-EFRC/reaction-network/
