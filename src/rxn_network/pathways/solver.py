@@ -31,6 +31,15 @@ class PathwaySolver(Solver):
         open_elem: str = None,
         chempot: float = None,
     ):
+        """
+
+        Args:
+            entries:
+            pathways:
+            cost_function:
+            open_elem:
+            chempot:
+        """
 
         super().__init__(entries=entries, pathways=pathways)
         self.cost_function = cost_function
@@ -45,6 +54,18 @@ class PathwaySolver(Solver):
         intermediate_rxn_energy_cutoff: float = 0.0,
         filter_interdependent: bool = True,
     ):
+        """
+
+        Args:
+            net_rxn:
+            max_num_combos:
+            find_intermediate_rxns:
+            intermediate_rxn_energy_cutoff:
+            filter_interdependent:
+
+        Returns:
+
+        """
 
         entries = self.entries.entries_list
         precursors = net_rxn.reactant_entries
@@ -73,7 +94,7 @@ class PathwaySolver(Solver):
                     reactions.append(r)
                     costs.append(c)
 
-        net_rxn_vector = self.build_idx_vector(net_rxn)
+        net_rxn_vector = self._build_idx_vector(net_rxn)
         if net_rxn in reactions:
             reactions.remove(net_rxn)
 
@@ -95,7 +116,7 @@ class PathwaySolver(Solver):
                     )
                 comp_matrices = np.stack(
                     [
-                        np.vstack([self.build_idx_vector(reactions[r]) for r in combo])
+                        np.vstack([self._build_idx_vector(reactions[r]) for r in combo])
                         for combo in combos
                         if combo
                     ]
@@ -140,6 +161,20 @@ class PathwaySolver(Solver):
         filtered_paths = sorted(list(set(filtered_paths)), key=lambda p: p.average_cost)
         return filtered_paths
 
+    def _build_idx_vector(self, rxn):
+        """
+
+        Args:
+            rxn:
+
+        Returns:
+
+        """
+        indices = [e.data.get("idx") for e in rxn.entries]
+        v = np.zeros(self.num_entries)
+        v[indices] = rxn.coefficients
+        return v
+
     def _find_intermediate_rxns(self, precursors, targets, energy_cutoff):
         rxns = []
         intermediates = {e for rxn in self.reactions for e in rxn.entries}
@@ -179,9 +214,3 @@ class PathwaySolver(Solver):
         self.logger.info(f"Found {len(rxns)} intermediate reactions!")
 
         return rxns
-
-    def build_idx_vector(self, rxn):
-        indices = [e.data.get("idx") for e in rxn.entries]
-        v = np.zeros(self.num_entries)
-        v[indices] = rxn.coefficients
-        return v

@@ -25,7 +25,6 @@ def pytest_itemcollected(item):
 @pytest.fixture(
     params=[
         "Mn-O-Y_entries.json.gz",
-        "Fe-Li-O-P_entries.json.gz",
     ],
     scope="session",
 )
