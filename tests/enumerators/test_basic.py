@@ -45,6 +45,16 @@ def basic_enumerator_with_precursors_and_target():
     return BasicEnumerator(precursors=["Y2O3", "Mn2O3"], target="YMnO3")
 
 
+@pytest.fixture
+def basic_open_enumerator():
+    return BasicOpenEnumerator(["O2"])
+
+
+def basic_open_enumerator_with_target():
+    return BasicOpenEnumerator(["O2"])
+
+
+
 def test_enumerate(
     filtered_entries, basic_enumerator_default, basic_enumerator_with_calculator
 ):
