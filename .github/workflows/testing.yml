@@ -88,7 +88,7 @@ jobs:
         miniconda-version: "latest"
         python-version: 3.9
         activate-environment: foo
-      run: |
+    - run: |
         conda install -c conda-forge graph-tool
         pip install -e .
         pip install -r requirements-optional.txt
