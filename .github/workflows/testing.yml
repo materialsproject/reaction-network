@@ -98,6 +98,5 @@ jobs:
         pip install -e .
         pip install -r requirements-optional.txt
         pip install -r requirements-docs.txt
-        python -c 'from rxn_network.network import NetworkEntry'
     - name: Build
-      run: mkdocs build
+      run: conda run mkdocs build
