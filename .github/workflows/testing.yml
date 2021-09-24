@@ -85,11 +85,15 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v2
       with:
         miniconda-version: "latest"
-        activate-environment: docs
-
+        python-version: 3.9
+        activate-environment: foo
+    - name: Bash
+      shell: bash -l {0}
+      run: |
+        conda info
+        conda list
     - name: Install dependencies
       run: |
-        conda activate docs
         conda install -c conda-forge graph-tool
         pip install -e .
         pip install -r requirements-optional.txt
