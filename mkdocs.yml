@@ -11,7 +11,7 @@ nav:
   - Reference:
       Core:
         Calculator: reference/core/calculator.md
-        Cost Function: reference/core/softplus.md
+        Cost Function: reference/core/cost_function.md
         Enumerator: reference/core/enumerator.md
         Network: reference/core/network.md
         Pathway: reference/core/pathway.md
@@ -41,7 +41,7 @@ nav:
         Graph-tool: reference/network/gt.md
         Network: reference/network/network.md
         Utils: reference/network/utils.md
-        Visualize: reference/visualize/visualize.md
+        Visualize: reference/network/visualize.md
       Pathways:
         Balanced: reference/pathways/balanced.md
         Basic: reference/pathways/basic.md
