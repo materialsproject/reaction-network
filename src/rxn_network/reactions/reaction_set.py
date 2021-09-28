@@ -4,7 +4,7 @@ objects which share entries.
 """
 
 from functools import lru_cache
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Set, Iterable
 
 import numpy as np
 from monty.json import MSONable
@@ -46,8 +46,8 @@ class ReactionSet(MSONable):
     @lru_cache(1)
     def get_rxns(
         self,
-        open_elem: Optional[Union[str, Element]] = None,
-        chempot: Optional[float] = 0,
+        open_elem: Optional[str] = None,
+        chempot: float = 0.0,
     ) -> List[Union[ComputedReaction, OpenComputedReaction]]:
         """
         Returns list of ComputedReaction objects or OpenComputedReaction objects (when
@@ -98,7 +98,7 @@ class ReactionSet(MSONable):
     def from_rxns(
         cls,
         rxns: List[Union[ComputedReaction, OpenComputedReaction]],
-        entries: Optional[List[ComputedEntry]] = None,
+        entries: Optional[Iterable[ComputedEntry]] = None,
     ) -> "ReactionSet":
         """
         Initiate a ReactionSet object from a list of reactions. Including a list of
@@ -127,7 +127,7 @@ class ReactionSet(MSONable):
         )
 
     @staticmethod
-    def _get_unique_entries(rxns) -> List[ComputedEntry]:
+    def _get_unique_entries(rxns: List[ComputedReaction]) -> Set[ComputedEntry]:
         """Return only unique entries from reactions"""
         entries = set()
         for r in rxns:

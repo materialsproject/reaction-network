@@ -2,6 +2,7 @@
 Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 """
 import hashlib
+from typing import Dict, Any
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry
@@ -47,7 +48,7 @@ class NISTReferenceEntry(Entry):
         self._formula = formula
         self.name = formula
         self.entry_id = "NISTReferenceEntry"
-        self.data = {}
+        self.data = {}  # type: Dict[Any, Any]
 
         super().__init__(composition.reduced_composition, energy)
 

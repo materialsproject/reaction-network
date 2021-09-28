@@ -5,7 +5,7 @@ pymatgen and streamlined for the reaction-network code.
 
 import re
 from itertools import chain, combinations
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Tuple
 
 import numpy as np
 from monty.fractions import gcd_float
@@ -29,7 +29,7 @@ class BasicReaction(Reaction):
         coefficients: Union[List[float], np.ndarray],
         balanced: Optional[bool] = None,
         data: Optional[Dict] = None,
-        lowest_num_errors: Optional[int] = None,
+        lowest_num_errors: Union[int, float] = 0,
     ):
         """
         A BasicReaction object is defined by a list of compositions and their
@@ -101,6 +101,7 @@ class BasicReaction(Reaction):
         """
         compositions = reactants + products
         coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)
+
         balanced = True
         if coeffs is None or lowest_num_errors == np.inf:
             balanced = False
@@ -273,7 +274,7 @@ class BasicReaction(Reaction):
         return self._compositions
 
     @property
-    def coefficients(self) -> np.array:  # pylint: disable = W0236
+    def coefficients(self) -> np.ndarray:  # pylint: disable = W0236
         """Array of reaction coefficients"""
         return self._coefficients
 
@@ -316,8 +317,8 @@ class BasicReaction(Reaction):
 
     @classmethod
     def _balance_coeffs(
-        cls, reactants: List[Composition], products: List[Composition], robust=True
-    ) -> np.array:
+        cls, reactants: List[Composition], products: List[Composition]
+    ) -> Tuple[np.ndarray, Union[int, float]]:
         """
         Balances the reaction and returns the new coefficient matrix
         """
@@ -351,7 +352,7 @@ class BasicReaction(Reaction):
                 for n_constr in range(num_constraints, 0, -1)
             ]
         )
-        best_soln = None
+        best_soln = np.zeros(num_comp)
 
         for constraints in chain(product_constraints, reactant_constraints):
             n_constr = len(constraints)

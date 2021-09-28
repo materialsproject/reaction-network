@@ -2,9 +2,10 @@
 A reaction class that builds reactions based on ComputedEntry objects and provides
 information about reaction thermodynamics.
 """
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import numpy as np
+from pymatgen.core.composition import Composition
 from pymatgen.entries.computed_entries import ComputedEntry
 from uncertainties import ufloat
 
@@ -21,14 +22,16 @@ class ComputedReaction(BasicReaction):
     def __init__(
         self,
         entries: List[ComputedEntry],
-        coefficients: List[float],
+        coefficients: Union[np.ndarray, List[float]],
         data: Optional[Dict] = None,
-        lowest_num_errors: Optional[int] = None,
+        lowest_num_errors: Union[int, float] = 0,
     ):
         """
         Args:
-            entries([ComputedEntry]): List of ComputedEntry objects.
-            coefficients([float]): List of reaction coefficients.
+            entries: List of ComputedEntry objects.
+            coefficients: List of reaction coefficients.
+            data: Optional dict of data
+            lowest_num_errors: number of "errors" encountered during reaction balancing
         """
         self._entries = list(entries)
         self.reactant_entries = [
@@ -59,14 +62,13 @@ class ComputedReaction(BasicReaction):
         Args:
             reactant_entries: List of reactant entries
             product_entries: List of product entries
+            data: Optional dict of data
         """
         reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
         product_comps = [e.composition.reduced_composition for e in product_entries]
         coefficients, lowest_num_errors = cls._balance_coeffs(
             reactant_comps, product_comps
         )
-        if not coefficients.any():
-            coefficients = []
 
         return cls(
             entries=list(reactant_entries) + list(product_entries),
@@ -81,7 +83,7 @@ class ComputedReaction(BasicReaction):
         Returns (float):
             The calculated reaction energy.
         """
-        calc_energies = {}
+        calc_energies: Dict[Composition, float] = {}
 
         for entry in self._entries:
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()

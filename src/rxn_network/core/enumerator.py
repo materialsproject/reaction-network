@@ -7,8 +7,6 @@ from typing import List
 
 from monty.json import MSONable
 
-from rxn_network.core.reaction import Reaction
-
 
 class Enumerator(MSONable, metaclass=ABCMeta):
     """
@@ -27,7 +25,7 @@ class Enumerator(MSONable, metaclass=ABCMeta):
         self.calculators = calculators
 
     @abstractmethod
-    def enumerate(self, entries) -> List[Reaction]:
+    def enumerate(self, entries):
         """
         Enumerates the potential reactions from the list of entries
         """

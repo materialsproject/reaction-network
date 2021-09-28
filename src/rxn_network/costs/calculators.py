@@ -28,8 +28,8 @@ class ChempotDistanceCalculator(Calculator):
     def __init__(
         self,
         cpd: ChemicalPotentialDiagram,
-        mu_func: Optional[str] = "sum",
-        name: Optional[str] = "chempot_distance",
+        mu_func: str = "sum",
+        name: str = "chempot_distance",
     ):
         """
         Args:
@@ -43,11 +43,11 @@ class ChempotDistanceCalculator(Calculator):
         self.name = name
 
         if mu_func == "max":
-            self._mu_func = np.max
+            self._mu_func = np.max  # type: ignore
         elif mu_func == "mean":
-            self._mu_func = np.mean
+            self._mu_func = np.mean  # type: ignore
         elif mu_func == "sum":
-            self._mu_func = np.sum
+            self._mu_func = np.sum   # type: ignore
 
     def calculate(self, rxn: ComputedReaction) -> float:
         """
@@ -97,8 +97,8 @@ class ChempotDistanceCalculator(Calculator):
     def from_entries(
         cls,
         entries: List[PDEntry],
-        mu_func: Optional[str] = "sum",
-        name: Optional[str] = "chempot_distance",
+        mu_func: str = "sum",
+        name: str = "chempot_distance",
         **kwargs
     ) -> "ChempotDistanceCalculator":
         """

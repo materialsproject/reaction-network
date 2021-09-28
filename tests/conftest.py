@@ -40,6 +40,12 @@ def gibbs_entries(mp_entries):
 
 
 @pytest.fixture(scope="session")
+def filtered_entries(gibbs_entries):
+    filtered_entries = gibbs_entries.filter_by_stability(0.0)
+    return filtered_entries
+
+
+@pytest.fixture(scope="session")
 def computed_rxn():
     """ 2 YOCl + 2 NaMnO2 + 0.5 O2 -> Y2Mn2O7 + 2 NaCl"""
     return loadfn(TEST_FILES_PATH / "computed_rxn.json.gz")

@@ -8,8 +8,8 @@ from numba import njit, prange
 
 @njit(parallel=True)
 def balance_path_arrays(
-    comp_matrices: np.array,
-    net_coeffs: np.array,
+    comp_matrices: np.ndarray,
+    net_coeffs: np.ndarray,
     tol: float = 1e-6,
 ):
     """

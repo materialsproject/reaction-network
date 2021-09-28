@@ -4,11 +4,12 @@ presence of an open entry (e.g. O2), and provides information about reaction
 thermodynamics computed as changes in grand potential.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import numpy as np
+
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
-from pymatgen.core.composition import Element
+from pymatgen.core.composition import Element, Composition
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.reactions.computed import ComputedReaction
@@ -23,7 +24,7 @@ class OpenComputedReaction(ComputedReaction):
     def __init__(
         self,
         entries: List[ComputedEntry],
-        coefficients: List[float],
+        coefficients: Union[np.ndarray, List[float]],
         chempots: Dict[Element, float],
         data: Optional[Dict] = None,
         lowest_num_errors=None,
@@ -31,11 +32,11 @@ class OpenComputedReaction(ComputedReaction):
         """
 
         Args:
-            entries:
-            coefficients:
-            chempots:
-            data:
-            lowest_num_errors:
+            entries: List of ComputedEntry objects.
+            coefficients: List of reaction coefficients.
+            chempots: Dict of chemical potentials corresponding to open elements
+            data: Optional dict of data
+            lowest_num_errors: number of "errors" encountered during reaction balancing
         """
         super().__init__(
             entries=entries,
@@ -58,7 +59,7 @@ class OpenComputedReaction(ComputedReaction):
         self.grand_entries = grand_entries
 
     @classmethod
-    def balance(
+    def balance(  # type: ignore
         cls,
         reactant_entries: List[ComputedEntry],
         product_entries: List[ComputedEntry],
@@ -83,22 +84,19 @@ class OpenComputedReaction(ComputedReaction):
             reactant_comps, product_comps
         )
 
-        if not coefficients.any():
-            coefficients = []
-
         entries = list(reactant_entries) + list(product_entries)
 
         args = {
             "entries": entries,
-            "coefficients": list(coefficients),
+            "coefficients": coefficients,
             "data": data,
             "lowest_num_errors": lowest_num_errors,
         }
 
         if not chempots:
-            rxn = ComputedReaction(**args)
+            rxn = ComputedReaction(**args)  # type: ignore
         else:
-            rxn = cls(chempots=chempots, **args)
+            rxn = cls(chempots=chempots, **args)  # type: ignore
 
         return rxn
 
@@ -108,7 +106,7 @@ class OpenComputedReaction(ComputedReaction):
         Returns (float):
             The calculated reaction energy.
         """
-        calc_energies = {}
+        calc_energies: Dict[Composition, float] = {}
 
         for entry in self.grand_entries:
             attr = "composition"

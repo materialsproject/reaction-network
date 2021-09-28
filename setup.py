@@ -38,7 +38,6 @@ setup(
     extra_requires={"demo": ["jupyter>=1.0.0"]},
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Development Status :: 4 - Beta",
@@ -51,5 +50,5 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     tests_require=["pytest"],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
 )

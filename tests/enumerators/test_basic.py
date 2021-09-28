@@ -15,12 +15,6 @@ def ymno3_rxns():
 
 
 @pytest.fixture
-def filtered_entries(gibbs_entries):
-    filtered_entries = gibbs_entries.filter_by_stability(0.0)
-    return filtered_entries
-
-
-@pytest.fixture
 def basic_enumerator_default():
     return BasicEnumerator()
 

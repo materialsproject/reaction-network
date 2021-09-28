@@ -107,7 +107,7 @@ def yens_ksp(
     a = [path]
     a_costs = [path_cost(path)]
 
-    b = PriorityQueue()  # automatically sorts by path cost (priority)
+    b = PriorityQueue()  # type: ignore
 
     g.ep["bool"] = g.new_edge_property("bool", val=True)
 
@@ -156,7 +156,6 @@ def yens_ksp(
     return a
 
 
-@staticmethod
 def update_vertex_properties(g, v, prop_dict):
     """
     Helper method for updating several vertex properties at once in a graph-tool

@@ -20,7 +20,7 @@ class Softplus(CostFunction):
 
     def __init__(
         self,
-        temp: Optional[float] = 300,
+        temp: float = 300,
         params: Optional[List[str]] = None,
         weights: Optional[List[float]] = None,
     ):
@@ -61,8 +61,8 @@ class Softplus(CostFunction):
                 raise ValueError(f"Reaction is missing parameter {p}!")
             values.append(value)
 
-        values = np.array(values)
-        total = float(np.dot(values, self.weights))
+        values_arr = np.array(values)
+        total = float(np.dot(values_arr, self.weights))
 
         return self._softplus(total, self.temp)
 

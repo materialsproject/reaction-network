@@ -26,7 +26,7 @@ class Reaction(MSONable, metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def coefficients(self) -> np.array:
+    def coefficients(self) -> np.ndarray:
         """Coefficients of the reaction"""
 
     @property
