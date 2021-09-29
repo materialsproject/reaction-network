@@ -56,12 +56,12 @@ def grand_potential_enumerator_with_precursors_and_target():
 def test_enumerate_gibbs(
     filtered_entries, gibbs_enumerator_default, gibbs_enumerator_with_calculator
 ):
-    expected_num_rxns = 400
+    expected_num_rxns = 109
 
     for enumerator in [gibbs_enumerator_default, gibbs_enumerator_with_calculator]:
         rxns = enumerator.enumerate(filtered_entries)
 
-        assert expected_num_rxns == len(rxns)
+        assert len(rxns) == expected_num_rxns
         assert len(rxns) == len(set(rxns))
         assert all([not r.is_identity for r in rxns])
 
@@ -70,22 +70,18 @@ def test_enumerate_gibbs(
 
 
 def test_enumerate_gibbs_with_precursors(filtered_entries,
-                                   basic_enumerator_with_precursors,
-                                   basic_open_enumerator_with_precursors):
+                                   gibbs_enumerator_with_precursors):
 
-    for enumerator in [basic_enumerator_with_precursors,
-                       basic_open_enumerator_with_precursors]:
+    rxns = gibbs_enumerator_with_precursors.enumerate(filtered_entries)
+    precursors = gibbs_enumerator_with_precursors.precursors
 
-        rxns = enumerator.enumerate(filtered_entries)
-        precursors = enumerator.precursors
+    for r in rxns:
+        reactants = [i.reduced_formula for i in r.reactants]
+        products = [i.reduced_formula for i in r.products]
 
-        for r in rxns:
-            reactants = [i.reduced_formula for i in r.reactants]
-            products = [i.reduced_formula for i in r.products]
-
-            for precursor in precursors:
-                assert precursor in reactants
-                assert precursor not in products
+        for precursor in precursors:
+            assert precursor in reactants
+            assert precursor not in products
 
 
 def test_enumerate_gibbs_with_target(filtered_entries,

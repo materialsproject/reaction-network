@@ -46,6 +46,8 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
                 module for options (e.g., ["ChempotDistanceCalculator])
         """
         super().__init__(precursors, target, calculators)
+        self.provide_entries = True
+        self.build_pd = True
 
     def estimate_num_reactions(self, entries: List[ComputedEntry]) -> int:
         """
@@ -81,7 +83,6 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         """Simple API for InterfacialReactivity module from pymatgen."""
         chempots=None
 
-        print(r1, r2, grand_pd)
         if grand_pd:
             interface = InterfacialReactivity(
                 r1,
@@ -144,6 +145,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         self.open_elem = Element(open_elem)  # type: ignore
         self.mu = mu
         self.chempots = {self.open_elem: self.mu}
+        self.build_grand_pd = True
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
         r = list(reactants)
@@ -153,6 +155,13 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             r1 = r[0]
         else:
             r1 = r[1]
+
+        open_elem = list(grand_pd.chempots.keys())[0]
+
+        for reactant in r:
+            elems = reactant.composition.elements
+            if len(elems) == 1 and elems[0] == open_elem:  # skip if reactant = open_e
+                return []
 
         return self._react_interface(
             r0.composition, r1.composition, pd, grand_pd=grand_pd,

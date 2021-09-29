@@ -43,10 +43,10 @@ class BasicEnumerator(Enumerator):
         objects during enumeration.
 
         Args:
-            precursors: Optional collection of precursor formulas; only reactions
-                with these phases as reactants will be enumerated.
-            target: Optional formula of target; only reactions which make this target
-                will be enumerated.
+            precursors: Optional list of precursor formulas; only reactions
+                which contain at least these phases as reactants will be enumerated.
+            target: Optional formula of target; only reactions which include
+                formation of this target will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator])
             n: Maximum reactant/product cardinality; i.e., largest possible number of
@@ -65,6 +65,10 @@ class BasicEnumerator(Enumerator):
         self.stabilize = False  # whether to use only stable entries
         if "ChempotDistanceCalculator" in self.calculators:
             self.stabilize = True
+
+        self.build_pd = False
+        self.build_grand_pd = False
+        self.provide_entries = False
 
     def enumerate(
         self,
@@ -106,7 +110,8 @@ class BasicEnumerator(Enumerator):
             filtered_entries = filter_entries_by_chemsys(entries, chemsys)
             calculators = initialize_calculators(self.calculators, filtered_entries)
 
-            rxn_iter = self._get_rxn_iterable(combos, filtered_entries)
+            ents = filtered_entries if self.provide_entries else None
+            rxn_iter = self._get_rxn_iterable(combos, ents)
             r = self._get_rxns(rxn_iter, precursors, target, calculators,
                                filtered_entries)
             rxns.extend(r)
@@ -144,20 +149,16 @@ class BasicEnumerator(Enumerator):
         Returns reactions from an iterable representing the combination of 2 sets
         of phases. Works for reactions with open phases.
         """
-        rxns = []
-
-        chempots = None
-        if hasattr(self, "chempots"):
-            chempots = self.chempots
-
         pd = None
-        if filtered_entries:
+        if self.build_pd:
             pd = PhaseDiagram(filtered_entries)
 
         grand_pd = None
-        if chempots:
+        if self.build_grand_pd:
+            chempots = self.chempots
             grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
 
+        rxns = []
         for reactants, products in rxn_iterable:
             r = set(reactants) if reactants else set()
             p = set(products) if products else set()
@@ -197,7 +198,7 @@ class BasicEnumerator(Enumerator):
 
     def _get_initialized_entries(self, entries):
         precursors, target = None, None
-        entries_updated = entries.copy()
+        entries_new = entries.copy()
 
         if self.precursors:
             precursors = {
@@ -205,23 +206,23 @@ class BasicEnumerator(Enumerator):
             }
             for p in precursors:
                 if p not in entries:
-                    old_entry = entries_updated.get_min_entry_by_formula(
+                    old_entry = entries_new.get_min_entry_by_formula(
                         p.composition.reduced_formula
                     )
-                    entries_updated.remove(old_entry)
-                    entries_updated.add(p)
+                    entries_new.remove(old_entry)
+                    entries_new.add(p)
 
         if self.target:
             target = initialize_entry(self.target, entries, self.stabilize)
             if self.stabilize:
-                entries_updated.remove(entries.get_min_entry_by_formula(self.target))
-                entries_updated.add(target)
+                entries_new.remove(entries.get_min_entry_by_formula(self.target))
+                entries_new.add(target)
 
         if self.stabilize:
-            entries_updated = entries_updated.filter_by_stability(e_above_hull=0.0)
+            entries_new = entries_new.filter_by_stability(e_above_hull=0.0)
             self.logger.info("Filtering by stable entries!")
 
-        return entries_updated, precursors, target
+        return entries_new, precursors, target
 
     @staticmethod
     def _filter_dict_by_elems(combos_dict, precursor_elems, target_elems):
@@ -281,9 +282,11 @@ class BasicOpenEnumerator(BasicEnumerator):
             precursors, target, calculators, n, remove_unbalanced, remove_changed
         )
         self.open_phases = open_phases
+        self.provide_entries = True
 
     def _get_rxn_iterable(self, combos, filtered_entries):
         combos = [set(c) for c in combos]
+
         open_entries = {e for e in filtered_entries if e.composition.reduced_formula
                         in self.open_phases}
         open_combos = [
