@@ -59,21 +59,29 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         """
         return math.comb(len(entries), 2)
 
-    def _react(self, reactants, products, calculators, pd=None):
-        e1 = reactants[0]
-        e2 = reactants[1]
+    def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
+        r = list(reactants)
+        r0 = r[0]
+
+        if len(r) == 1:
+            r1 = r[0]
+        else:
+            r1 = r[1]
 
         return self._react_interface(
-            e1.composition, e2.composition, pd, calculators=calculators
+            r0.composition, r1.composition, pd, grand_pd, calculators=calculators
         )
 
-    def _get_rxn_iter(self, combos):
-        return product(combos, None)
+    def _get_rxn_iterable(self, combos, filtered_entries):
+        return product(combos, [None])
 
     def _react_interface(
-        self, r1, r2, pd, grand_pd=None, open_entry=None, calculators=None
+        self, r1, r2, pd, grand_pd=None, calculators=None
     ):
-        "Simple API for InterfacialReactivity module from pymatgen."
+        """Simple API for InterfacialReactivity module from pymatgen."""
+        chempots=None
+
+        print(r1, r2, grand_pd)
         if grand_pd:
             interface = InterfacialReactivity(
                 r1,
@@ -135,69 +143,18 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         super().__init__(precursors=precursors, target=target, calculators=calculators)
         self.open_elem = Element(open_elem)  # type: ignore
         self.mu = mu
+        self.chempots = {self.open_elem: self.mu}
 
-    def enumerate(self, entries) -> List[ComputedReaction]:
-        entries = GibbsEntrySet(entries)
+    def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
+        r = list(reactants)
+        r0 = r[0]
 
-        target = None
-        if self.target:
-            target = initialize_entry(self.target, entries)
-            entries.add(target)
-            target_elems = {str(e) for e in target.composition.elements}
+        if len(r) == 1:
+            r1 = r[0]
+        else:
+            r1 = r[1]
 
-        precursors = None
-        if self.precursors:
-            precursors = {initialize_entry(f, entries) for f in self.precursors}
-            for p in precursors:
-                entries.add(p)
-            precursor_elems = {
-                str(elem) for p in precursors for elem in p.composition.elements
-            }
-
-        if "ChempotDistanceCalculator" in self.calculators:
-            entries = entries.filter_by_stability(e_above_hull=0.0)
-            self.logger.info(
-                "Filtering by stable entries due to use of 'ChempotDistanceCalculator'"
-            )
-
-        open_entry = sorted(
-            filter(lambda e: e.composition.elements == [self.open_elem], entries),
-            key=lambda e: e.energy_per_atom,
-        )[0]
-        entries_no_open = GibbsEntrySet(entries)
-        entries_no_open.remove(open_entry)
-        combos = list(combinations(entries_no_open, 2))
-        combos_dict = group_by_chemsys(combos, self.open_elem)
-
-        rxns = []
-        for chemsys, combos in tqdm(combos_dict.items()):
-            elems = chemsys.split("-")
-            if (
-                (target and not target_elems.issubset(elems))
-                or (precursors and not precursor_elems.issuperset(elems))
-                or len(elems) >= 10
-            ):
-                continue
-
-            chemsys_entries = filter_entries_by_chemsys(entries, chemsys)
-            pd = PhaseDiagram(chemsys_entries)
-
-            calculators = initialize_calculators(self.calculators, chemsys_entries)
-
-            grand_pd = GrandPotentialPhaseDiagram(
-                chemsys_entries, {self.open_elem: self.mu}
-            )
-            for e1, e2 in combos:
-                if precursors and {e1, e2} != precursors:
-                    continue
-                predicted_rxns = self._react_interface(
-                    e1.composition,
-                    e2.composition,
-                    pd,
-                    grand_pd,
-                    open_entry,
-                    calculators,
-                )
-                rxns.extend(predicted_rxns)
-
-        return list(set(rxns))
+        return self._react_interface(
+            r0.composition, r1.composition, pd, grand_pd=grand_pd,
+            calculators=calculators
+        )

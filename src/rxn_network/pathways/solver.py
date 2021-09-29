@@ -199,7 +199,7 @@ class PathwaySolver(Solver):
 
                 if self.open_elem:
                     boe = BasicOpenEnumerator(
-                        open_entries=[self.open_elem],
+                        open_phases=[self.open_elem],
                         precursors=intermediate_formulas,
                         target=target.composition.reduced_formula,
                     )
