@@ -38,8 +38,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
                 module for options (e.g., ["ChempotDistanceCalculator])
         """
         super().__init__(precursors, target, calculators)
-        self.provide_entries = True
-        self.build_pd = True
+        self._build_pd = True
 
     def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
         """
@@ -51,7 +50,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
 
         Returns: The upper bound on the number of possible reactions
         """
-        return comb(len(entries), 2)
+        return comb(len(entries), 2) * 2
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
         r = list(reactants)
@@ -103,12 +102,6 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             else:
                 rxn = get_computed_rxn(rxn, pd.all_entries)
 
-            if rxn.is_identity or rxn.lowest_num_errors > 0:
-                continue
-
-            if self.target and self.target not in rxn.product_entries:
-                continue
-
             rxn = apply_calculators(rxn, calculators)
             rxns.append(rxn)
 
@@ -135,7 +128,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         self.open_elem = Element(open_elem)  # type: ignore
         self.mu = mu
         self.chempots = {self.open_elem: self.mu}
-        self.build_grand_pd = True
+        self._build_grand_pd = True
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
         r = list(reactants)

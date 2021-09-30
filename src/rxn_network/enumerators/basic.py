@@ -63,13 +63,12 @@ class BasicEnumerator(Enumerator):
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
 
-        self.stabilize = False  # whether to use only stable entries
+        self._stabilize = False
         if "ChempotDistanceCalculator" in self.calculators:
-            self.stabilize = True
+            self._stabilize = True
 
-        self.build_pd = False
-        self.build_grand_pd = False
-        self.provide_entries = False
+        self._build_pd = False
+        self._build_grand_pd = False
 
     def enumerate(self, entries: GibbsEntrySet) -> List[ComputedReaction]:
         """
@@ -102,7 +101,6 @@ class BasicEnumerator(Enumerator):
 
         pbar = tqdm(combos_dict.items(), desc=self.__class__.__name__)
 
-
         rxns = []
         for chemsys, combos in pbar:
             pbar.set_description(f"{chemsys}")
@@ -128,9 +126,10 @@ class BasicEnumerator(Enumerator):
 
         Returns: The upper bound on the number of possible reactions
         """
-        return sum([comb(len(entries), i) for i in range(self.n)]) ** 2
+        return sum([comb(len(entries), i) for i in range(1, self.n + 1)]) ** 2
 
     def _get_open_combos(self, entries):
+        """ No open entries for BasicEnumerator, returns None"""
         return None
 
     def _get_combos_dict(self, entries, precursor_entries, target_entries):
@@ -174,18 +173,16 @@ class BasicEnumerator(Enumerator):
             p = set(products) if products else set()
             all_phases = r | p
 
-            if (
-                (r & p)
-                or (precursors and not precursors.issubset(all_phases))
-                or (target and target not in all_phases)
-            ):
+            if (r & p) or (precursors and not precursors.issubset(all_phases)):
                 continue
 
             suggested_rxns = self._react(r, p, calculators, pd, grand_pd)
 
             for rxn in suggested_rxns:
-                if (self.remove_unbalanced and not rxn.balanced) or (
-                    self.remove_changed and rxn.lowest_num_errors != 0
+                if (
+                    rxn.is_identity
+                    or (self.remove_unbalanced and not rxn.balanced)
+                    or (self.remove_changed and rxn.lowest_num_errors != 0)
                 ):
                     continue
 
@@ -251,6 +248,23 @@ class BasicEnumerator(Enumerator):
 
         return filtered_dict
 
+    @property
+    def stabilize(self):
+        """ Whether or not to use only stable entries in analysis"""
+        return self._stabilize
+
+    @property
+    def build_pd(self):
+        """Whether or not to build a PhaseDiagram object during reaction enumeration (
+        useful for some analyses)"""
+        return self._build_pd
+
+    @property
+    def build_grand_pd(self):
+        """Whether or not to build a GrandPotentialPhaseDiagram object during
+        reaction enumeration (useful for some analyses)"""
+        return self._build_grand_pd
+
 
 class BasicOpenEnumerator(BasicEnumerator):
     """
@@ -293,10 +307,30 @@ class BasicOpenEnumerator(BasicEnumerator):
             precursors, target, calculators, n, remove_unbalanced, remove_changed
         )
         self.open_phases = open_phases
-        self.provide_entries = True
+
+    def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
+        """
+        Estimate the upper bound of the number of possible reactions. This will
+        correlate with the amount of time it takes to enumerate reactions.
+
+        Args:
+            entries: A list of all entries to consider
+
+        Returns: The upper bound on the number of possible reactions
+        """
+        num_open_phases = len(self.open_phases)
+        num_combos_with_open = sum(
+            [comb(num_open_phases, i) for i in range(1, num_open_phases + 1)]
+        )
+
+        num_total_combos = 0
+        for i in range(1, self.n + 1):
+            num_combos = comb(len(entries), i)
+            num_total_combos += num_combos_with_open * num_combos
+
+        return num_total_combos ** 2
 
     def _get_rxn_iterable(self, combos, open_combos):
-
         combos_with_open = [
             combo | open_combo
             for combo in combos
@@ -310,9 +344,7 @@ class BasicOpenEnumerator(BasicEnumerator):
 
     def _get_open_combos(self, entries):
         open_entries = {
-            e
-            for e in entries
-            if e.composition.reduced_formula in self.open_phases
+            e for e in entries if e.composition.reduced_formula in self.open_phases
         }
         open_combos = [
             set(c) for c in limited_powerset(open_entries, len(open_entries))
