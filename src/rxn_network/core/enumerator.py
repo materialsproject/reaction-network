@@ -31,7 +31,7 @@ class Enumerator(MSONable, metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def estimate_num_reactions(self, entries) -> int:
+    def estimate_max_num_reactions(self, entries) -> int:
         """
         Estimate of the number of reactions from a list of entries
         """

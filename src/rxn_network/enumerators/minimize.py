@@ -1,26 +1,18 @@
 from itertools import combinations, product
-import math
+from math import comb
 from typing import List, Optional
 
 from pymatgen.analysis.interface_reactions import InterfacialReactivity
-from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm.auto import tqdm
 
 from rxn_network.enumerators.basic import BasicEnumerator
-from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import (
     apply_calculators,
-    filter_entries_by_chemsys,
     get_computed_rxn,
-    get_elems_set,
     get_open_computed_rxn,
-    group_by_chemsys,
-    initialize_calculators,
-    initialize_entry,
 )
-from rxn_network.reactions import ComputedReaction
 
 
 class MinimizeGibbsEnumerator(BasicEnumerator):
@@ -49,7 +41,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         self.provide_entries = True
         self.build_pd = True
 
-    def estimate_num_reactions(self, entries: List[ComputedEntry]) -> int:
+    def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
         """
         Estimate the upper bound of the number of possible reactions. This will
         correlate with the amount of time it takes to enumerate reactions.
@@ -59,7 +51,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
 
         Returns: The upper bound on the number of possible reactions
         """
-        return math.comb(len(entries), 2)
+        return comb(len(entries), 2)
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
         r = list(reactants)
@@ -74,14 +66,12 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             r0.composition, r1.composition, pd, grand_pd, calculators=calculators
         )
 
-    def _get_rxn_iterable(self, combos, filtered_entries):
+    def _get_rxn_iterable(self, combos, open_entries):
         return product(combos, [None])
 
-    def _react_interface(
-        self, r1, r2, pd, grand_pd=None, calculators=None
-    ):
+    def _react_interface(self, r1, r2, pd, grand_pd=None, calculators=None):
         """Simple API for InterfacialReactivity module from pymatgen."""
-        chempots=None
+        chempots = None
 
         if grand_pd:
             interface = InterfacialReactivity(
@@ -164,6 +154,9 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
                 return []
 
         return self._react_interface(
-            r0.composition, r1.composition, pd, grand_pd=grand_pd,
-            calculators=calculators
+            r0.composition,
+            r1.composition,
+            pd,
+            grand_pd=grand_pd,
+            calculators=calculators,
         )

@@ -1,7 +1,10 @@
 """ Tests for MinimizeGibbsEnumerator and MinimizeGrandPotentialEnumerator """
 import pytest
 from pymatgen.core.composition import Element
-from rxn_network.enumerators.minimize import MinimizeGibbsEnumerator, MinimizeGrandPotentialEnumerator
+from rxn_network.enumerators.minimize import (
+    MinimizeGibbsEnumerator,
+    MinimizeGrandPotentialEnumerator,
+)
 
 
 @pytest.fixture
@@ -36,21 +39,23 @@ def grand_potential_enumerator():
 
 @pytest.fixture
 def grand_potential_enumerator_with_precursors():
-    return MinimizeGrandPotentialEnumerator(open_elem=Element("O"), mu=0.0,
-                                            precursors=["Y2O3", "Mn2O3"])
+    return MinimizeGrandPotentialEnumerator(
+        open_elem=Element("O"), mu=0.0, precursors=["Y2O3", "Mn2O3"]
+    )
 
 
 @pytest.fixture
 def grand_potential_enumerator_with_target():
-    return MinimizeGrandPotentialEnumerator(open_elem=Element("O"),
-                                            mu=0.0, target="Y2Mn2O7")
+    return MinimizeGrandPotentialEnumerator(
+        open_elem=Element("O"), mu=0.0, target="Y2Mn2O7"
+    )
 
 
 @pytest.fixture
 def grand_potential_enumerator_with_precursors_and_target():
-    return MinimizeGrandPotentialEnumerator(open_elem=Element("O"), mu=0.0,
-                                            precursors=["Y2O3", "Mn2O3"],
-                                            target="Y2Mn2O7")
+    return MinimizeGrandPotentialEnumerator(
+        open_elem=Element("O"), mu=0.0, precursors=["Y2O3", "Mn2O3"], target="Y2Mn2O7"
+    )
 
 
 def test_enumerate_gibbs(
@@ -69,8 +74,9 @@ def test_enumerate_gibbs(
             assert all([r.data["chempot_distance"] is not None for r in rxns])
 
 
-def test_enumerate_gibbs_with_precursors(filtered_entries,
-                                   gibbs_enumerator_with_precursors):
+def test_enumerate_gibbs_with_precursors(
+    filtered_entries, gibbs_enumerator_with_precursors
+):
 
     rxns = gibbs_enumerator_with_precursors.enumerate(filtered_entries)
     precursors = gibbs_enumerator_with_precursors.precursors
@@ -84,12 +90,11 @@ def test_enumerate_gibbs_with_precursors(filtered_entries,
             assert precursor not in products
 
 
-def test_enumerate_gibbs_with_target(filtered_entries,
-                               basic_enumerator_with_target,
-                               basic_open_enumerator_with_target):
+def test_enumerate_gibbs_with_target(
+    filtered_entries, basic_enumerator_with_target, basic_open_enumerator_with_target
+):
 
-    for enumerator in [basic_enumerator_with_target,
-                       basic_open_enumerator_with_target]:
+    for enumerator in [basic_enumerator_with_target, basic_open_enumerator_with_target]:
         rxns = enumerator.enumerate(filtered_entries)
         target = enumerator.target
 
@@ -111,4 +116,3 @@ def test_enumerate_gibbs_with_precursors_and_target(
 
 def test_enumerate_grand(filtered_entries, grand_potential_enumerator):
     return True
-

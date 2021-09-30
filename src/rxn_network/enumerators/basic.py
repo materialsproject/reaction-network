@@ -29,6 +29,7 @@ class BasicEnumerator(Enumerator):
     Enumerator for finding all simple reactions within a set of entries, up to a
     maximum reactant and product cardinality (n).
     """
+
     def __init__(
         self,
         precursors: Optional[List[str]] = None,
@@ -70,10 +71,7 @@ class BasicEnumerator(Enumerator):
         self.build_grand_pd = False
         self.provide_entries = False
 
-    def enumerate(
-        self,
-        entries: GibbsEntrySet
-    ) -> List[ComputedReaction]:
+    def enumerate(self, entries: GibbsEntrySet) -> List[ComputedReaction]:
         """
         Calculate all possible reactions given a set of entries. If the enumerator
         was initialized with specified precursors or target, the reactions will be
@@ -89,9 +87,9 @@ class BasicEnumerator(Enumerator):
         3. Filter the combos dictionary for chemical systems which are not relevant (
         i.e. don't contain elements in precursors and/or target.
 
-        4. Iterate through each chemical system, initializating calculators,
+        4. Iterate through each chemical system, initializing calculators,
         and computing all possible reactions for reactant/product pair and/or
-        thermodnyamically predicted reactions for given reactants.
+        thermodynamically predicted reactions for given reactants.
 
         5. Add reactions to growing list, repeat Step 4 until combos dict exhausted.
 
@@ -100,8 +98,10 @@ class BasicEnumerator(Enumerator):
         """
         entries, precursors, target = self._get_initialized_entries(entries)
         combos_dict = self._get_combos_dict(entries, precursors, target)
+        open_combos = self._get_open_combos(entries)
 
         pbar = tqdm(combos_dict.items(), desc=self.__class__.__name__)
+
 
         rxns = []
         for chemsys, combos in pbar:
@@ -110,15 +110,15 @@ class BasicEnumerator(Enumerator):
             filtered_entries = filter_entries_by_chemsys(entries, chemsys)
             calculators = initialize_calculators(self.calculators, filtered_entries)
 
-            ents = filtered_entries if self.provide_entries else None
-            rxn_iter = self._get_rxn_iterable(combos, ents)
-            r = self._get_rxns(rxn_iter, precursors, target, calculators,
-                               filtered_entries)
+            rxn_iter = self._get_rxn_iterable(combos, open_combos)
+            r = self._get_rxns(
+                rxn_iter, precursors, target, calculators, filtered_entries
+            )
             rxns.extend(r)
 
         return list(set(rxns))
 
-    def estimate_num_reactions(self, entries: List[ComputedEntry]) -> int:
+    def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
         """
         Estimate the upper bound of the number of possible reactions. This will
         correlate with the amount of time it takes to enumerate reactions.
@@ -130,21 +130,31 @@ class BasicEnumerator(Enumerator):
         """
         return sum([comb(len(entries), i) for i in range(self.n)]) ** 2
 
-    def _get_combos_dict(self, entries, precursor_entries, target_entries):
-        precursor_elems = get_elems_set(precursor_entries) if precursor_entries else \
-            set()
-        target_elems = {e.name for e in target_entries.composition.elements} if \
-            target_entries else set()
+    def _get_open_combos(self, entries):
+        return None
 
-        combos = list(limited_powerset(entries, self.n))
+    def _get_combos_dict(self, entries, precursor_entries, target_entries):
+        precursor_elems = (
+            get_elems_set(precursor_entries) if precursor_entries else set()
+        )
+        target_elems = (
+            {e.name for e in target_entries.composition.elements}
+            if target_entries
+            else set()
+        )
+
+        combos = [set(c) for c in limited_powerset(entries, self.n)]
+
         combos_dict = group_by_chemsys(combos)
-        filtered_combos = self._filter_dict_by_elems(combos_dict, precursor_elems,
-                                                     target_elems)
+        filtered_combos = self._filter_dict_by_elems(
+            combos_dict, precursor_elems, target_elems
+        )
 
         return filtered_combos
 
-    def _get_rxns(self, rxn_iterable, precursors, target, calculators,
-                  filtered_entries=None):
+    def _get_rxns(
+        self, rxn_iterable, precursors, target, calculators, filtered_entries=None
+    ):
         """
         Returns reactions from an iterable representing the combination of 2 sets
         of phases. Works for reactions with open phases.
@@ -155,7 +165,7 @@ class BasicEnumerator(Enumerator):
 
         grand_pd = None
         if self.build_grand_pd:
-            chempots = self.chempots
+            chempots = getattr(self, "chempots")
             grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
 
         rxns = []
@@ -193,7 +203,7 @@ class BasicEnumerator(Enumerator):
         backward_rxn = apply_calculators(backward_rxn, calculators)
         return [forward_rxn, backward_rxn]
 
-    def _get_rxn_iterable(self, combos, filtered_entries):
+    def _get_rxn_iterable(self, combos, open_combos):
         return combinations(combos, 2)
 
     def _get_initialized_entries(self, entries):
@@ -229,10 +239,11 @@ class BasicEnumerator(Enumerator):
         filtered_dict = dict()
         for chemsys, combos in combos_dict.items():
             elems = chemsys.split("-")
-            if ((target_elems and not target_elems.issubset(elems))
-                    or (precursor_elems and not precursor_elems.issubset(elems))
-                    or len(elems) >= 10
-                    or len(elems) == 1
+            if (
+                (target_elems and not target_elems.issubset(elems))
+                or (precursor_elems and not precursor_elems.issubset(elems))
+                or len(elems) >= 10
+                or len(elems) == 1
             ):
                 continue
             else:
@@ -284,14 +295,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         self.open_phases = open_phases
         self.provide_entries = True
 
-    def _get_rxn_iterable(self, combos, filtered_entries):
-        combos = [set(c) for c in combos]
-
-        open_entries = {e for e in filtered_entries if e.composition.reduced_formula
-                        in self.open_phases}
-        open_combos = [
-            set(c) for c in limited_powerset(open_entries, len(open_entries))
-        ]
+    def _get_rxn_iterable(self, combos, open_combos):
 
         combos_with_open = [
             combo | open_combo
@@ -303,3 +307,14 @@ class BasicOpenEnumerator(BasicEnumerator):
         rxn_iter = product(combos, combos_with_open)
 
         return rxn_iter
+
+    def _get_open_combos(self, entries):
+        open_entries = {
+            e
+            for e in entries
+            if e.composition.reduced_formula in self.open_phases
+        }
+        open_combos = [
+            set(c) for c in limited_powerset(open_entries, len(open_entries))
+        ]
+        return open_combos

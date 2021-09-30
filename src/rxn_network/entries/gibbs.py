@@ -205,7 +205,7 @@ class GibbsComputedEntry(ComputedEntry):
         denominator = (num_elems - 1) * reduced_comp.num_atoms
 
         all_pairs = combinations(elem_dict.items(), 2)
-        mass_sum = 0.
+        mass_sum = 0.0
 
         for pair in all_pairs:
             m_i = Composition(pair[0][0]).weight

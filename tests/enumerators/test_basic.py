@@ -75,12 +75,16 @@ def test_enumerate(
             assert all([r.data["chempot_distance"] is not None for r in rxns])
 
 
-def test_enumerate_with_precursors(filtered_entries,
-                                   basic_enumerator_with_precursors,
-                                   basic_open_enumerator_with_precursors):
+def test_enumerate_with_precursors(
+    filtered_entries,
+    basic_enumerator_with_precursors,
+    basic_open_enumerator_with_precursors,
+):
 
-    for enumerator in [basic_enumerator_with_precursors,
-                       basic_open_enumerator_with_precursors]:
+    for enumerator in [
+        basic_enumerator_with_precursors,
+        basic_open_enumerator_with_precursors,
+    ]:
 
         rxns = enumerator.enumerate(filtered_entries)
         precursors = enumerator.precursors
@@ -94,12 +98,11 @@ def test_enumerate_with_precursors(filtered_entries,
                 assert precursor not in products
 
 
-def test_enumerate_with_target(filtered_entries,
-                               basic_enumerator_with_target,
-                               basic_open_enumerator_with_target):
+def test_enumerate_with_target(
+    filtered_entries, basic_enumerator_with_target, basic_open_enumerator_with_target
+):
 
-    for enumerator in [basic_enumerator_with_target,
-                       basic_open_enumerator_with_target]:
+    for enumerator in [basic_enumerator_with_target, basic_open_enumerator_with_target]:
         rxns = enumerator.enumerate(filtered_entries)
         target = enumerator.target
 
