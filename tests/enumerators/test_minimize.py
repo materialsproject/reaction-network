@@ -113,8 +113,7 @@ def test_enumerate_gibbs_with_precursors_and_target(
 ):
     rxns = gibbs_enumerator_with_precursors_and_target.enumerate(filtered_entries)
 
-    assert len(rxns) == 1
-    assert str(rxns[0]) == "0.5 Mn2O3 + 0.5 Y2O3 -> YMnO3"
+    assert {str(r) for r in rxns} == {"0.5 Mn2O3 + 0.5 Y2O3 -> YMnO3"}
 
 
 def test_enumerate_grand_potential(filtered_entries, grand_potential_enumerator):
@@ -136,8 +135,6 @@ def test_enumerate_grand_potential_precursors(
     }
 
     rxns = grand_potential_enumerator_with_precursors.enumerate(filtered_entries)
-    precursors = grand_potential_enumerator_with_precursors.precursors
-
     assert {str(r) for r in rxns} == expected_rxns
 
 

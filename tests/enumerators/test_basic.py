@@ -137,9 +137,10 @@ def test_open_enumerate_with_precursors_and_target(
 
 
 def test_open_enumerate(filtered_entries, basic_open_enumerator):
-    expected_num_rxns = 1592
+    expected_num_rxns = 1358
 
     rxns = basic_open_enumerator.enumerate(filtered_entries)
+    print(rxns)
 
     assert expected_num_rxns == len(rxns)
     assert len(rxns) == len(set(rxns))

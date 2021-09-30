@@ -337,7 +337,6 @@ class BasicOpenEnumerator(BasicEnumerator):
             for open_combo in open_combos
             if not combo & open_combo
         ]
-
         rxn_iter = product(combos, combos_with_open)
 
         return rxn_iter
