@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for rxn_network">
+    
+    <link rel="canonical" href="https://github.com/GENESIS-EFRC/reaction-network/reference/network/network/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+
+    
+    <title>Network - Reaction Network Documentation</title>
+    
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../../css/base.min.css" rel="stylesheet">
+    <link href="../../../css/cinder.min.css" rel="stylesheet">
+
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/github.min.css">
+        
+    
+    <link href="../../../assets/_mkdocstrings.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            
+              <a class="navbar-brand" href="../../..">Reaction Network Documentation</a>
+            
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="../../..">Home</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reference <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Core</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../core/calculator/">Calculator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/cost_function/">Cost Function</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/enumerator/">Enumerator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/pathway/">Pathway</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/reaction/">Reaction</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/solver/">Solver</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Costs</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../costs/calculators/">Calculators</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../costs/softplus/">Softplus</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../data/data/">Data</a>
+</li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Entries</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../entries/entry_set/">Entry Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/gibbs/">Gibbs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/nist/">Nist</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Enumerators</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../enumerators/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/minimize/">Minimize</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Firetasks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../firetasks/build_inputs/">Build Inputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/parse_outputs/">Parse Outputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/run_calc/">Run Calc</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Fireworks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../fireworks/core/">Core</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Network</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../entry/">Entry</a>
+</li>
+
+        
+            
+<li >
+    <a href="../gt/">Graph-tool</a>
+</li>
+
+        
+            
+<li class="active">
+    <a href="./">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../utils/">Utils</a>
+</li>
+
+        
+            
+<li >
+    <a href="../visualize/">Visualize</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Pathways</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../pathways/balanced/">Balanced</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/solver/">Solver</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Reactions</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../reactions/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/computed/">Computed</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/open/">Open</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/reaction_set/">Reaction Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Thermo</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../thermo/chempot_diagram/">Chempot Diagram</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../thermo/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../utils/">Utils</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../../CHANGELOG/">CHANGELOG</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../gt/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../utils/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/GENESIS-EFRC/reaction-network/edit/master/docs/reference/network/network.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#rxn_network.network.network">rxn_network.network.network</a></li>
+        <li class="first-level "><a href="#rxn_network.network.network.ReactionNetwork">ReactionNetwork</a></li>
+            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.__init__">__init__()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.build">build()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.find_pathways">find_pathways()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.set_precursors">set_precursors()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.set_target">set_target()</a></li>
+                
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<div class="doc doc-object doc-module">
+
+<a id="rxn_network.network.network"></a>
+    <div class="doc doc-contents first">
+
+      <p>Implementation of an actual reaction network interface.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.network.network.ReactionNetwork" class="doc doc-heading">
+        <code>ReactionNetwork</code>
+
+
+
+<a href="#rxn_network.network.network.ReactionNetwork" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Main reaction network class for building graphs of reactions and performing
+pathfinding.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.__init__" class="doc doc-heading">
+<code class="codehilite language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">enumerators</span><span class="p">,</span> <span class="n">cost_function</span><span class="p">,</span> <span class="n">open_elem</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chempot</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+<a href="#rxn_network.network.network.ReactionNetwork.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize a ReactionNetwork object for a set of entires, enumerator,
+and cost function. The network can be constructed by calling build().</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>entries</code></td>
+        <td><code>GibbsEntrySet</code></td>
+        <td><p>iterable of entry-like objects</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>enumerators</code></td>
+        <td><code>List[rxn_network.core.enumerator.Enumerator]</code></td>
+        <td><p>iterable of enumerators which will be called during the
+build of the network</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>cost_function</code></td>
+        <td><code>CostFunction</code></td>
+        <td><p>the function used to calculate the cost of each reaction edge</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>open_elem</code></td>
+        <td><code>Optional[str]</code></td>
+        <td><p>Optional name of an element that is kept open during reaction</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>chempot</code></td>
+        <td><code>Optional[float]</code></td>
+        <td><p>Optional associated chemical potential of open element</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span>
+    <span class="n">enumerators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">],</span>
+    <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span><span class="p">,</span>
+    <span class="n">open_elem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chempot</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialize a ReactionNetwork object for a set of entires, enumerator,</span>
+<span class="sd">    and cost function. The network can be constructed by calling build().</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        entries: iterable of entry-like objects</span>
+<span class="sd">        enumerators: iterable of enumerators which will be called during the</span>
+<span class="sd">            build of the network</span>
+<span class="sd">        cost_function: the function used to calculate the cost of each reaction edge</span>
+<span class="sd">        open_elem: Optional name of an element that is kept open during reaction</span>
+<span class="sd">        chempot: Optional associated chemical potential of open element</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">,</span> <span class="n">enumerators</span><span class="o">=</span><span class="n">enumerators</span><span class="p">,</span> <span class="n">cost_function</span><span class="o">=</span><span class="n">cost_function</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="o">=</span> <span class="n">open_elem</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">chempot</span> <span class="o">=</span> <span class="n">chempot</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.build" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.network.network.ReactionNetwork.build" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Construct the reaction network graph object and store under the "graph"
+attribute. Does NOT initialize precursors or target; you must call set_precursors()
+or set_target() to do so.</p>
+<p>Returns: None</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct the reaction network graph object and store under the &quot;graph&quot;</span>
+<span class="sd">    attribute. Does NOT initialize precursors or target; you must call set_precursors()</span>
+<span class="sd">    or set_target() to do so.</span>
+
+<span class="sd">    Returns: None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rxn_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns</span><span class="p">()</span>
+    <span class="n">costs</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">calculate_costs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cost_function</span><span class="p">)</span>
+    <span class="n">rxns</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chempot</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building graph from reactions...&quot;</span><span class="p">)</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">rxn_edges</span> <span class="o">=</span> <span class="n">get_rxn_nodes_and_edges</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="n">initialize_graph</span><span class="p">()</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">network_entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nodes</span><span class="p">):</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entry&quot;</span><span class="p">:</span> <span class="n">network_entry</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">network_entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+        <span class="n">update_vertex_props</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">props</span><span class="p">)</span>
+
+    <span class="n">edge_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">edge</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rxn_edges</span><span class="p">,</span> <span class="n">costs</span><span class="p">,</span> <span class="n">rxns</span><span class="p">):</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">edge_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">rxn</span><span class="p">,</span> <span class="s2">&quot;reaction&quot;</span><span class="p">))</span>
+
+    <span class="n">edge_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">get_loopback_edges</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">nodes</span><span class="p">))</span>
+
+    <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">edge_list</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">g</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.find_pathways" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.network.network.ReactionNetwork.find_pathways" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Find the k-shortest paths to a provided list of 1 or more targets.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>targets</code></td>
+        <td><code>List[str]</code></td>
+        <td><p>List of the formulas of each target</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>k</code></td>
+        <td><code>float</code></td>
+        <td><p>Number of shortest paths to find for each target</p></td>
+        <td><code>15</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>List[rxn_network.pathways.basic.BasicPathway]</code></td>
+      <td><p>List of BasicPathway objects to all provided targets.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BasicPathway</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Find the k-shortest paths to a provided list of 1 or more targets.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        targets: List of the formulas of each target</span>
+<span class="sd">        k: Number of shortest paths to find for each target</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of BasicPathway objects to all provided targets.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Must call set_precursors() before pathfinding!&quot;</span><span class="p">)</span>
+
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PATHS to </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------- </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">pathways</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shortest_paths</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pathways</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">paths</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.set_precursors" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.network.network.ReactionNetwork.set_precursors" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>precursors</code></td>
+        <td><code></code></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        precursors:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+
+    <span class="n">precursors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">precursors</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">precursors</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
+        <span class="n">precursors_v</span> <span class="o">=</span> <span class="n">find_vertex</span><span class="p">(</span>
+            <span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">remove_vertex</span><span class="p">(</span><span class="n">precursors_v</span><span class="p">)</span>
+        <span class="n">loopback_edges</span> <span class="o">=</span> <span class="n">find_edge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="s2">&quot;loopback_precursors&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">loopback_edges</span><span class="p">:</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">precursors</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One or more precursors are not included in network!&quot;</span><span class="p">)</span>
+
+    <span class="n">precursors_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+    <span class="n">precursors_entry</span> <span class="o">=</span> <span class="n">NetworkEntry</span><span class="p">(</span><span class="n">precursors</span><span class="p">,</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="p">)</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entry&quot;</span><span class="p">:</span> <span class="n">precursors_entry</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">precursors_entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="n">update_vertex_props</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">precursors_v</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+
+    <span class="n">add_edges</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entry&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Reactants</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">precursors</span><span class="p">):</span>
+                <span class="n">add_edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">precursors_v</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;precursors&quot;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Products</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">v2</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+                <span class="n">entry2</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entry&quot;</span><span class="p">][</span><span class="n">v2</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">entry2</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Reactants</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">precursors</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">entry2</span><span class="o">.</span><span class="n">entries</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">precursors</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">entry2</span><span class="o">.</span><span class="n">entries</span><span class="p">):</span>
+                        <span class="n">add_edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;loopback_precursors&quot;</span><span class="p">))</span>
+
+    <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">add_edges</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span> <span class="o">=</span> <span class="n">precursors</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.set_target" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.network.network.ReactionNetwork.set_target" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>target</code></td>
+        <td><code></code></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+    <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">or</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">target_v</span> <span class="o">=</span> <span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="o">.</span><span class="n">value</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">remove_vertex</span><span class="p">(</span><span class="n">target_v</span><span class="p">)</span>
+
+    <span class="n">target_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+    <span class="n">target_entry</span> <span class="o">=</span> <span class="n">NetworkEntry</span><span class="p">([</span><span class="n">target</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="p">)</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entry&quot;</span><span class="p">:</span> <span class="n">target_entry</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">target_entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="n">update_vertex_props</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+
+    <span class="n">add_edges</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entry&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Products</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="n">add_edges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">])</span>
+
+    <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">add_edges</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div></div>
+        
+        
+    </div>
+
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Built by The GENESIS EFRC</small><br>
+            
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
+
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../../../js/bootstrap-3.0.3.min.js"></script>
+
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../../.."</script>
+    
+    <script src="../../../js/base.js"></script>
+    <script src="../../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>

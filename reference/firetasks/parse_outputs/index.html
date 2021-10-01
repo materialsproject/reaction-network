@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for rxn_network">
+    
+    <link rel="canonical" href="https://github.com/GENESIS-EFRC/reaction-network/reference/firetasks/parse_outputs/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+
+    
+    <title>Parse Outputs - Reaction Network Documentation</title>
+    
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../../css/base.min.css" rel="stylesheet">
+    <link href="../../../css/cinder.min.css" rel="stylesheet">
+
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/github.min.css">
+        
+    
+    <link href="../../../assets/_mkdocstrings.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            
+              <a class="navbar-brand" href="../../..">Reaction Network Documentation</a>
+            
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="../../..">Home</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reference <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Core</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../core/calculator/">Calculator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/cost_function/">Cost Function</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/enumerator/">Enumerator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/pathway/">Pathway</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/reaction/">Reaction</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/solver/">Solver</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Costs</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../costs/calculators/">Calculators</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../costs/softplus/">Softplus</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../data/data/">Data</a>
+</li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Entries</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../entries/entry_set/">Entry Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/gibbs/">Gibbs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/nist/">Nist</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Enumerators</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../enumerators/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/minimize/">Minimize</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Firetasks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../build_inputs/">Build Inputs</a>
+</li>
+
+        
+            
+<li class="active">
+    <a href="./">Parse Outputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../run_calc/">Run Calc</a>
+</li>
+
+        
+            
+<li >
+    <a href="../utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Fireworks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../fireworks/core/">Core</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Network</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../network/entry/">Entry</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/gt/">Graph-tool</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/utils/">Utils</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/visualize/">Visualize</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Pathways</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../pathways/balanced/">Balanced</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/solver/">Solver</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Reactions</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../reactions/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/computed/">Computed</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/open/">Open</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/reaction_set/">Reaction Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Thermo</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../thermo/chempot_diagram/">Chempot Diagram</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../thermo/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../utils/">Utils</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../../CHANGELOG/">CHANGELOG</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../build_inputs/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../run_calc/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/GENESIS-EFRC/reaction-network/edit/master/docs/reference/firetasks/parse_outputs.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#rxn_network.firetasks.parse_outputs">rxn_network.firetasks.parse_outputs</a></li>
+        <li class="first-level "><a href="#rxn_network.firetasks.parse_outputs.NetworkToDb">NetworkToDb</a></li>
+            <li class="second-level"><a href="#rxn_network.firetasks.parse_outputs.NetworkToDb.run_task">run_task()</a></li>
+                
+        <li class="first-level "><a href="#rxn_network.firetasks.parse_outputs.ReactionsToDb">ReactionsToDb</a></li>
+            <li class="second-level"><a href="#rxn_network.firetasks.parse_outputs.ReactionsToDb.run_task">run_task()</a></li>
+                
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<div class="doc doc-object doc-module">
+
+<a id="rxn_network.firetasks.parse_outputs"></a>
+    <div class="doc doc-contents first">
+
+      <p>Firetasks for storing enumerated reaction or network data into a MongoDB.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.firetasks.parse_outputs.NetworkToDb" class="doc doc-heading">
+        <code>NetworkToDb</code>
+
+
+
+<a href="#rxn_network.firetasks.parse_outputs.NetworkToDb" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Stores calculated reaction network in a MongoDB.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.firetasks.parse_outputs.NetworkToDb.run_task" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.firetasks.parse_outputs.NetworkToDb.run_task" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>This method gets called when the Firetask is run. It can take in a
+Firework spec, perform some task using that data, and then return an
+output in the form of a FWAction.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>fw_spec</code></td>
+        <td><code>dict</code></td>
+        <td><p>A Firework spec. This comes from the master spec.
+In addition, this spec contains a special "_fw_env" key that
+contains the env settings of the FWorker calling this method.
+This provides for abstracting out certain commands or
+settings. For example, "foo" may be named "foo1" in resource
+1 and "foo2" in resource 2. The FWorker env can specify {
+"foo": "foo1"}, which maps an abstract variable "foo" to the
+relevant "foo1" or "foo2". You can then write a task that
+uses fw_spec["_fw_env"][&quot;foo&quot;] that will work across all
+these multiple resources.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code></code></td>
+      <td><p>(FWAction)</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/firetasks/parse_outputs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">):</span>
+    <span class="k">pass</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.firetasks.parse_outputs.ReactionsToDb" class="doc doc-heading">
+        <code>ReactionsToDb</code>
+
+
+
+<a href="#rxn_network.firetasks.parse_outputs.ReactionsToDb" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Stores calculated reactions (rxns.json) and their metadata (metadata.json) in a
+MongoDB.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.firetasks.parse_outputs.ReactionsToDb.run_task" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.firetasks.parse_outputs.ReactionsToDb.run_task" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>This method gets called when the Firetask is run. It can take in a
+Firework spec, perform some task using that data, and then return an
+output in the form of a FWAction.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>fw_spec</code></td>
+        <td><code>dict</code></td>
+        <td><p>A Firework spec. This comes from the master spec.
+In addition, this spec contains a special "_fw_env" key that
+contains the env settings of the FWorker calling this method.
+This provides for abstracting out certain commands or
+settings. For example, "foo" may be named "foo1" in resource
+1 and "foo2" in resource 2. The FWorker env can specify {
+"foo": "foo1"}, which maps an abstract variable "foo" to the
+relevant "foo1" or "foo2". You can then write a task that
+uses fw_spec["_fw_env"][&quot;foo&quot;] that will work across all
+these multiple resources.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code></code></td>
+      <td><p>(FWAction)</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/firetasks/parse_outputs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">):</span>
+    <span class="n">db_file</span> <span class="o">=</span> <span class="n">env_chk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db_file&quot;</span><span class="p">),</span> <span class="n">fw_spec</span><span class="p">)</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">rxns</span> <span class="o">=</span> <span class="n">loadfn</span><span class="p">(</span><span class="s2">&quot;rxns.json&quot;</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">loadfn</span><span class="p">(</span><span class="s2">&quot;metadata.json&quot;</span><span class="p">)</span>
+
+    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Reaction Enumeration (Target: &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;chemsys&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;rxns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jsanitize</span><span class="p">(</span><span class="n">rxns</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jsanitize</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">MongoStore</span><span class="o">.</span><span class="n">from_db_file</span><span class="p">(</span><span class="n">db_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+        <span class="n">task_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;task_id&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">task_ids</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">task_ids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;last_updated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div></div>
+        
+        
+    </div>
+
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Built by The GENESIS EFRC</small><br>
+            
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
+
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../../../js/bootstrap-3.0.3.min.js"></script>
+
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../../.."</script>
+    
+    <script src="../../../js/base.js"></script>
+    <script src="../../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>

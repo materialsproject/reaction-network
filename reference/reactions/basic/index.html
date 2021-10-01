@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for rxn_network">
+    
+    <link rel="canonical" href="https://github.com/GENESIS-EFRC/reaction-network/reference/reactions/basic/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+
+    
+    <title>Basic - Reaction Network Documentation</title>
+    
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../../css/base.min.css" rel="stylesheet">
+    <link href="../../../css/cinder.min.css" rel="stylesheet">
+
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/github.min.css">
+        
+    
+    <link href="../../../assets/_mkdocstrings.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            
+              <a class="navbar-brand" href="../../..">Reaction Network Documentation</a>
+            
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="../../..">Home</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reference <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Core</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../core/calculator/">Calculator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/cost_function/">Cost Function</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/enumerator/">Enumerator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/pathway/">Pathway</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/reaction/">Reaction</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/solver/">Solver</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Costs</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../costs/calculators/">Calculators</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../costs/softplus/">Softplus</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../data/data/">Data</a>
+</li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Entries</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../entries/entry_set/">Entry Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/gibbs/">Gibbs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/nist/">Nist</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Enumerators</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../enumerators/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/minimize/">Minimize</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Firetasks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../firetasks/build_inputs/">Build Inputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/parse_outputs/">Parse Outputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/run_calc/">Run Calc</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Fireworks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../fireworks/core/">Core</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Network</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../network/entry/">Entry</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/gt/">Graph-tool</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/utils/">Utils</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/visualize/">Visualize</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Pathways</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../pathways/balanced/">Balanced</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/solver/">Solver</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Reactions</a>
+    <ul class="dropdown-menu">
+        
+            
+<li class="active">
+    <a href="./">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../computed/">Computed</a>
+</li>
+
+        
+            
+<li >
+    <a href="../open/">Open</a>
+</li>
+
+        
+            
+<li >
+    <a href="../reaction_set/">Reaction Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Thermo</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../thermo/chempot_diagram/">Chempot Diagram</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../thermo/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../utils/">Utils</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../../CHANGELOG/">CHANGELOG</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../../pathways/utils/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../computed/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/GENESIS-EFRC/reaction-network/edit/master/docs/reference/reactions/basic.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#rxn_network.reactions.basic">rxn_network.reactions.basic</a></li>
+        <li class="first-level "><a href="#rxn_network.reactions.basic.BasicReaction">BasicReaction</a></li>
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.chemical_system">chemical_system</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.coefficients">coefficients</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.compositions">compositions</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.energy">energy</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.energy_per_atom">energy_per_atom</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.is_identity">is_identity</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.normalized_repr">normalized_repr</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.products">products</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.reactants">reactants</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.__init__">__init__()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.balance">balance()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.copy">copy()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.from_formulas">from_formulas()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.from_string">from_string()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.get_coeff">get_coeff()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.get_el_amount">get_el_amount()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.normalize_to">normalize_to()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.normalize_to_element">normalize_to_element()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.normalized_repr_and_factor">normalized_repr_and_factor()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.reactions.basic.BasicReaction.reverse">reverse()</a></li>
+                
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<div class="doc doc-object doc-module">
+
+<a id="rxn_network.reactions.basic"></a>
+    <div class="doc doc-contents first">
+
+      <p>This module for defining chemical reaction objects was originally sourced from
+pymatgen and streamlined for the reaction-network code.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.reactions.basic.BasicReaction" class="doc doc-heading">
+        <code>BasicReaction</code>
+
+
+
+<a href="#rxn_network.reactions.basic.BasicReaction" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>An object representing a basic chemical reaction: compositions and their
+coefficients.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.chemical_system" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">chemical_system</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.chemical_system" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the chemical system as string in the form of A-B-C-...</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.coefficients" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">coefficients</span><span class="p">:</span> <span class="n">ndarray</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.coefficients" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Array of reaction coefficients</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.compositions" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">compositions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">pymatgen</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">Composition</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.compositions" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>List of composition objects for this reaction</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.energy" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">energy</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.energy" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The energy of this reaction</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.energy_per_atom" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">energy_per_atom</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.energy_per_atom" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The energy per atom of this reaction</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.is_identity" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">is_identity</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.is_identity" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns True if the reaction has identical reactants and products</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.normalized_repr" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">normalized_repr</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.normalized_repr" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>A normalized representation of the reaction. All factors are converted
+to lowest common factors.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.products" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">products</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">pymatgen</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">Composition</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.products" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>List of products for this reaction</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.reactants" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">reactants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">pymatgen</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">Composition</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.reactants" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>List of reactants for this reaction</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.__init__" class="doc doc-heading">
+<code class="codehilite language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compositions</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">balanced</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lowest_num_errors</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>A BasicReaction object is defined by a list of compositions and their
+corresponding coefficients, where a negative coefficient refers to a
+reactant, and a positive coefficient refers to a product.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>compositions</code></td>
+        <td><code>List[pymatgen.core.composition.Composition]</code></td>
+        <td><p>List of composition objects (pymatgen).</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>coefficients</code></td>
+        <td><code>Union[List[float], numpy.ndarray]</code></td>
+        <td><p>List of coefficients, where negative coeff distinguishes a
+reactant.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>balanced</code></td>
+        <td><code>Optional[bool]</code></td>
+        <td><p>Whether the reaction is stoichiometricaly balanced or not
+(see construction via balance() method).</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>data</code></td>
+        <td><code>Optional[Dict]</code></td>
+        <td><p>Optional corresponding data in dictionary format; often used to store
+various calculated parameters.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>lowest_num_errors</code></td>
+        <td><code>Union[int, float]</code></td>
+        <td><p>the minimum number of errors reported by the reaction
+balancing algorithm (see the balance() method). A number of errors</p>
+<blockquote>
+<p>= 1 means that the reaction may be different than intended (some
+phases may be shuffled or removed entirely).</p>
+</blockquote></td>
+        <td><code>0</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">compositions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Composition</span><span class="p">],</span>
+    <span class="n">coefficients</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">balanced</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">lowest_num_errors</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A BasicReaction object is defined by a list of compositions and their</span>
+<span class="sd">    corresponding coefficients, where a negative coefficient refers to a</span>
+<span class="sd">    reactant, and a positive coefficient refers to a product.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        compositions: List of composition objects (pymatgen).</span>
+<span class="sd">        coefficients: List of coefficients, where negative coeff distinguishes a</span>
+<span class="sd">            reactant.</span>
+<span class="sd">        balanced: Whether the reaction is stoichiometricaly balanced or not</span>
+<span class="sd">            (see construction via balance() method).</span>
+<span class="sd">        data: Optional corresponding data in dictionary format; often used to store</span>
+<span class="sd">            various calculated parameters.</span>
+<span class="sd">        lowest_num_errors: the minimum number of errors reported by the reaction</span>
+<span class="sd">            balancing algorithm (see the balance() method). A number of errors</span>
+<span class="sd">            &gt;= 1 means that the reaction may be different than intended (some</span>
+<span class="sd">            phases may be shuffled or removed entirely).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_compositions</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">compositions</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">reactant_coeffs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">comp</span><span class="p">:</span> <span class="n">coeff</span>
+        <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_compositions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coefficients</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coeff</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">product_coeffs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">comp</span><span class="p">:</span> <span class="n">coeff</span>
+        <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_compositions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coefficients</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coeff</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">balanced</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">balanced</span> <span class="o">=</span> <span class="n">balanced</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sum_reactants</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">k</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactant_coeffs</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span> <span class="n">Composition</span><span class="p">({})</span>
+        <span class="p">)</span>
+        <span class="n">sum_products</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">k</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">product_coeffs</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span> <span class="n">Composition</span><span class="p">({})</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sum_reactants</span><span class="o">.</span><span class="n">almost_equals</span><span class="p">(</span>
+            <span class="n">sum_products</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TOLERANCE</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">balanced</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">balanced</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">lowest_num_errors</span> <span class="o">=</span> <span class="n">lowest_num_errors</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.balance" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">balance</span><span class="p">(</span><span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.balance" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Reactants and products to be specified as list of
+pymatgen.core.Composition. e.g., [comp1, comp2]</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>reactants</code></td>
+        <td><code>List[pymatgen.core.composition.Composition]</code></td>
+        <td><p>List of reactants.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>products</code></td>
+        <td><code>List[pymatgen.core.composition.Composition]</code></td>
+        <td><p>List of products.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>data</code></td>
+        <td><code>Optional[Dict]</code></td>
+        <td><p>Optional dictionary containing extra data about the reaction.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">balance</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span>
+    <span class="n">reactants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Composition</span><span class="p">],</span>
+    <span class="n">products</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Composition</span><span class="p">],</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BasicReaction&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reactants and products to be specified as list of</span>
+<span class="sd">    pymatgen.core.Composition. e.g., [comp1, comp2]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        reactants: List of reactants.</span>
+<span class="sd">        products: List of products.</span>
+<span class="sd">        data: Optional dictionary containing extra data about the reaction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">compositions</span> <span class="o">=</span> <span class="n">reactants</span> <span class="o">+</span> <span class="n">products</span>
+    <span class="n">coeffs</span><span class="p">,</span> <span class="n">lowest_num_errors</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_balance_coeffs</span><span class="p">(</span><span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
+
+    <span class="n">balanced</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">coeffs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lowest_num_errors</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+        <span class="n">balanced</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">compositions</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">compositions</span><span class="o">=</span><span class="n">compositions</span><span class="p">,</span>
+        <span class="n">coefficients</span><span class="o">=</span><span class="n">coeffs</span><span class="p">,</span>
+        <span class="n">balanced</span><span class="o">=</span><span class="n">balanced</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">lowest_num_errors</span><span class="o">=</span><span class="n">lowest_num_errors</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.copy" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.reactions.basic.BasicReaction.copy" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns a copy of the BasicReaction object</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BasicReaction&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a copy of the BasicReaction object&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">BasicReaction</span><span class="p">(</span>
+        <span class="n">compositions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">,</span>
+        <span class="n">coefficients</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span>
+        <span class="n">balanced</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">balanced</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">lowest_num_errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lowest_num_errors</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.from_formulas" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">from_formulas</span><span class="p">(</span><span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.from_formulas" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>reactants</code></td>
+        <td><code>List[str]</code></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>products</code></td>
+        <td><code>List[str]</code></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>BasicReaction</code></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_formulas</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span> <span class="n">reactants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">products</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BasicReaction&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        reactants:</span>
+<span class="sd">        products:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">reactant_comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reactants</span><span class="p">]</span>
+    <span class="n">product_comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
+    <span class="n">rxn</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="n">reactants</span><span class="o">=</span><span class="n">reactant_comps</span><span class="p">,</span> <span class="n">products</span><span class="o">=</span><span class="n">product_comps</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rxn</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.from_string" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">from_string</span><span class="p">(</span><span class="n">rxn_string</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#rxn_network.reactions.basic.BasicReaction.from_string" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Generates a balanced reaction from a string. The reaction must
+already be balanced.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>rxn_string</code></td>
+        <td><code></code></td>
+        <td><p>The reaction string. For example, "4 Li + O2-&gt; 2Li2O"</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>BasicReaction</code></td>
+      <td><p>BalancedReaction</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rxn_string</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BasicReaction&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a balanced reaction from a string. The reaction must</span>
+<span class="sd">    already be balanced.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rxn_string:</span>
+<span class="sd">            The reaction string. For example, &quot;4 Li + O2-&gt; 2Li2O&quot;</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        BalancedReaction</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rct_str</span><span class="p">,</span> <span class="n">prod_str</span> <span class="o">=</span> <span class="n">rxn_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_comp_amt</span><span class="p">(</span><span class="n">comp_str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">Composition</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">&quot;([\d\.]*(?:[eE]-?[\d\.]+)?)\s*([A-Z][\w\.\(\)]*)&quot;</span><span class="p">,</span> <span class="n">comp_str</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+
+    <span class="n">reactant_coeffs</span> <span class="o">=</span> <span class="n">get_comp_amt</span><span class="p">(</span><span class="n">rct_str</span><span class="p">)</span>
+    <span class="n">product_coeffs</span> <span class="o">=</span> <span class="n">get_comp_amt</span><span class="p">(</span><span class="n">prod_str</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_from_coeff_dicts</span><span class="p">(</span><span class="n">reactant_coeffs</span><span class="p">,</span> <span class="n">product_coeffs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.get_coeff" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">get_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.reactions.basic.BasicReaction.get_coeff" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns coefficient for a particular composition</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">get_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp</span><span class="p">:</span> <span class="n">Composition</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns coefficient for a particular composition</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">comp</span><span class="p">)]</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.get_el_amount" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">get_el_amount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.reactions.basic.BasicReaction.get_el_amount" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the amount of the element in the reaction.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>element</code></td>
+        <td><code>Element</code></td>
+        <td><p>Element in the reaction</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>float</code></td>
+      <td><p>Amount of that element in the reaction.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">get_el_amount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Element</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the amount of the element in the reaction.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        element (Element/Species): Element in the reaction</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Amount of that element in the reaction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">element</span><span class="p">]</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">))</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="o">/</span> <span class="mi">2</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.normalize_to" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">normalize_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.reactions.basic.BasicReaction.normalize_to" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Normalizes the reaction to one of the compositions via the provided factor.</p>
+<p>By default, normalizes such that the composition given has a coefficient of
+1.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>comp</code></td>
+        <td><code>Composition</code></td>
+        <td><p>Composition object to normalize to</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>factor</code></td>
+        <td><code>float</code></td>
+        <td><p>factor to normalize to. Defaults to 1.</p></td>
+        <td><code>1</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">normalize_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp</span><span class="p">:</span> <span class="n">Composition</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BasicReaction&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalizes the reaction to one of the compositions via the provided factor.</span>
+
+<span class="sd">    By default, normalizes such that the composition given has a coefficient of</span>
+<span class="sd">    1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comp: Composition object to normalize to</span>
+<span class="sd">        factor: factor to normalize to. Defaults to 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span>
+    <span class="n">scale_factor</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">coeffs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">comp</span><span class="p">)]</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span>
+    <span class="n">coeffs</span> <span class="o">*=</span> <span class="n">scale_factor</span>
+    <span class="k">return</span> <span class="n">BasicReaction</span><span class="p">(</span><span class="n">all_comp</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.normalize_to_element" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">normalize_to_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.reactions.basic.BasicReaction.normalize_to_element" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Normalizes the reaction to one of the elements.
+By default, normalizes such that the amount of the element is 1.
+Another factor can be specified.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>element</code></td>
+        <td><code>Element</code></td>
+        <td><p>Element to normalize to.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>factor</code></td>
+        <td><code>float</code></td>
+        <td><p>Factor to normalize to. Defaults to 1.</p></td>
+        <td><code>1</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">normalize_to_element</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Element</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BasicReaction&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalizes the reaction to one of the elements.</span>
+<span class="sd">    By default, normalizes such that the amount of the element is 1.</span>
+<span class="sd">    Another factor can be specified.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        element (Element/Species): Element to normalize to.</span>
+<span class="sd">        factor (float): Factor to normalize to. Defaults to 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span>
+    <span class="n">current_el_amount</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">sum</span><span class="p">([</span><span class="n">all_comp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">element</span><span class="p">]</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_comp</span><span class="p">))])</span>
+        <span class="o">/</span> <span class="mi">2</span>
+    <span class="p">)</span>
+    <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">/</span> <span class="n">current_el_amount</span>
+    <span class="n">coeffs</span> <span class="o">*=</span> <span class="n">scale_factor</span>
+    <span class="k">return</span> <span class="n">BasicReaction</span><span class="p">(</span><span class="n">all_comp</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.normalized_repr_and_factor" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">normalized_repr_and_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.reactions.basic.BasicReaction.normalized_repr_and_factor" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Normalized representation for a reaction
+For example, <code>4 Li + 2 O -&gt; 2Li2O</code> becomes <code>2 Li + O -&gt; Li2O</code></p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">normalized_repr_and_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalized representation for a reaction</span>
+<span class="sd">    For example, ``4 Li + 2 O -&gt; 2Li2O`` becomes ``2 Li + O -&gt; Li2O``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_from_comp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.reactions.basic.BasicReaction.reverse" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.reactions.basic.BasicReaction.reverse" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns a copy of the original BasicReaction object where original reactants are
+new products, and vice versa.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/basic.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BasicReaction&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a copy of the original BasicReaction object where original reactants are</span>
+<span class="sd">    new products, and vice versa.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">BasicReaction</span><span class="p">(</span>
+        <span class="n">compositions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">,</span>
+        <span class="n">coefficients</span><span class="o">=-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span>
+        <span class="n">balanced</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">balanced</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">lowest_num_errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lowest_num_errors</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div></div>
+        
+        
+    </div>
+
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Built by The GENESIS EFRC</small><br>
+            
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
+
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../../../js/bootstrap-3.0.3.min.js"></script>
+
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../../.."</script>
+    
+    <script src="../../../js/base.js"></script>
+    <script src="../../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>

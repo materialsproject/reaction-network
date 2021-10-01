@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for rxn_network">
+    
+    <link rel="canonical" href="https://github.com/GENESIS-EFRC/reaction-network/reference/entries/gibbs/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+
+    
+    <title>Gibbs - Reaction Network Documentation</title>
+    
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../../css/base.min.css" rel="stylesheet">
+    <link href="../../../css/cinder.min.css" rel="stylesheet">
+
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/github.min.css">
+        
+    
+    <link href="../../../assets/_mkdocstrings.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            
+              <a class="navbar-brand" href="../../..">Reaction Network Documentation</a>
+            
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="../../..">Home</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reference <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Core</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../core/calculator/">Calculator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/cost_function/">Cost Function</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/enumerator/">Enumerator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/pathway/">Pathway</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/reaction/">Reaction</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/solver/">Solver</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Costs</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../costs/calculators/">Calculators</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../costs/softplus/">Softplus</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../data/data/">Data</a>
+</li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Entries</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../entry_set/">Entry Set</a>
+</li>
+
+        
+            
+<li class="active">
+    <a href="./">Gibbs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../nist/">Nist</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Enumerators</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../enumerators/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/minimize/">Minimize</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Firetasks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../firetasks/build_inputs/">Build Inputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/parse_outputs/">Parse Outputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/run_calc/">Run Calc</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Fireworks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../fireworks/core/">Core</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Network</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../network/entry/">Entry</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/gt/">Graph-tool</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/utils/">Utils</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/visualize/">Visualize</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Pathways</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../pathways/balanced/">Balanced</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/solver/">Solver</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Reactions</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../reactions/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/computed/">Computed</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/open/">Open</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/reaction_set/">Reaction Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Thermo</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../thermo/chempot_diagram/">Chempot Diagram</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../thermo/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../utils/">Utils</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../../CHANGELOG/">CHANGELOG</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../entry_set/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../nist/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/GENESIS-EFRC/reaction-network/edit/master/docs/reference/entries/gibbs.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#rxn_network.entries.gibbs">rxn_network.entries.gibbs</a></li>
+        <li class="first-level "><a href="#rxn_network.entries.gibbs.GibbsComputedEntry">GibbsComputedEntry</a></li>
+            <li class="second-level"><a href="#rxn_network.entries.gibbs.GibbsComputedEntry.__init__">__init__()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.entries.gibbs.GibbsComputedEntry.as_dict">as_dict()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.entries.gibbs.GibbsComputedEntry.from_dict">from_dict()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.entries.gibbs.GibbsComputedEntry.from_structure">from_structure()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.entries.gibbs.GibbsComputedEntry.get_new_temperature">get_new_temperature()</a></li>
+                
+            <li class="second-level"><a href="#rxn_network.entries.gibbs.GibbsComputedEntry.gibbs_adjustment">gibbs_adjustment()</a></li>
+                
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<div class="doc doc-object doc-module">
+
+<a id="rxn_network.entries.gibbs"></a>
+    <div class="doc doc-contents first">
+
+      <p>Specialized computed entry to estimate Gibbs free energy of formation</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.entries.gibbs.GibbsComputedEntry" class="doc doc-heading">
+        <code>GibbsComputedEntry</code>
+
+
+
+<a href="#rxn_network.entries.gibbs.GibbsComputedEntry" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>An extension to ComputedEntry which estimates the Gibbs free energy of formation
+of solids using energy adjustments from the machine-learned SISSO descriptor from
+Bartel et al. (2018).</p>
+<p>WARNING: This descriptor only applies to solids. See
+entries.nist.NISTReferenceEntry for common gases (e.g. CO2).</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.entries.gibbs.GibbsComputedEntry.__init__" class="doc doc-heading">
+<code class="codehilite language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">composition</span><span class="p">,</span> <span class="n">formation_energy_per_atom</span><span class="p">,</span> <span class="n">volume_per_atom</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">energy_adjustments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">entry_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+<a href="#rxn_network.entries.gibbs.GibbsComputedEntry.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>A new computed entry object is returned with a supplied energy correction
+representing the difference between the formation enthalpy at T=0K and the
+Gibbs formation energy at the specified temperature.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>composition</code></td>
+        <td><code>Composition</code></td>
+        <td><p>The composition object (pymatgen)</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>formation_energy_per_atom</code></td>
+        <td><code>float</code></td>
+        <td><p>Calculated formation enthalpy, dH, at T = 298 K,
+normalized to the total number of atoms in the composition.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>volume_per_atom</code></td>
+        <td><code>float</code></td>
+        <td><p>The total volume of the associated structure divided by
+the total number of atoms.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>temperature</code></td>
+        <td><code>float</code></td>
+        <td><p>Temperature [K] by which to acquire dGf(T), must be selected
+from a range of [300, 2000] K.  If temperature is not selected from
+one of [300, 400, 500, ... 2000 K], then free energies will be
+interpolated.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>energy_adjustments</code></td>
+        <td><code>Optional[List]</code></td>
+        <td><p>Optional list of energy adjustments</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>parameters</code></td>
+        <td><code>Optional[dict]</code></td>
+        <td><p>Optional list of calculation parameters</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>data</code></td>
+        <td><code>Optional[dict]</code></td>
+        <td><p>Optional dictionary containing entry data</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>entry_id</code></td>
+        <td><code>Optional[object]</code></td>
+        <td><p>Optional entry-id, such as the entry's mp-id</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/entries/gibbs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">composition</span><span class="p">:</span> <span class="n">Composition</span><span class="p">,</span>
+    <span class="n">formation_energy_per_atom</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">volume_per_atom</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">energy_adjustments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">entry_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    A new computed entry object is returned with a supplied energy correction</span>
+<span class="sd">    representing the difference between the formation enthalpy at T=0K and the</span>
+<span class="sd">    Gibbs formation energy at the specified temperature.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        composition: The composition object (pymatgen)</span>
+<span class="sd">        formation_energy_per_atom: Calculated formation enthalpy, dH, at T = 298 K,</span>
+<span class="sd">            normalized to the total number of atoms in the composition.</span>
+<span class="sd">        volume_per_atom: The total volume of the associated structure divided by</span>
+<span class="sd">            the total number of atoms.</span>
+<span class="sd">        temperature: Temperature [K] by which to acquire dGf(T), must be selected</span>
+<span class="sd">            from a range of [300, 2000] K.  If temperature is not selected from</span>
+<span class="sd">            one of [300, 400, 500, ... 2000 K], then free energies will be</span>
+<span class="sd">            interpolated.</span>
+<span class="sd">        energy_adjustments: Optional list of energy adjustments</span>
+<span class="sd">        parameters: Optional list of calculation parameters</span>
+<span class="sd">        data: Optional dictionary containing entry data</span>
+<span class="sd">        entry_id: Optional entry-id, such as the entry&#39;s mp-id</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">composition</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">formation_energy_per_atom</span> <span class="o">=</span> <span class="n">formation_energy_per_atom</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">volume_per_atom</span> <span class="o">=</span> <span class="n">volume_per_atom</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
+
+    <span class="n">num_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span><span class="o">.</span><span class="n">num_atoms</span>
+
+    <span class="k">if</span> <span class="n">temperature</span> <span class="o">&lt;</span> <span class="mi">300</span> <span class="ow">or</span> <span class="n">temperature</span> <span class="o">&gt;</span> <span class="mi">2000</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Temperature must be selected from range: [300, 2000] K.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">energy_adjustments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">energy_adjustments</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">adjustment</span>
+            <span class="k">for</span> <span class="n">adjustment</span> <span class="ow">in</span> <span class="n">energy_adjustments</span>
+            <span class="k">if</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;Gibbs SISSO Correction&quot;</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">energy_adjustments</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">energy_adjustments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">ConstantEnergyAdjustment</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gibbs_adjustment</span><span class="p">(</span><span class="n">temperature</span><span class="p">),</span>
+            <span class="n">uncertainty</span><span class="o">=</span><span class="mf">0.05</span> <span class="o">*</span> <span class="n">num_atoms</span><span class="p">,</span>  <span class="c1"># descriptor has ~50 meV/atom MAD</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Gibbs SISSO Correction&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Gibbs correction: dGf(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K) - dHf (298 K)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">formation_energy</span> <span class="o">=</span> <span class="n">num_atoms</span> <span class="o">*</span> <span class="n">formation_energy_per_atom</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">composition</span><span class="o">=</span><span class="n">composition</span><span class="p">,</span>
+        <span class="n">energy</span><span class="o">=</span><span class="n">formation_energy</span><span class="p">,</span>
+        <span class="n">energy_adjustments</span><span class="o">=</span><span class="n">energy_adjustments</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">entry_id</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.entries.gibbs.GibbsComputedEntry.as_dict" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.entries.gibbs.GibbsComputedEntry.as_dict" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns an MSONable dict.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/entries/gibbs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="s2">&quot;Returns an MSONable dict.&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;volume_per_atom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_per_atom</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;formation_energy_per_atom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formation_energy_per_atom</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
+    <span class="k">return</span> <span class="n">data</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.entries.gibbs.GibbsComputedEntry.from_dict" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#rxn_network.entries.gibbs.GibbsComputedEntry.from_dict" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns a GibbsComputedEntry object from MSONable dictionary</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/entries/gibbs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GibbsComputedEntry&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;Returns a GibbsComputedEntry object from MSONable dictionary&quot;</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="n">MontyDecoder</span><span class="p">()</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">composition</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;composition&quot;</span><span class="p">],</span>
+        <span class="n">formation_energy_per_atom</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;formation_energy_per_atom&quot;</span><span class="p">],</span>
+        <span class="n">volume_per_atom</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;volume_per_atom&quot;</span><span class="p">],</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">],</span>
+        <span class="n">energy_adjustments</span><span class="o">=</span><span class="n">dec</span><span class="o">.</span><span class="n">process_decoded</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;energy_adjustments&quot;</span><span class="p">]),</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">],</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">],</span>
+        <span class="n">entry_id</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;entry_id&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">entry</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.entries.gibbs.GibbsComputedEntry.from_structure" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">from_structure</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">formation_energy_per_atom</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#rxn_network.entries.gibbs.GibbsComputedEntry.from_structure" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Constructor method for building a GibbsComputedEntry from a structure,
+formation enthalpy, and temperature.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>structure</code></td>
+        <td><code>Structure</code></td>
+        <td><p>Structure object (pymatgen)</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>formation_energy_per_atom</code></td>
+        <td><code>float</code></td>
+        <td><p>Formation enthalpy at T = 298 K associated
+with structure</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>temperature</code></td>
+        <td><code>float</code></td>
+        <td><p>Desired temperature [K] for acquiring dGf(T)</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code></code></td>
+        <td><p>Optional kwargs to be passed to init method of GibbsComputedEntry</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>GibbsComputedEntry</code></td>
+      <td><p>A new GibbsComputedEntry object</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/entries/gibbs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span>
+    <span class="n">structure</span><span class="p">:</span> <span class="n">Structure</span><span class="p">,</span>
+    <span class="n">formation_energy_per_atom</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GibbsComputedEntry&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructor method for building a GibbsComputedEntry from a structure,</span>
+<span class="sd">    formation enthalpy, and temperature.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        structure: Structure object (pymatgen)</span>
+<span class="sd">        formation_energy_per_atom: Formation enthalpy at T = 298 K associated</span>
+<span class="sd">            with structure</span>
+<span class="sd">        temperature: Desired temperature [K] for acquiring dGf(T)</span>
+<span class="sd">        **kwargs: Optional kwargs to be passed to init method of GibbsComputedEntry</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A new GibbsComputedEntry object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">composition</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">composition</span>
+    <span class="n">volume_per_atom</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">volume</span> <span class="o">/</span> <span class="n">structure</span><span class="o">.</span><span class="n">num_sites</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">composition</span><span class="o">=</span><span class="n">composition</span><span class="p">,</span>
+        <span class="n">formation_energy_per_atom</span><span class="o">=</span><span class="n">formation_energy_per_atom</span><span class="p">,</span>
+        <span class="n">volume_per_atom</span><span class="o">=</span><span class="n">volume_per_atom</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">entry</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.entries.gibbs.GibbsComputedEntry.get_new_temperature" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">get_new_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_temperature</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.entries.gibbs.GibbsComputedEntry.get_new_temperature" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Return a copy of the GibbsComputedEntry at the new specified temperature.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>new_temperature</code></td>
+        <td><code>float</code></td>
+        <td><p>The new temperature to use [K]</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>GibbsComputedEntry</code></td>
+      <td><p>A copy of the GibbsComputedEntry at the new specified temperature.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/entries/gibbs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">get_new_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GibbsComputedEntry&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a copy of the GibbsComputedEntry at the new specified temperature.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        new_temperature: The new temperature to use [K]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A copy of the GibbsComputedEntry at the new specified temperature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_entry_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+    <span class="n">new_entry_dict</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_temperature</span>
+
+    <span class="n">new_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">new_entry_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_entry</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.entries.gibbs.GibbsComputedEntry.gibbs_adjustment" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">gibbs_adjustment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.entries.gibbs.GibbsComputedEntry.gibbs_adjustment" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the difference between the predicted Gibbs formation energy and the
+formation enthalpy at 298 K, i.e., dGf(T) - dHf(298 K). Calculated using
+SISSO descriptor from Bartel et al. (2018) and elemental chemical potentials
+(FactSage).</p>
+<p>Units: eV (not normalized)</p>
+<p>Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
+Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
+the Gibbs energy of inorganic crystalline solids and
+temperature-dependent materials chemistry. Nature Communications, 9(1),
+4168. https://doi.org/10.1038/s41467-018-06682-4</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>temperature</code></td>
+        <td><code>float</code></td>
+        <td><p>The absolute temperature [K].</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>float</code></td>
+      <td><p>The correction to Gibbs free energy of formation (eV) from DFT energy.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/entries/gibbs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">gibbs_adjustment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the difference between the predicted Gibbs formation energy and the</span>
+<span class="sd">    formation enthalpy at 298 K, i.e., dGf(T) - dHf(298 K). Calculated using</span>
+<span class="sd">    SISSO descriptor from Bartel et al. (2018) and elemental chemical potentials</span>
+<span class="sd">    (FactSage).</span>
+
+<span class="sd">    Units: eV (not normalized)</span>
+
+<span class="sd">    Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,</span>
+<span class="sd">    Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for</span>
+<span class="sd">    the Gibbs energy of inorganic crystalline solids and</span>
+<span class="sd">    temperature-dependent materials chemistry. Nature Communications, 9(1),</span>
+<span class="sd">    4168. https://doi.org/10.1038/s41467-018-06682-4</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        temperature: The absolute temperature [K].</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The correction to Gibbs free energy of formation (eV) from DFT energy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span><span class="o">.</span><span class="n">is_element</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="n">num_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span><span class="o">.</span><span class="n">num_atoms</span>
+    <span class="n">reduced_mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduced_mass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composition</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">num_atoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_delta_sisso</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume_per_atom</span><span class="p">,</span> <span class="n">reduced_mass</span><span class="p">,</span> <span class="n">temperature</span>
+    <span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_g_i</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composition</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div></div>
+        
+        
+    </div>
+
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Built by The GENESIS EFRC</small><br>
+            
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
+
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../../../js/bootstrap-3.0.3.min.js"></script>
+
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../../.."</script>
+    
+    <script src="../../../js/base.js"></script>
+    <script src="../../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>

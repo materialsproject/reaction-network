@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for rxn_network">
+    
+    <link rel="canonical" href="https://github.com/GENESIS-EFRC/reaction-network/reference/firetasks/build_inputs/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+
+    
+    <title>Build Inputs - Reaction Network Documentation</title>
+    
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../../css/base.min.css" rel="stylesheet">
+    <link href="../../../css/cinder.min.css" rel="stylesheet">
+
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/github.min.css">
+        
+    
+    <link href="../../../assets/_mkdocstrings.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            
+              <a class="navbar-brand" href="../../..">Reaction Network Documentation</a>
+            
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="../../..">Home</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reference <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Core</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../core/calculator/">Calculator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/cost_function/">Cost Function</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/enumerator/">Enumerator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/pathway/">Pathway</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/reaction/">Reaction</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/solver/">Solver</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Costs</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../costs/calculators/">Calculators</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../costs/softplus/">Softplus</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../data/data/">Data</a>
+</li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Entries</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../entries/entry_set/">Entry Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/gibbs/">Gibbs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/nist/">Nist</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Enumerators</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../enumerators/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/minimize/">Minimize</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Firetasks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li class="active">
+    <a href="./">Build Inputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../parse_outputs/">Parse Outputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../run_calc/">Run Calc</a>
+</li>
+
+        
+            
+<li >
+    <a href="../utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Fireworks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../fireworks/core/">Core</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Network</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../network/entry/">Entry</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/gt/">Graph-tool</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/utils/">Utils</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../network/visualize/">Visualize</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Pathways</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../pathways/balanced/">Balanced</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/solver/">Solver</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Reactions</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../reactions/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/computed/">Computed</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/open/">Open</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/reaction_set/">Reaction Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Thermo</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../thermo/chempot_diagram/">Chempot Diagram</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../thermo/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../utils/">Utils</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../../CHANGELOG/">CHANGELOG</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../../enumerators/utils/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../parse_outputs/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/GENESIS-EFRC/reaction-network/edit/master/docs/reference/firetasks/build_inputs.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#rxn_network.firetasks.build_inputs">rxn_network.firetasks.build_inputs</a></li>
+        <li class="first-level "><a href="#rxn_network.firetasks.build_inputs.EntriesFromDb">EntriesFromDb</a></li>
+            <li class="second-level"><a href="#rxn_network.firetasks.build_inputs.EntriesFromDb.run_task">run_task()</a></li>
+                
+        <li class="first-level "><a href="#rxn_network.firetasks.build_inputs.EntriesFromMPRester">EntriesFromMPRester</a></li>
+            <li class="second-level"><a href="#rxn_network.firetasks.build_inputs.EntriesFromMPRester.run_task">run_task()</a></li>
+                
+        <li class="first-level "><a href="#rxn_network.firetasks.build_inputs.get_all_entries_in_chemsys">get_all_entries_in_chemsys()</a></li>
+        <li class="first-level "><a href="#rxn_network.firetasks.build_inputs.get_entries">get_entries()</a></li>
+        <li class="first-level "><a href="#rxn_network.firetasks.build_inputs.process_entries">process_entries()</a></li>
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<div class="doc doc-object doc-module">
+
+<a id="rxn_network.firetasks.build_inputs"></a>
+    <div class="doc doc-contents first">
+
+      <p>Firetasks for acquiring ComputedEntry data from MPRester or another materials MongoDB</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.firetasks.build_inputs.EntriesFromDb" class="doc doc-heading">
+        <code>EntriesFromDb</code>
+
+
+
+<a href="#rxn_network.firetasks.build_inputs.EntriesFromDb" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Acquire ComputedStructureEntry objects from a custom materials MongoDB.
+Automatically builds GibbsComputedEntry objects at specified temperature and
+filters by e_above_hull stability.</p>
+<p>Required params:
+    entry_db_file (str):
+    chemsys (str):
+    temperature (float):
+    e_above_hull (float):</p>
+<p>Optional params:
+    include_polymorphs (bool):</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.firetasks.build_inputs.EntriesFromDb.run_task" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.firetasks.build_inputs.EntriesFromDb.run_task" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>This method gets called when the Firetask is run. It can take in a
+Firework spec, perform some task using that data, and then return an
+output in the form of a FWAction.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>fw_spec</code></td>
+        <td><code>dict</code></td>
+        <td><p>A Firework spec. This comes from the master spec.
+In addition, this spec contains a special "_fw_env" key that
+contains the env settings of the FWorker calling this method.
+This provides for abstracting out certain commands or
+settings. For example, "foo" may be named "foo1" in resource
+1 and "foo2" in resource 2. The FWorker env can specify {
+"foo": "foo1"}, which maps an abstract variable "foo" to the
+relevant "foo1" or "foo2". You can then write a task that
+uses fw_spec["_fw_env"][&quot;foo&quot;] that will work across all
+these multiple resources.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code></code></td>
+      <td><p>(FWAction)</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/firetasks/build_inputs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">):</span>
+    <span class="n">db_file</span> <span class="o">=</span> <span class="n">env_chk</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;entry_db_file&quot;</span><span class="p">],</span> <span class="n">fw_spec</span><span class="p">)</span>
+    <span class="n">chemsys</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;chemsys&quot;</span><span class="p">]</span>
+    <span class="n">temperature</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">]</span>
+    <span class="n">e_above_hull</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">]</span>
+    <span class="n">include_polymorphs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;include_polymorphs&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">inc_structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;inc_structure&quot;</span><span class="p">,</span> <span class="s2">&quot;final&quot;</span><span class="p">)</span>
+    <span class="n">compatible_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compatible_only&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">property_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;property_data&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">MongoStore</span><span class="o">.</span><span class="n">from_db_file</span><span class="p">(</span><span class="n">db_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">get_all_entries_in_chemsys</span><span class="p">(</span>
+            <span class="n">db</span><span class="p">,</span>
+            <span class="n">chemsys</span><span class="p">,</span>
+            <span class="n">inc_structure</span><span class="o">=</span><span class="n">inc_structure</span><span class="p">,</span>
+            <span class="n">compatible_only</span><span class="o">=</span><span class="n">compatible_only</span><span class="p">,</span>
+            <span class="n">property_data</span><span class="o">=</span><span class="n">property_data</span><span class="p">,</span>
+            <span class="n">use_premade_entries</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">entries</span> <span class="o">=</span> <span class="n">process_entries</span><span class="p">(</span>
+        <span class="n">entries</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">e_above_hull</span><span class="p">,</span> <span class="n">include_polymorphs</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">FWAction</span><span class="p">(</span><span class="n">update_spec</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">entries</span><span class="p">})</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.firetasks.build_inputs.EntriesFromMPRester" class="doc doc-heading">
+        <code>EntriesFromMPRester</code>
+
+
+
+<a href="#rxn_network.firetasks.build_inputs.EntriesFromMPRester" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Acquire ComputedStructureEntry objects from the Materials Project database.
+Automatically builds GibbsComputedEntry objects at specified temperature and
+filters by e_above_hull stability.</p>
+<p>Note: the PMG_MAPI_KEY enviornment variable must be properly configured on the
+computing resource.</p>
+<p>Required params:
+    chemsys (str):
+    temperature (float):
+    e_above_hull (float):</p>
+<p>Optional params:
+    include_polymorphs (bool):</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.firetasks.build_inputs.EntriesFromMPRester.run_task" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.firetasks.build_inputs.EntriesFromMPRester.run_task" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>This method gets called when the Firetask is run. It can take in a
+Firework spec, perform some task using that data, and then return an
+output in the form of a FWAction.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>fw_spec</code></td>
+        <td><code>dict</code></td>
+        <td><p>A Firework spec. This comes from the master spec.
+In addition, this spec contains a special "_fw_env" key that
+contains the env settings of the FWorker calling this method.
+This provides for abstracting out certain commands or
+settings. For example, "foo" may be named "foo1" in resource
+1 and "foo2" in resource 2. The FWorker env can specify {
+"foo": "foo1"}, which maps an abstract variable "foo" to the
+relevant "foo1" or "foo2". You can then write a task that
+uses fw_spec["_fw_env"][&quot;foo&quot;] that will work across all
+these multiple resources.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code></code></td>
+      <td><p>(FWAction)</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/firetasks/build_inputs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">):</span>
+    <span class="n">chemsys</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;chemsys&quot;</span><span class="p">]</span>
+    <span class="n">temperature</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">]</span>
+    <span class="n">e_above_hull</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">]</span>
+    <span class="n">include_polymorphs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;include_polymorphs&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">MPRester</span><span class="p">()</span> <span class="k">as</span> <span class="n">mpr</span><span class="p">:</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_entries_in_chemsys</span><span class="p">(</span>
+            <span class="n">elements</span><span class="o">=</span><span class="n">chemsys</span><span class="p">,</span> <span class="n">inc_structure</span><span class="o">=</span><span class="s2">&quot;fiinal&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">entries</span> <span class="o">=</span> <span class="n">process_entries</span><span class="p">(</span>
+        <span class="n">entries</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">e_above_hull</span><span class="p">,</span> <span class="n">include_polymorphs</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">FWAction</span><span class="p">(</span><span class="n">update_spec</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">entries</span><span class="p">})</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="rxn_network.firetasks.build_inputs.get_all_entries_in_chemsys" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">get_all_entries_in_chemsys</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span> <span class="n">compatible_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inc_structure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">property_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_premade_entries</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">conventional_unit_cell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.firetasks.build_inputs.get_all_entries_in_chemsys" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Helper method for getting all entries in a total chemical system by querying
+database for all sub-chemical systems. Code adadpted from pymatgen.ext.matproj
+and modified to support very large chemical systems.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>elements</code></td>
+        <td><code>str or [str]</code></td>
+        <td><p>Chemical system string comprising element
+symbols separated by dashes, e.g., "Li-Fe-O" or List of element
+symbols, e.g., ["Li", "Fe", "O"].</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>compatible_only</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to return only "compatible"
+entries. Compatible entries are entries that have been
+processed using the MaterialsProjectCompatibility class,
+which performs adjustments to allow mixing of GGA and GGA+U
+calculations for more accurate phase diagrams and reaction
+energies.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>inc_structure</code></td>
+        <td><code>str</code></td>
+        <td><p>If None, entries returned are
+ComputedEntries. If inc_structure="final",
+ComputedStructureEntries with final structures are returned.
+Otherwise, ComputedStructureEntries with initial structures
+are returned.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>property_data</code></td>
+        <td><code>list</code></td>
+        <td><p>Specify additional properties to include in
+entry.data. If None, no data. Should be a subset of
+supported_properties.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>conventional_unit_cell</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to get the standard
+conventional unit cell</p></td>
+        <td><code>False</code></td>
+      </tr>
+      <tr>
+        <td><code>n</code></td>
+        <td><code>int</code></td>
+        <td><p>Chunk size, i.e., number of sub-chemical systems to consider</p></td>
+        <td><code>1000</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code></code></td>
+      <td><p>List of ComputedEntries.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/firetasks/build_inputs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">get_all_entries_in_chemsys</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">,</span>
+    <span class="n">elements</span><span class="p">,</span>
+    <span class="n">compatible_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">inc_structure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">property_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">use_premade_entries</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">conventional_unit_cell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper method for getting all entries in a total chemical system by querying</span>
+<span class="sd">    database for all sub-chemical systems. Code adadpted from pymatgen.ext.matproj</span>
+<span class="sd">    and modified to support very large chemical systems.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        elements (str or [str]): Chemical system string comprising element</span>
+<span class="sd">            symbols separated by dashes, e.g., &quot;Li-Fe-O&quot; or List of element</span>
+<span class="sd">            symbols, e.g., [&quot;Li&quot;, &quot;Fe&quot;, &quot;O&quot;].</span>
+<span class="sd">        compatible_only (bool): Whether to return only &quot;compatible&quot;</span>
+<span class="sd">            entries. Compatible entries are entries that have been</span>
+<span class="sd">            processed using the MaterialsProjectCompatibility class,</span>
+<span class="sd">            which performs adjustments to allow mixing of GGA and GGA+U</span>
+<span class="sd">            calculations for more accurate phase diagrams and reaction</span>
+<span class="sd">            energies.</span>
+<span class="sd">        inc_structure (str): If None, entries returned are</span>
+<span class="sd">            ComputedEntries. If inc_structure=&quot;final&quot;,</span>
+<span class="sd">            ComputedStructureEntries with final structures are returned.</span>
+<span class="sd">            Otherwise, ComputedStructureEntries with initial structures</span>
+<span class="sd">            are returned.</span>
+<span class="sd">        property_data (list): Specify additional properties to include in</span>
+<span class="sd">            entry.data. If None, no data. Should be a subset of</span>
+<span class="sd">            supported_properties.</span>
+<span class="sd">        conventional_unit_cell (bool): Whether to get the standard</span>
+<span class="sd">            conventional unit cell</span>
+<span class="sd">        n (int): Chunk size, i.e., number of sub-chemical systems to consider</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        List of ComputedEntries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">divide_chunks</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">l</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="n">elements</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">13</span><span class="p">:</span>
+        <span class="n">all_chemsyses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">els</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">all_chemsyses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">els</span><span class="p">)))</span>
+
+        <span class="n">all_chemsyses</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">divide_chunks</span><span class="p">(</span><span class="n">all_chemsyses</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+
+        <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chemsys_group</span> <span class="ow">in</span> <span class="n">all_chemsyses</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="n">get_entries</span><span class="p">(</span>
+                    <span class="n">db</span><span class="p">,</span>
+                    <span class="p">{</span><span class="s2">&quot;chemsys&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="p">:</span> <span class="n">chemsys_group</span><span class="p">}},</span>
+                    <span class="n">compatible_only</span><span class="o">=</span><span class="n">compatible_only</span><span class="p">,</span>
+                    <span class="n">inc_structure</span><span class="o">=</span><span class="n">inc_structure</span><span class="p">,</span>
+                    <span class="n">property_data</span><span class="o">=</span><span class="n">property_data</span><span class="p">,</span>
+                    <span class="n">use_premade_entries</span><span class="o">=</span><span class="n">use_premade_entries</span><span class="p">,</span>
+                    <span class="n">conventional_unit_cell</span><span class="o">=</span><span class="n">conventional_unit_cell</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">get_entries</span><span class="p">(</span>
+            <span class="n">db</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$not&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$elemMatch&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$nin&quot;</span><span class="p">:</span> <span class="n">elements</span><span class="p">}}}},</span>
+            <span class="n">compatible_only</span><span class="o">=</span><span class="n">compatible_only</span><span class="p">,</span>
+            <span class="n">inc_structure</span><span class="o">=</span><span class="n">inc_structure</span><span class="p">,</span>
+            <span class="n">property_data</span><span class="o">=</span><span class="n">property_data</span><span class="p">,</span>
+            <span class="n">use_premade_entries</span><span class="o">=</span><span class="n">use_premade_entries</span><span class="p">,</span>
+            <span class="n">conventional_unit_cell</span><span class="o">=</span><span class="n">conventional_unit_cell</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">entries</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="rxn_network.firetasks.build_inputs.get_entries" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">get_entries</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">chemsys_formula_id_criteria</span><span class="p">,</span> <span class="n">compatible_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inc_structure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">property_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_premade_entries</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">conventional_unit_cell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_by_e_above_hull</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.firetasks.build_inputs.get_entries" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Get a list of ComputedEntries or ComputedStructureEntries corresponding
+to a chemical system, formula, or materials_id or full criteria. Code adapted
+from pymatgen.ext.matproj.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>db</code></td>
+        <td><code>MongoStore</code></td>
+        <td><p>MongoStore object with database connection</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>chemsys_formula_id_criteria</code></td>
+        <td><code>Union[str, dict]</code></td>
+        <td><p>A chemical system
+(e.g., Li-Fe-O), or formula (e.g., Fe2O3) or materials_id
+(e.g., mp-1234) or full Mongo-style dict criteria.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>compatible_only</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to return only "compatible"
+entries. Compatible entries are entries that have been
+processed using the MaterialsProjectCompatibility class,
+which performs adjustments to allow mixing of GGA and GGA+U
+calculations for more accurate phase diagrams and reaction
+energies.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>inc_structure</code></td>
+        <td><code>bool</code></td>
+        <td><p>If None, entries returned are
+ComputedEntries. If inc_structure="initial",
+ComputedStructureEntries with initial structures are returned.
+Otherwise, ComputedStructureEntries with final structures
+are returned.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>property_data</code></td>
+        <td><code>Optional[List[str]]</code></td>
+        <td><p>Specify additional properties to include in
+entry.data. If None, no data. Should be a subset of
+supported_properties.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>use_premade_entries</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to use entry objects that have already been
+constructed. Defaults to False.</p></td>
+        <td><code>False</code></td>
+      </tr>
+      <tr>
+        <td><code>conventional_unit_cell</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to get the standard
+conventional unit cell</p></td>
+        <td><code>False</code></td>
+      </tr>
+      <tr>
+        <td><code>sort_by_e_above_hull</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to sort the list of entries by
+e_above_hull (will query e_above_hull as a property_data if True).</p></td>
+        <td><code>False</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code></code></td>
+      <td><p>List of ComputedEntry or ComputedStructureEntry objects.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/firetasks/build_inputs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">get_entries</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">MongoStore</span><span class="p">,</span>
+    <span class="n">chemsys_formula_id_criteria</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
+    <span class="n">compatible_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">inc_structure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">property_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">use_premade_entries</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">conventional_unit_cell</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">sort_by_e_above_hull</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a list of ComputedEntries or ComputedStructureEntries corresponding</span>
+<span class="sd">    to a chemical system, formula, or materials_id or full criteria. Code adapted</span>
+<span class="sd">    from pymatgen.ext.matproj.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db: MongoStore object with database connection</span>
+<span class="sd">        chemsys_formula_id_criteria: A chemical system</span>
+<span class="sd">            (e.g., Li-Fe-O), or formula (e.g., Fe2O3) or materials_id</span>
+<span class="sd">            (e.g., mp-1234) or full Mongo-style dict criteria.</span>
+<span class="sd">        compatible_only: Whether to return only &quot;compatible&quot;</span>
+<span class="sd">            entries. Compatible entries are entries that have been</span>
+<span class="sd">            processed using the MaterialsProjectCompatibility class,</span>
+<span class="sd">            which performs adjustments to allow mixing of GGA and GGA+U</span>
+<span class="sd">            calculations for more accurate phase diagrams and reaction</span>
+<span class="sd">            energies.</span>
+<span class="sd">        inc_structure: If None, entries returned are</span>
+<span class="sd">            ComputedEntries. If inc_structure=&quot;initial&quot;,</span>
+<span class="sd">            ComputedStructureEntries with initial structures are returned.</span>
+<span class="sd">            Otherwise, ComputedStructureEntries with final structures</span>
+<span class="sd">            are returned.</span>
+<span class="sd">        property_data: Specify additional properties to include in</span>
+<span class="sd">            entry.data. If None, no data. Should be a subset of</span>
+<span class="sd">            supported_properties.</span>
+<span class="sd">        use_premade_entries: Whether to use entry objects that have already been</span>
+<span class="sd">            constructed. Defaults to False.</span>
+<span class="sd">        conventional_unit_cell: Whether to get the standard</span>
+<span class="sd">            conventional unit cell</span>
+<span class="sd">        sort_by_e_above_hull: Whether to sort the list of entries by</span>
+<span class="sd">            e_above_hull (will query e_above_hull as a property_data if True).</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        List of ComputedEntry or ComputedStructureEntry objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;deprecated&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;run_type&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;is_hubbard&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pseudo_potential&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hubbards&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;potcar_symbols&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;oxide_type&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;final_energy&quot;</span><span class="p">,</span> <span class="s2">&quot;unit_cell_formula&quot;</span><span class="p">,</span> <span class="s2">&quot;task_id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">params</span>
+    <span class="k">if</span> <span class="n">sort_by_e_above_hull</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">property_data</span> <span class="ow">and</span> <span class="s2">&quot;e_above_hull&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">property_data</span><span class="p">:</span>
+            <span class="n">property_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">property_data</span><span class="p">:</span>
+            <span class="n">property_data</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">property_data</span><span class="p">:</span>
+        <span class="n">props</span> <span class="o">+=</span> <span class="n">property_data</span>
+    <span class="k">if</span> <span class="n">inc_structure</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">inc_structure</span> <span class="o">==</span> <span class="s2">&quot;initial&quot;</span><span class="p">:</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;initial_structure&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;structure&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chemsys_formula_id_criteria</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="n">MPRester</span><span class="o">.</span><span class="n">parse_criteria</span><span class="p">(</span><span class="n">chemsys_formula_id_criteria</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="n">chemsys_formula_id_criteria</span>
+
+    <span class="k">if</span> <span class="n">use_premade_entries</span><span class="p">:</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">,</span> <span class="s2">&quot;deprecated&quot;</span><span class="p">]</span>
+
+    <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">criteria</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deprecated&quot;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">use_premade_entries</span><span class="p">:</span>
+            <span class="n">ent</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GGA&quot;</span><span class="p">):</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">ComputedStructureEntry</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">ent</span><span class="p">[</span><span class="s2">&quot;GGA&quot;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">ent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GGA+U&quot;</span><span class="p">):</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">ComputedStructureEntry</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">ent</span><span class="p">[</span><span class="s2">&quot;GGA+U&quot;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing entry for </span><span class="si">{</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;potcar_symbols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;pseudo_potential&quot;</span><span class="p">][</span><span class="s2">&quot;functional&quot;</span><span class="p">],</span> <span class="n">l</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;pseudo_potential&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;labels&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;oxide_type&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;oxide_type&quot;</span><span class="p">]}</span>
+            <span class="k">if</span> <span class="n">property_data</span><span class="p">:</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">property_data</span><span class="p">})</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">inc_structure</span><span class="p">:</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">ComputedEntry</span><span class="p">(</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;unit_cell_formula&quot;</span><span class="p">],</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;final_energy&quot;</span><span class="p">],</span>
+                    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">params</span><span class="p">},</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">entry_id</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prim</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;initial_structure&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">inc_structure</span> <span class="o">==</span> <span class="s2">&quot;initial&quot;</span>
+                    <span class="k">else</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">conventional_unit_cell</span><span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">SpacegroupAnalyzer</span><span class="p">(</span><span class="n">prim</span><span class="p">)</span><span class="o">.</span><span class="n">get_conventional_standard_structure</span><span class="p">()</span>
+                    <span class="n">energy</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;final_energy&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">prim</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">prim</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="n">energy</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;final_energy&quot;</span><span class="p">]</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">ComputedStructureEntry</span><span class="p">(</span>
+                    <span class="n">s</span><span class="p">,</span>
+                    <span class="n">energy</span><span class="p">,</span>
+                    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">params</span><span class="p">},</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">entry_id</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+        <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">compatible_only</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">pymatgen.entries.compatibility</span> <span class="kn">import</span> <span class="n">MaterialsProject2020Compatibility</span>
+
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+                <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Failed to guess oxidation states.*&quot;</span>
+            <span class="p">)</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="n">MaterialsProject2020Compatibility</span><span class="p">()</span><span class="o">.</span><span class="n">process_entries</span><span class="p">(</span>
+                <span class="n">entries</span><span class="p">,</span> <span class="n">clean</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+    <span class="k">if</span> <span class="n">sort_by_e_above_hull</span><span class="p">:</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">entry</span><span class="p">:</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">entries</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="rxn_network.firetasks.build_inputs.process_entries" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">process_entries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">e_above_hull</span><span class="p">,</span> <span class="n">include_polymorphs</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.firetasks.build_inputs.process_entries" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>entries</code></td>
+        <td><code></code></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>temperature</code></td>
+        <td><code></code></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>e_above_hull</code></td>
+        <td><code></code></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>include_polymorphs</code></td>
+        <td><code></code></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/firetasks/build_inputs.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">process_entries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">e_above_hull</span><span class="p">,</span> <span class="n">include_polymorphs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        entries:</span>
+<span class="sd">        temperature:</span>
+<span class="sd">        e_above_hull:</span>
+<span class="sd">        include_polymorphs:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">entry_set</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="o">.</span><span class="n">from_entries</span><span class="p">(</span><span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
+    <span class="n">entry_set</span> <span class="o">=</span> <span class="n">entry_set</span><span class="o">.</span><span class="n">filter_by_stability</span><span class="p">(</span>
+        <span class="n">e_above_hull</span><span class="o">=</span><span class="n">e_above_hull</span><span class="p">,</span> <span class="n">include_polymorphs</span><span class="o">=</span><span class="n">include_polymorphs</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">entry_set</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div></div>
+        
+        
+    </div>
+
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Built by The GENESIS EFRC</small><br>
+            
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
+
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../../../js/bootstrap-3.0.3.min.js"></script>
+
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../../.."</script>
+    
+    <script src="../../../js/base.js"></script>
+    <script src="../../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>

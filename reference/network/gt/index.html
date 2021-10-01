@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation for rxn_network">
+    
+    <link rel="canonical" href="https://github.com/GENESIS-EFRC/reaction-network/reference/network/gt/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+
+    
+    <title>Graph-tool - Reaction Network Documentation</title>
+    
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../../css/base.min.css" rel="stylesheet">
+    <link href="../../../css/cinder.min.css" rel="stylesheet">
+
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/github.min.css">
+        
+    
+    <link href="../../../assets/_mkdocstrings.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            
+              <a class="navbar-brand" href="../../..">Reaction Network Documentation</a>
+            
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="../../..">Home</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reference <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Core</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../core/calculator/">Calculator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/cost_function/">Cost Function</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/enumerator/">Enumerator</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/pathway/">Pathway</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/reaction/">Reaction</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../core/solver/">Solver</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Costs</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../costs/calculators/">Calculators</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../costs/softplus/">Softplus</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../data/data/">Data</a>
+</li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Entries</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../entries/entry_set/">Entry Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/gibbs/">Gibbs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../entries/nist/">Nist</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Enumerators</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../enumerators/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/minimize/">Minimize</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../enumerators/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Firetasks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../firetasks/build_inputs/">Build Inputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/parse_outputs/">Parse Outputs</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/run_calc/">Run Calc</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../firetasks/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Fireworks</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../fireworks/core/">Core</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Network</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../entry/">Entry</a>
+</li>
+
+        
+            
+<li class="active">
+    <a href="./">Graph-tool</a>
+</li>
+
+        
+            
+<li >
+    <a href="../network/">Network</a>
+</li>
+
+        
+            
+<li >
+    <a href="../utils/">Utils</a>
+</li>
+
+        
+            
+<li >
+    <a href="../visualize/">Visualize</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Pathways</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../pathways/balanced/">Balanced</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/solver/">Solver</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../pathways/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Reactions</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../reactions/basic/">Basic</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/computed/">Computed</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/open/">Open</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/reaction_set/">Reaction Set</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../reactions/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Thermo</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../../thermo/chempot_diagram/">Chempot Diagram</a>
+</li>
+
+        
+            
+<li >
+    <a href="../../thermo/utils/">Utils</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../../utils/">Utils</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../../CHANGELOG/">CHANGELOG</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../entry/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../network/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/GENESIS-EFRC/reaction-network/edit/master/docs/reference/network/gt.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#rxn_network.network.gt">rxn_network.network.gt</a></li>
+        <li class="first-level "><a href="#rxn_network.network.gt.initialize_graph">initialize_graph()</a></li>
+        <li class="first-level "><a href="#rxn_network.network.gt.update_vertex_properties">update_vertex_properties()</a></li>
+        <li class="first-level "><a href="#rxn_network.network.gt.update_vertex_props">update_vertex_props()</a></li>
+        <li class="first-level "><a href="#rxn_network.network.gt.yens_ksp">yens_ksp()</a></li>
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<div class="doc doc-object doc-module">
+
+<a id="rxn_network.network.gt"></a>
+    <div class="doc doc-contents first">
+
+      <p>Graph-related functions specific to the graph-tool library. Used in the network module.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="rxn_network.network.gt.initialize_graph" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">initialize_graph</span><span class="p">(</span><span class="n">vertex_props</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">edge_props</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.network.gt.initialize_graph" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>vertex_props</code></td>
+        <td><code>Dict[str, str]</code></td>
+        <td></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>edge_props</code></td>
+        <td><code>Dict[str, str]</code></td>
+        <td></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Graph</code></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/gt.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_graph</span><span class="p">(</span>
+    <span class="n">vertex_props</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">edge_props</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vertex_props:</span>
+<span class="sd">        edge_props:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">vertex_props</span><span class="p">:</span>
+        <span class="n">vertex_props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">edge_props</span><span class="p">:</span>
+        <span class="n">edge_props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="n">vertex_props</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">DEFAULT_VERTEX_PROPS</span><span class="p">)</span>
+    <span class="n">edge_props</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">DEFAULT_EDGE_PROPS</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj_type</span> <span class="ow">in</span> <span class="n">vertex_props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="n">obj_type</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj_type</span> <span class="ow">in</span> <span class="n">edge_props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="n">obj_type</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">g</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="rxn_network.network.gt.update_vertex_properties" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">update_vertex_properties</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">prop_dict</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.network.gt.update_vertex_properties" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Helper method for updating several vertex properties at once in a graph-tool
+graph.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>g</code></td>
+        <td><code>gt.Graph</code></td>
+        <td><p>a graph-tool Graph object.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>v</code></td>
+        <td><code>gt.Vertex or int</code></td>
+        <td><p>a graph-tool Vertex object (or its index) for a vertex
+in the provided graph.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>prop_dict</code></td>
+        <td><code>dict</code></td>
+        <td><p>a dictionary of the form {"prop": val}, where prop is the
+name of a VertexPropertyMap of the graph and val is the new updated
+value for that vertex's property.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code></code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/gt.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">update_vertex_properties</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">prop_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper method for updating several vertex properties at once in a graph-tool</span>
+<span class="sd">    graph.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        g (gt.Graph): a graph-tool Graph object.</span>
+<span class="sd">        v (gt.Vertex or int): a graph-tool Vertex object (or its index) for a vertex</span>
+<span class="sd">            in the provided graph.</span>
+<span class="sd">        prop_dict (dict): a dictionary of the form {&quot;prop&quot;: val}, where prop is the</span>
+<span class="sd">            name of a VertexPropertyMap of the graph and val is the new updated</span>
+<span class="sd">            value for that vertex&#39;s property.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">prop</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">prop_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="n">prop</span><span class="p">][</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="rxn_network.network.gt.update_vertex_props" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">update_vertex_props</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">prop_dict</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.network.gt.update_vertex_props" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Helper method for updating several vertex properties at once in a graph-tool
+graph.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>g</code></td>
+        <td><code>gt.Graph</code></td>
+        <td><p>a graph-tool Graph object.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>v</code></td>
+        <td><code>gt.Vertex or int</code></td>
+        <td><p>a graph-tool Vertex object (or its index) for a vertex
+in the provided graph.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>prop_dict</code></td>
+        <td><code>dict</code></td>
+        <td><p>a dictionary of the form {"prop": val}, where prop is the
+name of a VertexPropertyMap of the graph and val is the new updated
+value for that vertex's property.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code></code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/gt.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">update_vertex_props</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">prop_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper method for updating several vertex properties at once in a graph-tool</span>
+<span class="sd">    graph.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        g (gt.Graph): a graph-tool Graph object.</span>
+<span class="sd">        v (gt.Vertex or int): a graph-tool Vertex object (or its index) for a vertex</span>
+<span class="sd">            in the provided graph.</span>
+<span class="sd">        prop_dict (dict): a dictionary of the form {&quot;prop&quot;: val}, where prop is the</span>
+<span class="sd">            name of a VertexPropertyMap of the graph and val is the new updated</span>
+<span class="sd">            value for that vertex&#39;s property.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">prop</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">prop_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="n">prop</span><span class="p">][</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="rxn_network.network.gt.yens_ksp" class="doc doc-heading">
+<code class="codehilite language-python"><span class="n">yens_ksp</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">num_k</span><span class="p">,</span> <span class="n">precursors_v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="n">edge_prop</span><span class="o">=</span><span class="s1">&#39;bool&#39;</span><span class="p">,</span> <span class="n">cost_prop</span><span class="o">=</span><span class="s1">&#39;cost&#39;</span><span class="p">)</span></code>
+
+
+<a href="#rxn_network.network.gt.yens_ksp" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Yen's Algorithm for k-shortest paths, adopted for graph-tool. Utilizes GraphView
+objects to speed up filtering. Inspired by igraph implementation by
+Antonin Lenfant.</p>
+<p>Ref: Jin Y. Yen, "Finding the K Shortest Loopless Paths
+in a Network", Management Science, Vol. 17, No. 11, Theory Series (Jul.,
+1971), pp. 712-716.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>g</code></td>
+        <td><code>Graph</code></td>
+        <td><p>the graph-tool graph object.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>num_k</code></td>
+        <td><code>int</code></td>
+        <td><p>number of k shortest paths that should be found.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>precursors_v</code></td>
+        <td><code>Vertex</code></td>
+        <td><p>graph-tool vertex object containing precursors.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>target_v</code></td>
+        <td><code>Vertex</code></td>
+        <td><p>graph-tool vertex object containing target.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>edge_prop</code></td>
+        <td><code>str</code></td>
+        <td><p>name of edge property map which allows for filtering edges.
+Defaults to the word "bool".</p></td>
+        <td><code>&#39;bool&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>cost_prop</code></td>
+        <td><code>str</code></td>
+        <td><p>name of edge property map that stores edge weights/costs.
+Defaults to the word "weight".</p></td>
+        <td><code>&#39;cost&#39;</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code></code></td>
+      <td><p>List of lists of graph vertices corresponding to each shortest path
+    (sorted in increasing order by cost).</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/gt.py</code></summary>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">yens_ksp</span><span class="p">(</span>
+    <span class="n">g</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
+    <span class="n">num_k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">precursors_v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">,</span>
+    <span class="n">target_v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">,</span>
+    <span class="n">edge_prop</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span>
+    <span class="n">cost_prop</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cost&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Yen&#39;s Algorithm for k-shortest paths, adopted for graph-tool. Utilizes GraphView</span>
+<span class="sd">    objects to speed up filtering. Inspired by igraph implementation by</span>
+<span class="sd">    Antonin Lenfant.</span>
+
+<span class="sd">    Ref: Jin Y. Yen, &quot;Finding the K Shortest Loopless Paths</span>
+<span class="sd">    in a Network&quot;, Management Science, Vol. 17, No. 11, Theory Series (Jul.,</span>
+<span class="sd">    1971), pp. 712-716.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        g: the graph-tool graph object.</span>
+<span class="sd">        num_k: number of k shortest paths that should be found.</span>
+<span class="sd">        precursors_v: graph-tool vertex object containing precursors.</span>
+<span class="sd">        target_v: graph-tool vertex object containing target.</span>
+<span class="sd">        edge_prop: name of edge property map which allows for filtering edges.</span>
+<span class="sd">            Defaults to the word &quot;bool&quot;.</span>
+<span class="sd">        cost_prop: name of edge property map that stores edge weights/costs.</span>
+<span class="sd">            Defaults to the word &quot;weight&quot;.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        List of lists of graph vertices corresponding to each shortest path</span>
+<span class="sd">            (sorted in increasing order by cost).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">path_cost</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates path cost given a list of vertices.&quot;&quot;&quot;</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">cost</span> <span class="o">+=</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">cost_prop</span><span class="p">][</span><span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">vertices</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="n">cost</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">shortest_path</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">precursors_v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">cost_prop</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
+    <span class="n">a_costs</span> <span class="o">=</span> <span class="p">[</span><span class="n">path_cost</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="n">PriorityQueue</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+
+    <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;bool&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_k</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">prev_path</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Identified only k=</span><span class="si">{</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2"> paths before exiting. </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">break</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prev_path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">spur_v</span> <span class="o">=</span> <span class="n">prev_path</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">root_path</span> <span class="o">=</span> <span class="n">prev_path</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="n">filtered_edges</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">root_path</span> <span class="o">==</span> <span class="n">path</span><span class="p">[:</span><span class="n">i</span><span class="p">]:</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">edge_prop</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">filtered_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+            <span class="n">gv</span> <span class="o">=</span> <span class="n">GraphView</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">efilt</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">edge_prop</span><span class="p">])</span>
+            <span class="n">spur_path</span> <span class="o">=</span> <span class="n">shortest_path</span><span class="p">(</span><span class="n">gv</span><span class="p">,</span> <span class="n">spur_v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">cost_prop</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">filtered_edges</span><span class="p">:</span>
+                <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="n">edge_prop</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">spur_path</span><span class="p">:</span>
+                <span class="n">total_path</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="n">spur_path</span>
+                <span class="n">total_path_cost</span> <span class="o">=</span> <span class="n">path_cost</span><span class="p">(</span><span class="n">total_path</span><span class="p">)</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">total_path_cost</span><span class="p">,</span> <span class="n">total_path</span><span class="p">))</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cost_</span><span class="p">,</span> <span class="n">path_</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">path_</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path_</span><span class="p">)</span>
+                <span class="n">a_costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cost_</span><span class="p">)</span>
+                <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">a</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div></div>
+        
+        
+    </div>
+
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Built by The GENESIS EFRC</small><br>
+            
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
+
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../../../js/bootstrap-3.0.3.min.js"></script>
+
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../../.."</script>
+    
+    <script src="../../../js/base.js"></script>
+    <script src="../../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>
