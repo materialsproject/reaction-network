@@ -1,7 +1,7 @@
 """
 Helpful utility functions used by the enumerator classes.
 """
-from typing import List
+from typing import List, Union
 
 from pymatgen.entries.computed_entries import Entry, ComputedEntry
 
@@ -29,17 +29,18 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = T
     return entry
 
 
-def initialize_calculators(calculators: List[str], entries: GibbsEntrySet):
+def initialize_calculators(calculators: Union[List[calcs.Calculator], List[str]],
+                                        entries: GibbsEntrySet):
     """
-    Initialize a list of Calculators given a list of their names (strings)
-    and a provided list of entries.
+    Initialize a list of Calculators given a list of their names (strings) or 
+    uninitialized objects, and a provided list of entries.
 
     Args:
         calculators: List of names of calculators
         entries: List of entries or EntrySet-type object
     """
     calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in calculators]
-    return [c.from_entries(entries) for c in calculators]
+    return [c.from_entries(entries) for c in calculators]  # type: ignore
 
 
 def apply_calculators(rxn: ComputedReaction, calculators: List[calcs.Calculator]):

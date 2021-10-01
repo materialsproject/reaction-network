@@ -81,7 +81,7 @@ class BasicEnumerator(Enumerator):
         ensure that entries are filtered by stability.
 
         2. Get a dictionary representing every possible node, i.e. phase combination,
-        grouped by chmical system.
+        grouped by chemical system.
 
         3. Filter the combos dictionary for chemical systems which are not relevant (
         i.e. don't contain elements in precursors and/or target.
@@ -128,10 +128,6 @@ class BasicEnumerator(Enumerator):
         """
         return sum([comb(len(entries), i) for i in range(1, self.n + 1)]) ** 2
 
-    def _get_open_combos(self, entries):
-        """ No open entries for BasicEnumerator, returns None"""
-        return None
-
     def _get_combos_dict(self, entries, precursor_entries, target_entries):
         precursor_elems = (
             get_elems_set(precursor_entries) if precursor_entries else set()
@@ -150,6 +146,10 @@ class BasicEnumerator(Enumerator):
         )
 
         return filtered_combos
+
+    def _get_open_combos(self, entries):
+        """ No open entries for BasicEnumerator, returns None"""
+        return None
 
     def _get_rxns(
         self, rxn_iterable, precursors, target, calculators, filtered_entries=None
@@ -330,6 +330,15 @@ class BasicOpenEnumerator(BasicEnumerator):
 
         return num_total_combos ** 2
 
+    def _get_open_combos(self, entries):
+        open_entries = {
+            e for e in entries if e.composition.reduced_formula in self.open_phases
+        }
+        open_combos = [
+            set(c) for c in limited_powerset(open_entries, len(open_entries))
+        ]
+        return open_combos
+
     def _get_rxn_iterable(self, combos, open_combos):
         combos_with_open = [
             combo | open_combo
@@ -340,12 +349,3 @@ class BasicOpenEnumerator(BasicEnumerator):
         rxn_iter = product(combos, combos_with_open)
 
         return rxn_iter
-
-    def _get_open_combos(self, entries):
-        open_entries = {
-            e for e in entries if e.composition.reduced_formula in self.open_phases
-        }
-        open_combos = [
-            set(c) for c in limited_powerset(open_entries, len(open_entries))
-        ]
-        return open_combos
