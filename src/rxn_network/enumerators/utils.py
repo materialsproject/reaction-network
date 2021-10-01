@@ -29,10 +29,11 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = T
     return entry
 
 
-def initialize_calculators(calculators: Union[List[calcs.Calculator], List[str]],
-                                        entries: GibbsEntrySet):
+def initialize_calculators(
+    calculators: Union[List[calcs.Calculator], List[str]], entries: GibbsEntrySet
+):
     """
-    Initialize a list of Calculators given a list of their names (strings) or 
+    Initialize a list of Calculators given a list of their names (strings) or
     uninitialized objects, and a provided list of entries.
 
     Args:
@@ -121,7 +122,8 @@ def stabilize_entries(pd, entries_to_adjust, tol=1e-6):
         e_above_hull = pd.get_e_above_hull(entry)
         entry_dict = entry.to_dict()
         entry_dict["energy"] = entry.uncorrected_energy + (
-            e_above_hull * entry.composition.num_atoms - tol)
+            e_above_hull * entry.composition.num_atoms - tol
+        )
         new_entry = ComputedEntry.from_dict(entry_dict)
         new_entries.append(new_entry)
     return new_entries
