@@ -1,4 +1,6 @@
-" Specialized entry to estimate Gibbs Free Energy for a solid"
+"""
+Specialized computed entry to estimate Gibbs free energy of formation
+"""
 import hashlib
 from itertools import combinations
 from typing import List, Optional
@@ -203,7 +205,7 @@ class GibbsComputedEntry(ComputedEntry):
         denominator = (num_elems - 1) * reduced_comp.num_atoms
 
         all_pairs = combinations(elem_dict.items(), 2)
-        mass_sum = 0
+        mass_sum = 0.0
 
         for pair in all_pairs:
             m_i = Composition(pair[0][0]).weight

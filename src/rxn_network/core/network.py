@@ -1,4 +1,6 @@
-" Basic interface for a reaction Network "
+"""
+Basic interface for a (reaction) Network
+"""
 import logging
 from abc import ABCMeta, abstractmethod
 from typing import List
@@ -10,7 +12,9 @@ from rxn_network.core.pathway import Pathway
 
 
 class Network(MSONable, metaclass=ABCMeta):
-    "Base definition for a reaction network"
+    """
+    Base definition for a reaction network
+    """
 
     def __init__(self, entries: List[Entry], enumerators, cost_function):
         self.logger = logging.getLogger(str(self.__class__.__name__))
@@ -24,16 +28,16 @@ class Network(MSONable, metaclass=ABCMeta):
 
     @abstractmethod
     def build(self):
-        "Construct the network from the supplied enumerators"
+        """Construct the network from the supplied enumerators"""
 
     @abstractmethod
-    def find_pathways(self) -> List[Pathway]:
-        "Find reaction pathways"
+    def find_pathways(self, target, k) -> List[Pathway]:
+        """Find reaction pathways"""
 
     @abstractmethod
     def set_precursors(self):
-        "Set the phases used as precursors in the network"
+        """Set the phases used as precursors in the network"""
 
     @abstractmethod
     def set_target(self):
-        "Set the phase used as a target in the network"
+        """Set the phase used as a target in the network"""

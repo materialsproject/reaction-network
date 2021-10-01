@@ -1,4 +1,6 @@
-" Firetasks for running enumeration and network calculations."
+"""
+Firetasks for running enumeration and network calculations
+"""
 import json
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
@@ -48,11 +50,12 @@ class RunEnumerators(FiretaskBase):
             }
             added_elems = "-".join(sorted(list(added_elems)))
 
-        metadata = {}
-        metadata["chemsys"] = chemsys
-        metadata["enumerators"] = enumerators
-        metadata["target"] = target
-        metadata["added_elems"] = added_elems
+        metadata = {
+            "chemsys": chemsys,
+            "enumerators": enumerators,
+            "target": target,
+            "added_elems": added_elems,
+        }
 
         results = []
         for enumerator in enumerators:

@@ -1,3 +1,7 @@
+"""
+Utility functions used in the ReactionNetwork class.
+"""
+
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 
 

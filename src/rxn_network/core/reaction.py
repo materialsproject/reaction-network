@@ -1,5 +1,7 @@
-" Basic interface for a chemical Reaction "
-from abc import ABCMeta, abstractproperty
+"""
+Basic interface for a (chemical) Reaction
+"""
+from abc import ABCMeta, abstractmethod
 from typing import List
 
 import numpy as np
@@ -8,39 +10,43 @@ from pymatgen.core.composition import Composition, Element
 
 
 class Reaction(MSONable, metaclass=ABCMeta):
-    "Base definition for a Reaction"
+    """
+    Base definition for a Reaction
+    """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def reactants(self) -> List[Composition]:
-        "List of reactants for this reaction"
+        """List of reactants for this reaction"""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def products(self) -> List[Composition]:
-        "List of products for this reaction"
+        """List of products for this reaction"""
 
-    @abstractproperty
-    def coefficients(self) -> np.array:
-        """
-        Coefficients of the reaction
-        """
+    @property
+    @abstractmethod
+    def coefficients(self) -> np.ndarray:
+        """Coefficients of the reaction"""
+
+    @property
+    @abstractmethod
+    def energy(self) -> float:
+        """The energy of this reaction in total eV"""
 
     @property
     def compositions(self) -> List[Composition]:
-        """
-        List of all compositions in the reaction.
-        """
+        """List of all compositions in the reaction"""
         return self.reactants + self.products
 
     @property
     def elements(self) -> List[Element]:
-        """
-        List of elements in the reaction
-        """
+        """List of elements in the reaction"""
         return list(set(el for comp in self.compositions for el in comp.elements))
 
     @property
     def num_atoms(self) -> float:
-        "Total number of atoms in this reaction"
+        """Total number of atoms in this reaction"""
         return (
             sum(
                 [
@@ -52,11 +58,7 @@ class Reaction(MSONable, metaclass=ABCMeta):
             / 2
         )
 
-    @abstractproperty
-    def energy(self) -> float:
-        "The energy of this reaction in total eV"
-
     @property
     def energy_per_atom(self) -> float:
-        "The energy per atom of this reaction in eV"
+        """The energy per atom of this reaction in eV"""
         return self.energy / self.num_atoms

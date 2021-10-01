@@ -1,15 +1,12 @@
-" Firetasks for acquiring ComputedEntry data from MPRester or another materials MongoDB"
-import datetime
+"""
+Firetasks for acquiring ComputedEntry data from MPRester or another materials MongoDB
+"""
 import itertools
-import json
-import os
 import warnings
-from typing import Union
+from typing import Union, Optional, List
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore
-from monty.json import MontyDecoder, jsanitize
-from monty.serialization import loadfn
 from pymatgen.core.structure import Structure
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
 from pymatgen.ext.matproj import MPRester
@@ -138,14 +135,14 @@ def process_entries(entries, temperature, e_above_hull, include_polymorphs):
 
 
 def get_entries(  # noqa: C901
-    db: str,
+    db: MongoStore,
     chemsys_formula_id_criteria: Union[str, dict],
-    compatible_only=True,
-    inc_structure=None,
-    property_data=None,
-    use_premade_entries=False,
-    conventional_unit_cell=False,
-    sort_by_e_above_hull=False,
+    compatible_only: bool = True,
+    inc_structure: bool = None,
+    property_data: Optional[List[str]] = None,
+    use_premade_entries: bool = False,
+    conventional_unit_cell: bool = False,
+    sort_by_e_above_hull: bool = False,
 ):
     """
     Get a list of ComputedEntries or ComputedStructureEntries corresponding
@@ -153,27 +150,29 @@ def get_entries(  # noqa: C901
     from pymatgen.ext.matproj.
 
     Args:
-        db:
-        chemsys_formula_id_criteria (str/dict): A chemical system
+        db: MongoStore object with database connection
+        chemsys_formula_id_criteria: A chemical system
             (e.g., Li-Fe-O), or formula (e.g., Fe2O3) or materials_id
             (e.g., mp-1234) or full Mongo-style dict criteria.
-        compatible_only (bool): Whether to return only "compatible"
+        compatible_only: Whether to return only "compatible"
             entries. Compatible entries are entries that have been
             processed using the MaterialsProjectCompatibility class,
             which performs adjustments to allow mixing of GGA and GGA+U
             calculations for more accurate phase diagrams and reaction
             energies.
-        inc_structure (str): If None, entries returned are
+        inc_structure: If None, entries returned are
             ComputedEntries. If inc_structure="initial",
             ComputedStructureEntries with initial structures are returned.
             Otherwise, ComputedStructureEntries with final structures
             are returned.
-        property_data (list): Specify additional properties to include in
+        property_data: Specify additional properties to include in
             entry.data. If None, no data. Should be a subset of
             supported_properties.
-        conventional_unit_cell (bool): Whether to get the standard
+        use_premade_entries: Whether to use entry objects that have already been
+            constructed. Defaults to False.
+        conventional_unit_cell: Whether to get the standard
             conventional unit cell
-        sort_by_e_above_hull (bool): Whether to sort the list of entries by
+        sort_by_e_above_hull: Whether to sort the list of entries by
             e_above_hull (will query e_above_hull as a property_data if True).
     Returns:
         List of ComputedEntry or ComputedStructureEntry objects.

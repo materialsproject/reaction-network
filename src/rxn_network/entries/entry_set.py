@@ -1,7 +1,9 @@
-" An entry set class for acquiring entries with Gibbs formation energies"
-from typing import List, Optional, Union
+"""
+An entry set class for acquiring entries with Gibbs formation energies
+"""
+from typing import List, Optional, Union, Set, Dict
 
-from monty.json import MontyDecoder, MSONable
+from monty.json import MontyDecoder
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core import Composition
 from pymatgen.entries.computed_entries import (
@@ -32,7 +34,9 @@ class GibbsEntrySet(EntrySet):
             entries: A collection of entry objects that will make up the entry set.
         """
         super().__init__(entries)
-        self.entries_list = list(entries)
+        self.entries_list = list(
+            sorted(entries, key=lambda e: e.composition.reduced_formula)
+        )
         self.build_indices()
 
     def filter_by_stability(
@@ -54,8 +58,8 @@ class GibbsEntrySet(EntrySet):
         """
         pd_dict = expand_pd(self.entries)
 
-        filtered_entries = set()
-        all_comps = dict()
+        filtered_entries: Set[Union[GibbsComputedEntry, NISTReferenceEntry]] = set()
+        all_comps: Dict[str, Union[GibbsComputedEntry, NISTReferenceEntry]] = dict()
 
         for chemsys, pd in pd_dict.items():
             for entry in pd.all_entries:
@@ -74,7 +78,7 @@ class GibbsEntrySet(EntrySet):
                 all_comps[formula] = entry
                 filtered_entries.add(entry)
 
-        return self.__class__(filtered_entries)
+        return self.__class__(list(filtered_entries))
 
     def build_indices(self):
         for idx, e in enumerate(self.entries_list):
@@ -194,7 +198,7 @@ class GibbsEntrySet(EntrySet):
             experimental reference entry objects at the specified temperature.
         """
         e_set = EntrySet(entries)
-        new_entries = set()
+        new_entries: Set[GibbsComputedEntry] = set()
         if len(e_set.chemsys) <= 9:  # Qhull algorithm struggles beyond 9 dimensions
             pd = PhaseDiagram(e_set)
             return cls.from_pd(pd, temperature)
@@ -204,4 +208,7 @@ class GibbsEntrySet(EntrySet):
             gibbs_set = cls.from_pd(pd, temperature)
             new_entries.update(gibbs_set)
 
-        return cls(new_entries)
+        return cls(list(new_entries))
+
+    def copy(self) -> "GibbsEntrySet":
+        return GibbsEntrySet(entries=self.entries)

@@ -1,10 +1,12 @@
-" Implementation of the softplus cost function"
-from typing import List
+"""
+Implementation of the softplus cost function
+"""
+from typing import List, Optional
 
 import numpy as np
 
 from rxn_network.core import CostFunction
-from rxn_network.reactions import ComputedReaction
+from rxn_network.reactions.computed import ComputedReaction
 
 
 class Softplus(CostFunction):
@@ -19,17 +21,22 @@ class Softplus(CostFunction):
     def __init__(
         self,
         temp: float = 300,
-        params: List[str] = ["energy_per_atom"],
-        weights: List[float] = [1.0],
+        params: Optional[List[str]] = None,
+        weights: Optional[List[float]] = None,
     ):
         """
         Args:
             temp: Temperature [K].
-            params: List of data dictionary keys for function parameters used in the
-                softplus function. Defaults to ["energy_per_atom"]
+            params: List of data dictionary keys for function parameters used as an
+                argument to the softplus function. Defaults to ["energy_per_atom"]
             weights: List of corresponding values by which to weight the
                 function parameters. Defaults to [1.0].
         """
+        if params is None:
+            params = ["energy_per_atom"]
+        if weights is None:
+            weights = [1.0]
+
         self.temp = temp
         self.params = params
         self.weights = np.array(weights)
@@ -39,7 +46,7 @@ class Softplus(CostFunction):
         Calculates the ost of reaction based on the initialized parameters and weights.
 
         Args:
-            rxn: A computed reaction.
+            rxn: A computed reaction to evaluate.
 
         Returns:
             The cost of the reaction.
@@ -54,18 +61,18 @@ class Softplus(CostFunction):
                 raise ValueError(f"Reaction is missing parameter {p}!")
             values.append(value)
 
-        values = np.array(values)
-        total = np.dot(values, self.weights)
+        values_arr = np.array(values)
+        total = float(np.dot(values_arr, self.weights))
 
         return self._softplus(total, self.temp)
 
     @staticmethod
     def _softplus(x: float, t: float) -> float:
-        "The mathematical formula for the softplus function"
+        """The mathematical formula for the softplus function"""
         return np.log(1 + (273 / t) * np.exp(x))
 
     def __repr__(self):
         return (
             f"Softplus with parameters: "
-            f"{' '.join([(f'{k} ({v})') for k, v in zip(self.params, self.weights)])}"
+            f"{' '.join([f'{k} ({v})' for k, v in zip(self.params, self.weights)])}"
         )

@@ -1,30 +1,27 @@
+"""
+Utility functions used in reaction pathway balancing.
+"""
+
 import numpy as np
 from numba import njit, prange
 
 
 @njit(parallel=True)
 def balance_path_arrays(
-    comp_matrices,
-    net_coeffs,
-    tol=1e-6,
+    comp_matrices: np.ndarray,
+    net_coeffs: np.ndarray,
+    tol: float = 1e-6,
 ):
     """
     Fast solution for reaction multiplicities via mass balance stochiometric
     constraints. Parallelized using Numba.
 
     Args:
-        comp_matrices ([np.array]): list of numpy arrays containing stoichiometric
-            coefficients of all compositions in all reactions, for each trial
-            combination.
-        net_coeffs ([np.array]): list of numpy arrays containing stoichiometric
-            coefficients of net reaction.
-        tol (float): numerical tolerance for determining if a multiplicity is zero
+        comp_matrices: Array containing stoichiometric coefficients of all
+            compositions in all reactions, for each trial combination.
+        net_coeffs: Array containing stoichiometric coefficients of net reaction.
+        tol: numerical tolerance for determining if a multiplicity is zero
             (reaction was removed).
-
-    Returns:
-        ([bool],[np.array]): Tuple containing bool identifying which trial
-            BalancedPathway objects were successfully balanced, and a list of all
-            multiplicities arrays.
     """
     shape = comp_matrices.shape
     net_coeff_filter = np.argwhere(net_coeffs != 0).flatten()

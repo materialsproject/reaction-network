@@ -1,66 +1,56 @@
-from itertools import permutations
+"""
+Helpful utility functions used by the enumerator classes.
+"""
+from typing import List, Union
 
-import numpy as np
-from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.entries.computed_entries import Entry, ComputedEntry
 
 import rxn_network.costs.calculators as calcs
+from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
-from rxn_network.utils import limited_powerset
 
 
-def initialize_entry(formula, entry_set, stabilize=True):
+def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = True):
     """
+    Acquire a (stabilized) entry by user-specified formula.
 
     Args:
-        formula:
-        entry_set:
-
-    Returns:
-
+        formula: Chemical formula
+        entry_set: GibbsEntrySet containing 1 or more entries corresponding to
+            given formula
+        stabilize: Whether or not to stabilize the entry by decreasing its energy
+            such that it is 'on the hull'
     """
     entry = entry_set.get_min_entry_by_formula(formula)
+
     if stabilize:
         entry = entry_set.stabilize_entry(entry)
     return entry
 
 
-def initialize_open_entries(open_entries, entry_set):
+def initialize_calculators(
+    calculators: Union[List[calcs.Calculator], List[str]], entries: GibbsEntrySet
+):
     """
+    Initialize a list of Calculators given a list of their names (strings) or
+    uninitialized objects, and a provided list of entries.
 
     Args:
-        open_entries:
-        entry_set:
-
-    Returns:
-
-    """
-    open_entries = [entry_set.get_min_entry_by_formula(e) for e in open_entries]
-    return open_entries
-
-
-def initialize_calculators(calculators, entries):
-    """
-
-    Args:
-        calculators:
-        entries:
-
-    Returns:
-
+        calculators: List of names of calculators
+        entries: List of entries or EntrySet-type object
     """
     calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in calculators]
-    return [c.from_entries(entries) for c in calculators]
+    return [c.from_entries(entries) for c in calculators]  # type: ignore
 
 
-def apply_calculators(rxn, calculators):
+def apply_calculators(rxn: ComputedReaction, calculators: List[calcs.Calculator]):
     """
+    Decorates a reaction by applying decorate() from a list of calculators.
 
     Args:
-        rxn:
-        calculators:
-
-    Returns:
+        rxn: ComputedReaction object
+        calculators: List of (initialized) calculators
 
     """
     for calc in calculators:
@@ -68,20 +58,30 @@ def apply_calculators(rxn, calculators):
     return rxn
 
 
-def get_total_chemsys(entries, open_elem=None):
+def get_total_chemsys(entries: List[Entry], open_elem=None):
     """
+    Returns chemical system for set of entries, with optional open element.
 
     Args:
         entries:
         open_elem:
-
-    Returns:
-
     """
     elements = {elem for entry in entries for elem in entry.composition.elements}
     if open_elem:
         elements.add(open_elem)
     return "-".join(sorted([str(e) for e in elements]))
+
+
+def get_elems_set(entries):
+    """
+
+    Args:
+        entries:
+
+    Returns:
+
+    """
+    return {str(elem) for e in entries for elem in e.composition.elements}
 
 
 def group_by_chemsys(combos, open_elem=None):
@@ -122,7 +122,7 @@ def stabilize_entries(pd, entries_to_adjust, tol=1e-6):
         e_above_hull = pd.get_e_above_hull(entry)
         entry_dict = entry.to_dict()
         entry_dict["energy"] = entry.uncorrected_energy + (
-            e_above_hull * entry.composition.num_atoms
+            e_above_hull * entry.composition.num_atoms - tol
         )
         new_entry = ComputedEntry.from_dict(entry_dict)
         new_entries.append(new_entry)
@@ -140,6 +140,7 @@ def filter_entries_by_chemsys(entries, chemsys):
 
     """
     chemsys = set(chemsys.split("-"))
+
     filtered_entries = list(
         filter(
             lambda e: chemsys.issuperset(e.composition.chemical_system.split("-")),

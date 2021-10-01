@@ -1,9 +1,11 @@
-" A basic reaction pathway class"
+"""
+Implements a class for storing (unbalanced/unconstrained) collection of reactions
+forming a reaction pathway.
+"""
 
 from typing import List, Optional
 
 from rxn_network.core import Pathway, Reaction
-from rxn_network.network.entry import NetworkEntryType
 
 
 class BasicPathway(Pathway):
@@ -15,7 +17,7 @@ class BasicPathway(Pathway):
     def __init__(self, reactions: List[Reaction], costs: Optional[List[float]] = None):
         """
         Args:
-            rxns ([ComputedReaction]): list of ComputedReaction objects in pymatgen
+            reactions ([ComputedReaction]): list of ComputedReaction objects in pymatgen
                 which occur along path.
             costs ([float]): list of corresponding costs for each reaction.
         """
@@ -48,20 +50,6 @@ class BasicPathway(Pathway):
 
     def __hash__(self):
         return hash(tuple(self.reactions))
-
-    @classmethod
-    def from_graph_path(cls, g, path):
-        rxns = []
-        costs = []
-
-        for step, v in enumerate(path):
-            if g.vp["type"][v] == NetworkEntryType.Products.value:
-                e = g.edge(path[step - 1], v)
-
-                rxns.append(g.ep["rxn"][e])
-                costs.append(g.ep["cost"][e])
-
-        return cls(reactions=rxns, costs=costs)
 
     @property
     def total_cost(self):

@@ -1,7 +1,9 @@
-" Implements an Entry that looks up NIST pre-tabulated Gibbs free energies "
+"""
+Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
+"""
 import hashlib
+from typing import Dict, Any
 
-from monty.json import MontyDecoder
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry
 from scipy.interpolate import interp1d
@@ -38,25 +40,20 @@ class NISTReferenceEntry(Entry):
             raise ValueError("Formula must be in NIST-JANAF thermochemical tables")
 
         if temperature < 300 or temperature > 2000:
-            raise ValueError("Temperature must be selected from range: [300, 2000] K.")
+            raise ValueError("Temperature must be selected from range: [300, 2000] K")
 
-        energy = self.get_nist_energy(formula, temperature)
+        energy = self._get_nist_energy(formula, temperature)
 
         self.temperature = temperature
         self._formula = formula
         self.name = formula
         self.entry_id = "NISTReferenceEntry"
-        self.data = {}
+        self.data = {}  # type: Dict[Any, Any]
 
         super().__init__(composition.reduced_composition, energy)
 
-    @property
-    def energy(self) -> float:
-        "The energy of the entry"
-        return self._energy
-
     @staticmethod
-    def get_nist_energy(formula: str, temperature: float) -> float:
+    def _get_nist_energy(formula: str, temperature: float) -> float:
         """
         Convenience method for accessing and interpolating NIST-JANAF data.
 
@@ -75,28 +72,34 @@ class NISTReferenceEntry(Entry):
         return data[str(temperature)]
 
     @property
+    def energy(self) -> float:
+        """The energy of the entry, as supplied by the NIST-JANAF tables."""
+        return self._energy
+
+    @property
     def correction_uncertainty(self) -> float:
-        "Uncertainty of NIST-JANAF data is not supplied."
+        """ Uncertainty of NIST-JANAF data is not supplied."""
         return 0
 
     @property
     def correction_uncertainty_per_atom(self) -> float:
-        "Uncertainty of NIST-JANAF data is not supplied."
+        """Uncertainty of NIST-JANAF data is not supplied."""
         return 0
 
     @property
     def is_experimental(self) -> bool:
+        """ Returns True by default."""
         return True
 
     def as_dict(self) -> dict:
-        "Returns an MSONable dict."
+        """ Returns an MSONable dict."""
         data = super().as_dict()
         data["temperature"] = self.temperature
         return data
 
     @classmethod
     def from_dict(cls, d) -> "NISTReferenceEntry":
-        "Returns NISTReferenceEntry constructed from MSONable dict."
+        """ Returns NISTReferenceEntry constructed from MSONable dict."""
         return cls(composition=d["composition"], temperature=d["temperature"])
 
     def __repr__(self):

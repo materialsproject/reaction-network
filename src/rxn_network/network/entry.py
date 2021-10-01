@@ -1,4 +1,7 @@
-" Basic Entry to hold multiple entries for the network book keeping "
+"""
+Entry objects used in a Network. This holds multiple entries and can be used as data
+for a graph node.
+"""
 from enum import Enum, auto
 from typing import List
 
@@ -7,7 +10,8 @@ from pymatgen.entries import Entry
 
 
 class NetworkEntryType(Enum):
-    "Describes the Network Entry Type"
+    """Describes the Network Entry Type"""
+
     Precursors = auto()
     Reactants = auto()
     Products = auto()
@@ -24,7 +28,7 @@ class NetworkEntry(MSONable):
     def __init__(self, entries: List[Entry], description: NetworkEntryType):
         """
         Args:
-           entries: list of ComputedEntry-like objects
+            entries: list of ComputedEntry-like objects
             description: Node type
         """
         self.entries = set(entries)
@@ -52,24 +56,24 @@ class NetworkEntry(MSONable):
 
 
 class DummyEntry(NetworkEntry):
-    "A Dummy Entry that doesn't hold any info"
+    """A Dummy Entry that doesn't hold any info"""
 
     def __init__(self):  # pylint: disable=W0231
-        "Dummy node doesn't need any parameters"
+        """Dummy node doesn't need any parameters"""
 
     @property
     def entries(self):
-        "No entries in DummyEntry"
+        """No entries in DummyEntry"""
         return []
 
     @property
     def chemsys(self):
-        "No Chemsys to DummyEntry"
+        """No Chemsys to DummyEntry"""
         return ""
 
     @property
     def description(self):
-        "DummyEntry is always of type Dummy"
+        """DummyEntry is always of type Dummy"""
         return NetworkEntryType.Dummy
 
     def __repr__(self):

@@ -1,4 +1,6 @@
-"Utility Fireworks functions borrowed from the atomate package."
+"""
+Utility Fireworks functions borrowed from the atomate package
+"""
 import logging
 import os
 import sys
