@@ -2,8 +2,8 @@
 This module implements added features to the ChemicalPotentialDiagram class from
 pymatgen.
 """
-
 from typing import Dict, List, Optional
+from functools import cached_property
 
 import numpy as np
 from pymatgen.analysis.chempot_diagram import ChemicalPotentialDiagram as ChempotDiagram
@@ -39,6 +39,13 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             entries=entries, limits=limits, default_min_limit=default_min_limit
         )
 
+    @cached_property
+    def domains(self) -> Dict[str, np.ndarray]:
+        """
+        Mapping of formulas to array of domain boundary points
+        """
+        return self._get_domains()
+
     def shortest_domain_distance(self, f1: str, f2: str) -> float:
         """
         Args:
@@ -49,8 +56,8 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             Shortest distance between domain boundaries in the full
             (hyper)dimensional space, calculated using KDTree.
         """
-        pts1 = self.domains[Composition(f1).reduced_formula]
-        pts2 = self.domains[Composition(f2).reduced_formula]
+        pts1 = self.domains[f1]
+        pts2 = self.domains[f2]
 
         tree = KDTree(pts1)
 

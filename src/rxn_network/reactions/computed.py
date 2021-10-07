@@ -151,7 +151,7 @@ class ComputedReaction(BasicReaction):
             self.entries, self.coefficients, self.data, self.lowest_num_errors
         )
 
-    def reverse(self):
+    def reverse(self) -> "ComputedReaction":
         """
         Returns a reversed reaction (i.e. sides flipped)
 

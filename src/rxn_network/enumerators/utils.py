@@ -44,7 +44,8 @@ def initialize_calculators(
     return [c.from_entries(entries) for c in calculators]  # type: ignore
 
 
-def apply_calculators(rxn: ComputedReaction, calculators: List[calcs.Calculator]):
+def apply_calculators(rxn: ComputedReaction, calculators: List[calcs.Calculator]) -> \
+        ComputedReaction:
     """
     Decorates a reaction by applying decorate() from a list of calculators.
 

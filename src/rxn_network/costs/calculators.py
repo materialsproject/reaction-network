@@ -43,11 +43,11 @@ class ChempotDistanceCalculator(Calculator):
         self.name = name
 
         if mu_func == "max":
-            self._mu_func = np.max  # type: ignore
+            self._mu_func = max  # type: ignore
         elif mu_func == "mean":
             self._mu_func = np.mean  # type: ignore
         elif mu_func == "sum":
-            self._mu_func = np.sum  # type: ignore
+            self._mu_func = sum  # type: ignore
 
     def calculate(self, rxn: ComputedReaction) -> float:
         """

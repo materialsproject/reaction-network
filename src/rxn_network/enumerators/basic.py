@@ -7,6 +7,7 @@ from math import comb
 from typing import List, Optional
 
 from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.core.composition import Composition
 from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDiagram
 from tqdm.auto import tqdm
 
@@ -67,6 +68,7 @@ class BasicEnumerator(Enumerator):
         if "ChempotDistanceCalculator" in self.calculators:
             self._stabilize = True
 
+        self.open_phases = None
         self._build_pd = False
         self._build_grand_pd = False
 
@@ -95,9 +97,9 @@ class BasicEnumerator(Enumerator):
         Args:
             entries: the set of all entries to enumerate from
         """
-        entries, precursors, target = self._get_initialized_entries(entries)
-        combos_dict = self._get_combos_dict(entries, precursors, target)
-        open_combos = self._get_open_combos(entries)
+        entries, precursors, target, open_entries = self._get_initialized_entries(entries)
+        combos_dict = self._get_combos_dict(entries, precursors, target, open_entries)
+        open_combos = self._get_open_combos(open_entries)
 
         pbar = tqdm(combos_dict.items(), desc=self.__class__.__name__)
 
@@ -128,7 +130,8 @@ class BasicEnumerator(Enumerator):
         """
         return sum([comb(len(entries), i) for i in range(1, self.n + 1)]) ** 2
 
-    def _get_combos_dict(self, entries, precursor_entries, target_entries):
+    def _get_combos_dict(self, entries, precursor_entries, target_entries,
+                         open_entries):
         precursor_elems = (
             get_elems_set(precursor_entries) if precursor_entries else set()
         )
@@ -138,16 +141,18 @@ class BasicEnumerator(Enumerator):
             else set()
         )
 
-        combos = [set(c) for c in limited_powerset(entries, self.n)]
+        entries = entries - open_entries
 
+        combos = [set(c) for c in limited_powerset(entries, self.n)]
         combos_dict = group_by_chemsys(combos)
+
         filtered_combos = self._filter_dict_by_elems(
             combos_dict, precursor_elems, target_elems
         )
 
         return filtered_combos
 
-    def _get_open_combos(self, entries):
+    def _get_open_combos(self, open_entries):
         """ No open entries for BasicEnumerator, returns None"""
         return None
 
@@ -173,7 +178,11 @@ class BasicEnumerator(Enumerator):
             p = set(products) if products else set()
             all_phases = r | p
 
-            if (r & p) or (precursors and not precursors.issubset(all_phases)):
+            if (
+                    (r & p)
+                    or (precursors and not precursors.issubset(all_phases))
+                    or (p and target and target not in all_phases)
+            ):
                 continue
 
             suggested_rxns = self._react(r, p, calculators, pd, grand_pd)
@@ -201,6 +210,7 @@ class BasicEnumerator(Enumerator):
         return [forward_rxn, backward_rxn]
 
     def _get_rxn_iterable(self, combos, open_combos):
+        """ Get all reaction/product combinations """
         return combinations(combos, 2)
 
     def _get_initialized_entries(self, entries):
@@ -229,7 +239,12 @@ class BasicEnumerator(Enumerator):
             entries_new = entries_new.filter_by_stability(e_above_hull=0.0)
             self.logger.info("Filtering by stable entries!")
 
-        return entries_new, precursors, target
+        open_entries = set()
+        if self.open_phases:
+            open_entries = {
+                e for e in entries if e.composition.reduced_formula in self.open_phases}
+
+        return entries_new, precursors, target, open_entries
 
     @staticmethod
     def _filter_dict_by_elems(combos_dict, precursor_elems, target_elems):
@@ -330,16 +345,16 @@ class BasicOpenEnumerator(BasicEnumerator):
 
         return num_total_combos ** 2
 
-    def _get_open_combos(self, entries):
-        open_entries = {
-            e for e in entries if e.composition.reduced_formula in self.open_phases
-        }
+    def _get_open_combos(self, open_entries):
+        """ Get all possible combinations of open entries. For a single entry,
+        this is just the entry itself. """
         open_combos = [
             set(c) for c in limited_powerset(open_entries, len(open_entries))
         ]
         return open_combos
 
     def _get_rxn_iterable(self, combos, open_combos):
+        """ Get all reaction/product combinations. """
         combos_with_open = [
             combo | open_combo
             for combo in combos
