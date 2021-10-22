@@ -39,6 +39,8 @@ class BasicEnumerator(Enumerator):
         n: int = 2,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        exclusive_precursors: bool = True,
+        exclusive_target: bool = False
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -57,12 +59,19 @@ class BasicEnumerator(Enumerator):
                 Defaults to True.
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
+            exclusive_precursors: Whether to consider only reactions that have
+                reactants which are a subset of the provided list of precursors.
+                Defaults to True.
+            exclusive_target: Whether to consider only reactions that make the
+                provided target directly (i.e. with no byproducts). Defualts to False.
         """
         super().__init__(precursors, target, calculators)
 
         self.n = n
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
+        self.exclusive_precursors = exclusive_precursors
+        self.exclusive_target = exclusive_target
 
         self._stabilize = False
         if "ChempotDistanceCalculator" in self.calculators:
@@ -112,7 +121,8 @@ class BasicEnumerator(Enumerator):
 
             rxn_iter = self._get_rxn_iterable(combos, open_combos)
             r = self._get_rxns(
-                rxn_iter, precursors, target, calculators, filtered_entries
+                rxn_iter, precursors, target, calculators, filtered_entries,
+                open_entries
             )
             rxns.extend(r)
 
@@ -157,7 +167,8 @@ class BasicEnumerator(Enumerator):
         return None
 
     def _get_rxns(
-        self, rxn_iterable, precursors, target, calculators, filtered_entries=None
+        self, rxn_iterable, precursors, target, calculators, filtered_entries=None,
+            open_entries=None
     ):
         """
         Returns reactions from an iterable representing the combination of 2 sets
@@ -172,11 +183,18 @@ class BasicEnumerator(Enumerator):
             chempots = getattr(self, "chempots")
             grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
 
+        set_func = "issuperset" if self.exclusive_precursors else "intersection"
+        if not open_entries:
+            open_entries = set()
+
         rxns = []
         for reactants, products in rxn_iterable:
             r = set(reactants) if reactants else set()
             p = set(products) if products else set()
             all_phases = r | p
+
+            precursor_func = getattr(precursors, set_func) if \
+                precursors else lambda e: None
 
             if (
                     (r & p)
@@ -195,8 +213,13 @@ class BasicEnumerator(Enumerator):
                 ):
                     continue
 
-                if not target or target in rxn.product_entries:
-                    if not precursors or precursors.issubset(rxn.reactant_entries):
+                if (
+                    not target
+                    or (self.exclusive_target and {target} == p)
+                    or (not self.exclusive_target and target in rxn.product_entries)
+                ):
+                    reactant_entries = set(rxn.reactant_entries) - open_entries
+                    if not precursors or precursor_func(reactant_entries):
                         rxns.append(rxn)
 
         return rxns
@@ -246,14 +269,17 @@ class BasicEnumerator(Enumerator):
 
         return entries_new, precursors, target, open_entries
 
-    @staticmethod
-    def _filter_dict_by_elems(combos_dict, precursor_elems, target_elems):
+    def _filter_dict_by_elems(self, combos_dict, precursor_elems, target_elems):
         filtered_dict = dict()
         for chemsys, combos in combos_dict.items():
             elems = chemsys.split("-")
             if (
-                (target_elems and not target_elems.issubset(elems))
+                (target_elems and not self.exclusive_target and not
+                    target_elems.issubset(elems))
+                or (target_elems and self.exclusive_target and target_elems != elems)
                 or (precursor_elems and not precursor_elems.issubset(elems))
+                or (precursor_elems and self.exclusive_precursors and not
+                    precursor_elems.issuperset(elems))
                 or len(elems) >= 10
                 or len(elems) == 1
             ):
@@ -298,6 +324,8 @@ class BasicOpenEnumerator(BasicEnumerator):
         n: int = 2,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        exclusive_precursors: bool = True,
+        exclusive_target: bool = False
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -319,7 +347,8 @@ class BasicOpenEnumerator(BasicEnumerator):
                 removing a reactant/product or having it change sides. Defaults to True.
         """
         super().__init__(
-            precursors, target, calculators, n, remove_unbalanced, remove_changed
+            precursors, target, calculators, n, remove_unbalanced, remove_changed,
+            exclusive_precursors, exclusive_target
         )
         self.open_phases = open_phases
 

@@ -52,6 +52,22 @@ class NISTReferenceEntry(Entry):
 
         super().__init__(composition.reduced_composition, energy)
 
+    def get_new_temperature(self, new_temperature: float) -> "NISTReferenceEntry":
+        """
+        Return a copy of the NISTReferenceEntry at the new specified temperature.
+
+        Args:
+            new_temperature: The new temperature to use [K]
+
+        Returns:
+            A copy of the NISTReferenceEntry at the new specified temperature.
+        """
+        new_entry_dict = self.as_dict()
+        new_entry_dict["temperature"] = new_temperature
+
+        new_entry = self.from_dict(new_entry_dict)
+        return new_entry
+
     @staticmethod
     def _get_nist_energy(formula: str, temperature: float) -> float:
         """

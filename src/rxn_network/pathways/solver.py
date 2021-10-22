@@ -161,7 +161,8 @@ class PathwaySolver(Solver):
 
     def _build_idx_vector(self, rxn):
         """
-
+        Builds a vector of indices for a reaction.
+        
         Args:
             rxn:
 
@@ -176,7 +177,7 @@ class PathwaySolver(Solver):
     def _find_intermediate_rxns(self, precursors, targets, energy_cutoff):
         rxns = []
         intermediates = {e for rxn in self.reactions for e in rxn.entries}
-        intermediates = intermediates - set(precursors) - set(targets)
+        intermediates = GibbsEntrySet(list(intermediates)+targets)
         intermediate_formulas = [e.composition.reduced_formula for e in intermediates]
 
         if not targets:
@@ -189,20 +190,20 @@ class PathwaySolver(Solver):
                     f"{target.composition.reduced_formula}..."
                 )
                 be = BasicEnumerator(
-                    precursors=intermediate_formulas,
                     target=target.composition.reduced_formula,
+                    exclusive_target=True
                 )
-                int_rxns = be.enumerate(self.entries)
+                int_rxns = be.enumerate(intermediates)
                 rxns.extend(int_rxns)
 
                 if self.open_elem:
                     boe = BasicOpenEnumerator(
                         open_phases=[self.open_elem],
-                        precursors=intermediate_formulas,
                         target=target.composition.reduced_formula,
+                        exclusive_target=True
                     )
 
-                    int_rxns_open = boe.enumerate(self.entries)
+                    int_rxns_open = boe.enumerate(intermediates)
                     rxns.extend(int_rxns_open)
 
         rxns = ReactionSet.from_rxns(rxns, self.entries).get_rxns(
