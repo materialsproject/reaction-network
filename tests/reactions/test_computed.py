@@ -6,7 +6,7 @@ from monty.serialization import loadfn
 from rxn_network.reactions.computed import ComputedReaction
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
-ENTRIES_FILE = "yocl-namno2_rxn_entries.json.gz"
+ENTRIES_FILE = "yocl_namno2_rxn_entries.json.gz"
 
 
 @pytest.fixture(scope="session")
