@@ -20,6 +20,10 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         default_min_limit: Optional[float] = -20.0,
     ):
         """
+        This class is an extension of the ChemicalPotentialDiagram class from pymatgen.
+        Several features have been added to the original class for the purpose of
+        calculating the shortest distance between two chemical potential domains.
+
         Args:
             entries: List of PDEntry-like objects containing a composition and
                 energy. Must contain elemental references and be suitable for typical

@@ -13,11 +13,11 @@ class Enumerator(MSONable, metaclass=ABCMeta):
     Base definition for the reaction enumeration methodology
     """
 
-    def __init__(self, precursors, target, calculators):
+    def __init__(self, precursors, targets, calculators):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
         self.precursors = precursors
-        self.target = target
+        self.targets = targets
 
         if not calculators:
             calculators = []

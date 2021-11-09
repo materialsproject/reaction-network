@@ -1,3 +1,8 @@
+"""
+This module implements two types of reaction enumerators using a free energy
+minimization technique, with or without the option of an open entry
+"""
+
 from itertools import combinations, product
 from math import comb
 from typing import List, Optional
@@ -26,7 +31,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     def __init__(
         self,
         precursors: Optional[List[str]] = None,
-        target: Optional[str] = None,
+        targets: Optional[List[str]] = None,
         calculators: Optional[List[str]] = None,
     ):
         """
@@ -121,10 +126,12 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         open_elem: Element,
         mu: float,
         precursors: Optional[List[str]] = None,
-        target: Optional[str] = None,
+        targets: Optional[List[str]] = None,
         calculators: Optional[List[str]] = None,
     ):
-        super().__init__(precursors=precursors, target=target, calculators=calculators)
+        super().__init__(
+            precursors=precursors, targets=targets, calculators=calculators
+        )
         self.open_elem = Element(open_elem)  # type: ignore
         self.mu = mu
         self.chempots = {self.open_elem: self.mu}

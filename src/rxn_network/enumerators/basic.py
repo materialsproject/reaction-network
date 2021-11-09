@@ -34,13 +34,13 @@ class BasicEnumerator(Enumerator):
     def __init__(
         self,
         precursors: Optional[List[str]] = None,
-        target: Optional[str] = None,
+        targets: Optional[List[str]] = None,
         calculators: Optional[List[str]] = None,
         n: int = 2,
+        exclusive_precursors: bool = True,
+        exclusive_targets: bool = False,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
-        exclusive_precursors: bool = True,
-        exclusive_target: bool = False
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -55,29 +55,29 @@ class BasicEnumerator(Enumerator):
                 module for options (e.g., ["ChempotDistanceCalculator])
             n: Maximum reactant/product cardinality; i.e., largest possible number of
                 entries on either side of the reaction. Defaults to 2.
-            remove_unbalanced: Whether to remove reactions which are unbalanced.
-                Defaults to True.
-            remove_changed: Whether to remove reactions which can only be balanced by
-                removing a reactant/product or having it change sides. Defaults to True.
             exclusive_precursors: Whether to consider only reactions that have
                 reactants which are a subset of the provided list of precursors.
                 Defaults to True.
             exclusive_target: Whether to consider only reactions that make the
                 provided target directly (i.e. with no byproducts). Defualts to False.
+            remove_unbalanced: Whether to remove reactions which are unbalanced.
+                Defaults to True.
+            remove_changed: Whether to remove reactions which can only be balanced by
+                removing a reactant/product or having it change sides. Defaults to True.
         """
-        super().__init__(precursors, target, calculators)
+        super().__init__(precursors, targets, calculators)
 
         self.n = n
+        self.exclusive_precursors = exclusive_precursors
+        self.exclusive_targets = exclusive_targets
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
-        self.exclusive_precursors = exclusive_precursors
-        self.exclusive_target = exclusive_target
 
         self._stabilize = False
         if "ChempotDistanceCalculator" in self.calculators:
-            self._stabilize = True
+            self._stabilize = True  # ChempotDistanceCalculator requires stable entries
 
-        self.open_phases = None
+        self.open_phases: Optional[List[str]] = None
         self._build_pd = False
         self._build_grand_pd = False
 
@@ -91,11 +91,11 @@ class BasicEnumerator(Enumerator):
         stable entries within the entry set. If using ChempotDistanceCalculator,
         ensure that entries are filtered by stability.
 
-        2. Get a dictionary representing every possible node, i.e. phase combination,
+        2. Get a dictionary representing every possible "node", i.e. phase combination,
         grouped by chemical system.
 
-        3. Filter the combos dictionary for chemical systems which are not relevant (
-        i.e. don't contain elements in precursors and/or target.
+        3. Filter the combos dictionary for chemical systems which are not relevant;
+        i.e., don't contain elements in precursors and/or target.
 
         4. Iterate through each chemical system, initializing calculators,
         and computing all possible reactions for reactant/product pair and/or
@@ -106,8 +106,10 @@ class BasicEnumerator(Enumerator):
         Args:
             entries: the set of all entries to enumerate from
         """
-        entries, precursors, target, open_entries = self._get_initialized_entries(entries)
-        combos_dict = self._get_combos_dict(entries, precursors, target, open_entries)
+        entries, precursors, targets, open_entries = self._get_initialized_entries(
+            entries
+        )
+        combos_dict = self._get_combos_dict(entries, precursors, targets, open_entries)
         open_combos = self._get_open_combos(open_entries)
 
         pbar = tqdm(combos_dict.items(), desc=self.__class__.__name__)
@@ -121,8 +123,12 @@ class BasicEnumerator(Enumerator):
 
             rxn_iter = self._get_rxn_iterable(combos, open_combos)
             r = self._get_rxns(
-                rxn_iter, precursors, target, calculators, filtered_entries,
-                open_entries
+                rxn_iter,
+                precursors,
+                targets,
+                calculators,
+                filtered_entries,
+                open_entries,
             )
             rxns.extend(r)
 
@@ -140,16 +146,13 @@ class BasicEnumerator(Enumerator):
         """
         return sum([comb(len(entries), i) for i in range(1, self.n + 1)]) ** 2
 
-    def _get_combos_dict(self, entries, precursor_entries, target_entries,
-                         open_entries):
+    def _get_combos_dict(
+        self, entries, precursor_entries, target_entries, open_entries
+    ):
         precursor_elems = (
             get_elems_set(precursor_entries) if precursor_entries else set()
         )
-        target_elems = (
-            {e.name for e in target_entries.composition.elements}
-            if target_entries
-            else set()
-        )
+        target_elems = get_elems_set(target_entries) if precursor_entries else set()
 
         entries = entries - open_entries
 
@@ -167,8 +170,13 @@ class BasicEnumerator(Enumerator):
         return None
 
     def _get_rxns(
-        self, rxn_iterable, precursors, target, calculators, filtered_entries=None,
-            open_entries=None
+        self,
+        rxn_iterable,
+        precursors,
+        targets,
+        calculators,
+        filtered_entries=None,
+        open_entries=None,
     ):
         """
         Returns reactions from an iterable representing the combination of 2 sets
@@ -183,7 +191,9 @@ class BasicEnumerator(Enumerator):
             chempots = getattr(self, "chempots")
             grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
 
-        set_func = "issuperset" if self.exclusive_precursors else "intersection"
+        p_set_func = "issuperset" if self.exclusive_precursors else "intersection"
+        t_set_func = "issuperset" if self.exclusive_targets else "intersection"
+
         if not open_entries:
             open_entries = set()
 
@@ -193,13 +203,15 @@ class BasicEnumerator(Enumerator):
             p = set(products) if products else set()
             all_phases = r | p
 
-            precursor_func = getattr(precursors, set_func) if \
-                precursors else lambda e: None
+            precursor_func = (
+                getattr(precursors, p_set_func) if precursors else lambda e: None
+            )
+            target_func = getattr(targets, t_set_func) if targets else lambda e: None
 
             if (
-                    (r & p)
-                    or (precursors and not precursors.issubset(all_phases))
-                    or (p and target and target not in all_phases)
+                (r & p)
+                or (precursors and not precursors & all_phases)
+                or (p and targets and not targets & all_phases)
             ):
                 continue
 
@@ -213,14 +225,13 @@ class BasicEnumerator(Enumerator):
                 ):
                     continue
 
-                if (
-                    not target
-                    or (self.exclusive_target and {target} == p)
-                    or (not self.exclusive_target and target in rxn.product_entries)
+                reactant_entries = set(rxn.reactant_entries) - open_entries
+                product_entries = rxn.product_entries
+
+                if (not targets or target_func(product_entries)) and (
+                    not precursors or precursor_func(reactant_entries)
                 ):
-                    reactant_entries = set(rxn.reactant_entries) - open_entries
-                    if not precursors or precursor_func(reactant_entries):
-                        rxns.append(rxn)
+                    rxns.append(rxn)
 
         return rxns
 
@@ -230,6 +241,7 @@ class BasicEnumerator(Enumerator):
 
         forward_rxn = apply_calculators(forward_rxn, calculators)
         backward_rxn = apply_calculators(backward_rxn, calculators)
+
         return [forward_rxn, backward_rxn]
 
     def _get_rxn_iterable(self, combos, open_combos):
@@ -237,26 +249,27 @@ class BasicEnumerator(Enumerator):
         return combinations(combos, 2)
 
     def _get_initialized_entries(self, entries):
-        precursors, target = None, None
+        """ Returns initialized entries, precursors, target, and open entries"""
+        precursors, targets = None, None
         entries_new = entries.copy()
 
-        if self.precursors:
-            precursors = {
-                initialize_entry(f, entries, self.stabilize) for f in self.precursors
-            }
-            for p in precursors:
-                if p not in entries:
-                    old_entry = entries_new.get_min_entry_by_formula(
-                        p.composition.reduced_formula
+        def initialize_entries_list(ents):
+            new_ents = {initialize_entry(f, entries, self.stabilize) for f in ents}
+            for e in new_ents:
+                if e not in entries_new:
+                    old_e = entries_new.get_min_entry_by_formula(
+                        e.composition.reduced_formula
                     )
-                    entries_new.remove(old_entry)
-                    entries_new.add(p)
+                    entries_new.remove(old_e)
+                    entries_new.add(e)
 
-        if self.target:
-            target = initialize_entry(self.target, entries, self.stabilize)
-            if self.stabilize:
-                entries_new.remove(entries.get_min_entry_by_formula(self.target))
-                entries_new.add(target)
+            return new_ents
+
+        if self.precursors:
+            precursors = initialize_entries_list(self.precursors)
+
+        if self.targets:
+            targets = initialize_entries_list(self.targets)
 
         if self.stabilize:
             entries_new = entries_new.filter_by_stability(e_above_hull=0.0)
@@ -265,21 +278,28 @@ class BasicEnumerator(Enumerator):
         open_entries = set()
         if self.open_phases:
             open_entries = {
-                e for e in entries if e.composition.reduced_formula in self.open_phases}
+                e for e in entries if e.composition.reduced_formula in self.open_phases
+            }
 
-        return entries_new, precursors, target, open_entries
+        return entries_new, precursors, targets, open_entries
 
     def _filter_dict_by_elems(self, combos_dict, precursor_elems, target_elems):
         filtered_dict = dict()
         for chemsys, combos in combos_dict.items():
             elems = chemsys.split("-")
             if (
-                (target_elems and not self.exclusive_target and not
-                    target_elems.issubset(elems))
-                or (target_elems and self.exclusive_target and target_elems != elems)
+                (
+                    target_elems
+                    and not self.exclusive_targets
+                    and not target_elems.issubset(elems)
+                )
+                or (target_elems and self.exclusive_targets and target_elems != elems)
                 or (precursor_elems and not precursor_elems.issubset(elems))
-                or (precursor_elems and self.exclusive_precursors and not
-                    precursor_elems.issuperset(elems))
+                or (
+                    precursor_elems
+                    and self.exclusive_precursors
+                    and not precursor_elems.issuperset(elems)
+                )
                 or len(elems) >= 10
                 or len(elems) == 1
             ):
@@ -319,13 +339,13 @@ class BasicOpenEnumerator(BasicEnumerator):
         self,
         open_phases: List[str],
         precursors: Optional[List[str]] = None,
-        target: Optional[str] = None,
+        targets: Optional[str] = None,
         calculators: Optional[List[str]] = None,
         n: int = 2,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
         exclusive_precursors: bool = True,
-        exclusive_target: bool = False
+        exclusive_target: bool = False,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -335,7 +355,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             open_phases: List of formulas of open entries (e.g. ["O2"])
             precursors: Optional list of formulas of precursor phases; only reactions
                 which have these phases as reactants will be enumerated.
-            target: Optional formula of target; only reactions which make this target
+            targets: Optional list of formulas of targets; only reactions which make this target
                 will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator]).
@@ -347,8 +367,14 @@ class BasicOpenEnumerator(BasicEnumerator):
                 removing a reactant/product or having it change sides. Defaults to True.
         """
         super().__init__(
-            precursors, target, calculators, n, remove_unbalanced, remove_changed,
-            exclusive_precursors, exclusive_target
+            precursors,
+            targets,
+            calculators,
+            n,
+            remove_unbalanced,
+            remove_changed,
+            exclusive_precursors,
+            exclusive_target,
         )
         self.open_phases = open_phases
 
@@ -375,8 +401,8 @@ class BasicOpenEnumerator(BasicEnumerator):
         return num_total_combos ** 2
 
     def _get_open_combos(self, open_entries):
-        """ Get all possible combinations of open entries. For a single entry,
-        this is just the entry itself. """
+        """Get all possible combinations of open entries. For a single entry,
+        this is just the entry itself."""
         open_combos = [
             set(c) for c in limited_powerset(open_entries, len(open_entries))
         ]
