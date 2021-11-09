@@ -2,6 +2,9 @@
 An entry set class for acquiring entries with Gibbs formation energies
 """
 from typing import List, Optional, Union, Set, Dict
+from copy import deepcopy
+
+from numpy.random import normal
 
 from monty.json import MontyDecoder
 from pymatgen.analysis.phase_diagram import PhaseDiagram
@@ -34,9 +37,24 @@ class GibbsEntrySet(EntrySet):
             entries: A collection of entry objects that will make up the entry set.
         """
         super().__init__(entries)
-        self.entries_list = list(
-            sorted(entries, key=lambda e: e.composition.reduced_formula)
-        )
+        self.build_indices()
+
+    def add(self, element):
+        """
+        Add an entry.
+
+        :param element: Entry
+        """
+        self.entries.add(element)
+        self.build_indices()
+
+    def discard(self, element):
+        """
+        Discard an entry.
+
+        :param element: Entry
+        """
+        self.entries.discard(element)
         self.build_indices()
 
     def filter_by_stability(
@@ -134,6 +152,42 @@ class GibbsEntrySet(EntrySet):
 
         return new_entry
 
+    def get_entries_with_jitter(self):
+        entries = deepcopy(self.entries_list)
+        jitter = normal(size=len(entries))
+
+        for idx, entry in enumerate(entries):
+            if entry.is_element:
+                continue
+            adj = ConstantEnergyAdjustment(
+                value=jitter[idx] * entry.correction_uncertainty,
+                name="Random jitter",
+                description="Randomly sampled noise to account for uncertainty in data",
+            )
+            entry.energy_adjustments.append(adj)
+
+        return GibbsEntrySet(entries)
+
+    def get_interpolated_entry(self, formula: str, tol=1e-6):
+        """
+        Helper method for interpolating an entry from the entry set.
+
+        Args:
+            formula: The chemical formula of the desired entry.
+
+        Returns:
+            An interpolated GibbsComputedEntry object.
+        """
+        comp = Composition(formula).reduced_composition
+        pd_entries = self.get_subset_in_chemsys([str(e) for e in comp.elements])
+
+        energy = PhaseDiagram(pd_entries).get_hull_energy(comp) + tol
+
+        return ComputedEntry(comp, energy, entry_id="(Interpolated Entry)")
+
+    def get_subset_in_chemsys(self, chemsys: List[str]) -> "GibbsEntrySet":
+        return GibbsEntrySet(super().get_subset_in_chemsys(chemsys))
+
     @classmethod
     def from_pd(cls, pd: PhaseDiagram, temperature: float) -> "GibbsEntrySet":
         """
@@ -209,6 +263,10 @@ class GibbsEntrySet(EntrySet):
             new_entries.update(gibbs_set)
 
         return cls(list(new_entries))
+
+    @property
+    def entries_list(self) -> List[ComputedEntry]:
+        return list(sorted(self.entries, key=lambda e: e.composition.reduced_formula))
 
     def copy(self) -> "GibbsEntrySet":
         return GibbsEntrySet(entries=self.entries)

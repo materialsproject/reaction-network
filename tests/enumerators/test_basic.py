@@ -31,12 +31,12 @@ def basic_enumerator_with_precursors():
 
 @pytest.fixture
 def basic_enumerator_with_target():
-    return BasicEnumerator(target="YMnO3")
+    return BasicEnumerator(targets=["YMnO3"])
 
 
 @pytest.fixture
 def basic_enumerator_with_precursors_and_target():
-    return BasicEnumerator(precursors=["Y2O3", "Mn2O3"], target="YMnO3")
+    return BasicEnumerator(precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"])
 
 
 @pytest.fixture
@@ -46,17 +46,19 @@ def basic_open_enumerator():
 
 @pytest.fixture
 def basic_open_enumerator_with_precursors():
-    return BasicOpenEnumerator(["O2"], precursors=["Y2O3", "Mn2O3"], exclusive_precursors=False)
+    return BasicOpenEnumerator(["O2"], precursors=["Y2O3", "Mn2O3"])
 
 
 @pytest.fixture
 def basic_open_enumerator_with_target():
-    return BasicOpenEnumerator(["O2"], target="Y2Mn2O7", exclusive_precursors=False)
+    return BasicOpenEnumerator(["O2"], targets=["Y2Mn2O7"])
 
 
 @pytest.fixture
-def basic_open_enumerator_with_precursors_and_target(exclusive_precursors=False):
-    return BasicOpenEnumerator(["O2"], precursors=["Y2O3", "Mn2O3"], target="Y2Mn2O7")
+def basic_open_enumerator_with_precursors_and_target():
+    return BasicOpenEnumerator(
+        ["O2"], precursors=["Y2O3", "Mn2O3"], targets=["Y2Mn2O7"]
+    )
 
 
 def test_enumerate(
@@ -104,13 +106,15 @@ def test_enumerate_with_target(
 
     for enumerator in [basic_enumerator_with_target, basic_open_enumerator_with_target]:
         rxns = enumerator.enumerate(filtered_entries)
-        target = enumerator.target
+        targets = enumerator.targets
 
         for r in rxns:
             reactants = [i.reduced_formula for i in r.reactants]
             products = [i.reduced_formula for i in r.products]
-            assert target not in reactants
-            assert target in products
+
+            for target in targets:
+                assert target not in reactants
+                assert target in products
 
 
 def test_enumerate_with_precursors_and_target(

@@ -2,6 +2,7 @@
 Helpful utility functions used by the enumerator classes.
 """
 from typing import List, Union
+import warnings
 
 from pymatgen.entries.computed_entries import Entry, ComputedEntry
 
@@ -22,10 +23,17 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = T
         stabilize: Whether or not to stabilize the entry by decreasing its energy
             such that it is 'on the hull'
     """
-    entry = entry_set.get_min_entry_by_formula(formula)
+    try:
+        entry = entry_set.get_min_entry_by_formula(formula)
+    except IndexError:
+        entry = entry_set.get_interpolated_entry(formula)
+        warnings.warn(
+            f"Using interpolated entry for {entry.composition.reduced_formula}"
+        )
 
     if stabilize:
-        entry = entry_set.stabilize_entry(entry)
+        entry = entry_set.stabilize_entry(entry, tol=1e-1)
+
     return entry
 
 
@@ -44,8 +52,9 @@ def initialize_calculators(
     return [c.from_entries(entries) for c in calculators]  # type: ignore
 
 
-def apply_calculators(rxn: ComputedReaction, calculators: List[calcs.Calculator]) -> \
-        ComputedReaction:
+def apply_calculators(
+    rxn: ComputedReaction, calculators: List[calcs.Calculator]
+) -> ComputedReaction:
     """
     Decorates a reaction by applying decorate() from a list of calculators.
 
@@ -128,27 +137,6 @@ def stabilize_entries(pd, entries_to_adjust, tol=1e-6):
         new_entry = ComputedEntry.from_dict(entry_dict)
         new_entries.append(new_entry)
     return new_entries
-
-
-def filter_entries_by_chemsys(entries, chemsys):
-    """
-
-    Args:
-        entries:
-        chemsys:
-
-    Returns:
-
-    """
-    chemsys = set(chemsys.split("-"))
-
-    filtered_entries = list(
-        filter(
-            lambda e: chemsys.issuperset(e.composition.chemical_system.split("-")),
-            entries,
-        )
-    )
-    return filtered_entries
 
 
 def get_entry_by_comp(comp, entries):

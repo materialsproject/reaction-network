@@ -2,7 +2,7 @@
 Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 """
 import hashlib
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry
@@ -101,6 +101,13 @@ class NISTReferenceEntry(Entry):
     def correction_uncertainty_per_atom(self) -> float:
         """Uncertainty of NIST-JANAF data is not supplied."""
         return 0
+
+    @property
+    def energy_adjustments(self) -> List:
+        """
+        Returns a list of energy adjustments. Not implemented for NIST-JANAF data.
+        """
+        return list()
 
     @property
     def is_experimental(self) -> bool:

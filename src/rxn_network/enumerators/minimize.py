@@ -42,7 +42,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator])
         """
-        super().__init__(precursors, target, calculators)
+        super().__init__(precursors, targets, calculators)
         self._build_pd = True
 
     def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
