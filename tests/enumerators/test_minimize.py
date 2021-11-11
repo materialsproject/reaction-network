@@ -24,12 +24,12 @@ def gibbs_enumerator_with_precursors():
 
 @pytest.fixture
 def gibbs_enumerator_with_target():
-    return MinimizeGibbsEnumerator(target="YMnO3")
+    return MinimizeGibbsEnumerator(targets=["YMnO3"])
 
 
 @pytest.fixture
 def gibbs_enumerator_with_precursors_and_target():
-    return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"], target="YMnO3")
+    return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"])
 
 
 @pytest.fixture
@@ -47,14 +47,17 @@ def grand_potential_enumerator_with_precursors():
 @pytest.fixture
 def grand_potential_enumerator_with_target():
     return MinimizeGrandPotentialEnumerator(
-        open_elem=Element("O"), mu=0.0, target="Y2Mn2O7"
+        open_elem=Element("O"), mu=0.0, targets=["Y2Mn2O7"]
     )
 
 
 @pytest.fixture
 def grand_potential_enumerator_with_precursors_and_target():
     return MinimizeGrandPotentialEnumerator(
-        open_elem=Element("O"), mu=0.0, precursors=["Y2O3", "Mn2O3"], target="Y2Mn2O7"
+        open_elem=Element("O"),
+        mu=0.0,
+        precursors=["Y2O3", "Mn2O3"],
+        targets=["Y2Mn2O7"],
     )
 
 
@@ -97,15 +100,16 @@ def test_enumerate_gibbs_with_target(filtered_entries, gibbs_enumerator_with_tar
     expected_num_rxns = 32
 
     rxns = gibbs_enumerator_with_target.enumerate(filtered_entries)
-    target = gibbs_enumerator_with_target.target
+    targets = gibbs_enumerator_with_target.targets
 
     assert len(rxns) == expected_num_rxns
 
     for r in rxns:
         reactants = [i.reduced_formula for i in r.reactants]
         products = [i.reduced_formula for i in r.products]
-        assert target not in reactants
-        assert target in products
+        for target in targets:
+            assert target not in reactants
+            assert target in products
 
 
 def test_enumerate_gibbs_with_precursors_and_target(
@@ -117,7 +121,7 @@ def test_enumerate_gibbs_with_precursors_and_target(
 
 
 def test_enumerate_grand_potential(filtered_entries, grand_potential_enumerator):
-    expected_num_rxns = 39
+    expected_num_rxns = 38
 
     rxns = grand_potential_enumerator.enumerate(filtered_entries)
 
@@ -132,6 +136,7 @@ def test_enumerate_grand_potential_precursors(
     expected_rxns = {
         "Mn2O3 + 0.5 Y2O3 + 0.25 O2 -> YMn2O5",
         "Mn2O3 + Y2O3 + 0.5 O2 -> Y2Mn2O7",
+        "0.5 Mn2O3 + 0.25 O2 -> MnO2",
     }
 
     rxns = grand_potential_enumerator_with_precursors.enumerate(filtered_entries)
@@ -144,15 +149,16 @@ def test_enumerate_grand_potential_target(
     expected_num_rxns = 12
 
     rxns = grand_potential_enumerator_with_target.enumerate(filtered_entries)
-    target = grand_potential_enumerator_with_target.target
+    targets = grand_potential_enumerator_with_target.targets
 
     assert len(rxns) == expected_num_rxns
 
     for r in rxns:
         reactants = [i.reduced_formula for i in r.reactants]
         products = [i.reduced_formula for i in r.products]
-        assert target not in reactants
-        assert target in products
+        for target in targets:
+            assert target not in reactants
+            assert target in products
 
 
 def test_enumerate_grand_potential_precursors_target(

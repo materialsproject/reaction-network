@@ -81,4 +81,8 @@ class EnumeratorFW(Firework):
 
 
 class NetworkFW(Firework):
+    """
+    Firework for building a reaction network.
+    """
+
     pass

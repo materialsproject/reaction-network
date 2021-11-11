@@ -7,8 +7,11 @@ from itertools import combinations, product
 from math import comb
 from typing import List, Optional
 
-from pymatgen.analysis.interface_reactions import InterfacialReactivity
-from pymatgen.core.composition import Element
+from pymatgen.analysis.interface_reactions import (
+    InterfacialReactivity,
+    GrandPotentialInterfacialReactivity,
+)
+from pymatgen.core.composition import Element, Composition
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm.auto import tqdm
 
@@ -33,16 +36,24 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         precursors: Optional[List[str]] = None,
         targets: Optional[List[str]] = None,
         calculators: Optional[List[str]] = None,
+        exclusive_precursors: bool = True,
+        exclusive_targets: bool = False,
     ):
         """
         Args:
             precursors: Optional formulas of precursors.
-            target: Optional formula of target; only reactions which make this target
+            targets: Optional formulas of targets; only reactions which make these targets
                 will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator])
         """
-        super().__init__(precursors, targets, calculators)
+        super().__init__(
+            precursors=precursors,
+            targets=targets,
+            calculators=calculators,
+            exclusive_precursors=exclusive_precursors,
+            exclusive_targets=exclusive_targets,
+        )
         self._build_pd = True
 
     def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
@@ -78,13 +89,13 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         chempots = None
 
         if grand_pd:
-            interface = InterfacialReactivity(
+            interface = GrandPotentialInterfacialReactivity(
                 r1,
                 r2,
                 grand_pd,
-                norm=True,
-                include_no_mixing_energy=False,
                 pd_non_grand=pd,
+                norm=True,
+                include_no_mixing_energy=True,
                 use_hull_energy=True,
             )
             chempots = grand_pd.chempots
@@ -94,9 +105,6 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
                 r1,
                 r2,
                 pd,
-                norm=False,
-                include_no_mixing_energy=False,
-                pd_non_grand=None,
                 use_hull_energy=True,
             )
 
@@ -128,11 +136,18 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         precursors: Optional[List[str]] = None,
         targets: Optional[List[str]] = None,
         calculators: Optional[List[str]] = None,
+        exclusive_precursors: bool = True,
+        exclusive_targets: bool = False,
     ):
         super().__init__(
-            precursors=precursors, targets=targets, calculators=calculators
+            precursors=precursors,
+            targets=targets,
+            calculators=calculators,
+            exclusive_precursors=exclusive_precursors,
+            exclusive_targets=exclusive_targets,
         )
         self.open_elem = Element(open_elem)  # type: ignore
+        self.open_phases = [Composition(str(self.open_elem)).reduced_formula]  # type: ignore
         self.mu = mu
         self.chempots = {self.open_elem: self.mu}
         self._build_grand_pd = True

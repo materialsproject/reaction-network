@@ -99,6 +99,14 @@ class GibbsEntrySet(EntrySet):
         return self.__class__(list(filtered_entries))
 
     def build_indices(self):
+        """
+        Builds the indices for the entry set. This method is called whenever an entry is
+        added/removed the entry set. The entry indices are useful for querying the entry
+        set for specific entries.
+
+        Returns:
+            None
+        """
         for idx, e in enumerate(self.entries_list):
             e.data.update({"idx": idx})
 

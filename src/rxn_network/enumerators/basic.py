@@ -64,7 +64,9 @@ class BasicEnumerator(Enumerator):
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
         """
-        super().__init__(precursors, targets, calculators)
+        super().__init__(
+            precursors=precursors, targets=targets, calculators=calculators
+        )
 
         self.n = n
         self.exclusive_precursors = exclusive_precursors
@@ -124,6 +126,7 @@ class BasicEnumerator(Enumerator):
             calculators = initialize_calculators(self.calculators, filtered_entries)
 
             rxn_iter = self._get_rxn_iterable(combos, open_combos)
+
             r = self._get_rxns(
                 rxn_iter,
                 precursors,
@@ -151,6 +154,8 @@ class BasicEnumerator(Enumerator):
     def _get_combos_dict(
         self, entries, precursor_entries, target_entries, open_entries
     ):
+        """Gets all possible entry combinations up to predefined cardinality n, filtered and
+        grouped by chemical system"""
         precursor_elems = (
             get_elems_set(precursor_entries) if precursor_entries else set()
         )
@@ -235,6 +240,8 @@ class BasicEnumerator(Enumerator):
                     not precursors or precursor_func(reactant_entries)
                 ):
                     rxns.append(rxn)
+                else:
+                    print(rxn)
 
         return rxns
 
