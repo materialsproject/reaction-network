@@ -13,6 +13,11 @@ from scipy.spatial import KDTree
 
 
 class ChemicalPotentialDiagram(ChempotDiagram):
+    """This class is an extension of the ChemicalPotentialDiagram class from pymatgen.
+    Several features have been added to the original class for the purpose of
+    calculating the shortest distance between two chemical potential domains.
+    """
+
     def __init__(
         self,
         entries: List[PDEntry],
@@ -20,9 +25,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         default_min_limit: Optional[float] = -20.0,
     ):
         """
-        This class is an extension of the ChemicalPotentialDiagram class from pymatgen.
-        Several features have been added to the original class for the purpose of
-        calculating the shortest distance between two chemical potential domains.
+        Initialize a ChemicalPotentialDiagram object.
 
         Args:
             entries: List of PDEntry-like objects containing a composition and
