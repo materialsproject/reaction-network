@@ -5,10 +5,13 @@ equations using matrix operations.
 
 from itertools import combinations
 from typing import List
+from copy import deepcopy
 
 import numpy as np
 from scipy.special import comb
 from tqdm.notebook import tqdm
+
+from pymatgen.core.composition import Composition
 
 from rxn_network.core import CostFunction, Pathway, Solver
 from rxn_network.entries.entry_set import GibbsEntrySet
@@ -21,6 +24,11 @@ from rxn_network.utils import grouper
 
 
 class PathwaySolver(Solver):
+    """
+    Solver that implements an efficient numba method for finding balanced
+    reaction pathways from a list of graph-derived reaction pathways (i.e. a list of lists of reactions)
+    """
+
     BATCH_SIZE = 500000
 
     def __init__(
@@ -40,8 +48,11 @@ class PathwaySolver(Solver):
             open_elem:
             chempot:
         """
+        super().__init__(entries=deepcopy(entries), pathways=deepcopy(pathways))
+        for e in self.entries.entries_list:
+            print(e.composition.reduced_formula)
+            print(e.data["idx"])
 
-        super().__init__(entries=entries, pathways=pathways)
         self.cost_function = cost_function
         self.open_elem = open_elem
         self.chempot = chempot
@@ -67,12 +78,12 @@ class PathwaySolver(Solver):
 
         """
 
-        entries = self.entries.entries_list
-        precursors = net_rxn.reactant_entries
-        targets = net_rxn.product_entries
+        entries = deepcopy(self.entries.entries_list)
+        precursors = deepcopy(net_rxn.reactant_entries)
+        targets = deepcopy(net_rxn.product_entries)
 
-        reactions = self.reactions.copy()
-        costs = self.costs.copy()
+        reactions = deepcopy(self.reactions)
+        costs = deepcopy(self.costs)
 
         if not net_rxn.balanced:
             raise ValueError(
@@ -83,6 +94,7 @@ class PathwaySolver(Solver):
 
         if find_intermediate_rxns:
             self.logger.info("Identifying reactions between intermediates...")
+
             intermediate_rxns = self._find_intermediate_rxns(
                 precursors, targets, intermediate_rxn_energy_cutoff
             )
@@ -97,6 +109,12 @@ class PathwaySolver(Solver):
         net_rxn_vector = self._build_idx_vector(net_rxn)
         if net_rxn in reactions:
             reactions.remove(net_rxn)
+
+        reactions_str = [str(r) for r in reactions]
+
+        for e in entries:
+            print(e.composition.reduced_formula)
+            print(e.data["idx"])
 
         paths = []
         for n in range(1, max_num_combos + 1):
@@ -129,14 +147,21 @@ class PathwaySolver(Solver):
                 path_rxns = []
                 path_costs = []
                 for rxn_mat in c_mat:
-                    entries, coeffs = zip(
-                        *[(entries[idx], c) for idx, c in enumerate(rxn_mat)]
+                    print(len(rxn_mat))
+                    ents, coeffs = zip(
+                        *[
+                            (entries[idx], c)
+                            for idx, c in enumerate(rxn_mat)
+                            if not np.isclose(c, 0.0)
+                        ]
                     )
+                    print(ents, coeffs)
 
-                    rxn = ComputedReaction(entries=entries, coefficients=coeffs)
+                    rxn = ComputedReaction(entries=ents, coefficients=coeffs)
+
                     try:
                         path_rxns.append(rxn)
-                        path_costs.append(costs[reactions.index(rxn)])
+                        path_costs.append(costs[reactions_str.index(str(rxn))])
                     except Exception as e:
                         print(e)
                         continue
@@ -162,7 +187,7 @@ class PathwaySolver(Solver):
     def _build_idx_vector(self, rxn):
         """
         Builds a vector of indices for a reaction.
-        
+
         Args:
             rxn:
 
@@ -176,40 +201,33 @@ class PathwaySolver(Solver):
 
     def _find_intermediate_rxns(self, precursors, targets, energy_cutoff):
         rxns = []
+
         intermediates = {e for rxn in self.reactions for e in rxn.entries}
-        intermediates = GibbsEntrySet(list(intermediates)+targets)
-        intermediate_formulas = [e.composition.reduced_formula for e in intermediates]
 
-        if not targets:
-            be = BasicEnumerator(precursors=intermediate_formulas)
-            rxns = be.enumerate(self.entries)
-        else:
-            for target in targets:
-                self.logger.info(
-                    f"Finding intermediate reactions to "
-                    f"{target.composition.reduced_formula}..."
-                )
-                be = BasicEnumerator(
-                    target=target.composition.reduced_formula,
-                    exclusive_target=True
-                )
-                int_rxns = be.enumerate(intermediates)
-                rxns.extend(int_rxns)
-
-                if self.open_elem:
-                    boe = BasicOpenEnumerator(
-                        open_phases=[self.open_elem],
-                        target=target.composition.reduced_formula,
-                        exclusive_target=True
-                    )
-
-                    int_rxns_open = boe.enumerate(intermediates)
-                    rxns.extend(int_rxns_open)
-
-        rxns = ReactionSet.from_rxns(rxns, self.entries).get_rxns(
-            open_elem=self.open_elem, chempot=self.chempot
+        intermediates = GibbsEntrySet(
+            list(intermediates) + targets,
+            auto_build_indices=False,  # setting to False ensures correct entry refs
         )
+        be = BasicEnumerator(
+            targets=[t.composition.reduced_formula for t in targets],
+        )
+        int_rxns = be.enumerate(intermediates)
+        rxns.extend(int_rxns)
+
+        if self.open_elem:
+            boe = BasicOpenEnumerator(
+                open_phases=[Composition(str(self.open_elem)).reduced_formula],
+                targets=[t.composition.reduced_formula for t in targets],
+            )
+
+            int_rxns_open = boe.enumerate(intermediates)
+            rxns.extend(int_rxns_open)
+
+        target_set = set(targets)
+
+        rxns = [r for r in rxns if target_set.issuperset(r.product_entries)]
         rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxns))
+
         self.logger.info(f"Found {len(rxns)} intermediate reactions!")
 
         return rxns

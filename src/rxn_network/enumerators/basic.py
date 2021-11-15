@@ -5,6 +5,7 @@ option of an open entry
 from itertools import combinations, product
 from math import comb
 from typing import List, Optional, Set
+from copy import deepcopy
 
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.core.composition import Composition
@@ -240,8 +241,6 @@ class BasicEnumerator(Enumerator):
                     not precursors or precursor_func(reactant_entries)
                 ):
                     rxns.append(rxn)
-                else:
-                    print(rxn)
 
         return rxns
 
@@ -261,7 +260,7 @@ class BasicEnumerator(Enumerator):
     def _get_initialized_entries(self, entries):
         """ Returns initialized entries, precursors, target, and open entries"""
         precursors, targets = set(), set()
-        entries_new = entries.copy()
+        entries_new = deepcopy(entries)
 
         def initialize_entries_list(ents):
             new_ents = {initialize_entry(f, entries, self.stabilize) for f in ents}

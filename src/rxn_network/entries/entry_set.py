@@ -1,12 +1,14 @@
 """
 An entry set class for acquiring entries with Gibbs formation energies
 """
+import collections
 from typing import List, Optional, Union, Set, Dict
 from copy import deepcopy
 
 from numpy.random import normal
 
-from monty.json import MontyDecoder
+from monty.json import MontyDecoder, MSONable
+from pymatgen.entries.entry_tools import EntrySet
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core import Composition
 from pymatgen.entries.computed_entries import (
@@ -14,7 +16,6 @@ from pymatgen.entries.computed_entries import (
     ComputedStructureEntry,
     ConstantEnergyAdjustment,
 )
-from pymatgen.entries.entry_tools import EntrySet
 from tqdm.auto import tqdm
 
 from rxn_network.entries.gibbs import GibbsComputedEntry
@@ -22,13 +23,17 @@ from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd
 
 
-class GibbsEntrySet(EntrySet):
+class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     """
     An extension of pymatgen's EntrySet to include factory methods for constructing
     GibbsComputedEntry objects from zero-temperature ComputedStructureEntry objects.
     """
 
-    def __init__(self, entries: List[Union[GibbsComputedEntry, NISTReferenceEntry]]):
+    def __init__(
+        self,
+        entries: List[Union[GibbsComputedEntry, NISTReferenceEntry]],
+        auto_build_indices=True,
+    ):
         """
         The supplied collection of entries will automatically be converted to a set of
         unique entries.
@@ -36,8 +41,19 @@ class GibbsEntrySet(EntrySet):
         Args:
             entries: A collection of entry objects that will make up the entry set.
         """
-        super().__init__(entries)
+        self.entries = set(entries)
+
+        self._auto_build_indices = auto_build_indices
         self.build_indices()
+
+    def __contains__(self, item):
+        return item in self.entries
+
+    def __iter__(self):
+        return self.entries.__iter__()
+
+    def __len__(self):
+        return len(self.entries)
 
     def add(self, element):
         """
@@ -56,6 +72,32 @@ class GibbsEntrySet(EntrySet):
         """
         self.entries.discard(element)
         self.build_indices()
+
+    def get_subset_in_chemsys(self, chemsys: List[str]):
+        """
+        Returns an EntrySet containing only the set of entries belonging to
+        a particular chemical system (in this definition, it includes all sub
+        systems). For example, if the entries are from the
+        Li-Fe-P-O system, and chemsys=["Li", "O"], only the Li, O,
+        and Li-O entries are returned.
+
+        Args:
+            chemsys: Chemical system specified as list of elements. E.g.,
+                ["Li", "O"]
+
+        Returns:
+            EntrySet
+        """
+        chem_sys = set(chemsys)
+        if not chem_sys.issubset(self.chemsys):
+            raise ValueError("%s is not a subset of %s" % (chem_sys, self.chemsys))
+        subset = set()
+        for e in self.entries:
+            elements = [sp.symbol for sp in e.composition.keys()]
+            if chem_sys.issuperset(elements):
+                subset.add(e)
+
+        return GibbsEntrySet(subset, auto_build_indices=self._auto_build_indices)
 
     def filter_by_stability(
         self, e_above_hull: float, include_polymorphs: Optional[bool] = False
@@ -96,7 +138,9 @@ class GibbsEntrySet(EntrySet):
                 all_comps[formula] = entry
                 filtered_entries.add(entry)
 
-        return self.__class__(list(filtered_entries))
+        return self.__class__(
+            list(filtered_entries), auto_build_indices=self._auto_build_indices
+        )
 
     def build_indices(self):
         """
@@ -107,8 +151,9 @@ class GibbsEntrySet(EntrySet):
         Returns:
             None
         """
-        for idx, e in enumerate(self.entries_list):
-            e.data.update({"idx": idx})
+        if self._auto_build_indices:
+            for idx, e in enumerate(self.entries_list):
+                e.data.update({"idx": idx})
 
     def get_min_entry_by_formula(self, formula: str) -> ComputedEntry:
         """
@@ -175,7 +220,7 @@ class GibbsEntrySet(EntrySet):
             )
             entry.energy_adjustments.append(adj)
 
-        return GibbsEntrySet(entries)
+        return GibbsEntrySet(entries, auto_build_indices=self._auto_build_indices)
 
     def get_interpolated_entry(self, formula: str, tol=1e-6):
         """
@@ -193,9 +238,6 @@ class GibbsEntrySet(EntrySet):
         energy = PhaseDiagram(pd_entries).get_hull_energy(comp) + tol
 
         return ComputedEntry(comp, energy, entry_id="(Interpolated Entry)")
-
-    def get_subset_in_chemsys(self, chemsys: List[str]) -> "GibbsEntrySet":
-        return GibbsEntrySet(super().get_subset_in_chemsys(chemsys))
 
     @classmethod
     def from_pd(cls, pd: PhaseDiagram, temperature: float) -> "GibbsEntrySet":
@@ -262,6 +304,7 @@ class GibbsEntrySet(EntrySet):
         """
         e_set = EntrySet(entries)
         new_entries: Set[GibbsComputedEntry] = set()
+
         if len(e_set.chemsys) <= 9:  # Qhull algorithm struggles beyond 9 dimensions
             pd = PhaseDiagram(e_set)
             return cls.from_pd(pd, temperature)
@@ -278,6 +321,25 @@ class GibbsEntrySet(EntrySet):
         """ Returns a list of all entries in the entry set. """
         return list(sorted(self.entries, key=lambda e: e.composition.reduced_formula))
 
+    @property
+    def chemsys(self) -> set:
+        """
+        Returns:
+            set representing the chemical system, e.g., {"Li", "Fe", "P", "O"}
+        """
+        chemsys = set()
+        for e in self.entries:
+            chemsys.update([el.symbol for el in e.composition.keys()])
+        return chemsys
+
+    def as_dict(self):
+        """
+        :return: MSONable dict
+        """
+        return {"entries": list(self.entries)}
+
     def copy(self) -> "GibbsEntrySet":
         """ Returns a copy of the entry set. """
-        return GibbsEntrySet(entries=self.entries)
+        return GibbsEntrySet(
+            entries=self.entries, auto_build_indices=self._auto_build_indices
+        )
