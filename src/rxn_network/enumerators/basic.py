@@ -7,6 +7,8 @@ from math import comb
 from typing import List, Optional, Set
 from copy import deepcopy
 
+from joblib import Parallel
+
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.core.composition import Composition
 from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDiagram
@@ -245,6 +247,7 @@ class BasicEnumerator(Enumerator):
         return rxns
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
+        """ Generates reactions from a list of reactants, products, and optional calculator(s)"""
         forward_rxn = ComputedReaction.balance(reactants, products)
         backward_rxn = forward_rxn.reverse()
 

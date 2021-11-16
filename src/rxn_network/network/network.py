@@ -11,6 +11,8 @@ from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.network.gt import (
     initialize_graph,
     update_vertex_props,
+    load_graph,
+    save_graph,
     yens_ksp,
 )
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
@@ -36,6 +38,9 @@ class ReactionNetwork(Network):
         """
         Initialize a ReactionNetwork object for a set of entires, enumerator,
         and cost function. The network can be constructed by calling build().
+
+        Note: the precursors and target must be set by calling set_precursors() and
+        set_target() respectively.
 
         Args:
             entries: iterable of entry-like objects
@@ -102,7 +107,7 @@ class ReactionNetwork(Network):
 
         paths = []
         for target in targets:
-            if type(target) == str:
+            if isinstance(target, str):
                 target = self.entries.get_min_entry_by_formula(target)
             self.set_target(target)
             print(f"PATHS to {target.composition.reduced_formula} \n")
@@ -161,7 +166,7 @@ class ReactionNetwork(Network):
 
         g.add_edge_list(add_edges, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
 
-        self.precursors = precursors
+        self._precursors = precursors
 
     def set_target(self, target):
         """
@@ -175,7 +180,7 @@ class ReactionNetwork(Network):
         g = self._g
         if target == self.target:
             return
-        elif self.target or target is None:
+        elif self.target:
             target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
             g.remove_vertex(target_v)
 
@@ -196,7 +201,31 @@ class ReactionNetwork(Network):
 
         g.add_edge_list(add_edges, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
 
-        self.target = target
+        self._target = target
+
+    def load_graph(self, filename: str):
+        """
+
+        Args:
+            filename:
+
+        Returns:
+        """
+        self._g = load_graph(filename)
+
+    def write_graph(self, filename: Optional[str] = None):
+        """
+        Writes graph to file.
+
+        Args:
+            filename: Filename to write to. If None, writes to default filename.
+
+        Returns: None
+        """
+        if not filename:
+            filename = f"{self.chemsys}.gt.gz"
+
+        save_graph(self._g, filename)
 
     def _shortest_paths(self, k=15):
         """Finds the k shortest paths using Yen's algorithm and returns BasicPathways"""
@@ -239,13 +268,48 @@ class ReactionNetwork(Network):
 
         return BasicPathway(reactions=rxns, costs=costs)
 
+    @classmethod
+    def from_dict_and_file(cls, d: dict, filename: str):
+        """
+
+        Args:
+            d:
+            filename:
+
+        Returns:
+        """
+        rn = cls.from_dict(d)
+        rn.load_graph(filename)
+
+        return rn
+
     @property
     def graph(self):
+        """ Returns the network object in graph-tool"""
         return self._g
 
     @property
     def chemsys(self):
         return "-".join(sorted(self.entries.chemsys))
+
+    def as_dict(self):
+        """ Return MSONable dict"""
+        d = super().as_dict()
+        d["precursors"] = self.precursors
+        d["target"] = self.target
+        return d
+
+    @classmethod
+    def from_dict(cls, d):
+        """ Return MSONable dict"""
+        precursors = d.pop("precursors", None)
+        target = d.pop("target", None)
+
+        rn = super().from_dict(d)
+        rn._precursors = precursors
+        rn._target = target
+
+        return rn
 
     def __repr__(self):
         return (

@@ -66,13 +66,16 @@ class EntriesFromDb(FiretaskBase):
     filters by e_above_hull stability.
 
     Required params:
-        entry_db_file (str):
+        entry_db_file (str): path to db.json file with MongoDB credentials.
         chemsys (str):
         temperature (float):
         e_above_hull (float):
 
     Optional params:
         include_polymorphs (bool):
+        inc_structure (bool):
+        compatible_only (bool):
+        property_data (dict):
 
     """
 

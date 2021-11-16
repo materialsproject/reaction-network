@@ -23,8 +23,8 @@ class Network(MSONable, metaclass=ABCMeta):
         self.enumerators = enumerators
         self.cost_function = cost_function
         self._g = None
-        self.precursors = None
-        self.target = None
+        self._precursors = None
+        self._target = None
 
     @abstractmethod
     def build(self):
@@ -41,3 +41,20 @@ class Network(MSONable, metaclass=ABCMeta):
     @abstractmethod
     def set_target(self):
         """Set the phase used as a target in the network"""
+
+    @property
+    def precursors(self):
+        return self._precursors
+
+    @property
+    def target(self):
+        return self._target
+
+    @property
+    def graph(self):
+        """ Returns the network object in graph-tool"""
+        return self._g
+
+    @property
+    def chemsys(self):
+        return "-".join(sorted(self.entries.chemsys))

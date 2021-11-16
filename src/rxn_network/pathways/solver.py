@@ -42,17 +42,13 @@ class PathwaySolver(Solver):
         """
 
         Args:
-            entries:
-            pathways:
-            cost_function:
-            open_elem:
-            chempot:
+            entries: GibbsEntrySet containing all entries in the network.
+            pathways: List of reaction pathways derived from the network.
+            cost_function: CostFunction object to use for the solver.
+            open_elem: Element to use for pathways with an open element.
+            chempot: Chemical potential to use for pathways with an open element.
         """
         super().__init__(entries=deepcopy(entries), pathways=deepcopy(pathways))
-        for e in self.entries.entries_list:
-            print(e.composition.reduced_formula)
-            print(e.data["idx"])
-
         self.cost_function = cost_function
         self.open_elem = open_elem
         self.chempot = chempot
@@ -68,22 +64,29 @@ class PathwaySolver(Solver):
         """
 
         Args:
-            net_rxn:
-            max_num_combos:
-            find_intermediate_rxns:
-            intermediate_rxn_energy_cutoff:
-            filter_interdependent:
+            net_rxn: The reaction representing the total reaction from precursors to
+                final targets.
+            max_num_combos: The maximum allowable size of the balanced reaction pathway.
+                At 5 or more, the solver will be very slow.
+            find_intermediate_rxns: Whether to find intermediate reactions; crucial for
+                finding pathways where intermediates react together, as these reactions may
+                not occur in the graph-derived pathways. Defaults to True.
+            intermediate_rxn_energy_cutoff: An energy cutoff by which to filter down
+                intermediate reactions. This can be useful when there are a large number of
+                possible intermediates. < 0 means allow only exergonic reactions.
+            filter_interdependent: Whether or not to filter out pathways where reaction
+                steps are interdependent. Defaults to True.
 
         Returns:
-
+            A list of BalancedPathway objects.
         """
 
         entries = deepcopy(self.entries.entries_list)
-        precursors = deepcopy(net_rxn.reactant_entries)
-        targets = deepcopy(net_rxn.product_entries)
-
         reactions = deepcopy(self.reactions)
         costs = deepcopy(self.costs)
+
+        precursors = deepcopy(net_rxn.reactant_entries)
+        targets = deepcopy(net_rxn.product_entries)
 
         if not net_rxn.balanced:
             raise ValueError(
@@ -109,12 +112,6 @@ class PathwaySolver(Solver):
         net_rxn_vector = self._build_idx_vector(net_rxn)
         if net_rxn in reactions:
             reactions.remove(net_rxn)
-
-        reactions_str = [str(r) for r in reactions]
-
-        for e in entries:
-            print(e.composition.reduced_formula)
-            print(e.data["idx"])
 
         paths = []
         for n in range(1, max_num_combos + 1):
@@ -147,7 +144,6 @@ class PathwaySolver(Solver):
                 path_rxns = []
                 path_costs = []
                 for rxn_mat in c_mat:
-                    print(len(rxn_mat))
                     ents, coeffs = zip(
                         *[
                             (entries[idx], c)
@@ -155,13 +151,12 @@ class PathwaySolver(Solver):
                             if not np.isclose(c, 0.0)
                         ]
                     )
-                    print(ents, coeffs)
 
                     rxn = ComputedReaction(entries=ents, coefficients=coeffs)
 
                     try:
                         path_rxns.append(rxn)
-                        path_costs.append(costs[reactions_str.index(str(rxn))])
+                        path_costs.append(costs[reactions.index(rxn)])
                     except Exception as e:
                         print(e)
                         continue
@@ -225,7 +220,6 @@ class PathwaySolver(Solver):
 
         target_set = set(targets)
 
-        rxns = [r for r in rxns if target_set.issuperset(r.product_entries)]
         rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxns))
 
         self.logger.info(f"Found {len(rxns)} intermediate reactions!")

@@ -6,6 +6,7 @@ from queue import Empty, PriorityQueue
 from typing import Dict
 
 from graph_tool import Graph, GraphView, Vertex
+from graph_tool import load_graph as load_g
 from graph_tool.topology import shortest_path
 
 DEFAULT_VERTEX_PROPS = {"entry": "object", "type": "int"}
@@ -40,6 +41,21 @@ def initialize_graph(
         g.ep[name] = g.new_edge_property(obj_type)
 
     return g
+
+
+def load_graph(filename):
+    """
+    Loads a graph-tool graph from a file.
+    """
+    g = load_g(filename)
+    return g
+
+
+def save_graph(g, filename):
+    """
+    Saves a graph-tool graph to a file.
+    """
+    g.save(filename)
 
 
 def update_vertex_props(g, v, prop_dict):

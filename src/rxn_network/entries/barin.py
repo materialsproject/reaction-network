@@ -1,21 +1,19 @@
 """
-Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
+Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin tables
 """
 import hashlib
 from typing import Dict, Any, List
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry
-from scipy.interpolate import interp1d
 
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
-from rxn_network.data import PATH_TO_NIST, load_experimental_data
+from rxn_network.data import PATH_TO_BARIN, load_experimental_data
 
-G_COMPOUNDS = load_experimental_data(PATH_TO_NIST / "compounds.json")
-G_GASES = load_experimental_data(PATH_TO_NIST / "gases.json")
+G_COMPOUNDS = load_experimental_data(PATH_TO_BARIN / "compounds.json")
 
 
-class NISTReferenceEntry(ExperimentalReferenceEntry):
+class BarinReferenceEntry(ExperimentalReferenceEntry):
     """
     An Entry class for NIST-JANAF experimental reference data. Given a composition,
     automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
@@ -27,7 +25,7 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
         Physics for the National Institute of Standards and Technology, 1998.
     """
 
-    REFERENCES = {**G_COMPOUNDS, **G_GASES}
+    REFERENCES = G_COMPOUNDS
 
     def __init__(self, composition: Composition, temperature: float):
         """
@@ -40,7 +38,10 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
         super().__init__(composition, temperature)
 
     @classmethod
-    def _validate_temperature(cls, formula, temperature: float) -> None:
+    def _validate_temperature(cls, formula, temperature) -> None:
         """ Ensure that the temperature is from a valid range. """
-        if temperature < 300 or temperature > 2000:
-            raise ValueError("Temperature must be selected from range: [300, 2000] K")
+        g = cls.REFERENCES[formula]
+        if temperature < min(g) or temperature > max(g):
+            raise ValueError(
+                f"Temperature must be selected from range: {min(g)} K to {max(g)} K"
+            )

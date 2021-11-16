@@ -70,4 +70,13 @@ class RunEnumerators(FiretaskBase):
 
 @explicit_serialize
 class RunNetwork(FiretaskBase):
-    pass
+    """
+    Builds a reaction network from a set of computed entries, a list of enumerators , and
+    a cost function.
+
+    Required params:
+        entries (List[ComputedEntry]): Computed entries to be fed into enumerate()
+            methods
+        enumerators (List[Enumerator]): Enumerators to run
+        cost_function (CostFunction): cost function to use for edge weights
+    """

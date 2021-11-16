@@ -2,6 +2,7 @@
 An entry set class for acquiring entries with Gibbs formation energies
 """
 import collections
+import logging
 from typing import List, Optional, Union, Set, Dict
 from copy import deepcopy
 
@@ -20,6 +21,7 @@ from tqdm.auto import tqdm
 
 from rxn_network.entries.gibbs import GibbsComputedEntry
 from rxn_network.entries.nist import NISTReferenceEntry
+from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.thermo.utils import expand_pd
 
 
@@ -240,7 +242,13 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return ComputedEntry(comp, energy, entry_id="(Interpolated Entry)")
 
     @classmethod
-    def from_pd(cls, pd: PhaseDiagram, temperature: float) -> "GibbsEntrySet":
+    def from_pd(
+        cls,
+        pd: PhaseDiagram,
+        temperature: float,
+        include_nist_data=True,
+        include_barin_data=True,
+    ) -> "GibbsEntrySet":
         """
         Constructor method for building a GibbsEntrySet from an existing phase diagram.
 
@@ -255,20 +263,58 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         """
         gibbs_entries = []
+        experimental_comps = []
+
         for entry in pd.all_entries:
-            if entry.composition.is_element and entry not in pd.el_refs.values():
-                continue
+            experimental = False
             composition = entry.composition
+            formula = composition.reduced_formula
 
-            if composition.reduced_formula in NISTReferenceEntry.REFERENCES:
-                new_entry = NISTReferenceEntry(
-                    composition=composition, temperature=temperature
-                )
-            else:
-                structure = entry.structure
-                formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
+            if composition.is_element and entry not in pd.el_refs.values():
+                continue
 
-                new_entry = GibbsComputedEntry.from_structure(
+            new_entries = []
+
+            if (
+                include_nist_data
+                and formula in NISTReferenceEntry.REFERENCES
+                and formula not in experimental_comps
+            ):
+                try:
+                    e = NISTReferenceEntry(
+                        composition=composition, temperature=temperature
+                    )
+                    new_entries.append(e)
+                except ValueError as e:
+                    logging.warning(
+                        f"Compound {formula} is in NIST-JANAF tables but at different temperatures!: {e}"
+                    )
+                experimental = True
+
+            if (
+                include_barin_data
+                and formula in BarinReferenceEntry.REFERENCES
+                and formula not in experimental_comps
+            ):
+                try:
+                    e = BarinReferenceEntry(
+                        composition=composition, temperature=temperature
+                    )
+                    new_entries.append(e)
+                except ValueError as e:
+                    logging.warning(
+                        f"Compound {formula} is in Barin tables but not at this temperature! {e}"
+                    )
+                experimental = True
+
+            if experimental:
+                experimental_comps.append(formula)
+
+            structure = entry.structure
+            formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
+
+            new_entries.append(
+                GibbsComputedEntry.from_structure(
                     structure=structure,
                     formation_energy_per_atom=formation_energy_per_atom,
                     temperature=temperature,
@@ -277,14 +323,19 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     data=entry.data,
                     entry_id=entry.entry_id,
                 )
+            )
 
-            gibbs_entries.append(new_entry)
+            gibbs_entries.extend(new_entries)
 
         return cls(gibbs_entries)
 
     @classmethod
     def from_entries(
-        cls, entries: List[ComputedStructureEntry], temperature: float
+        cls,
+        entries: List[ComputedStructureEntry],
+        temperature: float,
+        include_nist_data=True,
+        include_barin_data=True,
     ) -> "GibbsEntrySet":
         """
         Constructor method for initializing GibbsEntrySet from T = 0 K
@@ -307,11 +358,18 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         if len(e_set.chemsys) <= 9:  # Qhull algorithm struggles beyond 9 dimensions
             pd = PhaseDiagram(e_set)
-            return cls.from_pd(pd, temperature)
+            return cls.from_pd(
+                pd,
+                temperature,
+                include_nist_data=include_nist_data,
+                include_barin_data=include_barin_data,
+            )
 
         pd_dict = expand_pd(list(e_set))
         for chemsys, pd in tqdm(pd_dict.items()):
-            gibbs_set = cls.from_pd(pd, temperature)
+            gibbs_set = cls.from_pd(
+                pd, temperature, include_nist_data, include_barin_data
+            )
             new_entries.update(gibbs_set)
 
         return cls(list(new_entries))
@@ -331,12 +389,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         for e in self.entries:
             chemsys.update([el.symbol for el in e.composition.keys()])
         return chemsys
-
-    def as_dict(self):
-        """
-        :return: MSONable dict
-        """
-        return {"entries": list(self.entries)}
 
     def copy(self) -> "GibbsEntrySet":
         """ Returns a copy of the entry set. """
