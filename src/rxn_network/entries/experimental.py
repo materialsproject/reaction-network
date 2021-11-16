@@ -40,7 +40,9 @@ class ExperimentalReferenceEntry(Entry):
 
         super().__init__(composition.reduced_composition, energy)
 
-    def get_new_temperature(self, new_temperature: float) -> "NISTReferenceEntry":
+    def get_new_temperature(
+        self, new_temperature: float
+    ) -> "ExperimentalReferenceEntry":
         """
         Return a copy of the NISTReferenceEntry at the new specified temperature.
 
@@ -59,7 +61,9 @@ class ExperimentalReferenceEntry(Entry):
     @classmethod
     def _validate_temperature(cls, formula, temperature) -> None:
         """ Ensure that the temperature is from a valid range. """
-        if temperature < 300 or temperature > 2000:
+        if formula not in cls.REFERENCES:
+            raise ValueError(f"{formula} not in reference data!")
+        elif temperature < 300 or temperature > 2000:
             raise ValueError("Temperature must be selected from range: [300, 2000] K")
 
     @classmethod

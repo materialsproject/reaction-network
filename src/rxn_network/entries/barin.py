@@ -40,7 +40,11 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
     @classmethod
     def _validate_temperature(cls, formula, temperature) -> None:
         """ Ensure that the temperature is from a valid range. """
+        if formula not in cls.REFERENCES:
+            raise ValueError("Formula not in reference data!")
+
         g = cls.REFERENCES[formula]
+
         if temperature < min(g) or temperature > max(g):
             raise ValueError(
                 f"Temperature must be selected from range: {min(g)} K to {max(g)} K"

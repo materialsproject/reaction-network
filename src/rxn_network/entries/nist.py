@@ -38,9 +38,3 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
                 interpolated. Defaults to 300 K.
         """
         super().__init__(composition, temperature)
-
-    @classmethod
-    def _validate_temperature(cls, formula, temperature: float) -> None:
-        """ Ensure that the temperature is from a valid range. """
-        if temperature < 300 or temperature > 2000:
-            raise ValueError("Temperature must be selected from range: [300, 2000] K")

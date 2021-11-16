@@ -16,7 +16,7 @@ def entries():
 def test_invalid_formula():
     with pytest.raises(ValueError) as error:
         assert NISTReferenceEntry(Composition("AX"), temperature=300)
-    assert str(error.value) == "Formula must be in NIST-JANAF thermochemical tables"
+    assert str(error.value) == "AX not in reference data!"
 
 
 def test_invalid_temperature():

@@ -19,7 +19,9 @@ def mp_entries(request):
 
 @pytest.fixture(scope="session")
 def gibbs_entries(mp_entries):
-    entries = GibbsEntrySet.from_entries(mp_entries, temperature=1000)
+    entries = GibbsEntrySet.from_entries(
+        mp_entries, temperature=1000, include_barin_data=False
+    )
     return entries
 
 
@@ -33,6 +35,7 @@ def filtered_entries(gibbs_entries):
 def computed_rxn():
     """ 2 YOCl + 2 NaMnO2 + 0.5 O2 -> Y2Mn2O7 + 2 NaCl"""
     return loadfn(TEST_FILES_PATH / "computed_rxn.json.gz")
+
 
 # def pytest_itemcollected(item):
 #     """Make tests names more readable in the tests output."""
