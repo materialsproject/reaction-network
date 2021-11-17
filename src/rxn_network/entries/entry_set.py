@@ -31,11 +31,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     GibbsComputedEntry objects from zero-temperature ComputedStructureEntry objects.
     """
 
-    def __init__(
-        self,
-        entries: List[Union[GibbsComputedEntry, NISTReferenceEntry]],
-        auto_build_indices=True,
-    ):
+    def __init__(self, entries: List[Union[GibbsComputedEntry, NISTReferenceEntry]]):
         """
         The supplied collection of entries will automatically be converted to a set of
         unique entries.
@@ -44,9 +40,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entries: A collection of entry objects that will make up the entry set.
         """
         self.entries = set(entries)
-
-        self._auto_build_indices = auto_build_indices
-        self.build_indices()
 
     def __contains__(self, item):
         return item in self.entries
@@ -64,7 +57,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         :param element: Entry
         """
         self.entries.add(element)
-        self.build_indices()
 
     def discard(self, element):
         """
@@ -73,7 +65,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         :param element: Entry
         """
         self.entries.discard(element)
-        self.build_indices()
 
     def get_subset_in_chemsys(self, chemsys: List[str]):
         """
@@ -99,7 +90,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             if chem_sys.issuperset(elements):
                 subset.add(e)
 
-        return GibbsEntrySet(subset, auto_build_indices=self._auto_build_indices)
+        return GibbsEntrySet(subset)
 
     def filter_by_stability(
         self, e_above_hull: float, include_polymorphs: Optional[bool] = False
@@ -140,9 +131,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 all_comps[formula] = entry
                 filtered_entries.add(entry)
 
-        return self.__class__(
-            list(filtered_entries), auto_build_indices=self._auto_build_indices
-        )
+        return self.__class__(list(filtered_entries))
 
     def build_indices(self):
         """
@@ -150,12 +139,14 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         added/removed the entry set. The entry indices are useful for querying the entry
         set for specific entries.
 
+        Note: this internally modifies the entries in the entry set by updating data for
+        each entry to include the index.
+
         Returns:
             None
         """
-        if self._auto_build_indices:
-            for idx, e in enumerate(self.entries_list):
-                e.data.update({"idx": idx})
+        for idx, e in enumerate(self.entries_list):
+            e.data.update({"idx": idx})
 
     def get_min_entry_by_formula(self, formula: str) -> ComputedEntry:
         """
@@ -222,7 +213,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             )
             entry.energy_adjustments.append(adj)
 
-        return GibbsEntrySet(entries, auto_build_indices=self._auto_build_indices)
+        return GibbsEntrySet(entries)
 
     def get_interpolated_entry(self, formula: str, tol=1e-6):
         """
@@ -392,6 +383,4 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     def copy(self) -> "GibbsEntrySet":
         """ Returns a copy of the entry set. """
-        return GibbsEntrySet(
-            entries=self.entries, auto_build_indices=self._auto_build_indices
-        )
+        return GibbsEntrySet(entries=self.entries)

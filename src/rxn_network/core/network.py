@@ -26,6 +26,8 @@ class Network(MSONable, metaclass=ABCMeta):
         self._precursors = None
         self._target = None
 
+        self.entries.build_indices()
+
     @abstractmethod
     def build(self):
         """Construct the network from the supplied enumerators"""

@@ -80,8 +80,10 @@ class PathwaySolver(Solver):
         Returns:
             A list of BalancedPathway objects.
         """
+        entries = deepcopy(self.entries)
+        entries = entries.entries_list
+        num_entries = len(entries)
 
-        entries = deepcopy(self.entries.entries_list)
         reactions = deepcopy(self.reactions)
         costs = deepcopy(self.costs)
 
@@ -109,7 +111,10 @@ class PathwaySolver(Solver):
                     reactions.append(r)
                     costs.append(c)
 
-        net_rxn_vector = self._build_idx_vector(net_rxn)
+        for r in reactions:
+            v = self._build_idx_vector(r, num_entries)
+
+        net_rxn_vector = self._build_idx_vector(net_rxn, num_entries)
         if net_rxn in reactions:
             reactions.remove(net_rxn)
 
@@ -131,7 +136,12 @@ class PathwaySolver(Solver):
                     )
                 comp_matrices = np.stack(
                     [
-                        np.vstack([self._build_idx_vector(reactions[r]) for r in combo])
+                        np.vstack(
+                            [
+                                self._build_idx_vector(reactions[r], num_entries)
+                                for r in combo
+                            ]
+                        )
                         for combo in combos
                         if combo
                     ]
@@ -179,7 +189,8 @@ class PathwaySolver(Solver):
         filtered_paths = sorted(list(set(filtered_paths)), key=lambda p: p.average_cost)
         return filtered_paths
 
-    def _build_idx_vector(self, rxn):
+    @staticmethod
+    def _build_idx_vector(rxn, num_entries):
         """
         Builds a vector of indices for a reaction.
 
@@ -190,7 +201,7 @@ class PathwaySolver(Solver):
 
         """
         indices = [e.data.get("idx") for e in rxn.entries]
-        v = np.zeros(self.num_entries)
+        v = np.zeros(num_entries)
         v[indices] = rxn.coefficients
         return v
 
@@ -201,8 +212,8 @@ class PathwaySolver(Solver):
 
         intermediates = GibbsEntrySet(
             list(intermediates) + targets,
-            auto_build_indices=False,  # setting to False ensures correct entry refs
         )
+
         be = BasicEnumerator(
             targets=[t.composition.reduced_formula for t in targets],
         )
@@ -217,8 +228,6 @@ class PathwaySolver(Solver):
 
             int_rxns_open = boe.enumerate(intermediates)
             rxns.extend(int_rxns_open)
-
-        target_set = set(targets)
 
         rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxns))
 
