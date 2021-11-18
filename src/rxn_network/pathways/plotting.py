@@ -1,6 +1,5 @@
 """
-This module contains functions
-for plotting experimental reaction pathway data.
+This module contains functions for plotting experimental reaction pathway data.
 """
 import pandas
 from tqdm.notebook import tqdm

@@ -55,3 +55,13 @@ class NetworkToDb(FiretaskBase):
 
     def run_task(self, fw_spec):
         pass
+
+
+@explicit_serialize
+class PathwaysToDb(FiretaskBase):
+    """
+    Stores calculated pathways in a MongoDB.
+    """
+
+    def run_task(self, fw_spec):
+        pass

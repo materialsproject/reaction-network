@@ -1,11 +1,12 @@
 """
-Implementation of an actual reaction network interface.
+Implementation of reaction network interface.
 """
 
-from typing import List, Optional
+from typing import List, Optional, Iterable, Union
 
 from graph_tool.util import find_edge, find_vertex
 
+from pymatgen.entries import Entry
 from rxn_network.core import CostFunction, Enumerator, Network
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.network.gt import (
@@ -107,28 +108,37 @@ class ReactionNetwork(Network):
 
         paths = []
         for target in targets:
-            if isinstance(target, str):
-                target = self.entries.get_min_entry_by_formula(target)
             self.set_target(target)
-            print(f"PATHS to {target.composition.reduced_formula} \n")
+            print(f"PATHS to {self.target.composition.reduced_formula} \n")
             print("--------------------------------------- \n")
             pathways = self._shortest_paths(k=k)
             paths.extend(pathways)
 
         return paths
 
-    def set_precursors(self, precursors):
+    def set_precursors(self, precursors: Iterable[Union[Entry, str]]):
         """
+        Sets the precursors of the network. Removes all references to previous
+        precursors.
+
+        If entries are provided, will use the entries to set the precursors. If strings
+        are provided, will automatically find minimum-energy entries with matching reduced_formula.
 
         Args:
-            precursors:
+            precursors: iterable of
 
         Returns:
-
+            None
         """
         g = self._g
+        if not g:
+            raise ValueError("Must call build() before setting precursors!")
 
-        precursors = set(precursors)
+        precursors = {
+            p if isinstance(p, Entry) else self.entries.get_min_entry_by_formula(p)
+            for p in precursors
+        }
+
         if precursors == self.precursors:
             return
         elif self.precursors:
@@ -168,19 +178,34 @@ class ReactionNetwork(Network):
 
         self._precursors = precursors
 
-    def set_target(self, target):
+    def set_target(self, target: Union[Entry, str]):
         """
 
+        If entry is provided, will use that entry to set the target. If string is provided, will automatically find minimum-energy entriy with matching reduced_formula.
+
         Args:
-            target:
+            target: Entry, or string of reduced formula, of target
 
         Returns:
+            None
 
         """
         g = self._g
+        if not g:
+            raise ValueError("Must call build() before setting target!")
+
+        target = (
+            target
+            if isinstance(target, Entry)
+            else self.entries.get_min_entry_by_formula(target)
+        )
+
         if target == self.target:
             return
-        elif self.target:
+        elif target not in self.entries:
+            raise ValueError("Target is not included in network!")
+
+        if self.target:
             target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
             g.remove_vertex(target_v)
 
@@ -205,9 +230,10 @@ class ReactionNetwork(Network):
 
     def load_graph(self, filename: str):
         """
+        Loads graph-tool graph from file.
 
         Args:
-            filename:
+            filename: Filename of graph object to load (for example, .gt or .gt.gz format)
 
         Returns:
         """
@@ -215,7 +241,8 @@ class ReactionNetwork(Network):
 
     def write_graph(self, filename: Optional[str] = None):
         """
-        Writes graph to file.
+        Writes graph to file. If filename is not provided, will write to CHEMSYS.gt.gz
+        (where CHEMSYS is the chemical system of the network)
 
         Args:
             filename: Filename to write to. If None, writes to default filename.
@@ -256,6 +283,7 @@ class ReactionNetwork(Network):
 
     @staticmethod
     def _path_from_graph(g, path):
+        """Gets a BasicPathway object from a shortest path found in the network"""
         rxns = []
         costs = []
 
@@ -271,15 +299,18 @@ class ReactionNetwork(Network):
     @classmethod
     def from_dict_and_file(cls, d: dict, filename: str):
         """
+        Loads a ReactionNetwork object from a dictionary (MSONable version) and a
+        filename (to load graph object in graph-tool).
 
         Args:
-            d:
-            filename:
+            d: Dictionary containing the ReactionNetwork object
+            filename: Filename of graph object to load (for example, .gt or .gt.gz format)
 
         Returns:
+            ReactionNetwork object with loaded graph
         """
         rn = cls.from_dict(d)
-        rn.load_graph(filename)
+        rn.load_graph(filename)  # type: ignore
 
         return rn
 
@@ -301,7 +332,7 @@ class ReactionNetwork(Network):
 
     @classmethod
     def from_dict(cls, d):
-        """ Return MSONable dict"""
+        """ Instantiate object from MSONable dict"""
         precursors = d.pop("precursors", None)
         target = d.pop("target", None)
 

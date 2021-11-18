@@ -3,12 +3,16 @@ Basic interface for a (reaction) Network
 """
 import logging
 from abc import ABCMeta, abstractmethod
-from typing import List
+from typing import List, Iterable
 
 from monty.json import MSONable
 from pymatgen.entries import Entry
 
+from rxn_network.core.cost_function import CostFunction
+from rxn_network.core.enumerator import Enumerator
 from rxn_network.core.pathway import Pathway
+
+from rxn_network.entries.entry_set import GibbsEntrySet
 
 
 class Network(MSONable, metaclass=ABCMeta):
@@ -16,7 +20,12 @@ class Network(MSONable, metaclass=ABCMeta):
     Base definition for a reaction network
     """
 
-    def __init__(self, entries: List[Entry], enumerators, cost_function):
+    def __init__(
+        self,
+        entries: GibbsEntrySet,
+        enumerators: Iterable[Enumerator],
+        cost_function: CostFunction,
+    ):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
         self.entries = entries
