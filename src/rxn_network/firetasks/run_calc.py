@@ -37,24 +37,22 @@ class RunEnumerators(FiretaskBase):
 
         if not entries:
             entries = fw_spec["entries"]
-        else:
-            entries = entries["entries"]
 
         entries = GibbsEntrySet(entries)
         chemsys = "-".join(sorted(list(entries.chemsys)))
-        target = enumerators[0].target
+        targets = enumerators[0].targets
         added_elems = None
 
-        if target:
+        if targets:
             added_elems = entries.chemsys - {
-                str(e) for e in Composition(target).elements
+                str(e) for target in targets for e in Composition(target).elements
             }
             added_elems = "-".join(sorted(list(added_elems)))
 
         metadata = {
             "chemsys": chemsys,
             "enumerators": enumerators,
-            "target": target,
+            "targets": targets,
             "added_elems": added_elems,
         }
 
@@ -92,8 +90,6 @@ class BuildNetwork(FiretaskBase):
 
         if not entries:
             entries = fw_spec["entries"]
-        else:
-            entries = entries["entries"]
 
         metadata = {
             "chemsys": chemsys,

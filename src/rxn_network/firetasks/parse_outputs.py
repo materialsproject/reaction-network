@@ -30,8 +30,8 @@ class ReactionsToDb(FiretaskBase):
         metadata = loadfn("metadata.json")
 
         d["name"] = (
-            f"Reaction Enumeration (Target: "
-            f"{metadata['target']}): {metadata['chemsys']}"
+            f"Reaction Enumeration (Targets: "
+            f"{metadata['targets']}): {metadata['chemsys']}"
         )
         d["rxns"] = jsanitize(rxns, strict=True)
         d["metadata"] = jsanitize(metadata, strict=True)

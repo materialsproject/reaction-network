@@ -74,11 +74,11 @@ class EnumeratorFW(Firework):
                 )
             tasks.append(entry_task)
 
-        targets = {enumerator.target for enumerator in enumerators}
-        if len(targets) != 1:
-            raise ValueError("Enumerators contain different targets!")
-        target = targets.pop()
-        fw_name = f"Reaction Enumeration (Target: {target}): {chemsys}"
+        targets = {
+            target for enumerator in enumerators for target in enumerator.targets
+        }
+
+        fw_name = f"Reaction Enumeration (Targest: {targets}): {chemsys}"
 
         tasks.append(
             RunEnumerators(enumerators=enumerators, entries=entry_set, chemsys=chemsys)
@@ -90,7 +90,7 @@ class EnumeratorFW(Firework):
 
 class NetworkFW(Firework):
     """
-    Firework for building a reaction network and (optional) pathfinding.
+    Firework for building a reaction network and performing (optional) pathfinding.
     """
 
     def __init__(
