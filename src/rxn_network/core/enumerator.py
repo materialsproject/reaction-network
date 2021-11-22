@@ -16,13 +16,9 @@ class Enumerator(MSONable, metaclass=ABCMeta):
     def __init__(self, precursors, targets, calculators):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
-        self.precursors = precursors
-        self.targets = targets
-
-        if not calculators:
-            calculators = []
-
-        self.calculators = calculators
+        self.precursors = precursors if precursors else []
+        self.targets = targets if targets else []
+        self.calculators = calculators if calculators else []
 
     @abstractmethod
     def enumerate(self, entries):

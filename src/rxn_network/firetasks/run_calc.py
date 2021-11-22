@@ -33,14 +33,15 @@ class RunEnumerators(FiretaskBase):
 
     def run_task(self, fw_spec):
         enumerators = self["enumerators"]
-        entries = self.get("entries", None)
-
-        if not entries:
-            entries = fw_spec["entries"]
-
+        entries = (
+            self.get(["entries"]) if "entries" in self else self.fw_spec["entries"]
+        )
         entries = GibbsEntrySet(entries)
         chemsys = "-".join(sorted(list(entries.chemsys)))
-        targets = enumerators[0].targets
+
+        targets = {
+            target for enumerator in enumerators for target in enumerator.targets
+        }
         added_elems = None
 
         if targets:
@@ -84,19 +85,23 @@ class BuildNetwork(FiretaskBase):
     optional_params = ["open_elem", "chempot"]
 
     def run_task(self, fw_spec):
-        entries = self.get("entries", None)
-        enumerators = self["enumerators"]
+        entries = (
+            self.get(["entries"]) if "entries" in self else self.fw_spec["entries"]
+        )
+        enumerators = self.get(["enumerators"])
         cost_function = self["cost_function"]
 
-        if not entries:
-            entries = fw_spec["entries"]
+        entries = GibbsEntrySet(entries)
+        chemsys = "-".join(sorted(list(entries.chemsys)))
 
-        metadata = {
-            "chemsys": chemsys,
-            "enumerators": enumerators,
+        targets = {
+            target for enumerator in enumerators for target in enumerator.targets
         }
 
+        metadata = {"chemsys": chemsys, "enumerators": enumerators, "targets": targets}
+
         results = []
+
         rn = ReactionNetwork(entries, enumerators, cost_function)
         rn.build()
 

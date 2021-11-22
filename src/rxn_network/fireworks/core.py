@@ -78,7 +78,7 @@ class EnumeratorFW(Firework):
             target for enumerator in enumerators for target in enumerator.targets
         }
 
-        fw_name = f"Reaction Enumeration (Targest: {targets}): {chemsys}"
+        fw_name = f"Reaction Enumeration (Targets: {targets}): {chemsys}"
 
         tasks.append(
             RunEnumerators(enumerators=enumerators, entries=entry_set, chemsys=chemsys)

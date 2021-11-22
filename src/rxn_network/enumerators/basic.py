@@ -7,8 +7,6 @@ from math import comb
 from typing import List, Optional, Set
 from copy import deepcopy
 
-from joblib import Parallel
-
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.core.composition import Composition
 from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDiagram
