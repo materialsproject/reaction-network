@@ -181,7 +181,9 @@ class ReactionNetwork(Network):
     def set_target(self, target: Union[Entry, str]):
         """
 
-        If entry is provided, will use that entry to set the target. If string is provided, will automatically find minimum-energy entriy with matching reduced_formula.
+        If entry is provided, will use that entry to set the target. If string is
+        provided, will automatically find minimum-energy entry with matching
+        reduced_formula.
 
         Args:
             target: Entry, or string of reduced formula, of target
