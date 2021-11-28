@@ -15,14 +15,12 @@ G_COMPOUNDS = load_experimental_data(PATH_TO_BARIN / "compounds.json")
 
 class BarinReferenceEntry(ExperimentalReferenceEntry):
     """
-    An Entry class for NIST-JANAF experimental reference data. Given a composition,
+    An Entry class for Barin experimental reference data. Given a composition,
     automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
-    reference values (G_GASES, G_COMPOUNDS).
+    reference values.
 
     Reference:
-        Malcolm W. Chase Jr. NIST-JANAF thermochemical tables. Fourth edition.
-        Washington, DC : American Chemical Society;  New York : American Institute of
-        Physics for the National Institute of Standards and Technology, 1998.
+
     """
 
     REFERENCES = G_COMPOUNDS
@@ -36,16 +34,3 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
                 interpolated. Defaults to 300 K.
         """
         super().__init__(composition, temperature)
-
-    @classmethod
-    def _validate_temperature(cls, formula, temperature) -> None:
-        """ Ensure that the temperature is from a valid range. """
-        if formula not in cls.REFERENCES:
-            raise ValueError("Formula not in reference data!")
-
-        g = cls.REFERENCES[formula]
-
-        if temperature < min(g) or temperature > max(g):
-            raise ValueError(
-                f"Temperature must be selected from range: {min(g)} K to {max(g)} K"
-            )

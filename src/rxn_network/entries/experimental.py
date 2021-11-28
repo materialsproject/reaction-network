@@ -62,9 +62,14 @@ class ExperimentalReferenceEntry(Entry):
     def _validate_temperature(cls, formula, temperature) -> None:
         """ Ensure that the temperature is from a valid range. """
         if formula not in cls.REFERENCES:
-            raise ValueError(f"{formula} not in reference data!")
-        elif temperature < 300 or temperature > 2000:
-            raise ValueError("Temperature must be selected from range: [300, 2000] K")
+            raise ValueError("Formula not in reference data!")
+
+        g = cls.REFERENCES[formula]
+
+        if temperature < min(g) or temperature > max(g):
+            raise ValueError(
+                f"Temperature must be selected from range: {min(g)} K to {max(g)} K"
+            )
 
     @classmethod
     def _get_energy(cls, formula: str, temperature: float) -> float:

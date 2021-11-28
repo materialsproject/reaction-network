@@ -3,6 +3,7 @@ This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.
 """
 
+from copy import deepcopy
 import re
 from itertools import chain, combinations
 from typing import Dict, List, Optional, Union, Tuple
@@ -209,6 +210,32 @@ class BasicReaction(Reaction):
             data=self.data,
             lowest_num_errors=self.lowest_num_errors,
         )
+
+    def is_separable(self, target: Composition) -> bool:
+        """
+        Checks if the reaction forms byproducts which are separable from the target
+        composition; i.e., byproducts do not contain any of the elements in the target phase.
+
+        Args:
+            target: Composition object of target; elements in this phase will be used to
+                determine whether byproducts only contain added elements.
+
+        Returns:
+            True if reaction is separable from target, False otherwise.
+        """
+        if target not in self.compositions:
+            raise ValueError(
+                "Target composition {} not in reaction {}".format(target, self)
+            )
+
+        added_elems = set(self.elements) - set(target.elements)
+        products = set(deepcopy(self.products))
+        products.remove(target)
+
+        separable = [added_elems.issuperset(comp.elements) for comp in products]
+        found = all(separable)
+
+        return found
 
     @classmethod
     def from_string(cls, rxn_string) -> "BasicReaction":
