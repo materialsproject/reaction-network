@@ -62,7 +62,7 @@ class ExperimentalReferenceEntry(Entry):
     def _validate_temperature(cls, formula, temperature) -> None:
         """ Ensure that the temperature is from a valid range. """
         if formula not in cls.REFERENCES:
-            raise ValueError("Formula not in reference data!")
+            raise ValueError(f"{formula} not in reference data!")
 
         g = cls.REFERENCES[formula]
 
