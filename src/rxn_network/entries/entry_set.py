@@ -5,6 +5,7 @@ import collections
 import logging
 from typing import List, Optional, Union, Set, Dict
 from copy import deepcopy
+import warnings
 
 from numpy.random import normal
 
@@ -247,6 +248,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             pd: Phase Diagram object (pymatgen)
             temperature: Temperature [K] for determining Gibbs Free Energy of
                 formation, dGf(T)
+            include_nist_data: Whether to include NIST data in the entry set.
+            include_barin_data: Whether to include Barin data in the entry set.
 
         Returns:
             A GibbsEntrySet containing a collection of GibbsComputedEntry and
@@ -255,6 +258,14 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         gibbs_entries = []
         experimental_comps = []
+
+        if include_barin_data:
+            warnings.warn(
+                "##### WARNING ##### \n\n"
+                "Barin experimental data was acquired through optical "
+                "recognition and has not been verified. Use at your own risk! \n\n"
+                "##### WARNING #####"
+            )
 
         for entry in pd.all_entries:
             experimental = False
