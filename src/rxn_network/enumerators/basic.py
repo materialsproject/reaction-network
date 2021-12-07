@@ -58,7 +58,7 @@ class BasicEnumerator(Enumerator):
             exclusive_precursors: Whether to consider only reactions that have
                 reactants which are a subset of the provided list of precursors.
                 Defaults to True.
-            exclusive_target: Whether to consider only reactions that make the
+            exclusive_targets: Whether to consider only reactions that make the
                 provided target directly (i.e. with no byproducts). Defualts to False.
             remove_unbalanced: Whether to remove reactions which are unbalanced.
                 Defaults to True.
@@ -383,6 +383,11 @@ class BasicOpenEnumerator(BasicEnumerator):
                 module for options (e.g., ["ChempotDistanceCalculator]).
             n: Maximum reactant/product cardinality; i.e., largest possible number of
                 entries on either side of the reaction.
+            exclusive_precursors: Whether to consider only reactions that have
+                reactants which are a subset of the provided list of precursors.
+                Defaults to True.
+            exclusive_targets: Whether to consider only reactions that make the
+                provided target directly (i.e. with no byproducts). Defualts to False.
             remove_unbalanced: Whether to remove reactions which are unbalanced.
                 Defaults to True
             remove_changed: Whether to remove reactions which can only be balanced by

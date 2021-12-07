@@ -46,6 +46,11 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
                 will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator])
+            exclusive_precursors: Whether to consider only reactions that have
+                reactants which are a subset of the provided list of precursors.
+                Defaults to True.
+            exclusive_targets: Whether to consider only reactions that make the
+                provided target directly (i.e. with no byproducts). Defualts to False.
         """
         super().__init__(
             precursors=precursors,
@@ -139,6 +144,22 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
     ):
+        """
+        Args:
+            open_elem: The element to be considered as open
+            mu: The chemical potential of the open element
+            precursors: Optional formulas of precursors.
+            targets: Optional formulas of targets; only reactions which make these targets
+                will be enumerated.
+            calculators: Optional list of Calculator object names; see calculators
+                module for options (e.g., ["ChempotDistanceCalculator])
+            exclusive_precursors: Whether to consider only reactions that have
+                reactants which are a subset of the provided list of precursors.
+                Defaults to True.
+            exclusive_targets: Whether to consider only reactions that make the
+                provided target directly (i.e. with no byproducts). Defualts to False.
+        """
+
         super().__init__(
             precursors=precursors,
             targets=targets,

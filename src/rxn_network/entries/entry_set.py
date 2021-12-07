@@ -239,7 +239,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         pd: PhaseDiagram,
         temperature: float,
         include_nist_data=True,
-        include_barin_data=True,
+        include_barin_data=False,
     ) -> "GibbsEntrySet":
         """
         Constructor method for building a GibbsEntrySet from an existing phase diagram.
@@ -249,7 +249,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             temperature: Temperature [K] for determining Gibbs Free Energy of
                 formation, dGf(T)
             include_nist_data: Whether to include NIST data in the entry set.
-            include_barin_data: Whether to include Barin data in the entry set.
+            include_barin_data: Whether to include Barin data in the entry set. Defaults
+                to False. Warning: Barin data has not been verified. Use with caution.
 
         Returns:
             A GibbsEntrySet containing a collection of GibbsComputedEntry and
@@ -337,7 +338,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         entries: List[ComputedStructureEntry],
         temperature: float,
         include_nist_data=True,
-        include_barin_data=True,
+        include_barin_data=False,
     ) -> "GibbsEntrySet":
         """
         Constructor method for initializing GibbsEntrySet from T = 0 K

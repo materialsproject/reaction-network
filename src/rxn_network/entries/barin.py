@@ -21,7 +21,7 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
 
     Reference:
         Barin, I. (1995). Thermochemical data of pure substances. John Wiley & Sons,
-        Ltd. https://doi.org/10.1002/9783527619825
+            Ltd. https://doi.org/10.1002/9783527619825
     """
 
     REFERENCES = G_COMPOUNDS
