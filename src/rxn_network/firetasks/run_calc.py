@@ -33,10 +33,8 @@ class RunEnumerators(FiretaskBase):
 
     def run_task(self, fw_spec):
         enumerators = self["enumerators"]
-        entries = (
-            self.get(["entries"]) if "entries" in self else self.fw_spec["entries"]
-        )
-        entries = GibbsEntrySet(entries)
+        entries = self["entries"] if self["entries"] else fw_spec["entries"]
+        print(entries.entries)
         chemsys = "-".join(sorted(list(entries.chemsys)))
 
         targets = {
@@ -53,7 +51,7 @@ class RunEnumerators(FiretaskBase):
         metadata = {
             "chemsys": chemsys,
             "enumerators": enumerators,
-            "targets": targets,
+            "targets": list(targets),
             "added_elems": added_elems,
         }
 

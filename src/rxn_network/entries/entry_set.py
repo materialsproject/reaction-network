@@ -200,7 +200,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return new_entry
 
     def get_entries_with_jitter(self):
-        """ Returns a list of entries with jitter (random noise) added to their energies. """
+        """Returns a list of entries with jitter (random noise) added to their energies."""
         entries = deepcopy(self.entries_list)
         jitter = normal(size=len(entries))
 
@@ -379,7 +379,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     @property
     def entries_list(self) -> List[ComputedEntry]:
-        """ Returns a list of all entries in the entry set. """
+        """Returns a list of all entries in the entry set."""
         return list(sorted(self.entries, key=lambda e: e.composition.reduced_formula))
 
     @property
@@ -394,5 +394,14 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return chemsys
 
     def copy(self) -> "GibbsEntrySet":
-        """ Returns a copy of the entry set. """
+        """Returns a copy of the entry set."""
         return GibbsEntrySet(entries=self.entries)
+
+    def as_dict(self) -> dict:
+        """
+        Returns:
+            JSON serializable dict representation of the entry set.
+        """
+        d = super().as_dict()
+        d["entries"] = [e.as_dict() for e in self.entries]
+        return d

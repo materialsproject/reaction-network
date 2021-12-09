@@ -45,7 +45,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             targets: Optional formulas of targets; only reactions which make these targets
                 will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
-                module for options (e.g., ["ChempotDistanceCalculator])
+                module for options (e.g., ["ChempotDistanceCalculator"])
             exclusive_precursors: Whether to consider only reactions that have
                 reactants which are a subset of the provided list of precursors.
                 Defaults to True.
