@@ -24,7 +24,7 @@ class RunEnumerators(FiretaskBase):
 
     Required params:
         enumerators (List[Enumerator]): Enumerators to run
-        entries (List[ComputedEntry]): Computed entries to be fed into enumerate()
+        entries (EntrySet): Computed entries to be fed into enumerate()
             methods
 
     """
@@ -34,7 +34,7 @@ class RunEnumerators(FiretaskBase):
     def run_task(self, fw_spec):
         enumerators = self["enumerators"]
         entries = self["entries"] if self["entries"] else fw_spec["entries"]
-        print(entries.entries)
+        entries = GibbsEntrySet(entries)
         chemsys = "-".join(sorted(list(entries.chemsys)))
 
         targets = {
@@ -83,9 +83,7 @@ class BuildNetwork(FiretaskBase):
     optional_params = ["open_elem", "chempot"]
 
     def run_task(self, fw_spec):
-        entries = (
-            self.get(["entries"]) if "entries" in self else self.fw_spec["entries"]
-        )
+        entries = self["entries"] if self["entries"] else fw_spec["entries"]
         enumerators = self.get(["enumerators"])
         cost_function = self["cost_function"]
 
@@ -125,11 +123,14 @@ class FindPathways(FiretaskBase):
     optional_params = ["k"]
 
     def run_task(self, fw_spec):
-        rn = self["reaction_network"]
-        graph_fn = self["graph_fn"]
+        rn = (
+            self["reaction_network"]
+            if self["reaction_network"]
+            else fw_spec["reaction_network"]
+        )
+        graph_fn = self["graph_fn"] if self["graph_fn"] else fw_spec["graph_fn"]
         precursors = self["precursors"]
         targets = self["targets"]
-
         k = self.get("k")
 
         rn.load_graph(graph_fn)

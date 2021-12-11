@@ -318,7 +318,7 @@ class ReactionNetwork(Network):
 
     @property
     def graph(self):
-        """ Returns the network object in graph-tool"""
+        """Returns the network object in graph-tool"""
         return self._g
 
     @property
@@ -326,7 +326,7 @@ class ReactionNetwork(Network):
         return "-".join(sorted(self.entries.chemsys))
 
     def as_dict(self):
-        """ Return MSONable dict"""
+        """Return MSONable dict"""
         d = super().as_dict()
         d["precursors"] = self.precursors
         d["target"] = self.target
@@ -334,7 +334,7 @@ class ReactionNetwork(Network):
 
     @classmethod
     def from_dict(cls, d):
-        """ Instantiate object from MSONable dict"""
+        """Instantiate object from MSONable dict"""
         precursors = d.pop("precursors", None)
         target = d.pop("target", None)
 

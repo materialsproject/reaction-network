@@ -161,7 +161,7 @@ class NetworkFW(Firework):
             tasks.append(pathway_task)
 
         if solve_balanced_paths:
-            solver_task = RunSolver()
+            solver_task = RunSolver(solver)
             tasks.append(solver_task)
 
         fw_name = f"Reaction Network (Target: {target}): {chemsys}"

@@ -118,6 +118,14 @@ class EntriesFromDb(FiretaskBase):
         return FWAction(update_spec={"entries": entries})
 
 
+@explicit_serialize
+class PathwaySolverFromPaths(FiretaskBase):
+    """ """
+
+    required_params = ["entries", "paths", "cost_function"]
+    optional_params = ["open_elem", "chempot"]
+
+
 def process_entries(entries, temperature, e_above_hull, include_polymorphs):
     """
 

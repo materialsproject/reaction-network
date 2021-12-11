@@ -1,1 +1,0 @@
-{"chemsys": "Mn-O-Y", "enumerators": [{"@module": "rxn_network.enumerators.basic", "@class": "BasicEnumerator", "@version": null, "precursors": [], "targets": [], "calculators": [], "n": 2, "exclusive_precursors": true, "exclusive_targets": false, "remove_unbalanced": true, "remove_changed": true}], "targets": [], "added_elems": null}
