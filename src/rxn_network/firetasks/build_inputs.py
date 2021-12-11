@@ -120,10 +120,31 @@ class EntriesFromDb(FiretaskBase):
 
 @explicit_serialize
 class PathwaySolverFromPaths(FiretaskBase):
-    """ """
+    """
+
+    Required params:
+        entries (GibbsEntrySet):
+        paths (Iterable[Pathway]):
+        cost_function (CostFunction):
+
+    Optional params:
+        open_elem (Element):
+        chempot (float):
+
+    """
 
     required_params = ["entries", "paths", "cost_function"]
     optional_params = ["open_elem", "chempot"]
+
+    def run_task(self, fw_spec):
+        entries = self["entries"] if self["entries"] else fw_spec["entries"]
+        paths = self["paths"]
+        cost_function = self["cost_function"]
+        open_elem = self.get("open_elem", None)
+        chempot = self.get("chempot", None)
+
+        solver = PathwaySolver(entries, paths, cost_function, open_elem, chempot)
+        return FWAction(update_spec={"solver": solver})
 
 
 def process_entries(entries, temperature, e_above_hull, include_polymorphs):

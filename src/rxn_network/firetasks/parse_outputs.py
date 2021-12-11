@@ -24,11 +24,13 @@ class ReactionsToDb(FiretaskBase):
 
     def run_task(self, fw_spec):
         db_file = env_chk(self.get("db_file"), fw_spec)
+        rxns_fn = get("rxns_fn", "rxns.json")
+        metadata_fn = get("metadata_fn", "metadata.json")
+
+        rxns = loadfn(rxns_fn)
+        metadata = loadfn(metadata_fn)
 
         d = {}
-        rxns = loadfn("rxns.json")
-        metadata = loadfn("metadata.json")
-
         d["name"] = (
             f"Reaction Enumeration (Targets: "
             f"{metadata['targets']}): {metadata['chemsys']}"
@@ -36,32 +38,42 @@ class ReactionsToDb(FiretaskBase):
         d["rxns"] = jsanitize(rxns, strict=True)
         d["metadata"] = jsanitize(metadata, strict=True)
 
-        with MongoStore.from_db_file(db_file) as db:
-            task_ids = sorted(db.distinct("task_id"))
-            if task_ids:
-                d["task_id"] = task_ids[-1] + 1
-            else:
-                d["task_id"] = 1
-
-            d["last_updated"] = datetime.datetime.utcnow()
-            db.update(d)
+        store_in_mongo_db(d, db_file)
 
 
 @explicit_serialize
 class NetworkToDb(FiretaskBase):
     """
-    Stores calculated reaction network in a MongoDB.
+    Stores calculated reaction network and paths in a MongoDB.
     """
 
     def run_task(self, fw_spec):
-        pass
+        db_file = env_chk(self.get("db_file"), fw_spec)
+        network_fn = self.get("network_fn", "network.json")
+        graph_fn = self.get("graph_fn", "graph.gt.gz")
+        paths_fn = self.get("paths_fn", "paths.json")
+
+        network = loadfn("network_fn.json")
+        metadata = loadfn("metadata.json")
+
+        d["name"] = (
+            f"Reaction Network (Targets: "
+            f"{metadata['targets']}): {metadata['chemsys']}"
+        )
+        d["rxns"] = jsanitize(rxns, strict=True)
+        d["metadata"] = jsanitize(metadata, strict=True)
+
+        store_in_mongo_db(d, db_file)
 
 
-@explicit_serialize
-class PathwaysToDb(FiretaskBase):
-    """
-    Stores calculated pathways in a MongoDB.
-    """
+def store_in_mongo_db(d, db_file):
+    with MongoStore.from_db_file(db_file) as db:
+        task_ids = sorted(db.distinct("task_id"))
 
-    def run_task(self, fw_spec):
-        pass
+        if task_ids:
+            d["task_id"] = task_ids[-1] + 1
+        else:
+            d["task_id"] = 1
+
+        d["last_updated"] = datetime.datetime.utcnow()
+        db.update(d)

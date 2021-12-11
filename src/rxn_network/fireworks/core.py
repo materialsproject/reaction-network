@@ -2,12 +2,13 @@
 Implementation of Fireworks for performing reaction enumreation and network
 construction
 """
+from typing import Iterable, Union, List, Dict
 from fireworks import Firework
 
+from rxn_network.core import CostFunction, Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.firetasks.build_inputs import EntriesFromDb, EntriesFromMPRester
-from rxn_network.firetasks.parse_outputs import ReactionsToDb
-
+from rxn_network.firetasks.parse_outputs import ReactionsToDb, NetworkToDb
 from rxn_network.firetasks.run_calc import (
     RunEnumerators,
     BuildNetwork,
@@ -23,12 +24,12 @@ class EnumeratorFW(Firework):
 
     def __init__(
         self,
-        enumerators,
-        entries=None,
-        chemsys=None,
-        entry_set_params=None,
-        db_file=">>db_file<<",
-        entry_db_file=">>entry_db_file<<",
+        enumerators: Iterable[Enumerator],
+        entries: GibbsEntrySet = None,
+        chemsys: Union[str, Iterable[str]] = None,
+        entry_set_params: Dict = None,
+        db_file: str = ">>db_file<<",
+        entry_db_file: str = ">>entry_db_file<<",
         parents=None,
     ):
         """
@@ -95,17 +96,17 @@ class NetworkFW(Firework):
 
     def __init__(
         self,
-        enumerators,
-        cost_function,
-        entries=None,
-        chemsys=None,
+        enumerators: Iterable[Enumerator],
+        cost_function: CostFunction,
+        entries: GibbsEntrySet = None,
+        chemsys: Union[str, Iterable[str]] = None,
         entry_set_params=None,
-        find_pathways=True,
+        find_pathways: bool = True,
+        solve_balanced_paths: bool = True,
         pathway_params=None,
-        solve_balanced_paths=True,
         solver_params=None,
-        db_file=">>db_file<<",
-        entry_db_file=">>entry_db_file<<",
+        db_file: str = ">>db_file<<",
+        entry_db_file: str = ">>entry_db_file<<",
         parents=None,
     ):
         """
@@ -157,12 +158,14 @@ class NetworkFW(Firework):
         tasks.append(NetworkToDb(db_file=db_file, calc_dir="."))
 
         if find_pathways:
-            pathway_task = FindPathways()
-            tasks.append(pathway_task)
+            if not pathway_params:
+                pathway_params = {}
+            tasks.append(FindPathways())
 
         if solve_balanced_paths:
-            solver_task = RunSolver(solver)
-            tasks.append(solver_task)
+            if not solver_params:
+                solver_params = {}
+            tasks.append(RunSolver(solver))
 
         fw_name = f"Reaction Network (Target: {target}): {chemsys}"
         super().__init__(tasks, parents=parents, name=fw_name)
