@@ -10,6 +10,7 @@ from pymatgen.core import Composition
 
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.firetasks.utils import env_chk, get_logger
+from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.network.network import ReactionNetwork
 
@@ -62,8 +63,8 @@ class RunEnumerators(FiretaskBase):
 
         results = ReactionSet.from_rxns(results)
 
-        dumpfn(results, "rxns.json")
-        dumpfn(metadata, "metadata.json")
+        dumpfn(results, "rxns.json.gz")
+        dumpfn(metadata, "metadata.json.gz")
 
 
 @explicit_serialize
@@ -80,32 +81,36 @@ class BuildNetwork(FiretaskBase):
     """
 
     required_params = ["entries", "enumerators", "cost_function"]
-    optional_params = ["precursors", "target", "k", "open_elem", "chempot"]
+    optional_params = ["precursors", "targets", "k", "open_elem", "chempot"]
 
     def run_task(self, fw_spec):
         entries = self["entries"] if self["entries"] else fw_spec["entries"]
         enumerators = self.get(["enumerators"])
         cost_function = self["cost_function"]
+        precursors = self.get(["precursors"])
+        targets = self.get(["targets"])
+        k = self.get(["k"])
+        open_elem = self.get(["open_elem"])
+        chempot = self.get(["chempot"])
 
         entries = GibbsEntrySet(entries)
         chemsys = "-".join(sorted(list(entries.chemsys)))
 
-        targets = {
-            target for enumerator in enumerators for target in enumerator.targets
-        }
-
-        metadata = {"chemsys": chemsys, "enumerators": enumerators, "targets": targets}
-
-        results = []
-
-        rn = ReactionNetwork(entries, enumerators, cost_function)
+        rn = ReactionNetwork(
+            entries=entries,
+            enumerators=enumerators,
+            cost_function=cost_function,
+            open_elem=open_elem,
+            chempot=chempot,
+        )
         rn.build()
+
         rn.set_precursors(precursors)
         paths = rn.find_pathways(targets=targets, k=k)
 
         rn.write_graph()
-        dumpfn(rn, "network.json")
-        dumpfn(paths, "paths.json")
+        dumpfn(rn, "network.json.gz")
+        dumpfn(paths, "paths.json.gz")
 
 
 @explicit_serialize
@@ -114,24 +119,33 @@ class RunSolver(FiretaskBase):
     Balance reaction pathways.
 
     Required params:
-        solver (Solver): solver to use for balancing
+        entries (Solver): solver to use for balancing
 
     Optional params:
         max_num_combos (int): maximum number of combinations to enumerate
         find_intermediate_rxns (bool): whether to find intermediate reactions
     """
 
-    required_params = ["solver", "net_rxn"]
+    required_params = ["entries", "pathways", "cost_function"]
     optional_params = [
         "max_num_combos",
         "find_intermediate_rxns",
         "intermediate_rxn_energy_cutoff",
-        "fitler_interdependent",
+        "filter_interdependent",
     ]
 
     def run_task(self, fw_spec):
-        solver = self["solver"]
-        net_rxn = self["net_rxn"]
+        entries = self["entries"] if self["entries"] else fw_spec["entries"]
+
+        if not self["pathways"]:
+            pathways = loadfn(fw_spec["pathways_fn"])
+
+        solver = PathwaySolver(
+            entries=entries,
+            pathways=pathways,
+            cost_function=cost_function,
+            **solver_params
+        )
 
         max_num_combos = self.get("max_num_combos", None)
         find_intermediate_rxns = self.get("find_intermediate_rxns", None)

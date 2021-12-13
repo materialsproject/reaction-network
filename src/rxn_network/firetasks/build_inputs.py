@@ -144,7 +144,7 @@ class PathwaySolverFromPaths(FiretaskBase):
         chempot = self.get("chempot", None)
 
         solver = PathwaySolver(entries, paths, cost_function, open_elem, chempot)
-        return FWAction(update_spec={"solver": solver})
+        return FWAction(update_spec={"solver": solver.as_dict()})
 
 
 def process_entries(entries, temperature, e_above_hull, include_polymorphs):

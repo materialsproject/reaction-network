@@ -24,8 +24,11 @@ class ReactionsToDb(FiretaskBase):
 
     def run_task(self, fw_spec):
         db_file = env_chk(self.get("db_file"), fw_spec)
-        rxns_fn = get("rxns_fn", "rxns.json")
-        metadata_fn = get("metadata_fn", "metadata.json")
+
+        rxns = self.get("rxns")
+        if not rxns:
+            rxns = loadfn(os.path.join(fw_spec["launch_dir"], fw_spec["rxns_fn"]))
+        metadata_fn = self.get("metadata_fn", "metadata.json")
 
         rxns = loadfn(rxns_fn)
         metadata = loadfn(metadata_fn)
@@ -38,7 +41,8 @@ class ReactionsToDb(FiretaskBase):
         d["rxns"] = jsanitize(rxns, strict=True)
         d["metadata"] = jsanitize(metadata, strict=True)
 
-        store_in_mongo_db(d, db_file)
+        db = CalcDb(db_file)
+        db.insert(d)
 
 
 @explicit_serialize
@@ -49,12 +53,11 @@ class NetworkToDb(FiretaskBase):
 
     def run_task(self, fw_spec):
         db_file = env_chk(self.get("db_file"), fw_spec)
-        network_fn = self.get("network_fn", "network.json")
+        network_fn = self.get("network_fn", "network.json.gz")
         graph_fn = self.get("graph_fn", "graph.gt.gz")
-        paths_fn = self.get("paths_fn", "paths.json")
+        paths_fn = self.get("paths_fn", "paths.json.gz")
 
         network = loadfn("network_fn.json")
-        metadata = loadfn("metadata.json")
 
         d["name"] = (
             f"Reaction Network (Targets: "
@@ -63,19 +66,8 @@ class NetworkToDb(FiretaskBase):
         d["network"] = jsanitize(network, strict=True)
         d["paths"] = jsanitize(paths, strict=True)
         d["graph_fn"] = graph_fn
-        d["metadata"] = jsanitize(metadata, strict=True)
 
-        store_in_mongo_db(d, db_file)
+        db = CalcDb(db_file)
+        db.insert(d)
 
-
-def store_in_mongo_db(d, db_file):
-    with MongoStore.from_db_file(db_file) as db:
-        task_ids = sorted(db.distinct("task_id"))
-
-        if task_ids:
-            d["task_id"] = task_ids[-1] + 1
-        else:
-            d["task_id"] = 1
-
-        d["last_updated"] = datetime.datetime.utcnow()
-        db.update(d)
+        return FWAction(update_spec={"paths": paths})

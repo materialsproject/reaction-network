@@ -51,7 +51,10 @@ class EnumeratorFW(Firework):
             entry_set = GibbsEntrySet(entries)
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
-            tasks.append(self._get_entry_task())
+            use_db = bool(entry_db_file)
+            tasks.append(
+                _get_entry_task(entry_set_params=entry_set_params, use_db=use_db)
+            )
 
         targets = {
             target for enumerator in enumerators for target in enumerator.targets
@@ -66,32 +69,8 @@ class EnumeratorFW(Firework):
 
         super().__init__(tasks, parents=parents, name=fw_name)
 
-    def _get_entry_task(self):
-        entry_set_params = self.entry_set_params if self.entry_set_params else {}
-        temperature = entry_set_params.get("temperature", 300)
-        e_above_hull = entry_set_params.get("e_above_hull", 0.0)
-        include_polymorphs = entry_set_params.get("include_polymorphs", False)
 
-        if self.entry_db_file:
-            entry_task = EntriesFromDb(
-                entry_db_file=entry_db_file,
-                chemsys=chemsys,
-                temperature=temperature,
-                e_above_hull=e_above_hull,
-                include_polymorphs=include_polymorphs,
-            )
-        else:
-            entry_task = EntriesFromMPRester(
-                chemsys=chemsys,
-                temperature=temperature,
-                e_above_hull=e_above_hull,
-                include_polymorphs=include_polymorphs,
-            )
-
-        return entry_task
-
-
-class NetworkFW(EnumeratorFW):
+class NetworkFW(Firework):
     """
     Firework for building a reaction network and performing (optional) pathfinding.
     """
@@ -102,8 +81,10 @@ class NetworkFW(EnumeratorFW):
         cost_function: CostFunction,
         entries: GibbsEntrySet = None,
         chemsys: Union[str, Iterable[str]] = None,
-        entry_set_params: Optional[Dict] = None,
+        open_elem: Optional[str] = None,
+        chempot: Optional[float] = None,
         solve_balanced_paths: bool = True,
+        entry_set_params: Optional[Dict] = None,
         pathway_params: Optional[Dict] = None,
         solver_params: Optional[Dict] = None,
         db_file: str = ">>db_file<<",
@@ -126,6 +107,17 @@ class NetworkFW(EnumeratorFW):
         pathway_params = pathway_params if pathway_params else {}
         solver_params = solver_params if solver_params else {}
 
+        precursors = pathway_params.get("precursors")
+        targets = pathway_params.get("targets")
+        k = pathway_params.get("k")
+
+        max_num_combos = solver_params.get("max_num_combos")
+        find_intermediate_rxns = solver_params.get("find_intermediate_rxns")
+        intermediate_rxn_energy_cutoff = solver_params.get(
+            "intermediate_rxn_energy_cutoff"
+        )
+        filter_interdependent = solver_params.get("filter_interdependent")
+
         tasks = []
 
         entry_set = None
@@ -133,17 +125,59 @@ class NetworkFW(EnumeratorFW):
             entry_set = GibbsEntrySet(entries)
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
-            tasks.append(self._get_entry_task())
+            use_db = bool(entry_db_file)
+            tasks.append(
+                _get_entry_task(entry_set_params=entry_set_params, use_db=use_db)
+            )
 
         tasks.append(
-            BuildNetwork(enumerators=enumerators, entries=entry_set, chemsys=chemsys)
+            BuildNetwork(
+                entries=entry_set,
+                enumerators=enumerators,
+                cost_function=cost_function,
+                precursors=precursors,
+                targets=targets,
+                k=k,
+                open_elem=open_elem,
+                chempot=chempot,
+            )
         )
-        tasks.append(FindPathways())
         tasks.append(NetworkToDb(db_file=db_file, calc_dir="."))
 
         if solve_balanced_paths:
+            solver = RunSolver(
+                entries=entry_set
+                pathways=pathways,
+                cost_function=cost_function,
+                **solver_params,
+            )
             tasks.append(RunSolver(solver))
 
         fw_name = f"Reaction Network (Target: {target}): {chemsys}"
 
-        Firework.__init__(tasks, parents=parents, name=fw_name)
+        super().__init__(tasks, parents=parents, name=fw_name)
+
+
+def _get_entry_task(entry_set_params, use_db):
+    entry_set_params = entry_set_params if entry_set_params else {}
+    temperature = entry_set_params.get("temperature", 300)
+    e_above_hull = entry_set_params.get("e_above_hull", 0.0)
+    include_polymorphs = entry_set_params.get("include_polymorphs", False)
+
+    if use_db:
+        entry_task = EntriesFromDb(
+            entry_db_file=entry_db_file,
+            chemsys=chemsys,
+            temperature=temperature,
+            e_above_hull=e_above_hull,
+            include_polymorphs=include_polymorphs,
+        )
+    else:
+        entry_task = EntriesFromMPRester(
+            chemsys=chemsys,
+            temperature=temperature,
+            e_above_hull=e_above_hull,
+            include_polymorphs=include_polymorphs,
+        )
+
+    return entry_task

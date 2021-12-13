@@ -28,6 +28,8 @@ class ReactionSet(MSONable):
         entries: List[ComputedEntry],
         indices: Union[np.ndarray, List[List[int]]],
         coeffs: Union[np.ndarray, List[List[float]]],
+        open_elem: Optional[str] = None,
+        chempot: Optional[float] = 0.0,
         all_data: Optional[List] = None,
     ):
         """
@@ -41,13 +43,17 @@ class ReactionSet(MSONable):
         self.entries = entries
         self.indices = indices
         self.coeffs = coeffs
+        self.open_elem = open_elem
+        self.chempot = chempot
         self.all_data = all_data if all_data else []
+
+        self.mu_dict = None
+        if open_elem:
+            self.mu_dict = {Element(open_elem): chempot}
 
     @lru_cache(1)
     def get_rxns(
         self,
-        open_elem: Optional[str] = None,
-        chempot: float = 0.0,
     ) -> List[Union[ComputedReaction, OpenComputedReaction]]:
         """
         Returns list of ComputedReaction objects or OpenComputedReaction objects (when
@@ -59,16 +65,14 @@ class ReactionSet(MSONable):
         """
         rxns = []
 
-        chempots = None
-
-        if open_elem:
-            chempots = {Element(open_elem): chempot}
-
         for indices, coeffs, data in zip(self.indices, self.coeffs, self.all_data):
             entries = [self.entries[i] for i in indices]
-            if chempots:
+            if self.mu_dict:
                 rxn = OpenComputedReaction(
-                    entries=entries, coefficients=coeffs, data=data, chempots=chempots
+                    entries=entries,
+                    coefficients=coeffs,
+                    data=data,
+                    chempots=self.mu_dict,
                 )
             else:
                 rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
@@ -78,8 +82,6 @@ class ReactionSet(MSONable):
     def calculate_costs(
         self,
         cf: CostFunction,
-        open_elem: Optional[Union[str, Element]] = None,
-        chempot: Optional[float] = 0,
     ) -> List[float]:
         """
         Evaluate a cost function on an acquired set of reactions.
@@ -89,10 +91,7 @@ class ReactionSet(MSONable):
             open_elem: Open element, e.g. "O2"
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
         """
-        return [
-            cf.evaluate(rxn)
-            for rxn in self.get_rxns(open_elem=open_elem, chempot=chempot)
-        ]
+        return [cf.evaluate(rxn) for rxn in self.get_rxns()]
 
     @classmethod
     def from_rxns(
@@ -113,17 +112,17 @@ class ReactionSet(MSONable):
 
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
 
-        all_indices, all_coeffs, all_data = [], [], []
+        indices, coeffs, data = [], [], []
         for rxn in rxns:
-            all_indices.append([entries.index(e) for e in rxn.entries])
-            all_coeffs.append(list(rxn.coefficients))
-            all_data.append(rxn.data)
+            indices.append([entries.index(e) for e in rxn.entries])
+            coeffs.append(list(rxn.coefficients))
+            data.append(rxn.data)
 
         return cls(
             entries=entries,
-            indices=all_indices,
-            coeffs=all_coeffs,
-            all_data=all_data,
+            indices=indices,
+            coeffs=coeffs,
+            all_data=data,
         )
 
     @staticmethod
