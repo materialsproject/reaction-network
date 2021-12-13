@@ -16,6 +16,10 @@ from pymatgen.core.composition import Composition
 from rxn_network.core import CostFunction, Pathway, Solver
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
+from rxn_network.enumerators.minimize import (
+    MinimizeGibbsEnumerator,
+    MinimizeGrandPotentialEnumerator,
+)
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.utils import balance_path_arrays
 from rxn_network.reactions.computed import ComputedReaction
@@ -59,6 +63,8 @@ class PathwaySolver(Solver):
         max_num_combos: int = 4,
         find_intermediate_rxns: bool = True,
         intermediate_rxn_energy_cutoff: float = 0.0,
+        use_basic_enumerator: bool = True,
+        use_minimize_enumerator: bool = False,
         filter_interdependent: bool = True,
     ):
         """
@@ -74,6 +80,10 @@ class PathwaySolver(Solver):
             intermediate_rxn_energy_cutoff: An energy cutoff by which to filter down
                 intermediate reactions. This can be useful when there are a large number of
                 possible intermediates. < 0 means allow only exergonic reactions.
+            use_basic_enumerator: Whether to use the BasicEnumerator to find intermediate
+                reactions. Defaults to True.
+            use_minimize_enumerator: Whether to use the MinimizeGibbsEnumerator to find
+                intermediate reactions. Defaults to False.
             filter_interdependent: Whether or not to filter out pathways where reaction
                 steps are interdependent. Defaults to True.
 
@@ -101,7 +111,11 @@ class PathwaySolver(Solver):
             self.logger.info("Identifying reactions between intermediates...")
 
             intermediate_rxns = self._find_intermediate_rxns(
-                precursors, targets, intermediate_rxn_energy_cutoff
+                precursors,
+                targets,
+                intermediate_rxn_energy_cutoff,
+                use_basic_enumerator,
+                use_minimize_enumerator,
             )
             intermediate_costs = [
                 self.cost_function.evaluate(r) for r in intermediate_rxns
@@ -205,31 +219,53 @@ class PathwaySolver(Solver):
         v[indices] = rxn.coefficients
         return v
 
-    def _find_intermediate_rxns(self, precursors, targets, energy_cutoff):
+    def _find_intermediate_rxns(
+        self,
+        precursors,
+        targets,
+        energy_cutoff,
+        use_basic_enumerator,
+        use_minimize_enumerator,
+    ):
         rxns = []
 
         intermediates = {e for rxn in self.reactions for e in rxn.entries}
-
         intermediates = GibbsEntrySet(
             list(intermediates) + targets,
         )
+        target_formulas = [e.composition.reduced_formula for e in targets]
+        ref_elems = {e for e in self.entries if e.is_element}
 
-        be = BasicEnumerator(
-            targets=[t.composition.reduced_formula for t in targets],
-        )
-        int_rxns = be.enumerate(intermediates)
-        rxns.extend(int_rxns)
-
-        if self.open_elem:
-            boe = BasicOpenEnumerator(
-                open_phases=[Composition(str(self.open_elem)).reduced_formula],
-                targets=[t.composition.reduced_formula for t in targets],
+        if use_basic_enumerator:
+            be = BasicEnumerator(
+                targets=target_formulas,
             )
+            rxns.extend(be.enumerate(intermediates))
 
-            int_rxns_open = boe.enumerate(intermediates)
-            rxns.extend(int_rxns_open)
+            if self.open_elem:
+                boe = BasicOpenEnumerator(
+                    open_phases=[Composition(str(self.open_elem)).reduced_formula],
+                    targets=target_formulas,
+                )
+
+                rxns.extend(boe.enumerate(intermediates))
+
+        if use_minimize_enumerator:
+            ents = deepcopy(intermediates)
+            ents = ents | ref_elems
+
+            mge = MinimizeGibbsEnumerator(targets=target_formulas)
+            rxns.extend(mge.enumerate(ents))
+
+            if self.open_elem:
+                mgpe = MinimizeGrandPotentialEnumerator(
+                    open_elem=self.open_elem, mu=self.chempot, targets=target_formulas
+                )
+                rxns.extend(mgpe.enumerate(ents))
 
         rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxns))
+        rxns = [r for r in rxns if all([e in intermediates for e in r.entries])]
+        rxns = [r for r in rxns if (len(r.reactants) < 4 and len(r.products) < 4)]
 
         self.logger.info(f"Found {len(rxns)} intermediate reactions!")
 

@@ -80,7 +80,7 @@ class BuildNetwork(FiretaskBase):
     """
 
     required_params = ["entries", "enumerators", "cost_function"]
-    optional_params = ["open_elem", "chempot"]
+    optional_params = ["precursors", "target", "k", "open_elem", "chempot"]
 
     def run_task(self, fw_spec):
         entries = self["entries"] if self["entries"] else fw_spec["entries"]
@@ -100,45 +100,12 @@ class BuildNetwork(FiretaskBase):
 
         rn = ReactionNetwork(entries, enumerators, cost_function)
         rn.build()
-
-        results = ReactionSet.from_rxns(results)
-
-        dumpfn(results, "rxns.json")
-        dumpfn(metadata, "metadata.json")
-
-
-@explicit_serialize
-class FindPathways(FiretaskBase):
-    """
-    Finds pathways in an existing reaction network.
-
-    Required params:
-        entries (List[ComputedEntry]): Computed entries to be fed into enumerate()
-            methods
-        enumerators (List[Enumerator]): Enumerators to run
-        cost_function (CostFunction): cost function to use for edge weights
-    """
-
-    required_params = ["reaction_network", "graph_fn" "precursors", "targets"]
-    optional_params = ["k"]
-
-    def run_task(self, fw_spec):
-        rn = (
-            self["reaction_network"]
-            if self["reaction_network"]
-            else fw_spec["reaction_network"]
-        )
-        graph_fn = self["graph_fn"] if self["graph_fn"] else fw_spec["graph_fn"]
-        precursors = self["precursors"]
-        targets = self["targets"]
-        k = self.get("k")
-
-        rn.load_graph(graph_fn)
-
         rn.set_precursors(precursors)
         paths = rn.find_pathways(targets=targets, k=k)
 
-        dumpfn(paths, "shortest_paths.json")
+        rn.write_graph()
+        dumpfn(rn, "network.json")
+        dumpfn(paths, "paths.json")
 
 
 @explicit_serialize

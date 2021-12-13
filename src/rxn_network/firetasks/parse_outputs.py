@@ -60,7 +60,9 @@ class NetworkToDb(FiretaskBase):
             f"Reaction Network (Targets: "
             f"{metadata['targets']}): {metadata['chemsys']}"
         )
-        d["rxns"] = jsanitize(rxns, strict=True)
+        d["network"] = jsanitize(network, strict=True)
+        d["paths"] = jsanitize(paths, strict=True)
+        d["graph_fn"] = graph_fn
         d["metadata"] = jsanitize(metadata, strict=True)
 
         store_in_mongo_db(d, db_file)
