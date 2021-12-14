@@ -5,6 +5,9 @@ construction
 from typing import Iterable, Union, List, Dict, Optional
 from fireworks import Firework
 
+from pymatgen.analysis.reaction_calculator import Reaction, ReactionError
+from pymatgen.core.composition import Composition
+
 from rxn_network.core import CostFunction, Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.firetasks.build_inputs import EntriesFromDb, EntriesFromMPRester
@@ -14,7 +17,6 @@ from rxn_network.firetasks.run_calc import (
     BuildNetwork,
     RunSolver,
 )
-
 
 class EnumeratorFW(Firework):
     """
@@ -113,13 +115,6 @@ class NetworkFW(Firework):
         targets = pathway_params.get("targets")
         k = pathway_params.get("k")
 
-        max_num_combos = solver_params.get("max_num_combos")
-        find_intermediate_rxns = solver_params.get("find_intermediate_rxns")
-        intermediate_rxn_energy_cutoff = solver_params.get(
-            "intermediate_rxn_energy_cutoff"
-        )
-        filter_interdependent = solver_params.get("filter_interdependent")
-
         tasks = []
 
         entry_set = None
@@ -149,16 +144,28 @@ class NetworkFW(Firework):
         )
 
         if solve_balanced_paths:
+            try:
+                net_rxn = Reaction(
+                    [Composition(r) for r in precursors],
+                    [Composition(p) for p in targets],
+                )
+            except ReactionError:
+                raise ValueError(
+                    "Can not balance pathways with specified precursors/targets."
+                    "Please make sure a balanced net reaction can be written!"
+                )
+
             solver = RunSolver(
+                pathways=None,
                 entries=entry_set,
                 cost_function=cost_function,
+                net_rxn=net_rxn,
                 **solver_params,
             )
             tasks.append(RunSolver(solver))
 
         tasks.append(NetworkToDb(db_file=db_file))
 
-        chemsys = chemsys if chemsys else entry_set.chemsys
         fw_name = f"Reaction Network (Targets: {targets}): {chemsys}"
 
         super().__init__(tasks, parents=parents, name=fw_name)

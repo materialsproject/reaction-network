@@ -29,6 +29,7 @@ class ReactionsToDb(FiretaskBase):
     optional_params = ["db_file", "rxns_fn", "metadata_fn"]
 
     def run_task(self, fw_spec):
+        dir_name = os.path.abspath(os.getcwd())
         db_file = env_chk(self.get("db_file"), fw_spec)
         db = CalcDb(db_file)
 
@@ -55,27 +56,29 @@ class NetworkToDb(FiretaskBase):
     required_params = []
     optional_params = [
         "network",
-        "paths",
-        "balanced_paths",
+        "pathways",
+        "balanced_pathways",
         "open_elem",
         "chempot",
         "db_file",
     ]
 
     def run_task(self, fw_spec):
+        dir_name = os.path.abspath(os.getcwd())
         db_file = env_chk(self.get("db_file"), fw_spec)
         db = CalcDb(db_file)
 
         graph_fn = self.get("graph_fn") if self.get("graph_fn") else fw_spec["graph_fn"]
 
         network = load_json(self, "network", fw_spec)
-        paths = load_json(self, "paths", fw_spec)
-        balanced_paths = load_json(self, "balanced_paths", fw_spec)
+        pathways = load_json(self, "pathways", fw_spec)
+        balanced_pathways = load_json(self, "balanced_pathways", fw_spec)
 
         d = {}
+        d["dir_name"] = dir_name
         d["network"] = network
-        d["paths"] = paths
-        d["balanced_paths"] = balanced_paths
+        d["pathways"] = pathways
+        d["balanced_pathways"] = balanced_pathways
         d["graph_fn"] = graph_fn
 
         db.insert(d)

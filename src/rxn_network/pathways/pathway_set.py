@@ -63,7 +63,7 @@ class PathwaySet(MSONable):
             self.costs,
         ):
             reactions = [self._rxns[i] for i in indices]
-            if coefficients:
+            if coefficients is not None:
                 path = BalancedPathway(
                     reactions=reactions, coefficients=coefficients, costs=costs
                 )
@@ -115,3 +115,9 @@ class PathwaySet(MSONable):
             paths: List of Pathway objects
         """
         return ReactionSet.from_rxns([rxn for path in paths for rxn in path.reactions])
+
+    def __iter__(self):
+        """
+        Iterates over the PathwaySet.
+        """
+        return iter(self.get_paths())

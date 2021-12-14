@@ -80,4 +80,4 @@ def load_json(firetask, param, fw_spec):
         with gzip.open(obj_fn) as f:
             d = json.load(f)
 
-    return jsanitize(d, strict=True)
+    return d

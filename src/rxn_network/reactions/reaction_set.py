@@ -136,3 +136,9 @@ class ReactionSet(MSONable):
         for r in rxns:
             entries.update(r.entries)
         return entries
+
+    def __iter__(self):
+        """
+        Iterate over the reactions in the set.
+        """
+        return iter(self.get_rxns())
