@@ -33,7 +33,7 @@ class EnumeratorFW(Firework):
         """
 
         Args:
-            enumerators:
+            enumerators: List of enumerators to run
             entries:
             chemsys:
             entry_set_params:
