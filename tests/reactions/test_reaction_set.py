@@ -22,8 +22,13 @@ def rxn_set(rxns):
     return ReactionSet.from_rxns(rxns)
 
 
-def test_get_rxns(rxns, rxn_set):
-    open_rxns = rxn_set.get_rxns(open_elem="O", chempot=0)
+@pytest.fixture(scope="module")
+def open_rxn_set(rxns):
+    return ReactionSet.from_rxns(rxns, open_elem="O", chempot=0)
+
+
+def test_get_rxns(rxns, rxn_set, open_rxn_set):
+    open_rxns = open_rxn_set.get_rxns()
     assert rxn_set.get_rxns() == rxns
     assert open_rxns != rxns
     assert all([type(r) == OpenComputedReaction for r in open_rxns])
