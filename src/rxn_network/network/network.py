@@ -68,7 +68,7 @@ class ReactionNetwork(Network):
         """
         rxn_set = self._get_rxns()
         costs = rxn_set.calculate_costs(self.cost_function)
-        rxns = rxn_set.get_rxns(self.open_elem, self.chempot)
+        rxns = rxn_set.get_rxns()
 
         self.logger.info("Building graph from reactions...")
         nodes, rxn_edges = get_rxn_nodes_and_edges(rxns)
@@ -280,7 +280,9 @@ class ReactionNetwork(Network):
         for enumerator in self.enumerators:
             rxns.extend(enumerator.enumerate(self.entries))
 
-        rxns = ReactionSet.from_rxns(rxns, self.entries)
+        rxns = ReactionSet.from_rxns(
+            rxns, self.entries, open_elem=self.open_elem, chempot=self.chempot
+        )
         return rxns
 
     @staticmethod
@@ -301,7 +303,7 @@ class ReactionNetwork(Network):
     @classmethod
     def from_dict_and_file(cls, d: dict, filename: str):
         """
-        Loads a ReactionNetwork object from a dictionary (MSONable version) and a
+        Convenience constructor method that loads a ReactionNetwork object from a dictionary (MSONable version) and a
         filename (to load graph object in graph-tool).
 
         Args:
@@ -328,7 +330,7 @@ class ReactionNetwork(Network):
     def as_dict(self):
         """Return MSONable dict"""
         d = super().as_dict()
-        d["precursors"] = self.precursors
+        d["precursors"] = list(self.precursors)
         d["target"] = self.target
         return d
 

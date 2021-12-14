@@ -3,8 +3,12 @@ Utility Fireworks functions borrowed from the atomate package
 """
 import logging
 import os
+import gzip
 import sys
+import json
 from typing import Optional
+
+from monty.json import jsanitize
 
 
 def env_chk(
@@ -60,3 +64,20 @@ def get_logger(
     logger.addHandler(sh)
 
     return logger
+
+
+def load_json(firetask, param, fw_spec):
+    """ """
+    obj = firetask.get(param)
+    if obj:
+        d = obj.as_dict()
+    else:
+        param_fn = param + "_fn"
+        obj_fn = firetask.get(param_fn)
+        if not obj_fn:
+            obj_fn = fw_spec[param_fn]
+
+        with gzip.open(obj_fn) as f:
+            d = json.load(f)
+
+    return jsanitize(d, strict=True)

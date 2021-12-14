@@ -12,7 +12,6 @@ from rxn_network.firetasks.parse_outputs import ReactionsToDb, NetworkToDb
 from rxn_network.firetasks.run_calc import (
     RunEnumerators,
     BuildNetwork,
-    FindPathways,
     RunSolver,
 )
 
@@ -51,9 +50,12 @@ class EnumeratorFW(Firework):
             entry_set = GibbsEntrySet(entries)
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
-            use_db = bool(entry_db_file)
             tasks.append(
-                _get_entry_task(entry_set_params=entry_set_params, use_db=use_db)
+                _get_entry_task(
+                    chemsys=chemsys,
+                    entry_set_params=entry_set_params,
+                    entry_db_file=entry_db_file,
+                )
             )
 
         targets = {
@@ -125,9 +127,12 @@ class NetworkFW(Firework):
             entry_set = GibbsEntrySet(entries)
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
-            use_db = bool(entry_db_file)
             tasks.append(
-                _get_entry_task(entry_set_params=entry_set_params, use_db=use_db)
+                _get_entry_task(
+                    chemsys=chemsys,
+                    entry_set_params=entry_set_params,
+                    entry_db_file=entry_db_file,
+                )
             )
 
         tasks.append(
@@ -142,29 +147,30 @@ class NetworkFW(Firework):
                 chempot=chempot,
             )
         )
-        tasks.append(NetworkToDb(db_file=db_file, calc_dir="."))
 
         if solve_balanced_paths:
             solver = RunSolver(
-                entries=entry_set
-                pathways=pathways,
+                entries=entry_set,
                 cost_function=cost_function,
                 **solver_params,
             )
             tasks.append(RunSolver(solver))
 
-        fw_name = f"Reaction Network (Target: {target}): {chemsys}"
+        tasks.append(NetworkToDb(db_file=db_file))
+
+        chemsys = chemsys if chemsys else entry_set.chemsys
+        fw_name = f"Reaction Network (Targets: {targets}): {chemsys}"
 
         super().__init__(tasks, parents=parents, name=fw_name)
 
 
-def _get_entry_task(entry_set_params, use_db):
+def _get_entry_task(chemsys, entry_set_params, entry_db_file):
     entry_set_params = entry_set_params if entry_set_params else {}
     temperature = entry_set_params.get("temperature", 300)
     e_above_hull = entry_set_params.get("e_above_hull", 0.0)
     include_polymorphs = entry_set_params.get("include_polymorphs", False)
 
-    if use_db:
+    if bool(entry_db_file):
         entry_task = EntriesFromDb(
             entry_db_file=entry_db_file,
             chemsys=chemsys,

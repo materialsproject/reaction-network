@@ -10,6 +10,7 @@ from pymatgen.core import Composition
 
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.firetasks.utils import env_chk, get_logger
+from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.network.network import ReactionNetwork
@@ -85,13 +86,13 @@ class BuildNetwork(FiretaskBase):
 
     def run_task(self, fw_spec):
         entries = self["entries"] if self["entries"] else fw_spec["entries"]
-        enumerators = self.get(["enumerators"])
+        enumerators = self["enumerators"]
         cost_function = self["cost_function"]
-        precursors = self.get(["precursors"])
-        targets = self.get(["targets"])
-        k = self.get(["k"])
-        open_elem = self.get(["open_elem"])
-        chempot = self.get(["chempot"])
+        precursors = self.get("precursors")
+        targets = self.get("targets")
+        k = self.get("k", 10)
+        open_elem = self.get("open_elem")
+        chempot = self.get("chempot")
 
         entries = GibbsEntrySet(entries)
         chemsys = "-".join(sorted(list(entries.chemsys)))
@@ -107,10 +108,23 @@ class BuildNetwork(FiretaskBase):
 
         rn.set_precursors(precursors)
         paths = rn.find_pathways(targets=targets, k=k)
+        pathway_set = PathwaySet.from_paths(paths)
 
-        rn.write_graph()
-        dumpfn(rn, "network.json.gz")
-        dumpfn(paths, "paths.json.gz")
+        graph_fn = "graph.gt.gz"
+        network_fn = "network.json.gz"
+        paths_fn = "paths.json.gz"
+
+        rn.write_graph(graph_fn)
+        dumpfn(rn, network_fn)
+        dumpfn(pathway_set, paths_fn)
+
+        return FWAction(
+            update_spec={
+                "graph_fn": graph_fn,
+                "network_fn": network_fn,
+                "paths_fn": paths_fn,
+            }
+        )
 
 
 @explicit_serialize
@@ -126,8 +140,9 @@ class RunSolver(FiretaskBase):
         find_intermediate_rxns (bool): whether to find intermediate reactions
     """
 
-    required_params = ["entries", "pathways", "cost_function"]
+    required_params = ["entries", "cost_function"]
     optional_params = [
+        "pathways",
         "max_num_combos",
         "find_intermediate_rxns",
         "intermediate_rxn_energy_cutoff",
@@ -137,7 +152,7 @@ class RunSolver(FiretaskBase):
     def run_task(self, fw_spec):
         entries = self["entries"] if self["entries"] else fw_spec["entries"]
 
-        if not self["pathways"]:
+        if not self.get["pathways"]:
             pathways = loadfn(fw_spec["pathways_fn"])
 
         solver = PathwaySolver(
@@ -161,5 +176,9 @@ class RunSolver(FiretaskBase):
             intermediate_rxn_energy_cutoff=intermediate_rxn_energy_cutoff,
             filter_interdependent=filter_interdependent,
         )
+        pathway_set = PathwaySet.from_paths(paths)
 
-        dumpfn(paths, "balanced_paths.json")
+        balanced_paths_fn = "balanced_paths.json.gz"
+        dumpfn(pathway_set, balanced_paths_fn)
+
+        return FWAction(update_spec={"balanced_paths_fn": paths_fn})

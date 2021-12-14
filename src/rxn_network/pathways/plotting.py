@@ -17,7 +17,6 @@ from rxn_network.entries import GibbsEntrySet, GibbsComputedEntry
 class PathwayPlotter(MSONable):
     """
     Helper class for plotting a reaction pathway and the corresponding energy cascade.
-    Automatically
     """
 
     def __init__(self, phase_amounts, temps, apply_smoothing=True):

@@ -1,0 +1,108 @@
+{
+    "spec": {
+        "_tasks": [
+            {
+                "entry_db_file": ">>entry_db_file<<",
+                "chemsys": "Y-Mn-O",
+                "temperature": 300,
+                "e_above_hull": 0.0,
+                "include_polymorphs": false,
+                "_fw_name": "{{rxn_network.firetasks.build_inputs.EntriesFromDb}}"
+            },
+            {
+                "entries": null,
+                "enumerators": [
+                    {
+                        "@module": "rxn_network.enumerators.basic",
+                        "@class": "BasicEnumerator",
+                        "@version": null,
+                        "precursors": [],
+                        "targets": [],
+                        "calculators": [],
+                        "n": 2,
+                        "exclusive_precursors": true,
+                        "exclusive_targets": false,
+                        "remove_unbalanced": true,
+                        "remove_changed": true
+                    }
+                ],
+                "cost_function": {
+                    "@module": "rxn_network.costs.softplus",
+                    "@class": "Softplus",
+                    "@version": null,
+                    "temp": 900,
+                    "params": [
+                        "energy_per_atom"
+                    ],
+                    "weights": [
+                        1.0
+                    ]
+                },
+                "precursors": [
+                    "Y2O3",
+                    "Mn2O3"
+                ],
+                "targets": [
+                    "Y2Mn2O7"
+                ],
+                "k": 10,
+                "open_elem": null,
+                "chempot": null,
+                "_fw_name": "{{rxn_network.firetasks.run_calc.BuildNetwork}}"
+            },
+            {
+                "entries": null,
+                "cost_function": {
+                    "@module": "rxn_network.costs.softplus",
+                    "@class": "Softplus",
+                    "@version": null,
+                    "temp": 900,
+                    "params": [
+                        "energy_per_atom"
+                    ],
+                    "weights": [
+                        1.0
+                    ]
+                },
+                "_fw_name": "{{rxn_network.firetasks.run_calc.RunSolver}}"
+            },
+            {
+                "db_file": ">>db_file<<",
+                "_fw_name": "{{rxn_network.firetasks.parse_outputs.NetworkToDb}}"
+            }
+        ]
+    },
+    "fw_id": 3836,
+    "created_on": "2021-12-14T07:27:28.655061",
+    "updated_on": "2021-12-14T07:27:34.325368",
+    "launches": [
+        {
+            "fworker": {
+                "name": "knl_fworker",
+                "category": "",
+                "query": "{}",
+                "env": {
+                    "db_file": "/Users/mcdermott/db_rn.json",
+                    "entry_db_file": "/Users/mcdermott/db_mp.json"
+                }
+            },
+            "fw_id": 3836,
+            "launch_dir": "/Users/mcdermott/PycharmProjects/reaction-network/notebooks",
+            "host": "macbook-pro-3.lan.dhcp.lbl.gov",
+            "ip": "131.243.146.150",
+            "trackers": [],
+            "action": null,
+            "state": "RUNNING",
+            "state_history": [
+                {
+                    "state": "RUNNING",
+                    "created_on": "2021-12-14T07:27:34.304406",
+                    "updated_on": "2021-12-14T07:27:34.304416"
+                }
+            ],
+            "launch_id": 2898
+        }
+    ],
+    "state": "RUNNING",
+    "name": "Reaction Network (Targets: ['Y2Mn2O7']): Y-Mn-O"
+}

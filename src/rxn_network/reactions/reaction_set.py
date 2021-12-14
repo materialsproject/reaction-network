@@ -98,6 +98,8 @@ class ReactionSet(MSONable):
         cls,
         rxns: List[Union[ComputedReaction, OpenComputedReaction]],
         entries: Optional[Iterable[ComputedEntry]] = None,
+        open_elem: Optional[str] = None,
+        chempot: Optional[float] = 0.0,
     ) -> "ReactionSet":
         """
         Initiate a ReactionSet object from a list of reactions. Including a list of
@@ -122,6 +124,8 @@ class ReactionSet(MSONable):
             entries=entries,
             indices=indices,
             coeffs=coeffs,
+            open_elem=open_elem,
+            chempot=chempot,
             all_data=data,
         )
 
