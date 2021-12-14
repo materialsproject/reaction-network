@@ -56,9 +56,9 @@ class BalancedPathway(BasicPathway):
     ):
         """
         TODO: Implement this method
+
         Balances multiple reaction pathways to a net reaction
         """
-
         pass
 
     def comp_matrix(self):

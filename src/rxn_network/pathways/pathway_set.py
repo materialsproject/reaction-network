@@ -12,6 +12,7 @@ from pymatgen.core import Element
 
 from pymatgen.entries.computed_entries import ComputedEntry
 from rxn_network.core.cost_function import CostFunction
+from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
@@ -26,25 +27,20 @@ class PathwaySet(MSONable):
 
     def __init__(
         self,
-        reactions: ReactionSet,
+        reaction_set: ReactionSet,
         indices: Union[np.ndarray, List[List[int]]],
         coefficients: List[float],
         costs: Optional[List[float]] = None,
-        all_data: Optional[List] = None,
     ):
         """
         Args:
             entries: List of ComputedEntry objects shared by reactions
             indices: 2d array indexing the list of reactions for each reaction
-            all_data: 2d array  of data for each pathway
         """
-        self.reaction_set = ReactionSet(reaction_set)
+        self.reaction_set = reaction_set
         self.indices = indices
         self.coefficients = coefficients
         self.costs = costs
-        self.open_elem = open_elem
-        self.chempot = chempot
-        self.all_data = all_data if all_data else []
 
         self._rxns = self.reaction_set.get_rxns()
 
@@ -61,18 +57,18 @@ class PathwaySet(MSONable):
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
         """
         paths = []
-        for indices, coeffs, costs, data in zip(
-            self.indices, self.coefficients, self.costs, self.all_data
+        for indices, coefficients, costs in zip(
+            self.indices,
+            self.coefficients,
+            self.costs,
         ):
-            rxns = [self._rxns[i] for i in indices]
-            if chempots:
-                rxn = OpenComputedReaction(
-                    entries=entries, coefficients=coeffs, data=data, chempots=chempots
-                )
-            else:
-                rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
-            rxns.append(rxn)
-        return rxns
+            reactions = [self._rxns[i] for i in indices]
+            path = BalancedPathway(
+                reactions=reactions, coefficients=coefficients, costs=costs
+            )
+            paths.append(path)
+
+        return paths
 
     @classmethod
     def from_paths(
@@ -86,15 +82,31 @@ class PathwaySet(MSONable):
         Args:
             paths: List of Pathway objects
         """
-        all_indices, all_coeffs, all_data = [], [], []
-        for rxn in rxns:
-            all_indices.append([entries.index(e) for e in rxn.entries])
-            all_coeffs.append(list(rxn.coefficients))
-            all_data.append(rxn.data)
+        indices, coefficients, costs = [], [], []
+
+        reaction_set = cls._get_reaction_set(paths)
+        rxns = reaction_set.get_rxns()
+
+        for path in paths:
+            indices.append([rxns.index(r) for r in path.reactions])
+            coefficients.append(path.coefficients)
+            costs.append(path.costs)
 
         return cls(
-            entries=entries,
-            indices=all_indices,
-            coeffs=all_coeffs,
-            all_data=all_data,
+            reaction_set=reaction_set,
+            indices=indices,
+            coefficients=coefficients,
+            costs=costs,
         )
+
+    @staticmethod
+    def _get_reaction_set(
+        paths: List[Union[ComputedReaction, OpenComputedReaction]],
+    ) -> List[Union[ComputedReaction, OpenComputedReaction]]:
+        """
+        Returns list of unique reactions from a list of paths.
+
+        Args:
+            paths: List of Pathway objects
+        """
+        return ReactionSet.from_rxns([rxn for path in paths for rxn in path.reactions])
