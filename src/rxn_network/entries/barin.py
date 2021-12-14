@@ -2,13 +2,13 @@
 Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin tables
 """
 import hashlib
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry
 
-from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.data import PATH_TO_BARIN, load_experimental_data
+from rxn_network.entries.experimental import ExperimentalReferenceEntry
 
 G_COMPOUNDS = load_experimental_data(PATH_TO_BARIN / "compounds.json")
 

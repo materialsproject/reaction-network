@@ -5,7 +5,6 @@ import datetime
 import json
 import os
 
-import json
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore
 from monty.json import MontyDecoder, jsanitize
@@ -13,7 +12,6 @@ from monty.serialization import loadfn
 
 from rxn_network.firetasks.utils import env_chk, get_logger, load_json
 from rxn_network.utils.database import CalcDb
-
 
 logger = get_logger(__name__)
 

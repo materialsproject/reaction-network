@@ -3,14 +3,12 @@ An entry set class for acquiring entries with Gibbs formation energies
 """
 import collections
 import logging
-from typing import List, Optional, Union, Set, Dict
-from copy import deepcopy
 import warnings
-
-from numpy.random import normal
+from copy import deepcopy
+from typing import Dict, List, Optional, Set, Union
 
 from monty.json import MontyDecoder, MSONable
-from pymatgen.entries.entry_tools import EntrySet
+from numpy.random import normal
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core import Composition
 from pymatgen.entries.computed_entries import (
@@ -18,11 +16,12 @@ from pymatgen.entries.computed_entries import (
     ComputedStructureEntry,
     ConstantEnergyAdjustment,
 )
+from pymatgen.entries.entry_tools import EntrySet
 from tqdm.auto import tqdm
 
+from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.entries.gibbs import GibbsComputedEntry
 from rxn_network.entries.nist import NISTReferenceEntry
-from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.thermo.utils import expand_pd
 
 

@@ -1,11 +1,11 @@
 """
 Utility Fireworks functions borrowed from the atomate package
 """
+import gzip
+import json
 import logging
 import os
-import gzip
 import sys
-import json
 from typing import Optional
 
 from monty.json import jsanitize

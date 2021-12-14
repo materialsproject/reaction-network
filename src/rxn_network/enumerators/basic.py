@@ -2,14 +2,14 @@
 This module implements two types of basic reaction enumerators, with or without the
 option of an open entry
 """
+from copy import deepcopy
 from itertools import combinations, product
 from math import comb
 from typing import List, Optional, Set
-from copy import deepcopy
 
-from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.core.composition import Composition
-from pymatgen.analysis.phase_diagram import PhaseDiagram, GrandPotentialPhaseDiagram
+from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm.auto import tqdm
 
 from rxn_network.core import Enumerator

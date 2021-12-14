@@ -5,18 +5,16 @@ import json
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.json import MontyEncoder
-from monty.serialization import loadfn, dumpfn
+from monty.serialization import dumpfn, loadfn
 from pymatgen.core import Composition
 
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.firetasks.utils import env_chk, get_logger
+from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.network.network import ReactionNetwork
-
-from rxn_network.enumerators.utils import get_computed_rxn
-
 
 logger = get_logger(__name__)
 

@@ -3,13 +3,11 @@ A reaction class that builds reactions based on ComputedEntry objects under the
 presence of an open entry (e.g. O2), and provides information about reaction
 thermodynamics computed as changes in grand potential.
 """
-
 from typing import Dict, List, Optional, Union
 
 import numpy as np
-
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
-from pymatgen.core.composition import Element, Composition
+from pymatgen.core.composition import Composition, Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.reactions.computed import ComputedReaction

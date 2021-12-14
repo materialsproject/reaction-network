@@ -1,17 +1,17 @@
 """
 This module contains functions for plotting experimental reaction pathway data.
 """
-import pandas
-from tqdm.notebook import tqdm
 from functools import lru_cache
-from monty.json import MSONable
-from pymatgen.core.composition import Composition
-from pymatgen.analysis.phase_diagram import PhaseDiagram
 
-from scipy.ndimage.filters import median_filter
 import matplotlib.pyplot as plt
+import pandas
+from monty.json import MSONable
+from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.core.composition import Composition
+from scipy.ndimage.filters import median_filter
+from tqdm.notebook import tqdm
 
-from rxn_network.entries import GibbsEntrySet, GibbsComputedEntry
+from rxn_network.entries import GibbsComputedEntry, GibbsEntrySet
 
 
 class PathwayPlotter(MSONable):

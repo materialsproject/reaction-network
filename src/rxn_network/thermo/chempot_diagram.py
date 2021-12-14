@@ -2,8 +2,8 @@
 This module implements added features to the ChemicalPotentialDiagram class from
 pymatgen.
 """
-from typing import Dict, List, Optional
 from functools import cached_property
+from typing import Dict, List, Optional
 
 import numpy as np
 from pymatgen.analysis.chempot_diagram import ChemicalPotentialDiagram as ChempotDiagram

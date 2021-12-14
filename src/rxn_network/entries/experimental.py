@@ -2,7 +2,7 @@
 Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 """
 import hashlib
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry

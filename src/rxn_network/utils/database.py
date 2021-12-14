@@ -1,16 +1,15 @@
-import logging
 import datetime
+import logging
 import os
 import sys
 from typing import Optional
 
-from maggma.stores import MongoStore
 from maggma.core import StoreError
+from maggma.stores import MongoStore
 from monty.json import jsanitize
 from pymongo import ReturnDocument
 
 from rxn_network.firetasks.utils import get_logger
-
 
 logger = get_logger(__name__)
 

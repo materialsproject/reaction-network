@@ -1,18 +1,18 @@
 """
-Implements a class for conveniently and efficiently storing sets of ComputedReaction
-objects which share entries.
+Implements a class for conveniently and efficiently storing sets of Pathway-based
+objects which share entries/reactions.
 """
 
 from functools import lru_cache
-from typing import List, Optional, Union, Set, Iterable
+from typing import Iterable, List, Optional, Set, Union
 
 import numpy as np
 from monty.json import MSONable
 from pymatgen.core import Element
-
 from pymatgen.entries.computed_entries import ComputedEntry
+
 from rxn_network.core.cost_function import CostFunction
-from rxn_network.pathways import BasicPathway, BalancedPathway
+from rxn_network.pathways import BalancedPathway, BasicPathway
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet

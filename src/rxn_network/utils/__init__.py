@@ -1,1 +1,1 @@
-from rxn_network.utils.funcs import limited_powerset, grouper, get_project_root
+from rxn_network.utils.funcs import get_project_root, grouper, limited_powerset

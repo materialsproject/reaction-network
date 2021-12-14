@@ -2,21 +2,18 @@
 Implementation of Fireworks for performing reaction enumreation and network
 construction
 """
-from typing import Iterable, Union, List, Dict, Optional
-from fireworks import Firework
+from typing import Dict, Iterable, List, Optional, Union
 
+from fireworks import Firework
 from pymatgen.analysis.reaction_calculator import Reaction, ReactionError
 from pymatgen.core.composition import Composition
 
 from rxn_network.core import CostFunction, Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.firetasks.build_inputs import EntriesFromDb, EntriesFromMPRester
-from rxn_network.firetasks.parse_outputs import ReactionsToDb, NetworkToDb
-from rxn_network.firetasks.run_calc import (
-    RunEnumerators,
-    BuildNetwork,
-    RunSolver,
-)
+from rxn_network.firetasks.parse_outputs import NetworkToDb, ReactionsToDb
+from rxn_network.firetasks.run_calc import BuildNetwork, RunEnumerators, RunSolver
+
 
 class EnumeratorFW(Firework):
     """

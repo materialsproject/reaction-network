@@ -1,7 +1,6 @@
 """
 Utility functions used in the thermodynamic analysis classes.
 """
-
 from typing import Dict, List
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram

@@ -8,10 +8,10 @@ from math import comb
 from typing import List, Optional
 
 from pymatgen.analysis.interface_reactions import (
-    InterfacialReactivity,
     GrandPotentialInterfacialReactivity,
+    InterfacialReactivity,
 )
-from pymatgen.core.composition import Element, Composition
+from pymatgen.core.composition import Composition, Element
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm.auto import tqdm
 

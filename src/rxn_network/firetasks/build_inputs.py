@@ -3,7 +3,7 @@ Firetasks for acquiring ComputedEntry data from MPRester or another materials Mo
 """
 import itertools
 import warnings
-from typing import Union, Optional, List
+from typing import List, Optional, Union
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore

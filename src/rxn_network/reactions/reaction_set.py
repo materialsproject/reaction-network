@@ -4,13 +4,13 @@ objects which share entries.
 """
 
 from functools import lru_cache
-from typing import List, Optional, Union, Set, Iterable
+from typing import Iterable, List, Optional, Set, Union
 
 import numpy as np
 from monty.json import MSONable
 from pymatgen.core import Element
-
 from pymatgen.entries.computed_entries import ComputedEntry
+
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction

@@ -2,14 +2,14 @@
 Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 """
 import hashlib
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry
 from scipy.interpolate import interp1d
 
-from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.data import PATH_TO_NIST, load_experimental_data
+from rxn_network.entries.experimental import ExperimentalReferenceEntry
 
 G_COMPOUNDS = load_experimental_data(PATH_TO_NIST / "compounds.json")
 

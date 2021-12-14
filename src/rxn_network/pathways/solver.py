@@ -3,16 +3,15 @@ Implements a reaction pathway solver class which efficiently solves mass balance
 equations using matrix operations.
 """
 
+from copy import deepcopy
 from itertools import combinations
 from typing import List
-from copy import deepcopy
 
 import numpy as np
 from numba import njit, prange
+from pymatgen.core.composition import Composition
 from scipy.special import comb
 from tqdm.notebook import tqdm
-
-from pymatgen.core.composition import Composition
 
 from rxn_network.core import CostFunction, Pathway, Solver
 from rxn_network.entries.entry_set import GibbsEntrySet

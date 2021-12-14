@@ -3,7 +3,7 @@ Basic interface for a (reaction) Network
 """
 import logging
 from abc import ABCMeta, abstractmethod
-from typing import List, Iterable
+from typing import Iterable, List
 
 from monty.json import MSONable
 from pymatgen.entries import Entry
@@ -11,7 +11,6 @@ from pymatgen.entries import Entry
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.core.pathway import Pathway
-
 from rxn_network.entries.entry_set import GibbsEntrySet
 
 

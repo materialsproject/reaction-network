@@ -2,21 +2,21 @@
 Implementation of reaction network interface.
 """
 
-from typing import List, Optional, Iterable, Union
+from typing import Iterable, List, Optional, Union
 
 from graph_tool.util import find_edge, find_vertex
-
 from pymatgen.entries import Entry
+
 from rxn_network.core import CostFunction, Enumerator, Network
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.gt import (
     initialize_graph,
-    update_vertex_props,
     load_graph,
     save_graph,
+    update_vertex_props,
     yens_ksp,
 )
-from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.utils import get_loopback_edges, get_rxn_nodes_and_edges
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.reactions.reaction_set import ReactionSet

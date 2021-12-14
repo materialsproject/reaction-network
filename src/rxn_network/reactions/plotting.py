@@ -1,6 +1,6 @@
 import pandas
-from pymatgen.core.composition import Composition
 import plotly.express as px
+from pymatgen.core.composition import Composition
 
 from rxn_network.costs.softplus import Softplus
 

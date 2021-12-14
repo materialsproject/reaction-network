@@ -1,10 +1,10 @@
 """
 Helpful utility functions used by the enumerator classes.
 """
-from typing import List, Union
 import warnings
+from typing import List, Union
 
-from pymatgen.entries.computed_entries import Entry, ComputedEntry
+from pymatgen.entries.computed_entries import ComputedEntry, Entry
 
 import rxn_network.costs.calculators as calcs
 from rxn_network.entries.entry_set import GibbsEntrySet

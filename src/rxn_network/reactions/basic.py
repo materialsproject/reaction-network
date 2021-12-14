@@ -3,10 +3,10 @@ This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.
 """
 
-from copy import deepcopy
 import re
+from copy import deepcopy
 from itertools import chain, combinations
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from monty.fractions import gcd_float

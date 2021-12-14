@@ -1,2 +1,2 @@
-""" Tests for BalancedPathway """
+"""Tests for BalancedPathway"""
 import pytest
