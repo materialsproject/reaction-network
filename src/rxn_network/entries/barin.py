@@ -2,7 +2,7 @@
 Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin tables
 """
 import hashlib
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry
@@ -26,7 +26,9 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
 
     REFERENCES = G_COMPOUNDS
 
-    def __init__(self, composition: Composition, temperature: float):
+    def __init__(
+        self, composition: Composition, temperature: float, data: Optional[Dict] = None
+    ):
         """
         Args:
             composition: Composition object (pymatgen).
@@ -34,4 +36,4 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
         """
-        super().__init__(composition, temperature)
+        super().__init__(composition, temperature, data)

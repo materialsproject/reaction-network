@@ -62,7 +62,7 @@ class Network(MSONable, metaclass=ABCMeta):
 
     @property
     def graph(self):
-        """ Returns the network object in graph-tool"""
+        """Returns the network object in graph-tool"""
         return self._g
 
     @property

@@ -2,7 +2,7 @@
 Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 """
 import hashlib
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry
@@ -28,7 +28,9 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
 
     REFERENCES = G_COMPOUNDS
 
-    def __init__(self, composition: Composition, temperature: float):
+    def __init__(
+        self, composition: Composition, temperature: float, data: Optional[Dict] = None
+    ):
         """
         Args:
             composition: Composition object (pymatgen).
@@ -36,4 +38,4 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
         """
-        super().__init__(composition, temperature)
+        super().__init__(composition, temperature, data)

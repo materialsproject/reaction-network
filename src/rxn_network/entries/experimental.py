@@ -2,14 +2,15 @@
 Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 """
 import hashlib
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
+from monty.json import MSONable
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries import Entry
 from scipy.interpolate import interp1d
 
 
-class ExperimentalReferenceEntry(Entry):
+class ExperimentalReferenceEntry(MSONable):
     """
     An Entry class for experimental reference data. Given a composition,
     automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
@@ -18,27 +19,31 @@ class ExperimentalReferenceEntry(Entry):
 
     REFERENCES: Dict = {}
 
-    def __init__(self, composition: Composition, temperature: float):
+    def __init__(
+        self,
+        composition: Composition,
+        temperature: float,
+        data: Optional[dict] = None,
+    ):
         """
         Args:
             composition: Composition object (pymatgen).
             temperature: Temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
+            data: Optional dictionary containing entry data
         """
-        composition = Composition(composition)
-        formula = composition.reduced_formula
+        self._composition = Composition(composition)
+        formula = self._composition.reduced_formula
         self._validate_temperature(formula, temperature)
 
-        energy = self._get_energy(formula, temperature)
-
+        self._energy = self._get_energy(formula, temperature)
         self.temperature = temperature
+
         self._formula = formula
         self.name = formula
         self.entry_id = self.__class__.__name__
-        self.data = {}  # type: Dict[Any, Any]
-
-        super().__init__(composition.reduced_composition, energy)
+        self.data = data if data else {}  # type: Dict[Any, Any]
 
     def get_new_temperature(
         self, new_temperature: float
@@ -60,7 +65,7 @@ class ExperimentalReferenceEntry(Entry):
 
     @classmethod
     def _validate_temperature(cls, formula, temperature) -> None:
-        """ Ensure that the temperature is from a valid range. """
+        """Ensure that the temperature is from a valid range."""
         if formula not in cls.REFERENCES:
             raise ValueError(f"{formula} not in reference data!")
 
@@ -91,13 +96,25 @@ class ExperimentalReferenceEntry(Entry):
         return data[temperature]
 
     @property
+    def composition(self) -> Composition:
+        """
+        :return: the composition of the entry.
+        """
+        return self._composition
+
+    @property
     def energy(self) -> float:
         """The energy of the entry, as supplied by the reference tables."""
         return self._energy
 
     @property
+    def energy_per_atom(self) -> float:
+        """The energy of the entry, as supplied by the reference tables."""
+        return self.energy / self.composition.num_atoms
+
+    @property
     def correction_uncertainty(self) -> float:
-        """ Uncertainty of experimental data is not supplied."""
+        """Uncertainty of experimental data is not supplied."""
         return 0
 
     @property
@@ -114,19 +131,13 @@ class ExperimentalReferenceEntry(Entry):
 
     @property
     def is_experimental(self) -> bool:
-        """ Returns True by default."""
+        """Returns True by default."""
         return True
 
-    def as_dict(self) -> dict:
-        """ Returns an MSONable dict."""
-        data = super().as_dict()
-        data["temperature"] = self.temperature
-        return data
-
-    @classmethod
-    def from_dict(cls, d) -> "ExperimentalReferenceEntry":
-        """ Returns ExperimentalReferenceEntry constructed from MSONable dict."""
-        return cls(composition=d["composition"], temperature=d["temperature"])
+    @property
+    def is_element(self) -> bool:
+        """Returns True if the entry is an element."""
+        return self.composition.is_element
 
     def __repr__(self):
         output = [

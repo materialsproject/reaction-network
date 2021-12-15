@@ -66,7 +66,7 @@ class EnumeratorFW(Firework):
         tasks.append(
             RunEnumerators(enumerators=enumerators, entries=entry_set, chemsys=chemsys)
         )
-        tasks.append(ReactionsToDb(db_file=db_file, calc_dir="."))
+        tasks.append(ReactionsToDb(db_file=db_file))
 
         super().__init__(tasks, parents=parents, name=fw_name)
 
@@ -108,8 +108,8 @@ class NetworkFW(Firework):
         pathway_params = pathway_params if pathway_params else {}
         solver_params = solver_params if solver_params else {}
 
-        precursors = pathway_params.get("precursors")
-        targets = pathway_params.get("targets")
+        precursors = pathway_params.get("precursors", [])
+        targets = pathway_params.get("targets", [])
         k = pathway_params.get("k")
 
         tasks = []

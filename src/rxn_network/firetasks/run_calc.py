@@ -66,7 +66,8 @@ class RunEnumerators(FiretaskBase):
         results = ReactionSet.from_rxns(results)
 
         dumpfn(results, "rxns.json.gz")
-        dumpfn(metadata, "metadata.json.gz")
+
+        return FWAction(update_spec={"rxns_fn": "rxns.json.gz", "metadata": metadata})
 
 
 @explicit_serialize
@@ -107,23 +108,32 @@ class BuildNetwork(FiretaskBase):
         )
         rn.build()
 
-        rn.set_precursors(precursors)
-        paths = rn.find_pathways(targets=targets, k=k)
-        pathway_set = PathwaySet.from_paths(paths)
-
         graph_fn = "graph.gt.gz"
         network_fn = "network.json.gz"
-        pathways_fn = "paths.json.gz"
+        pathways_fn = None
+        metadata = {}
+
+        if precursors:
+            rn.set_precursors(precursors)
+        if precursors and targets:
+            paths = rn.find_pathways(targets=targets, k=k)
+
+            pathway_set = PathwaySet.from_paths(paths)
+            pathways_fn = "pathways.json.gz"
+            dumpfn(pathway_set, pathways_fn)
 
         rn.write_graph(graph_fn)
         dumpfn(rn, network_fn)
-        dumpfn(pathway_set, pathways_fn)
+
+        name = f"Reaction Network (Targets: " f"{targets}): {chemsys}"
 
         return FWAction(
             update_spec={
+                "name": name,
                 "graph_fn": graph_fn,
                 "network_fn": network_fn,
                 "pathways_fn": pathways_fn,
+                "metadata": metadata,
             }
         )
 

@@ -139,7 +139,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         added/removed the entry set. The entry indices are useful for querying the entry
         set for specific entries.
 
-        Note: this internally modifies the entries in the entry set by updating data for
+        Warning: this internally modifies the entries in the entry set by updating data for
         each entry to include the index.
 
         Returns:

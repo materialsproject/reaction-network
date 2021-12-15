@@ -214,6 +214,11 @@ class PathwaySolver(Solver):
 
         """
         indices = [e.data.get("idx") for e in rxn.entries]
+        if None in indices:
+            raise ValueError(
+                f"Could not find index for one or more entries in reaction: {rxn}"
+            )
+
         v = np.zeros(num_entries)
         v[indices] = rxn.coefficients
         return v
