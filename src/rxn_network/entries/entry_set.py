@@ -284,7 +284,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             if include_nist_data and formula in NISTReferenceEntry.REFERENCES:
                 try:
                     e = NISTReferenceEntry(
-                        composition=composition, temperature=temperature
+                        composition=Composition(formula), temperature=temperature
                     )
                     experimental = True
                     new_entries.append(e)
@@ -295,13 +295,13 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             if include_barin_data and formula in BarinReferenceEntry.REFERENCES:
                 try:
                     e = BarinReferenceEntry(
-                        composition=composition, temperature=temperature
+                        composition=Composition(formula), temperature=temperature
                     )
                     experimental = True
                     new_entries.append(e)
                 except ValueError as error:
                     logging.warning(
-                        f"Compound {formula} is in Barin tables but not at this temperature! {rrore}"
+                        f"Compound {formula} is in Barin tables but not at this temperature! {error}"
                     )
 
             if experimental:
