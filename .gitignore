@@ -121,3 +121,9 @@ notebooks/FW.json
 notebooks/balanced_pathways.json.gz
 
 notebooks/balanced_paths.json.gz
+
+notebooks/metadata.json.gz
+
+notebooks/pathways.json.gz
+
+notebooks/rxns.json.gz
