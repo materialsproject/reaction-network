@@ -257,7 +257,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         """
         gibbs_entries = []
-        experimental_comps = []
+        experimental_formulas = []
 
         if include_barin_data:
             warnings.warn(
@@ -272,60 +272,55 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             composition = entry.composition
             formula = composition.reduced_formula
 
-            if composition.is_element and entry not in pd.el_refs.values():
+            if (
+                composition.is_element
+                and entry not in pd.el_refs.values()
+                or formula in experimental_formulas
+            ):
                 continue
 
             new_entries = []
 
-            if (
-                include_nist_data
-                and formula in NISTReferenceEntry.REFERENCES
-                and formula not in experimental_comps
-            ):
+            if include_nist_data and formula in NISTReferenceEntry.REFERENCES:
                 try:
                     e = NISTReferenceEntry(
                         composition=composition, temperature=temperature
                     )
+                    experimental = True
                     new_entries.append(e)
-                except ValueError as e:
+                except ValueError as error:
                     logging.warning(
-                        f"Compound {formula} is in NIST-JANAF tables but at different temperatures!: {e}"
+                        f"Compound {formula} is in NIST-JANAF tables but at different temperatures!: {error}"
                     )
-                experimental = True
-
-            if (
-                include_barin_data
-                and formula in BarinReferenceEntry.REFERENCES
-                and formula not in experimental_comps
-            ):
+            if include_barin_data and formula in BarinReferenceEntry.REFERENCES:
                 try:
                     e = BarinReferenceEntry(
                         composition=composition, temperature=temperature
                     )
+                    experimental = True
                     new_entries.append(e)
-                except ValueError as e:
+                except ValueError as error:
                     logging.warning(
-                        f"Compound {formula} is in Barin tables but not at this temperature! {e}"
+                        f"Compound {formula} is in Barin tables but not at this temperature! {rrore}"
                     )
-                experimental = True
 
             if experimental:
-                experimental_comps.append(formula)
+                experimental_formulas.append(formula)
+            else:
+                structure = entry.structure
+                formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
 
-            structure = entry.structure
-            formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
-
-            new_entries.append(
-                GibbsComputedEntry.from_structure(
-                    structure=structure,
-                    formation_energy_per_atom=formation_energy_per_atom,
-                    temperature=temperature,
-                    energy_adjustments=None,
-                    parameters=entry.parameters,
-                    data=entry.data,
-                    entry_id=entry.entry_id,
+                new_entries.append(
+                    GibbsComputedEntry.from_structure(
+                        structure=structure,
+                        formation_energy_per_atom=formation_energy_per_atom,
+                        temperature=temperature,
+                        energy_adjustments=None,
+                        parameters=entry.parameters,
+                        data=entry.data,
+                        entry_id=entry.entry_id,
+                    )
                 )
-            )
 
             gibbs_entries.extend(new_entries)
 

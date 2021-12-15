@@ -34,16 +34,17 @@ class ExperimentalReferenceEntry(MSONable):
             data: Optional dictionary containing entry data
         """
         self._composition = Composition(composition)
+        self.temperature = temperature
+        self.data = data if data else {}  # type: Dict[Any, Any]
+
         formula = self._composition.reduced_formula
         self._validate_temperature(formula, temperature)
 
         self._energy = self._get_energy(formula, temperature)
-        self.temperature = temperature
 
         self._formula = formula
         self.name = formula
         self.entry_id = self.__class__.__name__
-        self.data = data if data else {}  # type: Dict[Any, Any]
 
     def get_new_temperature(
         self, new_temperature: float

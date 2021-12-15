@@ -156,6 +156,8 @@ class RunSolver(FiretaskBase):
         "max_num_combos",
         "find_intermediate_rxns",
         "intermediate_rxn_energy_cutoff",
+        "use_basic_enumerator",
+        "use_minimize_enumerator",
         "filter_interdependent",
     ]
 

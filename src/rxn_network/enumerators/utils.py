@@ -2,8 +2,9 @@
 Helpful utility functions used by the enumerator classes.
 """
 import warnings
-from typing import List, Union
+from typing import List, Union, Iterable, Optional
 
+from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry
 
 import rxn_network.costs.calculators as calcs
@@ -68,13 +69,13 @@ def apply_calculators(
     return rxn
 
 
-def get_total_chemsys(entries: List[Entry], open_elem=None):
+def get_total_chemsys(entries: Iterable[Entry], open_elem: Optional[Element] = None):
     """
     Returns chemical system for set of entries, with optional open element.
 
     Args:
-        entries:
-        open_elem:
+        entries: An iterable of entry-like objects
+        open_elem: a
     """
     elements = {elem for entry in entries for elem in entry.composition.elements}
     if open_elem:
@@ -82,7 +83,7 @@ def get_total_chemsys(entries: List[Entry], open_elem=None):
     return "-".join(sorted([str(e) for e in elements]))
 
 
-def get_elems_set(entries):
+def get_elems_set(entries: Iterable[Entry]):
     """
 
     Args:

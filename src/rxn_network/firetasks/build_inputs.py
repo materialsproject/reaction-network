@@ -3,8 +3,9 @@ Firetasks for acquiring ComputedEntry data from MPRester or another materials Mo
 """
 import itertools
 import warnings
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Iterable
 
+from pymatgen.entries import Entry
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore
 from pymatgen.core.structure import Structure
@@ -118,7 +119,12 @@ class EntriesFromDb(FiretaskBase):
         return FWAction(update_spec={"entries": entries})
 
 
-def process_entries(entries, temperature, e_above_hull, include_polymorphs):
+def process_entries(
+    entries: Iterable[Entry],
+    temperature: float,
+    e_above_hull: float,
+    include_polymorphs: bool,
+):
     """
 
     Args:
