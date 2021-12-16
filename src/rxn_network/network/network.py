@@ -8,6 +8,7 @@ from graph_tool.util import find_edge, find_vertex
 from pymatgen.entries import Entry
 
 from rxn_network.core import CostFunction, Enumerator, Network
+from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.gt import (
@@ -135,7 +136,9 @@ class ReactionNetwork(Network):
             raise ValueError("Must call build() before setting precursors!")
 
         precursors = {
-            p if isinstance(p, Entry) else self.entries.get_min_entry_by_formula(p)
+            p
+            if isinstance(p, (Entry, ExperimentalReferenceEntry))
+            else self.entries.get_min_entry_by_formula(p)
             for p in precursors
         }
 
@@ -198,7 +201,7 @@ class ReactionNetwork(Network):
 
         target = (
             target
-            if isinstance(target, Entry)
+            if isinstance(target, (Entry, ExperimentalReferenceEntry))
             else self.entries.get_min_entry_by_formula(target)
         )
 
