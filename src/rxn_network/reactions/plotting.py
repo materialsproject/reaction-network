@@ -37,7 +37,7 @@ def make_df_from_rxns(rxns, temp, target, cost_function) -> pandas.DataFrame:
             {
                 "rxn": rxns,
                 "energy": [rxn.energy_per_atom for rxn in rxns],
-                "dE": [rxn.energy_uncertainty_per_atom.s for rxn in rxns],
+                "dE": [rxn.energy_uncertainty_per_atom for rxn in rxns],
                 "distance": [rxn.data["chempot_distance"] for rxn in rxns],
                 "added_elems": added_elems,
                 "cost": costs,

@@ -42,7 +42,8 @@ The `notebooks` folder contains two (2) demonstration notebooks:
 
 If you use this code or Python package in your work, please consider citing the following paper:
 
-    McDermott, M. J., Dwaraknath, S. S., and Persson, K. A. (2021). A graph-based network for predicting chemical reaction pathways in solid-state materials synthesis. Nature Communications, 12(1). https://doi.org/10.1038/s41467-021-23339-x
+> McDermott, M. J., Dwaraknath, S. S., and Persson, K. A. (2021). A graph-based network for predicting chemical reaction pathways in solid-state materials synthesis. Nature Communications, 12(1). https://doi.org/10.1038/s41467-021-23339-x
+
 
 # Acknowledgements
 

@@ -1,7 +1,7 @@
 """
 Basic interface for a reaction cost Calculator
 """
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 from monty.json import MSONable
 
@@ -19,8 +19,26 @@ class Calculator(MSONable, metaclass=ABCMeta):
         Evaluates the specified property of a reaction
         """
 
-    @abstractmethod
-    def decorate(self, rxn: Reaction) -> "Reaction":
+    def decorate(self, rxn: Reaction) -> Reaction:
         """
-        Evaluates the specified prop. of a reaction and stores it in the reaction data
+        Decorates the reaction (in place) with the chemical potential distance by
+        storing the value within the reaction's data dictionary.
+
+        Args:
+            rxn: The reaction object.
+
+        Returns:
+            The reaction object, modified in place
+        """
+        if not rxn.data:
+            rxn.data = {}
+
+        rxn.data[self.name] = self.calculate(rxn)
+
+        return rxn
+
+    @abstractproperty
+    def name(self):
+        """
+        The name of the calculator; used to store the value within the reaction's data dictionary
         """
