@@ -257,6 +257,7 @@ class CompetitivenessScoreCalculator(Calculator):
         rxns = ReactionSet.from_rxns(
             rxns, open_elem=open_elem, chempot=self.chempot
         ).get_rxns()
+
         return rxns
 
     def _get_c_score(self, cost, competing_costs, scale=10):

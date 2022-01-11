@@ -2,13 +2,13 @@
 Implements a class for conveniently and efficiently storing sets of ComputedReaction
 objects which share entries.
 """
-
+from pandas import DataFrame
 from functools import lru_cache
 from typing import Iterable, List, Optional, Set, Union
 
 import numpy as np
 from monty.json import MSONable
-from pymatgen.core import Element
+from pymatgen.core.composition import Composition, Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core.cost_function import CostFunction
@@ -123,7 +123,10 @@ class ReactionSet(MSONable):
         all_open_elems: Set[Element] = set()
         all_chempots: Set[float] = set()
 
-        if all(r.__class__.__name__ == "OpenComputedReaction" for r in rxns) and not open_elem:
+        if (
+            all(r.__class__.__name__ == "OpenComputedReaction" for r in rxns)
+            and not open_elem
+        ):
             for r in rxns:
                 all_open_elems.update(r.chempots.keys())
                 all_chempots.update(r.chempots.values())
@@ -140,6 +143,60 @@ class ReactionSet(MSONable):
             chempot=chempot,
             all_data=data,
         )
+
+    def to_dataframe(
+        self, cost_function: CostFunction, target: Optional[Composition] = None
+    ) -> DataFrame:
+        """
+        Make a dataframe of reactions from a ReactionSet object.
+
+        Args:
+            rxns: List of reactions
+            temp: Temperature in Kelvin
+            target: Target composition
+            cost_function: Cost function to use
+
+        Returns:
+            Dataframe with columns:
+                rxn: Reaction object
+                energy: reaction energy in eV/atom
+                distance: Distance in eV/atom
+                added_elems: List of added elements
+                cost: Cost of reaction
+
+        """
+        rxns = self.get_rxns()
+        costs = [cost_function.evaluate(rxn) for rxn in rxns]
+
+        if target:
+            target = Composition(target)
+            if rxns[0].__class__.__name__ == "OpenComputedReaction":
+                added_elems = [
+                    rxn.total_chemical_system != target.chemical_system for rxn in rxns
+                ]
+            else:
+                added_elems = [
+                    rxn.chemical_system != target.chemical_system for rxn in rxns
+                ]
+        else:
+            added_elems = [None] * len(rxns)
+
+        df = (
+            DataFrame(
+                {
+                    "rxn": rxns,
+                    "energy": [rxn.energy_per_atom for rxn in rxns],
+                    "dE": [rxn.energy_uncertainty_per_atom for rxn in rxns],
+                    "distance": [rxn.data.get("chempot_distance") for rxn in rxns],
+                    "added_elems": added_elems,
+                    "cost": costs,
+                }
+            )
+            .sort_values("cost")
+            .reset_index(drop=True)
+        )
+
+        return df
 
     @staticmethod
     def _get_unique_entries(rxns: List[ComputedReaction]) -> Set[ComputedEntry]:
