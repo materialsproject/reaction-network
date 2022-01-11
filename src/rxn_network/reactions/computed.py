@@ -2,7 +2,7 @@
 A reaction class that builds reactions based on ComputedEntry objects and provides
 information about reaction thermodynamics.
 """
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Collection
 
 import numpy as np
 from pymatgen.core.composition import Composition
@@ -52,12 +52,12 @@ class ComputedReaction(BasicReaction):
         reactant_entries: List[ComputedEntry],
         product_entries: List[ComputedEntry],
         data: Optional[Dict] = None,
-    ):  # pylint: disable = W0221
+    ) -> "ComputedReaction":  # pylint: disable = W0221
         """
         Balances and returns a new ComputedReaction.
 
-        Reactants and products to be specified as list of
-        pymatgen.core.structure.Composition.  e.g., [comp1, comp2]
+        Reactants and products to be specified as a collection (list, set, etc.) of
+        ComputedEntry objects.
 
         Args:
             reactant_entries: List of reactant entries
@@ -108,13 +108,13 @@ class ComputedReaction(BasicReaction):
         return self.energy / self.num_atoms
 
     @property
-    def energy_uncertainty(self):
+    def energy_uncertainty(self) -> float:
         """
         Calculates the uncertainty in the reaction energy based on the uncertainty in the
         energies of the reactants/products
         """
 
-        calc_energies = {}
+        calc_energies: Dict[Composition, ufloat] = {}
 
         for entry in self._entries:
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()
@@ -130,14 +130,18 @@ class ComputedReaction(BasicReaction):
             ]
         )
 
-        return energy_with_uncertainty.s
+        return energy_with_uncertainty.s  # type: ignore
 
     @property
-    def energy_uncertainty_per_atom(self):
+    def energy_uncertainty_per_atom(self) -> float:
+        """
+        Returns the energy_uncertainty divided by the total number of atoms in
+        the reaction.
+        """
         return self.energy_uncertainty / self.num_atoms
 
     @property
-    def entries(self):
+    def entries(self) -> List[ComputedEntry]:
         """
         Returns a copy of the entries
         """

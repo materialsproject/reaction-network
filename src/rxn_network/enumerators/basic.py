@@ -175,7 +175,7 @@ class BasicEnumerator(Enumerator):
         return filtered_combos
 
     def _get_open_combos(self, open_entries) -> Optional[List[Set[ComputedEntry]]]:
-        """ No open entries for BasicEnumerator, returns None"""
+        """No open entries for BasicEnumerator, returns None"""
         return None
 
     def _get_rxns(
@@ -245,7 +245,7 @@ class BasicEnumerator(Enumerator):
         return rxns
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
-        """ Generates reactions from a list of reactants, products, and optional calculator(s)"""
+        """Generates reactions from a list of reactants, products, and optional calculator(s)"""
         forward_rxn = ComputedReaction.balance(reactants, products)
         backward_rxn = forward_rxn.reverse()
 
@@ -255,11 +255,11 @@ class BasicEnumerator(Enumerator):
         return [forward_rxn, backward_rxn]
 
     def _get_rxn_iterable(self, combos, open_combos):
-        """ Get all reaction/product combinations """
+        """Get all reaction/product combinations"""
         return combinations(combos, 2)
 
     def _get_initialized_entries(self, entries):
-        """ Returns initialized entries, precursors, target, and open entries"""
+        """Returns initialized entries, precursors, target, and open entries"""
         precursors, targets = set(), set()
         entries_new = deepcopy(entries)
 
@@ -333,7 +333,7 @@ class BasicEnumerator(Enumerator):
 
     @property
     def stabilize(self):
-        """ Whether or not to use only stable entries in analysis"""
+        """Whether or not to use only stable entries in analysis"""
         return self._stabilize
 
     @property
@@ -436,7 +436,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         return open_combos
 
     def _get_rxn_iterable(self, combos, open_combos):
-        """ Get all reaction/product combinations. """
+        """Get all reaction/product combinations."""
         combos_with_open = [
             combo | open_combo
             for combo in combos

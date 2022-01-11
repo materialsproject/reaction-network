@@ -4,7 +4,7 @@ objects which share entries.
 """
 from pandas import DataFrame
 from functools import lru_cache
-from typing import Iterable, List, Optional, Set, Union
+from typing import Iterable, List, Optional, Set, Union, Collection
 
 import numpy as np
 from monty.json import MSONable
@@ -28,8 +28,8 @@ class ReactionSet(MSONable):
         entries: List[ComputedEntry],
         indices: Union[np.ndarray, List[List[int]]],
         coeffs: Union[np.ndarray, List[List[float]]],
-        open_elem: Optional[str] = None,
-        chempot: Optional[float] = 0.0,
+        open_elem: Optional[Union[str, Element]] = None,
+        chempot: float = 0.0,
         all_data: Optional[List] = None,
     ):
         """
@@ -49,7 +49,7 @@ class ReactionSet(MSONable):
 
         self.mu_dict = None
         if open_elem:
-            self.mu_dict = {Element(open_elem): chempot}
+            self.mu_dict = {Element(open_elem): chempot}  # type: ignore
 
     @lru_cache(1)
     def get_rxns(
@@ -96,10 +96,10 @@ class ReactionSet(MSONable):
     @classmethod
     def from_rxns(
         cls,
-        rxns: List[Union[ComputedReaction, OpenComputedReaction]],
-        entries: Optional[Iterable[ComputedEntry]] = None,
-        open_elem: Optional[str] = None,
-        chempot: Optional[float] = 0.0,
+        rxns: Collection[Union[ComputedReaction, OpenComputedReaction]],
+        entries: Optional[Collection[ComputedEntry]] = None,
+        open_elem: Optional[Union[str, Element]] = None,
+        chempot: float = 0.0,
     ) -> "ReactionSet":
         """
         Initiate a ReactionSet object from a list of reactions. Including a list of
@@ -187,7 +187,7 @@ class ReactionSet(MSONable):
                     "rxn": rxns,
                     "energy": [rxn.energy_per_atom for rxn in rxns],
                     "dE": [rxn.energy_uncertainty_per_atom for rxn in rxns],
-                    "distance": [rxn.data.get("chempot_distance") for rxn in rxns],
+                    "distance": [rxn.data.get("chempot_distance") for rxn in rxns],  # type: ignore
                     "added_elems": added_elems,
                     "cost": costs,
                 }
@@ -199,7 +199,7 @@ class ReactionSet(MSONable):
         return df
 
     @staticmethod
-    def _get_unique_entries(rxns: List[ComputedReaction]) -> Set[ComputedEntry]:
+    def _get_unique_entries(rxns: Collection[ComputedReaction]) -> Set[ComputedEntry]:
         """Return only unique entries from reactions"""
         entries = set()
         for r in rxns:

@@ -6,7 +6,7 @@ pymatgen and streamlined for the reaction-network code.
 import re
 from copy import deepcopy
 from itertools import chain, combinations
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, Collection, Set
 
 import numpy as np
 from monty.fractions import gcd_float
@@ -81,7 +81,7 @@ class BasicReaction(Reaction):
             else:
                 self.balanced = True
 
-        self.data = data
+        self.data = data if data else {}
         self.lowest_num_errors = lowest_num_errors
 
     @classmethod
@@ -100,7 +100,7 @@ class BasicReaction(Reaction):
             products: List of products.
             data: Optional dictionary containing extra data about the reaction.
         """
-        compositions = reactants + products
+        compositions = list(reactants + products)
         coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)
 
         balanced = True

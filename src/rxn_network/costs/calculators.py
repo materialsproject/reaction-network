@@ -95,7 +95,7 @@ class ChempotDistanceCalculator(Calculator):
         entries: List[PDEntry],
         mu_func: str = "sum",
         name: str = "chempot_distance",
-        **kwargs
+        **kwargs,
     ) -> "ChempotDistanceCalculator":
         """
         Convenience constructor which first builds the ChemicalPotentialDiagram
@@ -149,7 +149,7 @@ class CompetitivenessScoreCalculator(Calculator):
         cost_function: CostFunction,
         open_phases: Optional[Iterable[str]] = None,
         open_elem: Optional[Union[str, Element]] = None,
-        chempot: Optional[float] = 0.0,
+        chempot: float = 0.0,
         use_basic=True,
         use_minimize=False,
         basic_enumerator_kwargs: Optional[Dict] = None,
@@ -206,6 +206,17 @@ class CompetitivenessScoreCalculator(Calculator):
 
     @lru_cache(maxsize=1)
     def get_competing_rxns(self, rxn: ComputedReaction) -> List[ComputedReaction]:
+        """
+        Returns a list of competing reactions for the given reaction. These are
+        enumerated given the settings in the constructor.
+
+        Args:
+            rxn: the reaction object
+
+        Returns:
+            A list of competing reactions
+
+        """
         precursors = [r.reduced_formula for r in rxn.reactants]
 
         open_phases = (
@@ -237,9 +248,9 @@ class CompetitivenessScoreCalculator(Calculator):
             open_elem = self.open_elem
             if not open_elem and open_phases:
                 open_comp = Composition(open_phases[0])
-                if len(open_phases) == 1 and open_comp.is_element:
+                if open_comp.is_element:
                     open_elem = open_comp.elements[0]
-                    warnings.warn("Using open phase element {}".format(open_elem))
+                    warnings.warn(f"Using open phase element {open_elem}")
 
             if open_elem:
                 kwargs["open_elem"] = open_elem
@@ -248,17 +259,17 @@ class CompetitivenessScoreCalculator(Calculator):
                 mgpe = MinimizeGrandPotentialEnumerator(**kwargs)
                 enumerators.append(mgpe)
 
-        rxns = []
+        rxns = set()
         for e in enumerators:
-            rxns.extend(e.enumerate(self.entries))
+            rxns.update(e.enumerate(self.entries))
 
         rxns.remove(rxn)
 
-        rxns = ReactionSet.from_rxns(
+        rxns_updated = ReactionSet.from_rxns(
             rxns, open_elem=open_elem, chempot=self.chempot
         ).get_rxns()
 
-        return rxns
+        return rxns_updated
 
     def _get_c_score(self, cost, competing_costs, scale=10):
         """
