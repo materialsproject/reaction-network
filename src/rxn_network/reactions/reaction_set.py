@@ -120,6 +120,18 @@ class ReactionSet(MSONable):
             coeffs.append(list(rxn.coefficients))
             data.append(rxn.data)
 
+        all_open_elems: Set[Element] = set()
+        all_chempots: Set[float] = set()
+
+        if all(r.__class__.__name__ == "OpenComputedReaction" for r in rxns) and not open_elem:
+            for r in rxns:
+                all_open_elems.update(r.chempots.keys())
+                all_chempots.update(r.chempots.values())
+
+            if len(all_chempots) == 1 and len(all_open_elems) == 1:
+                chempot = all_chempots.pop()
+                open_elem = all_open_elems.pop()
+
         return cls(
             entries=entries,
             indices=indices,
