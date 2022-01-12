@@ -3,14 +3,17 @@ Firetasks for running enumeration and network calculations
 """
 import json
 
+from typing import List
+
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.json import MontyEncoder
 from monty.serialization import dumpfn, loadfn
 from pymatgen.core import Composition
 
+from rxn_network.costs.calculators import CompetitivenessScoreCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import get_computed_rxn
-from rxn_network.firetasks.utils import env_chk, get_logger
+from rxn_network.firetasks.utils import env_chk, get_logger, load_json
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
@@ -68,6 +71,65 @@ class RunEnumerators(FiretaskBase):
         dumpfn(results, "rxns.json.gz")
 
         return FWAction(update_spec={"rxns_fn": "rxns.json.gz", "metadata": metadata})
+
+
+@explicit_serialize
+class CalculateCScores(FiretaskBase):
+    """
+    Calculates the competitiveness score for a set of reactions and stores that within the reaction
+    object data.
+    """
+
+    required_params: List[str] = ["entries", "cost_function"]
+    optional_params: List[str] = [
+        "rxns",
+        "k",
+        "open_phases",
+        "open_elem",
+        "chempot",
+        "use_basic",
+        "use_minimize",
+        "basic_enumerator_kwargs",
+        "minimize_enumerator_kwargs",
+    ]
+
+    def run_task(self, fw_spec):
+        entries = self["entries"] if self["entries"] else fw_spec["entries"]
+        cost_function = self["cost_function"]
+        rxns = ReactionSet.from_dict(load_json(self, "rxns", fw_spec))
+        k = self.get("k", 15)
+        open_phases = self.get("open_phases")
+        open_elem = self.get("open_elem")
+        chempot = self.get("chempot", 0.0)
+        use_basic = self.get("use_basic", True)
+        use_minimize = self.get("use_minimize", True)
+        basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
+        minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
+
+        calc = CompetitivenessScoreCalculator(
+            entries=entries,
+            cost_function=cost_function,
+            open_phases=open_phases,
+            open_elem=open_elem,
+            chempot=chempot,
+            use_basic=use_basic,
+            use_minimize=use_minimize,
+            basic_enumerator_kwargs=basic_enumerator_kwargs,
+            minimize_enumerator_kwargs=minimize_enumerator_kwargs,
+        )
+
+        costs = [cost_function.evaluate(r) for r in rxns]
+        sorted_rxns = [r for _, r in sorted(zip(costs, rxns), key=lambda x: x[0])]
+        new_rxns = []
+
+        for rxn in sorted_rxns[:k]:
+            new_rxns.append(calc.decorate(rxn))
+        for rxn in sorted_rxns[k:]:
+            rxn.data.update({"c_score": None})
+            new_rxns.append(rxn)
+        results = ReactionSet.from_rxns(new_rxns)
+
+        dumpfn(results, "rxns.json.gz")  # may overwrite existing rxns.json.gz
 
 
 @explicit_serialize

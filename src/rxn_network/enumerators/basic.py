@@ -167,9 +167,10 @@ class BasicEnumerator(Enumerator):
 
         combos = [set(c) for c in limited_powerset(entries, self.n)]
         combos_dict = group_by_chemsys(combos)
+        single_target = len(target_entries) == 1
 
         filtered_combos = self._filter_dict_by_elems(
-            combos_dict, precursor_elems, target_elems, open_elems
+            combos_dict, precursor_elems, target_elems, open_elems, single_target
         )
 
         return filtered_combos
@@ -298,7 +299,7 @@ class BasicEnumerator(Enumerator):
         return entries_new, precursors, targets, open_entries
 
     def _filter_dict_by_elems(
-        self, combos_dict, precursor_elems, target_elems, open_elems
+        self, combos_dict, precursor_elems, target_elems, open_elems, single_target
     ):
         filtered_dict = dict()
 
@@ -317,6 +318,8 @@ class BasicEnumerator(Enumerator):
                         continue
                 else:
                     if not target_elems & elems:
+                        continue
+                    elif single_target and not target_elems.issubset(elems):
                         continue
 
             if precursor_elems:

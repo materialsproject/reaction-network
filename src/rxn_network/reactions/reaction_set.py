@@ -2,12 +2,12 @@
 Implements a class for conveniently and efficiently storing sets of ComputedReaction
 objects which share entries.
 """
-from pandas import DataFrame
 from functools import lru_cache
-from typing import Iterable, List, Optional, Set, Union, Collection
+from typing import Collection, Iterable, List, Optional, Set, Union
 
 import numpy as np
 from monty.json import MSONable
+from pandas import DataFrame
 from pymatgen.core.composition import Composition, Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
@@ -144,6 +144,7 @@ class ReactionSet(MSONable):
             all_data=data,
         )
 
+    @lru_cache(1)
     def to_dataframe(
         self, cost_function: CostFunction, target: Optional[Composition] = None
     ) -> DataFrame:
@@ -181,20 +182,20 @@ class ReactionSet(MSONable):
         else:
             added_elems = [None] * len(rxns)
 
-        df = (
-            DataFrame(
-                {
-                    "rxn": rxns,
-                    "energy": [rxn.energy_per_atom for rxn in rxns],
-                    "dE": [rxn.energy_uncertainty_per_atom for rxn in rxns],
-                    "distance": [rxn.data.get("chempot_distance") for rxn in rxns],  # type: ignore
-                    "added_elems": added_elems,
-                    "cost": costs,
-                }
-            )
-            .sort_values("cost")
-            .reset_index(drop=True)
-        )
+        data = {
+            "rxn": rxns,
+            "energy": [rxn.energy_per_atom for rxn in rxns],
+            "dE": [rxn.energy_uncertainty_per_atom for rxn in rxns],  # type: ignore
+            "added_elems": added_elems,
+        }
+
+        attrs = list(rxns[0].data.keys())
+        for attr in attrs:
+            data.update({attr: [rxn.data.get(attr) for rxn in rxns]})
+
+        data["cost"] = costs
+
+        df = DataFrame(data).sort_values("cost").reset_index(drop=True)
 
         return df
 

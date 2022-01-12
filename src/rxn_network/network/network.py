@@ -240,7 +240,7 @@ class ReactionNetwork(Network):
         Args:
             filename: Filename of graph object to load (for example, .gt or .gt.gz format)
 
-        Returns:
+        Returns: None
         """
         self._g = load_graph(filename)
 

@@ -10,14 +10,25 @@ from pymatgen.core.composition import Composition
 
 from rxn_network.core import CostFunction, Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.enumerators.basic import BasicOpenEnumerator
+from rxn_network.enumerators.minimize import (
+    MinimizeGibbsEnumerator,
+    MinimizeGrandPotentialEnumerator,
+)
 from rxn_network.firetasks.build_inputs import EntriesFromDb, EntriesFromMPRester
 from rxn_network.firetasks.parse_outputs import NetworkToDb, ReactionsToDb
-from rxn_network.firetasks.run_calc import BuildNetwork, RunEnumerators, RunSolver
+from rxn_network.firetasks.run_calc import (
+    BuildNetwork,
+    RunEnumerators,
+    RunSolver,
+    CalculateCScores,
+)
 
 
 class EnumeratorFW(Firework):
     """
     Firework for running a list of enumerators (which outputs a list of reactions).
+    Option to calculate competitiveness scores and store those as data within the reactions.
     """
 
     def __init__(
@@ -26,6 +37,9 @@ class EnumeratorFW(Firework):
         entries: GibbsEntrySet = None,
         chemsys: Union[str, Iterable[str]] = None,
         entry_set_params: Optional[Dict] = None,
+        calculate_c_scores: Optional[Union[bool, int]] = False,
+        cost_function: Optional[CostFunction] = None,
+        c_score_kwargs: Optional[Dict] = None,
         db_file: str = ">>db_file<<",
         entry_db_file: str = ">>entry_db_file<<",
         parents=None,
@@ -34,9 +48,12 @@ class EnumeratorFW(Firework):
 
         Args:
             enumerators: List of enumerators to run
-            entries:
-            chemsys:
+            entries: Entries to use for enumeration
+            chemsys: Chemical system to use for enumeration
             entry_set_params:
+            calculate_c_scores:
+            cost_function:
+            c_score_kwargs:
             db_file:
             entry_db_file:
             parents:
@@ -66,6 +83,36 @@ class EnumeratorFW(Firework):
         tasks.append(
             RunEnumerators(enumerators=enumerators, entries=entry_set, chemsys=chemsys)
         )
+
+        if calculate_c_scores:
+            if not cost_function:
+                raise ValueError("Must provide a cost function to calculate C-scores!")
+
+            c_score_kwargs = c_score_kwargs or {}
+
+            for enumerator in enumerators:
+                if isinstance(enumerator, BasicOpenEnumerator):
+                    if not c_score_kwargs.get("open_phases"):
+                        c_score_kwargs["open_phases"] = enumerator.open_phases
+                elif isinstance(enumerator, MinimizeGibbsEnumerator):
+                    if not c_score_kwargs.get("use_minimize"):
+                        c_score_kwargs["use_minimize"] = True
+                elif isinstance(enumerator, MinimizeGrandPotentialEnumerator):
+                    if not c_score_kwargs.get("use_minimize"):
+                        c_score_kwargs["use_minimize"] = True
+                    if not c_score_kwargs.get("open_elem"):
+                        c_score_kwargs["open_elem"] = enumerator.open_elem
+                        c_score_kwargs["chempot"] = enumerator.mu
+
+            c_score_kwargs.update(
+                {
+                    "entries": entry_set,
+                    "cost_function": cost_function,
+                    "k": calculate_c_scores,
+                }
+            )
+            tasks.append(CalculateCScores(**c_score_kwargs))
+
         tasks.append(ReactionsToDb(db_file=db_file))
 
         super().__init__(tasks, parents=parents, name=fw_name)

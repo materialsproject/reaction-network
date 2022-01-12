@@ -263,7 +263,8 @@ class CompetitivenessScoreCalculator(Calculator):
         for e in enumerators:
             rxns.update(e.enumerate(self.entries))
 
-        rxns.remove(rxn)
+        if rxn in rxns:
+            rxns.remove(rxn)
 
         rxns_updated = ReactionSet.from_rxns(
             rxns, open_elem=open_elem, chempot=self.chempot

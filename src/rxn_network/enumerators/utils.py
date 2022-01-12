@@ -1,14 +1,16 @@
 """
-Helpful utility functions used by the enumerator classes.
+Utility functions used by the enumerator classes.
 """
 import warnings
-from typing import List, Union, Iterable, Optional
+from typing import List, Union, Iterable, Optional, Set, Tuple, Dict
 
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry
+from pymatgen.analysis.phase_diagram import PhaseDiagram
 
 import rxn_network.costs.calculators as calcs
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.core import Reaction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 
@@ -69,13 +71,28 @@ def apply_calculators(
     return rxn
 
 
-def get_total_chemsys(entries: Iterable[Entry], open_elem: Optional[Element] = None):
+def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
     """
-    Returns chemical system for set of entries, with optional open element.
+    Returns chemical system a set of element names, for set of entries.
 
     Args:
         entries: An iterable of entry-like objects
-        open_elem: a
+
+    Returns:
+        Set of element names (strings).
+    """
+    return {str(elem) for e in entries for elem in e.composition.elements}
+
+
+def get_total_chemsys_str(
+    entries: Iterable[Entry], open_elem: Optional[Element] = None
+) -> str:
+    """
+    Returns chemical system string for set of entries, with optional open element.
+
+    Args:
+        entries: An iterable of entry-like objects
+        open_elem: optional open element to include in chemical system
     """
     elements = {elem for entry in entries for elem in entry.composition.elements}
     if open_elem:
@@ -83,31 +100,22 @@ def get_total_chemsys(entries: Iterable[Entry], open_elem: Optional[Element] = N
     return "-".join(sorted([str(e) for e in elements]))
 
 
-def get_elems_set(entries: Iterable[Entry]):
+def group_by_chemsys(
+    combos: Iterable[Tuple[Entry]], open_elem: Optional[Element] = None
+):
     """
+    Groups entry combinations by chemical system, with optional open element.
 
     Args:
-        entries:
-
-    Returns:
-
-    """
-    return {str(elem) for e in entries for elem in e.composition.elements}
-
-
-def group_by_chemsys(combos, open_elem=None):
-    """
-
-    Args:
-        combos:
+        combos: Iterable of entry combinations
         open_elem:
 
     Returns:
 
     """
-    combo_dict = {}
+    combo_dict: Dict[str, List[Tuple[Entry]]] = {}
     for combo in combos:
-        key = get_total_chemsys(combo, open_elem)
+        key = get_total_chemsys_str(combo, open_elem)
         if key in combo_dict:
             combo_dict[key].append(combo)
         else:
@@ -116,13 +124,20 @@ def group_by_chemsys(combos, open_elem=None):
     return combo_dict
 
 
-def stabilize_entries(pd, entries_to_adjust, tol=1e-6):
+def stabilize_entries(
+    pd: PhaseDiagram, entries_to_adjust: Iterable[Entry], tol: float = 1e-6
+) -> List[Entry]:
     """
+    Simple method for stabilizing entries by decreasing their energy to be on the hull.
+
+    WARNING: This method is not guaranteed to work *simultaneously* for all entries due
+    to the fact that stabilization of one entry may destabilize others. Use with
+    caution.
 
     Args:
-        pd:
-        entries_to_adjust:
-        tol:
+        pd: PhaseDiagram object
+        entries_to_adjust: Iterable of entries requiring energies to be adjusted
+        tol: Numerical tolerance to ensure that the energy of the entry is below the hull
 
     Returns:
 
@@ -156,11 +171,13 @@ def get_entry_by_comp(comp, entries):
     return sorted(possible_entries, key=lambda e: e.energy_per_atom)[0]
 
 
-def get_computed_rxn(rxn, entries):
+def get_computed_rxn(rxn: Reaction, entries: Iterable[Entry]) -> ComputedReaction:
     """
+    Provided with a Reaction object and a list of possible entries, this function
+    returns a new ComputedReaction object containing a selection of those entries.
 
     Args:
-        rxn:
+        rxn: Reaction object
         entries:
 
     Returns:
@@ -173,8 +190,13 @@ def get_computed_rxn(rxn, entries):
     return rxn
 
 
-def get_open_computed_rxn(rxn, entries, chempots):
+def get_open_computed_rxn(
+    rxn: Reaction, entries: Iterable[Entry], chempots: Dict[Element, float]
+) -> OpenComputedReaction:
     """
+    Provided with a Reaction object and a list of possible entries, as well as a
+    dictionary of chemical potentials of open elements, this function returns a new
+    OpenComputedReaction object containing a selection of those entries.
 
     Args:
         rxn:

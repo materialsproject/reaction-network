@@ -21,7 +21,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
 
     def decorate(self, rxn: Reaction) -> Reaction:
         """
-        Decorates the reaction (in place) with the chemical potential distance by
+        Decorates the reaction (in place) with the calculated property by
         storing the value within the reaction's data dictionary.
 
         Args:
@@ -30,7 +30,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
         Returns:
             The reaction object, modified in place
         """
-        if not rxn.data:
+        if not getattr(rxn, "data"):
             rxn.data = {}
 
         rxn.data[self.name] = self.calculate(rxn)
