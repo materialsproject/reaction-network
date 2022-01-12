@@ -10,7 +10,7 @@ from monty.json import MontyEncoder
 from monty.serialization import dumpfn, loadfn
 from pymatgen.core import Composition
 
-from rxn_network.costs.calculators import CompetitivenessScoreCalculator
+from rxn_network.costs.competitiveness import CompetitivenessScoreCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.firetasks.utils import env_chk, get_logger, load_json
