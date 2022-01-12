@@ -66,7 +66,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         self.entries.discard(element)
 
-    def get_subset_in_chemsys(self, chemsys: List[str]):
+    def get_subset_in_chemsys(self, chemsys: List[str]) -> "GibbsEntrySet":
         """
         Returns an EntrySet containing only the set of entries belonging to
         a particular chemical system (in this definition, it includes all sub
@@ -198,8 +198,19 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return new_entry
 
-    def get_entries_with_jitter(self):
-        """Returns a list of entries with jitter (random noise) added to their energies."""
+    def get_entries_with_jitter(self) -> "GibbsEntrySet":
+        """
+        Returns a new GibbsEntrySet with entries that have had their energies shifted by
+        randomly sampled noise to account for uncertainty in data. This is done by
+        sampling from a Gaussian distribution using the entry's "correction_uncertainty"
+        attribute as the scale.
+
+        Args:
+            None
+        Returns:
+            A new GibbsEntrySet with entries that have had their energies shifted by
+            random noise.
+        """
         entries = deepcopy(self.entries_list)
         jitter = normal(size=len(entries))
 
@@ -215,7 +226,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return GibbsEntrySet(entries)
 
-    def get_interpolated_entry(self, formula: str, tol=1e-6):
+    def get_interpolated_entry(self, formula: str, tol=1e-6) -> ComputedEntry:
         """
         Helper method for interpolating an entry from the entry set.
 
@@ -230,7 +241,16 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         energy = PhaseDiagram(pd_entries).get_hull_energy(comp) + tol
 
-        return ComputedEntry(comp, energy, entry_id="(Interpolated Entry)")
+        adj = ConstantEnergyAdjustment(  # for keeping track of uncertainty
+            value=0.0,
+            uncertainty=0.05 * comp.num_atoms,  # conservative: 50 meV/atom uncertainty
+            name="Interpolation adjustment",
+            description="Keeps track of uncertainty in interpolation",
+        )
+
+        return ComputedEntry(
+            comp, energy, energy_adjustments=[adj], entry_id="(Interpolated Entry!)"
+        )
 
     @classmethod
     def from_pd(
@@ -262,7 +282,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         if include_barin_data:
             warnings.warn(
                 "##### WARNING ##### \n\n"
-                "Barin experimental data was acquired through optical "
+                "Barin experimental data was acquired through optical character"
                 "recognition and has not been verified. Use at your own risk! \n\n"
                 "##### WARNING #####"
             )

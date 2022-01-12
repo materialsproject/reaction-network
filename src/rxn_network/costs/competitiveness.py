@@ -108,6 +108,7 @@ class CompetitivenessScoreCalculator(Calculator):
 
         """
         precursors = [r.reduced_formula for r in rxn.reactants]
+        open_elem = self.open_elem
 
         open_phases = (
             [Composition(p).reduced_formula for p in self.open_phases]
@@ -135,7 +136,6 @@ class CompetitivenessScoreCalculator(Calculator):
             mge = MinimizeGibbsEnumerator(**kwargs)
             enumerators.append(mge)
 
-            open_elem = self.open_elem
             if not open_elem and open_phases:
                 open_comp = Composition(open_phases[0])
                 if open_comp.is_element:

@@ -157,20 +157,21 @@ class BasicEnumerator(Enumerator):
     ):
         """Gets all possible entry combinations up to predefined cardinality n, filtered and
         grouped by chemical system"""
-        precursor_elems = (
-            get_elems_set(precursor_entries) if precursor_entries else set()
-        )
-        target_elems = get_elems_set(target_entries) if target_entries else set()
-        open_elems = get_elems_set(open_entries) if open_entries else set()
+        precursor_elems = [
+            [str(el) for el in e.composition.elements] for e in precursor_entries
+        ]
+        target_elems = [
+            [str(el) for el in e.composition.elements] for e in target_entries
+        ]
+        open_elems = [[str(el) for el in e.composition.elements] for e in open_entries]
 
         entries = entries - open_entries
 
         combos = [set(c) for c in limited_powerset(entries, self.n)]
         combos_dict = group_by_chemsys(combos)
-        single_target = len(target_entries) == 1
 
         filtered_combos = self._filter_dict_by_elems(
-            combos_dict, precursor_elems, target_elems, open_elems, single_target
+            combos_dict, precursor_elems, target_elems, open_elems
         )
 
         return filtered_combos
@@ -299,35 +300,40 @@ class BasicEnumerator(Enumerator):
         return entries_new, precursors, targets, open_entries
 
     def _filter_dict_by_elems(
-        self, combos_dict, precursor_elems, target_elems, open_elems, single_target
+        self, combos_dict, precursor_elems, target_elems, open_elems,
     ):
         filtered_dict = dict()
 
         for chemsys, combos in combos_dict.items():
             elems = set(chemsys.split("-"))
 
-            if not open_elems.issubset(elems):
-                continue
-
             if len(elems) >= 10 or len(elems) == 1:
                 continue
 
-            if target_elems:
-                if self.exclusive_targets:
-                    if not target_elems == elems:
-                        continue
-                else:
-                    if not target_elems & elems:
-                        continue
-                    elif single_target and not target_elems.issubset(elems):
-                        continue
+            all_open_elems = {el for g in open_elems for el in g}
+            if not all_open_elems.issubset(elems):
+                continue
 
             if precursor_elems:
                 if self.exclusive_precursors:
-                    if not precursor_elems == elems:
+                    all_precursor_elems = {el for g in target_elems for el in g}
+                    if not all_precursor_elems == elems:
                         continue
                 else:
-                    if not precursor_elems & elems:
+                    if not any(
+                        [elems.issuperset(el_group) for el_group in precursor_elems]
+                    ):
+                        continue
+
+            if target_elems:
+                if self.exclusive_targets:
+                    all_target_elems = {el for g in target_elems for el in g}
+                    if not all_target_elems == elems:
+                        continue
+                else:
+                    if not any(
+                        [elems.issuperset(el_group) for el_group in target_elems]
+                    ):
                         continue
 
             filtered_dict[chemsys] = combos
