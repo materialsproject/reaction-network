@@ -15,7 +15,7 @@ from rxn_network.enumerators.minimize import (
     MinimizeGibbsEnumerator,
     MinimizeGrandPotentialEnumerator,
 )
-from rxn_network.firetasks.build_inputs import EntriesFromDb, EntriesFromMPRester
+from rxn_network.firetasks.build_inputs import get_entry_task
 from rxn_network.firetasks.parse_outputs import NetworkToDb, ReactionsToDb
 from rxn_network.firetasks.run_calc import (
     BuildNetwork,
@@ -48,15 +48,19 @@ class EnumeratorFW(Firework):
 
         Args:
             enumerators: List of enumerators to run
-            entries: Entries to use for enumeration
-            chemsys: Chemical system to use for enumeration
-            entry_set_params:
-            calculate_c_scores:
-            cost_function:
-            c_score_kwargs:
-            db_file:
-            entry_db_file:
-            parents:
+            entries: EntrySet to use for enumeration
+            chemsys: If entries aren't provided, they will be retrivied either from
+                MPRester or from the entry_db corresponding to this chemsys.
+            entry_set_params: Parameters to pass to the GibbsEntrySet constructor
+            calculate_c_scores: Whether or not to calculate c_scores; if an integer is
+                provided, this will specify the maximum number of highest ranked reactions
+                the calculation on.
+            cost_function: The cost function used to rank reactions and then calculate c-scores.
+            c_score_kwargs: Parameters to pass to the CompetitivenessScoreCalculator constructor.
+            db_file: Path to the database file to store the reactions in.
+            entry_db_file: Path to the database file containing entries (see chemsys
+                parameter above)
+            parents: Parents of this Firework.
         """
 
         tasks = []
@@ -67,7 +71,7 @@ class EnumeratorFW(Firework):
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
             tasks.append(
-                _get_entry_task(
+                get_entry_task(
                     chemsys=chemsys,
                     entry_set_params=entry_set_params,
                     entry_db_file=entry_db_file,
@@ -146,10 +150,14 @@ class NetworkFW(Firework):
             cost_function:
             entries:
             chemsys:
-            entry_set_params
+            open_elem:
+            chempot:
+            solve_balanced_paths:
+            entry_set_params:
+            pathway_params:
+            solver_params:
             db_file:
             entry_db_file:
-            include_polymorphs:
             parents:
         """
         pathway_params = pathway_params if pathway_params else {}
@@ -167,7 +175,7 @@ class NetworkFW(Firework):
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
             tasks.append(
-                _get_entry_task(
+                get_entry_task(
                     chemsys=chemsys,
                     entry_set_params=entry_set_params,
                     entry_db_file=entry_db_file,
@@ -215,26 +223,3 @@ class NetworkFW(Firework):
         super().__init__(tasks, parents=parents, name=fw_name)
 
 
-def _get_entry_task(chemsys, entry_set_params, entry_db_file):
-    entry_set_params = entry_set_params if entry_set_params else {}
-    temperature = entry_set_params.get("temperature", 300)
-    e_above_hull = entry_set_params.get("e_above_hull", 0.0)
-    include_polymorphs = entry_set_params.get("include_polymorphs", False)
-
-    if bool(entry_db_file):
-        entry_task = EntriesFromDb(
-            entry_db_file=entry_db_file,
-            chemsys=chemsys,
-            temperature=temperature,
-            e_above_hull=e_above_hull,
-            include_polymorphs=include_polymorphs,
-        )
-    else:
-        entry_task = EntriesFromMPRester(
-            chemsys=chemsys,
-            temperature=temperature,
-            e_above_hull=e_above_hull,
-            include_polymorphs=include_polymorphs,
-        )
-
-    return entry_task

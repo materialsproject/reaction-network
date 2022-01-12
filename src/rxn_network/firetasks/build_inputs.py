@@ -361,3 +361,28 @@ def get_all_entries_in_chemsys(
         )
 
     return entries
+
+
+def get_entry_task(chemsys, entry_set_params, entry_db_file):
+    entry_set_params = entry_set_params if entry_set_params else {}
+    temperature = entry_set_params.get("temperature", 300)
+    e_above_hull = entry_set_params.get("e_above_hull", 0.0)
+    include_polymorphs = entry_set_params.get("include_polymorphs", False)
+
+    if bool(entry_db_file):
+        entry_task = EntriesFromDb(
+            entry_db_file=entry_db_file,
+            chemsys=chemsys,
+            temperature=temperature,
+            e_above_hull=e_above_hull,
+            include_polymorphs=include_polymorphs,
+        )
+    else:
+        entry_task = EntriesFromMPRester(
+            chemsys=chemsys,
+            temperature=temperature,
+            e_above_hull=e_above_hull,
+            include_polymorphs=include_polymorphs,
+        )
+
+    return entry_task

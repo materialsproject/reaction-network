@@ -300,9 +300,16 @@ class BasicEnumerator(Enumerator):
         return entries_new, precursors, targets, open_entries
 
     def _filter_dict_by_elems(
-        self, combos_dict, precursor_elems, target_elems, open_elems,
+        self,
+        combos_dict,
+        precursor_elems,
+        target_elems,
+        open_elems,
     ):
         filtered_dict = dict()
+
+        all_precursor_elems = {el for g in precursor_elems for el in g}
+        all_target_elems = {el for g in target_elems for el in g}
 
         for chemsys, combos in combos_dict.items():
             elems = set(chemsys.split("-"))
@@ -316,7 +323,6 @@ class BasicEnumerator(Enumerator):
 
             if precursor_elems:
                 if self.exclusive_precursors:
-                    all_precursor_elems = {el for g in target_elems for el in g}
                     if not all_precursor_elems == elems:
                         continue
                 else:
@@ -327,7 +333,6 @@ class BasicEnumerator(Enumerator):
 
             if target_elems:
                 if self.exclusive_targets:
-                    all_target_elems = {el for g in target_elems for el in g}
                     if not all_target_elems == elems:
                         continue
                 else:
