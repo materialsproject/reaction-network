@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v3.0.0) (2021-10-01)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v2.0.3...v3.0.0)
+
+**Merged pull requests:**
+
+- \[WIP\] Add much-needed tests [\#45](https://github.com/GENESIS-EFRC/reaction-network/pull/45) ([mattmcdermott](https://github.com/mattmcdermott))
+
 ## [v2.0.3](https://github.com/GENESIS-EFRC/reaction-network/tree/v2.0.3) (2021-08-05)
 
 [Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v2.0.2...v2.0.3)
