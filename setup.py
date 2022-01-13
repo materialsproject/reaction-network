@@ -33,7 +33,7 @@ setup(
         "pymatgen>=2022.0.16",
         "fireworks>=1.9.7",
         "maggma>=0.38.1",
-        "numba>=0.54.1",
+        "numba>=0.53.0",
     ],
     extra_requires={"demo": ["jupyter>=1.0.0"]},
     classifiers=[
