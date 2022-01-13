@@ -2,22 +2,22 @@
 A calculator class for determining competitiveness score of a reaction.
 """
 import warnings
-from typing import List, Optional, Iterable, Dict, Union
 from functools import lru_cache
+from typing import Dict, Iterable, List, Optional, Union
 
 import numpy as np
 from pymatgen.core.composition import Composition, Element
 
 from rxn_network.core.calculator import Calculator
 from rxn_network.core.cost_function import CostFunction
-from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (
     MinimizeGibbsEnumerator,
     MinimizeGrandPotentialEnumerator,
 )
+from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.reactions.reaction_set import ReactionSet
 
 
 class CompetitivenessScoreCalculator(Calculator):
@@ -76,14 +76,15 @@ class CompetitivenessScoreCalculator(Calculator):
 
     def calculate(self, rxn: ComputedReaction) -> float:
         """
-        Calculates the chemical potential distance in eV/atom. The mu_func parameter
-        determines how the distance is calculated for the overall reaction.
+        Calculates the competitiveness score for a given reaction by enumerating
+        competing reactions, evaluating their cost with the supplied cost function, and
+        then using the c-score formula, i.e. the _get_c_score() method, to determine the competitiveness score.
 
         Args:
             rxn: the reaction object
 
         Returns:
-            The chemical potential distance of the reaction.
+            The competitiveness score
         """
         cost = self.cost_function.evaluate(rxn)
 

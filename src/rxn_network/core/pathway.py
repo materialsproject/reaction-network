@@ -1,5 +1,5 @@
 """
-Basic interface for a reaction Pathway
+Basic interface for a reaction pathway.
 """
 from abc import ABCMeta
 from typing import List
@@ -11,13 +11,10 @@ from rxn_network.core.reaction import Reaction
 
 class Pathway(MSONable, metaclass=ABCMeta):
     """
-    Base definition for a reaction pathway
+    Base definition for a reaction pathway.
     """
 
-    @property
-    def reactions(self) -> List[Reaction]:
-        """List of reactions in this Pathway"""
-        return self._reactions
+    reactions: List[Reaction]
 
     @property
     def entries(self):

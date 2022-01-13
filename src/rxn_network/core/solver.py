@@ -1,5 +1,5 @@
 """
-Basic interface for a reaction pathway Solver
+Basic interface for a reaction pathway solver.
 """
 import logging
 from abc import ABCMeta, abstractmethod
@@ -14,7 +14,7 @@ from rxn_network.core.reaction import Reaction
 
 class Solver(MSONable, metaclass=ABCMeta):
     """
-    Base definition for a pathway solver class
+    Base definition for a pathway solver class.
     """
 
     def __init__(self, entries, pathways):
@@ -57,7 +57,7 @@ class Solver(MSONable, metaclass=ABCMeta):
 
     @property
     def costs(self) -> List[float]:
-        """ Costs used in solver class"""
+        """Costs used in solver class"""
         return self._costs
 
     @property

@@ -45,6 +45,8 @@ class EntriesFromMPRester(FiretaskBase):
     def run_task(self, fw_spec):
         chemsys = self["chemsys"]
         temperature = self["temperature"]
+        include_nist_data = self.get("include_nist_data", True)
+        include_barin_data = self.get("include_barin_data", False)
         e_above_hull = self["e_above_hull"]
         include_polymorphs = self.get("include_polymorphs", False)
 
@@ -54,7 +56,12 @@ class EntriesFromMPRester(FiretaskBase):
             )
 
         entries = process_entries(
-            entries, temperature, e_above_hull, include_polymorphs
+            entries,
+            temperature=temperature,
+            include_nist_data=include_nist_data,
+            include_barin_data=include_barin_data,
+            e_above_hull=e_above_hull,
+            include_polymorphs=include_polymorphs,
         )
         return FWAction(update_spec={"entries": entries})
 
@@ -87,6 +94,8 @@ class EntriesFromDb(FiretaskBase):
         "e_above_hull",
     ]
     optional_params = [
+        "include_nist_data",
+        "include_barin_data",
         "include_polymorphs",
         "inc_structure",
         "compatible_only",
@@ -97,6 +106,8 @@ class EntriesFromDb(FiretaskBase):
         db_file = env_chk(self["entry_db_file"], fw_spec)
         chemsys = self["chemsys"]
         temperature = self["temperature"]
+        include_nist_data = self.get("include_nist_data", True)
+        include_barin_data = self.get("include_barin_data", False)
         e_above_hull = self["e_above_hull"]
         include_polymorphs = self.get("include_polymorphs", False)
         inc_structure = self.get("inc_structure", "final")
@@ -114,7 +125,12 @@ class EntriesFromDb(FiretaskBase):
             )
 
         entries = process_entries(
-            entries, temperature, e_above_hull, include_polymorphs
+            entries,
+            temperature=temperature,
+            include_nist_data=include_nist_data,
+            include_barin_data=include_barin_data,
+            e_above_hull=e_above_hull,
+            include_polymorphs=include_polymorphs,
         )
         return FWAction(update_spec={"entries": entries})
 
@@ -122,6 +138,8 @@ class EntriesFromDb(FiretaskBase):
 def process_entries(
     entries: Iterable[Entry],
     temperature: float,
+    include_nist_data: bool,
+    include_barin_data: bool,
     e_above_hull: float,
     include_polymorphs: bool,
 ):
@@ -136,7 +154,12 @@ def process_entries(
     Returns:
 
     """
-    entry_set = GibbsEntrySet.from_entries(entries=entries, temperature=temperature)
+    entry_set = GibbsEntrySet.from_entries(
+        entries=entries,
+        temperature=temperature,
+        include_nist_data=include_nist_data,
+        include_barin_data=include_barin_data,
+    )
     entry_set = entry_set.filter_by_stability(
         e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
     )
@@ -367,6 +390,8 @@ def get_entry_task(chemsys, entry_set_params, entry_db_file):
     entry_set_params = entry_set_params if entry_set_params else {}
     temperature = entry_set_params.get("temperature", 300)
     e_above_hull = entry_set_params.get("e_above_hull", 0.0)
+    include_nist_data = entry_set_params.get("include_nist_data", True)
+    include_barin_data = entry_set_params.get("include_barin_data", False)
     include_polymorphs = entry_set_params.get("include_polymorphs", False)
 
     if bool(entry_db_file):
@@ -374,6 +399,8 @@ def get_entry_task(chemsys, entry_set_params, entry_db_file):
             entry_db_file=entry_db_file,
             chemsys=chemsys,
             temperature=temperature,
+            include_nist_data=include_nist_data,
+            include_barin_data=include_barin_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
         )
@@ -381,6 +408,8 @@ def get_entry_task(chemsys, entry_set_params, entry_db_file):
         entry_task = EntriesFromMPRester(
             chemsys=chemsys,
             temperature=temperature,
+            include_nist_data=include_nist_data,
+            include_barin_data=include_barin_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
         )

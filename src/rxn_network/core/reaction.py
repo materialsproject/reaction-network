@@ -1,7 +1,7 @@
 """
 Basic interface for a (chemical) Reaction
 """
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import List
 
 import numpy as np
@@ -14,23 +14,19 @@ class Reaction(MSONable, metaclass=ABCMeta):
     Base definition for a Reaction
     """
 
-    @property
-    @abstractmethod
+    @abstractproperty
     def reactants(self) -> List[Composition]:
         """List of reactants for this reaction"""
 
-    @property
-    @abstractmethod
+    @abstractproperty
     def products(self) -> List[Composition]:
         """List of products for this reaction"""
 
-    @property
-    @abstractmethod
+    @abstractproperty
     def coefficients(self) -> np.ndarray:
         """Coefficients of the reaction"""
 
-    @property
-    @abstractmethod
+    @abstractproperty
     def energy(self) -> float:
         """The energy of this reaction in total eV"""
 

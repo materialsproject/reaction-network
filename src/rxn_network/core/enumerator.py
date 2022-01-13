@@ -10,7 +10,7 @@ from monty.json import MSONable
 
 class Enumerator(MSONable, metaclass=ABCMeta):
     """
-    Base definition for the reaction enumeration methodology
+    Base definition for a class that enumerates reactions.
     """
 
     def __init__(self, precursors, targets, calculators):
@@ -29,5 +29,6 @@ class Enumerator(MSONable, metaclass=ABCMeta):
     @abstractmethod
     def estimate_max_num_reactions(self, entries) -> int:
         """
-        Estimate of the number of reactions from a list of entries
+        Estimate of the maximum number of reactions that may be enumerated 
+        from a list of entries
         """

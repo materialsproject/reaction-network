@@ -2,7 +2,7 @@
 Implementation of Fireworks for performing reaction enumreation and network
 construction
 """
-from typing import Dict, Iterable, List, Optional, Union
+from typing import Dict, Iterable, Optional, Union
 
 from fireworks import Firework
 from pymatgen.analysis.reaction_calculator import Reaction, ReactionError
@@ -221,5 +221,3 @@ class NetworkFW(Firework):
         fw_name = f"Reaction Network (Targets: {targets}): {chemsys}"
 
         super().__init__(tasks, parents=parents, name=fw_name)
-
-

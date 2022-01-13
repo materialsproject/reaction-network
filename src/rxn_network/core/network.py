@@ -1,5 +1,5 @@
 """
-Basic interface for a (reaction) Network
+Basic interface for a reaction network.
 """
 import logging
 from abc import ABCMeta, abstractmethod
@@ -16,7 +16,7 @@ from rxn_network.entries.entry_set import GibbsEntrySet
 
 class Network(MSONable, metaclass=ABCMeta):
     """
-    Base definition for a reaction network
+    Base definition for a reaction network.
     """
 
     def __init__(
@@ -54,10 +54,12 @@ class Network(MSONable, metaclass=ABCMeta):
 
     @property
     def precursors(self):
+        """The phases used as precursors in the network"""
         return self._precursors
 
     @property
     def target(self):
+        """The phase used as a target in the network"""
         return self._target
 
     @property
@@ -67,4 +69,5 @@ class Network(MSONable, metaclass=ABCMeta):
 
     @property
     def chemsys(self):
+        """A string representing the chemical system (elements) of the network"""
         return "-".join(sorted(self.entries.chemsys))
