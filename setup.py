@@ -31,9 +31,9 @@ setup(
     install_requires=[
         "setuptools",
         "fireworks>=1.9.7",
-        "maggma>=0.26.0",
-        "numba>= 0.52.0",
-        "pymatgen>=2022.0.10",
+        "maggma>=0.38.1",
+        "numba>=0.54.1",
+        "pymatgen>=2022.1.9",
     ],
     extra_requires={"demo": ["jupyter>=1.0.0"]},
     classifiers=[
