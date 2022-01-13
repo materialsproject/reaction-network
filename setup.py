@@ -30,10 +30,10 @@ setup(
     include_package_data=True,
     install_requires=[
         "setuptools",
+        "pymatgen>=2022.1.9",
         "fireworks>=1.9.7",
         "maggma>=0.38.1",
         "numba>=0.54.1",
-        "pymatgen>=2022.1.9",
     ],
     extra_requires={"demo": ["jupyter>=1.0.0"]},
     classifiers=[
