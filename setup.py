@@ -30,7 +30,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "setuptools",
-        "pymatgen>=2022.1.9",
+        "pymatgen>=2022.0.16",
         "fireworks>=1.9.7",
         "maggma>=0.38.1",
         "numba>=0.54.1",
