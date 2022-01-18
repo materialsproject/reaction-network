@@ -7,8 +7,8 @@ from typing import Dict, List, Optional
 
 import numpy as np
 from pymatgen.analysis.chempot_diagram import ChemicalPotentialDiagram as ChempotDiagram
-from pymatgen.analysis.phase_diagram import PDEntry, PhaseDiagram
-from pymatgen.core.composition import Composition, Element
+from pymatgen.analysis.phase_diagram import PDEntry
+from pymatgen.core.composition import Element
 from scipy.spatial import KDTree
 
 

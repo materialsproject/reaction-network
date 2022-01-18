@@ -1,4 +1,5 @@
 # Contributing to reaction-network
+
 We would love to have your input! This includes:
 * Reporting a bug
 * Discussing the current state of the code
@@ -17,6 +18,7 @@ If you are making a bug report, incorporate as many elements of the following as
 * Notes (possibly including why you think this might be happening, or steps you tried that didn't work)
 
 ## Contributing code modifications or additions through Github
+
 We use Github to host code, to track issues and feature requests, as well as accept pull requests.
 
 Pull requests are the best way to propose changes to the codebase. Follow the 
@@ -28,6 +30,7 @@ The basic procedure for making a PR is:
 * When you're finished, go to your fork and make a Pull Request. It will automatically update if you need to make further changes.
 
 ### How to Make a **Great** Pull Request
+
 We have a few tips for writing good PRs that are accepted into the main repo:
 
 * Use the Google Code style for all of your code. Find an example [here.](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
@@ -42,5 +45,6 @@ When you submit your PR, our CI service will automatically run your tests.
 We welcome good discussion on the best ways to write your code, and the comments on your PR are an excellent area for discussion.
 
 #### Acknowledgments
+
 This document was adapted from the open-source contribution guidelines for Facebook's Draft, and briandk's 
 [contribution template](https://gist.github.com/briandk/3d2e8b3ec8daf5a27a62).

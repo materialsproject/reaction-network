@@ -1,7 +1,6 @@
 """
 This module contains functions for plotting experimental reaction pathway data.
 """
-from functools import lru_cache
 
 import matplotlib.pyplot as plt
 import pandas
@@ -11,7 +10,7 @@ from pymatgen.core.composition import Composition
 from scipy.ndimage.filters import median_filter
 from tqdm.notebook import tqdm
 
-from rxn_network.entries import GibbsComputedEntry, GibbsEntrySet
+from rxn_network.entries import GibbsEntrySet
 
 
 class PathwayPlotter(MSONable):

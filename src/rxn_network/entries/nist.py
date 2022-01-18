@@ -1,12 +1,10 @@
 """
-Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
+Implements an Entry that looks up pre-tabulated Gibbs free energies from the NIST-JANAF
+tables.
 """
-import hashlib
-from typing import Any, Dict, List, Optional
+from typing import Dict, Optional
 
 from pymatgen.core.composition import Composition
-from pymatgen.entries import Entry
-from scipy.interpolate import interp1d
 
 from rxn_network.data import PATH_TO_NIST, load_experimental_data
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
@@ -33,7 +31,7 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
     ):
         """
         Args:
-            composition: Composition object (pymatgen).
+            composition: Composition object (within pymatgen).
             temperature: Temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.

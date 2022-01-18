@@ -1,20 +1,14 @@
 """
 A calculator class for determining chemical potential distance of reactions
 """
-import warnings
-from functools import lru_cache
 from itertools import chain, combinations, product
-from typing import Dict, Iterable, List, Optional, Union
+from typing import Callable, List
 
 import numpy as np
 from pymatgen.analysis.phase_diagram import PDEntry
-from pymatgen.core.composition import Composition, Element
 
 from rxn_network.core.calculator import Calculator
-from rxn_network.core.cost_function import CostFunction
-from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 
@@ -24,7 +18,7 @@ class ChempotDistanceCalculator(Calculator):
     (in eV/atom).
 
     For more information on this specific implementation of the algorithm,
-    please cite/reference the paper below:
+    please reference the paper below:
 
     Todd, P. K.; McDermott, M. J.; Rom, C. L.; Corrao, A. A.; Denney, J. J.; Dwaraknath,
     S. S.; Khalifah, P. G.; Persson, K. A.;  Neilson, J. R. Selectivity in Yttrium
@@ -42,11 +36,12 @@ class ChempotDistanceCalculator(Calculator):
     ):
         """
         Args:
-            cpd: the chemical potential diagram
+            cpd: the chemical potential diagram object
             mu_func: the name of the function used to process the interfacial
                 chemical potential distances into a single value describing the whole
-                reaction.
+                reaction. Current options are 1) max, 2) mean, and 3) sum (default).
             name: the data dictionary key with which to store the calculated value.
+                Defaults to "chempot_distance".
         """
         self.cpd = cpd
         self._name = name
@@ -60,11 +55,12 @@ class ChempotDistanceCalculator(Calculator):
 
     def calculate(self, rxn: ComputedReaction) -> float:
         """
-        Calculates the chemical potential distance in eV/atom. The mu_func parameter
-        determines how the distance is calculated for the overall reaction.
+        Calculates the (aggregate) chemical potential distance in eV/atom. The mu_func parameter
+        determines how the individual pairwise interface distances are aggregated into a
+        single value describing the overall reaction.
 
         Args:
-            rxn: the reaction object
+            rxn: the ComputedReaction object
 
         Returns:
             The chemical potential distance of the reaction.
@@ -103,8 +99,8 @@ class ChempotDistanceCalculator(Calculator):
                 reaction.
             name: the data dictionary key by which to store the calculated value,
                 defaults to "chempot_distance"
-            **kwargs: optional kwargs passed to ChemicalPotentialDiagram; defaults to
-                "default_min_limit"=-50
+            **kwargs: optional kwargs passed to ChemicalPotentialDiagram. By default, passes
+                {"default_min_limit": -50}.
 
         Returns:
             A ChempotDistanceCalculator object
@@ -116,10 +112,12 @@ class ChempotDistanceCalculator(Calculator):
         return cls(cpd, mu_func, name)
 
     @property
-    def mu_func(self):
-        """Returns the function used to process the interfacial mu distances"""
+    def mu_func(self) -> Callable:
+        """Returns the function used to process the chemical potential distances into a
+        single metric."""
         return self._mu_func
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """Returns the name of the data dictionary key where the value is stored"""
         return self._name

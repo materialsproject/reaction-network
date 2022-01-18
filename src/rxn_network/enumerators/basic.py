@@ -1,6 +1,6 @@
 """
-This module implements two types of basic reaction enumerators, with or without the
-option of an open entry
+This module implements two types of basic reaction enumerators, differing in the option
+to consider open entries.
 """
 from copy import deepcopy
 from itertools import combinations, product
@@ -8,7 +8,6 @@ from math import comb
 from typing import List, Optional, Set
 
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
-from pymatgen.core.composition import Composition
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm.auto import tqdm
 
@@ -16,7 +15,6 @@ from rxn_network.core import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import (
     apply_calculators,
-    get_elems_set,
     group_by_chemsys,
     initialize_calculators,
     initialize_entry,
@@ -28,7 +26,10 @@ from rxn_network.utils import limited_powerset
 class BasicEnumerator(Enumerator):
     """
     Enumerator for finding all simple reactions within a set of entries, up to a
-    maximum reactant and product cardinality (n).
+    maximum reactant/product cardinality (n); i.e., how many phases on either side of
+    the reaction. This approach does not explicitly take into account thermodynamic
+    stability (i.e. phase diagram). This allows for enumeration of reactions where the
+    products may not be stable with respect to each other.
     """
 
     def __init__(
@@ -48,18 +49,22 @@ class BasicEnumerator(Enumerator):
 
         Args:
             precursors: Optional list of precursor formulas; only reactions
-                which contain at least these phases as reactants will be enumerated.
-            target: Optional formula of target; only reactions which include
-                formation of this target will be enumerated.
-            calculators: Optional list of Calculator object names; see calculators
-                module for options (e.g., ["ChempotDistanceCalculator])
+                which contain at least these phases as reactants will be enumerated. See the
+                "exclusive_precursors" parameter for more details.
+            targets: Optional list of target formulas; only reactions which include
+                formation of at least one of these targets will be enumerated. See the
+                "exclusive_targets" parameter for more details.
+            calculators: Optional list of Calculator object names to be initialized; see calculators
+                module for options (e.g., ["ChempotDistanceCalculator"])
             n: Maximum reactant/product cardinality; i.e., largest possible number of
                 entries on either side of the reaction. Defaults to 2.
             exclusive_precursors: Whether to consider only reactions that have
-                reactants which are a subset of the provided list of precursors.
-                Defaults to True.
+            reactants which are a subset of the provided list of precursors. In other
+                words, if True, this only identifies reactions with reactants selected from the precursors
+                argument. Defaults to True.
             exclusive_targets: Whether to consider only reactions that make the
-                provided target directly (i.e. with no byproducts). Defualts to False.
+                form products that are a subset of the provided list of targets. If False,
+                this only identifies reactions with no unspecified byproducts. Defualts to False.
             remove_unbalanced: Whether to remove reactions which are unbalanced.
                 Defaults to True.
             remove_changed: Whether to remove reactions which can only be balanced by
@@ -178,6 +183,7 @@ class BasicEnumerator(Enumerator):
 
     def _get_open_combos(self, open_entries) -> Optional[List[Set[ComputedEntry]]]:
         """No open entries for BasicEnumerator, returns None"""
+        _ = open_entries  # unused argument
         return None
 
     def _get_rxns(
@@ -247,7 +253,10 @@ class BasicEnumerator(Enumerator):
         return rxns
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
-        """Generates reactions from a list of reactants, products, and optional calculator(s)"""
+        """Generates reactions from a list of reactants, products, and optional
+        calculator(s)"""
+        _ = (pd, grand_pd)  # unused arguments in BasicEnumerator class
+
         forward_rxn = ComputedReaction.balance(reactants, products)
         backward_rxn = forward_rxn.reverse()
 
@@ -258,6 +267,8 @@ class BasicEnumerator(Enumerator):
 
     def _get_rxn_iterable(self, combos, open_combos):
         """Get all reaction/product combinations"""
+        _ = open_combos  # unused argument
+
         return combinations(combos, 2)
 
     def _get_initialized_entries(self, entries):
@@ -306,6 +317,7 @@ class BasicEnumerator(Enumerator):
         target_elems,
         open_elems,
     ):
+        """Filters the dictionary of combinations by elements"""
         filtered_dict = dict()
 
         all_precursor_elems = {el for g in precursor_elems for el in g}

@@ -62,7 +62,7 @@ class Solver(MSONable, metaclass=ABCMeta):
 
     @property
     def num_rxns(self) -> int:
-        """Length of reaction list"""
+        """Length of the reaction list"""
         return len(self.reactions)
 
     @property

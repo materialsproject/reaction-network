@@ -2,77 +2,119 @@ site_name: Reaction Network Documentation
 site_description: Documentation for rxn_network
 copyright: Built by The GENESIS EFRC
 
-theme:
-  name: null
-  custom_dir: 'cinder'
-
 nav:
   - Home: index.md
+  - Notebooks:
+      - Enumerators: ../notebooks/enumerators.ipynb
+      - Network: ../notebooks/network.ipynb
+      - Test: ../notebooks/test.md
   - Reference:
-      Core:
-        Calculator: reference/core/calculator.md
-        Cost Function: reference/core/cost_function.md
-        Enumerator: reference/core/enumerator.md
-        Network: reference/core/network.md
-        Pathway: reference/core/pathway.md
-        Reaction: reference/core/reaction.md
-        Solver: reference/core/solver.md
-      Costs:
-        Calculators: reference/costs/calculators.md
-        Softplus: reference/costs/softplus.md
-      Data: reference/data/data.md
-      Entries:
-        Entry Set: reference/entries/entry_set.md
-        Gibbs: reference/entries/gibbs.md
-        Nist: reference/entries/nist.md
-      Enumerators:
-        Basic: reference/enumerators/basic.md
-        Minimize: reference/enumerators/minimize.md
-        Utils: reference/enumerators/utils.md
-      Firetasks:
-        Build Inputs: reference/firetasks/build_inputs.md
-        Parse Outputs: reference/firetasks/parse_outputs.md
-        Run Calc: reference/firetasks/run_calc.md
-        Utils: reference/firetasks/utils.md
-      Fireworks:
-        Core: reference/fireworks/core.md
-      Network:
-        Entry: reference/network/entry.md
-        Graph-tool: reference/network/gt.md
-        Network: reference/network/network.md
-        Utils: reference/network/utils.md
-        Visualize: reference/network/visualize.md
-      Pathways:
-        Balanced: reference/pathways/balanced.md
-        Basic: reference/pathways/basic.md
-        Solver: reference/pathways/solver.md
-        Utils: reference/pathways/utils.md
-      Reactions:
-        Basic: reference/reactions/basic.md
-        Computed: reference/reactions/computed.md
-        Open: reference/reactions/open.md
-        Reaction Set: reference/reactions/reaction_set.md
-        Utils: reference/reactions/utils.md
-      Thermo:
-        Chempot Diagram: reference/thermo/chempot_diagram.md
-        Utils: reference/thermo/utils.md
-      Utils: reference/utils.md
+      - Core:
+          Calculator: reference/core/calculator.md
+          Cost Function: reference/core/cost_function.md
+          Enumerator: reference/core/enumerator.md
+          Network: reference/core/network.md
+          Pathway: reference/core/pathway.md
+          Reaction: reference/core/reaction.md
+          Solver: reference/core/solver.md
+      - Costs:
+          Calculators: reference/costs/calculators.md
+          Competitiveness: reference/costs/competitiveness.md
+          Softplus: reference/costs/softplus.md
+      - Data: reference/data/data.md
+      - Entries:
+          Barin: reference/entries/barin.md
+          Entry Set: reference/entries/entry_set.md
+          Experimental: reference/entries/experimental.md
+          Gibbs: reference/entries/gibbs.md
+          Nist: reference/entries/nist.md
+      - Enumerators:
+          Basic: reference/enumerators/basic.md
+          Minimize: reference/enumerators/minimize.md
+          Utils: reference/enumerators/utils.md
+      - Firetasks:
+          Build Inputs: reference/firetasks/build_inputs.md
+          Parse Outputs: reference/firetasks/parse_outputs.md
+          Run Calc: reference/firetasks/run_calc.md
+          Utils: reference/firetasks/utils.md
+      - Fireworks:
+          Core: reference/fireworks/core.md
+      - Network:
+          Entry: reference/network/entry.md
+          Graph-tool: reference/network/gt.md
+          Network: reference/network/network.md
+          Utils: reference/network/utils.md
+          Visualize: reference/network/visualize.md
+      - Pathways:
+          Balanced: reference/pathways/balanced.md
+          Basic: reference/pathways/basic.md
+          Pathway Set: reference/pathways/pathway_set.md
+          Plotting: reference/pathways/plotting.md
+          Solver: reference/pathways/solver.md
+      - Reactions:
+          Basic: reference/reactions/basic.md
+          Computed: reference/reactions/computed.md
+          Open: reference/reactions/open.md
+          Plotting: reference/reactions/plotting.md
+          Reaction Set: reference/reactions/reaction_set.md
+      - Thermo:
+          Chempot Diagram: reference/thermo/chempot_diagram.md
+          Utils: reference/thermo/utils.md
+      - Utils:
+          Database: reference/utils/database.md
+          Funcs: reference/utils/funcs.md
   - CHANGELOG: CHANGELOG.md
 
-site_url: https://github.com/GENESIS-EFRC/reaction-network
+site_url: https://github.com/GENESIS-EFRC/reaction-network/
 repo_url: https://github.com/GENESIS-EFRC/reaction-network/
+theme:
+  name: material
+  icon:
+    logo: material/currency-sign
+  features:
+  - navigation.tabs
+  - navigation.top
+  palette:
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: teal
+    accent: purple
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    accent: lime
+    toggle:
+      icon: material/weather-night
+      name: Switch to light mode
+
+extra_css:
+- css/mkdocstrings.css
+
 markdown_extensions:
-  - pymdownx.tabbed
-  - admonition
-  - codehilite
-  - attr_list
-  - pymdownx.details
-  - pymdownx.superfences
-  - pymdownx.inlinehilite
-  - toc:
-      permalink: true
+- admonition
+- pymdownx.details
+- pymdownx.emoji
+- pymdownx.magiclink
+- pymdownx.snippets:
+    check_paths: true
+- pymdownx.superfences
+- pymdownx.tabbed
+- pymdownx.tasklist
 
 plugins:
-  - search
-  - minify
-  - mkdocstrings
+- search
+- section-index
+- mkdocs-jupyter
+- mkdocstrings:
+    handlers:
+      python:
+        setup_commands:
+        - import sys
+        - sys.path.append("docs")
+        selection:
+          new_path_syntax: yes
+    watch:
+    - src/rxn_network

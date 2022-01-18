@@ -1,11 +1,9 @@
 """
-Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin tables
+Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin tables.
 """
-import hashlib
-from typing import Any, Dict, List, Optional
+from typing import Dict, Optional
 
 from pymatgen.core.composition import Composition
-from pymatgen.entries import Entry
 
 from rxn_network.data import PATH_TO_BARIN, load_experimental_data
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
@@ -31,8 +29,8 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
     ):
         """
         Args:
-            composition: Composition object (pymatgen).
-            temperature: Temperature in Kelvin. If temperature is not selected from
+            composition: Composition object (within pymatgen).
+            temperature: Absolute temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
         """

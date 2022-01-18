@@ -3,7 +3,7 @@ This module implements two types of reaction enumerators using a free energy
 minimization technique, with or without the option of an open entry
 """
 
-from itertools import combinations, product
+from itertools import product
 from math import comb
 from typing import List, Optional
 
@@ -13,7 +13,6 @@ from pymatgen.analysis.interface_reactions import (
 )
 from pymatgen.core.composition import Composition, Element
 from pymatgen.entries.computed_entries import ComputedEntry
-from tqdm.auto import tqdm
 
 from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.enumerators.utils import (
@@ -74,6 +73,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         return comb(len(entries), 2) * 2
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
+        """Reacts"""
         r = list(reactants)
         r0 = r[0]
 
@@ -87,6 +87,8 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         )
 
     def _get_rxn_iterable(self, combos, open_entries):
+        _ = open_entries  # unused argument
+
         return product(combos, [None])
 
     def _react_interface(self, r1, r2, pd, grand_pd=None, calculators=None):

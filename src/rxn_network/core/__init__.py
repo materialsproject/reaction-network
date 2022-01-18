@@ -1,4 +1,6 @@
-""" Core interfaces for the reaction-network package. """
+"""
+Core interfaces for the reaction-network package.
+"""
 from rxn_network.core.calculator import Calculator
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.enumerator import Enumerator

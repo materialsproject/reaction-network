@@ -6,14 +6,13 @@ from typing import Any, Dict, List, Optional
 from monty.json import MSONable
 
 from pymatgen.core.composition import Composition
-from pymatgen.entries import Entry
 from scipy.interpolate import interp1d
 
 
 class ExperimentalReferenceEntry(MSONable):
     """
-    An Entry class for experimental reference data. Given a composition,
-    automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
+    An Entry class for experimental reference data, to be sub-classed for specific data
+    sources.  Given a composition, automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
     reference values.
     """
 
@@ -65,7 +64,7 @@ class ExperimentalReferenceEntry(MSONable):
         return new_entry
 
     @classmethod
-    def _validate_temperature(cls, formula, temperature) -> None:
+    def _validate_temperature(cls, formula: str, temperature: float) -> None:
         """Ensure that the temperature is from a valid range."""
         if formula not in cls.REFERENCES:
             raise ValueError(f"{formula} not in reference data!")

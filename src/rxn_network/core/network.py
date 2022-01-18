@@ -6,7 +6,6 @@ from abc import ABCMeta, abstractmethod
 from typing import Iterable, List
 
 from monty.json import MSONable
-from pymatgen.entries import Entry
 
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.enumerator import Enumerator
@@ -45,11 +44,11 @@ class Network(MSONable, metaclass=ABCMeta):
         """Find reaction pathways"""
 
     @abstractmethod
-    def set_precursors(self):
+    def set_precursors(self, precursors):
         """Set the phases used as precursors in the network"""
 
     @abstractmethod
-    def set_target(self):
+    def set_target(self, target):
         """Set the phase used as a target in the network"""
 
     @property

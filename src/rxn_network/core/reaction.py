@@ -1,7 +1,7 @@
 """
 Basic interface for a (chemical) Reaction
 """
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 from typing import List
 
 import numpy as np
@@ -11,22 +11,26 @@ from pymatgen.core.composition import Composition, Element
 
 class Reaction(MSONable, metaclass=ABCMeta):
     """
-    Base definition for a Reaction
+    Base definition for a reaction class.
     """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def reactants(self) -> List[Composition]:
         """List of reactants for this reaction"""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def products(self) -> List[Composition]:
         """List of products for this reaction"""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def coefficients(self) -> np.ndarray:
         """Coefficients of the reaction"""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def energy(self) -> float:
         """The energy of this reaction in total eV"""
 

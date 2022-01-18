@@ -3,7 +3,6 @@ Basic interface for a reaction Enumerator
 """
 import logging
 from abc import ABCMeta, abstractmethod
-from typing import List
 
 from monty.json import MSONable
 
@@ -29,6 +28,6 @@ class Enumerator(MSONable, metaclass=ABCMeta):
     @abstractmethod
     def estimate_max_num_reactions(self, entries) -> int:
         """
-        Estimate of the maximum number of reactions that may be enumerated 
+        Estimate of the maximum number of reactions that may be enumerated
         from a list of entries
         """

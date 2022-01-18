@@ -1,7 +1,7 @@
 """
 Basic interface for a reaction cost Calculator
 """
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 
 from monty.json import MSONable
 
@@ -37,7 +37,8 @@ class Calculator(MSONable, metaclass=ABCMeta):
 
         return rxn
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def name(self):
         """
         The name of the calculator; used to store the value within the reaction's data dictionary

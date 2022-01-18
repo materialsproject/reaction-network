@@ -1,14 +1,11 @@
 """
-Utility Fireworks functions borrowed from the atomate package
+Utility Fireworks functions. Some of these functions are borrowed from the atomate package.
 """
 import gzip
 import json
 import logging
-import os
 import sys
 from typing import Optional
-
-from monty.json import jsanitize
 
 
 def env_chk(
@@ -67,7 +64,9 @@ def get_logger(
 
 
 def load_json(firetask, param, fw_spec):
-    """ """
+    """
+    Loads json file
+    """
     obj = firetask.get(param)
     if obj:
         d = obj.as_dict()

@@ -28,7 +28,7 @@ def expand_pd(entries: List[Entry]) -> Dict[str, PhaseDiagram]:
     )
 
     for e in sorted_entries:
-        for chemsys in pd_dict.keys():
+        for chemsys in pd_dict:
             if set(e.composition.chemical_system.split("-")).issubset(
                 chemsys.split("-")
             ):

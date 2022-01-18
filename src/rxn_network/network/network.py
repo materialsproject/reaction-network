@@ -317,7 +317,7 @@ class ReactionNetwork(Network):
             ReactionNetwork object with loaded graph
         """
         rn = cls.from_dict(d)
-        rn.load_graph(filename)  # type: ignore
+        rn.load_graph(filename)  # pylint: disable=no-member
 
         return rn
 
@@ -327,10 +327,11 @@ class ReactionNetwork(Network):
         return self._g
 
     @property
-    def chemsys(self):
+    def chemsys(self) -> str:
+        """Returns a string of the chemical system of the network"""
         return "-".join(sorted(self.entries.chemsys))
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         """Return MSONable dict"""
         d = super().as_dict()
         d["precursors"] = list(self.precursors)
@@ -344,8 +345,8 @@ class ReactionNetwork(Network):
         target = d.pop("target", None)
 
         rn = super().from_dict(d)
-        rn._precursors = precursors
-        rn._target = target
+        rn._precursors = precursors  # pylint: disable=protected-access
+        rn._target = target  # pylint: disable=protected-access
 
         return rn
 

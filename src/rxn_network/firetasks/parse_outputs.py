@@ -1,15 +1,10 @@
 """
 Firetasks for storing enumerated reaction or network data into a MongoDB.
 """
-import datetime
-import json
 import os
 from typing import List
 
-from fireworks import FiretaskBase, FWAction, explicit_serialize
-from maggma.stores import MongoStore
-from monty.json import MontyDecoder, jsanitize
-from monty.serialization import loadfn
+from fireworks import FiretaskBase, explicit_serialize
 
 from rxn_network.firetasks.utils import env_chk, get_logger, load_json
 from rxn_network.utils.database import CalcDb

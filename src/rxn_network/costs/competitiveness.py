@@ -25,12 +25,9 @@ class CompetitivenessScoreCalculator(Calculator):
     Calculator for determining the competitiveness score (c-score) for a reaction
     (in eV/atom).
 
-    For more information on this specific implementation of the algorithm,
-    please cite/reference the paper below:
+    WARNING: This calculator is working but has not been sufficiently tested. Use at
+    yown risk.
 
-    Todd, Paul K., McDermott, M.J., et al. “Selectivity in yttrium manganese oxide
-    synthesis via local chemical potentials in hyperdimensional phase space.”
-    ArXiv:2104.05986 [Cond-Mat], Apr. 2021. arXiv.org, http://arxiv.org/abs/2104.05986
     """
 
     def __init__(
@@ -78,10 +75,11 @@ class CompetitivenessScoreCalculator(Calculator):
         """
         Calculates the competitiveness score for a given reaction by enumerating
         competing reactions, evaluating their cost with the supplied cost function, and
-        then using the c-score formula, i.e. the _get_c_score() method, to determine the competitiveness score.
+        then using the c-score formula, i.e. the _get_c_score() method, to determine the
+        competitiveness score.
 
         Args:
-            rxn: the reaction object
+            rxn: the ComputedReaction object to be evaluated
 
         Returns:
             The competitiveness score
@@ -102,7 +100,7 @@ class CompetitivenessScoreCalculator(Calculator):
         enumerated given the settings in the constructor.
 
         Args:
-            rxn: the reaction object
+            rxn: the ComputedReaction object
 
         Returns:
             A list of competing reactions
@@ -167,9 +165,13 @@ class CompetitivenessScoreCalculator(Calculator):
         """
         Calculates the c-score for a given reaction.
 
+        This formula is based on a methodology presented in the following paper:
+        (TBD)
+
         Args:
             cost: the cost of the selected reaction
             competing_costs: the costs of all other competing reactions
+            scale: the (abritrary) scale factor used to scale the c-score. Defaults to 10.
 
         Returns:
             The c-score for the reaction
@@ -178,4 +180,5 @@ class CompetitivenessScoreCalculator(Calculator):
 
     @property
     def name(self):
+        """Returns the name of the data dictionary key where the value is stored"""
         return self._name
