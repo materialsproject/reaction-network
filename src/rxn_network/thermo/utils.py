@@ -1,13 +1,15 @@
 """
 Utility functions used in the thermodynamic analysis classes.
 """
-from typing import Dict, List
+from typing import Dict, Iterable
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries import Entry
 
 
-def expand_pd(entries: List[Entry]) -> Dict[str, PhaseDiagram]:
+def expand_pd(
+    entries: Iterable[Entry],
+) -> Dict[str, PhaseDiagram]:
     """
     Helper method for generating a set of smaller phase diagrams for analyzing
     thermodynamic staiblity in large chemical systems. This is necessary when

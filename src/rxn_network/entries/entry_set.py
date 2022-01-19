@@ -6,7 +6,7 @@ import collections
 import logging
 import warnings
 from copy import deepcopy
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union, Iterable
 
 from monty.json import MontyDecoder, MSONable
 from numpy.random import normal
@@ -36,7 +36,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     """
 
     def __init__(
-        self, entries: List[Union[GibbsComputedEntry, ExperimentalReferenceEntry]]
+        self, entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]]
     ):
         """
         The supplied collection of entries will automatically be converted to a set of
@@ -76,7 +76,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         Returns a GibbsEntrySet containing only the set of entries belonging to
         a particular chemical system (including subsystems). For example, if the entries
-        are from the Li-Fe-P-O system, and chemsys=["Li", "O"], only the Li, O, and Li-O entries are returned.
+        are from the Li-Fe-P-O system, and chemsys=["Li", "O"], only the Li, O, and Li-O
+        entries are returned.
 
         Args:
             chemsys: Chemical system specified as list of elements. E.g., ["Li", "O"]
@@ -141,8 +142,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         added/removed the entry set. The entry indices are useful for querying the entry
         set for specific entries.
 
-        Warning: this internally modifies the entries in the entry set by updating data for
-        each entry to include the index.
+        Warning: this internally modifies the entries in the entry set by updating data
+        for each entry to include the index.
 
         Returns:
             None

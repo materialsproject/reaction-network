@@ -84,7 +84,7 @@ class BasicEnumerator(Enumerator):
         if "ChempotDistanceCalculator" in self.calculators:
             self._stabilize = True  # ChempotDistanceCalculator requires stable entries
 
-        self.open_phases = None
+        self.open_phases: Optional[List] = None
         self._build_pd = False
         self._build_grand_pd = False
 
@@ -429,7 +429,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             remove_unbalanced=remove_unbalanced,
             remove_changed=remove_changed,
         )
-        self.open_phases = open_phases
+        self.open_phases: List[str] = open_phases
 
     def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
         """

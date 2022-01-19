@@ -1,7 +1,7 @@
 """
 Implements a class for storing balanced reaction pathways.
 """
-from typing import List, Optional, Union
+from typing import List, Union
 
 import numpy as np
 
@@ -21,22 +21,20 @@ class BalancedPathway(BasicPathway):
         self,
         reactions: List[Reaction],
         coefficients: List[float],
-        costs: Optional[List[float]] = None,
-        balanced: Optional[bool] = None,
+        costs: List[float],
+        balanced: bool = False,
     ):
         """
         Args:
-            rxns ([ComputedReaction]): list of ComputedReaction objects in pymatgen
-                which occur along path.
-            costs ([float]): list of corresponding costs for each reaction.
+            reactions: list of ComputedReaction objects which occur along path.
+            coefficients: list of coefficients to balance each of these reactions, respectively
+            costs: list of corresponding costs for each reaction.
+                balanced: whether or not the reaction pathway is balanced. Defaults to False.
         """
         self.coefficients = coefficients
         super().__init__(reactions=reactions, costs=costs)
 
-        if balanced is not None:
-            self.balanced = balanced
-        else:
-            self.balanced = False
+        self.balanced = balanced
 
     def __eq__(self, other):
         if super().__eq__(other):
@@ -59,7 +57,6 @@ class BalancedPathway(BasicPathway):
 
         Balances multiple reaction pathways to a net reaction
         """
-        pass
 
     def comp_matrix(self):
         """
@@ -87,7 +84,11 @@ class BalancedPathway(BasicPathway):
             ]
         )
 
-    def contains_interdependent_rxns(self, precursors):
+    def contains_interdependent_rxns(self, precursors) -> bool:
+        """
+        Whether or not the pathway contains interdependent reactions, given a list of
+        provided precursors.
+        """
         precursors = set(precursors)
         interdependent = False
 
@@ -95,7 +96,7 @@ class BalancedPathway(BasicPathway):
         num_rxns = len(rxns)
 
         if num_rxns == 1:
-            return False, None
+            return False
 
         for combo in limited_powerset(rxns, num_rxns):
             size = len(combo)
@@ -128,7 +129,8 @@ class BalancedPathway(BasicPathway):
         return interdependent
 
     @property
-    def average_cost(self):
+    def average_cost(self) -> float:
+        """Returns the mean cost of the pathway"""
         return np.dot(self.coefficients, self.costs) / sum(self.coefficients)
 
     def __repr__(self):

@@ -4,14 +4,11 @@ objects which share entries/reactions.
 """
 
 from functools import lru_cache
-from typing import Iterable, List, Optional, Set, Union
+from typing import List, Union
 
 import numpy as np
 from monty.json import MSONable
-from pymatgen.core import Element
-from pymatgen.entries.computed_entries import ComputedEntry
 
-from rxn_network.core.cost_function import CostFunction
 from rxn_network.pathways import BalancedPathway, BasicPathway
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
@@ -29,8 +26,8 @@ class PathwaySet(MSONable):
         self,
         reaction_set: ReactionSet,
         indices: Union[np.ndarray, List[List[int]]],
-        coefficients: List[float],
-        costs: Optional[List[float]] = None,
+        coefficients: Union[np.ndarray, List[List[float]]],
+        costs: Union[np.ndarray, List[List[float]]],
     ):
         """
         Args:
@@ -107,7 +104,7 @@ class PathwaySet(MSONable):
     @staticmethod
     def _get_reaction_set(
         paths: List[Union[ComputedReaction, OpenComputedReaction]],
-    ) -> List[Union[ComputedReaction, OpenComputedReaction]]:
+    ) -> ReactionSet:
         """
         Returns a reaction set built from a list of paths.
 

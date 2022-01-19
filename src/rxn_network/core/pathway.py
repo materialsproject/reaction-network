@@ -14,22 +14,22 @@ class Pathway(MSONable, metaclass=ABCMeta):
     Base definition for a reaction pathway.
     """
 
-    reactions: List[Reaction]
+    _reactions: List[Reaction]
 
     @property
     def entries(self):
         """Entry objects in this Pathway"""
-        return {entry for rxn in self.reactions for entry in rxn.entries}
+        return {entry for rxn in self._reactions for entry in rxn.entries}
 
     @property
     def all_reactants(self):
         """Entries serving as a reactant in any sub reaction"""
-        return {entry for rxn in self.reactions for entry in rxn.reactants}
+        return {entry for rxn in self._reactions for entry in rxn.reactants}
 
     @property
     def all_products(self):
         """Entries serving as a product in any sub reaction"""
-        return {entry for rxn in self.reactions for entry in rxn.products}
+        return {entry for rxn in self._reactions for entry in rxn.products}
 
     @property
     def compositions(self):
@@ -54,9 +54,9 @@ class Pathway(MSONable, metaclass=ABCMeta):
     @property
     def energy(self):
         """Total energy of this reaction pathway"""
-        return sum([rxn.energy for rxn in self.reactions])
+        return sum([rxn.energy for rxn in self._reactions])
 
     @property
     def energy_per_atom(self):
         """Total energy per atom of this reaction pathway"""
-        return sum([rxn.energy_per_atom for rxn in self.reactions])
+        return sum([rxn.energy_per_atom for rxn in self._reactions])

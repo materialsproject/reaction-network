@@ -1,3 +1,8 @@
+""" 
+This script generates the data/nist/compounds.json file by downloading data from the
+NIST-JANAF website, using the thermochem package to acquire it.
+"""
+
 import os
 import json
 from collections import OrderedDict
