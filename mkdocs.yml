@@ -5,9 +5,10 @@ copyright: Built by The GENESIS EFRC
 nav:
   - Home: index.md
   - Notebooks:
-      - Enumerators: ../notebooks/enumerators.ipynb
-      - Network: ../notebooks/network.ipynb
-      - Test: ../notebooks/test.md
+        - Enumerators: 
+            - Enumerators: enumerators.ipynb
+        - Network: 
+            - Network: network.ipynb
   - Reference:
       - Core:
           Calculator: reference/core/calculator.md
@@ -65,8 +66,10 @@ nav:
           Funcs: reference/utils/funcs.md
   - CHANGELOG: CHANGELOG.md
 
-site_url: https://github.com/GENESIS-EFRC/reaction-network/
 repo_url: https://github.com/GENESIS-EFRC/reaction-network/
+site_url: https://genesis-efrc.github.io/reaction-network/
+repo_name: Github
+
 theme:
   name: material
   icon:
@@ -79,16 +82,6 @@ theme:
     scheme: default
     primary: teal
     accent: purple
-    toggle:
-      icon: material/weather-sunny
-      name: Switch to dark mode
-  - media: "(prefers-color-scheme: dark)"
-    scheme: slate
-    primary: black
-    accent: lime
-    toggle:
-      icon: material/weather-night
-      name: Switch to light mode
 
 extra_css:
 - css/mkdocstrings.css
