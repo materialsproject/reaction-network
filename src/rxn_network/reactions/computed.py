@@ -2,7 +2,7 @@
 A reaction class that builds reactions based on ComputedEntry objects and provides
 information about reaction thermodynamics.
 """
-from typing import Dict, List, Optional, Union, Collection
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 from pymatgen.core.composition import Composition
@@ -168,8 +168,9 @@ class ComputedReaction(BasicReaction):
         return BasicReaction.__hash__(self)
 
     def __eq__(self, other):
-        eq = BasicReaction.__eq__(self, other)
-        if not eq:
-            return False
-        else:
-            return np.isclose(self.energy_per_atom, other.energy_per_atom)
+        is_equal = BasicReaction.__eq__(self, other)
+
+        if is_equal:
+            is_equal = np.isclose(self.energy_per_atom, other.energy_per_atom)
+
+        return is_equal

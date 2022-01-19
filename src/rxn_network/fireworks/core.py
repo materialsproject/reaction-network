@@ -201,11 +201,11 @@ class NetworkFW(Firework):
                     [Composition(r) for r in precursors],
                     [Composition(p) for p in targets],
                 )
-            except ReactionError:
+            except ReactionError as e:
                 raise ValueError(
                     "Can not balance pathways with specified precursors/targets."
                     "Please make sure a balanced net reaction can be written!"
-                )
+                ) from e
 
             solver = RunSolver(
                 pathways=None,

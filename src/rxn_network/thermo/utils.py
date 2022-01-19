@@ -23,7 +23,7 @@ def expand_pd(
         e.g. {"Li-Mn-O": <PhaseDiagram object>, "C-Y": <PhaseDiagram object>, ...}
     """
 
-    pd_dict: Dict[str, PhaseDiagram] = dict()
+    pd_dict: Dict[str, PhaseDiagram] = {}
 
     sorted_entries = sorted(
         entries, key=lambda x: len(x.composition.elements), reverse=True

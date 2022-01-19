@@ -143,8 +143,9 @@ def stabilize_entries(
 
     """
     indices = [pd.all_entries.index(entry) for entry in entries_to_adjust]
+
     new_entries = []
-    for idx, entry in zip(indices, entries_to_adjust):
+    for _, entry in zip(indices, entries_to_adjust):
         e_above_hull = pd.get_e_above_hull(entry)
         entry_dict = entry.to_dict()
         entry_dict["energy"] = entry.uncorrected_energy + (
@@ -152,6 +153,7 @@ def stabilize_entries(
         )
         new_entry = ComputedEntry.from_dict(entry_dict)
         new_entries.append(new_entry)
+
     return new_entries
 
 

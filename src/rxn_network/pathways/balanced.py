@@ -101,7 +101,7 @@ class BalancedPathway(BasicPathway):
         for combo in limited_powerset(rxns, num_rxns):
             size = len(combo)
             if (
-                any([set(rxn.reactants).issubset(precursors) for rxn in combo])
+                any(set(rxn.reactants).issubset(precursors) for rxn in combo)
                 or size == 1
             ):
                 continue

@@ -160,8 +160,10 @@ class BasicEnumerator(Enumerator):
     def _get_combos_dict(
         self, entries, precursor_entries, target_entries, open_entries
     ):
-        """Gets all possible entry combinations up to predefined cardinality n, filtered and
-        grouped by chemical system"""
+        """
+        Gets all possible entry combinations up to predefined cardinality n, filtered and
+        grouped by chemical system
+        """
         precursor_elems = [
             [str(el) for el in e.composition.elements] for e in precursor_entries
         ]
@@ -181,9 +183,11 @@ class BasicEnumerator(Enumerator):
 
         return filtered_combos
 
-    def _get_open_combos(self, open_entries) -> Optional[List[Set[ComputedEntry]]]:
+    def _get_open_combos(  # pylint: disable=R1711
+        self, open_entries
+    ) -> Optional[List[Set[ComputedEntry]]]:
         """No open entries for BasicEnumerator, returns None"""
-        _ = open_entries  # unused argument
+        _ = (self, open_entries)  # unused_arguments
         return None
 
     def _get_rxns(
@@ -253,9 +257,11 @@ class BasicEnumerator(Enumerator):
         return rxns
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
-        """Generates reactions from a list of reactants, products, and optional
-        calculator(s)"""
-        _ = (pd, grand_pd)  # unused arguments in BasicEnumerator class
+        """
+        Generates reactions from a list of reactants, products, and optional
+        calculator(s)
+        """
+        _ = (pd, grand_pd, self)  # unused arguments in BasicEnumerator class
 
         forward_rxn = ComputedReaction.balance(reactants, products)
         backward_rxn = forward_rxn.reverse()
@@ -265,9 +271,10 @@ class BasicEnumerator(Enumerator):
 
         return [forward_rxn, backward_rxn]
 
-    def _get_rxn_iterable(self, combos, open_combos):
+    @staticmethod
+    def _get_rxn_iterable(combos, open_combos):
         """Get all reaction/product combinations"""
-        _ = open_combos  # unused argument
+        _ = open_combos  # unused argument in BasicEnumerator class
 
         return combinations(combos, 2)
 
@@ -318,7 +325,7 @@ class BasicEnumerator(Enumerator):
         open_elems,
     ):
         """Filters the dictionary of combinations by elements"""
-        filtered_dict = dict()
+        filtered_dict = {}
 
         all_precursor_elems = {el for g in precursor_elems for el in g}
         all_target_elems = {el for g in target_elems for el in g}
@@ -339,7 +346,7 @@ class BasicEnumerator(Enumerator):
                         continue
                 else:
                     if not any(
-                        [elems.issuperset(el_group) for el_group in precursor_elems]
+                        elems.issuperset(el_group) for el_group in precursor_elems
                     ):
                         continue
 
@@ -348,9 +355,7 @@ class BasicEnumerator(Enumerator):
                     if not all_target_elems == elems:
                         continue
                 else:
-                    if not any(
-                        [elems.issuperset(el_group) for el_group in target_elems]
-                    ):
+                    if not any(elems.issuperset(el_group) for el_group in target_elems):
                         continue
 
             filtered_dict[chemsys] = combos
@@ -461,7 +466,8 @@ class BasicOpenEnumerator(BasicEnumerator):
         ]
         return open_combos
 
-    def _get_rxn_iterable(self, combos, open_combos):
+    @staticmethod
+    def _get_rxn_iterable(combos, open_combos):
         """Get all reaction/product combinations."""
         combos_with_open = [
             combo | open_combo

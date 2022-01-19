@@ -115,7 +115,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         pd_dict = expand_pd(self.entries)
 
         filtered_entries: Set[Union[GibbsComputedEntry, NISTReferenceEntry]] = set()
-        all_comps: Dict[str, Union[GibbsComputedEntry, NISTReferenceEntry]] = dict()
+        all_comps: Dict[str, Union[GibbsComputedEntry, NISTReferenceEntry]] = {}
 
         for _, pd in pd_dict.items():
             for entry in pd.all_entries:

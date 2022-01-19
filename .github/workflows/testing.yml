@@ -19,31 +19,35 @@ jobs:
     - name: Set up Python 3.8
       uses: actions/setup-python@v1
       with:
-        python-version: 3.8
+        python-version: 3.9
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-testing.txt
-
-    - name: Lint with pycodestyle
-      run: |
-        pip install pycodestyle
-        pycodestyle src/rxn_network
+        pip install -r requirements.txt  --quiet
+        pip install -r requirements-testing.txt  --quiet
 
     - name: Lint with mypy
       run: |
-        pip install mypy
         mypy src/rxn_network
+
+    - name: Lint with pycodestyle
+      run: |
+        pycodestyle src/rxn_network
+
+    - name: Lint with pylint
+      run: |
+        pylint src/rxn_network
+
+    - name: Lint with black
+      run: |
+        black --check --diff --color src/rxn_network
 
     - name: Lint with flake8
       run: |
-        pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
         flake8 --count --show-source --statistics src/rxn_network
-        # exit-zero treats all errors as warnings.
         flake8 --count --exit-zero --max-complexity=20 --statistics src/rxn_network
+
   test:
     strategy:
       max-parallel: 6

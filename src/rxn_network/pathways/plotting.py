@@ -72,13 +72,13 @@ class PathwayPlotter(MSONable):
         """
         Returns a list of energies for each phase
         """
-        all_energies = dict()
+        all_energies = {}
         formulas = self.df.columns.to_list()
 
         compositions = self.compositions
 
         for temp in tqdm(self.df.index):
-            all_energies[temp] = dict()
+            all_energies[temp] = {}
 
             gibbs_entries = GibbsEntrySet.from_entries(entries, temp)
             pd = PhaseDiagram(gibbs_entries)

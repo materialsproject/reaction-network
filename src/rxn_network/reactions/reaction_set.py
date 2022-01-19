@@ -3,7 +3,7 @@ Implements a class for conveniently and efficiently storing sets of ComputedReac
 objects which share entries.
 """
 from functools import lru_cache
-from typing import Collection, Iterable, List, Optional, Set, Union
+from typing import Collection, List, Optional, Set, Union
 
 import numpy as np
 from monty.json import MSONable

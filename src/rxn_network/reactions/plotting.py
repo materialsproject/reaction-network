@@ -1,11 +1,8 @@
-""" 
+"""
 Utility functions for plotting reaction data/analysis.
 """
 from pandas import DataFrame
 import plotly.express as px
-from pymatgen.core.composition import Composition
-
-from rxn_network.costs.softplus import Softplus
 
 
 def plot_energy_distance_scatter(df: DataFrame) -> px.scatter:

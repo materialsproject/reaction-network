@@ -40,10 +40,8 @@ class BasicPathway(Pathway):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return all(
-                [
-                    other_rxn == rxn
-                    for other_rxn, rxn in zip(other.reactions, self.reactions)
-                ]
+                other_rxn == rxn
+                for other_rxn, rxn in zip(other.reactions, self.reactions)
             )
 
         return False
@@ -64,4 +62,4 @@ class BasicPathway(Pathway):
     @property
     def is_experimental(self) -> bool:
         """Whether or not all reactions in the pathway are experimental"""
-        return all([e.is_experimental for e in self.entries])
+        return all(e.is_experimental for e in self.entries)

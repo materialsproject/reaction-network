@@ -144,7 +144,8 @@ class ReactionNetwork(Network):
 
         if precursors == self.precursors:
             return
-        elif self.precursors:
+
+        if self.precursors:
             precursors_v = find_vertex(
                 g, g.vp["type"], NetworkEntryType.Precursors.value
             )[0]
@@ -152,7 +153,7 @@ class ReactionNetwork(Network):
             loopback_edges = find_edge(g, g.ep["type"], "loopback_precursors")
             for e in loopback_edges:
                 g.remove_edge(e)
-        elif not all([p in self.entries for p in precursors]):
+        elif not all(p in self.entries for p in precursors):
             raise ValueError("One or more precursors are not included in network!")
 
         precursors_v = g.add_vertex()
@@ -207,7 +208,8 @@ class ReactionNetwork(Network):
 
         if target == self.target:
             return
-        elif target not in self.entries:
+
+        if target not in self.entries:
             raise ValueError("Target is not included in network!")
 
         if self.target:

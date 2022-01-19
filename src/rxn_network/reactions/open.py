@@ -57,13 +57,13 @@ class OpenComputedReaction(ComputedReaction):
         self.grand_entries = grand_entries
 
     @classmethod
-    def balance(  # type: ignore
+    def balance(  # type: ignore # pylint: disable = W0221
         cls,
         reactant_entries: List[ComputedEntry],
         product_entries: List[ComputedEntry],
         chempots: Dict[Element, float],
         data: Optional[Dict] = None,
-    ) -> "OpenComputedReaction":  # pylint: disable = W0221
+    ) -> "OpenComputedReaction":
         """
         Balances and returns a new ComputedReaction.
 

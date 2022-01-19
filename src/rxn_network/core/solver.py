@@ -2,7 +2,7 @@
 Basic interface for a reaction pathway solver.
 """
 import logging
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from typing import List
 
 from monty.json import MSONable
@@ -35,10 +35,6 @@ class Solver(MSONable, metaclass=ABCMeta):
 
         self._reactions = rxns
         self._costs = costs
-
-    @abstractmethod
-    def solve(self, net_rxn) -> List[Pathway]:
-        """Solve paths"""
 
     @property
     def entries(self) -> EntrySet:

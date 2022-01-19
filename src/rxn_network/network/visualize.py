@@ -8,12 +8,20 @@ import numpy as np
 
 
 def plot_network(
-    graph,
-    vertex_cmap="jet",
-    edge_cmap="PuBuGn_r",
+    graph: gt.Graph,
+    vertex_cmap_name: str = "jet",
+    edge_cmap_name: str = "PuBuGn_r",
     output=None,
-    cost_pos_scale_factor=10,
+    cost_pos_scale_factor: float = 10.0,
 ):
+    """
+    Plots a reaction network.
+
+    Args:
+        graph: a graph-tool Graph object
+        vertex_cmap
+
+    """
     g = graph.copy()
 
     costs = np.array(g.ep["cost"].get_array().tolist())
@@ -30,7 +38,7 @@ def plot_network(
     edge_width = [1.4 if g.ep["cost"][e] != 0 else 0.1 for e in g.edges()]
     edge_width = g.new_edge_property("float", edge_width)
 
-    color_func_v = _get_cmap_string(vertex_cmap, domain=sorted(chemsys_names))
+    color_func_v = _get_cmap_string(vertex_cmap_name, domain=sorted(chemsys_names))
     vertex_colors = [color_func_v(chemsys) for chemsys in chemsys_names]
     vertex_colors = g.new_vertex_property("vector<float>", vertex_colors)
 
@@ -38,7 +46,7 @@ def plot_network(
     vmin = avg_cost - 0.8 * avg_cost
     vmax = avg_cost + 0.8 * avg_cost
     norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
-    edge_cmap = matplotlib.cm.get_cmap(edge_cmap)
+    edge_cmap = matplotlib.cm.get_cmap(edge_cmap_name)
     edge_cmap = matplotlib.cm.ScalarMappable(norm=norm, cmap=edge_cmap)
 
     edge_colors = [edge_cmap.to_rgba(cost, alpha=0.5) for cost in costs]
@@ -61,17 +69,22 @@ def plot_network(
     )
 
 
-def plot_network_on_graphistry(graph):
+def plot_network_on_graphistry(graph: gt.Graph):
+    """
+    Plots a reaction network using Graphistry (https://graphistry.org/).
+
+    Args:
+        graph: a graph-tool Graph object
+    """
+
     try:
         import graphistry
         import networkx as nx
         import pyintergraph
-    except ImportError:
-        print(
-            "Must install optional dependencies: pygraphistry, networkx, "
-            "and pyintergraph!"
-        )
-        return
+    except ImportError as e:
+        raise ImportError(
+            "Must install optional dependencies: pygraphistry, networkx, and pyintergraph!"
+        ) from e
 
     nx_graph = pyintergraph.gt2nx(graph)
     mapping = {}
@@ -95,6 +108,9 @@ def plot_network_on_graphistry(graph):
 
 
 def _get_cmap_string(palette, domain):
+    """
+    Gets a matplotlib colormap string for a given palette and domain.
+    """
     domain_unique = np.unique(domain)
     hash_table = {key: i_str for i_str, key in enumerate(domain_unique)}
     mpl_cmap = matplotlib.cm.get_cmap(palette, lut=len(domain_unique))

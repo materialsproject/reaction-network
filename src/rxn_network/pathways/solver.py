@@ -22,14 +22,14 @@ from rxn_network.enumerators.minimize import (
 )
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import grouper
 
 
 class PathwaySolver(Solver):
     """
     Solver that implements an efficient numba method for finding balanced
-    reaction pathways from a list of graph-derived reaction pathways (i.e. a list of lists of reactions)
+    reaction pathways from a list of graph-derived reaction pathways (i.e. a list of
+    lists of reactions)
     """
 
     BATCH_SIZE = 500000
@@ -65,7 +65,7 @@ class PathwaySolver(Solver):
         use_basic_enumerator: bool = True,
         use_minimize_enumerator: bool = False,
         filter_interdependent: bool = True,
-    ):
+    ) -> List[BalancedPathway]:
         """
 
         Args:
@@ -110,7 +110,6 @@ class PathwaySolver(Solver):
             self.logger.info("Identifying reactions between intermediates...")
 
             intermediate_rxns = self._find_intermediate_rxns(
-                precursors,
                 targets,
                 intermediate_rxn_energy_cutoff,
                 use_basic_enumerator,
@@ -123,9 +122,6 @@ class PathwaySolver(Solver):
                 if r not in reactions:
                     reactions.append(r)
                     costs.append(c)
-
-        for r in reactions:
-            v = self._build_idx_vector(r, num_entries)
 
         net_rxn_vector = self._build_idx_vector(net_rxn, num_entries)
         if net_rxn in reactions:
@@ -203,12 +199,16 @@ class PathwaySolver(Solver):
         return filtered_paths
 
     @staticmethod
-    def _build_idx_vector(rxn, num_entries):
+    def _build_idx_vector(rxn: ComputedReaction, num_entries: int) -> np.ndarray:
         """
-        Builds a vector of indices for a reaction.
+        Builds a vector of indices for a reaction based on the data["idx"] attribute of
+        each entry in the reaction. This allows for reactions to be more easily
+        represented as vectors.
 
         Args:
-            rxn:
+            rxn: a ComputedReaction object
+            num_entries: The number of total entries in the entry set (that the reaction
+                comes from).
 
         Returns:
 
@@ -225,12 +225,12 @@ class PathwaySolver(Solver):
 
     def _find_intermediate_rxns(
         self,
-        precursors,
         targets,
         energy_cutoff,
         use_basic_enumerator,
         use_minimize_enumerator,
     ):
+        """ """
         rxns = []
 
         intermediates = {e for rxn in self.reactions for e in rxn.entries}
@@ -268,7 +268,7 @@ class PathwaySolver(Solver):
                 rxns.extend(mgpe.enumerate(ents))
 
         rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxns))
-        rxns = [r for r in rxns if all([e in intermediates for e in r.entries])]
+        rxns = [r for r in rxns if all(e in intermediates for e in r.entries)]
         rxns = [r for r in rxns if (len(r.reactants) < 4 and len(r.products) < 4)]
 
         self.logger.info(f"Found {len(rxns)} intermediate reactions!")
@@ -299,7 +299,7 @@ def balance_path_arrays(
     all_multiplicities = np.zeros((shape[0], shape[1]), np.float64)
     indices = np.full(shape[0], False)
 
-    for i in prange(shape[0]):
+    for i in prange(shape[0]):  # pylint: disable=not-an-iterable
         correct = True
         for j in range(len_net_coeff_filter):
             idx = net_coeff_filter[j]
@@ -315,10 +315,12 @@ def balance_path_arrays(
 
         if (multiplicities < tol).any():
             continue
-        elif not (
+
+        if not (
             np.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * np.abs(net_coeffs))
         ).all():
             continue
+
         all_multiplicities[i] = multiplicities
         indices[i] = True
 

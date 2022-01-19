@@ -6,7 +6,7 @@ pymatgen and streamlined for the reaction-network code.
 import re
 from copy import deepcopy
 from itertools import chain, combinations
-from typing import Dict, List, Optional, Tuple, Union, Collection, Set
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from monty.fractions import gcd_float
@@ -224,9 +224,7 @@ class BasicReaction(Reaction):
             True if reaction is separable from target, False otherwise.
         """
         if target not in self.compositions:
-            raise ValueError(
-                "Target composition {} not in reaction {}".format(target, self)
-            )
+            raise ValueError(f"Target composition {target} not in reaction {self}")
 
         added_elems = set(self.elements) - set(target.elements)
         products = set(deepcopy(self.products))
@@ -323,10 +321,8 @@ class BasicReaction(Reaction):
         if self.balanced is False:  # if not balanced, can not check coefficients
             return True
         return all(
-            [
-                np.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
-                for c in self.reactant_coeffs
-            ]
+            np.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
+            for c in self.reactant_coeffs
         )
 
     @property
@@ -416,9 +412,7 @@ class BasicReaction(Reaction):
         reactant_comps, r_coefs = zip(
             *[(comp, -1 * coeff) for comp, coeff in reactant_coeffs.items()]
         )
-        product_comps, p_coefs = zip(
-            *[(comp, coeff) for comp, coeff in product_coeffs.items()]
-        )
+        product_comps, p_coefs = zip(*list(product_coeffs.items()))
         return BasicReaction(reactant_comps + product_comps, r_coefs + p_coefs)
 
     @classmethod
@@ -432,9 +426,9 @@ class BasicReaction(Reaction):
             elif abs(amt - 1) < tol:
                 product_str.append(formula)
             elif amt < -tol:
-                reactant_str.append("{:.4g} {}".format(-amt, formula))
+                reactant_str.append(f"{round(-amt, 4)} {formula}")
             elif amt > tol:
-                product_str.append("{:.4g} {}".format(amt, formula))
+                product_str.append(f"{round(amt, 4)} {formula}")
 
         return " + ".join(reactant_str) + " -> " + " + ".join(product_str)
 
@@ -456,12 +450,14 @@ class BasicReaction(Reaction):
     def __eq__(self, other):
         if self is other:
             return True
-        elif str(self) == str(other):
-            return True
+
+        if str(self) == str(other):
+            is_equal = True
         else:
-            return (set(self.reactants) == set(other.reactants)) & (
+            is_equal = (set(self.reactants) == set(other.reactants)) & (
                 set(self.products) == set(other.products)
             )
+        return is_equal
 
     def __hash__(self):
         return hash(

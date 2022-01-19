@@ -127,7 +127,7 @@ class ExperimentalReferenceEntry(MSONable):
         """
         Returns a list of energy adjustments. Not implemented for experimental data.
         """
-        return list()
+        return []
 
     @property
     def is_experimental(self) -> bool:

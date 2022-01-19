@@ -28,9 +28,9 @@ def initialize_graph(
     g = Graph()
 
     if not vertex_props:
-        vertex_props = dict()
+        vertex_props = {}
     if not edge_props:
-        edge_props = dict()
+        edge_props = {}
 
     vertex_props.update(DEFAULT_VERTEX_PROPS)
     edge_props.update(DEFAULT_EDGE_PROPS)
@@ -175,7 +175,7 @@ def yens_ksp(
 def update_vertex_properties(g, v, prop_dict):
     """
     Helper method for updating several vertex properties at once in a graph-tool
-    graph.
+    graph; note that this updates the vertex property map in place.
 
     Args:
         g (gt.Graph): a graph-tool Graph object.
@@ -190,4 +190,3 @@ def update_vertex_properties(g, v, prop_dict):
     """
     for prop, val in prop_dict.items():
         g.vp[prop][v] = val
-    return None

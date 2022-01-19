@@ -86,12 +86,14 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             r0.composition, r1.composition, pd, grand_pd, calculators=calculators
         )
 
-    def _get_rxn_iterable(self, combos, open_entries):
+    @staticmethod
+    def _get_rxn_iterable(combos, open_entries):
         _ = open_entries  # unused argument
 
         return product(combos, [None])
 
-    def _react_interface(self, r1, r2, pd, grand_pd=None, calculators=None):
+    @staticmethod
+    def _react_interface(r1, r2, pd, grand_pd=None, calculators=None):
         """Simple API for InterfacialReactivity module from pymatgen."""
         chempots = None
 
