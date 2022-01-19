@@ -35,7 +35,7 @@ class ReactionNetwork(Network):
         enumerators: List[Enumerator],
         cost_function: CostFunction,
         open_elem: Optional[str] = None,
-        chempot: Optional[float] = None,
+        chempot: float = 0.0,
     ):
         """
         Initialize a ReactionNetwork object for a set of entires, enumerator,
@@ -278,7 +278,7 @@ class ReactionNetwork(Network):
         return paths
 
     def _get_rxns(self) -> ReactionSet:
-        "Gets reaction set by running all enumerators"
+        """Gets reaction set by running all enumerators"""
         rxns = []
         for enumerator in self.enumerators:
             rxns.extend(enumerator.enumerate(self.entries))

@@ -1,19 +1,16 @@
 """
 Firetasks for running enumeration and network calculations
 """
-import json
-
 from typing import List
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
-from monty.json import MontyEncoder
 from monty.serialization import dumpfn, loadfn
 from pymatgen.core import Composition
 
 from rxn_network.costs.competitiveness import CompetitivenessScoreCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import get_computed_rxn
-from rxn_network.firetasks.utils import env_chk, get_logger, load_json
+from rxn_network.firetasks.utils import get_logger, load_json
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver

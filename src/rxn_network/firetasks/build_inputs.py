@@ -3,12 +3,13 @@ Firetasks for acquiring ComputedEntry data from MPRester or another materials Mo
 """
 import itertools
 import warnings
-from typing import List, Optional, Union, Iterable
+from typing import Iterable, List, Optional, Union
 
-from pymatgen.entries import Entry
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore
 from pymatgen.core.structure import Structure
+from pymatgen.entries import Entry
+from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
 from pymatgen.ext.matproj import MPRester
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
@@ -255,7 +256,7 @@ def get_entries(  # noqa: C901
                 continue
         else:
             d["potcar_symbols"] = [
-                "%s %s" % (d["pseudo_potential"]["functional"], l)
+                f"{d['pseudo_potential']['functional']} {l}"
                 for l in d["pseudo_potential"].get("labels", [])
             ]
             data = {"oxide_type": d["oxide_type"]}
@@ -290,8 +291,6 @@ def get_entries(  # noqa: C901
                 )
         entries.append(e)
     if compatible_only:
-        from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
-
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore", message="Failed to guess oxidation states.*"
@@ -387,6 +386,10 @@ def get_all_entries_in_chemsys(
 
 
 def get_entry_task(chemsys, entry_set_params, entry_db_file):
+    """
+    Helper method for getting the an entry-acquiring FireTask. If an entry_db_file is
+    provided, uses the EntriesFromDb task; otherwise, uses the EntriesFromMPRester task.
+    """
     entry_set_params = entry_set_params if entry_set_params else {}
     temperature = entry_set_params.get("temperature", 300)
     e_above_hull = entry_set_params.get("e_above_hull", 0.0)

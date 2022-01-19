@@ -3,7 +3,7 @@ Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), Barin ta
 (all compounds), and FactSage (elements)
 """
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Union
 
 from monty.serialization import loadfn
 
@@ -15,7 +15,7 @@ PATH_TO_NIST = cwd / "nist"
 G_ELEMS = loadfn(cwd / "elements.json")
 
 
-def load_experimental_data(fn: str) -> Dict[str, Dict[float, Any]]:
+def load_experimental_data(fn: Union[str, Path]) -> Dict[str, Dict[float, Any]]:
     """
     Load experimental data from a json file.
 

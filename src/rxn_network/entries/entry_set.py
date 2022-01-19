@@ -352,7 +352,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     @classmethod
     def from_entries(
         cls,
-        entries: List[ComputedStructureEntry],
+        entries: Iterable[ComputedStructureEntry],
         temperature: float,
         include_nist_data=True,
         include_barin_data=False,
