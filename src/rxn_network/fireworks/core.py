@@ -45,7 +45,6 @@ class EnumeratorFW(Firework):
         parents=None,
     ):
         """
-
         Args:
             enumerators: List of enumerators to run
             entries: EntrySet to use for enumeration

@@ -87,8 +87,8 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         )
 
     @staticmethod
-    def _get_rxn_iterable(combos, open_entries):
-        _ = open_entries  # unused argument
+    def _get_rxn_iterable(combos, open_combos):
+        _ = open_combos  # unused argument
 
         return product(combos, [None])
 

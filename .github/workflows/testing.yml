@@ -23,9 +23,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt  --quiet
+        conda install -c conda-forge graph-tool
+        pip install -r requirements.txt --quiet
         pip install -r requirements-testing.txt  --quiet
+        pip install -r requirements-optional.txt --quiet
+        pip install -e .
 
     - name: Lint with mypy
       run: |
@@ -96,6 +98,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        python -m pip install --upgrade pip
         conda install -c conda-forge graph-tool
         pip install -r requirements.txt
         pip install -r requirements-optional.txt

@@ -426,9 +426,9 @@ class BasicReaction(Reaction):
             elif abs(amt - 1) < tol:
                 product_str.append(formula)
             elif amt < -tol:
-                reactant_str.append(f"{round(-amt, 4)} {formula}")
+                reactant_str.append(f"{-amt:.4g} {formula}")
             elif amt > tol:
-                product_str.append(f"{round(amt, 4)} {formula}")
+                product_str.append(f"{amt:.4g} {formula}")
 
         return " + ".join(reactant_str) + " -> " + " + ".join(product_str)
 
