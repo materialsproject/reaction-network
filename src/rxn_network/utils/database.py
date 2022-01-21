@@ -25,6 +25,7 @@ class CalcDb(MSONable):
             db_file: Path to the database file.
         """
         self.db_file = db_file
+
         try:
             db = MongoStore.from_db_file(db_file)
             db.connect()

@@ -27,12 +27,12 @@ from rxn_network.utils import grouper
 
 class PathwaySolver(Solver):
     """
-    Solver that implements an efficient numba method for finding balanced
+    Solver that implements an efficient method (using numba) for finding balanced
     reaction pathways from a list of graph-derived reaction pathways (i.e. a list of
     lists of reactions)
     """
 
-    BATCH_SIZE = 500000
+    BATCH_SIZE = 500000  # how many reactions to process in parallel using numba
 
     def __init__(
         self,
@@ -43,7 +43,6 @@ class PathwaySolver(Solver):
         chempot: float = None,
     ):
         """
-
         Args:
             entries: GibbsEntrySet containing all entries in the network.
             pathways: List of reaction pathways derived from the network.
@@ -211,7 +210,7 @@ class PathwaySolver(Solver):
                 comes from).
 
         Returns:
-
+            A vector of indices for the reaction.
         """
         indices = [e.data.get("idx") for e in rxn.entries]
         if None in indices:
@@ -230,7 +229,10 @@ class PathwaySolver(Solver):
         use_basic_enumerator,
         use_minimize_enumerator,
     ):
-        """ """
+        """
+        Internal method for finding intermediate reactions using enumerators and
+        specified settings.
+        """
         rxns = []
 
         intermediates = {e for rxn in self.reactions for e in rxn.entries}
@@ -284,7 +286,8 @@ def balance_path_arrays(
 ):
     """
     Fast solution for reaction multiplicities via mass balance stochiometric
-    constraints. Parallelized using Numba.
+    constraints. Parallelized using Numba. Can be applied to large batches (100K-1M
+    sets of reactions at a time.)
 
     Args:
         comp_matrices: Array containing stoichiometric coefficients of all

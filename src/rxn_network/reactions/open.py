@@ -28,7 +28,6 @@ class OpenComputedReaction(ComputedReaction):
         lowest_num_errors=None,
     ):
         """
-
         Args:
             entries: List of ComputedEntry objects.
             coefficients: List of reaction coefficients.
@@ -75,6 +74,7 @@ class OpenComputedReaction(ComputedReaction):
         Args:
             reactant_entries: List of reactant entries
             product_entries: List of product entries
+            chempots: Dict of chemical potentials corresponding to open element(s)
             data: Optional dict of data
         """
         reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
@@ -157,9 +157,7 @@ class OpenComputedReaction(ComputedReaction):
 
     def reverse(self):
         """
-
         Returns a copy of reaction with reactants/products swapped
-
         """
         return OpenComputedReaction(
             self.entries,

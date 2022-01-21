@@ -2,6 +2,8 @@
 This module contains functions for plotting experimental reaction pathway data.
 """
 
+from typing import List, Dict
+
 import matplotlib.pyplot as plt
 import pandas
 from monty.json import MSONable
@@ -16,12 +18,22 @@ from rxn_network.entries import GibbsEntrySet
 class PathwayPlotter(MSONable):
     """
     Helper class for plotting a reaction pathway and the corresponding energy cascade.
+
+    Note:
+        This class is far from complete and is not intended yet for general use.
     """
 
-    def __init__(self, phase_amounts, temps, apply_smoothing=True):
+    def __init__(
+        self,
+        phase_amounts: Dict[str, List[float]],
+        temps: List[float],
+        apply_smoothing: bool = True,
+    ):
         """
-        phase_amounts: dict of {phase: amount}
-        temps: list of temperatures
+        Args:
+            phase_amounts: Dicts with format {phase: [amounts]}
+            temps: list of temperatures
+            apply_smoothing: Whether to smooth the data. Default is True.
         """
         self._phase_amounts = phase_amounts
         self._temps = temps
@@ -34,17 +46,16 @@ class PathwayPlotter(MSONable):
 
     def plot_pathway(self):
         """
-        Returns a plot of the pathway
-
-        Args:
-            entries: list of entries
+        Returns a plot of the pathway by calling DataFrame.plot().
         """
-
         return self.df.plot()
 
     def plot_energy_cascade(self, entries):
         """
-        Returns a plot of the energy cascade
+        Returns a plot of the energy cascade given a list of entries.
+
+        Args:
+            entries: List of entries or GibbsEntrySet.
 
         """
         energies = self._get_energies(entries)
@@ -70,7 +81,7 @@ class PathwayPlotter(MSONable):
 
     def _get_energies(self, entries):
         """
-        Returns a list of energies for each phase
+        Interal method: returns a list of energies for each phase
         """
         all_energies = {}
         formulas = self.df.columns.to_list()

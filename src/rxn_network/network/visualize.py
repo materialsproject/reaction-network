@@ -1,6 +1,8 @@
 """
 Functions for visualizing/plotting reaction networks.
 """
+import warnings
+from typing import Optional
 
 import graph_tool.all as gt
 import matplotlib.cm
@@ -11,15 +13,18 @@ def plot_network(
     graph: gt.Graph,
     vertex_cmap_name: str = "jet",
     edge_cmap_name: str = "PuBuGn_r",
-    output=None,
+    output: Optional[str] = None,
     cost_pos_scale_factor: float = 10.0,
 ):
     """
-    Plots a reaction network.
+    Plots a reaction network using graph-tool visualization tools (i.e., graph_draw())
 
     Args:
         graph: a graph-tool Graph object
-        vertex_cmap
+        vertex_cmap_name: the name of . Defaults to "jet".
+        edge_cmap_name: Defaults to "PuBuGn_r".
+        output: Optional output filename
+        cost_pos_scale_factor
 
     """
     g = graph.copy()
@@ -71,11 +76,17 @@ def plot_network(
 
 def plot_network_on_graphistry(graph: gt.Graph):
     """
-    Plots a reaction network using Graphistry (https://graphistry.org/).
+    Plots a reaction network using Graphistry Hub (https://graphistry.org/). This uses
+    optional dependencies networkx and pyintergraph to facilitate mapping to a format
+    that can be easily rendered by graphistry.
 
     Args:
         graph: a graph-tool Graph object
     """
+
+    warnings.warn(
+        "This function may not work as expected, depending on your graphistry setup."
+    )
 
     try:
         import graphistry
@@ -109,7 +120,7 @@ def plot_network_on_graphistry(graph: gt.Graph):
 
 def _get_cmap_string(palette, domain):
     """
-    Gets a matplotlib colormap string for a given palette and domain.
+    Utility function for getting a matplotlib colormap string for a given palette and domain.
     """
     domain_unique = np.unique(domain)
     hash_table = {key: i_str for i_str, key in enumerate(domain_unique)}

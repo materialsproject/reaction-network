@@ -20,7 +20,8 @@ class ReactionSet(MSONable):
     """
     A lightweight class for storing large sets of ComputedReaction objects.
     Automatically represents a set of reactions as an array of coefficients with
-    a second array linking to a corresponding list of shared entries.
+    a second array linking to a corresponding list of shared entries. This is useful for
+    dumping large amounts of reaction data to a database.
     """
 
     def __init__(
@@ -38,6 +39,8 @@ class ReactionSet(MSONable):
             indices: Array indexing the entry list; gets entries used by each
                 reaction object
             coeffs: Array of all reaction coefficients
+            open_elem: Open element, e.g. "O2"
+            chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
             all_data: Optional list of data for each reaction
         """
         self.entries = entries
@@ -58,10 +61,6 @@ class ReactionSet(MSONable):
         """
         Returns list of ComputedReaction objects or OpenComputedReaction objects (when
         open element and chempot are specified) for the reaction set.
-
-        Args:
-            open_elem: Open element, e.g. "O2"
-            chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
         """
         rxns = []
 
@@ -88,8 +87,6 @@ class ReactionSet(MSONable):
 
         Args:
             cf: CostFunction object, e.g. Softplus()
-            open_elem: Open element, e.g. "O2"
-            chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
         """
         return [cf.evaluate(rxn) for rxn in self.get_rxns()]
 
@@ -108,6 +105,8 @@ class ReactionSet(MSONable):
         Args:
             rxns: List of ComputedReaction-like objects.
             entries: Optional list of ComputedEntry objects
+            open_elem: Open element, e.g. "O2"
+            chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
         """
         if not entries:
             entries = cls._get_unique_entries(rxns)
@@ -152,13 +151,11 @@ class ReactionSet(MSONable):
         Make a dataframe of reactions from a ReactionSet object.
 
         Args:
-            rxns: List of reactions
-            temp: Temperature in Kelvin
-            target: Target composition
-            cost_function: Cost function to use
+            cost_function: Cost function to use for evaluating reaction costs
+            target: Optional target composition (used to determine added elements)
 
         Returns:
-            Dataframe with columns:
+            Pandas DataFrame with columns:
                 rxn: Reaction object
                 energy: reaction energy in eV/atom
                 distance: Distance in eV/atom
@@ -201,7 +198,9 @@ class ReactionSet(MSONable):
 
     @staticmethod
     def _get_unique_entries(rxns: Collection[ComputedReaction]) -> Set[ComputedEntry]:
-        """Return only unique entries from reactions"""
+        """
+        Return only unique entries from reactions
+        """
         entries = set()
         for r in rxns:
             entries.update(r.entries)

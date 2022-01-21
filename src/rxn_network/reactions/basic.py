@@ -268,13 +268,15 @@ class BasicReaction(Reaction):
         cls, reactants: List[str], products: List[str]
     ) -> "BasicReaction":
         """
+        Initialize a reaction from a list of 1) reactant formulas and 2) product
+        formulas.
 
         Args:
-            reactants:
-            products:
+            reactants: List of reactant formulas
+            products: List of product formulas
 
         Returns:
-
+            A BasicReaction object
         """
 
         reactant_comps = [Composition(r) for r in reactants]

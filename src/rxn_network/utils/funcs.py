@@ -25,6 +25,12 @@ def limited_powerset(iterable, max_size) -> Iterable:
 def grouper(iterable: Iterable, n: int, fillvalue: Any = None):
     """
     Collects data into fixed-length chunks or blocks.
+
+    Args:
+        iterable: An iterable object to group.
+        n: The number of items to include in each group.
+        fillvalue: The value to use for the last group, if the length of the group is
+            less than n.
     """
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
@@ -33,6 +39,9 @@ def grouper(iterable: Iterable, n: int, fillvalue: Any = None):
 def get_project_root() -> Path:
     """
     Gets a Path object for the reaction-network project root directory.
+
+    Note:
+        This is specific to this file and project.
 
     Returns:
         Path object for the project root directory.

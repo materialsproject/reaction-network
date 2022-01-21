@@ -4,6 +4,7 @@ Implements a class for storing balanced reaction pathways.
 from typing import List, Union
 
 import numpy as np
+from pymatgen.core.composition import Composition
 
 from rxn_network.core import Pathway, Reaction
 from rxn_network.pathways.basic import BasicPathway
@@ -13,7 +14,7 @@ from rxn_network.utils import limited_powerset
 class BalancedPathway(BasicPathway):
     """
     Helper class for storing multiple ComputedReaction objects which form a single
-    reaction pathway as identified via pathfinding methods. Includes cost of each
+    reaction pathway as identified via pathfinding methods. Includes costs for each
     reaction.
     """
 
@@ -55,13 +56,19 @@ class BalancedPathway(BasicPathway):
         """
         TODO: Implement this method
 
-        Balances multiple reaction pathways to a net reaction
+        Balances multiple reaction pathways to a net reaction.
+
+        NOTE: Currently, to automatically balance and create a BalancedPathway object,
+        you must use the PathwaySolver class.
         """
 
-    def comp_matrix(self):
+    def comp_matrix(self) -> np.ndarray:
         """
         Internal method for getting the composition matrix used in the balancing
         procedure.
+
+        Returns:
+            An array representing the composition matrix for a reaction
         """
         return np.array(
             [
@@ -73,9 +80,15 @@ class BalancedPathway(BasicPathway):
             ]
         )
 
-    def get_coeff_vector_for_rxn(self, rxn):
+    def get_coeff_vector_for_rxn(self, rxn) -> np.ndarray:
         """
         Internal method for getting the net reaction coefficients vector.
+
+        Args:
+            rxn: Reaction object to get coefficients for
+
+        Returns:
+            An array representing the reaction coefficients vector
         """
         return np.array(
             [
@@ -84,12 +97,15 @@ class BalancedPathway(BasicPathway):
             ]
         )
 
-    def contains_interdependent_rxns(self, precursors) -> bool:
+    def contains_interdependent_rxns(self, precursors: List[Composition]) -> bool:
         """
         Whether or not the pathway contains interdependent reactions, given a list of
         provided precursors.
+
+        Args:
+            precursors: List of precursor compositions
         """
-        precursors = set(precursors)
+        precursors_set = set(precursors)
         interdependent = False
 
         rxns = set(self.reactions)
@@ -101,7 +117,7 @@ class BalancedPathway(BasicPathway):
         for combo in limited_powerset(rxns, num_rxns):
             size = len(combo)
             if (
-                any(set(rxn.reactants).issubset(precursors) for rxn in combo)
+                any(set(rxn.reactants).issubset(precursors_set) for rxn in combo)
                 or size == 1
             ):
                 continue
@@ -111,8 +127,8 @@ class BalancedPathway(BasicPathway):
             unique_reactants = []
             unique_products = []
             for rxn in combo:
-                unique_reactants.append(set(rxn.reactants) - precursors)
-                unique_products.append(set(rxn.products) - precursors)
+                unique_reactants.append(set(rxn.reactants) - precursors_set)
+                unique_products.append(set(rxn.products) - precursors_set)
 
             overlap = [False] * size
             for i in range(size):

@@ -19,7 +19,8 @@ class PathwaySet(MSONable):
     """
     A lightweight class for storing large sets of Pathway objects. Automatically
     represents a set of pathways as a (non-rectangular) 2D array of indices
-    corresponding to reactions within a reaction set.
+    corresponding to reactions within a reaction set. This is useful for dumping
+    reaction pathway data to a database.
     """
 
     def __init__(

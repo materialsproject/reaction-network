@@ -2,6 +2,7 @@
 This module implements added features to the ChemicalPotentialDiagram class from
 pymatgen.
 """
+import warnings
 from functools import cached_property
 from typing import Dict, List, Optional
 
@@ -49,7 +50,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
     @cached_property
     def domains(self) -> Dict[str, np.ndarray]:
         """
-        Mapping of formulas to array of domain boundary points
+        Mapping of formulas to array of domain boundary points. Cached for speed.
         """
         return self._get_domains()
 
@@ -70,10 +71,19 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         return min(tree.query(pts2)[0])
 
-    def shortest_elemental_domain_distances(self, f1, f2) -> float:
+    def shortest_elemental_domain_distances(self, f1: str, f2: str) -> float:
         """
-        TODO: Use with caution; this function may not yet make sense geometrically!
+        Args:
+            f1: chemical formula (1)
+            f2: chemical formula (2)
+
+        Returns:
+            Shortest distance between domain boundaries along one elemental axis.
         """
+        warnings.warn(
+            "Use with caution; this function may not result in anything meaningful!"
+        )
+
         pts1 = self.domains[f1]
         pts2 = self.domains[f2]
         pts1 = pts1[~np.isclose(pts1, self.default_min_limit).any(axis=1)]
