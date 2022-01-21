@@ -1,7 +1,6 @@
 """
 Implementation of reaction network interface.
 """
-
 from typing import Iterable, List, Optional, Union
 
 from graph_tool.util import find_edge, find_vertex

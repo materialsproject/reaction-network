@@ -7,6 +7,8 @@ import logging
 import sys
 from typing import Optional
 
+from fireworks import FireTaskBase
+
 
 def env_chk(
     val: str,
@@ -63,9 +65,20 @@ def get_logger(
     return logger
 
 
-def load_json(firetask, param, fw_spec):
+def load_json(firetask: FireTaskBase, param: str, fw_spec: dict) -> dict:
     """
-    Loads json file
+    Utility function for loading json file related to a parameter of a FireTask. This first looks
+    within the task to see if the object is already serialized; if not, it looks for a
+    file with the filename stored under the {param}_fn attribute either within the
+    FireTask or the fw_spec.
+
+    Args:
+        firetask: FireTask object
+        param: parmeter name
+        fw_spec: Firework spec.
+
+    Returns:
+        A loaded JSON object (dict)
     """
     obj = firetask.get(param)
     if obj:

@@ -30,30 +30,41 @@ class EntriesFromMPRester(FiretaskBase):
     Note: the PMG_MAPI_KEY enviornment variable must be properly configured on the
     computing resource.
 
+    Note: This task is not yet compatible with the new Materials Project API.
+
     Required params:
-        chemsys (str):
-        temperature (float):
-        e_above_hull (float):
+        chemsys (str): String of chemical system to query (e.g. "Li-Mn-O")
+        temperature (float): Temperature (K) at which to build GibbsComputedEntry objects
+        e_above_hull (float): Only include entries with an energy above hull below this value (eV)
 
     Optional params:
-        include_polymorphs (bool):
+        include_polymorphs (bool): Whether or not to include metastable polymorphs.
+            Defaults to False.
+        include_nist_data (bool): Whether or not to include NIST data when constructing
+            the GibbsComputedEntry objects. Defaults to True.
+        include_barin_data (bool): Whether or not to include Barin data when constructing
+            the GibbsComputedEntry objects. Defaults to False.
 
     """
 
     required_params = ["chemsys", "temperature", "e_above_hull"]
-    optional_params = ["include_polymorphs"]
+    optional_params = [
+        "include_nist_data",
+        "include_barin_data",
+        "include_polymorphs",
+    ]
 
     def run_task(self, fw_spec):
         chemsys = self["chemsys"]
         temperature = self["temperature"]
+        e_above_hull = self["e_above_hull"]
         include_nist_data = self.get("include_nist_data", True)
         include_barin_data = self.get("include_barin_data", False)
-        e_above_hull = self["e_above_hull"]
         include_polymorphs = self.get("include_polymorphs", False)
 
         with MPRester() as mpr:
             entries = mpr.get_entries_in_chemsys(
-                elements=chemsys, inc_structure="fiinal"
+                elements=chemsys, inc_structure="final"
             )
 
         entries = process_entries(
@@ -76,15 +87,20 @@ class EntriesFromDb(FiretaskBase):
 
     Required params:
         entry_db_file (str): path to db.json file with MongoDB credentials.
-        chemsys (str):
-        temperature (float):
-        e_above_hull (float):
+        chemsys (str): String of chemical system to query (e.g. "Li-Mn-O")
+        temperature (float): Temperature (K) at which to build GibbsComputedEntry objects
+        e_above_hull (float): Only include entries with an energy above hull below this value (eV)
 
     Optional params:
-        include_polymorphs (bool):
-        inc_structure (bool):
-        compatible_only (bool):
-        property_data (dict):
+        include_polymorphs (bool): Whether or not to include metastable polymorphs.
+            Defaults to False.
+        include_nist_data (bool): Whether or not to include NIST data when constructing
+            the GibbsComputedEntry objects. Defaults to True.
+        include_barin_data (bool): Whether or not to include Barin data when constructing
+            the GibbsComputedEntry objects. Defaults to False.
+        inc_structure (str): What type of structure object to include. Defaults to "final".
+        compatible_only (bool): Include only entries that are MP compatible. Defaults to True.
+        property_data (dict): Optional dictionary of properties to include in each entry.
 
     """
 
@@ -143,17 +159,23 @@ def process_entries(
     include_barin_data: bool,
     e_above_hull: float,
     include_polymorphs: bool,
-):
+) -> GibbsEntrySet:
     """
 
     Args:
-        entries:
-        temperature:
-        e_above_hull:
-        include_polymorphs:
+        entries: Iterable of Entry objects to process.
+        temperature (float): Temperature (K) at which to build GibbsComputedEntry
+            objects
+        include_nist_data (bool): Whether or not to include NIST data when constructing
+            the GibbsComputedEntry objects. Defaults to True.
+        include_barin_data (bool): Whether or not to include Barin data when constructing
+            the GibbsComputedEntry objects. Defaults to False.
+        e_above_hull (float): Only include entries with an energy above hull below this value (eV)
+        include_polymorphs (bool): Whether or not to include metastable polymorphs.
+            Defaults to False.
 
     Returns:
-
+        A GibbsEntrySet object containing GibbsComputedEntry objects with specified constraints.
     """
     entry_set = GibbsEntrySet.from_entries(
         entries=entries,
@@ -171,7 +193,7 @@ def get_entries(  # noqa: C901
     db: MongoStore,
     chemsys_formula_id_criteria: Union[str, dict],
     compatible_only: bool = True,
-    inc_structure: bool = None,
+    inc_structure: Optional[str] = None,
     property_data: Optional[List[str]] = None,
     use_premade_entries: bool = False,
     conventional_unit_cell: bool = False,
@@ -290,6 +312,7 @@ def get_entries(  # noqa: C901
                     entry_id=d["task_id"],
                 )
         entries.append(e)
+
     if compatible_only:
         with warnings.catch_warnings():
             warnings.filterwarnings(
@@ -298,27 +321,30 @@ def get_entries(  # noqa: C901
             entries = MaterialsProject2020Compatibility().process_entries(
                 entries, clean=True
             )
+
     if sort_by_e_above_hull:
         entries = sorted(entries, key=lambda entry: entry.data["e_above_hull"])
+
     return entries
 
 
 def get_all_entries_in_chemsys(
-    db,
-    elements,
-    compatible_only=True,
-    inc_structure=None,
-    property_data=None,
-    use_premade_entries=False,
-    conventional_unit_cell=False,
-    n=1000,
-):
+    db: MongoStore,
+    elements: Union[str, List[str]],
+    compatible_only: bool = True,
+    inc_structure: Optional[str] = None,
+    property_data: Optional[list] = None,
+    use_premade_entries: bool = False,
+    conventional_unit_cell: bool = False,
+    n: int = 1000,
+) -> List[ComputedEntry]:
     """
     Helper method for getting all entries in a total chemical system by querying
     database for all sub-chemical systems. Code adadpted from pymatgen.ext.matproj
     and modified to support very large chemical systems.
 
     Args:
+        db: MongoStore object with database connection
         elements (str or [str]): Chemical system string comprising element
             symbols separated by dashes, e.g., "Li-Fe-O" or List of element
             symbols, e.g., ["Li", "Fe", "O"].
@@ -336,6 +362,8 @@ def get_all_entries_in_chemsys(
         property_data (list): Specify additional properties to include in
             entry.data. If None, no data. Should be a subset of
             supported_properties.
+        use_premade_entries: Whether to use entry objects that have already been
+            constructed. Defaults to False.
         conventional_unit_cell (bool): Whether to get the standard
             conventional unit cell
         n (int): Chunk size, i.e., number of sub-chemical systems to consider
@@ -385,10 +413,28 @@ def get_all_entries_in_chemsys(
     return entries
 
 
-def get_entry_task(chemsys, entry_set_params, entry_db_file):
+def get_entry_task(
+    chemsys: Union[str, Iterable[str]],
+    entry_set_params: Optional[dict],
+    entry_db_file: str,
+) -> Union[EntriesFromDb, EntriesFromMPRester]:
     """
-    Helper method for getting the an entry-acquiring FireTask. If an entry_db_file is
-    provided, uses the EntriesFromDb task; otherwise, uses the EntriesFromMPRester task.
+    Helper method for choosing an entry-acquiring FireTask depending on what is provided
+    by the user. If an entry_db_file is provided, uses the EntriesFromDb task;
+    otherwise, uses the EntriesFromMPRester task.
+
+    Args:
+        chemsys (str): String of chemical system to query (e.g. "Li-Mn-O")
+        entry_set_params (dict): Dictionary of parameters for constructing a
+            GibbsEntrySet.
+                - temperature (float): Temperature in Kelvin
+                - e_above_hull (float): E-above-hull in eV
+                - include_nist_data (bool): Whether to include NIST data
+                - include_barin_data (bool): Whether to include Barin data
+                - include_polymorphs (bool): Whether to include metastable polymorphs
+        entry_db_file (str): Path to file containing entries to use.
+
+    Retruns:
     """
     entry_set_params = entry_set_params if entry_set_params else {}
     temperature = entry_set_params.get("temperature", 300)

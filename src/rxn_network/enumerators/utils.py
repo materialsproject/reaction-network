@@ -2,15 +2,15 @@
 Utility functions used by the enumerator classes.
 """
 import warnings
-from typing import List, Union, Iterable, Optional, Set, Tuple, Dict
+from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 
-from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import ComputedEntry, Entry
 from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.core.composition import Composition, Element
+from pymatgen.entries.computed_entries import ComputedEntry, Entry
 
 import rxn_network.costs.calculators as calcs
-from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.core import Reaction
+from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 
@@ -35,7 +35,7 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = T
         )
 
     if stabilize:
-        entry = entry_set.stabilize_entry(entry, tol=1e-1)
+        entry = entry_set.get_stabilized_entry(entry, tol=1e-1)
 
     return entry
 
@@ -73,7 +73,7 @@ def apply_calculators(
 
 def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
     """
-    Returns chemical system a set of element names, for set of entries.
+    Returns chemical system as a set of element names, for set of entries.
 
     Args:
         entries: An iterable of entry-like objects
@@ -102,16 +102,16 @@ def get_total_chemsys_str(
 
 def group_by_chemsys(
     combos: Iterable[Tuple[Entry]], open_elem: Optional[Element] = None
-):
+) -> dict:
     """
     Groups entry combinations by chemical system, with optional open element.
 
     Args:
         combos: Iterable of entry combinations
-        open_elem:
+        open_elem: optional open element to include in chemical system grouping
 
     Returns:
-
+        Dictionary of entry combos grouped by chemical system
     """
     combo_dict: Dict[str, List[Tuple[Entry]]] = {}
     for combo in combos:
@@ -140,7 +140,7 @@ def stabilize_entries(
         tol: Numerical tolerance to ensure that the energy of the entry is below the hull
 
     Returns:
-
+        A list of new entries with energies adjusted to be on the hull
     """
     indices = [pd.all_entries.index(entry) for entry in entries_to_adjust]
 
@@ -157,15 +157,16 @@ def stabilize_entries(
     return new_entries
 
 
-def get_entry_by_comp(comp, entries):
+def get_min_entry_by_comp(comp: Composition, entries: Iterable[Entry]) -> Entry:
     """
+    Gets the entry with the lowest energy for a given composition from a set of provided entries.
 
     Args:
-        comp:
-        entries:
+        comp: Composition object
+        entries: Iterable of entries
 
     Returns:
-
+        Entry with the lowest enegy per atom for the given composition
     """
     possible_entries = filter(
         lambda e: e.composition.reduced_composition == comp.reduced_composition, entries
@@ -180,13 +181,13 @@ def get_computed_rxn(rxn: Reaction, entries: Iterable[Entry]) -> ComputedReactio
 
     Args:
         rxn: Reaction object
-        entries:
+        entries: Iterable of entries
 
     Returns:
-
+        A ComputedReaction object transformed from a normal Reaction object
     """
-    reactant_entries = [get_entry_by_comp(r, entries) for r in rxn.reactants]
-    product_entries = [get_entry_by_comp(p, entries) for p in rxn.products]
+    reactant_entries = [get_min_entry_by_comp(r, entries) for r in rxn.reactants]
+    product_entries = [get_min_entry_by_comp(p, entries) for p in rxn.products]
 
     rxn = ComputedReaction.balance(reactant_entries, product_entries)
     return rxn
@@ -201,15 +202,15 @@ def get_open_computed_rxn(
     OpenComputedReaction object containing a selection of those entries.
 
     Args:
-        rxn:
-        entries:
-        chempots:
-
+        rxn: Reaction object
+        entries: Iterable of entries
+        chempots: Dictionary of chemical potentials of open elements
+    `
     Returns:
-
+        An OpenComputedReaction object transformed from a normal Reaction object
     """
-    reactant_entries = [get_entry_by_comp(r, entries) for r in rxn.reactants]
-    product_entries = [get_entry_by_comp(p, entries) for p in rxn.products]
+    reactant_entries = [get_min_entry_by_comp(r, entries) for r in rxn.reactants]
+    product_entries = [get_min_entry_by_comp(p, entries) for p in rxn.products]
 
     rxn = OpenComputedReaction.balance(reactant_entries, product_entries, chempots)
 

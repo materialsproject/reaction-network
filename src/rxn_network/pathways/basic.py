@@ -17,7 +17,7 @@ class BasicPathway(Pathway):
     def __init__(self, reactions: List[Reaction], costs: Optional[List[float]] = None):
         """
         Args:
-            reactions ([ComputedReaction]): list of ComputedReaction objects in pymatgen
+            reactions ([ComputedReaction]): list of ComputedReaction objects
                 which occur along path.
             costs ([float]): list of corresponding costs for each reaction.
         """

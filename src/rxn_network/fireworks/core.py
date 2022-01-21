@@ -27,15 +27,16 @@ from rxn_network.firetasks.run_calc import (
 
 class EnumeratorFW(Firework):
     """
-    Firework for running a list of enumerators (which outputs a list of reactions).
-    Option to calculate competitiveness scores and store those as data within the reactions.
+    Firework for running a list of enumerators and storing the resulting reactions in a database.
+    An option is included to calculate competitiveness scores and store those as data
+    within the reactions.
     """
 
     def __init__(
         self,
         enumerators: Iterable[Enumerator],
-        entries: GibbsEntrySet = None,
-        chemsys: Union[str, Iterable[str]] = None,
+        entries: Optional[GibbsEntrySet] = None,
+        chemsys: Optional[Union[str, Iterable[str]]] = None,
         entry_set_params: Optional[Dict] = None,
         calculate_c_scores: Optional[Union[bool, int]] = False,
         cost_function: Optional[CostFunction] = None,
@@ -47,7 +48,7 @@ class EnumeratorFW(Firework):
         """
         Args:
             enumerators: List of enumerators to run
-            entries: EntrySet to use for enumeration
+            entries: EntrySet object containing entries to use for enumeration
             chemsys: If entries aren't provided, they will be retrivied either from
                 MPRester or from the entry_db corresponding to this chemsys.
             entry_set_params: Parameters to pass to the GibbsEntrySet constructor
@@ -69,6 +70,10 @@ class EnumeratorFW(Firework):
             entry_set = GibbsEntrySet(entries)
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
+            if not chemsys:
+                raise ValueError(
+                    "If entries are not provided, a chemsys must be provided!"
+                )
             tasks.append(
                 get_entry_task(
                     chemsys=chemsys,
@@ -80,8 +85,6 @@ class EnumeratorFW(Firework):
         targets = {
             target for enumerator in enumerators for target in enumerator.targets
         }
-
-        fw_name = f"Reaction Enumeration (Targets: {targets}): {chemsys}"
 
         tasks.append(
             RunEnumerators(enumerators=enumerators, entries=entry_set, chemsys=chemsys)
@@ -118,20 +121,22 @@ class EnumeratorFW(Firework):
 
         tasks.append(ReactionsToDb(db_file=db_file))
 
+        fw_name = f"Reaction Enumeration (Targets: {targets}): {chemsys}"
         super().__init__(tasks, parents=parents, name=fw_name)
 
 
 class NetworkFW(Firework):
     """
-    Firework for building a reaction network and performing (optional) pathfinding.
+    Firework for building a ReactionNetwork and optionally performing pathfinding.
+    Output data is stored within a database.
     """
 
     def __init__(
         self,
         enumerators: Iterable[Enumerator],
         cost_function: CostFunction,
-        entries: GibbsEntrySet = None,
-        chemsys: Union[str, Iterable[str]] = None,
+        entries: Optional[GibbsEntrySet] = None,
+        chemsys: Optional[Union[str, Iterable[str]]] = None,
         open_elem: Optional[str] = None,
         chempot: Optional[float] = None,
         solve_balanced_paths: bool = True,
@@ -143,21 +148,24 @@ class NetworkFW(Firework):
         parents=None,
     ):
         """
-
         Args:
-            enumerators:
-            cost_function:
-            entries:
-            chemsys:
-            open_elem:
-            chempot:
-            solve_balanced_paths:
-            entry_set_params:
-            pathway_params:
-            solver_params:
-            db_file:
-            entry_db_file:
-            parents:
+            enumerators: List of enumerators to use for calculating reactions in the network.
+            cost_function: A cost function used to assign edge weights to reactions in
+                the network.
+            entries: EntrySet object containing entries to use for enumeration (optional)
+            chemsys: If entries aren't provided, they will be retrivied either from
+                MPRester or from the entry_db corresponding to this chemsys.
+            entry_set_params: Parameters to pass to the GibbsEntrySet constructor
+            open_elem: Optional open element to use for renormalizing reaction energies.
+            chempot: Optional chemical potential assigned to open_elem.
+            solve_balanced_paths: Whether to solve for BalancedPathway objects using the
+                PathwaySolver. Defaults to True.
+            entry_set_params: Parameters to pass to the GibbsEntrySet constructor
+            pathway_params: Parameters to pass to the ReactionNetwork.find_pathways() method.
+            solver_params: Parameters to pass to the PathwaySolver constructor.
+            db_file: Path to the database file to store the reaction network and pathways in.
+            entry_db_file: Path to the database file containing entries (see chemsys argument)
+            parents: Parents of this Firework.
         """
         pathway_params = pathway_params if pathway_params else {}
         solver_params = solver_params if solver_params else {}
@@ -173,6 +181,10 @@ class NetworkFW(Firework):
             entry_set = GibbsEntrySet(entries)
             chemsys = "-".join(sorted(list(entry_set.chemsys)))
         else:
+            if not chemsys:
+                raise ValueError(
+                    "If entries are not provided, a chemsys must be provided!"
+                )
             tasks.append(
                 get_entry_task(
                     chemsys=chemsys,

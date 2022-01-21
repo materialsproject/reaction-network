@@ -17,9 +17,9 @@ from rxn_network.reactions.reaction_set import ReactionSet
 
 class PathwaySet(MSONable):
     """
-    A lightweight class for storing large sets of Pathway objects.
-    Automatically represents a set of pathways as a (non-rectangular) 2d array of
-    indices corresponding to reactions within a reaction set.
+    A lightweight class for storing large sets of Pathway objects. Automatically
+    represents a set of pathways as a (non-rectangular) 2D array of indices
+    corresponding to reactions within a reaction set.
     """
 
     def __init__(

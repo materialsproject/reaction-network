@@ -6,8 +6,9 @@ import collections
 import logging
 import warnings
 from copy import deepcopy
-from typing import Dict, List, Optional, Set, Union, Iterable
+from typing import Dict, Iterable, List, Optional, Set, Union
 
+from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
 from numpy.random import normal
 from pymatgen.analysis.phase_diagram import PhaseDiagram
@@ -167,7 +168,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         )
         return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
 
-    def stabilize_entry(self, entry: ComputedEntry, tol: float = 1e-6) -> ComputedEntry:
+    def get_stabilized_entry(
+        self, entry: ComputedEntry, tol: float = 1e-6
+    ) -> ComputedEntry:
         """
         Helper method for lowering the energy of a single entry such that it is just
         barely stable on the phase diagram.
@@ -200,6 +203,16 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             new_entry = MontyDecoder().process_decoded(entry_dict)
 
         return new_entry
+
+    @deprecated(
+        get_stabilized_entry,
+        "This method has been renamed. Use get_stabilized_entry instead.",
+    )
+    def stabilize_entry(self, entry: ComputedEntry, tol: float = 1e-6) -> ComputedEntry:
+        """
+        This method is deprecated. Use get_stabilized_entry instead.
+        """
+        return self.get_stabilized_entry(entry, tol)
 
     def get_entries_with_jitter(self) -> "GibbsEntrySet":
         """

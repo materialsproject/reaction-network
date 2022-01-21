@@ -1,6 +1,6 @@
 """
-Entry objects used in a Network. This holds multiple entries and can be used as data
-for a graph node.
+Entry objects used in a Network. These network entry objects hold multiple entries and
+can be used as data for a node in the graph.
 """
 from enum import Enum, auto
 from typing import List
@@ -28,8 +28,8 @@ class NetworkEntry(MSONable):
     def __init__(self, entries: List[Entry], description: NetworkEntryType):
         """
         Args:
-            entries: list of ComputedEntry-like objects
-            description: Node type
+            entries: list of Entry-like objects
+            description: Node type (e.g., Precursors, Target... see NetworkEntryType class)
         """
         self.entries = set(entries)
         self.elements = sorted(
@@ -56,7 +56,10 @@ class NetworkEntry(MSONable):
 
 
 class DummyEntry(NetworkEntry):
-    """A Dummy Entry that doesn't hold any info"""
+    """
+    A Dummy Entry that doesn't hold any info. This maybe useful for serving as an empty
+    node to facilitate pathfinding to all nodes, etc.
+    """
 
     def __init__(self):  # pylint: disable=W0231
         """Dummy node doesn't need any parameters"""

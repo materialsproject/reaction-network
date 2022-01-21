@@ -23,16 +23,20 @@ logger = get_logger(__name__)
 class RunEnumerators(FiretaskBase):
     """
     Run a list of enumerators on a provided set of computed entries and dump the
-    calculated ComputedReaction objects to a file (rxns.json). Metadata is stored as metadata.json.
+    calculated ComputedReaction objects to a file (rxns.json.gz).
 
     Required params:
         enumerators (List[Enumerator]): Enumerators to run
         entries (EntrySet): Computed entries to be fed into enumerate()
             methods
 
+    Optional params:
+        None
+
     """
 
-    required_params = ["enumerators", "entries"]
+    required_params: List[str] = ["enumerators", "entries"]
+    optional_params: List[str] = []
 
     def run_task(self, fw_spec):
         enumerators = self["enumerators"]
@@ -73,8 +77,33 @@ class RunEnumerators(FiretaskBase):
 @explicit_serialize
 class CalculateCScores(FiretaskBase):
     """
-    Calculates the competitiveness score for a set of reactions and stores that within the reaction
-    object data.
+    Calculates the competitiveness score using the CompetitivenessScoreCalculator for a
+    set of reactions and stores that within the reaction object data.
+
+    Required params:
+        entries (GibbsEntrySet): An entry set to be used for the calculation of
+            competitiveness scores.
+        cost_function (CostFunction): The cost function to be used in determining the
+            cost of competing reactions.
+
+    Optional params:
+        rxns (ReactionSet): A set of reactions of interest. If not provided, will load
+            from a rxns.json.gz file
+        k (int): The number of reactions to be considered for the calculation of the
+            competitiveness scores. Will take the k lowest-cost reactions.
+        open_phases (Iterable[str]): An optional list of open phases to be used in
+            calculating open reactions with the BasicOpenEnumerator.
+        open_elem (Union[str, Element]): An optional open element to be used for
+            calculating open reactions with MinimizeGrandPotentialEnumerator.
+        chempot (float): The chemical potential of the open element.
+        use_basic (bool): Whether or not to use the basic enumerator(s)
+            (BasicEnumerator, BasicOpenEnumerator) in enumerating competing reactions. Defaults to True.
+        use_minimize (bool): Whether or not to use the minimze enumerator(s)
+            (MinimizeGibbsEnumerator, MinimizeGrandPotentialEnumerator) in enumerating
+            competing reactions. Defaults to True.
+        basic_enumerator_kwargs (dict): Optional kwargs to pass to BasicEnumerator (and BasicOpenEnumerator)
+        minimize_enumerator_kwargs (dict): Optional kwargs to pass to
+            MinimizeGibbsEnumerator (and MinimizeGrandPotentialEnumerator)
     """
 
     required_params: List[str] = ["entries", "cost_function"]
@@ -132,14 +161,23 @@ class CalculateCScores(FiretaskBase):
 @explicit_serialize
 class BuildNetwork(FiretaskBase):
     """
-    Builds a reaction network from a set of computed entries, a list of enumerators , and
-    a cost function.
+    Builds a reaction network from a set of computed entries, a list of enumerators, and
+    a cost function. Optionally performs pathfinding if both the precursors and targets
+    optional parameters are provided.
 
     Required params:
         entries (List[ComputedEntry]): Computed entries to be fed into enumerate()
             methods
         enumerators (List[Enumerator]): Enumerators to run
-        cost_function (CostFunction): cost function to use for edge weights
+        cost_function (CostFunction): cost function to use for edge weights in the network
+
+    Optional params:
+        precursors (Iterable[Union[Entry, str]]): A list of precursor formulas to be used for pathfinding.
+        targets (Iterable[Union[Entry, str]]): A list of target formulas to be used for pathfinding.
+        k (int): The number of shortest paths to find to each target. Defaults to 10.
+        open_elem (str): An optional open element to be used for modifying reaction energies
+            and finding open reactions.
+        chempot (float): The chemical potential of the specified open element.
     """
 
     required_params = ["entries", "enumerators", "cost_function"]
@@ -200,14 +238,29 @@ class BuildNetwork(FiretaskBase):
 @explicit_serialize
 class RunSolver(FiretaskBase):
     """
-    Balance reaction pathways.
+    Finds BalancedPathway objects from a set of graph-derived reaction Pathway objects
+    by using the PathwaySolver class. Optional parameters are passed to the
+    PathwaySolver.solve() function.
 
     Required params:
-        entries (Solver): solver to use for balancing
+        pathways: (List[Pathway]): A list of pathway objects to be considered by the solver
+        entries (GibbsEntrySet): GibbsEntrySet containing all entries in the network.
+        cost_function (CostFunction): cost function to use for edge weights of solved intermediate reactions
+        net_rxn (ComputedReaction): The net reaction representing the complete
+            conversion of precursors --> targets.
 
     Optional params:
-        max_num_combos (int): maximum number of combinations to enumerate
-        find_intermediate_rxns (bool): whether to find intermediate reactions
+        max_num_combos (int): maximum number of combinations to enumerate. Defaults to 4
+        find_intermediate_rxns (bool): whether to find intermediate reactions in the
+            Solver. Defaults to True.
+        intermediate_rxn_energy_cutoff (float): only consider intermediate reactions
+            with energies below this cutoff value. Defaults to 0.0.
+        use_basic_enumerator (bool): Whether to use the BasicEnumerator to find
+            intermediate reactions. Defaults to True.
+        use_minimize_enumerator (bool): Whether to use the Minimize enumerator(s) to find
+            intermediate reactions. Defaults to False.
+        filter_interdependent (bool): Whether to filter out BalancedPathway objects
+            which contain interdependent reactions. Defaults to True.
     """
 
     required_params = ["pathways", "entries", "cost_function", "net_rxn"]

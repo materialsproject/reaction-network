@@ -1,7 +1,6 @@
 """
 Graph-related functions specific to the graph-tool library. Used in the network module.
 """
-
 from queue import Empty, PriorityQueue
 from typing import Dict
 
@@ -11,71 +10,6 @@ from graph_tool.topology import shortest_path
 
 DEFAULT_VERTEX_PROPS = {"entry": "object", "type": "int"}
 DEFAULT_EDGE_PROPS = {"rxn": "object", "cost": "double", "type": "string"}
-
-
-def initialize_graph(
-    vertex_props: Dict[str, str] = None, edge_props: Dict[str, str] = None
-) -> Graph:
-    """
-
-    Args:
-        vertex_props:
-        edge_props:
-
-    Returns:
-
-    """
-    g = Graph()
-
-    if not vertex_props:
-        vertex_props = {}
-    if not edge_props:
-        edge_props = {}
-
-    vertex_props.update(DEFAULT_VERTEX_PROPS)
-    edge_props.update(DEFAULT_EDGE_PROPS)
-
-    for name, obj_type in vertex_props.items():
-        g.vp[name] = g.new_vertex_property(obj_type)
-    for name, obj_type in edge_props.items():
-        g.ep[name] = g.new_edge_property(obj_type)
-
-    return g
-
-
-def load_graph(filename):
-    """
-    Loads a graph-tool graph from a file.
-    """
-    g = load_g(filename)
-    return g
-
-
-def save_graph(g, filename):
-    """
-    Saves a graph-tool graph to a file.
-    """
-    g.save(filename)
-
-
-def update_vertex_props(g, v, prop_dict):
-    """
-    Helper method for updating several vertex properties at once in a graph-tool
-    graph.
-
-    Args:
-        g (gt.Graph): a graph-tool Graph object.
-        v (gt.Vertex or int): a graph-tool Vertex object (or its index) for a vertex
-            in the provided graph.
-        prop_dict (dict): a dictionary of the form {"prop": val}, where prop is the
-            name of a VertexPropertyMap of the graph and val is the new updated
-            value for that vertex's property.
-
-    Returns:
-        None
-    """
-    for prop, val in prop_dict.items():
-        g.vp[prop][v] = val
 
 
 def yens_ksp(
@@ -88,12 +22,13 @@ def yens_ksp(
 ):
     """
     Yen's Algorithm for k-shortest paths, adopted for graph-tool. Utilizes GraphView
-    objects to speed up filtering. Inspired by igraph implementation by
-    Antonin Lenfant.
+    objects to speed up filtering. I
 
-    Ref: Jin Y. Yen, "Finding the K Shortest Loopless Paths
-    in a Network", Management Science, Vol. 17, No. 11, Theory Series (Jul.,
-    1971), pp. 712-716.
+    This implementation was inspired by the igraph implementation by Antonin Lenfant.
+
+    Reference:
+        Jin Y. Yen, "Finding the K Shortest Loopless Paths n a Network", Management
+        Science, Vol. 17, No. 11, Theory Series (Jul., 1971), pp. 712-716.
 
     Args:
         g: the graph-tool graph object.
@@ -172,10 +107,58 @@ def yens_ksp(
     return a
 
 
-def update_vertex_properties(g, v, prop_dict):
+def initialize_graph(
+    vertex_props: Dict[str, str] = None, edge_props: Dict[str, str] = None
+) -> Graph:
+    """
+    Initializes a graph-tool graph with the provided vertex and edge properties,
+    provided a dictionary of the form {"prop": "type"}, where prop is the name of the
+    property and type is the data type.
+
+    Args:
+        vertex_props: Dictionary of vertex property map properties in the form of {"prop": "type"}.
+        edge_props: Dictionary of edge property map properties in the form of {"prop": "type"}.
+
+    Returns:
+        Graph: a graph-tool graph object.
+    """
+    g = Graph()
+
+    if not vertex_props:
+        vertex_props = {}
+    if not edge_props:
+        edge_props = {}
+
+    vertex_props.update(DEFAULT_VERTEX_PROPS)
+    edge_props.update(DEFAULT_EDGE_PROPS)
+
+    for name, obj_type in vertex_props.items():
+        g.vp[name] = g.new_vertex_property(obj_type)
+    for name, obj_type in edge_props.items():
+        g.ep[name] = g.new_edge_property(obj_type)
+
+    return g
+
+
+def load_graph(filename: str):
+    """
+    Loads a graph-tool graph from a file name.
+    """
+    g = load_g(filename)
+    return g
+
+
+def save_graph(g: Graph, filename: str):
+    """
+    Saves a graph-tool graph to a file by calling the Graph.save(filename) method.
+    """
+    g.save(filename)
+
+
+def update_vertex_props(g, v, prop_dict):
     """
     Helper method for updating several vertex properties at once in a graph-tool
-    graph; note that this updates the vertex property map in place.
+    Graph; note that this updates the vertex property map in place.
 
     Args:
         g (gt.Graph): a graph-tool Graph object.

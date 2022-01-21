@@ -73,7 +73,8 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         return comb(len(entries), 2) * 2
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
-        """Reacts"""
+        """React method for MinimizeGibbsEnumerator, which uses the interfacial reaction
+        approach (see _react_interface())"""
         r = list(reactants)
         r0 = r[0]
 
@@ -88,6 +89,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
 
     @staticmethod
     def _get_rxn_iterable(combos, open_combos):
+        """Gets the iterable used to generate reactions"""
         _ = open_combos  # unused argument
 
         return product(combos, [None])
@@ -178,6 +180,8 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         self._build_grand_pd = True
 
     def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
+        """Same as the MinimizeGibbsEnumerator react function, but with ability to
+        specify open element and grand potential phase diagram"""
         r = list(reactants)
         r0 = r[0]
 

@@ -35,5 +35,6 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
             temperature: Temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
+            data: Optional dictionary containing entry data
         """
         super().__init__(composition, temperature, data)
