@@ -1,203 +1,238 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/CHANGELOG/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/CHANGELOG/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/utils/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/enumerators/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/core/calculator/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/network/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/core/cost_function/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/core/calculator/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/core/enumerator/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/core/cost_function/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/core/network/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/core/enumerator/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/core/pathway/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/core/network/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/core/reaction/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/core/pathway/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/core/solver/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/core/reaction/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/costs/calculators/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/core/solver/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/costs/softplus/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/costs/calculators/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/data/data/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/costs/competitiveness/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/entries/entry_set/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/costs/softplus/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/entries/gibbs/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/data/data/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/entries/nist/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/entries/barin/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/enumerators/basic/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/entries/entry_set/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/enumerators/minimize/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/entries/experimental/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/enumerators/utils/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/entries/gibbs/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/firetasks/build_inputs/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/entries/nist/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/firetasks/parse_outputs/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/enumerators/basic/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/firetasks/run_calc/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/enumerators/minimize/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/firetasks/utils/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/enumerators/utils/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/fireworks/core/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/firetasks/build_inputs/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/network/entry/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/firetasks/parse_outputs/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/network/gt/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/firetasks/run_calc/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/network/network/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/firetasks/utils/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/network/utils/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/fireworks/core/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/network/visualize/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/network/entry/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/pathways/balanced/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/network/gt/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/pathways/basic/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/network/network/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/pathways/solver/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/network/utils/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/pathways/utils/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/network/visualize/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/reactions/basic/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/pathways/balanced/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/reactions/computed/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/pathways/basic/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/reactions/open/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/pathways/pathway_set/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/reactions/reaction_set/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/pathways/plotting/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/reactions/utils/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/pathways/solver/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/thermo/chempot_diagram/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/reactions/basic/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/GENESIS-EFRC/reaction-network/reference/thermo/utils/</loc>
-         <lastmod>2021-10-01</lastmod>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/reactions/computed/</loc>
+         <lastmod>2022-01-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/reactions/open/</loc>
+         <lastmod>2022-01-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/reactions/plotting/</loc>
+         <lastmod>2022-01-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/reactions/reaction_set/</loc>
+         <lastmod>2022-01-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/thermo/chempot_diagram/</loc>
+         <lastmod>2022-01-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/thermo/utils/</loc>
+         <lastmod>2022-01-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/utils/database/</loc>
+         <lastmod>2022-01-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://genesis-efrc.github.io/reaction-network/reference/utils/funcs/</loc>
+         <lastmod>2022-01-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

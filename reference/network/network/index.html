@@ -1,466 +1,1750 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Documentation for rxn_network">
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
     
-    <link rel="canonical" href="https://github.com/GENESIS-EFRC/reaction-network/reference/network/network/">
-    <link rel="shortcut icon" href="../../../img/favicon.ico">
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for rxn_network">
+      
+      
+      
+        <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/network/network/">
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.7">
+    
+    
+      
+        <title>Network - Reaction Network Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.cd566b2a.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.e6a45f82.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../css/mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
 
     
-    <title>Network - Reaction Network Documentation</title>
     
-
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
-    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="../../../css/base.min.css" rel="stylesheet">
-    <link href="../../../css/cinder.min.css" rel="stylesheet">
-
+  </head>
+  
+  
     
-        
-        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/github.min.css">
-        
     
-    <link href="../../../assets/_mkdocstrings.css" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-        <![endif]-->
-
+      
     
-
-     
-</head>
-
-<body>
-
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-
-        <!-- Collapsed navigation -->
-        <div class="navbar-header">
-            <!-- Expander button -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            
-
-            <!-- Main title -->
-
-            
-              <a class="navbar-brand" href="../../..">Reaction Network Documentation</a>
-            
-        </div>
-
-        <!-- Expanded navigation -->
-        <div class="navbar-collapse collapse">
-                <!-- Main navigation -->
-                <ul class="nav navbar-nav">
-                
-                
-                    <li >
-                        <a href="../../..">Home</a>
-                    </li>
-                
-                
-                
-                    <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reference <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Core</a>
-    <ul class="dropdown-menu">
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
         
-            
-<li >
-    <a href="../../core/calculator/">Calculator</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../core/cost_function/">Cost Function</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../core/enumerator/">Enumerator</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../core/network/">Network</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../core/pathway/">Pathway</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../core/reaction/">Reaction</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../core/solver/">Solver</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Costs</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../../costs/calculators/">Calculators</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../costs/softplus/">Softplus</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-<li >
-    <a href="../../data/data/">Data</a>
-</li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Entries</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../../entries/entry_set/">Entry Set</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../entries/gibbs/">Gibbs</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../entries/nist/">Nist</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Enumerators</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../../enumerators/basic/">Basic</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../enumerators/minimize/">Minimize</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../enumerators/utils/">Utils</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Firetasks</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../../firetasks/build_inputs/">Build Inputs</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../firetasks/parse_outputs/">Parse Outputs</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../firetasks/run_calc/">Run Calc</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../firetasks/utils/">Utils</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Fireworks</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../../fireworks/core/">Core</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Network</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../entry/">Entry</a>
-</li>
-
-        
-            
-<li >
-    <a href="../gt/">Graph-tool</a>
-</li>
-
-        
-            
-<li class="active">
-    <a href="./">Network</a>
-</li>
-
-        
-            
-<li >
-    <a href="../utils/">Utils</a>
-</li>
-
-        
-            
-<li >
-    <a href="../visualize/">Visualize</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Pathways</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../../pathways/balanced/">Balanced</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../pathways/basic/">Basic</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../pathways/solver/">Solver</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../pathways/utils/">Utils</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Reactions</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../../reactions/basic/">Basic</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../reactions/computed/">Computed</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../reactions/open/">Open</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../reactions/reaction_set/">Reaction Set</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../reactions/utils/">Utils</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Thermo</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../../thermo/chempot_diagram/">Chempot Diagram</a>
-</li>
-
-        
-            
-<li >
-    <a href="../../thermo/utils/">Utils</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-<li >
-    <a href="../../utils/">Utils</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../../../CHANGELOG/">CHANGELOG</a>
-                    </li>
-                
-                
-                </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fas fa-search"></i> Search
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="prev" href="../gt/">
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="next" href="../utils/">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/GENESIS-EFRC/reaction-network/edit/master/docs/reference/network/network.md"><i class="fab fa-github"></i> Edit on GitHub</a>
-                    </li>
-            </ul>
-        </div>
+        <a href="#rxn_network.network.network" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
-</div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
 
-    <div class="container">
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Reaction Network Documentation" class="md-header__button md-logo" aria-label="Reaction Network Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4.41 3 3 4.41 5.69 7.1A7.924 7.924 0 0 0 4 12c0 1.85.63 3.55 1.69 4.9L3 19.59 4.41 21l2.69-2.69A7.924 7.924 0 0 0 12 20c1.85 0 3.55-.63 4.9-1.69L19.59 21 21 19.59l-2.69-2.69A7.924 7.924 0 0 0 20 12c0-1.85-.63-3.55-1.69-4.9L21 4.41 19.59 3 16.9 5.69A7.924 7.924 0 0 0 12 4c-1.85 0-3.55.63-4.9 1.69L4.41 3M12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Reaction Network Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Network
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
         
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+          
         
-        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#rxn_network.network.network">rxn_network.network.network</a></li>
-        <li class="first-level "><a href="#rxn_network.network.network.ReactionNetwork">ReactionNetwork</a></li>
-            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.__init__">__init__()</a></li>
-                
-            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.build">build()</a></li>
-                
-            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.find_pathways">find_pathways()</a></li>
-                
-            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.set_precursors">set_precursors()</a></li>
-                
-            <li class="second-level"><a href="#rxn_network.network.network.ReactionNetwork.set_target">set_target()</a></li>
-                
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/GENESIS-EFRC/reaction-network/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Github
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../.." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../enumerators/" class="md-tabs__link">
+        Notebooks
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../core/calculator/" class="md-tabs__link md-tabs__link--active">
+        Reference
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../../CHANGELOG/" class="md-tabs__link">
+      CHANGELOG
+    </a>
+  </li>
+
+      
     </ul>
-</div></div>
-        <div class="col-md-9" role="main">
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Reaction Network Documentation" class="md-nav__button md-logo" aria-label="Reaction Network Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4.41 3 3 4.41 5.69 7.1A7.924 7.924 0 0 0 4 12c0 1.85.63 3.55 1.69 4.9L3 19.59 4.41 21l2.69-2.69A7.924 7.924 0 0 0 12 20c1.85 0 3.55-.63 4.9-1.69L19.59 21 21 19.59l-2.69-2.69A7.924 7.924 0 0 0 20 12c0-1.85-.63-3.55-1.69-4.9L21 4.41 19.59 3 16.9 5.69A7.924 7.924 0 0 0 12 4c-1.85 0-3.55.63-4.9 1.69L4.41 3M12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6z"/></svg>
+
+    </a>
+    Reaction Network Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/GENESIS-EFRC/reaction-network/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Github
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Notebooks
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Notebooks" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Notebooks
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_1">
+          Enumerators
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Enumerators" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_1">
+          <span class="md-nav__icon md-icon"></span>
+          Enumerators
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../enumerators/" class="md-nav__link">
+        reaction-network (Demo Notebook): Enumerators
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2" type="checkbox" id="__nav_2_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_2">
+          Network
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Network" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          Network
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../network/" class="md-nav__link">
+        reaction-network (Demo Notebook): Networks
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_1">
+          Core
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Core" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          Core
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/calculator/" class="md-nav__link">
+        Calculator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/cost_function/" class="md-nav__link">
+        Cost Function
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/enumerator/" class="md-nav__link">
+        Enumerator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/network/" class="md-nav__link">
+        Network
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/pathway/" class="md-nav__link">
+        Pathway
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/reaction/" class="md-nav__link">
+        Reaction
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/solver/" class="md-nav__link">
+        Solver
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_2">
+          Costs
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Costs" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Costs
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/calculators/" class="md-nav__link">
+        Calculators
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/competitiveness/" class="md-nav__link">
+        Competitiveness
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/softplus/" class="md-nav__link">
+        Softplus
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/data/" class="md-nav__link">
+        Data
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" type="checkbox" id="__nav_3_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_4">
+          Entries
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Entries" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_4">
+          <span class="md-nav__icon md-icon"></span>
+          Entries
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/barin/" class="md-nav__link">
+        Barin
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/entry_set/" class="md-nav__link">
+        Entry Set
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/experimental/" class="md-nav__link">
+        Experimental
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/gibbs/" class="md-nav__link">
+        Gibbs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/nist/" class="md-nav__link">
+        Nist
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_5" type="checkbox" id="__nav_3_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_5">
+          Enumerators
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Enumerators" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_5">
+          <span class="md-nav__icon md-icon"></span>
+          Enumerators
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enumerators/basic/" class="md-nav__link">
+        Basic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enumerators/minimize/" class="md-nav__link">
+        Minimize
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enumerators/utils/" class="md-nav__link">
+        Utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_6" type="checkbox" id="__nav_3_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_6">
+          Firetasks
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Firetasks" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_6">
+          <span class="md-nav__icon md-icon"></span>
+          Firetasks
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../firetasks/build_inputs/" class="md-nav__link">
+        Build Inputs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../firetasks/parse_outputs/" class="md-nav__link">
+        Parse Outputs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../firetasks/run_calc/" class="md-nav__link">
+        Run Calc
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../firetasks/utils/" class="md-nav__link">
+        Utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_7">
+          Fireworks
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Fireworks" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_7">
+          <span class="md-nav__icon md-icon"></span>
+          Fireworks
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fireworks/core/" class="md-nav__link">
+        Core
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_8">
+          Network
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Network" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_8">
+          <span class="md-nav__icon md-icon"></span>
+          Network
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../entry/" class="md-nav__link">
+        Entry
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gt/" class="md-nav__link">
+        Graph-tool
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Network
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Network
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.network.network" class="md-nav__link">
+    rxn_network.network.network
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork" class="md-nav__link">
+    ReactionNetwork
+  </a>
+  
+    <nav class="md-nav" aria-label="ReactionNetwork">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.chemsys" class="md-nav__link">
+    chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.graph" class="md-nav__link">
+    graph
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.as_dict" class="md-nav__link">
+    as_dict()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.build" class="md-nav__link">
+    build()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.find_pathways" class="md-nav__link">
+    find_pathways()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.from_dict" class="md-nav__link">
+    from_dict()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.from_dict_and_file" class="md-nav__link">
+    from_dict_and_file()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.load_graph" class="md-nav__link">
+    load_graph()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.set_precursors" class="md-nav__link">
+    set_precursors()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.set_target" class="md-nav__link">
+    set_target()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.write_graph" class="md-nav__link">
+    write_graph()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        Utils
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../visualize/" class="md-nav__link">
+        Visualize
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_9" type="checkbox" id="__nav_3_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_9">
+          Pathways
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Pathways" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_9">
+          <span class="md-nav__icon md-icon"></span>
+          Pathways
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/balanced/" class="md-nav__link">
+        Balanced
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/basic/" class="md-nav__link">
+        Basic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/pathway_set/" class="md-nav__link">
+        Pathway Set
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/plotting/" class="md-nav__link">
+        Plotting
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/solver/" class="md-nav__link">
+        Solver
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_10" type="checkbox" id="__nav_3_10" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_10">
+          Reactions
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reactions" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_10">
+          <span class="md-nav__icon md-icon"></span>
+          Reactions
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/basic/" class="md-nav__link">
+        Basic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/computed/" class="md-nav__link">
+        Computed
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/open/" class="md-nav__link">
+        Open
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/plotting/" class="md-nav__link">
+        Plotting
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/reaction_set/" class="md-nav__link">
+        Reaction Set
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_11" type="checkbox" id="__nav_3_11" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_11">
+          Thermo
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Thermo" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_11">
+          <span class="md-nav__icon md-icon"></span>
+          Thermo
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../thermo/chempot_diagram/" class="md-nav__link">
+        Chempot Diagram
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../thermo/utils/" class="md-nav__link">
+        Utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_12" type="checkbox" id="__nav_3_12" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_12">
+          Utils
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Utils" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_12">
+          <span class="md-nav__icon md-icon"></span>
+          Utils
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utils/database/" class="md-nav__link">
+        Database
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utils/funcs/" class="md-nav__link">
+        Funcs
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        CHANGELOG
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.network.network" class="md-nav__link">
+    rxn_network.network.network
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork" class="md-nav__link">
+    ReactionNetwork
+  </a>
+  
+    <nav class="md-nav" aria-label="ReactionNetwork">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.chemsys" class="md-nav__link">
+    chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.graph" class="md-nav__link">
+    graph
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.as_dict" class="md-nav__link">
+    as_dict()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.build" class="md-nav__link">
+    build()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.find_pathways" class="md-nav__link">
+    find_pathways()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.from_dict" class="md-nav__link">
+    from_dict()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.from_dict_and_file" class="md-nav__link">
+    from_dict_and_file()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.load_graph" class="md-nav__link">
+    load_graph()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.set_precursors" class="md-nav__link">
+    set_precursors()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.set_target" class="md-nav__link">
+    set_target()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.network.network.ReactionNetwork.write_graph" class="md-nav__link">
+    write_graph()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+<a href="https://github.com/GENESIS-EFRC/reaction-network/edit/master/docs/reference/network/network.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+  <h1>Network</h1>
 
 <div class="doc doc-object doc-module">
 
 <a id="rxn_network.network.network"></a>
     <div class="doc doc-contents first">
 
-      <p>Implementation of an actual reaction network interface.</p>
+      <p>Implementation of reaction network interface.</p>
 
 
 
@@ -477,17 +1761,355 @@
 
 
 <h2 id="rxn_network.network.network.ReactionNetwork" class="doc doc-heading">
-        <code>ReactionNetwork</code>
+        <code>
+ReactionNetwork            (<a title="rxn_network.core.network.Network" href="../../core/network/#rxn_network.core.network.Network">Network</a>)
+        </code>
 
 
 
-<a href="#rxn_network.network.network.ReactionNetwork" class="headerlink" title="Permanent link">&para;</a></h2>
+</h2>
 
     <div class="doc doc-contents ">
 
       <p>Main reaction network class for building graphs of reactions and performing
 pathfinding.</p>
 
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReactionNetwork</span><span class="p">(</span><span class="n">Network</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main reaction network class for building graphs of reactions and performing</span>
+<span class="sd">    pathfinding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span>
+        <span class="n">enumerators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">],</span>
+        <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span><span class="p">,</span>
+        <span class="n">open_elem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">chempot</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a ReactionNetwork object for a set of entires, enumerator,</span>
+<span class="sd">        and cost function. The network can be constructed by calling build().</span>
+
+<span class="sd">        Note: the precursors and target must be set by calling set_precursors() and</span>
+<span class="sd">        set_target() respectively.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entries: iterable of entry-like objects</span>
+<span class="sd">            enumerators: iterable of enumerators which will be called during the</span>
+<span class="sd">                build of the network</span>
+<span class="sd">            cost_function: the function used to calculate the cost of each reaction edge</span>
+<span class="sd">            open_elem: Optional name of an element that is kept open during reaction</span>
+<span class="sd">            chempot: Optional associated chemical potential of open element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">,</span> <span class="n">enumerators</span><span class="o">=</span><span class="n">enumerators</span><span class="p">,</span> <span class="n">cost_function</span><span class="o">=</span><span class="n">cost_function</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="o">=</span> <span class="n">open_elem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chempot</span> <span class="o">=</span> <span class="n">chempot</span>
+
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct the reaction network graph object and store under the &quot;graph&quot;</span>
+<span class="sd">        attribute. Does NOT initialize precursors or target; you must call set_precursors()</span>
+<span class="sd">        or set_target() to do so.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rxn_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns</span><span class="p">()</span>
+        <span class="n">costs</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">calculate_costs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cost_function</span><span class="p">)</span>
+        <span class="n">rxns</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building graph from reactions...&quot;</span><span class="p">)</span>
+        <span class="n">nodes</span><span class="p">,</span> <span class="n">rxn_edges</span> <span class="o">=</span> <span class="n">get_rxn_nodes_and_edges</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="n">initialize_graph</span><span class="p">()</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">network_entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nodes</span><span class="p">):</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entry&quot;</span><span class="p">:</span> <span class="n">network_entry</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">network_entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+            <span class="n">update_vertex_props</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">props</span><span class="p">)</span>
+
+        <span class="n">edge_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">edge</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rxn_edges</span><span class="p">,</span> <span class="n">costs</span><span class="p">,</span> <span class="n">rxns</span><span class="p">):</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">edge_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">rxn</span><span class="p">,</span> <span class="s2">&quot;reaction&quot;</span><span class="p">))</span>
+
+        <span class="n">edge_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">get_loopback_edges</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">nodes</span><span class="p">))</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">edge_list</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">g</span>
+
+    <span class="k">def</span> <span class="nf">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BasicPathway</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the k-shortest paths to a provided list of 1 or more targets.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            targets: List of the formulas of each target</span>
+<span class="sd">            k: Number of shortest paths to find for each target</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of BasicPathway objects to all provided targets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Must call set_precursors() before pathfinding!&quot;</span><span class="p">)</span>
+
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PATHS to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------- </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">pathways</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shortest_paths</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pathways</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">paths</span>
+
+    <span class="k">def</span> <span class="nf">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Entry</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the precursors of the network. Removes all references to previous</span>
+<span class="sd">        precursors.</span>
+
+<span class="sd">        If entries are provided, will use the entries to set the precursors. If strings</span>
+<span class="sd">        are provided, will automatically find minimum-energy entries with matching reduced_formula.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            precursors: iterable of</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must call build() before setting precursors!&quot;</span><span class="p">)</span>
+
+        <span class="n">precursors</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">p</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">))</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">precursors</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">precursors</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
+            <span class="n">precursors_v</span> <span class="o">=</span> <span class="n">find_vertex</span><span class="p">(</span>
+                <span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">remove_vertex</span><span class="p">(</span><span class="n">precursors_v</span><span class="p">)</span>
+            <span class="n">loopback_edges</span> <span class="o">=</span> <span class="n">find_edge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="s2">&quot;loopback_precursors&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">loopback_edges</span><span class="p">:</span>
+                <span class="n">g</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">precursors</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One or more precursors are not included in network!&quot;</span><span class="p">)</span>
+
+        <span class="n">precursors_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+        <span class="n">precursors_entry</span> <span class="o">=</span> <span class="n">NetworkEntry</span><span class="p">(</span><span class="n">precursors</span><span class="p">,</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="p">)</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entry&quot;</span><span class="p">:</span> <span class="n">precursors_entry</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">precursors_entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+        <span class="n">update_vertex_props</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">precursors_v</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+
+        <span class="n">add_edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entry&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Reactants</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">precursors</span><span class="p">):</span>
+                    <span class="n">add_edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">precursors_v</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;precursors&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Products</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">v2</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+                    <span class="n">entry2</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entry&quot;</span><span class="p">][</span><span class="n">v2</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">entry2</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Reactants</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">precursors</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">entry2</span><span class="o">.</span><span class="n">entries</span><span class="p">):</span>
+                            <span class="k">continue</span>
+                        <span class="k">if</span> <span class="n">precursors</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">entry2</span><span class="o">.</span><span class="n">entries</span><span class="p">):</span>
+                            <span class="n">add_edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;loopback_precursors&quot;</span><span class="p">))</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">add_edges</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span> <span class="o">=</span> <span class="n">precursors</span>
+
+    <span class="k">def</span> <span class="nf">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Entry</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If entry is provided, will use that entry to set the target. If string is</span>
+<span class="sd">        provided, will automatically find minimum-energy entry with matching</span>
+<span class="sd">        reduced_formula.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target: Entry, or string of reduced formula, of target</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must call build() before setting target!&quot;</span><span class="p">)</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">target</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">))</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Target is not included in network!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
+            <span class="n">target_v</span> <span class="o">=</span> <span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="o">.</span><span class="n">value</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">remove_vertex</span><span class="p">(</span><span class="n">target_v</span><span class="p">)</span>
+
+        <span class="n">target_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+        <span class="n">target_entry</span> <span class="o">=</span> <span class="n">NetworkEntry</span><span class="p">([</span><span class="n">target</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="p">)</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entry&quot;</span><span class="p">:</span> <span class="n">target_entry</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">target_entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+        <span class="n">update_vertex_props</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+
+        <span class="n">add_edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;entry&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Products</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+                <span class="n">add_edges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">])</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">add_edges</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">target</span>
+
+    <span class="k">def</span> <span class="nf">load_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads graph-tool graph from file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename: Filename of graph object to load (for example, .gt or .gt.gz format)</span>
+
+<span class="sd">        Returns: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">load_graph</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">write_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes graph to file. If filename is not provided, will write to CHEMSYS.gt.gz</span>
+<span class="sd">        (where CHEMSYS is the chemical system of the network)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename: Filename to write to. If None, writes to default filename.</span>
+
+<span class="sd">        Returns: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">.gt.gz&quot;</span>
+
+        <span class="n">save_graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_shortest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds the k shortest paths using Yen&#39;s algorithm and returns BasicPathways&quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">precursors_v</span> <span class="o">=</span> <span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="o">.</span><span class="n">value</span><span class="p">)[</span>
+            <span class="mi">0</span>
+        <span class="p">]</span>
+        <span class="n">target_v</span> <span class="o">=</span> <span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="o">.</span><span class="n">value</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">yens_ksp</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">precursors_v</span><span class="p">,</span> <span class="n">target_v</span><span class="p">):</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path_from_graph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">paths</span>
+
+    <span class="k">def</span> <span class="nf">_get_rxns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReactionSet</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Gets reaction set by running all enumerators&quot;&quot;&quot;</span>
+        <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">enumerator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">enumerators</span><span class="p">:</span>
+            <span class="n">rxns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">enumerator</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">))</span>
+
+        <span class="n">rxns</span> <span class="o">=</span> <span class="n">ReactionSet</span><span class="o">.</span><span class="n">from_rxns</span><span class="p">(</span>
+            <span class="n">rxns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="n">open_elem</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">,</span> <span class="n">chempot</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chempot</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">rxns</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_path_from_graph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets a BasicPathway object from a shortest path found in the network&quot;&quot;&quot;</span>
+        <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">costs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">][</span><span class="n">v</span><span class="p">]</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Products</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="n">step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+
+                <span class="n">rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">][</span><span class="n">e</span><span class="p">])</span>
+                <span class="n">costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">][</span><span class="n">e</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">BasicPathway</span><span class="p">(</span><span class="n">reactions</span><span class="o">=</span><span class="n">rxns</span><span class="p">,</span> <span class="n">costs</span><span class="o">=</span><span class="n">costs</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict_and_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convenience constructor method that loads a ReactionNetwork object from a dictionary (MSONable version) and a</span>
+<span class="sd">        filename (to load graph object in graph-tool).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            d: Dictionary containing the ReactionNetwork object</span>
+<span class="sd">            filename: Filename of graph object to load (for example, .gt or .gt.gz format)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ReactionNetwork object with loaded graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rn</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">rn</span><span class="o">.</span><span class="n">load_graph</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>  <span class="c1"># pylint: disable=no-member</span>
+
+        <span class="k">return</span> <span class="n">rn</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the network object in graph-tool&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chemsys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a string of the chemical system of the network&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">chemsys</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return MSONable dict&quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;precursors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">)</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span>
+        <span class="k">return</span> <span class="n">d</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate object from MSONable dict&quot;&quot;&quot;</span>
+        <span class="n">precursors</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;precursors&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">rn</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">rn</span><span class="o">.</span><span class="n">_precursors</span> <span class="o">=</span> <span class="n">precursors</span>  <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">rn</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">target</span>  <span class="c1"># pylint: disable=protected-access</span>
+
+        <span class="k">return</span> <span class="n">rn</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;ReactionNetwork for chemical system: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;with Graph: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+</code></pre></div>
+        </details>
 
 
 
@@ -497,6 +2119,50 @@ pathfinding.</p>
 
 
 
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.chemsys" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">chemsys</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns a string of the chemical system of the network</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.graph" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">graph</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the network object in graph-tool</p>
+    </div>
+
+  </div>
 
 
 
@@ -508,18 +2174,20 @@ pathfinding.</p>
 
 
 <h3 id="rxn_network.network.network.ReactionNetwork.__init__" class="doc doc-heading">
-<code class="codehilite language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">enumerators</span><span class="p">,</span> <span class="n">cost_function</span><span class="p">,</span> <span class="n">open_elem</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chempot</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">enumerators</span><span class="p">,</span> <span class="n">cost_function</span><span class="p">,</span> <span class="n">open_elem</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chempot</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
   </span>
 
-<a href="#rxn_network.network.network.ReactionNetwork.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+</h3>
 
     <div class="doc doc-contents ">
 
       <p>Initialize a ReactionNetwork object for a set of entires, enumerator,
 and cost function. The network can be constructed by calling build().</p>
+<p>Note: the precursors and target must be set by calling set_precursors() and
+set_target() respectively.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -559,25 +2227,28 @@ build of the network</p></td>
       </tr>
       <tr>
         <td><code>chempot</code></td>
-        <td><code>Optional[float]</code></td>
+        <td><code>float</code></td>
         <td><p>Optional associated chemical potential of open element</p></td>
-        <td><code>None</code></td>
+        <td><code>0.0</code></td>
       </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>rxn_network/network/network.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span>
     <span class="n">enumerators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">],</span>
     <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span><span class="p">,</span>
     <span class="n">open_elem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">chempot</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chempot</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize a ReactionNetwork object for a set of entires, enumerator,</span>
 <span class="sd">    and cost function. The network can be constructed by calling build().</span>
+
+<span class="sd">    Note: the precursors and target must be set by calling set_precursors() and</span>
+<span class="sd">    set_target() respectively.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        entries: iterable of entry-like objects</span>
@@ -605,33 +2276,77 @@ build of the network</p></td>
 
 
 
+<h3 id="rxn_network.network.network.ReactionNetwork.as_dict" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Return MSONable dict</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return MSONable dict&quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;precursors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">)</span>
+    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span>
+    <span class="k">return</span> <span class="n">d</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h3 id="rxn_network.network.network.ReactionNetwork.build" class="doc doc-heading">
-<code class="codehilite language-python"><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
 
 
-<a href="#rxn_network.network.network.ReactionNetwork.build" class="headerlink" title="Permanent link">&para;</a></h3>
+</h3>
 
     <div class="doc doc-contents ">
 
       <p>Construct the reaction network graph object and store under the "graph"
 attribute. Does NOT initialize precursors or target; you must call set_precursors()
 or set_target() to do so.</p>
-<p>Returns: None</p>
 
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>rxn_network/network/network.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Construct the reaction network graph object and store under the &quot;graph&quot;</span>
 <span class="sd">    attribute. Does NOT initialize precursors or target; you must call set_precursors()</span>
 <span class="sd">    or set_target() to do so.</span>
 
-<span class="sd">    Returns: None</span>
-
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rxn_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns</span><span class="p">()</span>
     <span class="n">costs</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">calculate_costs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cost_function</span><span class="p">)</span>
-    <span class="n">rxns</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chempot</span><span class="p">)</span>
+    <span class="n">rxns</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">()</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building graph from reactions...&quot;</span><span class="p">)</span>
     <span class="n">nodes</span><span class="p">,</span> <span class="n">rxn_edges</span> <span class="o">=</span> <span class="n">get_rxn_nodes_and_edges</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span>
@@ -666,10 +2381,10 @@ or set_target() to do so.</p>
 
 
 <h3 id="rxn_network.network.network.ReactionNetwork.find_pathways" class="doc doc-heading">
-<code class="codehilite language-python"><span class="n">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span></code>
 
 
-<a href="#rxn_network.network.network.ReactionNetwork.find_pathways" class="headerlink" title="Permanent link">&para;</a></h3>
+</h3>
 
     <div class="doc doc-contents ">
 
@@ -717,9 +2432,8 @@ or set_target() to do so.</p>
 </table>
         <details class="quote">
           <summary>Source code in <code>rxn_network/network/network.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BasicPathway</span><span class="p">]:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BasicPathway</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">    Find the k-shortest paths to a provided list of 1 or more targets.</span>
 
 <span class="sd">    Args:</span>
@@ -734,10 +2448,8 @@ or set_target() to do so.</p>
 
     <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
-            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PATHS to </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PATHS to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------- </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">pathways</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shortest_paths</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
         <span class="n">paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pathways</span><span class="p">)</span>
@@ -755,14 +2467,195 @@ or set_target() to do so.</p>
 
 
 
-<h3 id="rxn_network.network.network.ReactionNetwork.set_precursors" class="doc doc-heading">
-<code class="codehilite language-python"><span class="n">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">)</span></code>
+<h3 id="rxn_network.network.network.ReactionNetwork.from_dict" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></code>
 
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
 
-<a href="#rxn_network.network.network.ReactionNetwork.set_precursors" class="headerlink" title="Permanent link">&para;</a></h3>
+</h3>
 
     <div class="doc doc-contents ">
 
+      <p>Instantiate object from MSONable dict</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Instantiate object from MSONable dict&quot;&quot;&quot;</span>
+    <span class="n">precursors</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;precursors&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">rn</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">rn</span><span class="o">.</span><span class="n">_precursors</span> <span class="o">=</span> <span class="n">precursors</span>  <span class="c1"># pylint: disable=protected-access</span>
+    <span class="n">rn</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">target</span>  <span class="c1"># pylint: disable=protected-access</span>
+
+    <span class="k">return</span> <span class="n">rn</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.from_dict_and_file" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_dict_and_file</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Convenience constructor method that loads a ReactionNetwork object from a dictionary (MSONable version) and a
+filename (to load graph object in graph-tool).</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>d</code></td>
+        <td><code>dict</code></td>
+        <td><p>Dictionary containing the ReactionNetwork object</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>filename</code></td>
+        <td><code>str</code></td>
+        <td><p>Filename of graph object to load (for example, .gt or .gt.gz format)</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td><p>ReactionNetwork object with loaded graph</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_dict_and_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience constructor method that loads a ReactionNetwork object from a dictionary (MSONable version) and a</span>
+<span class="sd">    filename (to load graph object in graph-tool).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        d: Dictionary containing the ReactionNetwork object</span>
+<span class="sd">        filename: Filename of graph object to load (for example, .gt or .gt.gz format)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ReactionNetwork object with loaded graph</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rn</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">rn</span><span class="o">.</span><span class="n">load_graph</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>  <span class="c1"># pylint: disable=no-member</span>
+
+    <span class="k">return</span> <span class="n">rn</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.load_graph" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">load_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Loads graph-tool graph from file.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>filename</code></td>
+        <td><code>str</code></td>
+        <td><p>Filename of graph object to load (for example, .gt or .gt.gz format)</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>      <p>Returns: None</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">load_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads graph-tool graph from file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename: Filename of graph object to load (for example, .gt or .gt.gz format)</span>
+
+<span class="sd">    Returns: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">load_graph</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.set_precursors" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Sets the precursors of the network. Removes all references to previous
+precursors.</p>
+<p>If entries are provided, will use the entries to set the precursors. If strings
+are provided, will automatically find minimum-energy entries with matching reduced_formula.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -777,29 +2670,58 @@ or set_target() to do so.</p>
   <tbody>
       <tr>
         <td><code>precursors</code></td>
-        <td><code></code></td>
-        <td></td>
+        <td><code>Iterable[Union[pymatgen.entries.Entry, str]]</code></td>
+        <td><p>iterable of</p></td>
         <td><em>required</em></td>
       </tr>
   </tbody>
 </table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>rxn_network/network/network.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Entry</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]):</span>
     <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the precursors of the network. Removes all references to previous</span>
+<span class="sd">    precursors.</span>
+
+<span class="sd">    If entries are provided, will use the entries to set the precursors. If strings</span>
+<span class="sd">    are provided, will automatically find minimum-energy entries with matching reduced_formula.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        precursors:</span>
+<span class="sd">        precursors: iterable of</span>
 
 <span class="sd">    Returns:</span>
-
+<span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must call build() before setting precursors!&quot;</span><span class="p">)</span>
 
-    <span class="n">precursors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">precursors</span><span class="p">)</span>
+    <span class="n">precursors</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">p</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">))</span>
+        <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">precursors</span>
+    <span class="p">}</span>
+
     <span class="k">if</span> <span class="n">precursors</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
         <span class="k">return</span>
-    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
         <span class="n">precursors_v</span> <span class="o">=</span> <span class="n">find_vertex</span><span class="p">(</span>
             <span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="o">.</span><span class="n">value</span>
         <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -807,7 +2729,7 @@ or set_target() to do so.</p>
         <span class="n">loopback_edges</span> <span class="o">=</span> <span class="n">find_edge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="s2">&quot;loopback_precursors&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">loopback_edges</span><span class="p">:</span>
             <span class="n">g</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">precursors</span><span class="p">]):</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">precursors</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One or more precursors are not included in network!&quot;</span><span class="p">)</span>
 
     <span class="n">precursors_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
@@ -834,7 +2756,7 @@ or set_target() to do so.</p>
 
     <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">add_edges</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]])</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span> <span class="o">=</span> <span class="n">precursors</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span> <span class="o">=</span> <span class="n">precursors</span>
 </code></pre></div>
         </details>
     </div>
@@ -848,13 +2770,16 @@ or set_target() to do so.</p>
 
 
 <h3 id="rxn_network.network.network.ReactionNetwork.set_target" class="doc doc-heading">
-<code class="codehilite language-python"><span class="n">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></code>
 
 
-<a href="#rxn_network.network.network.ReactionNetwork.set_target" class="headerlink" title="Permanent link">&para;</a></h3>
+</h3>
 
     <div class="doc doc-contents ">
 
+      <p>If entry is provided, will use that entry to set the target. If string is
+provided, will automatically find minimum-energy entry with matching
+reduced_formula.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -869,27 +2794,58 @@ or set_target() to do so.</p>
   <tbody>
       <tr>
         <td><code>target</code></td>
-        <td><code></code></td>
-        <td></td>
+        <td><code>Union[pymatgen.entries.Entry, str]</code></td>
+        <td><p>Entry, or string of reduced formula, of target</p></td>
         <td><em>required</em></td>
       </tr>
   </tbody>
 </table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>rxn_network/network/network.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Entry</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
     <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If entry is provided, will use that entry to set the target. If string is</span>
+<span class="sd">    provided, will automatically find minimum-energy entry with matching</span>
+<span class="sd">    reduced_formula.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        target:</span>
+<span class="sd">        target: Entry, or string of reduced formula, of target</span>
 
 <span class="sd">    Returns:</span>
-
+<span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must call build() before setting target!&quot;</span><span class="p">)</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">target</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">))</span>
+        <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="p">)</span>
+
     <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
         <span class="k">return</span>
-    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">or</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="k">if</span> <span class="n">target</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Target is not included in network!&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
         <span class="n">target_v</span> <span class="o">=</span> <span class="n">find_vertex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="o">.</span><span class="n">value</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">g</span><span class="o">.</span><span class="n">remove_vertex</span><span class="p">(</span><span class="n">target_v</span><span class="p">)</span>
 
@@ -910,7 +2866,66 @@ or set_target() to do so.</p>
 
     <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">add_edges</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]])</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">target</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.network.network.ReactionNetwork.write_graph" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">write_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Writes graph to file. If filename is not provided, will write to CHEMSYS.gt.gz
+(where CHEMSYS is the chemical system of the network)</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>filename</code></td>
+        <td><code>Optional[str]</code></td>
+        <td><p>Filename to write to. If None, writes to default filename.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>      <p>Returns: None</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/network/network.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">write_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Writes graph to file. If filename is not provided, will write to CHEMSYS.gt.gz</span>
+<span class="sd">    (where CHEMSYS is the chemical system of the network)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename: Filename to write to. If None, writes to default filename.</span>
+
+<span class="sd">    Returns: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">.gt.gz&quot;</span>
+
+    <span class="n">save_graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -937,107 +2952,86 @@ or set_target() to do so.</p>
 
     </div>
 
-  </div></div>
-        
-        
-    </div>
+  </div>
 
-    
-      <footer class="col-md-12 text-center">
-          
-          
-            <hr>
-            <p>
-            <small>Built by The GENESIS EFRC</small><br>
-            
-            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
-            </p>
-          
-
-          
-          
-      </footer>
-    
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="../../../js/bootstrap-3.0.3.min.js"></script>
-
-    
-    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
-        
-    <script>hljs.initHighlightingOnLoad();</script>
-    
-
-    <script>var base_url = "../../.."</script>
-    
-    <script src="../../../js/base.js"></script>
-    <script src="../../../search/main.js"></script>
-
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    <span aria-hidden="true">&times;</span>
-                    <span class="sr-only">Close</span>
-                </button>
-                <h4 class="modal-title" id="searchModalLabel">Search</h4>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form>
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
-            </div>
+              
+            </article>
+          </div>
         </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../gt/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Graph-tool" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Graph-tool
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../utils/" class="md-footer__link md-footer__link--next" aria-label="Next: Utils" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Utils
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Built by The GENESIS EFRC
     </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="help shortcut"><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td class="next shortcut"><kbd>n</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td class="prev shortcut"><kbd>p</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td class="search shortcut"><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
 </div>
-    </body>
-
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.22074ed6.min.js"}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.01de222e.min.js"></script>
+      
+    
+  </body>
 </html>
