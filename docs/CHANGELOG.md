@@ -1,5 +1,29 @@
 # Changelog
 
+## [v4.0.1](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.0.1) (2022-01-22)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.2...v4.0.1)
+
+## [v4.0.2](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.0.2) (2022-01-22)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v5.0.0...v4.0.2)
+
+**Merged pull requests:**
+
+- Fix github workflows [\#75](https://github.com/GENESIS-EFRC/reaction-network/pull/75) ([mattmcdermott](https://github.com/mattmcdermott))
+
+## [v5.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v5.0.0) (2022-01-22)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.0...v5.0.0)
+
+## [v4.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.0.0) (2022-01-22)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v3.0.0...v4.0.0)
+
+**Merged pull requests:**
+
+- New NetworkFW, competitiveness scores, updates to enumerators, and bug fixes + speed-ups [\#59](https://github.com/GENESIS-EFRC/reaction-network/pull/59) ([mattmcdermott](https://github.com/mattmcdermott))
+
 ## [v3.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v3.0.0) (2021-10-01)
 
 [Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v2.0.3...v3.0.0)
