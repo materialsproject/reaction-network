@@ -3,13 +3,11 @@ A reaction class that builds reactions based on ComputedEntry objects under the
 presence of an open entry (e.g. O2), and provides information about reaction
 thermodynamics computed as changes in grand potential.
 """
-
 from typing import Dict, List, Optional, Union
 
 import numpy as np
-
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
-from pymatgen.core.composition import Element, Composition
+from pymatgen.core.composition import Composition, Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.reactions.computed import ComputedReaction
@@ -30,7 +28,6 @@ class OpenComputedReaction(ComputedReaction):
         lowest_num_errors=None,
     ):
         """
-
         Args:
             entries: List of ComputedEntry objects.
             coefficients: List of reaction coefficients.
@@ -59,25 +56,27 @@ class OpenComputedReaction(ComputedReaction):
         self.grand_entries = grand_entries
 
     @classmethod
-    def balance(  # type: ignore
+    def balance(  # type: ignore # pylint: disable = W0221
         cls,
         reactant_entries: List[ComputedEntry],
         product_entries: List[ComputedEntry],
-        chempots: Dict[Element, float] = None,
+        chempots: Dict[Element, float],
         data: Optional[Dict] = None,
-    ):  # pylint: disable = W0221
+    ) -> "OpenComputedReaction":
         """
+        Balances and returns a new ComputedReaction.
+
+        Reactants and products to be specified as a collection (list, set, etc.) of
+        ComputedEntry objects.
+
+        A dictionary of open elements and their corresponding chemical potentials must be supplied.
 
         Args:
-            reactant_entries:
-            product_entries:
-            chempots:
-            data:
-
-        Returns:
-
+            reactant_entries: List of reactant entries
+            product_entries: List of product entries
+            chempots: Dict of chemical potentials corresponding to open element(s)
+            data: Optional dict of data
         """
-
         reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
         product_comps = [e.composition.reduced_composition for e in product_entries]
         coefficients, lowest_num_errors = cls._balance_coeffs(
@@ -86,7 +85,7 @@ class OpenComputedReaction(ComputedReaction):
 
         entries = list(reactant_entries) + list(product_entries)
 
-        args = {
+        kwargs = {
             "entries": entries,
             "coefficients": coefficients,
             "data": data,
@@ -94,9 +93,9 @@ class OpenComputedReaction(ComputedReaction):
         }
 
         if not chempots:
-            rxn = ComputedReaction(**args)  # type: ignore
+            rxn = ComputedReaction(**kwargs)  # type: ignore
         else:
-            rxn = cls(chempots=chempots, **args)  # type: ignore
+            rxn = cls(chempots=chempots, **kwargs)  # type: ignore
 
         return rxn
 
@@ -110,7 +109,7 @@ class OpenComputedReaction(ComputedReaction):
 
         for entry in self.grand_entries:
             attr = "composition"
-            if type(entry) == GrandPotPDEntry:
+            if isinstance(entry, GrandPotPDEntry):
                 attr = "original_comp"
 
             comp, factor = getattr(entry, attr).get_reduced_composition_and_factor()
@@ -158,9 +157,7 @@ class OpenComputedReaction(ComputedReaction):
 
     def reverse(self):
         """
-
         Returns a copy of reaction with reactants/products swapped
-
         """
         return OpenComputedReaction(
             self.entries,

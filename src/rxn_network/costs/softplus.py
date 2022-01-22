@@ -1,5 +1,5 @@
 """
-Implementation of the softplus cost function
+Implementation of the softplus cost function.
 """
 from typing import List, Optional
 
@@ -11,11 +11,11 @@ from rxn_network.reactions.computed import ComputedReaction
 
 class Softplus(CostFunction):
     """
-    The softplus cost function is a smooth version of the Rectified Linear Unit (
+    The softplus cost function is a smoothed version of the Rectified Linear Unit (
     ReLU) function commonly used in neural networks. It has the property that the
     output goes to 0 as the input goes to negative infinity, but the output
     approaches a linear scaling as the input goes to positive infinity. This is an
-    especially useful mapping for applying it to determine costs in reaction networks.
+    especially useful mapping for determining a cost ranking of a reaction.
     """
 
     def __init__(
@@ -26,7 +26,8 @@ class Softplus(CostFunction):
     ):
         """
         Args:
-            temp: Temperature [K].
+            temp: Absolute Temperature [K]. This serves as a scale factor for the output
+                of the function. Higher temperatures -> lower costs. Defaults to 300 K.
             params: List of data dictionary keys for function parameters used as an
                 argument to the softplus function. Defaults to ["energy_per_atom"]
             weights: List of corresponding values by which to weight the
@@ -43,10 +44,10 @@ class Softplus(CostFunction):
 
     def evaluate(self, rxn: ComputedReaction) -> float:
         """
-        Calculates the ost of reaction based on the initialized parameters and weights.
+        Calculates the cost of reaction based on the initialized parameters and weights.
 
         Args:
-            rxn: A computed reaction to evaluate.
+            rxn: A ComputedReaction to evaluate.
 
         Returns:
             The cost of the reaction.

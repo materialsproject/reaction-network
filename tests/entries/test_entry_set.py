@@ -73,14 +73,14 @@ def test_get_min_entry_by_formula(gibbs_entries):
         assert gibbs_entries.get_min_entry_by_formula(f).entry_id == entry_id
 
 
-def test_stabilize_entry(gibbs_entries):
+def test_get_stabilized_entry(gibbs_entries):
     entries = gibbs_entries.copy()
 
     formulas = ["YMn3O6", "Mn2O5"]
 
     for f in formulas:
         e = entries.get_min_entry_by_formula(f)
-        e_stable = entries.stabilize_entry(e)
+        e_stable = entries.get_stabilized_entry(e)
         entries.add(e_stable)
 
         assert e_stable in PhaseDiagram(entries).stable_entries

@@ -1,5 +1,7 @@
 """
-Specialized computed entry to estimate Gibbs free energy of formation
+A computed entry object for estimating the Gibbs free energy of formation. Note that
+this is similar to the implementation within pymatgen, but has been refactored here to
+add extra functionality.
 """
 import hashlib
 from itertools import combinations
@@ -9,7 +11,11 @@ import numpy as np
 from monty.json import MontyDecoder
 from pymatgen.core.composition import Composition
 from pymatgen.core.structure import Structure
-from pymatgen.entries.computed_entries import ComputedEntry, ConstantEnergyAdjustment
+from pymatgen.entries.computed_entries import (
+    ComputedEntry,
+    ConstantEnergyAdjustment,
+    EnergyAdjustment,
+)
 from scipy.interpolate import interp1d
 
 from rxn_network.data import G_ELEMS
@@ -23,6 +29,13 @@ class GibbsComputedEntry(ComputedEntry):
 
     WARNING: This descriptor only applies to solids. See
     entries.nist.NISTReferenceEntry for common gases (e.g. CO2).
+
+    Reference:
+        Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
+        Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
+        the Gibbs energy of inorganic crystalline solids and
+        temperature-dependent materials chemistry. Nature Communications, 9(1),
+        4168. https://doi.org/10.1038/s41467-018-06682-4
     """
 
     def __init__(
@@ -31,7 +44,7 @@ class GibbsComputedEntry(ComputedEntry):
         formation_energy_per_atom: float,
         volume_per_atom: float,
         temperature: float,
-        energy_adjustments: Optional[List] = None,
+        energy_adjustments: Optional[List[EnergyAdjustment]] = None,
         parameters: Optional[dict] = None,
         data: Optional[dict] = None,
         entry_id: Optional[object] = None,
@@ -45,11 +58,12 @@ class GibbsComputedEntry(ComputedEntry):
         Args:
             composition: The composition object (pymatgen)
             formation_energy_per_atom: Calculated formation enthalpy, dH, at T = 298 K,
-                normalized to the total number of atoms in the composition.
-            volume_per_atom: The total volume of the associated structure divided by
-                the total number of atoms.
-            temperature: Temperature [K] by which to acquire dGf(T), must be selected
-                from a range of [300, 2000] K.  If temperature is not selected from
+                normalized to the total number of atoms in the composition. NOTE: since this
+                is a _formation_ energy, it must be calculated using a phase diagram construction.
+            volume_per_atom: The total volume of the associated structure divided by its
+                number of atoms.
+            temperature: Temperature [K] by which to acquire dGf(T); must be selected
+                from a range of [300, 2000] K. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated.
             energy_adjustments: Optional list of energy adjustments
@@ -104,7 +118,7 @@ class GibbsComputedEntry(ComputedEntry):
             new_temperature: The new temperature to use [K]
 
         Returns:
-            A copy of the GibbsComputedEntry at the new specified temperature.
+            A copy of the GibbsComputedEntry, initialized at the new specified temperature.
         """
         new_entry_dict = self.as_dict()
         new_entry_dict["temperature"] = new_temperature
@@ -120,12 +134,6 @@ class GibbsComputedEntry(ComputedEntry):
         (FactSage).
 
         Units: eV (not normalized)
-
-        Reference: Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
-        Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
-        the Gibbs energy of inorganic crystalline solids and
-        temperature-dependent materials chemistry. Nature Communications, 9(1),
-        4168. https://doi.org/10.1038/s41467-018-06682-4
 
         Args:
             temperature: The absolute temperature [K].
@@ -170,10 +178,10 @@ class GibbsComputedEntry(ComputedEntry):
         )
 
     @staticmethod
-    def _sum_g_i(composition, temperature) -> float:
+    def _sum_g_i(composition: Composition, temperature: float) -> float:
         """
         Sum of the stoichiometrically weighted chemical potentials [eV] of the elements
-        at specified temperature, as acquired from "elements.json".
+        at specified temperature, as acquired from data/elements.json.
         """
         elems = composition.get_el_amt_dict()
 
@@ -236,7 +244,7 @@ class GibbsComputedEntry(ComputedEntry):
             formation_energy_per_atom: Formation enthalpy at T = 298 K associated
                 with structure
             temperature: Desired temperature [K] for acquiring dGf(T)
-            **kwargs: Optional kwargs to be passed to init method of GibbsComputedEntry
+            **kwargs: Optional kwargs to be passed to GibbsComputedEntry.__init__
 
         Returns:
             A new GibbsComputedEntry object
@@ -253,11 +261,12 @@ class GibbsComputedEntry(ComputedEntry):
         return entry
 
     @property
-    def is_experimental(self):
+    def is_experimental(self) -> bool:
+        """Returns True if the entry contains at least one ICSD id stored in the data dictionary"""
         return bool(self.data.get("icsd_ids"))
 
     def as_dict(self) -> dict:
-        "Returns an MSONable dict."
+        """Returns an MSONable dict."""
         data = super().as_dict()
         data["volume_per_atom"] = self.volume_per_atom
         data["formation_energy_per_atom"] = self.formation_energy_per_atom
@@ -265,8 +274,8 @@ class GibbsComputedEntry(ComputedEntry):
         return data
 
     @classmethod
-    def from_dict(cls, d) -> "GibbsComputedEntry":
-        "Returns a GibbsComputedEntry object from MSONable dictionary"
+    def from_dict(cls, d: dict) -> "GibbsComputedEntry":
+        """ "Returns a GibbsComputedEntry object from MSONable dictionary"""
         dec = MontyDecoder()
         entry = cls(
             composition=d["composition"],

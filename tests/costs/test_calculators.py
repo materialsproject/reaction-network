@@ -15,19 +15,19 @@ TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 
 answers = {
     "0.5 Y2O3 + 0.5 Mn2O3 -> YMnO3": {
-        np.sum: 0.480008216,
-        np.max: 0.480008216,
-        np.mean: 0.240004108,
+        "sum": 0.480008216,
+        "max": 0.480008216,
+        "mean": 0.240004108,
     },
     "2 YClO + 2 NaMnO2 + 0.5 O2 -> Y2Mn2O7 + 2 NaCl": {
-        np.sum: 1.369790046,
-        np.max: 1.369790045,
-        np.mean: 0.195684292,
+        "sum": 1.369790046,
+        "max": 1.369790045,
+        "mean": 0.195684292,
     },
 }
 
 
-@pytest.fixture(params=["Cl-Mn-Na-O-Y_entries.json.gz"])
+@pytest.fixture(params=["Cl_Mn_Na_O_Y_entries.json.gz"])
 def entries(request):
     entries = loadfn(TEST_FILES_PATH / request.param)
     return GibbsEntrySet(entries)
@@ -64,7 +64,7 @@ def calculator(cpd, mu_func):
 
 def test_calculate(calculator, rxn):
     actual_cost = calculator.calculate(rxn)
-    expected_cost = answers[str(rxn)][calculator.mu_func]
+    expected_cost = answers[str(rxn)][calculator.mu_func.__name__]
 
     assert actual_cost == pytest.approx(expected_cost)
 
@@ -73,7 +73,7 @@ def test_decorate(calculator, rxn):
     rxn_dec = calculator.decorate(rxn)
 
     actual_cost = rxn_dec.data[calculator.name]
-    expected_cost = answers[str(rxn)][calculator.mu_func]
+    expected_cost = answers[str(rxn)][calculator.mu_func.__name__]
 
     assert type(rxn_dec) == ComputedReaction
     assert pytest.approx(expected_cost, actual_cost)
@@ -83,7 +83,7 @@ def test_from_entries(entries, mu_func, rxn):
     calc = ChempotDistanceCalculator.from_entries(entries=entries, mu_func=mu_func)
 
     actual_cost = calc.calculate(rxn)
-    expected_cost = answers[str(rxn)][calc.mu_func]
+    expected_cost = answers[str(rxn)][calc.mu_func.__name__]
 
     assert type(calc) == ChempotDistanceCalculator
     assert pytest.approx(expected_cost, actual_cost)

@@ -11,7 +11,7 @@ from pymatgen.core.composition import Composition, Element
 
 class Reaction(MSONable, metaclass=ABCMeta):
     """
-    Base definition for a Reaction
+    Base definition for a reaction class.
     """
 
     @property

@@ -17,9 +17,9 @@ class BasicPathway(Pathway):
     def __init__(self, reactions: List[Reaction], costs: Optional[List[float]] = None):
         """
         Args:
-            reactions ([ComputedReaction]): list of ComputedReaction objects in pymatgen
+            reactions: list of ComputedReaction objects
                 which occur along path.
-            costs ([float]): list of corresponding costs for each reaction.
+            costs: Optional list of corresponding costs for each reaction.
         """
         self._reactions = reactions
 
@@ -40,10 +40,8 @@ class BasicPathway(Pathway):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return all(
-                [
-                    other_rxn == rxn
-                    for other_rxn, rxn in zip(other.reactions, self.reactions)
-                ]
+                other_rxn == rxn
+                for other_rxn, rxn in zip(other.reactions, self.reactions)
             )
 
         return False
@@ -52,9 +50,16 @@ class BasicPathway(Pathway):
         return hash(tuple(self.reactions))
 
     @property
-    def total_cost(self):
+    def reactions(self) -> List[Reaction]:
+        """A list of reactions contained in the reaction pathway"""
+        return self._reactions
+
+    @property
+    def total_cost(self) -> float:
+        """The sum of all costs associated with reactions in the pathway"""
         return sum(self.costs)
 
     @property
-    def is_experimental(self):
-        return all([e.is_experimental for e in self.entries])
+    def is_experimental(self) -> bool:
+        """Whether or not all reactions in the pathway are experimental"""
+        return all(e.is_experimental for e in self.entries)

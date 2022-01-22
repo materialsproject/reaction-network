@@ -1,2 +1,2 @@
 jupyter==1.0.0
-graphistry==0.20.1
+graphistry==0.20.5

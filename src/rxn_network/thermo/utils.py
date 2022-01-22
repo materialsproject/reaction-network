@@ -1,14 +1,15 @@
 """
 Utility functions used in the thermodynamic analysis classes.
 """
-
-from typing import Dict, List
+from typing import Dict, Iterable
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries import Entry
 
 
-def expand_pd(entries: List[Entry]) -> Dict[str, PhaseDiagram]:
+def expand_pd(
+    entries: Iterable[Entry],
+) -> Dict[str, PhaseDiagram]:
     """
     Helper method for generating a set of smaller phase diagrams for analyzing
     thermodynamic staiblity in large chemical systems. This is necessary when
@@ -22,14 +23,14 @@ def expand_pd(entries: List[Entry]) -> Dict[str, PhaseDiagram]:
         e.g. {"Li-Mn-O": <PhaseDiagram object>, "C-Y": <PhaseDiagram object>, ...}
     """
 
-    pd_dict: Dict[str, PhaseDiagram] = dict()
+    pd_dict: Dict[str, PhaseDiagram] = {}
 
     sorted_entries = sorted(
         entries, key=lambda x: len(x.composition.elements), reverse=True
     )
 
     for e in sorted_entries:
-        for chemsys in pd_dict.keys():
+        for chemsys in pd_dict:
             if set(e.composition.chemical_system.split("-")).issubset(
                 chemsys.split("-")
             ):

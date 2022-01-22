@@ -19,8 +19,27 @@ class Calculator(MSONable, metaclass=ABCMeta):
         Evaluates the specified property of a reaction
         """
 
-    @abstractmethod
-    def decorate(self, rxn: Reaction) -> "Reaction":
+    def decorate(self, rxn: Reaction) -> Reaction:
         """
-        Evaluates the specified prop. of a reaction and stores it in the reaction data
+        Decorates the reaction (in place) with the calculated property by
+        storing the value within the reaction's data dictionary.
+
+        Args:
+            rxn: The reaction object.
+
+        Returns:
+            The reaction object, modified in place
+        """
+        if not getattr(rxn, "data"):
+            rxn.data = {}
+
+        rxn.data[self.name] = self.calculate(rxn)
+
+        return rxn
+
+    @property
+    @abstractmethod
+    def name(self):
+        """
+        The name of the calculator; used to store the value within the reaction's data dictionary
         """

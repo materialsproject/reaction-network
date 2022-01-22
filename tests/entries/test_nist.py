@@ -16,17 +16,23 @@ def entries():
 def test_invalid_formula():
     with pytest.raises(ValueError) as error:
         assert NISTReferenceEntry(Composition("AX"), temperature=300)
-    assert str(error.value) == "Formula must be in NIST-JANAF thermochemical tables"
+    assert str(error.value) == "AX not in reference data!"
 
 
 def test_invalid_temperature():
     with pytest.raises(ValueError) as error:
         assert NISTReferenceEntry(Composition("K2CO3"), temperature=200)
-    assert str(error.value) == "Temperature must be selected from range: [300, 2000] K"
+    assert (
+        str(error.value)
+        == "Temperature must be selected from range: 300.0 K to 2000.0 K"
+    )
 
     with pytest.raises(ValueError) as error:
         assert NISTReferenceEntry(Composition("K2CO3"), temperature=2300)
-    assert str(error.value) == "Temperature must be selected from range: [300, 2000] K"
+    assert (
+        str(error.value)
+        == "Temperature must be selected from range: 300.0 K to 2000.0 K"
+    )
 
 
 def test_energy(entries):

@@ -4,8 +4,9 @@ pymatgen and streamlined for the reaction-network code.
 """
 
 import re
+from copy import deepcopy
 from itertools import chain, combinations
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from monty.fractions import gcd_float
@@ -80,7 +81,7 @@ class BasicReaction(Reaction):
             else:
                 self.balanced = True
 
-        self.data = data
+        self.data = data if data else {}
         self.lowest_num_errors = lowest_num_errors
 
     @classmethod
@@ -99,7 +100,7 @@ class BasicReaction(Reaction):
             products: List of products.
             data: Optional dictionary containing extra data about the reaction.
         """
-        compositions = reactants + products
+        compositions = list(reactants + products)
         coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)
 
         balanced = True
@@ -210,6 +211,30 @@ class BasicReaction(Reaction):
             lowest_num_errors=self.lowest_num_errors,
         )
 
+    def is_separable(self, target: Composition) -> bool:
+        """
+        Checks if the reaction forms byproducts which are separable from the target
+        composition; i.e., byproducts do not contain any of the elements in the target phase.
+
+        Args:
+            target: Composition object of target; elements in this phase will be used to
+                determine whether byproducts only contain added elements.
+
+        Returns:
+            True if reaction is separable from target, False otherwise.
+        """
+        if target not in self.compositions:
+            raise ValueError(f"Target composition {target} not in reaction {self}")
+
+        added_elems = set(self.elements) - set(target.elements)
+        products = set(deepcopy(self.products))
+        products.remove(target)
+
+        separable = [added_elems.issuperset(comp.elements) for comp in products]
+        found = all(separable)
+
+        return found
+
     @classmethod
     def from_string(cls, rxn_string) -> "BasicReaction":
         """
@@ -243,13 +268,15 @@ class BasicReaction(Reaction):
         cls, reactants: List[str], products: List[str]
     ) -> "BasicReaction":
         """
+        Initialize a reaction from a list of 1) reactant formulas and 2) product
+        formulas.
 
         Args:
-            reactants:
-            products:
+            reactants: List of reactant formulas
+            products: List of product formulas
 
         Returns:
-
+            A BasicReaction object
         """
 
         reactant_comps = [Composition(r) for r in reactants]
@@ -296,10 +323,8 @@ class BasicReaction(Reaction):
         if self.balanced is False:  # if not balanced, can not check coefficients
             return True
         return all(
-            [
-                np.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
-                for c in self.reactant_coeffs
-            ]
+            np.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
+            for c in self.reactant_coeffs
         )
 
     @property
@@ -389,9 +414,7 @@ class BasicReaction(Reaction):
         reactant_comps, r_coefs = zip(
             *[(comp, -1 * coeff) for comp, coeff in reactant_coeffs.items()]
         )
-        product_comps, p_coefs = zip(
-            *[(comp, coeff) for comp, coeff in product_coeffs.items()]
-        )
+        product_comps, p_coefs = zip(*list(product_coeffs.items()))
         return BasicReaction(reactant_comps + product_comps, r_coefs + p_coefs)
 
     @classmethod
@@ -405,9 +428,9 @@ class BasicReaction(Reaction):
             elif abs(amt - 1) < tol:
                 product_str.append(formula)
             elif amt < -tol:
-                reactant_str.append("{:.4g} {}".format(-amt, formula))
+                reactant_str.append(f"{-amt:.4g} {formula}")
             elif amt > tol:
-                product_str.append("{:.4g} {}".format(amt, formula))
+                product_str.append(f"{amt:.4g} {formula}")
 
         return " + ".join(reactant_str) + " -> " + " + ".join(product_str)
 
@@ -429,12 +452,14 @@ class BasicReaction(Reaction):
     def __eq__(self, other):
         if self is other:
             return True
-        elif str(self) == str(other):
-            return True
+
+        if str(self) == str(other):
+            is_equal = True
         else:
-            return (set(self.reactants) == set(other.reactants)) & (
+            is_equal = (set(self.reactants) == set(other.reactants)) & (
                 set(self.products) == set(other.products)
             )
+        return is_equal
 
     def __hash__(self):
         return hash(

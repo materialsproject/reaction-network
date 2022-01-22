@@ -1,21 +1,22 @@
 """
-Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
+Implements an Entry that looks up pre-tabulated Gibbs free energies from the NIST-JANAF
+tables.
 """
-import hashlib
-from typing import Dict, Any
+from typing import Dict, Optional
 
 from pymatgen.core.composition import Composition
-from pymatgen.entries import Entry
-from scipy.interpolate import interp1d
 
-from rxn_network.data import G_COMPOUNDS, G_GASES
+from rxn_network.data import PATH_TO_NIST, load_experimental_data
+from rxn_network.entries.experimental import ExperimentalReferenceEntry
+
+G_COMPOUNDS = load_experimental_data(PATH_TO_NIST / "compounds.json")
 
 
-class NISTReferenceEntry(Entry):
+class NISTReferenceEntry(ExperimentalReferenceEntry):
     """
     An Entry class for NIST-JANAF experimental reference data. Given a composition,
     automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
-    reference values (G_GASES, G_COMPOUNDS).
+    reference values.
 
     Reference:
         Malcolm W. Chase Jr. NIST-JANAF thermochemical tables. Fourth edition.
@@ -23,103 +24,17 @@ class NISTReferenceEntry(Entry):
         Physics for the National Institute of Standards and Technology, 1998.
     """
 
-    REFERENCES = {**G_COMPOUNDS, **G_GASES}
+    REFERENCES = G_COMPOUNDS
 
-    def __init__(self, composition: Composition, temperature: float):
+    def __init__(
+        self, composition: Composition, temperature: float, data: Optional[Dict] = None
+    ):
         """
         Args:
-            composition: Composition object (pymatgen).
+            composition: Composition object (within pymatgen).
             temperature: Temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
+            data: Optional dictionary containing entry data
         """
-        composition = Composition(composition)
-        formula = composition.reduced_formula
-
-        if formula not in NISTReferenceEntry.REFERENCES:
-            raise ValueError("Formula must be in NIST-JANAF thermochemical tables")
-
-        if temperature < 300 or temperature > 2000:
-            raise ValueError("Temperature must be selected from range: [300, 2000] K")
-
-        energy = self._get_nist_energy(formula, temperature)
-
-        self.temperature = temperature
-        self._formula = formula
-        self.name = formula
-        self.entry_id = "NISTReferenceEntry"
-        self.data = {}  # type: Dict[Any, Any]
-
-        super().__init__(composition.reduced_composition, energy)
-
-    @staticmethod
-    def _get_nist_energy(formula: str, temperature: float) -> float:
-        """
-        Convenience method for accessing and interpolating NIST-JANAF data.
-
-        Args:
-            formula: Chemical formula by which to search NIST-JANAF data.
-            temperature: Absolute temperature [K].
-
-        Returns:
-            Gibbs free energy of formation of formula at specified temperature [eV]
-        """
-        data = NISTReferenceEntry.REFERENCES[formula]
-        if temperature % 100 > 0:
-            g_interp = interp1d([float(t) for t in data.keys()], list(data.values()))
-            return g_interp(temperature)[()]
-
-        return data[str(temperature)]
-
-    @property
-    def energy(self) -> float:
-        """The energy of the entry, as supplied by the NIST-JANAF tables."""
-        return self._energy
-
-    @property
-    def correction_uncertainty(self) -> float:
-        """ Uncertainty of NIST-JANAF data is not supplied."""
-        return 0
-
-    @property
-    def correction_uncertainty_per_atom(self) -> float:
-        """Uncertainty of NIST-JANAF data is not supplied."""
-        return 0
-
-    @property
-    def is_experimental(self) -> bool:
-        """ Returns True by default."""
-        return True
-
-    def as_dict(self) -> dict:
-        """ Returns an MSONable dict."""
-        data = super().as_dict()
-        data["temperature"] = self.temperature
-        return data
-
-    @classmethod
-    def from_dict(cls, d) -> "NISTReferenceEntry":
-        """ Returns NISTReferenceEntry constructed from MSONable dict."""
-        return cls(composition=d["composition"], temperature=d["temperature"])
-
-    def __repr__(self):
-        output = [
-            f"NISTReferenceEntry | {self._formula}",
-            f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
-        ]
-        return "\n".join(output)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return (self._formula == other._formula) and (
-                self.temperature == other.temperature
-            )
-        return False
-
-    def __hash__(self):
-        data_md5 = hashlib.md5(
-            "NISTReferenceEntry"
-            f"{self.composition}_"
-            f"{self.temperature}".encode("utf-8")
-        ).hexdigest()
-        return int(data_md5, 16)
+        super().__init__(composition, temperature, data)
