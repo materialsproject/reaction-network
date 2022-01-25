@@ -87,7 +87,7 @@ class EnumeratorFW(Firework):
         }
 
         tasks.append(
-            RunEnumerators(enumerators=enumerators, entries=entry_set, chemsys=chemsys)
+            RunEnumerators(enumerators=enumerators, entries=entry_set)
         )
 
         if calculate_c_scores:
