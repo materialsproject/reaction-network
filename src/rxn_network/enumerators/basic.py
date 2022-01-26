@@ -42,6 +42,7 @@ class BasicEnumerator(Enumerator):
         exclusive_targets: bool = False,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        quiet: bool = False,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -69,6 +70,7 @@ class BasicEnumerator(Enumerator):
                 Defaults to True.
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
+            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
         super().__init__(
             precursors=precursors, targets=targets, calculators=calculators
@@ -79,6 +81,7 @@ class BasicEnumerator(Enumerator):
         self.exclusive_targets = exclusive_targets
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
+        self.quiet = quiet
 
         self._stabilize = False
         if "ChempotDistanceCalculator" in self.calculators:
@@ -120,7 +123,9 @@ class BasicEnumerator(Enumerator):
         combos_dict = self._get_combos_dict(entries, precursors, targets, open_entries)
         open_combos = self._get_open_combos(open_entries)
 
-        pbar = tqdm(combos_dict.items(), desc=self.__class__.__name__)
+        pbar = tqdm(
+            combos_dict.items(), desc=self.__class__.__name__, disable=self.quiet
+        )
 
         rxns = []
         for chemsys, combos in pbar:
@@ -399,6 +404,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         exclusive_targets: bool = False,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        quiet: bool = False,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -423,6 +429,7 @@ class BasicOpenEnumerator(BasicEnumerator):
                 Defaults to True
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
+            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
         super().__init__(
             precursors=precursors,
@@ -433,6 +440,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             exclusive_targets=exclusive_targets,
             remove_unbalanced=remove_unbalanced,
             remove_changed=remove_changed,
+            quiet=quiet,
         )
         self.open_phases: List[str] = open_phases
 

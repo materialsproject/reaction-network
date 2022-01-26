@@ -37,6 +37,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         calculators: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        quiet: bool = False,
     ):
         """
         Args:
@@ -50,6 +51,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
                 Defaults to True.
             exclusive_targets: Whether to consider only reactions that make the
                 provided target directly (i.e. with no byproducts). Defualts to False.
+            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
         super().__init__(
             precursors=precursors,
@@ -57,6 +59,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             calculators=calculators,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
+            quiet=quiet,
         )
         self._build_pd = True
 
@@ -149,6 +152,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         calculators: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        quiet: bool = False,
     ):
         """
         Args:
@@ -164,6 +168,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
                 Defaults to True.
             exclusive_targets: Whether to consider only reactions that make the
                 provided target directly (i.e. with no byproducts). Defualts to False.
+            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
 
         super().__init__(
@@ -172,6 +177,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             calculators=calculators,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
+            quiet=quiet,
         )
         self.open_elem = Element(open_elem)  # type: ignore
         self.open_phases = [Composition(str(self.open_elem)).reduced_formula]  # type: ignore
