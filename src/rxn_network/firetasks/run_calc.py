@@ -157,7 +157,9 @@ class CalculateCScores(FiretaskBase):
         results = ReactionSet.from_rxns(new_rxns)
         dumpfn(results, "rxns.json.gz")  # may overwrite existing rxns.json.gz
 
-        return FWAction(mod_spec=[{"_set": {"metadata->cost_function": cost_function}}])
+        return FWAction(
+            mod_spec=[{"_set": {"metadata->cost_function": cost_function.as_dict()}}]
+        )
 
 
 @explicit_serialize
