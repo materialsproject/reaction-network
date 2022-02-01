@@ -1,20 +1,36 @@
 # Changelog
 
+## [Unreleased](https://github.com/GENESIS-EFRC/reaction-network/tree/HEAD)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.1.0...HEAD)
+
+**Closed issues:**
+
+- Unnecessary computations in Enumerators with `exclusive_precursors=True` [\#77](https://github.com/GENESIS-EFRC/reaction-network/issues/77)
+
+## [v4.1.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.1.0) (2022-02-01)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.1...v4.1.0)
+
+**Closed issues:**
+
+- Unnecessary calculations occurring when exclusive\_precursors=True [\#76](https://github.com/GENESIS-EFRC/reaction-network/issues/76)
+
+**Merged pull requests:**
+
+- Speed up enumerators and tests [\#85](https://github.com/GENESIS-EFRC/reaction-network/pull/85) ([mattmcdermott](https://github.com/mattmcdermott))
+
 ## [v4.0.1](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.0.1) (2022-01-22)
 
 [Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.2...v4.0.1)
 
 ## [v4.0.2](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.0.2) (2022-01-22)
 
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v5.0.0...v4.0.2)
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.0...v4.0.2)
 
 **Merged pull requests:**
 
 - Fix github workflows [\#75](https://github.com/GENESIS-EFRC/reaction-network/pull/75) ([mattmcdermott](https://github.com/mattmcdermott))
-
-## [v5.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v5.0.0) (2022-01-22)
-
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.0...v5.0.0)
 
 ## [v4.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.0.0) (2022-01-22)
 
