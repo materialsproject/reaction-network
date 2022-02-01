@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/costs/competitiveness/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.7">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.9">
     
     
       
@@ -21,7 +21,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.cd566b2a.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2b4465f4.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.e6a45f82.min.css">
@@ -1662,7 +1662,7 @@ CompetitivenessScoreCalculator            (<a title="rxn_network.core.calculator
       <p>Calculator for determining the competitiveness score (c-score) for a reaction
 (in eV/atom).</p>
 <p>WARNING: This calculator is working but has not been sufficiently tested. Use at
-yown risk.</p>
+your own risk.</p>
 
         <details class="quote">
           <summary>Source code in <code>rxn_network/costs/competitiveness.py</code></summary>
@@ -1672,7 +1672,7 @@ yown risk.</p>
 <span class="sd">    (in eV/atom).</span>
 
 <span class="sd">    WARNING: This calculator is working but has not been sufficiently tested. Use at</span>
-<span class="sd">    yown risk.</span>
+<span class="sd">    your own risk.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1780,12 +1780,6 @@ yown risk.</p>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;precursors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">precursors</span>
             <span class="n">mge</span> <span class="o">=</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">enumerators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mge</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">open_elem</span> <span class="ow">and</span> <span class="n">open_phases</span><span class="p">:</span>
-                <span class="n">open_comp</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">open_phases</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">open_comp</span><span class="o">.</span><span class="n">is_element</span><span class="p">:</span>
-                    <span class="n">open_elem</span> <span class="o">=</span> <span class="n">open_comp</span><span class="o">.</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using open phase element </span><span class="si">{</span><span class="n">open_elem</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">open_elem</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;open_elem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">open_elem</span>
@@ -2140,12 +2134,6 @@ enumerated given the settings in the constructor.</p>
         <span class="n">mge</span> <span class="o">=</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">enumerators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mge</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">open_elem</span> <span class="ow">and</span> <span class="n">open_phases</span><span class="p">:</span>
-            <span class="n">open_comp</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">open_phases</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">open_comp</span><span class="o">.</span><span class="n">is_element</span><span class="p">:</span>
-                <span class="n">open_elem</span> <span class="o">=</span> <span class="n">open_comp</span><span class="o">.</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using open phase element </span><span class="si">{</span><span class="n">open_elem</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">open_elem</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;open_elem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">open_elem</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mu&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chempot</span>
@@ -2269,7 +2257,7 @@ enumerated given the settings in the constructor.</p>
     <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.22074ed6.min.js"}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.01de222e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.960e086b.min.js"></script>
       
     
   </body>

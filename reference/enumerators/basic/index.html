@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/enumerators/basic/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.7">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.9">
     
     
       
@@ -21,7 +21,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.cd566b2a.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2b4465f4.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.e6a45f82.min.css">
@@ -1769,6 +1769,7 @@ products may not be stable with respect to each other.</p>
         <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">remove_unbalanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">remove_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Supplied target and calculator parameters are automatically initialized as</span>
@@ -1796,6 +1797,7 @@ products may not be stable with respect to each other.</p>
 <span class="sd">                Defaults to True.</span>
 <span class="sd">            remove_changed: Whether to remove reactions which can only be balanced by</span>
 <span class="sd">                removing a reactant/product or having it change sides. Defaults to True.</span>
+<span class="sd">            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="n">calculators</span>
@@ -1806,6 +1808,7 @@ products may not be stable with respect to each other.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">exclusive_targets</span> <span class="o">=</span> <span class="n">exclusive_targets</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_unbalanced</span> <span class="o">=</span> <span class="n">remove_unbalanced</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_changed</span> <span class="o">=</span> <span class="n">remove_changed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">quiet</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_stabilize</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="s2">&quot;ChempotDistanceCalculator&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="p">:</span>
@@ -1847,7 +1850,9 @@ products may not be stable with respect to each other.</p>
         <span class="n">combos_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_combos_dict</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">)</span>
         <span class="n">open_combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_open_combos</span><span class="p">(</span><span class="n">open_entries</span><span class="p">)</span>
 
-        <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">combos_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="n">combos_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quiet</span>
+        <span class="p">)</span>
 
         <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">chemsys</span><span class="p">,</span> <span class="n">combos</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">:</span>
@@ -1946,21 +1951,33 @@ products may not be stable with respect to each other.</p>
             <span class="n">open_entries</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
         <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
+
         <span class="k">for</span> <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span> <span class="ow">in</span> <span class="n">rxn_iterable</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">reactants</span><span class="p">)</span> <span class="k">if</span> <span class="n">reactants</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
             <span class="n">p</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="k">if</span> <span class="n">products</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
             <span class="n">all_phases</span> <span class="o">=</span> <span class="n">r</span> <span class="o">|</span> <span class="n">p</span>
 
             <span class="n">precursor_func</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="nb">getattr</span><span class="p">(</span><span class="n">precursors</span><span class="p">,</span> <span class="n">p_set_func</span><span class="p">)</span> <span class="k">if</span> <span class="n">precursors</span> <span class="k">else</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="kc">None</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">precursors</span> <span class="o">|</span> <span class="n">open_entries</span><span class="p">,</span> <span class="n">p_set_func</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">precursors</span>
+                <span class="k">else</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="kc">True</span>
             <span class="p">)</span>
-            <span class="n">target_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">t_set_func</span><span class="p">)</span> <span class="k">if</span> <span class="n">targets</span> <span class="k">else</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="kc">None</span>
+            <span class="n">target_func</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">targets</span> <span class="o">|</span> <span class="n">open_entries</span><span class="p">,</span> <span class="n">t_set_func</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">targets</span>
+                <span class="k">else</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="p">)</span>
 
             <span class="k">if</span> <span class="p">(</span>
                 <span class="p">(</span><span class="n">r</span> <span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="p">(</span><span class="n">precursors</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">precursors</span> <span class="o">&amp;</span> <span class="n">all_phases</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="p">(</span><span class="n">p</span> <span class="ow">and</span> <span class="n">targets</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">targets</span> <span class="o">&amp;</span> <span class="n">all_phases</span><span class="p">)</span>
             <span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">precursor_func</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="ow">or</span> <span class="n">precursor_func</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">target_func</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="ow">or</span> <span class="n">target_func</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
                 <span class="k">continue</span>
 
             <span class="n">suggested_rxns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_react</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">calculators</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">grand_pd</span><span class="p">)</span>
@@ -1976,9 +1993,7 @@ products may not be stable with respect to each other.</p>
                 <span class="n">reactant_entries</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">reactant_entries</span><span class="p">)</span> <span class="o">-</span> <span class="n">open_entries</span>
                 <span class="n">product_entries</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">product_entries</span><span class="p">)</span> <span class="o">-</span> <span class="n">open_entries</span>
 
-                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">targets</span> <span class="ow">or</span> <span class="n">target_func</span><span class="p">(</span><span class="n">product_entries</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span>
-                    <span class="ow">not</span> <span class="n">precursors</span> <span class="ow">or</span> <span class="n">precursor_func</span><span class="p">(</span><span class="n">reactant_entries</span><span class="p">)</span>
-                <span class="p">):</span>
+                <span class="k">if</span> <span class="n">precursor_func</span><span class="p">(</span><span class="n">reactant_entries</span><span class="p">)</span> <span class="ow">and</span> <span class="n">target_func</span><span class="p">(</span><span class="n">product_entries</span><span class="p">):</span>
                     <span class="n">rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">rxns</span>
@@ -2196,7 +2211,7 @@ useful for some analyses)</p>
 
 
 <h3 id="rxn_network.enumerators.basic.BasicEnumerator.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_unbalanced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_unbalanced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -2278,6 +2293,12 @@ Defaults to True.</p></td>
 removing a reactant/product or having it change sides. Defaults to True.</p></td>
         <td><code>True</code></td>
       </tr>
+      <tr>
+        <td><code>quiet</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to run in quiet mode (no progress bar). Defaults to False.</p></td>
+        <td><code>False</code></td>
+      </tr>
   </tbody>
 </table>
         <details class="quote">
@@ -2292,6 +2313,7 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
     <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">remove_unbalanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">remove_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Supplied target and calculator parameters are automatically initialized as</span>
@@ -2319,6 +2341,7 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
 <span class="sd">            Defaults to True.</span>
 <span class="sd">        remove_changed: Whether to remove reactions which can only be balanced by</span>
 <span class="sd">            removing a reactant/product or having it change sides. Defaults to True.</span>
+<span class="sd">        quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="n">calculators</span>
@@ -2329,6 +2352,7 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
     <span class="bp">self</span><span class="o">.</span><span class="n">exclusive_targets</span> <span class="o">=</span> <span class="n">exclusive_targets</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">remove_unbalanced</span> <span class="o">=</span> <span class="n">remove_unbalanced</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">remove_changed</span> <span class="o">=</span> <span class="n">remove_changed</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">quiet</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_stabilize</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="s2">&quot;ChempotDistanceCalculator&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="p">:</span>
@@ -2437,7 +2461,9 @@ thermodynamically predicted reactions for given reactants.</p>
     <span class="n">combos_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_combos_dict</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">)</span>
     <span class="n">open_combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_open_combos</span><span class="p">(</span><span class="n">open_entries</span><span class="p">)</span>
 
-    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">combos_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
+        <span class="n">combos_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quiet</span>
+    <span class="p">)</span>
 
     <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">chemsys</span><span class="p">,</span> <span class="n">combos</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">:</span>
@@ -2576,6 +2602,7 @@ the ReactionSet class).</p>
         <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">remove_unbalanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">remove_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Supplied target and calculator parameters are automatically initialized as</span>
@@ -2600,6 +2627,7 @@ the ReactionSet class).</p>
 <span class="sd">                Defaults to True</span>
 <span class="sd">            remove_changed: Whether to remove reactions which can only be balanced by</span>
 <span class="sd">                removing a reactant/product or having it change sides. Defaults to True.</span>
+<span class="sd">            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span>
@@ -2610,6 +2638,7 @@ the ReactionSet class).</p>
             <span class="n">exclusive_targets</span><span class="o">=</span><span class="n">exclusive_targets</span><span class="p">,</span>
             <span class="n">remove_unbalanced</span><span class="o">=</span><span class="n">remove_unbalanced</span><span class="p">,</span>
             <span class="n">remove_changed</span><span class="o">=</span><span class="n">remove_changed</span><span class="p">,</span>
+            <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_phases</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">open_phases</span>
 
@@ -2675,7 +2704,7 @@ the ReactionSet class).</p>
 
 
 <h3 id="rxn_network.enumerators.basic.BasicOpenEnumerator.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_phases</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_unbalanced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_phases</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_unbalanced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -2762,6 +2791,12 @@ Defaults to True</p></td>
 removing a reactant/product or having it change sides. Defaults to True.</p></td>
         <td><code>True</code></td>
       </tr>
+      <tr>
+        <td><code>quiet</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to run in quiet mode (no progress bar). Defaults to False.</p></td>
+        <td><code>False</code></td>
+      </tr>
   </tbody>
 </table>
         <details class="quote">
@@ -2777,6 +2812,7 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
     <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">remove_unbalanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">remove_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Supplied target and calculator parameters are automatically initialized as</span>
@@ -2801,6 +2837,7 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
 <span class="sd">            Defaults to True</span>
 <span class="sd">        remove_changed: Whether to remove reactions which can only be balanced by</span>
 <span class="sd">            removing a reactant/product or having it change sides. Defaults to True.</span>
+<span class="sd">        quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span>
@@ -2811,6 +2848,7 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
         <span class="n">exclusive_targets</span><span class="o">=</span><span class="n">exclusive_targets</span><span class="p">,</span>
         <span class="n">remove_unbalanced</span><span class="o">=</span><span class="n">remove_unbalanced</span><span class="p">,</span>
         <span class="n">remove_changed</span><span class="o">=</span><span class="n">remove_changed</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">open_phases</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">open_phases</span>
 </code></pre></div>
@@ -2983,7 +3021,7 @@ correlate with the amount of time it takes to enumerate reactions.</p>
     <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.22074ed6.min.js"}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.01de222e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.960e086b.min.js"></script>
       
     
   </body>

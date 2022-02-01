@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/enumerators/minimize/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.7">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.9">
     
     
       
@@ -21,7 +21,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.cd566b2a.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2b4465f4.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.e6a45f82.min.css">
@@ -1694,6 +1694,7 @@ automatically excluded.</p>
         <span class="n">calculators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">exclusive_precursors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
@@ -1707,6 +1708,7 @@ automatically excluded.</p>
 <span class="sd">                Defaults to True.</span>
 <span class="sd">            exclusive_targets: Whether to consider only reactions that make the</span>
 <span class="sd">                provided target directly (i.e. with no byproducts). Defualts to False.</span>
+<span class="sd">            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span>
@@ -1714,6 +1716,7 @@ automatically excluded.</p>
             <span class="n">calculators</span><span class="o">=</span><span class="n">calculators</span><span class="p">,</span>
             <span class="n">exclusive_precursors</span><span class="o">=</span><span class="n">exclusive_precursors</span><span class="p">,</span>
             <span class="n">exclusive_targets</span><span class="o">=</span><span class="n">exclusive_targets</span><span class="p">,</span>
+            <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_pd</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1807,7 +1810,7 @@ automatically excluded.</p>
 
 
 <h3 id="rxn_network.enumerators.minimize.MinimizeGibbsEnumerator.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1864,6 +1867,12 @@ Defaults to True.</p></td>
 provided target directly (i.e. with no byproducts). Defualts to False.</p></td>
         <td><code>False</code></td>
       </tr>
+      <tr>
+        <td><code>quiet</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to run in quiet mode (no progress bar). Defaults to False.</p></td>
+        <td><code>False</code></td>
+      </tr>
   </tbody>
 </table>
         <details class="quote">
@@ -1875,6 +1884,7 @@ provided target directly (i.e. with no byproducts). Defualts to False.</p></td>
     <span class="n">calculators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">exclusive_precursors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
@@ -1888,6 +1898,7 @@ provided target directly (i.e. with no byproducts). Defualts to False.</p></td>
 <span class="sd">            Defaults to True.</span>
 <span class="sd">        exclusive_targets: Whether to consider only reactions that make the</span>
 <span class="sd">            provided target directly (i.e. with no byproducts). Defualts to False.</span>
+<span class="sd">        quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span>
@@ -1895,6 +1906,7 @@ provided target directly (i.e. with no byproducts). Defualts to False.</p></td>
         <span class="n">calculators</span><span class="o">=</span><span class="n">calculators</span><span class="p">,</span>
         <span class="n">exclusive_precursors</span><span class="o">=</span><span class="n">exclusive_precursors</span><span class="p">,</span>
         <span class="n">exclusive_targets</span><span class="o">=</span><span class="n">exclusive_targets</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_build_pd</span> <span class="o">=</span> <span class="kc">True</span>
 </code></pre></div>
@@ -2010,6 +2022,7 @@ phase space. Identity reactions are excluded.</p>
         <span class="n">calculators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">exclusive_precursors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
@@ -2025,6 +2038,7 @@ phase space. Identity reactions are excluded.</p>
 <span class="sd">                Defaults to True.</span>
 <span class="sd">            exclusive_targets: Whether to consider only reactions that make the</span>
 <span class="sd">                provided target directly (i.e. with no byproducts). Defualts to False.</span>
+<span class="sd">            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -2033,6 +2047,7 @@ phase space. Identity reactions are excluded.</p>
             <span class="n">calculators</span><span class="o">=</span><span class="n">calculators</span><span class="p">,</span>
             <span class="n">exclusive_precursors</span><span class="o">=</span><span class="n">exclusive_precursors</span><span class="p">,</span>
             <span class="n">exclusive_targets</span><span class="o">=</span><span class="n">exclusive_targets</span><span class="p">,</span>
+            <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">open_elem</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_phases</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">))</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
@@ -2085,7 +2100,7 @@ phase space. Identity reactions are excluded.</p>
 
 
 <h3 id="rxn_network.enumerators.minimize.MinimizeGrandPotentialEnumerator.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_elem</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_elem</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -2154,6 +2169,12 @@ Defaults to True.</p></td>
 provided target directly (i.e. with no byproducts). Defualts to False.</p></td>
         <td><code>False</code></td>
       </tr>
+      <tr>
+        <td><code>quiet</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to run in quiet mode (no progress bar). Defaults to False.</p></td>
+        <td><code>False</code></td>
+      </tr>
   </tbody>
 </table>
         <details class="quote">
@@ -2167,6 +2188,7 @@ provided target directly (i.e. with no byproducts). Defualts to False.</p></td>
     <span class="n">calculators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">exclusive_precursors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
@@ -2182,6 +2204,7 @@ provided target directly (i.e. with no byproducts). Defualts to False.</p></td>
 <span class="sd">            Defaults to True.</span>
 <span class="sd">        exclusive_targets: Whether to consider only reactions that make the</span>
 <span class="sd">            provided target directly (i.e. with no byproducts). Defualts to False.</span>
+<span class="sd">        quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -2190,6 +2213,7 @@ provided target directly (i.e. with no byproducts). Defualts to False.</p></td>
         <span class="n">calculators</span><span class="o">=</span><span class="n">calculators</span><span class="p">,</span>
         <span class="n">exclusive_precursors</span><span class="o">=</span><span class="n">exclusive_precursors</span><span class="p">,</span>
         <span class="n">exclusive_targets</span><span class="o">=</span><span class="n">exclusive_targets</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">open_elem</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">open_phases</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">))</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
@@ -2300,7 +2324,7 @@ provided target directly (i.e. with no byproducts). Defualts to False.</p></td>
     <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.22074ed6.min.js"}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.01de222e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.960e086b.min.js"></script>
       
     
   </body>
