@@ -1,7 +1,6 @@
 """
 A calculator class for determining competitiveness score of a reaction.
 """
-import warnings
 from functools import lru_cache
 from typing import Dict, Iterable, List, Optional, Union
 
