@@ -86,9 +86,7 @@ class EnumeratorFW(Firework):
             target for enumerator in enumerators for target in enumerator.targets
         }
 
-        tasks.append(
-            RunEnumerators(enumerators=enumerators, entries=entry_set, chemsys=chemsys)
-        )
+        tasks.append(RunEnumerators(enumerators=enumerators, entries=entry_set))
 
         if calculate_c_scores:
             if not cost_function:

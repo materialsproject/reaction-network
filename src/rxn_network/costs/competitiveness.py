@@ -1,7 +1,6 @@
 """
 A calculator class for determining competitiveness score of a reaction.
 """
-import warnings
 from functools import lru_cache
 from typing import Dict, Iterable, List, Optional, Union
 
@@ -26,7 +25,7 @@ class CompetitivenessScoreCalculator(Calculator):
     (in eV/atom).
 
     WARNING: This calculator is working but has not been sufficiently tested. Use at
-    yown risk.
+    your own risk.
 
     """
 
@@ -134,12 +133,6 @@ class CompetitivenessScoreCalculator(Calculator):
             kwargs["precursors"] = precursors
             mge = MinimizeGibbsEnumerator(**kwargs)
             enumerators.append(mge)
-
-            if not open_elem and open_phases:
-                open_comp = Composition(open_phases[0])
-                if open_comp.is_element:
-                    open_elem = open_comp.elements[0]
-                    warnings.warn(f"Using open phase element {open_elem}")
 
             if open_elem:
                 kwargs["open_elem"] = open_elem

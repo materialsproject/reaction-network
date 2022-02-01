@@ -5,24 +5,26 @@ from rxn_network.entries.entry_set import GibbsEntrySet
 
 TEST_FILES_PATH = Path(__file__).parent / "test_files"
 
-
-@pytest.fixture(
-    params=[
-        "Mn_O_Y_entries.json.gz",
-    ],
-    scope="session",
-)
-def mp_entries(request):
-    mp_entries = loadfn(TEST_FILES_PATH / request.param)
-    return mp_entries
+MN_O_Y_ENTRIES = loadfn(TEST_FILES_PATH / "Mn_O_Y_entries.json.gz")
+CL_MN_NA_O_Y_ENTRIES = loadfn(TEST_FILES_PATH / "Cl_Mn_Na_O_Y_entries.json.gz")
 
 
 @pytest.fixture(scope="session")
-def gibbs_entries(mp_entries):
-    entries = GibbsEntrySet.from_entries(
-        mp_entries, temperature=1000, include_barin_data=False
+def entries():
+    return GibbsEntrySet(CL_MN_NA_O_Y_ENTRIES)
+
+
+@pytest.fixture(scope="session")
+def mp_entries():
+    return MN_O_Y_ENTRIES
+
+
+@pytest.fixture(scope="session")
+def gibbs_entries():
+    ents = GibbsEntrySet.from_entries(
+        MN_O_Y_ENTRIES, temperature=1000, include_barin_data=False
     )
-    return entries
+    return ents
 
 
 @pytest.fixture(scope="session")

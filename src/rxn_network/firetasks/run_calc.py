@@ -1,6 +1,7 @@
 """
 Firetasks for running enumeration and network calculations
 """
+import warnings
 from typing import List
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
@@ -57,7 +58,7 @@ class RunEnumerators(FiretaskBase):
 
         metadata = {
             "chemsys": chemsys,
-            "enumerators": enumerators,
+            "enumerators": [e.as_dict() for e in enumerators],
             "targets": list(targets),
             "added_elems": added_elems,
         }
@@ -132,6 +133,12 @@ class CalculateCScores(FiretaskBase):
         basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
         minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
 
+        if use_minimize and open_phases and not open_elem:
+            open_comp = Composition(open_phases[0])
+            if open_comp.is_element:
+                open_elem = open_comp.elements[0]
+                warnings.warn(f"Using open phase element {open_elem}")
+
         calc = CompetitivenessScoreCalculator(
             entries=entries,
             cost_function=cost_function,
@@ -153,9 +160,13 @@ class CalculateCScores(FiretaskBase):
         for rxn in sorted_rxns[k:]:
             rxn.data.update({"c_score": None})
             new_rxns.append(rxn)
-        results = ReactionSet.from_rxns(new_rxns)
 
+        results = ReactionSet.from_rxns(new_rxns)
         dumpfn(results, "rxns.json.gz")  # may overwrite existing rxns.json.gz
+
+        return FWAction(
+            mod_spec=[{"_set": {"metadata->cost_function": cost_function.as_dict()}}]
+        )
 
 
 @explicit_serialize

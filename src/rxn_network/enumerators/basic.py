@@ -42,6 +42,7 @@ class BasicEnumerator(Enumerator):
         exclusive_targets: bool = False,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        quiet: bool = False,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -69,6 +70,7 @@ class BasicEnumerator(Enumerator):
                 Defaults to True.
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
+            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
         super().__init__(
             precursors=precursors, targets=targets, calculators=calculators
@@ -79,6 +81,7 @@ class BasicEnumerator(Enumerator):
         self.exclusive_targets = exclusive_targets
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
+        self.quiet = quiet
 
         self._stabilize = False
         if "ChempotDistanceCalculator" in self.calculators:
@@ -120,7 +123,9 @@ class BasicEnumerator(Enumerator):
         combos_dict = self._get_combos_dict(entries, precursors, targets, open_entries)
         open_combos = self._get_open_combos(open_entries)
 
-        pbar = tqdm(combos_dict.items(), desc=self.__class__.__name__)
+        pbar = tqdm(
+            combos_dict.items(), desc=self.__class__.__name__, disable=self.quiet
+        )
 
         rxns = []
         for chemsys, combos in pbar:
@@ -219,21 +224,33 @@ class BasicEnumerator(Enumerator):
             open_entries = set()
 
         rxns = []
+
         for reactants, products in rxn_iterable:
             r = set(reactants) if reactants else set()
             p = set(products) if products else set()
             all_phases = r | p
 
             precursor_func = (
-                getattr(precursors, p_set_func) if precursors else lambda e: None
+                getattr(precursors | open_entries, p_set_func)
+                if precursors
+                else lambda e: True
             )
-            target_func = getattr(targets, t_set_func) if targets else lambda e: None
+            target_func = (
+                getattr(targets | open_entries, t_set_func)
+                if targets
+                else lambda e: True
+            )
 
             if (
                 (r & p)
                 or (precursors and not precursors & all_phases)
                 or (p and targets and not targets & all_phases)
             ):
+                continue
+
+            if not (precursor_func(r) or precursor_func(p)):
+                continue
+            if p and not (target_func(r) or target_func(p)):
                 continue
 
             suggested_rxns = self._react(r, p, calculators, pd, grand_pd)
@@ -249,9 +266,7 @@ class BasicEnumerator(Enumerator):
                 reactant_entries = set(rxn.reactant_entries) - open_entries
                 product_entries = set(rxn.product_entries) - open_entries
 
-                if (not targets or target_func(product_entries)) and (
-                    not precursors or precursor_func(reactant_entries)
-                ):
+                if precursor_func(reactant_entries) and target_func(product_entries):
                     rxns.append(rxn)
 
         return rxns
@@ -399,6 +414,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         exclusive_targets: bool = False,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        quiet: bool = False,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -423,6 +439,7 @@ class BasicOpenEnumerator(BasicEnumerator):
                 Defaults to True
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
+            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
         super().__init__(
             precursors=precursors,
@@ -433,6 +450,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             exclusive_targets=exclusive_targets,
             remove_unbalanced=remove_unbalanced,
             remove_changed=remove_changed,
+            quiet=quiet,
         )
         self.open_phases: List[str] = open_phases
 

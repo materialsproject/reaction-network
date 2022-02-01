@@ -46,8 +46,8 @@ class ReactionsToDb(FiretaskBase):
             f"{metadata.get('targets')}): {metadata.get('chemsys')}"
         )
         d["rxns"] = rxns
-        d["metadata"] = metadata
 
+        d.update(metadata)
         db.insert(d)
 
 
@@ -98,8 +98,8 @@ class NetworkToDb(FiretaskBase):
         d["dir_name"] = dir_name
         d["network"] = network
         d["pathways"] = pathways
-        d["metadata"] = metadata
         d["balanced_pathways"] = balanced_pathways
         d["graph_fn"] = graph_fn
 
+        d.update(metadata)
         db.insert(d)
