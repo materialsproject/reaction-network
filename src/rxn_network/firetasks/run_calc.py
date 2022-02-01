@@ -1,6 +1,7 @@
 """
 Firetasks for running enumeration and network calculations
 """
+import warnings
 from typing import List
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
@@ -131,6 +132,12 @@ class CalculateCScores(FiretaskBase):
         use_minimize = self.get("use_minimize", True)
         basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
         minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
+
+        if use_minimize and open_phases and not open_elem:
+            open_comp = Composition(open_phases[0])
+            if open_comp.is_element:
+                open_elem = open_comp.elements[0]
+                warnings.warn(f"Using open phase element {open_elem}")
 
         calc = CompetitivenessScoreCalculator(
             entries=entries,

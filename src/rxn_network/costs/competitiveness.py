@@ -135,12 +135,6 @@ class CompetitivenessScoreCalculator(Calculator):
             mge = MinimizeGibbsEnumerator(**kwargs)
             enumerators.append(mge)
 
-            if not open_elem and open_phases:
-                open_comp = Composition(open_phases[0])
-                if open_comp.is_element:
-                    open_elem = open_comp.elements[0]
-                    warnings.warn(f"Using open phase element {open_elem}")
-
             if open_elem:
                 kwargs["open_elem"] = open_elem
                 kwargs["mu"] = self.chempot
