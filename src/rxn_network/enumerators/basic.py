@@ -224,21 +224,33 @@ class BasicEnumerator(Enumerator):
             open_entries = set()
 
         rxns = []
+
         for reactants, products in rxn_iterable:
             r = set(reactants) if reactants else set()
             p = set(products) if products else set()
             all_phases = r | p
 
             precursor_func = (
-                getattr(precursors, p_set_func) if precursors else lambda e: None
+                getattr(precursors | open_entries, p_set_func)
+                if precursors
+                else lambda e: True
             )
-            target_func = getattr(targets, t_set_func) if targets else lambda e: None
+            target_func = (
+                getattr(targets | open_entries, t_set_func)
+                if targets
+                else lambda e: True
+            )
 
             if (
                 (r & p)
                 or (precursors and not precursors & all_phases)
                 or (p and targets and not targets & all_phases)
             ):
+                continue
+
+            if not (precursor_func(r) or precursor_func(p)):
+                continue
+            if p and not (target_func(r) or target_func(p)):
                 continue
 
             suggested_rxns = self._react(r, p, calculators, pd, grand_pd)
@@ -254,9 +266,7 @@ class BasicEnumerator(Enumerator):
                 reactant_entries = set(rxn.reactant_entries) - open_entries
                 product_entries = set(rxn.product_entries) - open_entries
 
-                if (not targets or target_func(product_entries)) and (
-                    not precursors or precursor_func(reactant_entries)
-                ):
+                if precursor_func(reactant_entries) and target_func(product_entries):
                     rxns.append(rxn)
 
         return rxns

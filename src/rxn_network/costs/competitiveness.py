@@ -26,7 +26,7 @@ class CompetitivenessScoreCalculator(Calculator):
     (in eV/atom).
 
     WARNING: This calculator is working but has not been sufficiently tested. Use at
-    yown risk.
+    your own risk.
 
     """
 
