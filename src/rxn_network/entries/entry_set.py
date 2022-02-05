@@ -6,7 +6,8 @@ import collections
 import logging
 import warnings
 from copy import deepcopy
-from typing import Dict, Iterable, List, Optional, Set, Union
+from typing import Dict, Iterable, List, Optional, Set, Union, Tuple
+from functools import lru_cache
 
 from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
@@ -162,11 +163,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Returns:
             Ground state computed entry object.
         """
-        comp = Composition(formula).reduced_composition
-        possible_entries = filter(
-            lambda x: x.composition.reduced_composition == comp, self.entries
+        return self._get_min_entry_by_formula(
+            self.entries_tuple,
+            formula,
         )
-        return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
 
     def get_stabilized_entry(
         self, entry: ComputedEntry, tol: float = 1e-6
@@ -267,6 +267,15 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return ComputedEntry(
             comp, energy, energy_adjustments=[adj], entry_id="(Interpolated Entry!)"
         )
+
+    @staticmethod
+    @lru_cache(maxsize=None)
+    def _get_min_entry_by_formula(entries, formula):
+        formula_clean = Composition(formula).reduced_formula
+        possible_entries = filter(
+            lambda x: x.composition.reduced_formula == formula_clean, entries
+        )
+        return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
 
     @classmethod
     def from_pd(
@@ -411,6 +420,11 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     def entries_list(self) -> List[ComputedEntry]:
         """Returns a list of all entries in the entry set."""
         return list(sorted(self.entries, key=lambda e: e.composition.reduced_formula))
+
+    @property
+    def entries_tuple(self) -> Tuple[ComputedEntry]:
+        """Returns a tuple of all entries in the entry set."""
+        return tuple(self.entries_list)  # type: ignore
 
     @property
     def chemsys(self) -> set:

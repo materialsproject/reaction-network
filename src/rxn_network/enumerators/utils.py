@@ -5,7 +5,7 @@ import warnings
 from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-from pymatgen.core.composition import Composition, Element
+from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry
 
 import rxn_network.costs.calculators as calcs
@@ -157,24 +157,9 @@ def stabilize_entries(
     return new_entries
 
 
-def get_min_entry_by_comp(comp: Composition, entries: Iterable[Entry]) -> Entry:
-    """
-    Gets the entry with the lowest energy for a given composition from a set of provided entries.
-
-    Args:
-        comp: Composition object
-        entries: Iterable of entries
-
-    Returns:
-        Entry with the lowest enegy per atom for the given composition
-    """
-    possible_entries = filter(
-        lambda e: e.composition.reduced_composition == comp.reduced_composition, entries
-    )
-    return sorted(possible_entries, key=lambda e: e.energy_per_atom)[0]
-
-
-def get_computed_rxn(rxn: Reaction, entries: Iterable[Entry]) -> ComputedReaction:
+def get_computed_rxn(
+    rxn: Reaction, entries: GibbsEntrySet, chempots=None
+) -> ComputedReaction:
     """
     Provided with a Reaction object and a list of possible entries, this function
     returns a new ComputedReaction object containing a selection of those entries.
@@ -186,32 +171,16 @@ def get_computed_rxn(rxn: Reaction, entries: Iterable[Entry]) -> ComputedReactio
     Returns:
         A ComputedReaction object transformed from a normal Reaction object
     """
-    reactant_entries = [get_min_entry_by_comp(r, entries) for r in rxn.reactants]
-    product_entries = [get_min_entry_by_comp(p, entries) for p in rxn.products]
+    reactant_entries = [
+        entries.get_min_entry_by_formula(r.reduced_formula) for r in rxn.reactants
+    ]
+    product_entries = [
+        entries.get_min_entry_by_formula(p.reduced_formula) for p in rxn.products
+    ]
 
-    rxn = ComputedReaction.balance(reactant_entries, product_entries)
-    return rxn
-
-
-def get_open_computed_rxn(
-    rxn: Reaction, entries: Iterable[Entry], chempots: Dict[Element, float]
-) -> OpenComputedReaction:
-    """
-    Provided with a Reaction object and a list of possible entries, as well as a
-    dictionary of chemical potentials of open elements, this function returns a new
-    OpenComputedReaction object containing a selection of those entries.
-
-    Args:
-        rxn: Reaction object
-        entries: Iterable of entries
-        chempots: Dictionary of chemical potentials of open elements
-    `
-    Returns:
-        An OpenComputedReaction object transformed from a normal Reaction object
-    """
-    reactant_entries = [get_min_entry_by_comp(r, entries) for r in rxn.reactants]
-    product_entries = [get_min_entry_by_comp(p, entries) for p in rxn.products]
-
-    rxn = OpenComputedReaction.balance(reactant_entries, product_entries, chempots)
+    if chempots:
+        rxn = OpenComputedReaction.balance(reactant_entries, product_entries, chempots)
+    else:
+        rxn = ComputedReaction.balance(reactant_entries, product_entries)
 
     return rxn

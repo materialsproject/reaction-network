@@ -27,12 +27,6 @@ answers = {
 }
 
 
-@pytest.fixture(params=["Cl_Mn_Na_O_Y_entries.json.gz"])
-def entries(request):
-    entries = loadfn(TEST_FILES_PATH / request.param)
-    return GibbsEntrySet(entries)
-
-
 @pytest.fixture(
     params=[
         [["Y2O3", "Mn2O3"], ["YMnO3"]],

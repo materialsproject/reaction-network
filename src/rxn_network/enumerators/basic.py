@@ -248,12 +248,14 @@ class BasicEnumerator(Enumerator):
             ):
                 continue
 
-            if not (precursor_func(r) or precursor_func(p)):
+            if not (precursor_func(r) or (p and precursor_func(p))):
                 continue
             if p and not (target_func(r) or target_func(p)):
                 continue
 
-            suggested_rxns = self._react(r, p, calculators, pd, grand_pd)
+            suggested_rxns = self._react(
+                r, p, calculators, filtered_entries, pd, grand_pd
+            )
 
             for rxn in suggested_rxns:
                 if (
@@ -271,12 +273,25 @@ class BasicEnumerator(Enumerator):
 
         return rxns
 
-    def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
+    def _react(
+        self,
+        reactants,
+        products,
+        calculators,
+        filtered_entries=None,
+        pd=None,
+        grand_pd=None,
+    ):
         """
         Generates reactions from a list of reactants, products, and optional
         calculator(s)
         """
-        _ = (pd, grand_pd, self)  # unused arguments in BasicEnumerator class
+        _ = (
+            filtered_entries,
+            pd,
+            grand_pd,
+            self,
+        )  # unused arguments in BasicEnumerator class
 
         forward_rxn = ComputedReaction.balance(reactants, products)
         backward_rxn = forward_rxn.reverse()
