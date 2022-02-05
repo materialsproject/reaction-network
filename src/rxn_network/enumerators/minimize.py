@@ -86,7 +86,6 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         """React method for MinimizeGibbsEnumerator, which uses the interfacial reaction
         approach (see _react_interface())"""
         r = list(reactants)
-        print(r)
         r0 = r[0]
 
         if len(r) == 1:
