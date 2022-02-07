@@ -1,9 +1,10 @@
 """
 Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin tables.
 """
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from pymatgen.core.composition import Composition
+from pymatgen.entries.computed_entries import EnergyAdjustment
 
 from rxn_network.data import PATH_TO_BARIN, load_experimental_data
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
@@ -25,7 +26,11 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
     REFERENCES = G_COMPOUNDS
 
     def __init__(
-        self, composition: Composition, temperature: float, data: Optional[Dict] = None
+        self,
+        composition: Composition,
+        temperature: float,
+        energy_adjustments: Optional[List[EnergyAdjustment]] = None,
+        data: Optional[Dict] = None,
     ):
         """
         Args:
@@ -34,4 +39,9 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
         """
-        super().__init__(composition, temperature, data)
+        super().__init__(
+            composition=composition,
+            temperature=temperature,
+            energy_adjustments=energy_adjustments,
+            data=data,
+        )

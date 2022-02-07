@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 from monty.json import MSONable
 
 from pymatgen.core.composition import Composition
+from pymatgen.entries.computed_entries import EnergyAdjustment
 from scipy.interpolate import interp1d
 
 
@@ -22,6 +23,7 @@ class ExperimentalReferenceEntry(MSONable):
         self,
         composition: Composition,
         temperature: float,
+        energy_adjustments: Optional[List[EnergyAdjustment]] = None,
         data: Optional[dict] = None,
     ):
         """
@@ -33,7 +35,8 @@ class ExperimentalReferenceEntry(MSONable):
             data: Optional dictionary containing entry data
         """
         self._composition = Composition(composition)
-        self.temperature = temperature
+        self._temperature = temperature
+        self.energy_adjustments = energy_adjustments if energy_adjustments else []
         self.data = data if data else {}  # type: Dict[Any, Any]
 
         formula = self._composition.reduced_formula
@@ -123,11 +126,8 @@ class ExperimentalReferenceEntry(MSONable):
         return 0
 
     @property
-    def energy_adjustments(self) -> List:
-        """
-        Returns a list of energy adjustments. Not implemented for experimental data.
-        """
-        return []
+    def temperature(self) -> float:
+        return self._temperature
 
     @property
     def is_experimental(self) -> bool:

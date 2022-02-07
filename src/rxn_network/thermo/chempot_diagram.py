@@ -5,6 +5,7 @@ pymatgen.
 import warnings
 from functools import cached_property
 from typing import Dict, List, Optional
+from copy import deepcopy
 
 import numpy as np
 from pymatgen.analysis.chempot_diagram import ChemicalPotentialDiagram as ChempotDiagram
@@ -12,9 +13,12 @@ from pymatgen.analysis.phase_diagram import PDEntry
 from pymatgen.core.composition import Element
 from scipy.spatial import KDTree
 
+from rxn_network.entries.entry_set import GibbsEntrySet
+
 
 class ChemicalPotentialDiagram(ChempotDiagram):
-    """This class is an extension of the ChemicalPotentialDiagram class from pymatgen.
+    """
+    This class is an extension of the ChemicalPotentialDiagram class from pymatgen.
     Several features have been added to the original class for the purpose of
     calculating the shortest distance between two chemical potential domains.
     """
@@ -24,6 +28,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         entries: List[PDEntry],
         limits: Optional[Dict[Element, float]] = None,
         default_min_limit: Optional[float] = -20.0,
+        calculate_metastable_domains=False,
     ):
         """
         Initialize a ChemicalPotentialDiagram object.
@@ -46,6 +51,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         super().__init__(
             entries=entries, limits=limits, default_min_limit=default_min_limit
         )
+        self.calculate_metastable_domains = calculate_metastable_domains
 
     @cached_property
     def domains(self) -> Dict[str, np.ndarray]:
@@ -53,6 +59,13 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         Mapping of formulas to array of domain boundary points. Cached for speed.
         """
         return self._get_domains()
+
+    @property
+    def metastable_domains(self) -> Dict[str, np.ndarray]:
+        """Gets a dictionary of the chemical potential domains for metastable chemical
+        formulas. This corresponds to the domains of the relevant phases if they were
+        just barely stable"""
+        return self._get_metastable_domains()
 
     def shortest_domain_distance(self, f1: str, f2: str) -> float:
         """
@@ -95,3 +108,23 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         diff = diff.reshape(-1, num_elems)
 
         return diff.min(axis=0)
+
+    def _get_metastable_domains(self):
+        e_set = GibbsEntrySet(self.entries)
+        e_dict = e_set.min_entries_by_formula
+        stable_formulas = list(self.domains.keys())
+
+        metastable_entries = [e for f, e in e_dict.items() if f not in stable_formulas]
+
+        metastable_domains = {}
+        for e in metastable_entries:
+            print(e.as_dict())
+            e_set_copy = deepcopy(e_set)
+            e_set_copy.add(e_set_copy.get_stabilized_entry(e))
+
+            formula = e.composition.reduced_formula
+
+            domain = self.__class__(e_set_copy).domains[formula]
+            metastable_domains[formula] = domain
+
+        return metastable_domains

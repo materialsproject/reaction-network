@@ -6,7 +6,7 @@ import collections
 import logging
 import warnings
 from copy import deepcopy
-from typing import Dict, Iterable, List, Optional, Set, Union, Tuple
+from typing import Dict, Iterable, List, Optional, Set, Union
 from functools import cached_property
 
 from monty.dev import deprecated
