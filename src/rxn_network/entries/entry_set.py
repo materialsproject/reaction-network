@@ -163,7 +163,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Returns:
             Ground state computed entry object.
         """
-        return self.min_entries_by_formula[formula]
+        return self.min_entries_by_formula[Composition(formula).reduced_formula]
 
     def get_stabilized_entry(
         self, entry: ComputedEntry, tol: float = 1e-6
@@ -411,8 +411,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     @cached_property
     def min_entries_by_formula(self) -> Dict[str, ComputedEntry]:
-        """Returns a dict of minimum energy entries in the entry set, indexed by
-        formula."""
+        """
+        Returns a dict of minimum energy entries in the entry set, indexed by
+        formula.
+        """
         min_entries = {}
         for e in self.entries:
             formula = e.composition.reduced_formula
