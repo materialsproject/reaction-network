@@ -7,7 +7,7 @@ import logging
 import warnings
 from copy import deepcopy
 from typing import Dict, Iterable, List, Optional, Set, Union, Tuple
-from functools import lru_cache
+from functools import cached_property
 
 from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
@@ -163,10 +163,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Returns:
             Ground state computed entry object.
         """
-        return self._get_min_entry_by_formula(
-            self.entries_tuple,
-            formula,
-        )
+        return self.min_entries_by_formula[formula]
 
     def get_stabilized_entry(
         self, entry: ComputedEntry, tol: float = 1e-6
@@ -267,15 +264,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return ComputedEntry(
             comp, energy, energy_adjustments=[adj], entry_id="(Interpolated Entry!)"
         )
-
-    @staticmethod
-    @lru_cache(maxsize=None)
-    def _get_min_entry_by_formula(entries, formula):
-        formula_clean = Composition(formula).reduced_formula
-        possible_entries = filter(
-            lambda x: x.composition.reduced_formula == formula_clean, entries
-        )
-        return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
 
     @classmethod
     def from_pd(
@@ -416,15 +404,27 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return cls(list(new_entries))
 
-    @property
+    @cached_property
     def entries_list(self) -> List[ComputedEntry]:
         """Returns a list of all entries in the entry set."""
         return list(sorted(self.entries, key=lambda e: e.composition.reduced_formula))
 
-    @property
-    def entries_tuple(self) -> Tuple[ComputedEntry]:
-        """Returns a tuple of all entries in the entry set."""
-        return tuple(self.entries_list)  # type: ignore
+    @cached_property
+    def min_entries_by_formula(self) -> Dict[str, ComputedEntry]:
+        """Returns a dict of minimum energy entries in the entry set, indexed by
+        formula."""
+        min_entries = {}
+        for e in self.entries:
+            formula = e.composition.reduced_formula
+            if formula not in min_entries:
+                entries = filter(
+                    lambda x: x.composition.reduced_formula == formula, self.entries
+                )
+                min_entries[formula] = sorted(entries, key=lambda x: x.energy_per_atom)[
+                    0
+                ]
+
+        return min_entries
 
     @property
     def chemsys(self) -> set:
