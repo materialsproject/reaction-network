@@ -1,26 +1,26 @@
 """
-Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin tables.
+Implements an Entry that looks up pre-tabulated Gibbs free energies from the NIST-JANAF
+tables.
 """
 from typing import Dict, Optional, List
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries.computed_entries import EnergyAdjustment
 
-from rxn_network.data import PATH_TO_BARIN, load_experimental_data
+from rxn_network.data import PATH_TO_FREED, load_experimental_data
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 
-G_COMPOUNDS = load_experimental_data(PATH_TO_BARIN / "compounds.json.gz")
+G_COMPOUNDS = load_experimental_data(PATH_TO_FREED / "compounds.json.gz")
 
 
-class BarinReferenceEntry(ExperimentalReferenceEntry):
+class FREEDReferenceEntry(ExperimentalReferenceEntry):
     """
-    An Entry class for Barin experimental reference data. Given a composition,
+    An Entry class for FREED experimental reference data. Given a composition,
     automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
     reference values.
 
     Reference:
-        Barin, I. (1995). Thermochemical data of pure substances. John Wiley & Sons,
-            Ltd. https://doi.org/10.1002/9783527619825
+        https://www.thermart.net/freed-thermodynamic-database/
     """
 
     REFERENCES = G_COMPOUNDS
@@ -35,9 +35,10 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
         """
         Args:
             composition: Composition object (within pymatgen).
-            temperature: Absolute temperature in Kelvin. If temperature is not selected from
+            temperature: Temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
+            data: Optional dictionary containing entry data
         """
         super().__init__(
             composition=composition,

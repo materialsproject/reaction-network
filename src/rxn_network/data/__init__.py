@@ -10,6 +10,7 @@ from monty.serialization import loadfn
 cwd = Path(__file__).parent.resolve()
 
 PATH_TO_BARIN = cwd / "barin"
+PATH_TO_FREED = cwd / "freed"
 PATH_TO_NIST = cwd / "nist"
 
 G_ELEMS = loadfn(cwd / "elements.json")

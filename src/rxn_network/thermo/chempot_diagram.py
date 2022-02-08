@@ -118,9 +118,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         metastable_domains = {}
         for e in metastable_entries:
-            print(e.as_dict())
             e_set_copy = deepcopy(e_set)
-            e_set_copy.add(e_set_copy.get_stabilized_entry(e))
+            new_entry = e_set_copy.get_stabilized_entry(e)
+            e_set_copy.add(new_entry)
 
             formula = e.composition.reduced_formula
 

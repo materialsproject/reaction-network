@@ -25,6 +25,7 @@ from tqdm.auto import tqdm
 from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.gibbs import GibbsComputedEntry
+from rxn_network.entries.freed import FREEDReferenceEntry
 from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd
 
@@ -272,6 +273,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         temperature: float,
         include_nist_data=True,
         include_barin_data=False,
+        include_freed_data=False,
     ) -> "GibbsEntrySet":
         """
         Constructor method for building a GibbsEntrySet from an existing phase diagram.
@@ -336,6 +338,17 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     logging.warning(
                         f"Compound {formula} is in Barin tables but not at this temperature! {error}"
                     )
+            if include_freed_data and formula in FREEDReferenceEntry.REFERENCES:
+                try:
+                    e = FREEDReferenceEntry(
+                        composition=Composition(formula), temperature=temperature
+                    )
+                    experimental = True
+                    new_entries.append(e)
+                except ValueError as error:
+                    logging.warning(
+                        f"Compound {formula} is in FREED tables but not at this temperature! {error}"
+                    )
 
             if experimental:
                 experimental_formulas.append(formula)
@@ -366,6 +379,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         temperature: float,
         include_nist_data=True,
         include_barin_data=False,
+        include_freed_data=False,
     ) -> "GibbsEntrySet":
         """
         Constructor method for initializing GibbsEntrySet from T = 0 K
@@ -393,6 +407,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 temperature,
                 include_nist_data=include_nist_data,
                 include_barin_data=include_barin_data,
+                include_freed_data=include_freed_data,
             )
 
         pd_dict = expand_pd(list(e_set))

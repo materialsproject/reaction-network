@@ -10,7 +10,7 @@ from pymatgen.entries.computed_entries import EnergyAdjustment
 from rxn_network.data import PATH_TO_NIST, load_experimental_data
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 
-G_COMPOUNDS = load_experimental_data(PATH_TO_NIST / "compounds.json")
+G_COMPOUNDS = load_experimental_data(PATH_TO_NIST / "compounds.json.gz")
 
 
 class NISTReferenceEntry(ExperimentalReferenceEntry):
