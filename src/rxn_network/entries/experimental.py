@@ -154,8 +154,10 @@ class ExperimentalReferenceEntry(ComputedEntry):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return (
-                self.composition.reduced_formula == other.composition.reduced_formula
-            ) and (self.temperature == other.temperature)
+                (self.composition.reduced_formula == other.composition.reduced_formula)
+                and (self.temperature == other.temperature)
+                and (set(self.energy_adjustments) == set(other.energy_adjustments))
+            )
         return False
 
     def __hash__(self):
