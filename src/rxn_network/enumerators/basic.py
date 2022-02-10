@@ -84,8 +84,6 @@ class BasicEnumerator(Enumerator):
         self.quiet = quiet
 
         self._stabilize = False
-        if "ChempotDistanceCalculator" in self.calculators:
-            self._stabilize = True  # ChempotDistanceCalculator requires stable entries
 
         self.open_phases: Optional[List] = None
         self._build_pd = False

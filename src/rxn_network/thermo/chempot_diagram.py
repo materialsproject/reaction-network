@@ -10,8 +10,7 @@ import numpy as np
 from pymatgen.analysis.chempot_diagram import ChemicalPotentialDiagram as ChempotDiagram
 from pymatgen.analysis.phase_diagram import PDEntry, PhaseDiagram
 from pymatgen.core.composition import Element
-
-from scipy.spatial import KDTree, HalfspaceIntersection
+from scipy.spatial import HalfspaceIntersection, KDTree
 
 from rxn_network.entries.entry_set import GibbsEntrySet
 
@@ -68,8 +67,20 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             Shortest distance between domain boundaries in the full
             (hyper)dimensional space, calculated using KDTree.
         """
-        pts1 = self.domains[f1]
-        pts2 = self.domains[f2]
+
+        if f1 in self.domains:
+            pts1 = self.domains[f1]
+        elif f1 in self.metastable_domains:
+            pts1 = self.metastable_domains[f1]
+        else:
+            raise ValueError(f"Formula {f1} not in domains!")
+
+        if f2 in self.domains:
+            pts2 = self.domains[f2]
+        elif f2 in self.metastable_domains:
+            pts2 = self.metastable_domains[f2]
+        else:
+            raise ValueError(f"Formula {f2} not in domains!")
 
         tree = KDTree(pts1)
 
