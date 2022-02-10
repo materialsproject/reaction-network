@@ -5,7 +5,7 @@ pymatgen.
 import warnings
 from functools import cached_property, lru_cache
 from typing import Dict, List, Optional, Tuple
-from copy import deepcopy
+from copy import copy
 
 import numpy as np
 from pymatgen.analysis.chempot_diagram import ChemicalPotentialDiagram as ChempotDiagram
@@ -53,6 +53,13 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         )
         self._hs_int = self._get_halfspace_intersection()
 
+        num_hyperplanes = len(self._hyperplanes)
+        num_border_hyperplanes = len(self._border_hyperplanes)
+
+        self._border_hyperplane_indices = list(
+            range(num_hyperplanes, num_hyperplanes + num_border_hyperplanes)
+        )
+
     def shortest_domain_distance(self, f1: str, f2: str) -> float:
         """
         Args:
@@ -71,18 +78,33 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         return min(tree.query(pts2)[0])
 
     def add_entry(self, entry):
+        """
+        Adds an entry to existing chemical potential diagram. Uses scipy's
+        add_halfspaces() method to save some time/memory.
+
+        Args:
+            entry:
+
+        Returns:
+            None
+
+        """
+        if entry in self.entries:
+            return
+        elif not set(entry.composition.elements).issubset(self.elements):
+            raise ValueError("New entry is not within the same chemical system!")
+
         hyperplane = self._get_hyperplane(entry)
-        idx = len(self._hyperplanes) - self.dim
-        self._hyperplanes = np.vstack(
-            [self._hyperplanes[:idx], hyperplane, self._hyperplanes[idx:]]
-        )
-        self._hyperplane_entries.insert(idx, entry)
+        self._hyperplanes = np.vstack([self._hyperplanes, hyperplane])
+        self._hyperplane_entries.append(entry)
         self._hs_int.add_halfspaces([hyperplane], restart=True)
         self._entry_dict[entry.composition.reduced_formula] = entry
-        del self.domains  # clear cache
+        self.entries.append(entry)
 
-    def remove_entry(self, entry):
-        pass
+        try:
+            del self.domains  # clear cache
+        except AttributeError:
+            pass
 
     def _get_halfspace_intersection(self):
         hs_hyperplanes = np.vstack([self._hyperplanes, self._border_hyperplanes])
@@ -94,14 +116,16 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     def _get_domains(self) -> Dict[str, np.ndarray]:
         """Returns a dictionary of domains as {formula: np.ndarray}"""
+        domains = {entry.composition.reduced_formula: [] for entry in self._hyperplane_entries}  # type: ignore
         entries = self._hyperplane_entries
-        domains = {entry.composition.reduced_formula: [] for entry in entries}  # type: ignore
 
         for intersection, facet in zip(
             self.hs_int.intersections, self.hs_int.dual_facets
         ):
             for v in facet:
-                if v < len(entries):
+                if v not in self._border_hyperplane_indices:
+                    if v > max(self._border_hyperplane_indices):
+                        v = v - len(self._border_hyperplane_indices)
                     this_entry = entries[v]
                     formula = this_entry.composition.reduced_formula
                     domains[formula].append(intersection)
@@ -133,6 +157,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     @property
     def hs_int(self):
+        """Returns the scipy HalfSpaceIntersection object"""
         return self._hs_int
 
     @cached_property
@@ -155,17 +180,17 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         stable_formulas = list(self.domains.keys())
 
         metastable_entries = [e for f, e in e_dict.items() if f not in stable_formulas]
-
         metastable_domains = {}
+
         for e in metastable_entries:
-            new_entry = e_set.get_stabilized_entry(e)
-            e_set.add(new_entry)
-
             formula = e.composition.reduced_formula
-
-            domain = self.__class__(e_set).domains[formula]
-            metastable_domains[formula] = domain
-
-            e_set.remove(new_entry)
+            new_entry = e_set.get_stabilized_entry(e)
+            cpd = ChemicalPotentialDiagram.from_dict(self.as_dict())
+            print(cpd)
+            print(cpd.domains)
+            cpd.add_entry(new_entry)
+            print(cpd)
+            print(cpd.domains)
+            metastable_domains[formula] = cpd.domains[formula]
 
         return metastable_domains
