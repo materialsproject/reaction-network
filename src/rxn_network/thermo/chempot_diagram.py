@@ -2,10 +2,9 @@
 This module implements added features to the ChemicalPotentialDiagram class from
 pymatgen.
 """
-import warnings
-from functools import cached_property, lru_cache
+
+from functools import cached_property
 from typing import Dict, List, Optional, Tuple
-from copy import copy
 
 import numpy as np
 from pymatgen.analysis.chempot_diagram import ChemicalPotentialDiagram as ChempotDiagram
@@ -55,7 +54,6 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         num_hyperplanes = len(self._hyperplanes)
         num_border_hyperplanes = len(self._border_hyperplanes)
-
         self._border_hyperplane_indices = list(
             range(num_hyperplanes, num_hyperplanes + num_border_hyperplanes)
         )
@@ -108,11 +106,8 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     def _get_halfspace_intersection(self):
         hs_hyperplanes = np.vstack([self._hyperplanes, self._border_hyperplanes])
-        interior_point = np.min(self.lims, axis=1)
-
-        return HalfspaceIntersection(
-            hs_hyperplanes, interior_point + 1e-6, incremental=True
-        )
+        interior_point = np.min(self.lims, axis=1) + 1e-1
+        return HalfspaceIntersection(hs_hyperplanes, interior_point, incremental=True)
 
     def _get_domains(self) -> Dict[str, np.ndarray]:
         """Returns a dictionary of domains as {formula: np.ndarray}"""
@@ -185,12 +180,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         for e in metastable_entries:
             formula = e.composition.reduced_formula
             new_entry = e_set.get_stabilized_entry(e)
-            cpd = ChemicalPotentialDiagram.from_dict(self.as_dict())
-            print(cpd)
-            print(cpd.domains)
-            cpd.add_entry(new_entry)
-            print(cpd)
-            print(cpd.domains)
+            cpd = ChemicalPotentialDiagram(list(e_dict.values()) + [new_entry])
             metastable_domains[formula] = cpd.domains[formula]
 
         return metastable_domains
