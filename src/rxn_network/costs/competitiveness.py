@@ -40,6 +40,7 @@ class CompetitivenessScoreCalculator(Calculator):
         use_minimize=False,
         basic_enumerator_kwargs: Optional[Dict] = None,
         minimize_enumerator_kwargs: Optional[Dict] = None,
+        quiet=True,
         name: str = "c_score",
     ):
         """
@@ -69,6 +70,10 @@ class CompetitivenessScoreCalculator(Calculator):
             self.basic_enumerator_kwargs["calculators"] = calcs
         if not self.minimize_enumerator_kwargs.get("calculators"):
             self.minimize_enumerator_kwargs["calculators"] = calcs
+
+        if quiet:
+            self.basic_enumerator_kwargs["quiet"] = True
+            self.minimize_enumerator_kwargs["quiet"] = True
 
     def calculate(self, rxn: ComputedReaction) -> float:
         """
@@ -105,6 +110,8 @@ class CompetitivenessScoreCalculator(Calculator):
             A list of competing reactions
 
         """
+        chemsys = rxn.chemical_system.split("-")
+
         precursors = [r.reduced_formula for r in rxn.reactants]
         open_elem = self.open_elem
 
@@ -115,6 +122,9 @@ class CompetitivenessScoreCalculator(Calculator):
         )
         if open_phases:
             precursors = list(set(precursors) - set(open_phases))
+
+        entries = self.entries.filter_by_stability(0.0).get_subset_in_chemsys(chemsys)
+        entries.update(rxn.entries)  # add back entries which may have been filtered out
 
         enumerators = []
         if self.use_basic:
@@ -143,7 +153,7 @@ class CompetitivenessScoreCalculator(Calculator):
 
         rxns = set()
         for e in enumerators:
-            rxns.update(e.enumerate(self.entries))
+            rxns.update(e.enumerate(entries))
 
         if rxn in rxns:
             rxns.remove(rxn)

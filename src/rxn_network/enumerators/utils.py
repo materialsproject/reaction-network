@@ -15,7 +15,7 @@ from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 
 
-def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = True):
+def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = False):
     """
     Acquire a (stabilized) entry by user-specified formula.
 
@@ -28,14 +28,14 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = T
     """
     try:
         entry = entry_set.get_min_entry_by_formula(formula)
-    except IndexError:
+    except KeyError:
         entry = entry_set.get_interpolated_entry(formula)
         warnings.warn(
             f"Using interpolated entry for {entry.composition.reduced_formula}"
         )
 
     if stabilize:
-        entry = entry_set.get_stabilized_entry(entry, tol=1e-1)
+        entry = entry_set.get_stabilized_entry(entry, tol=1e-3)
 
     return entry
 

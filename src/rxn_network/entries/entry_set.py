@@ -63,9 +63,21 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         Add an entry to the set.
 
-        :param element: Entry
+        Args:
+            entry: An entry object.
         """
         self.entries.add(entry)
+
+    def update(
+        self, entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]]
+    ):
+        """
+        Add an iterable of entries to the set.
+
+        Args:
+            entry: An iterable of entry objects.
+        """
+        self.entries.update(entries)
 
     def discard(self, entry: Union[GibbsComputedEntry, ExperimentalReferenceEntry]):
         """
