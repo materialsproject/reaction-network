@@ -21,8 +21,8 @@ def plot_energy_distance_scatter(df: DataFrame) -> px.scatter:
 
     fig = px.scatter(
         df,
-        x="energy",
-        y="chempot_distance",
+        x="chempot_distance",
+        y="c_score",
         hover_name="rxn",
         labels={
             "energy": r"$\Delta G_{\mathrm{rxn}} ~ \mathrm{\left("

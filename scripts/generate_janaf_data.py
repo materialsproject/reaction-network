@@ -4,6 +4,7 @@ NIST-JANAF website, using the thermochem package to acquire it.
 """
 
 import os
+import gzip
 import json
 from collections import OrderedDict
 import pandas
@@ -74,6 +75,7 @@ if __name__ == "__main__":
         formula, factor = Composition(f).get_integer_formula_and_factor()
         all_data[formula] = {temp: g / factor for temp, g in zip(temps, dGf)}
 
-all_data = OrderedDict(sorted(all_data.items()))
-with open("compounds.json", "w") as f:
-    json.dump(all_data, f)
+    all_data = OrderedDict(sorted(all_data.items()))
+
+    with gzip.open("compounds.json.gz", "wt", encoding="ascii") as zipfile:
+        json.dump(all_data, zipfile)

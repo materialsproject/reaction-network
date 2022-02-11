@@ -98,7 +98,7 @@ class PathwaySet(MSONable):
         return cls(
             reaction_set=reaction_set,
             indices=indices,
-            coefficients=coefficients,
+            coefficients=coefficients,  # type: ignore
             costs=costs,
         )
 

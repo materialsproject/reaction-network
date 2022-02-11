@@ -18,7 +18,6 @@ from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.enumerators.utils import (
     apply_calculators,
     get_computed_rxn,
-    get_open_computed_rxn,
 )
 
 
@@ -75,7 +74,15 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         """
         return comb(len(entries), 2) * 2
 
-    def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
+    def _react(
+        self,
+        reactants,
+        products,
+        calculators,
+        filtered_entries=None,
+        pd=None,
+        grand_pd=None,
+    ):
         """React method for MinimizeGibbsEnumerator, which uses the interfacial reaction
         approach (see _react_interface())"""
         r = list(reactants)
@@ -87,7 +94,12 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             r1 = r[1]
 
         return self._react_interface(
-            r0.composition, r1.composition, pd, grand_pd, calculators=calculators
+            r0.composition,
+            r1.composition,
+            filtered_entries,
+            pd,
+            grand_pd,
+            calculators=calculators,
         )
 
     @staticmethod
@@ -98,7 +110,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         return product(combos, [None])
 
     @staticmethod
-    def _react_interface(r1, r2, pd, grand_pd=None, calculators=None):
+    def _react_interface(r1, r2, filtered_entries, pd, grand_pd=None, calculators=None):
         """Simple API for InterfacialReactivity module from pymatgen."""
         chempots = None
 
@@ -124,11 +136,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
 
         rxns = []
         for _, _, _, rxn, _ in interface.get_kinks():
-            if grand_pd:
-                rxn = get_open_computed_rxn(rxn, pd.all_entries, chempots)
-            else:
-                rxn = get_computed_rxn(rxn, pd.all_entries)
-
+            rxn = get_computed_rxn(rxn, filtered_entries, chempots)
             rxn = apply_calculators(rxn, calculators)
             rxns.append(rxn)
 
@@ -185,7 +193,15 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         self.chempots = {self.open_elem: self.mu}
         self._build_grand_pd = True
 
-    def _react(self, reactants, products, calculators, pd=None, grand_pd=None):
+    def _react(
+        self,
+        reactants,
+        products,
+        calculators,
+        filtered_entries=None,
+        pd=None,
+        grand_pd=None,
+    ):
         """Same as the MinimizeGibbsEnumerator react function, but with ability to
         specify open element and grand potential phase diagram"""
         r = list(reactants)
@@ -206,6 +222,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         return self._react_interface(
             r0.composition,
             r1.composition,
+            filtered_entries,
             pd,
             grand_pd=grand_pd,
             calculators=calculators,

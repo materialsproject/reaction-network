@@ -7,6 +7,7 @@ import logging
 import warnings
 from copy import deepcopy
 from typing import Dict, Iterable, List, Optional, Set, Union
+from functools import cached_property
 
 from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
@@ -24,6 +25,7 @@ from tqdm.auto import tqdm
 from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.gibbs import GibbsComputedEntry
+from rxn_network.entries.freed import FREEDReferenceEntry
 from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd
 
@@ -61,9 +63,21 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         Add an entry to the set.
 
-        :param element: Entry
+        Args:
+            entry: An entry object.
         """
         self.entries.add(entry)
+
+    def update(
+        self, entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]]
+    ):
+        """
+        Add an iterable of entries to the set.
+
+        Args:
+            entry: An iterable of entry objects.
+        """
+        self.entries.update(entries)
 
     def discard(self, entry: Union[GibbsComputedEntry, ExperimentalReferenceEntry]):
         """
@@ -162,11 +176,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Returns:
             Ground state computed entry object.
         """
-        comp = Composition(formula).reduced_composition
-        possible_entries = filter(
-            lambda x: x.composition.reduced_composition == comp, self.entries
-        )
-        return sorted(possible_entries, key=lambda x: x.energy_per_atom)[0]
+        return self.min_entries_by_formula[Composition(formula).reduced_formula]
 
     def get_stabilized_entry(
         self, entry: ComputedEntry, tol: float = 1e-6
@@ -275,6 +285,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         temperature: float,
         include_nist_data=True,
         include_barin_data=False,
+        include_freed_data=False,
     ) -> "GibbsEntrySet":
         """
         Constructor method for building a GibbsEntrySet from an existing phase diagram.
@@ -339,6 +350,17 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     logging.warning(
                         f"Compound {formula} is in Barin tables but not at this temperature! {error}"
                     )
+            if include_freed_data and formula in FREEDReferenceEntry.REFERENCES:
+                try:
+                    e = FREEDReferenceEntry(
+                        composition=Composition(formula), temperature=temperature
+                    )
+                    experimental = True
+                    new_entries.append(e)
+                except ValueError as error:
+                    logging.warning(
+                        f"Compound {formula} is in FREED tables but not at this temperature! {error}"
+                    )
 
             if experimental:
                 experimental_formulas.append(formula)
@@ -369,6 +391,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         temperature: float,
         include_nist_data=True,
         include_barin_data=False,
+        include_freed_data=False,
     ) -> "GibbsEntrySet":
         """
         Constructor method for initializing GibbsEntrySet from T = 0 K
@@ -396,6 +419,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 temperature,
                 include_nist_data=include_nist_data,
                 include_barin_data=include_barin_data,
+                include_freed_data=include_freed_data,
             )
 
         pd_dict = expand_pd(list(e_set))
@@ -407,10 +431,29 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return cls(list(new_entries))
 
-    @property
+    @cached_property
     def entries_list(self) -> List[ComputedEntry]:
         """Returns a list of all entries in the entry set."""
         return list(sorted(self.entries, key=lambda e: e.composition.reduced_formula))
+
+    @cached_property
+    def min_entries_by_formula(self) -> Dict[str, ComputedEntry]:
+        """
+        Returns a dict of minimum energy entries in the entry set, indexed by
+        formula.
+        """
+        min_entries = {}
+        for e in self.entries:
+            formula = e.composition.reduced_formula
+            if formula not in min_entries:
+                entries = filter(
+                    lambda x: x.composition.reduced_formula == formula, self.entries
+                )
+                min_entries[formula] = sorted(entries, key=lambda x: x.energy_per_atom)[
+                    0
+                ]
+
+        return min_entries
 
     @property
     def chemsys(self) -> set:

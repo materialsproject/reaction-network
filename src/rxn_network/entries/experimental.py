@@ -2,14 +2,15 @@
 Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 """
 import hashlib
-from typing import Any, Dict, List, Optional
-from monty.json import MSONable
+from typing import Dict, List, Optional
 
 from pymatgen.core.composition import Composition
+from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
+from monty.json import MontyDecoder
 from scipy.interpolate import interp1d
 
 
-class ExperimentalReferenceEntry(MSONable):
+class ExperimentalReferenceEntry(ComputedEntry):
     """
     An Entry class for experimental reference data, to be sub-classed for specific data
     sources.  Given a composition, automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
@@ -22,6 +23,7 @@ class ExperimentalReferenceEntry(MSONable):
         self,
         composition: Composition,
         temperature: float,
+        energy_adjustments: Optional[List[EnergyAdjustment]] = None,
         data: Optional[dict] = None,
     ):
         """
@@ -32,18 +34,23 @@ class ExperimentalReferenceEntry(MSONable):
                 interpolated. Defaults to 300 K.
             data: Optional dictionary containing entry data
         """
-        self._composition = Composition(composition)
-        self.temperature = temperature
-        self.data = data if data else {}  # type: Dict[Any, Any]
+        formula = Composition(composition).reduced_formula
+        entry_id = self.__class__.__name__
 
-        formula = self._composition.reduced_formula
+        self._temperature = temperature
         self._validate_temperature(formula, temperature)
 
-        self._energy = self._get_energy(formula, temperature)
+        energy = self._get_energy(formula, temperature)
 
-        self._formula = formula
+        super().__init__(
+            composition,
+            energy,
+            energy_adjustments=energy_adjustments,
+            data=data,
+            entry_id=entry_id,
+        )
+
         self.name = formula
-        self.entry_id = self.__class__.__name__
 
     def get_new_temperature(
         self, new_temperature: float
@@ -96,38 +103,9 @@ class ExperimentalReferenceEntry(MSONable):
         return data[temperature]
 
     @property
-    def composition(self) -> Composition:
-        """
-        :return: the composition of the entry.
-        """
-        return self._composition
-
-    @property
-    def energy(self) -> float:
-        """The energy of the entry, as supplied by the reference tables."""
-        return self._energy
-
-    @property
-    def energy_per_atom(self) -> float:
-        """The energy of the entry, as supplied by the reference tables."""
-        return self.energy / self.composition.num_atoms
-
-    @property
-    def correction_uncertainty(self) -> float:
-        """Uncertainty of experimental data is not supplied."""
-        return 0
-
-    @property
-    def correction_uncertainty_per_atom(self) -> float:
-        """Uncertainty of experimental data is not supplied."""
-        return 0
-
-    @property
-    def energy_adjustments(self) -> List:
-        """
-        Returns a list of energy adjustments. Not implemented for experimental data.
-        """
-        return []
+    def temperature(self) -> float:
+        """Returns temperature used to calculate entry's energy"""
+        return self._temperature
 
     @property
     def is_experimental(self) -> bool:
@@ -139,17 +117,46 @@ class ExperimentalReferenceEntry(MSONable):
         """Returns True if the entry is an element."""
         return self.composition.is_element
 
+    def as_dict(self):
+        """
+        Returns:
+            A dict representation of the Entry.
+        """
+        d = super().as_dict()
+
+        d["temperature"] = self.temperature
+
+        del d["energy"]
+        del d["entry_id"]
+        del d["parameters"]
+        del d["correction"]
+
+        return d
+
+    @classmethod
+    def from_dict(cls, d):
+        dec = MontyDecoder()
+        entry = cls(
+            composition=d["composition"],
+            temperature=d["temperature"],
+            energy_adjustments=dec.process_decoded(d["energy_adjustments"]),
+            data=d["data"],
+        )
+        return entry
+
     def __repr__(self):
         output = [
-            f"{self.__class__.__name__} | {self._formula}",
+            f"{self.__class__.__name__} | {self.composition.reduced_formula}",
             f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
         ]
         return "\n".join(output)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return (self._formula == other._formula) and (
-                self.temperature == other.temperature
+            return (
+                (self.composition.reduced_formula == other.composition.reduced_formula)
+                and (self.temperature == other.temperature)
+                and (set(self.energy_adjustments) == set(other.energy_adjustments))
             )
         return False
 
