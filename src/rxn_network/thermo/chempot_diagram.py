@@ -38,7 +38,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
                 of with 2+ elements
             limits: Bounds of elemental chemical potentials (min, max), which are
                 used to construct the border hyperplanes used in the
-                HalfSpaceIntersection algorithm; these constrain the space over which the
+                HalfspaceIntersection algorithm; these constrain the space over which the
                 domains are calculated and also determine the size of the plotted
                 diagram. Any elemental limits not specified are covered in the
                 default_min_limit argument
@@ -100,7 +100,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         """
         if entry in self.entries:
             return
-        elif not set(entry.composition.elements).issubset(self.elements):
+        if not set(entry.composition.elements).issubset(self.elements):
             raise ValueError("New entry is not within the same chemical system!")
 
         hyperplane = self._get_hyperplane(entry)
