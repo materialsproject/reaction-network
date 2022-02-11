@@ -797,6 +797,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rxn_network.entries.entry_set.GibbsEntrySet.min_entries_by_formula" class="md-nav__link">
+    min_entries_by_formula
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#rxn_network.entries.entry_set.GibbsEntrySet.__init__" class="md-nav__link">
     __init__()
   </a>
@@ -890,6 +897,13 @@
           <li class="md-nav__item">
   <a href="#rxn_network.entries.entry_set.GibbsEntrySet.get_subset_in_chemsys" class="md-nav__link">
     get_subset_in_chemsys()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.entries.entry_set.GibbsEntrySet.update" class="md-nav__link">
+    update()
   </a>
   
 </li>
@@ -1674,6 +1688,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rxn_network.entries.entry_set.GibbsEntrySet.min_entries_by_formula" class="md-nav__link">
+    min_entries_by_formula
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#rxn_network.entries.entry_set.GibbsEntrySet.__init__" class="md-nav__link">
     __init__()
   </a>
@@ -1767,6 +1788,13 @@
           <li class="md-nav__item">
   <a href="#rxn_network.entries.entry_set.GibbsEntrySet.get_subset_in_chemsys" class="md-nav__link">
     get_subset_in_chemsys()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.entries.entry_set.GibbsEntrySet.update" class="md-nav__link">
+    update()
   </a>
   
 </li>
@@ -1868,9 +1896,21 @@ that be using composition, stability, chemical system, etc.</p>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add an entry to the set.</span>
 
-<span class="sd">        :param element: Entry</span>
+<span class="sd">        Args:</span>
+<span class="sd">            entry: An entry object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">GibbsComputedEntry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">]]</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an iterable of entries to the set.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entry: An iterable of entry objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">discard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GibbsComputedEntry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">]):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1969,11 +2009,7 @@ that be using composition, stability, chemical system, etc.</p>
 <span class="sd">        Returns:</span>
 <span class="sd">            Ground state computed entry object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">comp</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_composition</span>
-        <span class="n">possible_entries</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="o">==</span> <span class="n">comp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">possible_entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_entries_by_formula</span><span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">get_stabilized_entry</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">ComputedEntry</span><span class="p">,</span> <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span>
@@ -2082,6 +2118,7 @@ that be using composition, stability, chemical system, etc.</p>
         <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">include_nist_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">include_barin_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">include_freed_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GibbsEntrySet&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor method for building a GibbsEntrySet from an existing phase diagram.</span>
@@ -2146,6 +2183,17 @@ that be using composition, stability, chemical system, etc.</p>
                     <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Compound </span><span class="si">{</span><span class="n">formula</span><span class="si">}</span><span class="s2"> is in Barin tables but not at this temperature! </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
+            <span class="k">if</span> <span class="n">include_freed_data</span> <span class="ow">and</span> <span class="n">formula</span> <span class="ow">in</span> <span class="n">FREEDReferenceEntry</span><span class="o">.</span><span class="n">REFERENCES</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">FREEDReferenceEntry</span><span class="p">(</span>
+                        <span class="n">composition</span><span class="o">=</span><span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">),</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span>
+                    <span class="p">)</span>
+                    <span class="n">experimental</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">new_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Compound </span><span class="si">{</span><span class="n">formula</span><span class="si">}</span><span class="s2"> is in FREED tables but not at this temperature! </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">experimental</span><span class="p">:</span>
                 <span class="n">experimental_formulas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span>
@@ -2176,6 +2224,7 @@ that be using composition, stability, chemical system, etc.</p>
         <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">include_nist_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">include_barin_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">include_freed_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GibbsEntrySet&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor method for initializing GibbsEntrySet from T = 0 K</span>
@@ -2203,6 +2252,7 @@ that be using composition, stability, chemical system, etc.</p>
                 <span class="n">temperature</span><span class="p">,</span>
                 <span class="n">include_nist_data</span><span class="o">=</span><span class="n">include_nist_data</span><span class="p">,</span>
                 <span class="n">include_barin_data</span><span class="o">=</span><span class="n">include_barin_data</span><span class="p">,</span>
+                <span class="n">include_freed_data</span><span class="o">=</span><span class="n">include_freed_data</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="n">pd_dict</span> <span class="o">=</span> <span class="n">expand_pd</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">e_set</span><span class="p">))</span>
@@ -2214,10 +2264,29 @@ that be using composition, stability, chemical system, etc.</p>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">new_entries</span><span class="p">))</span>
 
-    <span class="nd">@property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">entries_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Returns a list of all entries in the entry set.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">))</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span> <span class="nf">min_entries_by_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ComputedEntry</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dict of minimum energy entries in the entry set, indexed by</span>
+<span class="sd">        formula.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">min_entries</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="n">formula</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span>
+            <span class="k">if</span> <span class="n">formula</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">min_entries</span><span class="p">:</span>
+                <span class="n">entries</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="o">==</span> <span class="n">formula</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span>
+                <span class="p">)</span>
+                <span class="n">min_entries</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)[</span>
+                    <span class="mi">0</span>
+                <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">min_entries</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">chemsys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">:</span>
@@ -2299,8 +2368,9 @@ that be using composition, stability, chemical system, etc.</p>
 <code class="highlight language-python"><span class="n">entries_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">pymatgen</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">computed_entries</span><span class="o">.</span><span class="n">ComputedEntry</span><span class="p">]</span></code>
 
   <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-cached"><code>cached</code></small>
       <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
   </span>
 
 </h3>
@@ -2308,6 +2378,31 @@ that be using composition, stability, chemical system, etc.</p>
     <div class="doc doc-contents ">
 
       <p>Returns a list of all entries in the entry set.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.entries.entry_set.GibbsEntrySet.min_entries_by_formula" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">min_entries_by_formula</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pymatgen</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">computed_entries</span><span class="o">.</span><span class="n">ComputedEntry</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-cached"><code>cached</code></small>
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns a dict of minimum energy entries in the entry set, indexed by
+formula.</p>
     </div>
 
   </div>
@@ -2391,15 +2486,34 @@ unique entries.</p>
     <div class="doc doc-contents ">
 
       <p>Add an entry to the set.</p>
-<p>:param element: Entry</p>
 
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>entry</code></td>
+        <td><code>Union[rxn_network.entries.gibbs.GibbsComputedEntry, rxn_network.entries.experimental.ExperimentalReferenceEntry]</code></td>
+        <td><p>An entry object.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>rxn_network/entries/entry_set.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GibbsComputedEntry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">]):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Add an entry to the set.</span>
 
-<span class="sd">    :param element: Entry</span>
+<span class="sd">    Args:</span>
+<span class="sd">        entry: An entry object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
 </code></pre></div>
@@ -2685,7 +2799,7 @@ cutoff (e_above_hull) via phase diagram construction.</p></td>
 
 
 <h3 id="rxn_network.entries.entry_set.GibbsEntrySet.from_entries" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">from_entries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">include_nist_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_barin_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">from_entries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">include_nist_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_barin_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_freed_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
@@ -2752,6 +2866,7 @@ experimental reference entry objects at the specified temperature.</p></td>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">include_nist_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">include_barin_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">include_freed_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GibbsEntrySet&quot;</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructor method for initializing GibbsEntrySet from T = 0 K</span>
@@ -2779,6 +2894,7 @@ experimental reference entry objects at the specified temperature.</p></td>
             <span class="n">temperature</span><span class="p">,</span>
             <span class="n">include_nist_data</span><span class="o">=</span><span class="n">include_nist_data</span><span class="p">,</span>
             <span class="n">include_barin_data</span><span class="o">=</span><span class="n">include_barin_data</span><span class="p">,</span>
+            <span class="n">include_freed_data</span><span class="o">=</span><span class="n">include_freed_data</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="n">pd_dict</span> <span class="o">=</span> <span class="n">expand_pd</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">e_set</span><span class="p">))</span>
@@ -2802,7 +2918,7 @@ experimental reference entry objects at the specified temperature.</p></td>
 
 
 <h3 id="rxn_network.entries.entry_set.GibbsEntrySet.from_pd" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">from_pd</span><span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">include_nist_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_barin_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">from_pd</span><span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">include_nist_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_barin_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_freed_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
@@ -2878,6 +2994,7 @@ experimental reference entry objects at the specified temperature.</p></td>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">include_nist_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">include_barin_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">include_freed_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GibbsEntrySet&quot;</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructor method for building a GibbsEntrySet from an existing phase diagram.</span>
@@ -2941,6 +3058,17 @@ experimental reference entry objects at the specified temperature.</p></td>
             <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Compound </span><span class="si">{</span><span class="n">formula</span><span class="si">}</span><span class="s2"> is in Barin tables but not at this temperature! </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_freed_data</span> <span class="ow">and</span> <span class="n">formula</span> <span class="ow">in</span> <span class="n">FREEDReferenceEntry</span><span class="o">.</span><span class="n">REFERENCES</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">FREEDReferenceEntry</span><span class="p">(</span>
+                    <span class="n">composition</span><span class="o">=</span><span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">),</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span>
+                <span class="p">)</span>
+                <span class="n">experimental</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">new_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Compound </span><span class="si">{</span><span class="n">formula</span><span class="si">}</span><span class="s2"> is in FREED tables but not at this temperature! </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">experimental</span><span class="p">:</span>
@@ -3185,11 +3313,7 @@ random noise.</p></td>
 <span class="sd">    Returns:</span>
 <span class="sd">        Ground state computed entry object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">comp</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_composition</span>
-    <span class="n">possible_entries</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="o">==</span> <span class="n">comp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">possible_entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_entries_by_formula</span><span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">]</span>
 </code></pre></div>
         </details>
     </div>
@@ -3366,6 +3490,59 @@ entries are returned.</p>
 
   </div>
 
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.entries.entry_set.GibbsEntrySet.update" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Add an iterable of entries to the set.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>entry</code></td>
+        <td></td>
+        <td><p>An iterable of entry objects.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/entries/entry_set.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">GibbsComputedEntry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">]]</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add an iterable of entries to the set.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        entry: An iterable of entry objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
 
 
 

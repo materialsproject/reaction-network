@@ -1732,7 +1732,15 @@ automatically excluded.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">comb</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
-    <span class="k">def</span> <span class="nf">_react</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">calculators</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_react</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reactants</span><span class="p">,</span>
+        <span class="n">products</span><span class="p">,</span>
+        <span class="n">calculators</span><span class="p">,</span>
+        <span class="n">filtered_entries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;React method for MinimizeGibbsEnumerator, which uses the interfacial reaction</span>
 <span class="sd">        approach (see _react_interface())&quot;&quot;&quot;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">reactants</span><span class="p">)</span>
@@ -1744,7 +1752,12 @@ automatically excluded.</p>
             <span class="n">r1</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_react_interface</span><span class="p">(</span>
-            <span class="n">r0</span><span class="o">.</span><span class="n">composition</span><span class="p">,</span> <span class="n">r1</span><span class="o">.</span><span class="n">composition</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">grand_pd</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="n">calculators</span>
+            <span class="n">r0</span><span class="o">.</span><span class="n">composition</span><span class="p">,</span>
+            <span class="n">r1</span><span class="o">.</span><span class="n">composition</span><span class="p">,</span>
+            <span class="n">filtered_entries</span><span class="p">,</span>
+            <span class="n">pd</span><span class="p">,</span>
+            <span class="n">grand_pd</span><span class="p">,</span>
+            <span class="n">calculators</span><span class="o">=</span><span class="n">calculators</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
@@ -1755,7 +1768,7 @@ automatically excluded.</p>
         <span class="k">return</span> <span class="n">product</span><span class="p">(</span><span class="n">combos</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_react_interface</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_react_interface</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Simple API for InterfacialReactivity module from pymatgen.&quot;&quot;&quot;</span>
         <span class="n">chempots</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1781,11 +1794,7 @@ automatically excluded.</p>
 
         <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">rxn</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">interface</span><span class="o">.</span><span class="n">get_kinks</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">grand_pd</span><span class="p">:</span>
-                <span class="n">rxn</span> <span class="o">=</span> <span class="n">get_open_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">all_entries</span><span class="p">,</span> <span class="n">chempots</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">rxn</span> <span class="o">=</span> <span class="n">get_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">all_entries</span><span class="p">)</span>
-
+            <span class="n">rxn</span> <span class="o">=</span> <span class="n">get_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="p">,</span> <span class="n">chempots</span><span class="p">)</span>
             <span class="n">rxn</span> <span class="o">=</span> <span class="n">apply_calculators</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">calculators</span><span class="p">)</span>
             <span class="n">rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
 
@@ -2055,7 +2064,15 @@ phase space. Identity reactions are excluded.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">chempots</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_grand_pd</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_react</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">calculators</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_react</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reactants</span><span class="p">,</span>
+        <span class="n">products</span><span class="p">,</span>
+        <span class="n">calculators</span><span class="p">,</span>
+        <span class="n">filtered_entries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Same as the MinimizeGibbsEnumerator react function, but with ability to</span>
 <span class="sd">        specify open element and grand potential phase diagram&quot;&quot;&quot;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">reactants</span><span class="p">)</span>
@@ -2076,6 +2093,7 @@ phase space. Identity reactions are excluded.</p>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_react_interface</span><span class="p">(</span>
             <span class="n">r0</span><span class="o">.</span><span class="n">composition</span><span class="p">,</span>
             <span class="n">r1</span><span class="o">.</span><span class="n">composition</span><span class="p">,</span>
+            <span class="n">filtered_entries</span><span class="p">,</span>
             <span class="n">pd</span><span class="p">,</span>
             <span class="n">grand_pd</span><span class="o">=</span><span class="n">grand_pd</span><span class="p">,</span>
             <span class="n">calculators</span><span class="o">=</span><span class="n">calculators</span><span class="p">,</span>

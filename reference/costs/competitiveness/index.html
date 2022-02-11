@@ -1687,6 +1687,7 @@ your own risk.</p>
         <span class="n">use_minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">basic_enumerator_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">minimize_enumerator_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;c_score&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1716,6 +1717,10 @@ your own risk.</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">basic_enumerator_kwargs</span><span class="p">[</span><span class="s2">&quot;calculators&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calcs</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize_enumerator_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;calculators&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">minimize_enumerator_kwargs</span><span class="p">[</span><span class="s2">&quot;calculators&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calcs</span>
+
+        <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">basic_enumerator_kwargs</span><span class="p">[</span><span class="s2">&quot;quiet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">minimize_enumerator_kwargs</span><span class="p">[</span><span class="s2">&quot;quiet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1752,6 +1757,8 @@ your own risk.</p>
 <span class="sd">            A list of competing reactions</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chemsys</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">chemical_system</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
         <span class="n">precursors</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">]</span>
         <span class="n">open_elem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span>
 
@@ -1762,6 +1769,9 @@ your own risk.</p>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">open_phases</span><span class="p">:</span>
             <span class="n">precursors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">precursors</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">open_phases</span><span class="p">))</span>
+
+        <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">filter_by_stability</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">get_subset_in_chemsys</span><span class="p">(</span><span class="n">chemsys</span><span class="p">)</span>
+        <span class="n">entries</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>  <span class="c1"># add back entries which may have been filtered out</span>
 
         <span class="n">enumerators</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_basic</span><span class="p">:</span>
@@ -1790,7 +1800,7 @@ your own risk.</p>
 
         <span class="n">rxns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">enumerators</span><span class="p">:</span>
-            <span class="n">rxns</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">))</span>
+            <span class="n">rxns</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">entries</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">:</span>
             <span class="n">rxns</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
@@ -1866,7 +1876,7 @@ your own risk.</p>
 
 
 <h3 id="rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">cost_function</span><span class="p">,</span> <span class="n">open_phases</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">open_elem</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chempot</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">use_basic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">basic_enumerator_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minimize_enumerator_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;c_score&#39;</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">cost_function</span><span class="p">,</span> <span class="n">open_phases</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">open_elem</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chempot</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">use_basic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">basic_enumerator_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minimize_enumerator_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;c_score&#39;</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1922,6 +1932,7 @@ determining c-score</p></td>
     <span class="n">use_minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">basic_enumerator_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">minimize_enumerator_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;c_score&quot;</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1951,6 +1962,10 @@ determining c-score</p></td>
         <span class="bp">self</span><span class="o">.</span><span class="n">basic_enumerator_kwargs</span><span class="p">[</span><span class="s2">&quot;calculators&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calcs</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize_enumerator_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;calculators&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minimize_enumerator_kwargs</span><span class="p">[</span><span class="s2">&quot;calculators&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calcs</span>
+
+    <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_enumerator_kwargs</span><span class="p">[</span><span class="s2">&quot;quiet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize_enumerator_kwargs</span><span class="p">[</span><span class="s2">&quot;quiet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 </code></pre></div>
         </details>
     </div>
@@ -2105,6 +2120,8 @@ enumerated given the settings in the constructor.</p>
 <span class="sd">        A list of competing reactions</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chemsys</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">chemical_system</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
     <span class="n">precursors</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">]</span>
     <span class="n">open_elem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span>
 
@@ -2115,6 +2132,9 @@ enumerated given the settings in the constructor.</p>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">open_phases</span><span class="p">:</span>
         <span class="n">precursors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">precursors</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">open_phases</span><span class="p">))</span>
+
+    <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">filter_by_stability</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">get_subset_in_chemsys</span><span class="p">(</span><span class="n">chemsys</span><span class="p">)</span>
+    <span class="n">entries</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>  <span class="c1"># add back entries which may have been filtered out</span>
 
     <span class="n">enumerators</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_basic</span><span class="p">:</span>
@@ -2143,7 +2163,7 @@ enumerated given the settings in the constructor.</p>
 
     <span class="n">rxns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">enumerators</span><span class="p">:</span>
-        <span class="n">rxns</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">))</span>
+        <span class="n">rxns</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">entries</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">:</span>
         <span class="n">rxns</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>

@@ -1811,8 +1811,6 @@ products may not be stable with respect to each other.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">quiet</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_stabilize</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="s2">&quot;ChempotDistanceCalculator&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_stabilize</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># ChempotDistanceCalculator requires stable entries</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">open_phases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_pd</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1975,12 +1973,14 @@ products may not be stable with respect to each other.</p>
             <span class="p">):</span>
                 <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">precursor_func</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="ow">or</span> <span class="n">precursor_func</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">precursor_func</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">p</span> <span class="ow">and</span> <span class="n">precursor_func</span><span class="p">(</span><span class="n">p</span><span class="p">))):</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">p</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">target_func</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="ow">or</span> <span class="n">target_func</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
                 <span class="k">continue</span>
 
-            <span class="n">suggested_rxns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_react</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">calculators</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">grand_pd</span><span class="p">)</span>
+            <span class="n">suggested_rxns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_react</span><span class="p">(</span>
+                <span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">calculators</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">grand_pd</span>
+            <span class="p">)</span>
 
             <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">suggested_rxns</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(</span>
@@ -1998,12 +1998,25 @@ products may not be stable with respect to each other.</p>
 
         <span class="k">return</span> <span class="n">rxns</span>
 
-    <span class="k">def</span> <span class="nf">_react</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">calculators</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_react</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reactants</span><span class="p">,</span>
+        <span class="n">products</span><span class="p">,</span>
+        <span class="n">calculators</span><span class="p">,</span>
+        <span class="n">filtered_entries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates reactions from a list of reactants, products, and optional</span>
 <span class="sd">        calculator(s)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">grand_pd</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>  <span class="c1"># unused arguments in BasicEnumerator class</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">filtered_entries</span><span class="p">,</span>
+            <span class="n">pd</span><span class="p">,</span>
+            <span class="n">grand_pd</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span>
+        <span class="p">)</span>  <span class="c1"># unused arguments in BasicEnumerator class</span>
 
         <span class="n">forward_rxn</span> <span class="o">=</span> <span class="n">ComputedReaction</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
         <span class="n">backward_rxn</span> <span class="o">=</span> <span class="n">forward_rxn</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
@@ -2355,8 +2368,6 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
     <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">quiet</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_stabilize</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">if</span> <span class="s2">&quot;ChempotDistanceCalculator&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_stabilize</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># ChempotDistanceCalculator requires stable entries</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">open_phases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_build_pd</span> <span class="o">=</span> <span class="kc">False</span>
@@ -2662,7 +2673,7 @@ the ReactionSet class).</p>
             <span class="n">num_combos</span> <span class="o">=</span> <span class="n">comb</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">),</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">num_total_combos</span> <span class="o">+=</span> <span class="n">num_combos_with_open</span> <span class="o">*</span> <span class="n">num_combos</span>
 
-        <span class="k">return</span> <span class="n">num_total_combos</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">num_total_combos</span><span class="o">**</span><span class="mi">2</span>
 
     <span class="k">def</span> <span class="nf">_get_open_combos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get all possible combinations of open entries. For a single entry,</span>
@@ -2916,7 +2927,7 @@ correlate with the amount of time it takes to enumerate reactions.</p>
         <span class="n">num_combos</span> <span class="o">=</span> <span class="n">comb</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">),</span> <span class="n">i</span><span class="p">)</span>
         <span class="n">num_total_combos</span> <span class="o">+=</span> <span class="n">num_combos_with_open</span> <span class="o">*</span> <span class="n">num_combos</span>
 
-    <span class="k">return</span> <span class="n">num_total_combos</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">num_total_combos</span><span class="o">**</span><span class="mi">2</span>
 </code></pre></div>
         </details>
     </div>

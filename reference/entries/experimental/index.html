@@ -797,48 +797,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.composition" class="md-nav__link">
-    composition
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.correction_uncertainty" class="md-nav__link">
-    correction_uncertainty
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.correction_uncertainty_per_atom" class="md-nav__link">
-    correction_uncertainty_per_atom
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.energy" class="md-nav__link">
-    energy
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.energy_adjustments" class="md-nav__link">
-    energy_adjustments
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.energy_per_atom" class="md-nav__link">
-    energy_per_atom
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_element" class="md-nav__link">
     is_element
   </a>
@@ -853,8 +811,29 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.temperature" class="md-nav__link">
+    temperature
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.__init__" class="md-nav__link">
     __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.as_dict" class="md-nav__link">
+    as_dict()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.from_dict" class="md-nav__link">
+    from_dict()
   </a>
   
 </li>
@@ -1618,48 +1597,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.composition" class="md-nav__link">
-    composition
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.correction_uncertainty" class="md-nav__link">
-    correction_uncertainty
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.correction_uncertainty_per_atom" class="md-nav__link">
-    correction_uncertainty_per_atom
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.energy" class="md-nav__link">
-    energy
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.energy_adjustments" class="md-nav__link">
-    energy_adjustments
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.energy_per_atom" class="md-nav__link">
-    energy_per_atom
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_element" class="md-nav__link">
     is_element
   </a>
@@ -1674,8 +1611,29 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.temperature" class="md-nav__link">
+    temperature
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.__init__" class="md-nav__link">
     __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.as_dict" class="md-nav__link">
+    as_dict()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.from_dict" class="md-nav__link">
+    from_dict()
   </a>
   
 </li>
@@ -1734,7 +1692,7 @@
 
 <h2 id="rxn_network.entries.experimental.ExperimentalReferenceEntry" class="doc doc-heading">
         <code>
-ExperimentalReferenceEntry            (<span title="monty.json.MSONable">MSONable</span>)
+ExperimentalReferenceEntry            (<span title="pymatgen.entries.computed_entries.ComputedEntry">ComputedEntry</span>)
         </code>
 
 
@@ -1749,7 +1707,7 @@ reference values.</p>
 
         <details class="quote">
           <summary>Source code in <code>rxn_network/entries/experimental.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ExperimentalReferenceEntry</span><span class="p">(</span><span class="n">MSONable</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ExperimentalReferenceEntry</span><span class="p">(</span><span class="n">ComputedEntry</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An Entry class for experimental reference data, to be sub-classed for specific data</span>
 <span class="sd">    sources.  Given a composition, automatically finds the Gibbs free energy of formation, dGf(T) from tabulated</span>
@@ -1762,6 +1720,7 @@ reference values.</p>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">composition</span><span class="p">:</span> <span class="n">Composition</span><span class="p">,</span>
         <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">energy_adjustments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EnergyAdjustment</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1772,18 +1731,23 @@ reference values.</p>
 <span class="sd">                interpolated. Defaults to 300 K.</span>
 <span class="sd">            data: Optional dictionary containing entry data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">composition</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="n">data</span> <span class="k">else</span> <span class="p">{}</span>  <span class="c1"># type: Dict[Any, Any]</span>
+        <span class="n">formula</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">composition</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_formula</span>
+        <span class="n">entry_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
-        <span class="n">formula</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span><span class="o">.</span><span class="n">reduced_formula</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span> <span class="o">=</span> <span class="n">temperature</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_temperature</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_energy</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_energy</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">composition</span><span class="p">,</span>
+            <span class="n">energy</span><span class="p">,</span>
+            <span class="n">energy_adjustments</span><span class="o">=</span><span class="n">energy_adjustments</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">entry_id</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">formula</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
     <span class="k">def</span> <span class="nf">get_new_temperature</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">new_temperature</span><span class="p">:</span> <span class="nb">float</span>
@@ -1836,38 +1800,9 @@ reference values.</p>
         <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">temperature</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">composition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Composition</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :return: the composition of the entry.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The energy of the entry, as supplied by the reference tables.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">energy_per_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The energy of the entry, as supplied by the reference tables.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">num_atoms</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">correction_uncertainty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Uncertainty of experimental data is not supplied.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="mi">0</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">correction_uncertainty_per_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Uncertainty of experimental data is not supplied.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="mi">0</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">energy_adjustments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a list of energy adjustments. Not implemented for experimental data.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">def</span> <span class="nf">temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns temperature used to calculate entry&#39;s energy&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_experimental</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -1879,17 +1814,46 @@ reference values.</p>
         <span class="sd">&quot;&quot;&quot;Returns True if the entry is an element.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">is_element</span>
 
+    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A dict representation of the Entry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
+
+        <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;entry_id&quot;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;correction&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">d</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="n">dec</span> <span class="o">=</span> <span class="n">MontyDecoder</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">composition</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;composition&quot;</span><span class="p">],</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">],</span>
+            <span class="n">energy_adjustments</span><span class="o">=</span><span class="n">dec</span><span class="o">.</span><span class="n">process_decoded</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;energy_adjustments&quot;</span><span class="p">]),</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">entry</span>
+
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">output</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="sa">f</span><span class="s2">&quot;Gibbs Energy (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K) = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_formula</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">temperature</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_adjustments</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">energy_adjustments</span><span class="p">))</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
 
@@ -1910,144 +1874,6 @@ reference values.</p>
 
 
 
-
-
-
-  <div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.composition" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">composition</span><span class="p">:</span> <span class="n">Composition</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-      <p>:return: the composition of the entry.</p>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.correction_uncertainty" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">correction_uncertainty</span><span class="p">:</span> <span class="nb">float</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-      <p>Uncertainty of experimental data is not supplied.</p>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.correction_uncertainty_per_atom" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">correction_uncertainty_per_atom</span><span class="p">:</span> <span class="nb">float</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-      <p>Uncertainty of experimental data is not supplied.</p>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.energy" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">energy</span><span class="p">:</span> <span class="nb">float</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-      <p>The energy of the entry, as supplied by the reference tables.</p>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.energy_adjustments" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">energy_adjustments</span><span class="p">:</span> <span class="n">List</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-      <p>Returns a list of energy adjustments. Not implemented for experimental data.</p>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.energy_per_atom" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">energy_per_atom</span><span class="p">:</span> <span class="nb">float</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-      <p>The energy of the entry, as supplied by the reference tables.</p>
-    </div>
-
-  </div>
 
 
 
@@ -2097,6 +1923,29 @@ reference values.</p>
 
 
 
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.temperature" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns temperature used to calculate entry's energy</p>
+    </div>
+
+  </div>
+
+
+
 
 
 
@@ -2107,7 +1956,7 @@ reference values.</p>
 
 
 <h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">composition</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">composition</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">energy_adjustments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -2157,6 +2006,7 @@ interpolated. Defaults to 300 K.</p></td>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">composition</span><span class="p">:</span> <span class="n">Composition</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">energy_adjustments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EnergyAdjustment</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -2167,24 +2017,120 @@ interpolated. Defaults to 300 K.</p></td>
 <span class="sd">            interpolated. Defaults to 300 K.</span>
 <span class="sd">        data: Optional dictionary containing entry data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">composition</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="n">data</span> <span class="k">else</span> <span class="p">{}</span>  <span class="c1"># type: Dict[Any, Any]</span>
+    <span class="n">formula</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">composition</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_formula</span>
+    <span class="n">entry_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
-    <span class="n">formula</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span><span class="o">.</span><span class="n">reduced_formula</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span> <span class="o">=</span> <span class="n">temperature</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_temperature</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_energy</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_energy</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">=</span> <span class="n">formula</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">composition</span><span class="p">,</span>
+        <span class="n">energy</span><span class="p">,</span>
+        <span class="n">energy_adjustments</span><span class="o">=</span><span class="n">energy_adjustments</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">entry_id</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">formula</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 </code></pre></div>
         </details>
     </div>
 
   </div>
 
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.as_dict" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td><p>A dict representation of the Entry.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/entries/experimental.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A dict representation of the Entry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+
+    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
+
+    <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;entry_id&quot;</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;correction&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">d</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.entries.experimental.ExperimentalReferenceEntry.from_dict" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>:param d: Dict representation.
+:return: ComputedEntry</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/entries/experimental.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="n">MontyDecoder</span><span class="p">()</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">composition</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;composition&quot;</span><span class="p">],</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">],</span>
+        <span class="n">energy_adjustments</span><span class="o">=</span><span class="n">dec</span><span class="o">.</span><span class="n">process_decoded</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;energy_adjustments&quot;</span><span class="p">]),</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">entry</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
 
 
 

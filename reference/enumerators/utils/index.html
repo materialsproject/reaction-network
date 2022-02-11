@@ -913,20 +913,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rxn_network.enumerators.utils.get_min_entry_by_comp" class="md-nav__link">
-    get_min_entry_by_comp()
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rxn_network.enumerators.utils.get_open_computed_rxn" class="md-nav__link">
-    get_open_computed_rxn()
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#rxn_network.enumerators.utils.get_total_chemsys_str" class="md-nav__link">
     get_total_chemsys_str()
   </a>
@@ -1618,20 +1604,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rxn_network.enumerators.utils.get_min_entry_by_comp" class="md-nav__link">
-    get_min_entry_by_comp()
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rxn_network.enumerators.utils.get_open_computed_rxn" class="md-nav__link">
-    get_open_computed_rxn()
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#rxn_network.enumerators.utils.get_total_chemsys_str" class="md-nav__link">
     get_total_chemsys_str()
   </a>
@@ -1771,7 +1743,7 @@
 
 
 <h2 id="rxn_network.enumerators.utils.get_computed_rxn" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">get_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">chempots</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 
 </h2>
@@ -1800,7 +1772,7 @@ returns a new ComputedReaction object containing a selection of those entries.</
       </tr>
       <tr>
         <td><code>entries</code></td>
-        <td><code>Iterable[pymatgen.entries.Entry]</code></td>
+        <td><code>GibbsEntrySet</code></td>
         <td><p>Iterable of entries</p></td>
         <td><em>required</em></td>
       </tr>
@@ -1823,7 +1795,9 @@ returns a new ComputedReaction object containing a selection of those entries.</
 </table>
         <details class="quote">
           <summary>Source code in <code>rxn_network/enumerators/utils.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">:</span> <span class="n">Reaction</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_computed_rxn</span><span class="p">(</span>
+    <span class="n">rxn</span><span class="p">:</span> <span class="n">Reaction</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span> <span class="n">chempots</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Provided with a Reaction object and a list of possible entries, this function</span>
 <span class="sd">    returns a new ComputedReaction object containing a selection of those entries.</span>
@@ -1835,10 +1809,18 @@ returns a new ComputedReaction object containing a selection of those entries.</
 <span class="sd">    Returns:</span>
 <span class="sd">        A ComputedReaction object transformed from a normal Reaction object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">reactant_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_min_entry_by_comp</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">]</span>
-    <span class="n">product_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_min_entry_by_comp</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">products</span><span class="p">]</span>
+    <span class="n">reactant_entries</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span>
+    <span class="p">]</span>
+    <span class="n">product_entries</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">products</span>
+    <span class="p">]</span>
 
-    <span class="n">rxn</span> <span class="o">=</span> <span class="n">ComputedReaction</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="n">reactant_entries</span><span class="p">,</span> <span class="n">product_entries</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">chempots</span><span class="p">:</span>
+        <span class="n">rxn</span> <span class="o">=</span> <span class="n">OpenComputedReaction</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="n">reactant_entries</span><span class="p">,</span> <span class="n">product_entries</span><span class="p">,</span> <span class="n">chempots</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rxn</span> <span class="o">=</span> <span class="n">ComputedReaction</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="n">reactant_entries</span><span class="p">,</span> <span class="n">product_entries</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">rxn</span>
 </code></pre></div>
         </details>
@@ -1909,180 +1891,6 @@ returns a new ComputedReaction object containing a selection of those entries.</
 <span class="sd">        Set of element names (strings).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">}</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-function">
-
-
-
-<h2 id="rxn_network.enumerators.utils.get_min_entry_by_comp" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_min_entry_by_comp</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span></code>
-
-
-</h2>
-
-    <div class="doc doc-contents ">
-
-      <p>Gets the entry with the lowest energy for a given composition from a set of provided entries.</p>
-
-<p><strong>Parameters:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-      <tr>
-        <td><code>comp</code></td>
-        <td><code>Composition</code></td>
-        <td><p>Composition object</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>entries</code></td>
-        <td><code>Iterable[pymatgen.entries.Entry]</code></td>
-        <td><p>Iterable of entries</p></td>
-        <td><em>required</em></td>
-      </tr>
-  </tbody>
-</table>
-<p><strong>Returns:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>Entry</code></td>
-      <td><p>Entry with the lowest enegy per atom for the given composition</p></td>
-    </tr>
-  </tbody>
-</table>
-        <details class="quote">
-          <summary>Source code in <code>rxn_network/enumerators/utils.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_min_entry_by_comp</span><span class="p">(</span><span class="n">comp</span><span class="p">:</span> <span class="n">Composition</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Entry</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Gets the entry with the lowest energy for a given composition from a set of provided entries.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        comp: Composition object</span>
-<span class="sd">        entries: Iterable of entries</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Entry with the lowest enegy per atom for the given composition</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">possible_entries</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="o">==</span> <span class="n">comp</span><span class="o">.</span><span class="n">reduced_composition</span><span class="p">,</span> <span class="n">entries</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">possible_entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-function">
-
-
-
-<h2 id="rxn_network.enumerators.utils.get_open_computed_rxn" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_open_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">chempots</span><span class="p">)</span></code>
-
-
-</h2>
-
-    <div class="doc doc-contents ">
-
-      <p>Provided with a Reaction object and a list of possible entries, as well as a
-dictionary of chemical potentials of open elements, this function returns a new
-OpenComputedReaction object containing a selection of those entries.</p>
-
-<p><strong>Parameters:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-      <tr>
-        <td><code>rxn</code></td>
-        <td><code>Reaction</code></td>
-        <td><p>Reaction object</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>entries</code></td>
-        <td><code>Iterable[pymatgen.entries.Entry]</code></td>
-        <td><p>Iterable of entries</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>chempots</code></td>
-        <td><code>Dict[pymatgen.core.periodic_table.Element, float]</code></td>
-        <td><p>Dictionary of chemical potentials of open elements</p></td>
-        <td><em>required</em></td>
-      </tr>
-  </tbody>
-</table>      <p>`</p>
-
-<p><strong>Returns:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>OpenComputedReaction</code></td>
-      <td><p>An OpenComputedReaction object transformed from a normal Reaction object</p></td>
-    </tr>
-  </tbody>
-</table>
-        <details class="quote">
-          <summary>Source code in <code>rxn_network/enumerators/utils.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_open_computed_rxn</span><span class="p">(</span>
-    <span class="n">rxn</span><span class="p">:</span> <span class="n">Reaction</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span><span class="p">],</span> <span class="n">chempots</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Element</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenComputedReaction</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Provided with a Reaction object and a list of possible entries, as well as a</span>
-<span class="sd">    dictionary of chemical potentials of open elements, this function returns a new</span>
-<span class="sd">    OpenComputedReaction object containing a selection of those entries.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        rxn: Reaction object</span>
-<span class="sd">        entries: Iterable of entries</span>
-<span class="sd">        chempots: Dictionary of chemical potentials of open elements</span>
-<span class="sd">    `</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        An OpenComputedReaction object transformed from a normal Reaction object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">reactant_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_min_entry_by_comp</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">]</span>
-    <span class="n">product_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_min_entry_by_comp</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">products</span><span class="p">]</span>
-
-    <span class="n">rxn</span> <span class="o">=</span> <span class="n">OpenComputedReaction</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="n">reactant_entries</span><span class="p">,</span> <span class="n">product_entries</span><span class="p">,</span> <span class="n">chempots</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">rxn</span>
 </code></pre></div>
         </details>
     </div>
@@ -2308,7 +2116,7 @@ uninitialized objects, and a provided list of entries.</p>
 
 
 <h2 id="rxn_network.enumerators.utils.initialize_entry" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">initialize_entry</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">entry_set</span><span class="p">,</span> <span class="n">stabilize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">initialize_entry</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">entry_set</span><span class="p">,</span> <span class="n">stabilize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 
 </h2>
@@ -2346,13 +2154,13 @@ given formula</p></td>
         <td><code>bool</code></td>
         <td><p>Whether or not to stabilize the entry by decreasing its energy
 such that it is 'on the hull'</p></td>
-        <td><code>True</code></td>
+        <td><code>False</code></td>
       </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>rxn_network/enumerators/utils.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_entry</span><span class="p">(</span><span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">entry_set</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span> <span class="n">stabilize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_entry</span><span class="p">(</span><span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">entry_set</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span> <span class="n">stabilize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Acquire a (stabilized) entry by user-specified formula.</span>
 
@@ -2365,14 +2173,14 @@ such that it is 'on the hull'</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="n">entry_set</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="n">entry_set</span><span class="o">.</span><span class="n">get_interpolated_entry</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Using interpolated entry for </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">stabilize</span><span class="p">:</span>
-        <span class="n">entry</span> <span class="o">=</span> <span class="n">entry_set</span><span class="o">.</span><span class="n">get_stabilized_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">entry_set</span><span class="o">.</span><span class="n">get_stabilized_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">entry</span>
 </code></pre></div>
