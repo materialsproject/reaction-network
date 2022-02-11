@@ -2,15 +2,28 @@
 
 ## [Unreleased](https://github.com/GENESIS-EFRC/reaction-network/tree/HEAD)
 
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.1.0...HEAD)
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.2.0...HEAD)
+
+**Fixed bugs:**
+
+- Minimize enumerators slow when exclusive precursors specified [\#87](https://github.com/GENESIS-EFRC/reaction-network/issues/87)
+- `get_computed_rxn` behaving very slow [\#86](https://github.com/GENESIS-EFRC/reaction-network/issues/86)
+
+## [v4.2.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.2.0) (2022-02-11)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.1.0...v4.2.0)
 
 **Closed issues:**
 
 - Unnecessary computations in Enumerators with `exclusive_precursors=True` [\#77](https://github.com/GENESIS-EFRC/reaction-network/issues/77)
 
+**Merged pull requests:**
+
+- Address several performance issues, add FREED data, support for metastable CPDs [\#88](https://github.com/GENESIS-EFRC/reaction-network/pull/88) ([mattmcdermott](https://github.com/mattmcdermott))
+
 ## [v4.1.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.1.0) (2022-02-01)
 
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.1...v4.1.0)
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.2...v4.1.0)
 
 **Closed issues:**
 
@@ -20,13 +33,13 @@
 
 - Speed up enumerators and tests [\#85](https://github.com/GENESIS-EFRC/reaction-network/pull/85) ([mattmcdermott](https://github.com/mattmcdermott))
 
-## [v4.0.1](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.0.1) (2022-01-22)
-
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.2...v4.0.1)
-
 ## [v4.0.2](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.0.2) (2022-01-22)
 
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.0...v4.0.2)
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.1...v4.0.2)
+
+## [v4.0.1](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.0.1) (2022-01-22)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.0.0...v4.0.1)
 
 **Merged pull requests:**
 
