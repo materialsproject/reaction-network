@@ -487,7 +487,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             num_combos = comb(len(entries), i)
             num_total_combos += num_combos_with_open * num_combos
 
-        return num_total_combos ** 2
+        return num_total_combos**2
 
     def _get_open_combos(self, open_entries):
         """Get all possible combinations of open entries. For a single entry,
