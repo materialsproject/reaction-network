@@ -86,35 +86,6 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         return min(tree.query(pts2)[0])
 
-    def add_entry(self, entry):
-        """
-        Adds an entry to existing chemical potential diagram. Uses scipy's
-        add_halfspaces() method to save some time/memory.
-
-        Args:
-            entry:
-
-        Returns:
-            None
-
-        """
-        if entry in self.entries:
-            return
-        if not set(entry.composition.elements).issubset(self.elements):
-            raise ValueError("New entry is not within the same chemical system!")
-
-        hyperplane = self._get_hyperplane(entry)
-        self._hyperplanes = np.vstack([self._hyperplanes, hyperplane])
-        self._hyperplane_entries.append(entry)
-        self._hs_int.add_halfspaces([hyperplane], restart=True)
-        self._entry_dict[entry.composition.reduced_formula] = entry
-        self.entries.append(entry)
-
-        try:
-            del self.domains  # clear cache
-        except AttributeError:
-            pass
-
     def _get_halfspace_intersection(self):
         hs_hyperplanes = np.vstack([self._hyperplanes, self._border_hyperplanes])
         interior_point = np.min(self.lims, axis=1) + 1e-1
