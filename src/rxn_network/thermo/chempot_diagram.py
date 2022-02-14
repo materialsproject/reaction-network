@@ -89,7 +89,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
     def _get_halfspace_intersection(self):
         hs_hyperplanes = np.vstack([self._hyperplanes, self._border_hyperplanes])
         interior_point = np.min(self.lims, axis=1) + 1e-1
-        return HalfspaceIntersection(hs_hyperplanes, interior_point, incremental=True)
+        return HalfspaceIntersection(hs_hyperplanes, interior_point)
 
     def _get_domains(self) -> Dict[str, np.ndarray]:
         """Returns a dictionary of domains as {formula: np.ndarray}"""
