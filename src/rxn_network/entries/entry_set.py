@@ -7,7 +7,7 @@ import logging
 import warnings
 from copy import deepcopy
 from typing import Dict, Iterable, List, Optional, Set, Union
-from functools import cached_property, lru_cache
+from functools import cached_property
 
 from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
@@ -20,7 +20,7 @@ from pymatgen.entries.computed_entries import (
     ConstantEnergyAdjustment,
 )
 from pymatgen.entries.entry_tools import EntrySet
-from tqdm.auto import tqdm
+from tqdm.autonotebook import tqdm
 
 from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
@@ -39,7 +39,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     """
 
     def __init__(
-        self, entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]]
+        self,
+        entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]],
+        calculate_e_above_hulls: bool = True,
     ):
         """
         The supplied collection of entries will automatically be converted to a set of
@@ -49,8 +51,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entries: A collection of entry objects that will make up the entry set.
         """
         self.entries = set(entries)
-        for e in self.entries:
-            e.data["e_above_hull"] = self.get_e_above_hull(e)
+
+        if calculate_e_above_hulls:
+            for e in self.entries:
+                e.data["e_above_hull"] = self.get_e_above_hull(e)
 
     def __contains__(self, item):
         return item in self.entries
@@ -91,6 +95,11 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     @cached_property
     def pd_dict(self):
+        """
+        Returns a dictionary of phase diagrams, keyed by the chemical system. This is
+        acquired using the helper method expand_pd() and represents one of the simplest
+        divisions of sub-PDs for large chemical systems. Cached for speed.
+        """
         return expand_pd(self.entries)
 
     def get_subset_in_chemsys(self, chemsys: List[str]) -> "GibbsEntrySet":
@@ -114,7 +123,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             if chem_sys.issuperset(elements):
                 subset.add(e)
 
-        return GibbsEntrySet(subset)
+        return GibbsEntrySet(subset, calculate_e_above_hulls=False)
 
     def filter_by_stability(
         self, e_above_hull: float, include_polymorphs: Optional[bool] = False
@@ -299,12 +308,19 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Returns:
             The energy above hull for the entry.
         """
-        for chemsys in self.pd_dict:
+        e_above_hull = None
+        for chemsys, pd in self.pd_dict.items():
             elems_pd = set(chemsys.split("-"))
             elems_entry = set(entry.composition.chemical_system.split("-"))
 
             if elems_entry.issubset(elems_pd):
-                return self.pd_dict[chemsys].get_e_above_hull(entry)
+                e_above_hull = pd.get_e_above_hull(entry)
+                break
+
+        if e_above_hull is None:
+            raise ValueError("Entry not in any of the phase diagrams in pd_dict!")
+
+        return e_above_hull
 
     @classmethod
     def from_pd(
@@ -496,7 +512,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     def copy(self) -> "GibbsEntrySet":
         """Returns a copy of the entry set."""
-        return GibbsEntrySet(entries=self.entries)
+        return GibbsEntrySet(entries=self.entries, calculate_e_above_hulls=False)
 
     def as_dict(self) -> dict:
         """

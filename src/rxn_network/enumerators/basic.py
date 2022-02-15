@@ -9,7 +9,7 @@ from typing import List, Optional, Set
 
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
-from tqdm.auto import tqdm
+from tqdm.autonotebook import tqdm
 
 from rxn_network.core import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet

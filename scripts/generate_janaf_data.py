@@ -8,7 +8,7 @@ import gzip
 import json
 from collections import OrderedDict
 import pandas
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 from pymatgen.core.composition import Composition
 from thermochem.janaf import Janafdb
