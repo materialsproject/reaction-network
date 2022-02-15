@@ -6,6 +6,7 @@ add extra functionality.
 import hashlib
 from itertools import combinations
 from typing import List, Optional
+from functools import cached_property
 
 import numpy as np
 from monty.json import MontyDecoder
@@ -19,6 +20,19 @@ from pymatgen.entries.computed_entries import (
 from scipy.interpolate import interp1d
 
 from rxn_network.data import G_ELEMS
+
+
+# TO-DO: Find better method than monkey patching a class from pymatgen.
+@cached_property
+def cached_reduced_formula(self):
+    """
+    Simple caching for reduced formula.
+    """
+    return self.get_reduced_formula_and_factor()[0]
+
+
+Composition.reduced_formula = cached_reduced_formula
+Composition.reduced_formula.__set_name__(Composition, "reduced_formula")
 
 
 class GibbsComputedEntry(ComputedEntry):

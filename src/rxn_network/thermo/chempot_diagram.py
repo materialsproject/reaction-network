@@ -46,9 +46,34 @@ class ChemicalPotentialDiagram(ChempotDiagram):
                 unspecified elements within the "limits" argument. This results in
                 default limits of (default_min_limit, 0)
         """
-        super().__init__(
-            entries=entries, limits=limits, default_min_limit=default_min_limit
+        self.entries = list(entries)
+        self.limits = limits
+        self.default_min_limit = default_min_limit
+        self.elements = list(
+            sorted({els for e in self.entries for els in e.composition.elements})
         )
+        self.dim = len(self.elements)
+        self._min_entries, self._el_refs = self._get_min_entries_and_el_refs(
+            self.entries
+        )
+        self._entry_dict = {e.composition.reduced_formula: e for e in self._min_entries}
+        self._border_hyperplanes = self._get_border_hyperplanes()
+        (
+            self._hyperplanes,
+            self._hyperplane_entries,
+        ) = self._get_hyperplanes_and_entries()
+
+        if self.dim < 2:
+            raise ValueError(
+                "ChemicalPotentialDiagram currently requires phase "
+                "diagrams with 2 or more elements!"
+            )
+
+        if len(self.el_refs) != self.dim:
+            missing = set(self.elements).difference(self.el_refs.keys())
+            raise ValueError(
+                f"There are no entries for the terminal elements: {missing}"
+            )
         self._hs_int = self._get_halfspace_intersection()
 
         num_hyperplanes = len(self._hyperplanes)
