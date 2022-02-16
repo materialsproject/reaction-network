@@ -1,24 +1,27 @@
 """ 
-This script generates the data/nist/compounds.json file by downloading data from the
-NIST-JANAF website, using the thermochem package to acquire it.
+Script for generating file: data/nist/compounds.json.gz
 """
 
-import os
 import gzip
 import json
 from collections import OrderedDict
-import pandas
-from tqdm import tqdm
+from typing import Dict
 
+import numpy as np
+import pandas
 from pymatgen.core.composition import Composition
 from thermochem.janaf import Janafdb
+from tqdm import tqdm
 
 JMOL_PER_EV = 96485.307499258
 
 if __name__ == "__main__":
     jdb = Janafdb()
 
-    db = pandas.read_csv("JANAF_index.txt", delimiter="|")
+    db = pandas.read_csv(
+        "JANAF_index.txt",
+        delimiter="|",
+    )
     db.columns = ["formula", "name", "phase", "filename"]
     db["formula"] = db["formula"].map(str.strip)
     db["name"] = db["name"].map(str.strip)
@@ -39,8 +42,7 @@ if __name__ == "__main__":
         cleaned_formulas.append(f)
 
     # Acquire data
-
-    all_data = {}
+    all_data: Dict[str, Dict[float:float]] = {}
 
     for f in tqdm(cleaned_formulas):
         phase_df = db[db["formula"] == f]
@@ -59,6 +61,7 @@ if __name__ == "__main__":
             phase = phase_df[phases == "g"]
 
         fn = phase["filename"].values[0]
+
         try:
             data = jdb.getphasedata(filename=fn)
         except pandas.errors.ParserError as e:
@@ -73,7 +76,20 @@ if __name__ == "__main__":
         dGf = [data.DeltaG(t) / JMOL_PER_EV for t in temps]
 
         formula, factor = Composition(f).get_integer_formula_and_factor()
-        all_data[formula] = {temp: g / factor for temp, g in zip(temps, dGf)}
+        energies = {temp: g / factor for temp, g in zip(temps, dGf)}
+
+        existing_data = all_data.get(formula)
+        if not existing_data:
+            new_energies = energies
+        else:
+            new_energies = dict()
+            for t in sorted(set(temps + list(existing_data.keys()))):
+                new_e = energies.get(t, np.inf)
+                old_e = existing_data.get(t, np.inf)
+
+                new_energies[t] = min(new_e, old_e)
+
+        all_data[formula] = new_energies
 
     all_data = OrderedDict(sorted(all_data.items()))
 

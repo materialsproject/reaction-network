@@ -1,5 +1,5 @@
 """ 
-This script generates the data/freed/compounds.json file by using the s4 package as an interface.
+This script generates the data/freed/compounds.json.gz file by using the s4 package as an interface.
 """
 
 import numpy as np
