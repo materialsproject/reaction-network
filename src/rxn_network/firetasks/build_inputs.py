@@ -51,6 +51,7 @@ class EntriesFromMPRester(FiretaskBase):
     optional_params = [
         "include_nist_data",
         "include_barin_data",
+        "include_freed_data",
         "include_polymorphs",
     ]
 
@@ -60,6 +61,7 @@ class EntriesFromMPRester(FiretaskBase):
         e_above_hull = self["e_above_hull"]
         include_nist_data = self.get("include_nist_data", True)
         include_barin_data = self.get("include_barin_data", False)
+        include_freed_data = self.get("include_freed_data", False)
         include_polymorphs = self.get("include_polymorphs", False)
 
         with MPRester() as mpr:
@@ -72,6 +74,7 @@ class EntriesFromMPRester(FiretaskBase):
             temperature=temperature,
             include_nist_data=include_nist_data,
             include_barin_data=include_barin_data,
+            include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
         )

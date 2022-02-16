@@ -1,9 +1,8 @@
-""" 
+"""
 This script generates the data/freed/compounds.json.gz file by using the s4 package as an interface.
 """
 
 import numpy as np
-from pymatgen.core.composition import Composition
 from collections import OrderedDict
 import json
 import gzip
@@ -14,7 +13,7 @@ from s4.thermo.exp.freed import ExpThermoDatabase
 if __name__ == "__main__":
     xp = ExpThermoDatabase()
     temps = np.arange(300, 2100, 100)
-    data = {}
+    data = {}  # type: ignore
 
     # Acquire data
     for c in xp.compositions:
