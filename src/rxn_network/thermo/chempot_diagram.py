@@ -180,6 +180,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         e_set = GibbsEntrySet(self.entries)
         e_dict = e_set.min_entries_by_formula
         stable_formulas = list(self.domains.keys())
+        stable_formulas.extend([str(e) for e in self.elements])
 
         metastable_entries = [e for f, e in e_dict.items() if f not in stable_formulas]
         metastable_domains = {}
