@@ -10,7 +10,7 @@ from monty.json import MSONable
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Composition
 from scipy.ndimage.filters import median_filter
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm
 
 from rxn_network.entries import GibbsEntrySet
 

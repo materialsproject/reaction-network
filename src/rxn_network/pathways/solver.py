@@ -11,7 +11,7 @@ import numpy as np
 from numba import njit, prange
 from pymatgen.core.composition import Composition
 from scipy.special import comb
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm
 
 from rxn_network.core import CostFunction, Pathway, Solver
 from rxn_network.entries.entry_set import GibbsEntrySet

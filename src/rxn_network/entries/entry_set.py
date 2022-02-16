@@ -20,7 +20,7 @@ from pymatgen.entries.computed_entries import (
     ConstantEnergyAdjustment,
 )
 from pymatgen.entries.entry_tools import EntrySet
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm
 
 from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
@@ -41,7 +41,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     def __init__(
         self,
         entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]],
-        calculate_e_above_hulls: bool = True,
+        calculate_e_above_hulls: bool = False,
     ):
         """
         The supplied collection of entries will automatically be converted to a set of
@@ -51,6 +51,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entries: A collection of entry objects that will make up the entry set.
         """
         self.entries = set(entries)
+        self.calculate_e_above_hulls = calculate_e_above_hulls
 
         if calculate_e_above_hulls:
             for e in self.entries:
@@ -521,4 +522,5 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         d = super().as_dict()
         d["entries"] = [e.as_dict() for e in self.entries]
+        d["calculate_e_above_hulls"] = self.calculate_e_above_hulls
         return d
