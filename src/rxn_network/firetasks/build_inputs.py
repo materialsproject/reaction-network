@@ -113,6 +113,7 @@ class EntriesFromDb(FiretaskBase):
     optional_params = [
         "include_nist_data",
         "include_barin_data",
+        "include_freed_data",
         "include_polymorphs",
         "inc_structure",
         "compatible_only",
@@ -125,6 +126,7 @@ class EntriesFromDb(FiretaskBase):
         temperature = self["temperature"]
         include_nist_data = self.get("include_nist_data", True)
         include_barin_data = self.get("include_barin_data", False)
+        include_freed_data = self.get("include_freed_data", False)
         e_above_hull = self["e_above_hull"]
         include_polymorphs = self.get("include_polymorphs", False)
         inc_structure = self.get("inc_structure", "final")
@@ -146,6 +148,7 @@ class EntriesFromDb(FiretaskBase):
             temperature=temperature,
             include_nist_data=include_nist_data,
             include_barin_data=include_barin_data,
+            include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
         )
@@ -157,6 +160,7 @@ def process_entries(
     temperature: float,
     include_nist_data: bool,
     include_barin_data: bool,
+    include_freed_data: bool,
     e_above_hull: float,
     include_polymorphs: bool,
 ) -> GibbsEntrySet:
@@ -182,6 +186,7 @@ def process_entries(
         temperature=temperature,
         include_nist_data=include_nist_data,
         include_barin_data=include_barin_data,
+        include_freed_data=include_freed_data,
     )
     entry_set = entry_set.filter_by_stability(
         e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
@@ -441,6 +446,7 @@ def get_entry_task(
     e_above_hull = entry_set_params.get("e_above_hull", 0.0)
     include_nist_data = entry_set_params.get("include_nist_data", True)
     include_barin_data = entry_set_params.get("include_barin_data", False)
+    include_freed_data = entry_set_params.get("include_freed_data", False)
     include_polymorphs = entry_set_params.get("include_polymorphs", False)
 
     if bool(entry_db_file):
@@ -450,6 +456,7 @@ def get_entry_task(
             temperature=temperature,
             include_nist_data=include_nist_data,
             include_barin_data=include_barin_data,
+            include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
         )
@@ -459,6 +466,7 @@ def get_entry_task(
             temperature=temperature,
             include_nist_data=include_nist_data,
             include_barin_data=include_barin_data,
+            include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
         )
