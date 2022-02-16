@@ -2,13 +2,12 @@
 This script generates the data/freed/compounds.json.gz file by using the s4 package as an interface.
 """
 
-import numpy as np
-from collections import OrderedDict
-import json
 import gzip
+import json
+from collections import OrderedDict
 
+import numpy as np
 from s4.thermo.exp.freed import ExpThermoDatabase
-
 
 if __name__ == "__main__":
     xp = ExpThermoDatabase()
@@ -16,7 +15,7 @@ if __name__ == "__main__":
     data = {}  # type: ignore
 
     # Acquire data
-    for c in xp.compositions:
+    for c, phases in xp.compositions.items():
         if c.is_element:
             continue
 
@@ -24,8 +23,6 @@ if __name__ == "__main__":
 
         if not data.get(formula):
             data[formula] = dict()
-
-        phases = xp.compositions[c]
 
         for t in temps:
             energies = []
