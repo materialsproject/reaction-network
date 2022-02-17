@@ -326,7 +326,7 @@ class BasicEnumerator(Enumerator):
                         e.composition.reduced_formula
                     )
                     entries_new.discard(old_e)
-                except IndexError:
+                except KeyError:
                     pass
 
                 entries_new.add(e)

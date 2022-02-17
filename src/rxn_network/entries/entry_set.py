@@ -286,7 +286,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         comp = Composition(formula).reduced_composition
         pd_entries = self.get_subset_in_chemsys([str(e) for e in comp.elements])
 
-        energy = PhaseDiagram(pd_entries).get_hull_energy(comp) + tol
+        energy = PhaseDiagram(pd_entries).get_hull_energy(comp) - tol
 
         adj = ConstantEnergyAdjustment(  # for keeping track of uncertainty
             value=0.0,
