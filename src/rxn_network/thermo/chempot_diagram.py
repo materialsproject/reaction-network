@@ -22,7 +22,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
     calculating the shortest distance between two chemical potential domains.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         entries: List[PDEntry],
         limits: Optional[Dict[Element, float]] = None,
