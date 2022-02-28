@@ -22,7 +22,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
     calculating the shortest distance between two chemical potential domains.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         entries: List[PDEntry],
         limits: Optional[Dict[Element, float]] = None,
@@ -46,9 +46,34 @@ class ChemicalPotentialDiagram(ChempotDiagram):
                 unspecified elements within the "limits" argument. This results in
                 default limits of (default_min_limit, 0)
         """
-        super().__init__(
-            entries=entries, limits=limits, default_min_limit=default_min_limit
+        self.entries = list(entries)
+        self.limits = limits
+        self.default_min_limit = default_min_limit
+        self.elements = list(
+            sorted({els for e in self.entries for els in e.composition.elements})
         )
+        self.dim = len(self.elements)
+        self._min_entries, self._el_refs = self._get_min_entries_and_el_refs(
+            self.entries
+        )
+        self._entry_dict = {e.composition.reduced_formula: e for e in self._min_entries}
+        self._border_hyperplanes = self._get_border_hyperplanes()
+        (
+            self._hyperplanes,
+            self._hyperplane_entries,
+        ) = self._get_hyperplanes_and_entries()
+
+        if self.dim < 2:
+            raise ValueError(
+                "ChemicalPotentialDiagram currently requires phase "
+                "diagrams with 2 or more elements!"
+            )
+
+        if len(self.el_refs) != self.dim:
+            missing = set(self.elements).difference(self.el_refs.keys())
+            raise ValueError(
+                f"There are no entries for the terminal elements: {missing}"
+            )
         self._hs_int = self._get_halfspace_intersection()
 
         num_hyperplanes = len(self._hyperplanes)
@@ -86,39 +111,10 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         return min(tree.query(pts2)[0])
 
-    def add_entry(self, entry):
-        """
-        Adds an entry to existing chemical potential diagram. Uses scipy's
-        add_halfspaces() method to save some time/memory.
-
-        Args:
-            entry:
-
-        Returns:
-            None
-
-        """
-        if entry in self.entries:
-            return
-        if not set(entry.composition.elements).issubset(self.elements):
-            raise ValueError("New entry is not within the same chemical system!")
-
-        hyperplane = self._get_hyperplane(entry)
-        self._hyperplanes = np.vstack([self._hyperplanes, hyperplane])
-        self._hyperplane_entries.append(entry)
-        self._hs_int.add_halfspaces([hyperplane], restart=True)
-        self._entry_dict[entry.composition.reduced_formula] = entry
-        self.entries.append(entry)
-
-        try:
-            del self.domains  # clear cache
-        except AttributeError:
-            pass
-
     def _get_halfspace_intersection(self):
         hs_hyperplanes = np.vstack([self._hyperplanes, self._border_hyperplanes])
         interior_point = np.min(self.lims, axis=1) + 1e-1
-        return HalfspaceIntersection(hs_hyperplanes, interior_point, incremental=True)
+        return HalfspaceIntersection(hs_hyperplanes, interior_point)
 
     def _get_domains(self) -> Dict[str, np.ndarray]:
         """Returns a dictionary of domains as {formula: np.ndarray}"""
@@ -184,6 +180,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         e_set = GibbsEntrySet(self.entries)
         e_dict = e_set.min_entries_by_formula
         stable_formulas = list(self.domains.keys())
+        stable_formulas.extend([str(e) for e in self.elements])
 
         metastable_entries = [e for f, e in e_dict.items() if f not in stable_formulas]
         metastable_domains = {}

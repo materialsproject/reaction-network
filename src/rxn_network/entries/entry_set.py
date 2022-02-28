@@ -20,7 +20,7 @@ from pymatgen.entries.computed_entries import (
     ConstantEnergyAdjustment,
 )
 from pymatgen.entries.entry_tools import EntrySet
-from tqdm.auto import tqdm
+from tqdm import tqdm
 
 from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
@@ -39,7 +39,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     """
 
     def __init__(
-        self, entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]]
+        self,
+        entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]],
+        calculate_e_above_hulls: bool = False,
     ):
         """
         The supplied collection of entries will automatically be converted to a set of
@@ -49,6 +51,11 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entries: A collection of entry objects that will make up the entry set.
         """
         self.entries = set(entries)
+        self.calculate_e_above_hulls = calculate_e_above_hulls
+
+        if calculate_e_above_hulls:
+            for e in self.entries:
+                e.data["e_above_hull"] = self.get_e_above_hull(e)
 
     def __contains__(self, item):
         return item in self.entries
@@ -87,6 +94,15 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         self.entries.discard(entry)
 
+    @cached_property
+    def pd_dict(self):
+        """
+        Returns a dictionary of phase diagrams, keyed by the chemical system. This is
+        acquired using the helper method expand_pd() and represents one of the simplest
+        divisions of sub-PDs for large chemical systems. Cached for speed.
+        """
+        return expand_pd(self.entries)
+
     def get_subset_in_chemsys(self, chemsys: List[str]) -> "GibbsEntrySet":
         """
         Returns a GibbsEntrySet containing only the set of entries belonging to
@@ -108,7 +124,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             if chem_sys.issuperset(elements):
                 subset.add(e)
 
-        return GibbsEntrySet(subset)
+        return GibbsEntrySet(subset, calculate_e_above_hulls=False)
 
     def filter_by_stability(
         self, e_above_hull: float, include_polymorphs: Optional[bool] = False
@@ -127,7 +143,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             A new GibbsEntrySet where the entries have been filtered by an energy
             cutoff (e_above_hull) via phase diagram construction.
         """
-        pd_dict = expand_pd(self.entries)
+        pd_dict = self.pd_dict
 
         filtered_entries: Set[Union[GibbsComputedEntry, NISTReferenceEntry]] = set()
         all_comps: Dict[str, Union[GibbsComputedEntry, NISTReferenceEntry]] = {}
@@ -179,11 +195,16 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return self.min_entries_by_formula[Composition(formula).reduced_formula]
 
     def get_stabilized_entry(
-        self, entry: ComputedEntry, tol: float = 1e-6
+        self, entry: ComputedEntry, tol: float = 1e-3
     ) -> ComputedEntry:
         """
         Helper method for lowering the energy of a single entry such that it is just
-        barely stable on the phase diagram.
+        barely stable on the phase diagram. If the entry is already stable, it will be
+        returned unchanged.
+
+        If the entry includes the "e_above_hull" data, this value will be used to
+        stabilize the entry. Otherwise, the energy above hull will be calculated via
+        creation of a phase diagram (can take a long time for repeated calls)
 
         Args:
             entry: A computed entry object.
@@ -193,15 +214,15 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Returns:
             A new ComputedEntry with energy adjustment making it appear to be stable.
         """
-        chemsys = [str(e) for e in entry.composition.elements]
-        entries = self.get_subset_in_chemsys(chemsys)
-        pd = PhaseDiagram(entries)
-        e_above_hull = pd.get_e_above_hull(entry)
+        e_above_hull = entry.data.get("e_above_hull")
+
+        if e_above_hull is None:
+            e_above_hull = self.get_e_above_hull(entry)
 
         if e_above_hull == 0.0:
             new_entry = entry
         else:
-            e_adj = -1 * pd.get_e_above_hull(entry) * entry.composition.num_atoms - tol
+            e_adj = -1 * e_above_hull * entry.composition.num_atoms - tol
             adjustment = ConstantEnergyAdjustment(
                 value=e_adj,
                 name="Stabilization Adjustment",
@@ -265,7 +286,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         comp = Composition(formula).reduced_composition
         pd_entries = self.get_subset_in_chemsys([str(e) for e in comp.elements])
 
-        energy = PhaseDiagram(pd_entries).get_hull_energy(comp) + tol
+        energy = PhaseDiagram(pd_entries).get_hull_energy(comp) - tol
 
         adj = ConstantEnergyAdjustment(  # for keeping track of uncertainty
             value=0.0,
@@ -277,6 +298,30 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return ComputedEntry(
             comp, energy, energy_adjustments=[adj], entry_id="(Interpolated Entry!)"
         )
+
+    def get_e_above_hull(self, entry: ComputedEntry) -> float:
+        """
+        Helper method for calculating the energy above hull for a single entry.
+
+        Args:
+            entry: A ComputedEntry object.
+
+        Returns:
+            The energy above hull for the entry.
+        """
+        e_above_hull = None
+        for chemsys, pd in self.pd_dict.items():
+            elems_pd = set(chemsys.split("-"))
+            elems_entry = set(entry.composition.chemical_system.split("-"))
+
+            if elems_entry.issubset(elems_pd):
+                e_above_hull = pd.get_e_above_hull(entry)
+                break
+
+        if e_above_hull is None:
+            raise ValueError("Entry not in any of the phase diagrams in pd_dict!")
+
+        return e_above_hull
 
     @classmethod
     def from_pd(
@@ -468,7 +513,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     def copy(self) -> "GibbsEntrySet":
         """Returns a copy of the entry set."""
-        return GibbsEntrySet(entries=self.entries)
+        return GibbsEntrySet(entries=self.entries, calculate_e_above_hulls=False)
 
     def as_dict(self) -> dict:
         """
@@ -477,4 +522,5 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         d = super().as_dict()
         d["entries"] = [e.as_dict() for e in self.entries]
+        d["calculate_e_above_hulls"] = self.calculate_e_above_hulls
         return d

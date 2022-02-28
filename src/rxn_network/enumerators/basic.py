@@ -9,7 +9,7 @@ from typing import List, Optional, Set
 
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
-from tqdm.auto import tqdm
+from tqdm import tqdm
 
 from rxn_network.core import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
@@ -128,9 +128,7 @@ class BasicEnumerator(Enumerator):
         rxns = []
         for chemsys, combos in pbar:
             pbar.set_description(f"{chemsys}")
-
             elems = chemsys.split("-")
-
             filtered_entries = entries.get_subset_in_chemsys(elems)
             calculators = initialize_calculators(self.calculators, filtered_entries)
 
@@ -308,16 +306,16 @@ class BasicEnumerator(Enumerator):
 
     def _get_initialized_entries(self, entries):
         """Returns initialized entries, precursors, target, and open entries"""
-        precursors, targets = set(), set()
-        entries_new = deepcopy(entries)
 
         def initialize_entries_list(ents):
             new_ents = {initialize_entry(f, entries, self.stabilize) for f in ents}
             return new_ents
 
+        precursors, targets = set(), set()
+        entries_new = GibbsEntrySet(deepcopy(entries), calculate_e_above_hulls=True)
+
         if self.precursors:
             precursors = initialize_entries_list(self.precursors)
-
         if self.targets:
             targets = initialize_entries_list(self.targets)
 
@@ -328,7 +326,7 @@ class BasicEnumerator(Enumerator):
                         e.composition.reduced_formula
                     )
                     entries_new.discard(old_e)
-                except IndexError:
+                except KeyError:
                     pass
 
                 entries_new.add(e)
