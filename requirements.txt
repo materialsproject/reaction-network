@@ -1,5 +1,5 @@
 numba==0.53.0
 numpy==1.22.2
-pymatgen==2022.1.24
+pymatgen==2022.2.10
 fireworks==2.0.2
 maggma==0.39.1
