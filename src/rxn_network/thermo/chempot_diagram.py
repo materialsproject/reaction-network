@@ -192,7 +192,8 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
             try:
                 metastable_domains[formula] = cpd.domains[formula]
-            except:
+            except KeyError:
                 print(e.composition.reduced_formula)
+                continue
 
         return metastable_domains
