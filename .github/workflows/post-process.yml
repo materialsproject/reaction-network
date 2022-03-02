@@ -29,6 +29,6 @@ jobs:
       - # It is often a desired behavior to merge only when a workflow execution
         # succeeds. This can be changed as needed.
         if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        uses: rymndhng/release-on-push-action@v0.20.0
+        uses: rymndhng/release-on-push-action@v0.23.1
         with:
           bump_version_scheme: norelease

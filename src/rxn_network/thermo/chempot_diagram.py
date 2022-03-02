@@ -189,6 +189,10 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             formula = e.composition.reduced_formula
             new_entry = e_set.get_stabilized_entry(e)
             cpd = ChemicalPotentialDiagram(list(e_dict.values()) + [new_entry])
-            metastable_domains[formula] = cpd.domains[formula]
+
+            try:
+                metastable_domains[formula] = cpd.domains[formula]
+            except:
+                print(e.composition.reduced_formula)
 
         return metastable_domains
