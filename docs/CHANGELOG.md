@@ -1,13 +1,19 @@
 # Changelog
 
-## [Unreleased](https://github.com/GENESIS-EFRC/reaction-network/tree/HEAD)
+## [v4.3.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.3.0) (2022-03-02)
 
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.2.0...HEAD)
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.2.0...v4.3.0)
 
 **Fixed bugs:**
 
+- `NISTReferenceEntry` is sometimes incorrect for phases with multiple entries having different formulas [\#89](https://github.com/GENESIS-EFRC/reaction-network/issues/89)
 - Minimize enumerators slow when exclusive precursors specified [\#87](https://github.com/GENESIS-EFRC/reaction-network/issues/87)
 - `get_computed_rxn` behaving very slow [\#86](https://github.com/GENESIS-EFRC/reaction-network/issues/86)
+
+**Merged pull requests:**
+
+- Update Github action for release [\#100](https://github.com/GENESIS-EFRC/reaction-network/pull/100) ([mattmcdermott](https://github.com/mattmcdermott))
+- Fix for broken NIST data and small speedups for e\_above\_hull calculations [\#90](https://github.com/GENESIS-EFRC/reaction-network/pull/90) ([mattmcdermott](https://github.com/mattmcdermott))
 
 ## [v4.2.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.2.0) (2022-02-11)
 
