@@ -481,7 +481,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """Returns a list of all entries in the entry set."""
         return list(sorted(self.entries, key=lambda e: e.composition.reduced_formula))
 
-    @cached_property
+    @property
     def min_entries_by_formula(self) -> Dict[str, ComputedEntry]:
         """
         Returns a dict of minimum energy entries in the entry set, indexed by
