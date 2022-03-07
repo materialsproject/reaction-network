@@ -7,9 +7,9 @@ from itertools import combinations, product
 from math import comb
 from typing import List, Optional, Set
 
+import ray
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
-from tqdm import tqdm
 
 from rxn_network.core import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
@@ -120,31 +120,28 @@ class BasicEnumerator(Enumerator):
 
         combos_dict = self._get_combos_dict(entries, precursors, targets, open_entries)
         open_combos = self._get_open_combos(open_entries)
+        if not open_combos:
+            open_combos = []
 
-        pbar = tqdm(
-            combos_dict.items(), desc=self.__class__.__name__, disable=self.quiet
-        )
+        items = combos_dict.items()
 
-        rxns = []
-        for chemsys, combos in pbar:
-            pbar.set_description(f"{chemsys}")
-            elems = chemsys.split("-")
-            filtered_entries = entries.get_subset_in_chemsys(elems)
-            calculators = initialize_calculators(self.calculators, filtered_entries)
+        open_combos = ray.put(open_combos)
+        entries = ray.put(entries)
+        open_entries = ray.put(open_entries)
+        precursors = ray.put(precursors)
+        targets = ray.put(targets)
 
-            rxn_iter = self._get_rxn_iterable(combos, open_combos)
-
-            r = self._get_rxns(
-                rxn_iter,
-                precursors,
-                targets,
-                calculators,
-                filtered_entries,
-                open_entries,
+        rxns = [
+            self._get_rxns_from_items.remote(
+                self, item, open_combos, entries, open_entries, precursors, targets
             )
-            rxns.extend(r)
+            for item in items
+        ]
 
-        return list(set(rxns))
+        results = ray.get(rxns)
+        results = list({r for r_set in results for r in r_set})
+
+        return results
 
     def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
         """
@@ -190,6 +187,34 @@ class BasicEnumerator(Enumerator):
         """No open entries for BasicEnumerator, returns None"""
         _ = (self, open_entries)  # unused_arguments
         return None
+
+    @ray.remote
+    def _get_rxns_from_items(
+        self,
+        item,
+        open_combos,
+        entries,
+        open_entries,
+        precursors,
+        targets,
+    ):
+        chemsys, combos = item
+
+        elems = chemsys.split("-")
+        filtered_entries = entries.get_subset_in_chemsys(elems)
+        calculators = initialize_calculators(self.calculators, filtered_entries)
+
+        rxn_iter = self._get_rxn_iterable(combos, open_combos)
+
+        rxns = self._get_rxns(
+            rxn_iter,
+            precursors,
+            targets,
+            calculators,
+            filtered_entries,
+            open_entries,
+        )
+        return rxns
 
     def _get_rxns(
         self,
