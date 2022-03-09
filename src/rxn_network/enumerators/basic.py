@@ -136,14 +136,20 @@ class BasicEnumerator(Enumerator):
         if len(items) > PARALLEL_THRESHOLD:
             logging.info(f"Parallelizing enumeration for {len(items)} chemical systems")
             parallel=True
-            
+
             import ray
+
+            @ray.remote
+            def _get_rxns_from_items_ray(self, item, open_combos, entries, open_entries, precursors, targets):
+                return self._get_rxns_from_items(item, open_combos, entries, open_entries, precursors, targets)
 
             if not ray.is_initialized():
                 ray.init(
                     _redis_password="default",
                     ignore_reinit_error=True,
                 )
+
+            print(ray.nodes())
 
             obj = ray.put(self)
             open_combos = ray.put(open_combos)
@@ -242,10 +248,6 @@ class BasicEnumerator(Enumerator):
             open_entries,
         )
         return rxns
-    
-    @ray.remote
-    def _get_rxns_from_items_ray(self, item, open_combos, entries, open_entries, precursors, targets):
-        return self._get_rxns_from_items(item, open_combos, entries, open_entries, precursors, targets)
 
     def _get_rxns(
         self,
