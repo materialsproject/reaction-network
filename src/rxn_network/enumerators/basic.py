@@ -159,13 +159,15 @@ class BasicEnumerator(Enumerator):
             targets = ray.put(targets)
 
             rxns = [
-                self._get_rxns_from_items_ray.remote(
+                _get_rxns_from_items_ray.remote(
                     obj, item, open_combos, entries, open_entries, precursors, targets
                 )
                 for item in items
             ]
         else:
-            rxns = [self._get_rxns_from_items(item, open_combos, entries, open_entries, precursors, targets) for item in items]
+            rxns = []
+            for item in tqdm(items):
+                rxns.append(self._get_rxns_from_items(item, open_combos, entries, open_entries, precursors, targets))
 
         results = []
         if parallel:
