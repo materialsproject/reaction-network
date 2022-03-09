@@ -9,7 +9,6 @@ from math import comb
 from typing import List, Optional, Set
 from tqdm import tqdm
 
-import ray
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 
@@ -137,6 +136,8 @@ class BasicEnumerator(Enumerator):
         if len(items) > PARALLEL_THRESHOLD:
             logging.info(f"Parallelizing enumeration for {len(items)} chemical systems")
             parallel=True
+            
+            import ray
 
             if not ray.is_initialized():
                 ray.init(
