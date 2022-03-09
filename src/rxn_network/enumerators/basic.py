@@ -7,6 +7,7 @@ from copy import deepcopy
 from itertools import combinations, product
 from math import comb
 from typing import List, Optional, Set
+from tqdm import tqdm
 
 import ray
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
@@ -135,7 +136,6 @@ class BasicEnumerator(Enumerator):
 
         if len(items) > PARALLEL_THRESHOLD:
             logging.info(f"Parallelizing enumeration for {len(items)} chemical systems")
-            print("parallel")
             parallel=True
 
             if not ray.is_initialized():
@@ -160,14 +160,15 @@ class BasicEnumerator(Enumerator):
         else:
             rxns = [self._get_rxns_from_items(item, open_combos, entries, open_entries, precursors, targets) for item in items]
 
-        results = rxns
-
+        results = []
         if parallel:
-            results = ray.get(rxns)
+            for r in tqdm(rxns):
+                results.extend(ray.get(r))
+        else:
+            for r in tqdm(rxns):
+                results.extend(r)
 
-        results = list({r for r_set in results for r in r_set})
-
-        return results
+        return list(set(results))
 
     def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
         """
