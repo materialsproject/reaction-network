@@ -2,6 +2,7 @@
 This module implements two types of basic reaction enumerators, differing in the option
 to consider open entries.
 """
+import logging
 from copy import deepcopy
 from itertools import combinations, product
 from math import comb
@@ -21,6 +22,9 @@ from rxn_network.enumerators.utils import (
 )
 from rxn_network.reactions import ComputedReaction
 from rxn_network.utils import limited_powerset
+
+
+PARALLEL_THRESHOLD = 10  # maximum number of subsystems to consider serially
 
 
 class BasicEnumerator(Enumerator):
@@ -89,6 +93,7 @@ class BasicEnumerator(Enumerator):
         self._build_pd = False
         self._build_grand_pd = False
 
+
     def enumerate(self, entries: GibbsEntrySet) -> List[ComputedReaction]:
         """
         Calculate all possible reactions given a set of entries. If the enumerator
@@ -114,6 +119,7 @@ class BasicEnumerator(Enumerator):
         Args:
             entries: the set of all entries to enumerate from
         """
+
         entries, precursors, targets, open_entries = self._get_initialized_entries(
             entries
         )
@@ -125,20 +131,40 @@ class BasicEnumerator(Enumerator):
 
         items = combos_dict.items()
 
-        open_combos = ray.put(open_combos)
-        entries = ray.put(entries)
-        open_entries = ray.put(open_entries)
-        precursors = ray.put(precursors)
-        targets = ray.put(targets)
+        parallel=False
 
-        rxns = [
-            self._get_rxns_from_items.remote(
-                self, item, open_combos, entries, open_entries, precursors, targets
-            )
-            for item in items
-        ]
+        if len(items) > PARALLEL_THRESHOLD:
+            logging.info(f"Parallelizing enumeration for {len(items)} chemical systems")
+            print("parallel")
+            parallel=True
 
-        results = ray.get(rxns)
+            if not ray.is_initialized():
+                ray.init(
+                    _redis_password="default",
+                    ignore_reinit_error=True,
+                )
+
+            obj = ray.put(self)
+            open_combos = ray.put(open_combos)
+            entries = ray.put(entries)
+            open_entries = ray.put(open_entries)
+            precursors = ray.put(precursors)
+            targets = ray.put(targets)
+
+            rxns = [
+                self._get_rxns_from_items_ray.remote(
+                    obj, item, open_combos, entries, open_entries, precursors, targets
+                )
+                for item in items
+            ]
+        else:
+            rxns = [self._get_rxns_from_items(item, open_combos, entries, open_entries, precursors, targets) for item in items]
+
+        results = rxns
+
+        if parallel:
+            results = ray.get(rxns)
+
         results = list({r for r_set in results for r in r_set})
 
         return results
@@ -188,7 +214,6 @@ class BasicEnumerator(Enumerator):
         _ = (self, open_entries)  # unused_arguments
         return None
 
-    @ray.remote
     def _get_rxns_from_items(
         self,
         item,
@@ -215,6 +240,10 @@ class BasicEnumerator(Enumerator):
             open_entries,
         )
         return rxns
+    
+    @ray.remote
+    def _get_rxns_from_items_ray(self, item, open_combos, entries, open_entries, precursors, targets):
+        return self._get_rxns_from_items(item, open_combos, entries, open_entries, precursors, targets)
 
     def _get_rxns(
         self,
