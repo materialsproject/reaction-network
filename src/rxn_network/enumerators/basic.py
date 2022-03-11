@@ -161,9 +161,8 @@ class BasicEnumerator(Enumerator):
         parallel = False
         median_comp_size = median([len(v) for v in combos_dict.values()])
 
-        if median_comp_size > PARALLEL_THRESHOLD:
+        if median_comp_size > PARALLEL_THRESHOLD and len(combos_dict) > 1:
             parallel = True
-            print(f"Parallelizing enumeration for {len(items)} chemical systems")
 
             obj = ray.put(self)
             open_combos = ray.put(open_combos)
@@ -180,7 +179,10 @@ class BasicEnumerator(Enumerator):
             ]
         else:
             rxns = []
-            for item in tqdm(items):
+            iterator = items
+            if not self.quiet:
+                iterator = tqdm(items, total=len(items))
+            for item in items:
                 rxns.append(
                     self._get_rxns_from_items(
                         item, open_combos, entries, open_entries, precursors, targets
@@ -189,6 +191,8 @@ class BasicEnumerator(Enumerator):
 
         results = []
 
+        iterator = rxns
+
         if parallel:
 
             def to_iterator(obj_ids):
@@ -196,11 +200,12 @@ class BasicEnumerator(Enumerator):
                     done, obj_ids = ray.wait(obj_ids)
                     yield ray.get(done[0])
 
-            for r in tqdm(to_iterator(rxns), total=len(rxns)):
-                results.extend(r)
-        else:
-            for r in rxns:
-                results.extend(r)
+            iterator = to_iterator(rxns)
+            if not self.quiet:
+                iterator = tqdm(iterator, total=len(rxns))
+
+        for r in iterator:
+            results.extend(r)
 
         return list(set(results))
 
