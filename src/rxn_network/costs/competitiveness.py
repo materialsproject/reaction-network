@@ -7,6 +7,7 @@ from typing import Dict, Iterable, List, Optional, Union
 import numpy as np
 import ray
 from pymatgen.core.composition import Composition, Element
+from tqdm import tqdm
 
 from rxn_network.core.calculator import Calculator
 from rxn_network.core.cost_function import CostFunction
@@ -18,7 +19,7 @@ from rxn_network.enumerators.minimize import (
 )
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils import initialize_ray
+from rxn_network.utils import initialize_ray, to_iterator
 
 initialize_ray()
 
