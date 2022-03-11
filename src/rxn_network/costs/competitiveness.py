@@ -11,6 +11,7 @@ from rxn_network.core.calculator import Calculator
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
+
 from rxn_network.enumerators.minimize import (
     MinimizeGibbsEnumerator,
     MinimizeGrandPotentialEnumerator,

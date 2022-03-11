@@ -16,6 +16,7 @@ from tqdm import tqdm
 from rxn_network.core import CostFunction, Pathway, Solver
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
+
 from rxn_network.enumerators.minimize import (
     MinimizeGibbsEnumerator,
     MinimizeGrandPotentialEnumerator,

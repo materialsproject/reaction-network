@@ -7,6 +7,7 @@ import os
 from copy import deepcopy
 from itertools import combinations, product
 from math import comb
+from numpy import median
 from typing import List, Optional, Set
 from tqdm import tqdm
 
@@ -25,7 +26,31 @@ from rxn_network.reactions import ComputedReaction
 from rxn_network.utils import limited_powerset
 
 
-PARALLEL_THRESHOLD = 10  # maximum number of subsystems to consider serially
+import ray
+
+if not ray.is_initialized():
+    print("Ray is not initialized. Trying with environment variables!")
+    if os.environ.get("ip_head"):
+        ray.init(
+            address="auto",
+            _node_ip_address=os.environ["ip_head"].split(":")[0],
+            _redis_password=os.environ["redis_password"],
+        )
+    else:
+        print("Could not identify existing Ray instance. Creating a new one.")
+        ray.init(_redis_password="default_password")
+
+
+PARALLEL_THRESHOLD = 4  # median computation size above which parallelization enabled
+
+
+@ray.remote
+def _get_rxns_from_items_ray(
+    obj, item, open_combos, entries, open_entries, precursors, targets
+):
+    return obj._get_rxns_from_items(
+        item, open_combos, entries, open_entries, precursors, targets
+    )
 
 
 class BasicEnumerator(Enumerator):
@@ -100,7 +125,7 @@ class BasicEnumerator(Enumerator):
         was initialized with specified precursors or target, the reactions will be
         filtered by these constraints. Every enumerator follows a standard procedure:
 
-        1. Initialize entries, i.e. ensure that precursors and target are considered
+        1. Initialize entries, i.e., ensure that precursors and target are considered
         stable entries within the entry set. If using ChempotDistanceCalculator,
         ensure that entries are filtered by stability.
 
@@ -129,30 +154,16 @@ class BasicEnumerator(Enumerator):
         if not open_combos:
             open_combos = []
 
-        items = combos_dict.items()
+        items = sorted(
+            combos_dict.items(), key=lambda e: len(e[1]), reverse=True
+        )  # sorted for parallelization
 
         parallel = False
+        median_comp_size = median([len(v) for v in combos_dict.values()])
 
-        if len(items) > PARALLEL_THRESHOLD:
-            logging.info(f"Parallelizing enumeration for {len(items)} chemical systems")
+        if median_comp_size > PARALLEL_THRESHOLD:
             parallel = True
-
-            import ray
-
-            @ray.remote
-            def _get_rxns_from_items_ray(
-                self, item, open_combos, entries, open_entries, precursors, targets
-            ):
-                return self._get_rxns_from_items(
-                    item, open_combos, entries, open_entries, precursors, targets
-                )
-
-            if not ray.is_initialized():
-                ray.init(
-                    address="auto",
-                    _node_ip_address=os.environ["ip_head"].split(":")[0],
-                    _redis_password=os.environ["redis_password"],
-                )
+            print(f"Parallelizing enumeration for {len(items)} chemical systems")
 
             obj = ray.put(self)
             open_combos = ray.put(open_combos)
@@ -177,11 +188,18 @@ class BasicEnumerator(Enumerator):
                 )
 
         results = []
+
         if parallel:
-            for r in tqdm(rxns):
-                results.extend(ray.get(r))
+
+            def to_iterator(obj_ids):
+                while obj_ids:
+                    done, obj_ids = ray.wait(obj_ids)
+                    yield ray.get(done[0])
+
+            for r in tqdm(to_iterator(rxns), total=len(rxns)):
+                results.extend(r)
         else:
-            for r in tqdm(rxns):
+            for r in rxns:
                 results.extend(r)
 
         return list(set(results))
