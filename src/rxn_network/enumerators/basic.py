@@ -37,8 +37,9 @@ if not ray.is_initialized():
             _redis_password=os.environ["redis_password"],
         )
     else:
-        print("Could not identify existing Ray instance. Creating a new one.")
+        print("Could not identify existing Ray instance. Creating a new one...")
         ray.init(_redis_password="default_password")
+    print(ray.nodes())
 
 
 PARALLEL_THRESHOLD = 4  # median computation size above which parallelization enabled
