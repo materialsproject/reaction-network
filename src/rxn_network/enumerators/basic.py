@@ -3,6 +3,7 @@ This module implements two types of basic reaction enumerators, differing in the
 to consider open entries.
 """
 import logging
+import os
 from copy import deepcopy
 from itertools import combinations, product
 from math import comb
@@ -93,7 +94,6 @@ class BasicEnumerator(Enumerator):
         self._build_pd = False
         self._build_grand_pd = False
 
-
     def enumerate(self, entries: GibbsEntrySet) -> List[ComputedReaction]:
         """
         Calculate all possible reactions given a set of entries. If the enumerator
@@ -131,25 +131,28 @@ class BasicEnumerator(Enumerator):
 
         items = combos_dict.items()
 
-        parallel=False
+        parallel = False
 
         if len(items) > PARALLEL_THRESHOLD:
             logging.info(f"Parallelizing enumeration for {len(items)} chemical systems")
-            parallel=True
+            parallel = True
 
             import ray
 
             @ray.remote
-            def _get_rxns_from_items_ray(self, item, open_combos, entries, open_entries, precursors, targets):
-                return self._get_rxns_from_items(item, open_combos, entries, open_entries, precursors, targets)
+            def _get_rxns_from_items_ray(
+                self, item, open_combos, entries, open_entries, precursors, targets
+            ):
+                return self._get_rxns_from_items(
+                    item, open_combos, entries, open_entries, precursors, targets
+                )
 
             if not ray.is_initialized():
                 ray.init(
-                    _redis_password="default",
-                    ignore_reinit_error=True,
+                    address="auto",
+                    _node_ip_address=os.environ["ip_head"].split(":")[0],
+                    _redis_password=os.environ["redis_password"],
                 )
-
-            print(ray.nodes())
 
             obj = ray.put(self)
             open_combos = ray.put(open_combos)
@@ -167,7 +170,11 @@ class BasicEnumerator(Enumerator):
         else:
             rxns = []
             for item in tqdm(items):
-                rxns.append(self._get_rxns_from_items(item, open_combos, entries, open_entries, precursors, targets))
+                rxns.append(
+                    self._get_rxns_from_items(
+                        item, open_combos, entries, open_entries, precursors, targets
+                    )
+                )
 
         results = []
         if parallel:
