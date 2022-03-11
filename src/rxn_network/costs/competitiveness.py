@@ -5,19 +5,32 @@ from functools import lru_cache
 from typing import Dict, Iterable, List, Optional, Union
 
 import numpy as np
+import ray
 from pymatgen.core.composition import Composition, Element
 
 from rxn_network.core.calculator import Calculator
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
-
 from rxn_network.enumerators.minimize import (
     MinimizeGibbsEnumerator,
     MinimizeGrandPotentialEnumerator,
 )
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.utils import initialize_ray
+
+initialize_ray()
+
+
+@ray.remote
+def _calculate_ray(obj, rxn):
+    return obj.calculate(rxn)
+
+
+@ray.remote
+def _decorate_ray(obj, rxn):
+    return obj.decorate(rxn)
 
 
 class CompetitivenessScoreCalculator(Calculator):
@@ -97,6 +110,52 @@ class CompetitivenessScoreCalculator(Calculator):
         c_score = self._get_c_score(cost, competing_costs)
 
         return c_score
+
+    def calculate_many(self, rxns: List[ComputedReaction]) -> List[float]:
+        """
+        Calculates the competitiveness score for a list of reactions by enumerating
+        competing reactions, evaluating their cost with the supplied cost function, and
+        then using the c-score formula, i.e. the _get_c_score() method, to determine the
+        competitiveness score. Parallelized with ray.
+
+        Args:
+            rxns: the list of ComputedReaction objects to be evaluated
+
+        Returns:
+            The list of competitiveness scores
+        """
+        obj = ray.put(self)
+
+        costs = [_calculate_ray.remote(obj, rxn) for rxn in rxns]
+        iterator = tqdm(to_iterator(costs), total=len(costs))
+
+        results = []
+        for r in iterator:
+            results.append(r)
+
+        return results
+
+    def decorate_many(self, rxns: List[ComputedReaction]) -> List[ComputedReaction]:
+        """
+        Decorates a list of reactions with the competitiveness score. Parallelized with
+        ray.
+
+        Args:
+            rxns: the list of ComputedReaction objects to be decorated
+
+        Returns:
+            The list of decorated ComputedReaction objects
+        """
+        obj = ray.put(self)
+
+        new_rxns = [_decorate_ray.remote(obj, rxn) for rxn in rxns]
+        iterator = tqdm(to_iterator(new_rxns), total=len(new_rxns))
+
+        results = []
+        for r in iterator:
+            results.append(r)
+
+        return results
 
     @lru_cache(maxsize=1)
     def get_competing_rxns(self, rxn: ComputedReaction) -> List[ComputedReaction]:

@@ -153,10 +153,9 @@ class CalculateCScores(FiretaskBase):
 
         costs = [cost_function.evaluate(r) for r in rxns]
         sorted_rxns = [r for _, r in sorted(zip(costs, rxns), key=lambda x: x[0])]
-        new_rxns = []
 
-        for rxn in sorted_rxns[:k]:
-            new_rxns.append(calc.decorate(rxn))
+        new_rxns = calc.decorate_many(sorted_rxns[:k])
+
         for rxn in sorted_rxns[k:]:
             rxn.data.update({"c_score": None})
             new_rxns.append(rxn)

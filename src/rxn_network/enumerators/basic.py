@@ -7,12 +7,13 @@ import os
 from copy import deepcopy
 from itertools import combinations, product
 from math import comb
-from numpy import median
 from typing import List, Optional, Set
-from tqdm import tqdm
 
+import ray
+from numpy import median
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
+from tqdm import tqdm
 
 from rxn_network.core import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
@@ -23,33 +24,20 @@ from rxn_network.enumerators.utils import (
     initialize_entry,
 )
 from rxn_network.reactions import ComputedReaction
-from rxn_network.utils import limited_powerset
+from rxn_network.utils import initialize_ray, limited_powerset, to_iterator
 
 
-import ray
-
-if not ray.is_initialized():
-    print("Ray is not initialized. Trying with environment variables!")
-    if os.environ.get("ip_head"):
-        ray.init(
-            address="auto",
-            _node_ip_address=os.environ["ip_head"].split(":")[0],
-            _redis_password=os.environ["redis_password"],
-        )
-    else:
-        print("Could not identify existing Ray instance. Creating a new one...")
-        ray.init(_redis_password="default_password")
-    print(ray.nodes())
+initialize_ray()
 
 
 PARALLEL_THRESHOLD = 4  # median computation size above which parallelization enabled
 
 
 @ray.remote
-def _get_rxns_from_items_ray(
+def _get_rxns_from_item_ray(
     obj, item, open_combos, entries, open_entries, precursors, targets
 ):
-    return obj._get_rxns_from_items(
+    return obj._get_rxns_from_item(
         item, open_combos, entries, open_entries, precursors, targets
     )
 
@@ -173,7 +161,7 @@ class BasicEnumerator(Enumerator):
             targets = ray.put(targets)
 
             rxns = [
-                _get_rxns_from_items_ray.remote(
+                _get_rxns_from_item_ray.remote(
                     obj, item, open_combos, entries, open_entries, precursors, targets
                 )
                 for item in items
@@ -185,7 +173,7 @@ class BasicEnumerator(Enumerator):
                 iterator = tqdm(items, total=len(items))
             for item in items:
                 rxns.append(
-                    self._get_rxns_from_items(
+                    self._get_rxns_from_item(
                         item, open_combos, entries, open_entries, precursors, targets
                     )
                 )
@@ -195,12 +183,6 @@ class BasicEnumerator(Enumerator):
         iterator = rxns
 
         if parallel:
-
-            def to_iterator(obj_ids):
-                while obj_ids:
-                    done, obj_ids = ray.wait(obj_ids)
-                    yield ray.get(done[0])
-
             iterator = to_iterator(rxns)
             if not self.quiet:
                 iterator = tqdm(iterator, total=len(rxns))
@@ -255,7 +237,7 @@ class BasicEnumerator(Enumerator):
         _ = (self, open_entries)  # unused_arguments
         return None
 
-    def _get_rxns_from_items(
+    def _get_rxns_from_item(
         self,
         item,
         open_combos,
