@@ -21,8 +21,6 @@ from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import initialize_ray, to_iterator
 
-initialize_ray()
-
 
 @ray.remote
 def _calculate_ray(obj, rxn):
@@ -125,6 +123,7 @@ class CompetitivenessScoreCalculator(Calculator):
         Returns:
             The list of competitiveness scores
         """
+        initialize_ray()
         obj = ray.put(self)
 
         costs = [_calculate_ray.remote(obj, rxn) for rxn in rxns]

@@ -27,9 +27,6 @@ from rxn_network.reactions import ComputedReaction
 from rxn_network.utils import initialize_ray, limited_powerset, to_iterator
 
 
-initialize_ray()
-
-
 PARALLEL_THRESHOLD = 4  # median computation size above which parallelization enabled
 
 
@@ -153,6 +150,7 @@ class BasicEnumerator(Enumerator):
         if median_comp_size > PARALLEL_THRESHOLD and len(combos_dict) > 1:
             parallel = True
 
+            initialize_ray()
             obj = ray.put(self)
             open_combos = ray.put(open_combos)
             entries = ray.put(entries)
