@@ -2,8 +2,6 @@
 This module implements two types of basic reaction enumerators, differing in the option
 to consider open entries.
 """
-import logging
-import os
 from copy import deepcopy
 from itertools import combinations, product
 from math import comb
@@ -142,7 +140,7 @@ class BasicEnumerator(Enumerator):
 
         items = sorted(
             combos_dict.items(), key=lambda e: len(e[1]), reverse=True
-        )  # sorted for parallelization
+        )  # sorted for better parallelization
 
         parallel = False
         median_comp_size = median([len(v) for v in combos_dict.values()])

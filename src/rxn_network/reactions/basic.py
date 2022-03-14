@@ -223,12 +223,20 @@ class BasicReaction(Reaction):
         Returns:
             True if reaction is separable from target, False otherwise.
         """
-        if target not in self.compositions:
+        identified_targets = [
+            c
+            for c in self.compositions
+            if c.reduced_composition == target.reduced_composition
+        ]
+
+        if len(identified_targets) == 0:
             raise ValueError(f"Target composition {target} not in reaction {self}")
 
         added_elems = set(self.elements) - set(target.elements)
         products = set(deepcopy(self.products))
-        products.remove(target)
+
+        for t in identified_targets:
+            products.remove(t)
 
         separable = [added_elems.issuperset(comp.elements) for comp in products]
         found = all(separable)

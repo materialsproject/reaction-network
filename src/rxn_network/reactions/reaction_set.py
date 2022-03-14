@@ -166,35 +166,50 @@ class ReactionSet(MSONable):
         rxns = self.get_rxns()
         costs = [cost_function.evaluate(rxn) for rxn in rxns]
 
-        if target:
-            target = Composition(target)
-            if rxns[0].__class__.__name__ == "OpenComputedReaction":
-                added_elems = [
-                    rxn.total_chemical_system != target.chemical_system for rxn in rxns
-                ]
-            else:
-                added_elems = [
-                    rxn.chemical_system != target.chemical_system for rxn in rxns
-                ]
-        else:
-            added_elems = [None] * len(rxns)
-
         data = {
             "rxn": rxns,
             "energy": [rxn.energy_per_atom for rxn in rxns],
             "dE": [rxn.energy_uncertainty_per_atom for rxn in rxns],  # type: ignore
-            "added_elems": added_elems,
         }
+
+        if target:
+            data["added_elems"] = [self._get_added_elems(rxn, target) for rxn in rxns]
+            data["separable"] = [rxn.is_separable(target) for rxn in rxns]
 
         attrs = list(rxns[0].data.keys())
         for attr in attrs:
             data.update({attr: [rxn.data.get(attr) for rxn in rxns]})
 
         data["cost"] = costs
-
         df = DataFrame(data).sort_values("cost").reset_index(drop=True)
 
         return df
+
+    @staticmethod
+    def _get_added_elems(
+        rxn: Union[ComputedReaction, OpenComputedReaction], target: Composition
+    ) -> str:
+        """
+        Get list of added elements for a reaction.
+
+        Args:
+            rxn: Reaction object
+            target: target composition (used to determine added elements)
+
+        """
+        target = Composition(target)
+        chemsys_prop = (
+            "total_chemical_system"
+            if rxn.__class__.__name__ == "OpenComputedReaction"
+            else "chemical_system"
+        )
+
+        added_elems = set(getattr(rxn, chemsys_prop).split("-")) - set(
+            target.chemical_system.split("-")
+        )
+        added_elems = "-".join(sorted(list(added_elems)))
+
+        return added_elems
 
     @staticmethod
     def _get_unique_entries(rxns: Collection[ComputedReaction]) -> Set[ComputedEntry]:
