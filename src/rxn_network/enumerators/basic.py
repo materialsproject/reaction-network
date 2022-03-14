@@ -28,15 +28,6 @@ from rxn_network.utils import initialize_ray, limited_powerset, to_iterator
 PARALLEL_THRESHOLD = 4  # median computation size above which parallelization enabled
 
 
-@ray.remote
-def _get_rxns_from_item_ray(
-    obj, item, open_combos, entries, open_entries, precursors, targets
-):
-    return obj._get_rxns_from_item(
-        item, open_combos, entries, open_entries, precursors, targets
-    )
-
-
 class BasicEnumerator(Enumerator):
     """
     Enumerator for finding all simple reactions within a set of entries, up to a
@@ -157,7 +148,7 @@ class BasicEnumerator(Enumerator):
             targets = ray.put(targets)
 
             rxns = [
-                _get_rxns_from_item_ray.remote(
+                _get_rxns_from_chemsys_ray.remote(
                     obj, item, open_combos, entries, open_entries, precursors, targets
                 )
                 for item in items
@@ -169,7 +160,7 @@ class BasicEnumerator(Enumerator):
                 iterator = tqdm(items, total=len(items))
             for item in items:
                 rxns.append(
-                    self._get_rxns_from_item(
+                    self._get_rxns_in_chemsys(
                         item, open_combos, entries, open_entries, precursors, targets
                     )
                 )
@@ -233,7 +224,7 @@ class BasicEnumerator(Enumerator):
         _ = (self, open_entries)  # unused_arguments
         return None
 
-    def _get_rxns_from_item(
+    def _get_rxns_in_chemsys(
         self,
         item,
         open_combos,
@@ -242,6 +233,7 @@ class BasicEnumerator(Enumerator):
         precursors,
         targets,
     ):
+        """ """
         chemsys, combos = item
 
         elems = chemsys.split("-")
@@ -250,7 +242,7 @@ class BasicEnumerator(Enumerator):
 
         rxn_iter = self._get_rxn_iterable(combos, open_combos)
 
-        rxns = self._get_rxns(
+        rxns = self._get_rxns_from_iterable(
             rxn_iter,
             precursors,
             targets,
@@ -260,7 +252,7 @@ class BasicEnumerator(Enumerator):
         )
         return rxns
 
-    def _get_rxns(
+    def _get_rxns_from_iterable(
         self,
         rxn_iterable,
         precursors,
@@ -576,3 +568,16 @@ class BasicOpenEnumerator(BasicEnumerator):
         rxn_iter = product(combos, combos_with_open)
 
         return rxn_iter
+
+
+@ray.remote
+def _get_rxns_from_chemsys_ray(
+    obj, item, open_combos, entries, open_entries, precursors, targets
+):
+    """
+    Wrapper function for parallelizing reaction enumeration using ray. See
+    _get_rxns_in_chemsys in BasicEnumerator for more details.
+    """
+    return obj._get_rxns_in_chemsys(
+        item, open_combos, entries, open_entries, precursors, targets
+    )
