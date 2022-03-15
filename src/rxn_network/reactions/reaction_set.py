@@ -207,9 +207,9 @@ class ReactionSet(MSONable):
         added_elems = set(getattr(rxn, chemsys_prop).split("-")) - set(
             target.chemical_system.split("-")
         )
-        added_elems = "-".join(sorted(list(added_elems)))
+        added_elems_str = "-".join(sorted(list(added_elems)))
 
-        return added_elems
+        return added_elems_str
 
     @staticmethod
     def _get_unique_entries(rxns: Collection[ComputedReaction]) -> Set[ComputedEntry]:
