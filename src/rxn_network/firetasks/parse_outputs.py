@@ -25,15 +25,17 @@ class ReactionsToDb(FiretaskBase):
             for rxns.json.gz file in current folder.
         metadata (dict): Optional metadata to store with the ReactionSet.
         db_file (str): Optional path to CalcDb file.
+        use_gridfs (bool): Whether or not to store the reactions in GridFS.
 
     """
 
     required_params: List[str] = []
-    optional_params: List[str] = ["rxns", "metadata", "db_file"]
+    optional_params: List[str] = ["rxns", "metadata", "db_file", "use_gridfs"]
 
     def run_task(self, fw_spec):
         dir_name = os.path.abspath(os.getcwd())
         db_file = env_chk(self.get("db_file"), fw_spec)
+        use_gridfs = self.get("use_gridfs", True)
         db = CalcDb(db_file)
 
         rxns = load_json(self, "rxns", fw_spec)
@@ -45,10 +47,15 @@ class ReactionsToDb(FiretaskBase):
             f"Reaction Enumeration (Targets: "
             f"{metadata.get('targets')}): {metadata.get('chemsys')}"
         )
-        d["rxns"] = rxns
+        if not use_gridfs:
+            d["rxns"] = rxns
 
         d.update(metadata)
-        db.insert(d)
+        task_id = db.insert(d)
+
+        if use_gridfs:
+            rxns["task_id"] = task_id
+            db.insert_gridfs(rxns, metadata_keys=["task_id"])
 
 
 @explicit_serialize
@@ -103,3 +110,24 @@ class NetworkToDb(FiretaskBase):
 
         d.update(metadata)
         db.insert(d)
+
+
+@explicit_serialize
+class ChangeDir(FiretaskBase):
+    """
+    FireTask to create new folder with the option of changing directory to the new folder.
+
+    Required params:
+        folder_name (str): folder name.
+
+    Optional params:
+        change_dir(bool): change working dir to new folder after creation.
+            Defaults to False.
+        relative_path (bool): whether folder name is relative or absolute.
+            Defaults to True.
+    """
+
+    required_params = ["folder_name"]
+
+    def run_task(self, fw_spec):
+        os.chdir(self["folder_name"])

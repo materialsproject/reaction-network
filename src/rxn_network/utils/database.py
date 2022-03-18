@@ -4,9 +4,10 @@ Database utilities for the rxn_network package to facilitate connection to datab
 """
 
 from datetime import datetime
+from typing import List, Optional
 
 from maggma.core import StoreError
-from maggma.stores import MongoStore
+from maggma.stores import GridFSStore, MongoStore
 from monty.json import MSONable, jsanitize
 
 from rxn_network.firetasks.utils import get_logger
@@ -65,3 +66,28 @@ class CalcDb(MSONable):
             task_id = None
 
         return task_id
+
+    def insert_gridfs(
+        self, d: dict, sub_name="fs", metadata_keys: Optional[List] = None
+    ):
+        """
+        Insert the task document in the GridFS database collection.
+        """
+        kw = {
+            k: v
+            for k, v in self.db.as_dict().items()
+            if k
+            in [
+                "database",
+                "collection_name",
+                "host",
+                "port",
+                "username",
+                "password",
+            ]
+        }
+        kw["collection_name"] = f"{kw['collection_name']}_{sub_name}"
+        fs_store = GridFSStore(**kw)
+        fs_store.connect()
+
+        fs_store.update(d, additional_metadata=metadata_keys)

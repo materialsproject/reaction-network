@@ -118,7 +118,7 @@ class EnumeratorFW(Firework):
             )
             tasks.append(CalculateCScores(**c_score_kwargs))
 
-        tasks.append(ReactionsToDb(db_file=db_file))
+        tasks.append(ReactionsToDb(db_file=db_file, use_gridfs=True))
 
         fw_name = f"Reaction Enumeration (Targets: {targets}): {chemsys}"
         super().__init__(tasks, parents=parents, name=fw_name)

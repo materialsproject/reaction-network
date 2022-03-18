@@ -6,7 +6,7 @@ import plotly.express as px
 
 
 def plot_reaction_scatter(
-    df: DataFrame, x="energy", y="chempot_distance"
+    df: DataFrame, x="energy", y="chempot_distance", color="has_added_elems"
 ) -> px.scatter:
     """
     Plot a Plotly scatter plot of chemical potential distance vs energy.
@@ -40,8 +40,8 @@ def plot_reaction_scatter(
         labels={i: get_label(i) for i in [x, y]},
         error_x="dE",
         template="simple_white",
-        color="has_added_elems",
-        color_discrete_sequence=["gray", "darkorange"],
+        color=color,
+        color_discrete_map={True: "darkorange", False: "gray"},
         width=800,
         height=800,
     )
