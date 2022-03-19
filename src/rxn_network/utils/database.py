@@ -6,6 +6,8 @@ Database utilities for the rxn_network package to facilitate connection to datab
 from datetime import datetime
 from typing import List, Optional
 
+from bson import ObjectId
+
 from maggma.core import StoreError
 from maggma.stores import GridFSStore, MongoStore
 from monty.json import MSONable, jsanitize
@@ -56,10 +58,7 @@ class CalcDb(MSONable):
                 logger.info(f"Updating {d['dir_name']} with taskid = {d['task_id']}")
 
             d = jsanitize(d, allow_bson=True)
-            self.db.update(
-                d,
-                "dir_name",
-            )
+            self.db.update(d, ["targets", "chemsys"])
             task_id = d["task_id"]
         else:
             logger.info(f"Skipping duplicate {d['dir_name']}")
@@ -90,4 +89,4 @@ class CalcDb(MSONable):
         fs_store = GridFSStore(**kw)
         fs_store.connect()
 
-        fs_store.update(d, additional_metadata=metadata_keys)
+        fs_store.update(d, key="task_id", additional_metadata=metadata_keys)

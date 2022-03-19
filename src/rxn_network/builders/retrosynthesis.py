@@ -1,8 +1,6 @@
-from typing import Dict, List, Optional
-
 from maggma.builders.map_builder import MapBuilder
 from maggma.core import Store
-from maggma.utils import Timeout, grouper
+from maggma.utils import grouper
 from pymatgen.core.composition import Composition
 
 from rxn_network.core.cost_function import CostFunction
@@ -70,6 +68,7 @@ class SynthesisRecipeBuilder(MapBuilder):
         return self.tasks.find({"status": "COMPLETED"})
 
     def unary_function(self, item):
+        """Map function to process a single item."""
         rxns_dict = item["rxns"]
         target = Composition(item["targets"][0])
         added_elems = item["added_elems"]
