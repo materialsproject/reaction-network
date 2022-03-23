@@ -21,6 +21,7 @@ class SynthesisRecipeBuilder(MapBuilder):
         self.cf = cf
 
         super().__init__(source=tasks, target=recipes, **kwargs)
+        self.sources.append(self.tasks_fs)
 
     def get_items(self):
         """Get the items to process."""
@@ -48,34 +49,37 @@ class SynthesisRecipeBuilder(MapBuilder):
         self.total = len(keys)
         for chunked_keys in grouper(keys, self.chunk_size):
             chunked_keys = list(chunked_keys)
-            query = list(
-                self.tasks.query(
-                    criteria={self.tasks.key: {"$in": chunked_keys}},
+            for key in chunked_keys:
+                query = self.tasks.query_one(
+                    criteria={self.tasks.key: key},
                     properties=projection,
                 )
-            )
-            query_fs = list(
-                self.tasks_fs.query(
-                    criteria={self.tasks_fs.key: {"$in": chunked_keys}},
+                query_fs = self.tasks_fs.query_one(
+                    criteria={"task_id": key},
                     properties=projection,
                 )
-            )
-            for d1, d2 in zip(query, query_fs):
-                d = d1
-                d.update(d2)
-                yield d1
 
-        return self.tasks.find({"status": "COMPLETED"})
+                if query_fs is not None:
+                    del query_fs["task_id"]
+                    query["rxns"] = query_fs
+
+                yield query
 
     def unary_function(self, item):
         """Map function to process a single item."""
-        rxns_dict = item["rxns"]
+        try:
+            rxns_dict = item["rxns"]
+        except KeyError:
+            self.logger.info("No rxns found for task {}!".format(item["task_id"]))
+            return
+
         target = Composition(item["targets"][0])
         added_elems = item["added_elems"]
         enumerators = item["enumerators"]
 
         rxn_set = ReactionSet.from_dict(rxns_dict)
         df = rxn_set.to_dataframe(cost_function=self.cf, target=target)
+        df["rxn"] = df["rxn"].astype("str")
 
         d = {}
         d["recipes"] = df.to_dict(orient="records")

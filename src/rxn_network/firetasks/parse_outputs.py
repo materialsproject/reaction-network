@@ -8,6 +8,7 @@ from fireworks import FiretaskBase, explicit_serialize
 
 from rxn_network.firetasks.utils import env_chk, get_logger, load_json
 from rxn_network.utils.database import CalcDb
+from rxn_network.reactions.reaction_set import ReactionSet
 
 logger = get_logger(__name__)
 
@@ -47,13 +48,14 @@ class ReactionsToDb(FiretaskBase):
             f"Reaction Enumeration (Targets: "
             f"{metadata.get('targets')}): {metadata.get('chemsys')}"
         )
-        if not use_gridfs:
-            d["rxns"] = rxns
+        rxn_set = ReactionSet.from_dict(rxns)
+        rxns_str = [str(r) for r in rxn_set.get_rxns()]
+        d["rxns"] = rxns_str
 
         d.update(metadata)
         task_id = db.insert(d)
 
-        if use_gridfs:
+        if use_gridfs:  # store full reaction objects in GridFS
             rxns["task_id"] = task_id
             db.insert_gridfs(rxns, metadata_keys=["task_id"])
 
