@@ -1,17 +1,18 @@
 """
 Firetasks for running enumeration and network calculations
 """
+import os
 import warnings
 from typing import List
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
-from pymatgen.core import Composition
+from pymatgen.core.composition import Composition, Element
 
 from rxn_network.costs.competitiveness import CompetitivenessScoreCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import get_computed_rxn
-from rxn_network.firetasks.utils import get_logger, load_json
+from rxn_network.firetasks.utils import get_logger, load_json, load_entry_set
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
@@ -37,12 +38,12 @@ class RunEnumerators(FiretaskBase):
     """
 
     required_params: List[str] = ["enumerators", "entries"]
-    optional_params: List[str] = []
+    optional_params: List[str] = ["task_label", "entries_fn"]
 
     def run_task(self, fw_spec):
         enumerators = self["enumerators"]
-        entries = self["entries"] if self["entries"] else fw_spec["entries"]
-        entries = GibbsEntrySet(entries)
+        task_label = self.get("task_label", "")
+        entries = load_entry_set(self, fw_spec)
         chemsys = "-".join(sorted(list(entries.chemsys)))
 
         targets = {
@@ -54,13 +55,18 @@ class RunEnumerators(FiretaskBase):
             added_elems = entries.chemsys - {
                 str(e) for target in targets for e in Composition(target).elements
             }
-            added_elems = "-".join(sorted(list(added_elems)))
+            added_chemsys = "-".join(sorted(list(added_elems)))
+            added_elements = [Element(e) for e in added_elems]
 
         metadata = {
+            "task_label": task_label,
+            "dir_name": os.getcwd(),
+            "elements": [Element(e) for e in chemsys.split("-")],
             "chemsys": chemsys,
             "enumerators": [e.as_dict() for e in enumerators],
-            "targets": list(targets),
-            "added_elems": added_elems,
+            "targets": list(sorted(targets)),
+            "added_elements": added_elements,
+            "added_chemsys": added_chemsys,
         }
 
         results = []
@@ -71,8 +77,11 @@ class RunEnumerators(FiretaskBase):
         results = ReactionSet.from_rxns(results)
 
         dumpfn(results, "rxns.json.gz")
+        dumpfn(metadata, "metadata.json.gz")
 
-        return FWAction(update_spec={"rxns_fn": "rxns.json.gz", "metadata": metadata})
+        return FWAction(
+            update_spec={"rxns_fn": "rxns.json.gz", "metadata_fn": "metadata.json.gz"}
+        )
 
 
 @explicit_serialize
@@ -118,12 +127,14 @@ class CalculateCScores(FiretaskBase):
         "use_minimize",
         "basic_enumerator_kwargs",
         "minimize_enumerator_kwargs",
+        "entries_fn",
     ]
 
     def run_task(self, fw_spec):
-        entries = self["entries"] if self["entries"] else fw_spec["entries"]
+        entries = load_entry_set(self, fw_spec)
         cost_function = self["cost_function"]
-        rxns = ReactionSet.from_dict(load_json(self, "rxns", fw_spec))
+        rxns = load_json(self, "rxns", fw_spec)
+        metadata = load_json(self, "metadata", fw_spec)
         k = self.get("k", 15)
         open_phases = self.get("open_phases")
         open_elem = self.get("open_elem")
@@ -161,11 +172,11 @@ class CalculateCScores(FiretaskBase):
             new_rxns.append(rxn)
 
         results = ReactionSet.from_rxns(new_rxns)
-        dumpfn(results, "rxns.json.gz")  # may overwrite existing rxns.json.gz
 
-        return FWAction(
-            mod_spec=[{"_set": {"metadata->cost_function": cost_function.as_dict()}}]
-        )
+        metadata["cost_function"] = cost_function
+
+        dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
+        dumpfn(metadata, "metadata.json.gz")  # will overwrite existing metadata.json.gz
 
 
 @explicit_serialize
@@ -191,10 +202,17 @@ class BuildNetwork(FiretaskBase):
     """
 
     required_params = ["entries", "enumerators", "cost_function"]
-    optional_params = ["precursors", "targets", "k", "open_elem", "chempot"]
+    optional_params = [
+        "precursors",
+        "targets",
+        "k",
+        "open_elem",
+        "chempot",
+        "entries_fn",
+    ]
 
     def run_task(self, fw_spec):
-        entries = self["entries"] if self["entries"] else fw_spec["entries"]
+        entries = load_entry_set(self, fw_spec)
         enumerators = self["enumerators"]
         cost_function = self["cost_function"]
         precursors = self.get("precursors")
@@ -284,7 +302,7 @@ class RunSolver(FiretaskBase):
     ]
 
     def run_task(self, fw_spec):
-        entries = self["entries"] if self["entries"] else fw_spec["entries"]
+        entries = load_entry_set(self, fw_spec)
         cost_function = self["cost_function"]
         if not self.get("pathways"):
             pathways = loadfn(fw_spec["pathways_fn"])

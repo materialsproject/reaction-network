@@ -1,4 +1,4 @@
-from maggma.builders.map_builder import MapBuilder
+from maggma.builders import Builder
 from maggma.core import Store
 from maggma.utils import grouper
 from pymatgen.core.composition import Composition
@@ -7,7 +7,7 @@ from rxn_network.core.cost_function import CostFunction
 from rxn_network.reactions.reaction_set import ReactionSet
 
 
-class SynthesisRecipeBuilder(MapBuilder):
+class SynthesisRecipeBuilder(Builder):
     """
     Build a synthesis recipe document from the reaction results from EnumeratorWF.
     """

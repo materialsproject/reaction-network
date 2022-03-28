@@ -1,13 +1,13 @@
 """Core definition for various task and synthesis recipe documents"""
-import os
 from enum import Enum
 from typing import Any, List, Optional
+from datetime import datetime
 
-from monty.serialization import loadfn
 from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 from pymatgen.core.composition import Composition, Element
 
-from rxn_network.core.enumerator import Enumerator
+from rxn_network.core import CostFunction, Enumerator, Network
+from rxn_network.reactions.reaction_set import ReactionSet
 
 
 class EnumeratorTask(BaseModel):
@@ -15,19 +15,21 @@ class EnumeratorTask(BaseModel):
     A single task object from the reaction enumerator workflow.
     """
 
-    name: str = Field(None, description="The name of the task.")
     task_id: str = Field(None, description="The task id")
-    state: Enum = Field(None, description="The task state")
-    last_updated: Optional[str] = Field(None, description="The last updated time")
+    task_label: str = Field(None, description="The name of the task.")
+    last_updated: Optional[datetime] = Field(None, description="The last updated time")
     dir_name: str = Field(None, description="The directory name")
-    rxns_fs_id: str = Field(
-        None, description="The GridFS ID referencing the reaction enumerator output"
+    rxns: Optional[ReactionSet] = Field(
+        None, description="The reaction set. Optional to allow for storing in GridFS."
     )
     elements: List[Element] = Field(
         None, description="The elements of the total chemical system"
     )
     chemsys: str = Field(
         None, description="The total chemical system string (e.g., Fe-Li-O)."
+    )
+    added_elements: List[Element] = Field(
+        None, description="The elements added beyond the elements of the target(s)."
     )
     added_chemsys: str = Field(
         None, description="The chemical system of the added elements"
@@ -36,34 +38,56 @@ class EnumeratorTask(BaseModel):
         None,
         description="A list of the enumerator objects used to calculate the reactions.",
     )
-    cost_function: str = Field(
+    cost_function: CostFunction = Field(
         None, description="The cost function used to calculate the cost."
     )
 
     @classmethod
-    def from_files(cls, rxns_fn, metadata_fn, **kwargs):
-        dir_name = os.path.abspath(os.getcwd())
+    def from_rxns_and_metadata(cls, rxns: ReactionSet, metadata: dict, **kwargs):
+        """
+        Create an EnumeratorTask from the reaction enumerator outputs.
 
-        rxns = (loadfn(rxns_fn),)
-        metadata = loadfn(metadata_fn)
+        Args:
+            rxns: the reaction set
+            metadata: The metadata dictionary.
+            **kwargs: Additional keyword arguments to pass to the EnumeratorTask constructor.
+        """
+        data = metadata.copy()
+        data["rxns"] = rxns
 
-        d = {"rxns": rxns, "metadata": metadata, "dir_name": dir_name}
+        d = {k: v for k, v in data.items() if v is not None}
+
         return cls(**d, **kwargs)
 
 
 class NetworkTask(BaseModel):
     """
+    TODO: Finish model
+
     A single task object from the reaction network workflow.
     """
 
-    task_id: str = Field(..., description="The task id")
-    state: Enum = Field(..., description="The task state")
-    data: Optional[Any] = Field(None, description="The task data")
-    last_updated: Optional[str] = Field(None, description="The last updated time")
+    task_id: str = Field(None, description="The task id")
+    task_label: str = Field(None, description="The name of the task.")
+    last_updated: Optional[datetime] = Field(None, description="The last updated time")
+    dir_name: str = Field(None, description="The directory name")
 
     @classmethod
-    def from_files(cls, rxn_file, metadata_file):
-        return cls
+    def from_network_and_metadata(cls, network: Network, metadata: dict, **kwargs):
+        """
+        Create a NetworkTask from the reaction network workflow outputs.
+
+        Args:
+            network: the Network object
+            metadata: The metadata dictionary.
+            **kwargs: Additional keyword arguments to pass to the EnumeratorTask constructor.
+        """
+        data = metadata.copy()
+        data["network"] = network
+
+        d = {k: v for k, v in data.items() if v is not None}
+
+        return cls(**d, **kwargs)
 
 
 class Phase(BaseModel):

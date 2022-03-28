@@ -63,7 +63,6 @@ class EnumeratorFW(Firework):
                 parameter above)
             parents: Parents of this Firework.
         """
-
         tasks = []
 
         entry_set = None
@@ -87,7 +86,13 @@ class EnumeratorFW(Firework):
             target for enumerator in enumerators for target in enumerator.targets
         }
 
-        tasks.append(RunEnumerators(enumerators=enumerators, entries=entry_set))
+        fw_name = f"Reaction Enumeration (Targets: {targets}): {chemsys}"
+
+        tasks.append(
+            RunEnumerators(
+                enumerators=enumerators, entries=entry_set, task_label=fw_name
+            )
+        )
 
         if calculate_c_scores:
             if not cost_function:
@@ -120,7 +125,6 @@ class EnumeratorFW(Firework):
 
         tasks.append(ReactionsToDb(db_file=db_file, use_gridfs=True))
 
-        fw_name = f"Reaction Enumeration (Targets: {targets}): {chemsys}"
         super().__init__(tasks, parents=parents, name=fw_name)
 
 

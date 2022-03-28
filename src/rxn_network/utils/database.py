@@ -6,8 +6,6 @@ Database utilities for the rxn_network package to facilitate connection to datab
 from datetime import datetime
 from typing import List, Optional
 
-from bson import ObjectId
-
 from maggma.core import StoreError
 from maggma.stores import GridFSStore, MongoStore
 from monty.json import MSONable, jsanitize
@@ -57,8 +55,8 @@ class CalcDb(MSONable):
                 d["task_id"] = result["task_id"]
                 logger.info(f"Updating {d['dir_name']} with taskid = {d['task_id']}")
 
-            d = jsanitize(d, allow_bson=True)
-            self.db.update(d, ["targets", "chemsys"])
+            d = jsanitize(d, allow_bson=True, strict=True)
+            self.db.update(d, key="task_id")
             task_id = d["task_id"]
         else:
             logger.info(f"Skipping duplicate {d['dir_name']}")
@@ -71,6 +69,22 @@ class CalcDb(MSONable):
     ):
         """
         Insert the task document in the GridFS database collection.
+        """
+        fs_store = self.connect_to_gridfs(sub_name)
+
+        d = jsanitize(d, allow_bson=True, strict=True)
+        fs_store.update(d, key="task_id", additional_metadata=metadata_keys)
+
+    def connect_to_gridfs(self, sub_name="fs"):
+        """
+        Connects to and returns a GridFSStore using provided db_file. Appends "sub_name" to
+        collection name of the provided DB.
+
+        Args:
+            sub_name: name of the GridFS sub-collection
+
+        Returns:
+            GridFSStore object
         """
         kw = {
             k: v
@@ -89,4 +103,4 @@ class CalcDb(MSONable):
         fs_store = GridFSStore(**kw)
         fs_store.connect()
 
-        fs_store.update(d, key="task_id", additional_metadata=metadata_keys)
+        return fs_store

@@ -38,7 +38,6 @@ def plot_reaction_scatter(
         y=y,
         hover_name="rxn",
         labels={i: get_label(i) for i in [x, y]},
-        error_x="dE",
         template="simple_white",
         color=color,
         color_discrete_map={True: "darkorange", False: "gray"},
