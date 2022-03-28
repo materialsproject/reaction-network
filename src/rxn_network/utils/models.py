@@ -142,7 +142,7 @@ class Phase(BaseModel):
         data["entry_id"] = entry.entry_id
         data["e_above_hull"] = entry.data.get("e_above_hull", None)
         data["is_metastable"] = (
-            data["e_above_hull"] > 0 if data["e_above_hull"] else None
+            data["e_above_hull"] > 0 if data["e_above_hull"] is not None else None
         )
         data["is_experimental"] = entry.is_experimental
         data["icsd_ids"] = entry.data.get("icsd_ids", None)
@@ -273,7 +273,7 @@ class ComputedSynthesisRecipe(BaseModel):
         )
         data["cost"] = cost
         data["byproducts"] = sorted(
-            [c.reduced_formula for c in set(rxn.products) - set(target)]
+            [c.reduced_formula for c in (set(rxn.products) - {target})]
         )
 
         d = {k: v for k, v in data.items() if v is not None}
@@ -287,6 +287,8 @@ class ComputedSynthesisRecipesDoc(BaseModel):
     """
 
     task_id: str = Field(None, description="Task ID")
+    task_label: str = Field(None, description="The name of the task document")
+    last_updated: Optional[datetime] = Field(None, description="The last updated time")
     recipes: List[ComputedSynthesisRecipe] = Field(
         None, description="List of computed synthesis recipes"
     )

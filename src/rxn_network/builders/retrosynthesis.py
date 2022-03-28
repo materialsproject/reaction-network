@@ -1,15 +1,15 @@
 """ Builder(s) for generating synthesis recipe documents."""
+from datetime import datetime
 from math import ceil
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, Optional
 
 from maggma.builders import Builder
 from maggma.core import Store
 from maggma.utils import grouper
-from monty.json import jsanitize
+from monty.json import MontyDecoder, jsanitize
 from pymatgen.core.composition import Composition
 
 from rxn_network.core.cost_function import CostFunction
-from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.models import (
     ComputedSynthesisRecipe,
     ComputedSynthesisRecipesDoc,
@@ -71,12 +71,8 @@ class SynthesisRecipeBuilder(Builder):
         """Get the items to process."""
         to_process_task_ids = self._find_to_process()
 
-        self.logger.info(
-            "Processing {} task docs for synthesis recipes".format(
-                len(to_process_task_ids)
-            )
-        )
         self.total = len(to_process_task_ids)
+        self.logger.info(f"Processing {self.total} task docs for synthesis recipes")
 
         for task_id in to_process_task_ids:
             task = self.tasks.query_one({"task_id": task_id})
@@ -87,11 +83,11 @@ class SynthesisRecipeBuilder(Builder):
                 task["rxns"] = rxns
                 if not rxns:
                     self.logger.warning(
-                        "Missing rxns from GridFSStore for task_id {}".format(task_id)
+                        f"Missing rxns from GridFSStore for task_id {task_id}"
                     )
             else:
                 if not task.get("rxns"):
-                    self.logger.warning("Missing rxns in task {}".format(task_id))
+                    self.logger.warning(f"Missing rxns in task {task_id}")
 
             if task is not None:
                 yield task
@@ -100,7 +96,11 @@ class SynthesisRecipeBuilder(Builder):
 
     def process_item(self, item):
         """Creates a synthesis recipe document from the task document."""
-        rxns_dict = item["rxns"]
+        item = MontyDecoder().process_decoded(item)
+
+        task_id = item["task_id"]
+        task_label = item["task_label"]
+        rxns = item["rxns"]
         targets = item["targets"]
         elements = item["elements"]
         chemsys = item["chemsys"]
@@ -111,16 +111,16 @@ class SynthesisRecipeBuilder(Builder):
 
         if len(targets) > 1:
             self.logger.warning(
-                "Enumerator has multiple targets for task_id {}".format(item["task_id"])
+                f"Enumerator has multiple targets for task_id {item['task_id']}"
             )
             self.logger.warning("Selecting first target...")
 
         target = item["targets"][0]
         target_comp = Composition(target)
 
-        self.logger.debug("Creating synthesis recipes for {}".format(item["task_id"]))
+        self.logger.debug(f"Creating synthesis recipes for {item['task_id']}")
 
-        rxns = ReactionSet.from_dict(rxns_dict).get_rxns()
+        rxns = rxns.get_rxns()
         costs = [self.cf.evaluate(rxn) for rxn in rxns]
         recipes = [
             ComputedSynthesisRecipe.from_computed_rxn(
@@ -131,6 +131,9 @@ class SynthesisRecipeBuilder(Builder):
 
         d: Dict[str, Any] = {}
 
+        d["task_id"] = task_id
+        d["task_label"] = task_label
+        d["last_updated"] = datetime.utcnow()
         d["recipes"] = recipes
         d["target_composition"] = target_comp
         d["target_formula"] = target
@@ -168,7 +171,6 @@ class SynthesisRecipeBuilder(Builder):
         self.ensure_indexes()
 
         task_keys = set(self.tasks.distinct("task_id", criteria=self.query))
-        print(task_keys)
         updated_tasks = set(self.recipes.newer_in(self.tasks))
 
         return updated_tasks & task_keys

@@ -67,7 +67,7 @@ class EntriesFromMPRester(FiretaskBase):
 
         with MPRester() as mpr:
             entries = mpr.get_entries_in_chemsys(
-                elements=chemsys, inc_structure="final"
+                elements=chemsys, inc_structure="final", property_data=["icsd_ids"]
             )
 
         entries = process_entries(
@@ -466,6 +466,7 @@ def get_entry_task(
             include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
+            property_data=["icsd_ids"],
         )
     else:
         entry_task = EntriesFromMPRester(

@@ -578,6 +578,6 @@ def _get_rxns_from_chemsys_ray(
     Wrapper function for parallelizing reaction enumeration using ray. See
     _get_rxns_in_chemsys in BasicEnumerator for more details.
     """
-    return obj._get_rxns_in_chemsys(
+    return obj._get_rxns_in_chemsys(  # pylint: disable=protected-access
         item, open_combos, entries, open_entries, precursors, targets
     )
