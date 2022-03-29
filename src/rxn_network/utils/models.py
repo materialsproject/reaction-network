@@ -100,15 +100,12 @@ class Phase(BaseModel):
     """
 
     name: str = Field(None, description="Name of the phase.")
-    composition: Composition = Field(
-        None, description="The composition object for the phase"
-    )
     energy: float = Field(None, description="The energy of the phase")
     energy_per_atom: float = Field(
         None, description="The energy per atom of the phase."
     )
-    reduced_formula: str = Field(None, description="The reduced formula of the phase.")
-    temperature: float = Field(
+    formula: str = Field(None, description="The reduced formula of the phase.")
+    temp: float = Field(
         None, description="The temperature at which the energy was calculated."
     )
     entry_id: str = Field(
@@ -131,20 +128,20 @@ class Phase(BaseModel):
         """
         Simple constructor for a phase from a pymatgen ComputedEntry object.
         """
+        e_above_hull = entry.data.get("e_above_hull", None)
         data: Dict[str, Any] = {}
 
         data["name"] = entry.name
-        data["composition"] = entry.composition
-        data["energy"] = entry.energy
-        data["energy_per_atom"] = entry.energy_per_atom
-        data["reduced_formula"] = entry.composition.reduced_formula
-        data["temperature"] = getattr(entry, "temperature", None)
+        data["energy"] = round(entry.energy, 5)
+        data["energy_per_atom"] = round(entry.energy_per_atom, 5)
+        data["formula"] = entry.composition.reduced_formula
+        data["temp"] = getattr(entry, "temperature", None)
         data["entry_id"] = entry.entry_id
-        data["e_above_hull"] = entry.data.get("e_above_hull", None)
-        data["is_metastable"] = (
-            data["e_above_hull"] > 0 if data["e_above_hull"] is not None else None
+        data["e_above_hull"] = (
+            round(e_above_hull, 4) if e_above_hull is not None else None
         )
-        data["is_experimental"] = entry.is_experimental
+        data["is_metastable"] = e_above_hull > 0 if e_above_hull is not None else None
+        data["is_experimental"] = getattr(entry, "is_experimental", False)
         data["icsd_ids"] = entry.data.get("icsd_ids", None)
         d = {k: v for k, v in data.items() if v is not None}
 
@@ -157,7 +154,7 @@ class ReactionThermo(BaseModel):
     """
 
     energy_per_atom: float = Field(None, description="Reaction energy in eV/atom")
-    energy_uncertainty_per_atom: float = Field(
+    uncertainty_per_atom: float = Field(
         None, description="Reaction energy uncertainty in eV/atom"
     )
 
@@ -196,17 +193,7 @@ class Reaction(BaseModel):
     rxn_str: str = Field(None, description="String of balanced reaction")
     reactants: List[Phase] = Field(None, description="List of reactant phases")
     products: List[Phase] = Field(None, description="List of product phases")
-    elements: List[Element] = Field(
-        None, description="List of elements in the reaction"
-    )
     chemsys: str = Field(None, description="The chemical system string (e.g., Fe-Li-O)")
-    compositions: List[Composition] = Field(
-        None, description="List of composition objects in the reaction equation."
-    )
-    coefficients: List[float] = Field(
-        None,
-        description="List of coefficients corresponding to compositions in reactin equation.",
-    )
 
     @classmethod
     def from_computed_rxn(cls, rxn: ComputedReaction, **kwargs) -> "Reaction":
@@ -218,10 +205,7 @@ class Reaction(BaseModel):
         data["rxn_str"] = str(rxn)
         data["reactants"] = [Phase.from_computed_entry(r) for r in rxn.reactant_entries]
         data["products"] = [Phase.from_computed_entry(p) for p in rxn.product_entries]
-        data["elements"] = rxn.elements
         data["chemsys"] = rxn.chemical_system
-        data["compositions"] = rxn.compositions
-        data["coefficients"] = rxn.coefficients.tolist()
 
         d = {k: v for k, v in data.items() if v is not None}
 
@@ -254,22 +238,29 @@ class ComputedSynthesisRecipe(BaseModel):
         """
         Simple constructor for a Reaction model from a ComputedReaction object.
         """
+        chempot_distance = rxn.data.get("chempot_distance")
+        c_score = rxn.data.get("c_score")
         data: Dict[str, Any] = {}
 
         data["rxn"] = Reaction.from_computed_rxn(rxn)
         data["thermo"] = ReactionThermo(
-            energy_per_atom=rxn.energy_per_atom,
-            energy_uncertainty_per_atom=rxn.energy_uncertainty_per_atom,
+            energy_per_atom=round(rxn.energy_per_atom, 4),
+            uncertainty_per_atom=round(rxn.energy_uncertainty_per_atom, 5),
         )
         data["selectivity"] = ReactionSelectivity(
-            chempot_distance=rxn.data.get("chempot_distance"),
-            c_score=rxn.data.get("c_score"),
+            chempot_distance=round(chempot_distance)
+            if chempot_distance is not None
+            else None,
+            c_score=round(c_score) if c_score is not None else None,
             mu_func=mu_func,
         )
         data["heuristics"] = ReactionHeuristics(
             is_separable=rxn.is_separable(target),
-            fraction_experimental=sum([e.is_experimental for e in rxn.entries])
-            / len(rxn.entries),
+            fraction_experimental=round(
+                sum([getattr(e, "is_experimental", False) for e in rxn.entries])
+                / len(rxn.entries),
+                3,
+            ),
         )
         data["cost"] = cost
         data["byproducts"] = sorted(
@@ -309,4 +300,7 @@ class ComputedSynthesisRecipesDoc(BaseModel):
     )
     cost_function: CostFunction = Field(
         None, description="The cost function used to calculate the cost."
+    )
+    use_gridfs: bool = Field(
+        False, description="Whether or not GridFS was used to store recipes."
     )

@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 
 from maggma.builders import Builder
 from maggma.core import Store
+from maggma.stores import GridFSStore
 from maggma.utils import grouper
 from monty.json import MontyDecoder, jsanitize
 from pymatgen.core.composition import Composition
@@ -26,23 +27,28 @@ class SynthesisRecipeBuilder(Builder):
         tasks: Store,
         recipes: Store,
         cf: CostFunction,
-        tasks_fs: Optional[Store] = None,
+        tasks_fs: Optional[GridFSStore] = None,
+        recipes_fs: Optional[GridFSStore] = None,
         query: Optional[Dict] = None,
         **kwargs,
     ):
         self.tasks = tasks
         self.tasks_fs = tasks_fs
         self.recipes = recipes
+        self.recipes_fs = recipes_fs
         self.cf = cf
         self.query = query
         self.kwargs = kwargs
 
         sources = [tasks]
+        targets = [recipes]
 
         if tasks_fs:
             sources.append(tasks_fs)
+        if recipes_fs:
+            targets.append(recipes_fs)
 
-        super().__init__(sources=sources, targets=[recipes], **kwargs)
+        super().__init__(sources=sources, targets=targets, **kwargs)
 
     def ensure_indexes(self):
         """
@@ -55,6 +61,8 @@ class SynthesisRecipeBuilder(Builder):
 
         if self.tasks_fs:
             self.tasks_fs.ensure_index(self.tasks_fs.key)
+        if self.recipes_fs:
+            self.recipes_fs.ensure_index(self.recipes_fs.key)
 
     def prechunk(self, number_splits: int):
         """
@@ -154,12 +162,23 @@ class SynthesisRecipeBuilder(Builder):
 
     def update_targets(self, items):
         """
-        Inserts the new synthesis recipe docs into the Synthesis Recipes collection
+        Inserts the new synthesis recipe docs into the Synthesis Recipes collection.
+        Stores recipes in GridFS if a recipes GridFSStore is provided.
         """
         docs = list(filter(None, items))
 
         if len(docs) > 0:
             self.logger.info(f"Found {len(docs)} synthesis recipe docs to update")
+
+            if self.recipes_fs:
+                recipes = []
+                for d in docs:
+                    d["use_gridfs"] = True
+                    recipe = {"task_id": d["task_id"], "recipes": d.pop("recipes")}
+                    recipes.append(recipe)
+
+                self.recipes_fs.update(recipes, additional_metadata=["task_id"])
+
             self.recipes.update(docs)
         else:
             self.logger.info("No items to update")
@@ -171,6 +190,5 @@ class SynthesisRecipeBuilder(Builder):
         self.ensure_indexes()
 
         task_keys = set(self.tasks.distinct("task_id", criteria=self.query))
-        updated_tasks = set(self.recipes.newer_in(self.tasks))
-
+        updated_tasks = set(self.recipes.newer_in(self.tasks, exhaustive=True))
         return updated_tasks & task_keys
