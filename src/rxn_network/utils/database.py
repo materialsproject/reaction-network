@@ -49,7 +49,11 @@ class CalcDb(MSONable):
             d["last_updated"] = datetime.utcnow()
             if result is None:
                 if ("task_id" not in d) or (not d["task_id"]):
-                    d["task_id"] = max(self.db.distinct("task_id")) + 1
+                    all_task_ids = self.db.distinct("task_id")
+                    if len(all_task_ids) == 0:
+                        d["task_id"] = 1
+                    else:
+                        d["task_id"] = max(all_task_ids) + 1
                 logger.info(f"Inserting {d['dir_name']} with taskid = {d['task_id']}")
             elif update_duplicates:
                 d["task_id"] = result["task_id"]
