@@ -16,7 +16,7 @@ class EnumeratorTask(BaseModel):
     A single task object from the reaction enumerator workflow.
     """
 
-    task_id: str = Field(None, description="The task id")
+    task_id: int = Field(None, description="The task id")
     task_label: str = Field(None, description="The name of the task.")
     last_updated: Optional[datetime] = Field(None, description="The last updated time")
     dir_name: str = Field(None, description="The directory name")
@@ -71,7 +71,7 @@ class NetworkTask(BaseModel):
     A single task object from the reaction network workflow.
     """
 
-    task_id: str = Field(None, description="The task id")
+    task_id: int = Field(None, description="The task id")
     task_label: str = Field(None, description="The name of the task.")
     last_updated: Optional[datetime] = Field(None, description="The last updated time")
     dir_name: str = Field(None, description="The directory name")
@@ -286,7 +286,7 @@ class ComputedSynthesisRecipesDoc(BaseModel):
     Model for a document containing computed synthesis recipes for one material
     """
 
-    task_id: str = Field(None, description="Task ID")
+    task_id: int = Field(None, description="Task ID")
     task_label: str = Field(None, description="The name of the task document")
     last_updated: Optional[datetime] = Field(None, description="The last updated time")
     recipes: List[ComputedSynthesisRecipe] = Field(
