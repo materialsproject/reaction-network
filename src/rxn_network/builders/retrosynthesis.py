@@ -177,7 +177,9 @@ class SynthesisRecipeBuilder(Builder):
                     recipe = {"task_id": d["task_id"], "recipes": d.pop("recipes")}
                     recipes.append(recipe)
 
-                self.recipes_fs.update(recipes, additional_metadata=["task_id"])
+                self.recipes_fs.update(
+                    recipes, key="task_id", additional_metadata=["task_id"]
+                )
 
             self.recipes.update(docs)
         else:
