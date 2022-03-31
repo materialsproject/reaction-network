@@ -47,6 +47,7 @@ class BasicEnumerator(Enumerator):
         exclusive_targets: bool = False,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        calculate_e_above_hulls: bool = True,
         quiet: bool = False,
     ):
         """
@@ -86,6 +87,7 @@ class BasicEnumerator(Enumerator):
         self.exclusive_targets = exclusive_targets
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
+        self.calculate_e_above_hulls = calculate_e_above_hulls
         self.quiet = quiet
 
         self._stabilize = False
@@ -373,7 +375,10 @@ class BasicEnumerator(Enumerator):
             return new_ents
 
         precursors, targets = set(), set()
-        entries_new = GibbsEntrySet(deepcopy(entries), calculate_e_above_hulls=True)
+
+        entries_new = GibbsEntrySet(
+            deepcopy(entries), calculate_e_above_hulls=self.calculate_e_above_hulls
+        )
 
         if self.precursors:
             precursors = initialize_entries_list(self.precursors)
@@ -486,6 +491,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         exclusive_targets: bool = False,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        calculate_e_above_hulls: bool = False,
         quiet: bool = False,
     ):
         """

@@ -244,15 +244,14 @@ class PathwaySolver(Solver):
         ref_elems = {e for e in self.entries if e.is_element}
 
         if use_basic_enumerator:
-            be = BasicEnumerator(
-                targets=target_formulas,
-            )
+            be = BasicEnumerator(targets=target_formulas, calculate_e_above_hulls=False)
             rxns.extend(be.enumerate(intermediates))
 
             if self.open_elem:
                 boe = BasicOpenEnumerator(
                     open_phases=[Composition(str(self.open_elem)).reduced_formula],
                     targets=target_formulas,
+                    calculate_e_above_hulls=False,
                 )
 
                 rxns.extend(boe.enumerate(intermediates))
@@ -261,12 +260,17 @@ class PathwaySolver(Solver):
             ents = deepcopy(intermediates)
             ents = ents | ref_elems
 
-            mge = MinimizeGibbsEnumerator(targets=target_formulas)
+            mge = MinimizeGibbsEnumerator(
+                targets=target_formulas, calculate_e_above_hulls=False
+            )
             rxns.extend(mge.enumerate(ents))
 
             if self.open_elem:
                 mgpe = MinimizeGrandPotentialEnumerator(
-                    open_elem=self.open_elem, mu=self.chempot, targets=target_formulas
+                    open_elem=self.open_elem,
+                    mu=self.chempot,
+                    targets=target_formulas,
+                    calculate_e_above_hulls=False,
                 )
                 rxns.extend(mgpe.enumerate(ents))
 

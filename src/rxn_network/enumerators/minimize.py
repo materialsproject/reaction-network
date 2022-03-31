@@ -36,6 +36,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         calculators: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        calculate_e_above_hulls: bool = False,
         quiet: bool = False,
     ):
         """
@@ -58,6 +59,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             calculators=calculators,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
+            calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
         )
         self._build_pd = True
@@ -160,6 +162,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         calculators: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        calculate_e_above_hulls: bool = False,
         quiet: bool = False,
     ):
         """
@@ -185,6 +188,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             calculators=calculators,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
+            calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
         )
         self.open_elem = Element(open_elem)  # type: ignore
