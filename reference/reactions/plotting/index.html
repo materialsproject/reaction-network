@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/reactions/plotting/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.3">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.3">
     
     
       
@@ -1329,6 +1329,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#rxn_network.reactions.plotting.plot_reaction_scatter" class="md-nav__link">
+    plot_reaction_scatter()
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1540,6 +1547,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#rxn_network.reactions.plotting.plot_reaction_scatter" class="md-nav__link">
+    plot_reaction_scatter()
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1621,7 +1635,7 @@
   </thead>
   <tbody>
     <tr>
-      <td><code>&lt;function scatter at 0x7f6e6e52aee0&gt;</code></td>
+      <td><code>&lt;function scatter at 0x7f1730b2e9d0&gt;</code></td>
       <td><p>Plotly scatter plot</p></td>
     </tr>
   </tbody>
@@ -1657,6 +1671,111 @@
         <span class="n">template</span><span class="o">=</span><span class="s2">&quot;simple_white&quot;</span><span class="p">,</span>
         <span class="n">color</span><span class="o">=</span><span class="s2">&quot;added_elems&quot;</span><span class="p">,</span>
         <span class="n">color_discrete_sequence</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;darkorange&quot;</span><span class="p">,</span> <span class="s2">&quot;gray&quot;</span><span class="p">],</span>
+        <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span>
+        <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;%</span><span class="si">{hovertext}</span><span class="s2">&lt;/b&gt;&lt;br&gt;&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;&lt;br&gt;&lt;b&gt;energy&lt;/b&gt;: %</span><span class="si">{x:.3f}</span><span class="s2"> (eV/atom)&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;&lt;br&gt;&lt;b&gt;distance&lt;/b&gt;: %</span><span class="si">{y:.3f}</span><span class="s2"> (eV/atom)&lt;br&gt;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="rxn_network.reactions.plotting.plot_reaction_scatter" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">plot_reaction_scatter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;energy&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;chempot_distance&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;has_added_elems&#39;</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Plot a Plotly scatter plot of chemical potential distance vs energy.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>df</code></td>
+        <td><code>DataFrame</code></td>
+        <td><p>DataFrame with columns: rxn, energy, distance, added_elems</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>&lt;function scatter at 0x7f1730b2e9d0&gt;</code></td>
+      <td><p>Plotly scatter plot</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/reactions/plotting.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">plot_reaction_scatter</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;chempot_distance&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;has_added_elems&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot a Plotly scatter plot of chemical potential distance vs energy.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: DataFrame with columns: rxn, energy, distance, added_elems</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Plotly scatter plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_label</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;energy&quot;</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$\Delta G_{\mathrm</span><span class="si">{rxn}</span><span class="s2">} ~ \mathrm{\left(\dfrac{\mathsf</span><span class="si">{eV}</span><span class="s2">}{\mathsf</span><span class="si">{atom}</span><span class="s2">}\right)}$&quot;</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;chempot_distance&quot;</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$\Sigma \Delta \mu_{\mathrm</span><span class="si">{min}</span><span class="s2">} ~ \mathrm{\left(\dfrac{\mathsf</span><span class="si">{eV}</span><span class="s2">}{\mathsf</span><span class="si">{atom}</span><span class="s2">}\right)}$&quot;</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;c_score&quot;</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Competitiveness Score&quot;</span>
+        <span class="k">return</span> <span class="n">label</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;has_added_elems&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;added_elems&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+        <span class="n">hover_name</span><span class="o">=</span><span class="s2">&quot;rxn&quot;</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">get_label</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]},</span>
+        <span class="n">template</span><span class="o">=</span><span class="s2">&quot;simple_white&quot;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+        <span class="n">color_discrete_map</span><span class="o">=</span><span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="s2">&quot;darkorange&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="s2">&quot;gray&quot;</span><span class="p">},</span>
         <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1758,7 +1877,7 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
       <script src="../../../assets/javascripts/bundle.b88e97c5.min.js"></script>

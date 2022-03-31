@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/firetasks/parse_outputs/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.3">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.3">
     
     
       
@@ -953,6 +953,26 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#rxn_network.firetasks.parse_outputs.ChangeDir" class="md-nav__link">
+    ChangeDir
+  </a>
+  
+    <nav class="md-nav" aria-label="ChangeDir">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.firetasks.parse_outputs.ChangeDir.run_task" class="md-nav__link">
+    run_task()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#rxn_network.firetasks.parse_outputs.NetworkToDb" class="md-nav__link">
     NetworkToDb
   </a>
@@ -1567,6 +1587,26 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#rxn_network.firetasks.parse_outputs.ChangeDir" class="md-nav__link">
+    ChangeDir
+  </a>
+  
+    <nav class="md-nav" aria-label="ChangeDir">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.firetasks.parse_outputs.ChangeDir.run_task" class="md-nav__link">
+    run_task()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#rxn_network.firetasks.parse_outputs.NetworkToDb" class="md-nav__link">
     NetworkToDb
   </a>
@@ -1641,6 +1681,148 @@
 
 
 
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.firetasks.parse_outputs.ChangeDir" class="doc doc-heading">
+        <code>
+ChangeDir            (<span title="fireworks.core.firework.FiretaskBase">FiretaskBase</span>)
+        </code>
+
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>FireTask to create new folder with the option of changing directory to the new folder.</p>
+<p>Required params:
+    folder_name (str): folder name.</p>
+<p>Optional params:
+    change_dir(bool): change working dir to new folder after creation.
+        Defaults to False.
+    relative_path (bool): whether folder name is relative or absolute.
+        Defaults to True.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/firetasks/parse_outputs.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@explicit_serialize</span>
+<span class="k">class</span> <span class="nc">ChangeDir</span><span class="p">(</span><span class="n">FiretaskBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FireTask to create new folder with the option of changing directory to the new folder.</span>
+
+<span class="sd">    Required params:</span>
+<span class="sd">        folder_name (str): folder name.</span>
+
+<span class="sd">    Optional params:</span>
+<span class="sd">        change_dir(bool): change working dir to new folder after creation.</span>
+<span class="sd">            Defaults to False.</span>
+<span class="sd">        relative_path (bool): whether folder name is relative or absolute.</span>
+<span class="sd">            Defaults to True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">required_params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;folder_name&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;folder_name&quot;</span><span class="p">])</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.firetasks.parse_outputs.ChangeDir.run_task" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>This method gets called when the Firetask is run. It can take in a
+Firework spec, perform some task using that data, and then return an
+output in the form of a FWAction.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>fw_spec</code></td>
+        <td><code>dict</code></td>
+        <td><p>A Firework spec. This comes from the master spec.
+In addition, this spec contains a special "_fw_env" key that
+contains the env settings of the FWorker calling this method.
+This provides for abstracting out certain commands or
+settings. For example, "foo" may be named "foo1" in resource
+1 and "foo2" in resource 2. The FWorker env can specify {
+"foo": "foo1"}, which maps an abstract variable "foo" to the
+relevant "foo1" or "foo2". You can then write a task that
+uses fw_spec["_fw_env"][&quot;foo&quot;] that will work across all
+these multiple resources.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td><p>(FWAction)</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/firetasks/parse_outputs.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;folder_name&quot;</span><span class="p">])</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
 
 
 
@@ -1866,7 +2048,9 @@ ReactionsToDb            (<span title="fireworks.core.firework.FiretaskBase">Fir
     rxns (Iterable[Reaction]): Optional list of reactions to store. Otherwise, looks
         for rxns.json.gz file in current folder.
     metadata (dict): Optional metadata to store with the ReactionSet.
-    db_file (str): Optional path to CalcDb file.</p>
+    db_file (str): Optional path to CalcDb file.
+    use_gridfs (bool): Whether or not to store the reactions in GridFS. Defaults to
+        True if not supplied.</p>
 
         <details class="quote">
           <summary>Source code in <code>rxn_network/firetasks/parse_outputs.py</code></summary>
@@ -1883,30 +2067,38 @@ ReactionsToDb            (<span title="fireworks.core.firework.FiretaskBase">Fir
 <span class="sd">            for rxns.json.gz file in current folder.</span>
 <span class="sd">        metadata (dict): Optional metadata to store with the ReactionSet.</span>
 <span class="sd">        db_file (str): Optional path to CalcDb file.</span>
+<span class="sd">        use_gridfs (bool): Whether or not to store the reactions in GridFS. Defaults to</span>
+<span class="sd">            True if not supplied.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">required_params</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">optional_params</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rxns&quot;</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="s2">&quot;db_file&quot;</span><span class="p">]</span>
+    <span class="n">optional_params</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;rxns&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;metadata&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;db_file&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;use_gridfs&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">):</span>
-        <span class="n">dir_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+        <span class="n">rxns</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;rxns&quot;</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span>
         <span class="n">db_file</span> <span class="o">=</span> <span class="n">env_chk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db_file&quot;</span><span class="p">),</span> <span class="n">fw_spec</span><span class="p">)</span>
+        <span class="n">use_gridfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_gridfs&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
         <span class="n">db</span> <span class="o">=</span> <span class="n">CalcDb</span><span class="p">(</span><span class="n">db_file</span><span class="p">)</span>
 
-        <span class="n">rxns</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;rxns&quot;</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">])</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">EnumeratorTask</span><span class="o">.</span><span class="n">from_rxns_and_metadata</span><span class="p">(</span><span class="n">rxns</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">jsanitize</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">dict</span><span class="p">(),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_bson</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dir_name</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Reaction Enumeration (Targets: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;targets&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;chemsys&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;rxns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxns</span>
+        <span class="k">if</span> <span class="n">use_gridfs</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;rxns&quot;</span><span class="p">]</span>  <span class="c1"># remove rxns from doc to store later in GridFS</span>
 
-        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-        <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">use_gridfs</span><span class="p">:</span>
+            <span class="n">d_fs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">&quot;rxns&quot;</span><span class="p">:</span> <span class="n">rxns</span><span class="p">}</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_gridfs</span><span class="p">(</span><span class="n">d_fs</span><span class="p">,</span> <span class="n">metadata_keys</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">])</span>
 </code></pre></div>
         </details>
 
@@ -1986,23 +2178,24 @@ these multiple resources.</p></td>
         <details class="quote">
           <summary>Source code in <code>rxn_network/firetasks/parse_outputs.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">):</span>
-    <span class="n">dir_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+    <span class="n">rxns</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;rxns&quot;</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span>
     <span class="n">db_file</span> <span class="o">=</span> <span class="n">env_chk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db_file&quot;</span><span class="p">),</span> <span class="n">fw_spec</span><span class="p">)</span>
+    <span class="n">use_gridfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_gridfs&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
     <span class="n">db</span> <span class="o">=</span> <span class="n">CalcDb</span><span class="p">(</span><span class="n">db_file</span><span class="p">)</span>
 
-    <span class="n">rxns</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;rxns&quot;</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">)</span>
-    <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="n">fw_spec</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">])</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">EnumeratorTask</span><span class="o">.</span><span class="n">from_rxns_and_metadata</span><span class="p">(</span><span class="n">rxns</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">jsanitize</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">dict</span><span class="p">(),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_bson</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dir_name</span>
-    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;Reaction Enumeration (Targets: &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;targets&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;chemsys&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span>
-    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;rxns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxns</span>
+    <span class="k">if</span> <span class="n">use_gridfs</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;rxns&quot;</span><span class="p">]</span>  <span class="c1"># remove rxns from doc to store later in GridFS</span>
 
-    <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-    <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">task_id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">use_gridfs</span><span class="p">:</span>
+        <span class="n">d_fs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">&quot;rxns&quot;</span><span class="p">:</span> <span class="n">rxns</span><span class="p">}</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">insert_gridfs</span><span class="p">(</span><span class="n">d_fs</span><span class="p">,</span> <span class="n">metadata_keys</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">])</span>
 </code></pre></div>
         </details>
     </div>
@@ -2104,7 +2297,7 @@ these multiple resources.</p></td>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
       <script src="../../../assets/javascripts/bundle.b88e97c5.min.js"></script>

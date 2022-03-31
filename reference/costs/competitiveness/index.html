@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/costs/competitiveness/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.3">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.3">
     
     
       
@@ -710,6 +710,20 @@
           <li class="md-nav__item">
   <a href="#rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.calculate" class="md-nav__link">
     calculate()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.calculate_many" class="md-nav__link">
+    calculate_many()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.decorate_many" class="md-nav__link">
+    decorate_many()
   </a>
   
 </li>
@@ -1597,6 +1611,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.calculate_many" class="md-nav__link">
+    calculate_many()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.decorate_many" class="md-nav__link">
+    decorate_many()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.get_competing_rxns" class="md-nav__link">
     get_competing_rxns()
   </a>
@@ -1744,6 +1772,53 @@ your own risk.</p>
         <span class="n">c_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_c_score</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">competing_costs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">c_score</span>
+
+    <span class="k">def</span> <span class="nf">calculate_many</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the competitiveness score for a list of reactions by enumerating</span>
+<span class="sd">        competing reactions, evaluating their cost with the supplied cost function, and</span>
+<span class="sd">        then using the c-score formula, i.e. the _get_c_score() method, to determine the</span>
+<span class="sd">        competitiveness score. Parallelized with ray.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rxns: the list of ComputedReaction objects to be evaluated</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The list of competitiveness scores</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">initialize_ray</span><span class="p">()</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">costs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_calculate_ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">rxn</span><span class="p">)</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">]</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">to_iterator</span><span class="p">(</span><span class="n">costs</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">costs</span><span class="p">))</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">def</span> <span class="nf">decorate_many</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decorates a list of reactions with the competitiveness score. Parallelized with</span>
+<span class="sd">        ray.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rxns: the list of ComputedReaction objects to be decorated</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The list of decorated ComputedReaction objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">new_rxns</span> <span class="o">=</span> <span class="p">[</span><span class="n">_decorate_ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">rxn</span><span class="p">)</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">]</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">to_iterator</span><span class="p">(</span><span class="n">new_rxns</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">new_rxns</span><span class="p">))</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span>
 
     <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_competing_rxns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">]:</span>
@@ -2061,6 +2136,171 @@ competitiveness score.</p>
 
 
 
+<h3 id="rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.calculate_many" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">calculate_many</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxns</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Calculates the competitiveness score for a list of reactions by enumerating
+competing reactions, evaluating their cost with the supplied cost function, and
+then using the c-score formula, i.e. the _get_c_score() method, to determine the
+competitiveness score. Parallelized with ray.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>rxns</code></td>
+        <td><code>List[rxn_network.reactions.computed.ComputedReaction]</code></td>
+        <td><p>the list of ComputedReaction objects to be evaluated</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>List[float]</code></td>
+      <td><p>The list of competitiveness scores</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/costs/competitiveness.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_many</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the competitiveness score for a list of reactions by enumerating</span>
+<span class="sd">    competing reactions, evaluating their cost with the supplied cost function, and</span>
+<span class="sd">    then using the c-score formula, i.e. the _get_c_score() method, to determine the</span>
+<span class="sd">    competitiveness score. Parallelized with ray.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rxns: the list of ComputedReaction objects to be evaluated</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The list of competitiveness scores</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">initialize_ray</span><span class="p">()</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="n">costs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_calculate_ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">rxn</span><span class="p">)</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">]</span>
+    <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">to_iterator</span><span class="p">(</span><span class="n">costs</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">costs</span><span class="p">))</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.decorate_many" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">decorate_many</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxns</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Decorates a list of reactions with the competitiveness score. Parallelized with
+ray.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>rxns</code></td>
+        <td><code>List[rxn_network.reactions.computed.ComputedReaction]</code></td>
+        <td><p>the list of ComputedReaction objects to be decorated</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>List[rxn_network.reactions.computed.ComputedReaction]</code></td>
+      <td><p>The list of decorated ComputedReaction objects</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/costs/competitiveness.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">decorate_many</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorates a list of reactions with the competitiveness score. Parallelized with</span>
+<span class="sd">    ray.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rxns: the list of ComputedReaction objects to be decorated</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The list of decorated ComputedReaction objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="n">new_rxns</span> <span class="o">=</span> <span class="p">[</span><span class="n">_decorate_ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">rxn</span><span class="p">)</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">]</span>
+    <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">to_iterator</span><span class="p">(</span><span class="n">new_rxns</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">new_rxns</span><span class="p">))</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h3 id="rxn_network.costs.competitiveness.CompetitivenessScoreCalculator.get_competing_rxns" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">get_competing_rxns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn</span><span class="p">)</span></code>
 
@@ -2275,7 +2515,7 @@ enumerated given the settings in the constructor.</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
       <script src="../../../assets/javascripts/bundle.b88e97c5.min.js"></script>

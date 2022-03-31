@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/enumerators/basic/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.3">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.3">
     
     
       
@@ -1728,6 +1728,7 @@ to consider open entries.</p>
 
 
 
+
   <div class="doc doc-object doc-class">
 
 
@@ -1770,6 +1771,7 @@ products may not be stable with respect to each other.</p>
         <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">remove_unbalanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">remove_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">calculate_e_above_hulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1809,6 +1811,7 @@ products may not be stable with respect to each other.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">exclusive_targets</span> <span class="o">=</span> <span class="n">exclusive_targets</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_unbalanced</span> <span class="o">=</span> <span class="n">remove_unbalanced</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_changed</span> <span class="o">=</span> <span class="n">remove_changed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calculate_e_above_hulls</span> <span class="o">=</span> <span class="n">calculate_e_above_hulls</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">quiet</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_stabilize</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1823,7 +1826,7 @@ products may not be stable with respect to each other.</p>
 <span class="sd">        was initialized with specified precursors or target, the reactions will be</span>
 <span class="sd">        filtered by these constraints. Every enumerator follows a standard procedure:</span>
 
-<span class="sd">        1. Initialize entries, i.e. ensure that precursors and target are considered</span>
+<span class="sd">        1. Initialize entries, i.e., ensure that precursors and target are considered</span>
 <span class="sd">        stable entries within the entry set. If using ChempotDistanceCalculator,</span>
 <span class="sd">        ensure that entries are filtered by stability.</span>
 
@@ -1842,37 +1845,65 @@ products may not be stable with respect to each other.</p>
 <span class="sd">        Args:</span>
 <span class="sd">            entries: the set of all entries to enumerate from</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">open_entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_initialized_entries</span><span class="p">(</span>
             <span class="n">entries</span>
         <span class="p">)</span>
 
         <span class="n">combos_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_combos_dict</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">)</span>
         <span class="n">open_combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_open_combos</span><span class="p">(</span><span class="n">open_entries</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">open_combos</span><span class="p">:</span>
+            <span class="n">open_combos</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
-            <span class="n">combos_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quiet</span>
-        <span class="p">)</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">combos_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>  <span class="c1"># sorted for better parallelization</span>
 
-        <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">chemsys</span><span class="p">,</span> <span class="n">combos</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">:</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">elems</span> <span class="o">=</span> <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
-            <span class="n">filtered_entries</span> <span class="o">=</span> <span class="n">entries</span><span class="o">.</span><span class="n">get_subset_in_chemsys</span><span class="p">(</span><span class="n">elems</span><span class="p">)</span>
-            <span class="n">calculators</span> <span class="o">=</span> <span class="n">initialize_calculators</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="p">)</span>
+        <span class="n">parallel</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">median_comp_size</span> <span class="o">=</span> <span class="n">median</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">combos_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
 
-            <span class="n">rxn_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_iterable</span><span class="p">(</span><span class="n">combos</span><span class="p">,</span> <span class="n">open_combos</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">median_comp_size</span> <span class="o">&gt;</span> <span class="n">PARALLEL_THRESHOLD</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">combos_dict</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">parallel</span> <span class="o">=</span> <span class="kc">True</span>
 
-            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns</span><span class="p">(</span>
-                <span class="n">rxn_iter</span><span class="p">,</span>
-                <span class="n">precursors</span><span class="p">,</span>
-                <span class="n">targets</span><span class="p">,</span>
-                <span class="n">calculators</span><span class="p">,</span>
-                <span class="n">filtered_entries</span><span class="p">,</span>
-                <span class="n">open_entries</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">rxns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+            <span class="n">initialize_ray</span><span class="p">()</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">open_combos</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">open_combos</span><span class="p">)</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+            <span class="n">open_entries</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">open_entries</span><span class="p">)</span>
+            <span class="n">precursors</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">precursors</span><span class="p">)</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rxns</span><span class="p">))</span>
+            <span class="n">rxns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">_get_rxns_from_chemsys_ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
+                    <span class="n">obj</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">open_combos</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">iterator</span> <span class="o">=</span> <span class="n">items</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+                <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                <span class="n">rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns_in_chemsys</span><span class="p">(</span>
+                        <span class="n">item</span><span class="p">,</span> <span class="n">open_combos</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">rxns</span>
+
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">iterator</span> <span class="o">=</span> <span class="n">to_iterator</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+                <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">iterator</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">rxns</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">estimate_max_num_reactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1919,7 +1950,35 @@ products may not be stable with respect to each other.</p>
         <span class="n">_</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">)</span>  <span class="c1"># unused_arguments</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_get_rxns</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">_get_rxns_in_chemsys</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">,</span>
+        <span class="n">open_combos</span><span class="p">,</span>
+        <span class="n">entries</span><span class="p">,</span>
+        <span class="n">open_entries</span><span class="p">,</span>
+        <span class="n">precursors</span><span class="p">,</span>
+        <span class="n">targets</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">chemsys</span><span class="p">,</span> <span class="n">combos</span> <span class="o">=</span> <span class="n">item</span>
+
+        <span class="n">elems</span> <span class="o">=</span> <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        <span class="n">filtered_entries</span> <span class="o">=</span> <span class="n">entries</span><span class="o">.</span><span class="n">get_subset_in_chemsys</span><span class="p">(</span><span class="n">elems</span><span class="p">)</span>
+        <span class="n">calculators</span> <span class="o">=</span> <span class="n">initialize_calculators</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="p">)</span>
+
+        <span class="n">rxn_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_iterable</span><span class="p">(</span><span class="n">combos</span><span class="p">,</span> <span class="n">open_combos</span><span class="p">)</span>
+
+        <span class="n">rxns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns_from_iterable</span><span class="p">(</span>
+            <span class="n">rxn_iter</span><span class="p">,</span>
+            <span class="n">precursors</span><span class="p">,</span>
+            <span class="n">targets</span><span class="p">,</span>
+            <span class="n">calculators</span><span class="p">,</span>
+            <span class="n">filtered_entries</span><span class="p">,</span>
+            <span class="n">open_entries</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">rxns</span>
+
+    <span class="k">def</span> <span class="nf">_get_rxns_from_iterable</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">rxn_iterable</span><span class="p">,</span>
         <span class="n">precursors</span><span class="p">,</span>
@@ -2040,7 +2099,10 @@ products may not be stable with respect to each other.</p>
             <span class="k">return</span> <span class="n">new_ents</span>
 
         <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(),</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">entries_new</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">entries</span><span class="p">),</span> <span class="n">calculate_e_above_hulls</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">entries_new</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="p">(</span>
+            <span class="n">deepcopy</span><span class="p">(</span><span class="n">entries</span><span class="p">),</span> <span class="n">calculate_e_above_hulls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">calculate_e_above_hulls</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>
             <span class="n">precursors</span> <span class="o">=</span> <span class="n">initialize_entries_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">)</span>
@@ -2223,7 +2285,7 @@ useful for some analyses)</p>
 
 
 <h3 id="rxn_network.enumerators.basic.BasicEnumerator.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_unbalanced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_unbalanced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calculate_e_above_hulls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -2325,6 +2387,7 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
     <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">remove_unbalanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">remove_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">calculate_e_above_hulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -2364,6 +2427,7 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
     <span class="bp">self</span><span class="o">.</span><span class="n">exclusive_targets</span> <span class="o">=</span> <span class="n">exclusive_targets</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">remove_unbalanced</span> <span class="o">=</span> <span class="n">remove_unbalanced</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">remove_changed</span> <span class="o">=</span> <span class="n">remove_changed</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">calculate_e_above_hulls</span> <span class="o">=</span> <span class="n">calculate_e_above_hulls</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">quiet</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_stabilize</span> <span class="o">=</span> <span class="kc">False</span>
@@ -2396,7 +2460,7 @@ was initialized with specified precursors or target, the reactions will be
 filtered by these constraints. Every enumerator follows a standard procedure:</p>
 <ol>
 <li>
-<p>Initialize entries, i.e. ensure that precursors and target are considered
+<p>Initialize entries, i.e., ensure that precursors and target are considered
 stable entries within the entry set. If using ChempotDistanceCalculator,
 ensure that entries are filtered by stability.</p>
 </li>
@@ -2445,7 +2509,7 @@ thermodynamically predicted reactions for given reactants.</p>
 <span class="sd">    was initialized with specified precursors or target, the reactions will be</span>
 <span class="sd">    filtered by these constraints. Every enumerator follows a standard procedure:</span>
 
-<span class="sd">    1. Initialize entries, i.e. ensure that precursors and target are considered</span>
+<span class="sd">    1. Initialize entries, i.e., ensure that precursors and target are considered</span>
 <span class="sd">    stable entries within the entry set. If using ChempotDistanceCalculator,</span>
 <span class="sd">    ensure that entries are filtered by stability.</span>
 
@@ -2464,37 +2528,65 @@ thermodynamically predicted reactions for given reactants.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        entries: the set of all entries to enumerate from</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">open_entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_initialized_entries</span><span class="p">(</span>
         <span class="n">entries</span>
     <span class="p">)</span>
 
     <span class="n">combos_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_combos_dict</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">)</span>
     <span class="n">open_combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_open_combos</span><span class="p">(</span><span class="n">open_entries</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">open_combos</span><span class="p">:</span>
+        <span class="n">open_combos</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
-        <span class="n">combos_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quiet</span>
-    <span class="p">)</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="n">combos_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>  <span class="c1"># sorted for better parallelization</span>
 
-    <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">chemsys</span><span class="p">,</span> <span class="n">combos</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">:</span>
-        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">elems</span> <span class="o">=</span> <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
-        <span class="n">filtered_entries</span> <span class="o">=</span> <span class="n">entries</span><span class="o">.</span><span class="n">get_subset_in_chemsys</span><span class="p">(</span><span class="n">elems</span><span class="p">)</span>
-        <span class="n">calculators</span> <span class="o">=</span> <span class="n">initialize_calculators</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="p">)</span>
+    <span class="n">parallel</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">median_comp_size</span> <span class="o">=</span> <span class="n">median</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">combos_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
 
-        <span class="n">rxn_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_iterable</span><span class="p">(</span><span class="n">combos</span><span class="p">,</span> <span class="n">open_combos</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">median_comp_size</span> <span class="o">&gt;</span> <span class="n">PARALLEL_THRESHOLD</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">combos_dict</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">parallel</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns</span><span class="p">(</span>
-            <span class="n">rxn_iter</span><span class="p">,</span>
-            <span class="n">precursors</span><span class="p">,</span>
-            <span class="n">targets</span><span class="p">,</span>
-            <span class="n">calculators</span><span class="p">,</span>
-            <span class="n">filtered_entries</span><span class="p">,</span>
-            <span class="n">open_entries</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">rxns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">initialize_ray</span><span class="p">()</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">open_combos</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">open_combos</span><span class="p">)</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+        <span class="n">open_entries</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">open_entries</span><span class="p">)</span>
+        <span class="n">precursors</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">precursors</span><span class="p">)</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rxns</span><span class="p">))</span>
+        <span class="n">rxns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">_get_rxns_from_chemsys_ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
+                <span class="n">obj</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">open_combos</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">items</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+            <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="n">rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns_in_chemsys</span><span class="p">(</span>
+                    <span class="n">item</span><span class="p">,</span> <span class="n">open_combos</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">open_entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">iterator</span> <span class="o">=</span> <span class="n">rxns</span>
+
+    <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">to_iterator</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+            <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">iterator</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">rxns</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
 </code></pre></div>
         </details>
     </div>
@@ -2610,6 +2702,7 @@ the ReactionSet class).</p>
         <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">remove_unbalanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">remove_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">calculate_e_above_hulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2712,7 +2805,7 @@ the ReactionSet class).</p>
 
 
 <h3 id="rxn_network.enumerators.basic.BasicOpenEnumerator.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_phases</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_unbalanced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_phases</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_unbalanced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calculate_e_above_hulls</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -2820,6 +2913,7 @@ removing a reactant/product or having it change sides. Defaults to True.</p></td
     <span class="n">exclusive_targets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">remove_unbalanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">remove_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">calculate_e_above_hulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -3026,7 +3120,7 @@ correlate with the amount of time it takes to enumerate reactions.</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
       <script src="../../../assets/javascripts/bundle.b88e97c5.min.js"></script>

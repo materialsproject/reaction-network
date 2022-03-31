@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/thermo/chempot_diagram/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.3">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.3">
     
     
       
@@ -1392,13 +1392,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.domains" class="md-nav__link">
-    domains
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.hs_int" class="md-nav__link">
     hs_int
   </a>
@@ -1583,13 +1576,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.domains" class="md-nav__link">
-    domains
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.hs_int" class="md-nav__link">
     hs_int
   </a>
@@ -1692,7 +1678,7 @@ calculating the shortest distance between two chemical potential domains.</p>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">entries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PDEntry</span><span class="p">],</span>
         <span class="n">limits</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Element</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">default_min_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">default_min_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.0</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a ChemicalPotentialDiagram object.</span>
@@ -1744,6 +1730,7 @@ calculating the shortest distance between two chemical potential domains.</p>
 
         <span class="n">num_hyperplanes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyperplanes</span><span class="p">)</span>
         <span class="n">num_border_hyperplanes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplanes</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplane_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
             <span class="nb">range</span><span class="p">(</span><span class="n">num_hyperplanes</span><span class="p">,</span> <span class="n">num_hyperplanes</span> <span class="o">+</span> <span class="n">num_border_hyperplanes</span><span class="p">)</span>
         <span class="p">)</span>
@@ -1792,8 +1779,6 @@ calculating the shortest distance between two chemical potential domains.</p>
         <span class="p">):</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">facet</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplane_indices</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplane_indices</span><span class="p">):</span>
-                        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplane_indices</span><span class="p">)</span>
                     <span class="n">this_entry</span> <span class="o">=</span> <span class="n">entries</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
                     <span class="n">formula</span> <span class="o">=</span> <span class="n">this_entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span>
                     <span class="n">domains</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span>
@@ -1823,25 +1808,6 @@ calculating the shortest distance between two chemical potential domains.</p>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hs_int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the scipy HalfSpaceIntersection object&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_int</span>
-
-    <span class="nd">@cached_property</span>
-    <span class="k">def</span> <span class="nf">domains</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Mapping of formulas to array of domain boundary points. Cached for speed.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_domains</span><span class="p">()</span>
-
-    <span class="nd">@cached_property</span>
-    <span class="k">def</span> <span class="nf">metastable_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Gets a dictionary of the chemical potential domains for metastable chemical</span>
-<span class="sd">        formulas. This corresponds to the domains of the relevant phases if they were</span>
-<span class="sd">        just barely stable&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_metastable_domains</span><span class="p">()</span>
-
     <span class="k">def</span> <span class="nf">_get_metastable_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">e_set</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
         <span class="n">e_dict</span> <span class="o">=</span> <span class="n">e_set</span><span class="o">.</span><span class="n">min_entries_by_formula</span>
@@ -1853,16 +1819,34 @@ calculating the shortest distance between two chemical potential domains.</p>
 
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">metastable_entries</span><span class="p">:</span>
             <span class="n">formula</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span>
-            <span class="n">new_entry</span> <span class="o">=</span> <span class="n">e_set</span><span class="o">.</span><span class="n">get_stabilized_entry</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="n">cpd</span> <span class="o">=</span> <span class="n">ChemicalPotentialDiagram</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">e_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">new_entry</span><span class="p">])</span>
+            <span class="n">new_entry</span> <span class="o">=</span> <span class="n">e_set</span><span class="o">.</span><span class="n">get_stabilized_entry</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">)</span>
+            <span class="n">e_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
+            <span class="n">cpd</span> <span class="o">=</span> <span class="n">ChemicalPotentialDiagram</span><span class="p">(</span><span class="n">e_set</span><span class="p">,</span> <span class="n">default_min_limit</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">metastable_domains</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpd</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span>
-                <span class="k">continue</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Metastable domain for </span><span class="si">{</span><span class="n">formula</span><span class="si">}</span><span class="s2"> not found! Please investigate.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">e_set</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">metastable_domains</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hs_int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the scipy HalfSpaceIntersection object&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_int</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span> <span class="nf">metastable_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a dictionary of the chemical potential domains for metastable chemical</span>
+<span class="sd">        formulas. This corresponds to the domains of the relevant phases if they were</span>
+<span class="sd">        just barely stable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_metastable_domains</span><span class="p">()</span>
 </code></pre></div>
         </details>
 
@@ -1872,30 +1856,6 @@ calculating the shortest distance between two chemical potential domains.</p>
 
 
 
-
-
-
-  <div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.domains" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">domains</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-cached"><code>cached</code></small>
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-      <p>Mapping of formulas to array of domain boundary points. Cached for speed.</p>
-    </div>
-
-  </div>
 
 
 
@@ -1956,7 +1916,7 @@ just barely stable</p>
 
 
 <h3 id="rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_min_limit</span><span class="o">=-</span><span class="mf">20.0</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_min_limit</span><span class="o">=-</span><span class="mf">100.0</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -2005,7 +1965,7 @@ default_min_limit argument</p></td>
         <td><p>Default minimum chemical potential limit for
 unspecified elements within the "limits" argument. This results in
 default limits of (default_min_limit, 0)</p></td>
-        <td><code>-20.0</code></td>
+        <td><code>-100.0</code></td>
       </tr>
   </tbody>
 </table>
@@ -2015,7 +1975,7 @@ default limits of (default_min_limit, 0)</p></td>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">entries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PDEntry</span><span class="p">],</span>
     <span class="n">limits</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Element</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">default_min_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">20.0</span><span class="p">,</span>
+    <span class="n">default_min_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.0</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize a ChemicalPotentialDiagram object.</span>
@@ -2067,6 +2027,7 @@ default limits of (default_min_limit, 0)</p></td>
 
     <span class="n">num_hyperplanes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyperplanes</span><span class="p">)</span>
     <span class="n">num_border_hyperplanes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplanes</span><span class="p">)</span>
+
     <span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplane_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
         <span class="nb">range</span><span class="p">(</span><span class="n">num_hyperplanes</span><span class="p">,</span> <span class="n">num_hyperplanes</span> <span class="o">+</span> <span class="n">num_border_hyperplanes</span><span class="p">)</span>
     <span class="p">)</span>
@@ -2263,7 +2224,7 @@ default limits of (default_min_limit, 0)</p></td>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "search": "../../../assets/javascripts/workers/search.bd0b6b67.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
       <script src="../../../assets/javascripts/bundle.b88e97c5.min.js"></script>
