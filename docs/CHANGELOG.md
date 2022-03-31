@@ -1,5 +1,26 @@
 # Changelog
 
+## [v6.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.0.0) (2022-03-31)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v5.0.0...v6.0.0)
+
+## [v5.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v5.0.0) (2022-03-31)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.3.0...v5.0.0)
+
+**Fixed bugs:**
+
+- `ChemicalPotentialDiagram.metastable_domains` occasionally does not work for some systems, particularly with large \# elements [\#91](https://github.com/GENESIS-EFRC/reaction-network/issues/91)
+
+**Closed issues:**
+
+- Setup Issue \(setuptools-scm was unable to detect version for\) [\#105](https://github.com/GENESIS-EFRC/reaction-network/issues/105)
+
+**Merged pull requests:**
+
+- Add support for multiprocessing via ray, add builders and pydantic models, bug fixes [\#106](https://github.com/GENESIS-EFRC/reaction-network/pull/106) ([mattmcdermott](https://github.com/mattmcdermott))
+- Fix broken metastable\_domains in chemical potential diagram [\#102](https://github.com/GENESIS-EFRC/reaction-network/pull/102) ([mattmcdermott](https://github.com/mattmcdermott))
+
 ## [v4.3.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v4.3.0) (2022-03-02)
 
 [Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.2.0...v4.3.0)
