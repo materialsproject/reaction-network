@@ -5,9 +5,11 @@ import os
 from typing import List
 
 from fireworks import FiretaskBase, explicit_serialize
+from monty.json import jsanitize
 
 from rxn_network.firetasks.utils import env_chk, get_logger, load_json
 from rxn_network.utils.database import CalcDb
+from rxn_network.utils.models import EnumeratorTask
 
 logger = get_logger(__name__)
 
@@ -25,30 +27,38 @@ class ReactionsToDb(FiretaskBase):
             for rxns.json.gz file in current folder.
         metadata (dict): Optional metadata to store with the ReactionSet.
         db_file (str): Optional path to CalcDb file.
+        use_gridfs (bool): Whether or not to store the reactions in GridFS. Defaults to
+            True if not supplied.
 
     """
 
     required_params: List[str] = []
-    optional_params: List[str] = ["rxns", "metadata", "db_file"]
+    optional_params: List[str] = [
+        "rxns",
+        "metadata",
+        "db_file",
+        "use_gridfs",
+    ]
 
     def run_task(self, fw_spec):
-        dir_name = os.path.abspath(os.getcwd())
+        rxns = load_json(self, "rxns", fw_spec)
+        metadata = load_json(self, "metadata", fw_spec)
         db_file = env_chk(self.get("db_file"), fw_spec)
+        use_gridfs = self.get("use_gridfs", True)
+
         db = CalcDb(db_file)
 
-        rxns = load_json(self, "rxns", fw_spec)
-        metadata = self.get("metadata", fw_spec["metadata"])
+        task = EnumeratorTask.from_rxns_and_metadata(rxns, metadata)
+        d = jsanitize(task.dict(), strict=True, allow_bson=True)
 
-        d = {}
-        d["dir_name"] = dir_name
-        d["name"] = (
-            f"Reaction Enumeration (Targets: "
-            f"{metadata.get('targets')}): {metadata.get('chemsys')}"
-        )
-        d["rxns"] = rxns
+        if use_gridfs:
+            del d["rxns"]  # remove rxns from doc to store later in GridFS
 
-        d.update(metadata)
-        db.insert(d)
+        task_id = db.insert(d)
+
+        if use_gridfs:
+            d_fs = {"task_id": task_id, "rxns": rxns}
+            db.insert_gridfs(d_fs, metadata_keys=["task_id"])
 
 
 @explicit_serialize
@@ -103,3 +113,24 @@ class NetworkToDb(FiretaskBase):
 
         d.update(metadata)
         db.insert(d)
+
+
+@explicit_serialize
+class ChangeDir(FiretaskBase):
+    """
+    FireTask to create new folder with the option of changing directory to the new folder.
+
+    Required params:
+        folder_name (str): folder name.
+
+    Optional params:
+        change_dir(bool): change working dir to new folder after creation.
+            Defaults to False.
+        relative_path (bool): whether folder name is relative or absolute.
+            Defaults to True.
+    """
+
+    required_params = ["folder_name"]
+
+    def run_task(self, fw_spec):
+        os.chdir(self["folder_name"])

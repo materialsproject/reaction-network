@@ -1,13 +1,14 @@
 """
 Utility Fireworks functions. Some of these functions are borrowed from the atomate package.
 """
-import gzip
-import json
 import logging
 import sys
 from typing import Optional
 
 from fireworks import FireTaskBase
+from monty.serialization import loadfn
+
+from rxn_network.entries.entry_set import GibbsEntrySet
 
 
 def env_chk(
@@ -78,18 +79,33 @@ def load_json(firetask: FireTaskBase, param: str, fw_spec: dict) -> dict:
         fw_spec: Firework spec.
 
     Returns:
-        A loaded JSON object (dict)
+        A loaded object (dict)
     """
     obj = firetask.get(param)
-    if obj:
-        d = obj.as_dict()
-    else:
+
+    if not obj:
         param_fn = param + "_fn"
         obj_fn = firetask.get(param_fn)
+
         if not obj_fn:
             obj_fn = fw_spec[param_fn]
 
-        with gzip.open(obj_fn) as f:
-            d = json.load(f)
+        obj = loadfn(obj_fn)
 
-    return d
+    return obj
+
+
+def load_entry_set(firetask, fw_spec):
+    """
+    Loads a GibbsEntrySet, either from the firetask itself (or its fw_spec), or from a
+    file given the entries_fn attribute.
+    """
+    entries = firetask["entries"]
+    entries_fn = firetask.get("entries_fn")
+
+    if not entries:
+        entries_fn = entries_fn if entries_fn else fw_spec["entries_fn"]
+        entries = loadfn(entries_fn)
+
+    entries = GibbsEntrySet(entries)
+    return entries

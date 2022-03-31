@@ -7,6 +7,8 @@ from itertools import combinations, product
 from math import comb
 from typing import List, Optional, Set
 
+import ray
+from numpy import median
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
@@ -20,7 +22,10 @@ from rxn_network.enumerators.utils import (
     initialize_entry,
 )
 from rxn_network.reactions import ComputedReaction
-from rxn_network.utils import limited_powerset
+from rxn_network.utils import initialize_ray, limited_powerset, to_iterator
+
+
+PARALLEL_THRESHOLD = 4  # median computation size above which parallelization enabled
 
 
 class BasicEnumerator(Enumerator):
@@ -42,6 +47,7 @@ class BasicEnumerator(Enumerator):
         exclusive_targets: bool = False,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        calculate_e_above_hulls: bool = True,
         quiet: bool = False,
     ):
         """
@@ -81,6 +87,7 @@ class BasicEnumerator(Enumerator):
         self.exclusive_targets = exclusive_targets
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
+        self.calculate_e_above_hulls = calculate_e_above_hulls
         self.quiet = quiet
 
         self._stabilize = False
@@ -95,7 +102,7 @@ class BasicEnumerator(Enumerator):
         was initialized with specified precursors or target, the reactions will be
         filtered by these constraints. Every enumerator follows a standard procedure:
 
-        1. Initialize entries, i.e. ensure that precursors and target are considered
+        1. Initialize entries, i.e., ensure that precursors and target are considered
         stable entries within the entry set. If using ChempotDistanceCalculator,
         ensure that entries are filtered by stability.
 
@@ -114,37 +121,65 @@ class BasicEnumerator(Enumerator):
         Args:
             entries: the set of all entries to enumerate from
         """
+
         entries, precursors, targets, open_entries = self._get_initialized_entries(
             entries
         )
 
         combos_dict = self._get_combos_dict(entries, precursors, targets, open_entries)
         open_combos = self._get_open_combos(open_entries)
+        if not open_combos:
+            open_combos = []
 
-        pbar = tqdm(
-            combos_dict.items(), desc=self.__class__.__name__, disable=self.quiet
-        )
+        items = sorted(
+            combos_dict.items(), key=lambda e: len(e[1]), reverse=True
+        )  # sorted for better parallelization
 
-        rxns = []
-        for chemsys, combos in pbar:
-            pbar.set_description(f"{chemsys}")
-            elems = chemsys.split("-")
-            filtered_entries = entries.get_subset_in_chemsys(elems)
-            calculators = initialize_calculators(self.calculators, filtered_entries)
+        parallel = False
+        median_comp_size = median([len(v) for v in combos_dict.values()])
 
-            rxn_iter = self._get_rxn_iterable(combos, open_combos)
+        if median_comp_size > PARALLEL_THRESHOLD and len(combos_dict) > 1:
+            parallel = True
 
-            r = self._get_rxns(
-                rxn_iter,
-                precursors,
-                targets,
-                calculators,
-                filtered_entries,
-                open_entries,
-            )
-            rxns.extend(r)
+            initialize_ray()
+            obj = ray.put(self)
+            open_combos = ray.put(open_combos)
+            entries = ray.put(entries)
+            open_entries = ray.put(open_entries)
+            precursors = ray.put(precursors)
+            targets = ray.put(targets)
 
-        return list(set(rxns))
+            rxns = [
+                _get_rxns_from_chemsys_ray.remote(
+                    obj, item, open_combos, entries, open_entries, precursors, targets
+                )
+                for item in items
+            ]
+        else:
+            rxns = []
+            iterator = items
+            if not self.quiet:
+                iterator = tqdm(items, total=len(items))
+            for item in items:
+                rxns.append(
+                    self._get_rxns_in_chemsys(
+                        item, open_combos, entries, open_entries, precursors, targets
+                    )
+                )
+
+        results = []
+
+        iterator = rxns
+
+        if parallel:
+            iterator = to_iterator(rxns)
+            if not self.quiet:
+                iterator = tqdm(iterator, total=len(rxns))
+
+        for r in iterator:
+            results.extend(r)
+
+        return list(set(results))
 
     def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
         """
@@ -191,7 +226,35 @@ class BasicEnumerator(Enumerator):
         _ = (self, open_entries)  # unused_arguments
         return None
 
-    def _get_rxns(
+    def _get_rxns_in_chemsys(
+        self,
+        item,
+        open_combos,
+        entries,
+        open_entries,
+        precursors,
+        targets,
+    ):
+        """ """
+        chemsys, combos = item
+
+        elems = chemsys.split("-")
+        filtered_entries = entries.get_subset_in_chemsys(elems)
+        calculators = initialize_calculators(self.calculators, filtered_entries)
+
+        rxn_iter = self._get_rxn_iterable(combos, open_combos)
+
+        rxns = self._get_rxns_from_iterable(
+            rxn_iter,
+            precursors,
+            targets,
+            calculators,
+            filtered_entries,
+            open_entries,
+        )
+        return rxns
+
+    def _get_rxns_from_iterable(
         self,
         rxn_iterable,
         precursors,
@@ -312,7 +375,10 @@ class BasicEnumerator(Enumerator):
             return new_ents
 
         precursors, targets = set(), set()
-        entries_new = GibbsEntrySet(deepcopy(entries), calculate_e_above_hulls=True)
+
+        entries_new = GibbsEntrySet(
+            deepcopy(entries), calculate_e_above_hulls=self.calculate_e_above_hulls
+        )
 
         if self.precursors:
             precursors = initialize_entries_list(self.precursors)
@@ -425,6 +491,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         exclusive_targets: bool = False,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
+        calculate_e_above_hulls: bool = False,
         quiet: bool = False,
     ):
         """
@@ -507,3 +574,16 @@ class BasicOpenEnumerator(BasicEnumerator):
         rxn_iter = product(combos, combos_with_open)
 
         return rxn_iter
+
+
+@ray.remote
+def _get_rxns_from_chemsys_ray(
+    obj, item, open_combos, entries, open_entries, precursors, targets
+):
+    """
+    Wrapper function for parallelizing reaction enumeration using ray. See
+    _get_rxns_in_chemsys in BasicEnumerator for more details.
+    """
+    return obj._get_rxns_in_chemsys(  # pylint: disable=protected-access
+        item, open_combos, entries, open_entries, precursors, targets
+    )

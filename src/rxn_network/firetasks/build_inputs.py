@@ -5,8 +5,9 @@ import itertools
 import warnings
 from typing import Iterable, List, Optional, Union
 
-from fireworks import FiretaskBase, FWAction, explicit_serialize
+from fireworks import FWAction, FiretaskBase, explicit_serialize
 from maggma.stores import MongoStore
+from monty.serialization import dumpfn
 from pymatgen.core.structure import Structure
 from pymatgen.entries import Entry
 from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
@@ -66,7 +67,7 @@ class EntriesFromMPRester(FiretaskBase):
 
         with MPRester() as mpr:
             entries = mpr.get_entries_in_chemsys(
-                elements=chemsys, inc_structure="final"
+                elements=chemsys, inc_structure="final", property_data=["icsd_ids"]
             )
 
         entries = process_entries(
@@ -78,7 +79,9 @@ class EntriesFromMPRester(FiretaskBase):
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
         )
-        return FWAction(update_spec={"entries": entries})
+
+        dumpfn(entries, "entries.json.gz")
+        return FWAction(update_spec={"entries_fn": "entries.json.gz"})
 
 
 @explicit_serialize
@@ -155,7 +158,8 @@ class EntriesFromDb(FiretaskBase):
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
         )
-        return FWAction(update_spec={"entries": entries})
+        dumpfn(entries, "entries.json.gz")
+        return FWAction(update_spec={"entries_fn": "entries.json.gz"})
 
 
 def process_entries(
@@ -462,6 +466,7 @@ def get_entry_task(
             include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
+            property_data=["icsd_ids"],
         )
     else:
         entry_task = EntriesFromMPRester(

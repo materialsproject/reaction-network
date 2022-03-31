@@ -20,7 +20,14 @@ conda activate gt
 conda install -c conda-forge graph-tool
 ```
 
-To install an editable version of the rxn-network code, simply download (clone) the
+Reaction network can then simply be installed via pip:
+
+```properties
+pip install reaction-network
+```
+
+## For developers: 
+To install an editable version of the rxn-network code, simply clone the
 code from this repository, navigate to its directory, and then run the
 following command to install the requirements:
 
@@ -28,6 +35,9 @@ following command to install the requirements:
 pip install -r requirements.txt
 pip install -e .
 ```
+
+Note that this only works if the repository is cloned from GitHub, such that it contains
+the proper metadata.
 
 # Tutorial notebooks
 
