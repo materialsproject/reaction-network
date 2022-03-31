@@ -70,7 +70,7 @@ def test_decorate(calculator, rxn):
     expected_cost = answers[str(rxn)][calculator.mu_func.__name__]
 
     assert type(rxn_dec) == ComputedReaction
-    assert pytest.approx(expected_cost, actual_cost)
+    assert actual_cost == pytest.approx(expected_cost)
 
 
 def test_from_entries(entries, mu_func, rxn):
@@ -80,4 +80,4 @@ def test_from_entries(entries, mu_func, rxn):
     expected_cost = answers[str(rxn)][calc.mu_func.__name__]
 
     assert type(calc) == ChempotDistanceCalculator
-    assert pytest.approx(expected_cost, actual_cost)
+    assert actual_cost == pytest.approx(expected_cost)
