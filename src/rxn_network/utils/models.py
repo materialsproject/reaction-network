@@ -248,7 +248,7 @@ class ComputedSynthesisRecipe(BaseModel):
             uncertainty_per_atom=round(rxn.energy_uncertainty_per_atom, 5),
         )
         data["selectivity"] = ReactionSelectivity(
-            chempot_distance=round(chempot_distance)
+            chempot_distance=round(chempot_distance, 3)
             if chempot_distance is not None
             else None,
             c_score=round(c_score) if c_score is not None else None,
