@@ -115,7 +115,7 @@ class SynthesisRecipeBuilder(Builder):
         added_elements = item["added_elements"]
         added_chemsys = item["added_chemsys"]
         enumerators = item["enumerators"]
-        mu_func = None  # TODO: incorporate this?
+        mu_func = None  # incorporate this?
 
         if len(targets) > 1:
             self.logger.warning(
