@@ -3,4 +3,4 @@ numpy==1.22.2
 pymatgen==2022.3.29
 fireworks==2.0.2
 maggma==0.44.1
-ray==1.10.0
+ray==1.11.0
