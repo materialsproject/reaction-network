@@ -127,6 +127,7 @@ class CalculateCScores(FiretaskBase):
         "use_minimize",
         "basic_enumerator_kwargs",
         "minimize_enumerator_kwargs",
+        "target_formulas",
         "entries_fn",
     ]
 
@@ -143,6 +144,7 @@ class CalculateCScores(FiretaskBase):
         use_minimize = self.get("use_minimize", True)
         basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
         minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
+        target_formulas = self.get("target_formulas")
 
         if use_minimize and open_phases and not open_elem:
             open_comp = Composition(open_phases[0])
@@ -160,6 +162,7 @@ class CalculateCScores(FiretaskBase):
             use_minimize=use_minimize,
             basic_enumerator_kwargs=basic_enumerator_kwargs,
             minimize_enumerator_kwargs=minimize_enumerator_kwargs,
+            target_formulas=target_formulas,
         )
 
         costs = [cost_function.evaluate(r) for r in rxns]

@@ -244,14 +244,14 @@ class ComputedSynthesisRecipe(BaseModel):
 
         data["rxn"] = Reaction.from_computed_rxn(rxn)
         data["thermo"] = ReactionThermo(
-            energy_per_atom=round(rxn.energy_per_atom, 4),
+            energy_per_atom=round(rxn.energy_per_atom, 5),
             uncertainty_per_atom=round(rxn.energy_uncertainty_per_atom, 5),
         )
         data["selectivity"] = ReactionSelectivity(
-            chempot_distance=round(chempot_distance, 3)
+            chempot_distance=round(chempot_distance, 5)
             if chempot_distance is not None
             else None,
-            c_score=round(c_score) if c_score is not None else None,
+            c_score=round(c_score, 5) if c_score is not None else None,
             mu_func=mu_func,
         )
         data["heuristics"] = ReactionHeuristics(
@@ -259,7 +259,7 @@ class ComputedSynthesisRecipe(BaseModel):
             fraction_experimental=round(
                 sum([getattr(e, "is_experimental", False) for e in rxn.entries])
                 / len(rxn.entries),
-                3,
+                5,
             ),
         )
         data["cost"] = cost

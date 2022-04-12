@@ -2,7 +2,7 @@
 A calculator class for determining competitiveness score of a reaction.
 """
 from functools import lru_cache
-from typing import Dict, Iterable, List, Optional, Union
+from typing import Dict, Iterable, List, Optional, Union, Set
 
 import numpy as np
 import ray
@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from rxn_network.core.calculator import Calculator
 from rxn_network.core.cost_function import CostFunction
+from rxn_network.core.reaction import Reaction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (
@@ -53,6 +54,7 @@ class CompetitivenessScoreCalculator(Calculator):
         use_minimize=False,
         basic_enumerator_kwargs: Optional[Dict] = None,
         minimize_enumerator_kwargs: Optional[Dict] = None,
+        target_formulas: Optional[List[str]] = None,
         quiet=True,
         name: str = "c_score",
     ):
@@ -77,6 +79,9 @@ class CompetitivenessScoreCalculator(Calculator):
         self.minimize_enumerator_kwargs = (
             minimize_enumerator_kwargs if minimize_enumerator_kwargs else {}
         )
+        if target_formulas:
+            target_formulas = [Composition(t).reduced_formula for t in target_formulas]
+        self.target_formulas = target_formulas
 
         calcs = ["ChempotDistanceCalculator"]
         if not self.basic_enumerator_kwargs.get("calculators"):
@@ -218,8 +223,18 @@ class CompetitivenessScoreCalculator(Calculator):
         if rxn in rxns:
             rxns.remove(rxn)
 
+        rxns_cleaned: Set[Reaction] = set()
+        if self.target_formulas:
+            target_formulas = set(self.target_formulas)
+            for r in rxns:
+                formulas = {c.reduced_formula for c in r.compositions}
+                if not target_formulas & formulas:
+                    rxns_cleaned.add(r)
+        else:
+            rxns_cleaned = rxns
+
         rxns_updated = ReactionSet.from_rxns(
-            rxns, open_elem=open_elem, chempot=self.chempot
+            rxns_cleaned, open_elem=open_elem, chempot=self.chempot
         ).get_rxns()
 
         return rxns_updated
