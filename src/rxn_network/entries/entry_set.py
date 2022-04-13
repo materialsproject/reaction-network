@@ -74,6 +74,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entry: An entry object.
         """
         self.entries.add(entry)
+        self._clear_cache()
 
     def update(
         self, entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]]
@@ -85,6 +86,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entry: An iterable of entry objects.
         """
         self.entries.update(entries)
+        self._clear_cache()
 
     def discard(self, entry: Union[GibbsComputedEntry, ExperimentalReferenceEntry]):
         """
@@ -93,6 +95,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         :param element: Entry
         """
         self.entries.discard(entry)
+        self._clear_cache()
 
     @cached_property
     def pd_dict(self):
@@ -296,7 +299,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         )
 
         return ComputedEntry(
-            comp, energy, energy_adjustments=[adj], entry_id="(Interpolated Entry!)"
+            comp,
+            energy,
+            energy_adjustments=[adj],
+            entry_id=f"(Interpolated Entry: {comp.formula})",
         )
 
     def get_e_above_hull(self, entry: ComputedEntry) -> float:
@@ -524,3 +530,17 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         d["entries"] = [e.as_dict() for e in self.entries]
         d["calculate_e_above_hulls"] = self.calculate_e_above_hulls
         return d
+
+    def _clear_cache(self):
+        """
+        Clears cached properties.
+        """
+        try:
+            del self.entries_list
+        except AttributeError:
+            pass
+
+        try:
+            del self.pd_dict
+        except AttributeError:
+            pass
