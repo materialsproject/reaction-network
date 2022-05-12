@@ -30,6 +30,9 @@ from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd
 
 
+CARBONATE_CORRECTION = -1.2484  # eV/atom per CO3(2-) from Huo et al. (2022)
+
+
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     """
     This object is based on pymatgen's EntrySet class and includes factory methods for constructing

@@ -30,7 +30,8 @@ def plot_reaction_scatter(
 
     df = df.copy()
     df["rxn"] = df["rxn"].astype(str)
-    df["has_added_elems"] = df["added_elems"] != ""
+    if "added_elems" in df:
+        df["has_added_elems"] = df["added_elems"] != ""
 
     fig = px.scatter(
         df,

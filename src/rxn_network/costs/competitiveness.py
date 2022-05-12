@@ -240,7 +240,7 @@ class CompetitivenessScoreCalculator(Calculator):
         return rxns_updated
 
     @staticmethod
-    def _get_c_score(cost, competing_costs, scale=10):
+    def _get_c_score(cost, competing_costs, scale=1000):
         """
         Calculates the c-score for a given reaction.
 
