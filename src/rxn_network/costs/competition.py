@@ -33,7 +33,7 @@ def _decorate_ray(obj, rxn):
     return obj.decorate(rxn)
 
 
-class CompetitivenessScoreCalculator(Calculator):
+class CompetitionScoreCalculator(Calculator):
     """
     Calculator for determining the competitiveness score (c-score) for a reaction
     (in eV/atom).

@@ -9,7 +9,7 @@ from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
 from pymatgen.core.composition import Composition, Element
 
-from rxn_network.costs.competitiveness import CompetitivenessScoreCalculator
+from rxn_network.costs.competition import CompetitionScoreCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.firetasks.utils import get_logger, load_json, load_entry_set
@@ -152,7 +152,7 @@ class CalculateCScores(FiretaskBase):
                 open_elem = open_comp.elements[0]
                 warnings.warn(f"Using open phase element {open_elem}")
 
-        calc = CompetitivenessScoreCalculator(
+        calc = CompetitionScoreCalculator(
             entries=entries,
             cost_function=cost_function,
             open_phases=open_phases,

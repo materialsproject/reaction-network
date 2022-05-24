@@ -1,7 +1,9 @@
+# Thermodynamic data
+
 This folder contains a copy of the experimental thermochemistry data used in the 
 reaction-network code.
 
-## Barin _(data/barin/compounds.json)_
+## Barin _(data/barin/compounds.json.gz)_
 
 This is a copy of many of of the compounds contained in Ihsan Barin's thermochemical
 data tables. **Note: these data were captured via optical character recognition, and hence
@@ -12,7 +14,18 @@ Reference:
     Barin, I. Thermochemical Data of Pure Substances; VCH: Weinheim; New York, 2008.
 
 
-## NIST-JANAF _(data/nist/compounds.json)_
+## FREED _(data/freed/compounds.json.gz)_
+
+This is an extraction of the Gibbs free energies of formation data from the FREED Thermodynamic
+Database, which is a computer adaptation of the U.S. Bureau of Mines thermodynamic
+database and some other exxtra sources.
+
+Reference:
+
+    Morris, Arthur E.; 2019. https://www.thermart.net/freed-thermodynamic-database/
+
+
+## NIST-JANAF _(data/nist/compounds.json.gz)_
 
 This is a copy of all thermochemical data from the 4th edition of the NIST-JANAF tables,
 as gathered from the NIST-JANAF website.
@@ -30,3 +43,7 @@ according within the `GibbsComputedEntry` class.
 Reference:
 
     Bale, C. W.; Chartrand, P.; Degterov, S. A.; Eriksson, G.; Hack, K.; Ben Mahfoud, R.; Melançon, J.; Pelton, A. D.; Petersen, S. FactSage Thermochemical Software and Databases. Calphad 2002, 26 (2), 189–228. https://doi.org/10.1016/S0364-5916(02)00035-4.
+
+
+
+
