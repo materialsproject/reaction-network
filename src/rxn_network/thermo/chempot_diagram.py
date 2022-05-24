@@ -44,7 +44,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
                 default_min_limit argument
             default_min_limit (float): Default minimum chemical potential limit for
                 unspecified elements within the "limits" argument. This results in
-                default limits of (default_min_limit, 0)
+                default limits of (-100, 0)
         """
         self.entries = list(entries)
         self.limits = limits
@@ -169,7 +169,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             formula = e.composition.reduced_formula
             new_entry = e_set.get_stabilized_entry(e, tol=1e-1)
             e_set.add(new_entry)
-            cpd = ChemicalPotentialDiagram(e_set, default_min_limit=-100)
+            cpd = ChemicalPotentialDiagram(e_set, default_min_limit=-500)
 
             try:
                 metastable_domains[formula] = cpd.domains[formula]

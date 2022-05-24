@@ -20,6 +20,9 @@ class CarbonateCorrection(CompositionEnergyAdjustment):
             num_ions (int): Number of carbonate ions in the composition object
             carbonate_correction (float): Energy correction per atom per (CO3)2- anion
         """
+        self._num_ions = num_ions
+        self._carbonate_correction = carbonate_correction
+
         super().__init__(
             adj_per_atom=carbonate_correction,
             n_atoms=num_ions,
@@ -28,3 +31,11 @@ class CarbonateCorrection(CompositionEnergyAdjustment):
                 "Correction for dGf with (CO3)2- anion, as fit to MP data (300 K)."
             ),
         )
+
+    @property
+    def num_ions(self):
+        return self._num_ions
+
+    @property
+    def carbonate_correction(self):
+        return self._carbonate_correction
