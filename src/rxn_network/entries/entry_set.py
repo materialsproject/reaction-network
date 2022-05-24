@@ -5,6 +5,7 @@ code has been adapted from the EntrySet class in pymatgen.
 import collections
 import logging
 import warnings
+import math
 from copy import deepcopy
 from typing import Dict, Iterable, List, Optional, Set, Union
 from functools import cached_property
@@ -13,7 +14,7 @@ from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
 from numpy.random import normal
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-from pymatgen.core import Composition
+from pymatgen.core import Composition, Element
 from pymatgen.entries.computed_entries import (
     ComputedEntry,
     ComputedStructureEntry,
@@ -23,14 +24,12 @@ from pymatgen.entries.entry_tools import EntrySet
 from tqdm import tqdm
 
 from rxn_network.entries.barin import BarinReferenceEntry
+from rxn_network.entries.corrections import CarbonateCorrection
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.gibbs import GibbsComputedEntry
 from rxn_network.entries.freed import FREEDReferenceEntry
 from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd
-
-
-CARBONATE_CORRECTION = -1.2484  # eV/atom per CO3(2-) from Huo et al. (2022)
 
 
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):
@@ -232,7 +231,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             adjustment = ConstantEnergyAdjustment(
                 value=e_adj,
                 name="Stabilization Adjustment",
-                description="Shifts energy so that " "entry is on the convex hull",
+                description="Shifts energy so that entry is on the convex hull",
             )
 
             entry_dict = entry.as_dict()
@@ -340,6 +339,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_nist_data=True,
         include_barin_data=False,
         include_freed_data=False,
+        apply_carbonate_correction=True,
     ) -> "GibbsEntrySet":
         """
         Constructor method for building a GibbsEntrySet from an existing phase diagram.
@@ -391,7 +391,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     new_entries.append(e)
                 except ValueError as error:
                     logging.warning(
-                        f"Compound {formula} is in NIST-JANAF tables but at different temperatures!: {error}"
+                        f"Compound {formula} is in NIST-JANAF tables but at different"
+                        f" temperatures!: {error}"
                     )
             if include_barin_data and formula in BarinReferenceEntry.REFERENCES:
                 try:
@@ -402,7 +403,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     new_entries.append(e)
                 except ValueError as error:
                     logging.warning(
-                        f"Compound {formula} is in Barin tables but not at this temperature! {error}"
+                        f"Compound {formula} is in Barin tables but not at this"
+                        f" temperature! {error}"
                     )
             if include_freed_data and formula in FREEDReferenceEntry.REFERENCES:
                 try:
@@ -413,7 +415,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     new_entries.append(e)
                 except ValueError as error:
                     logging.warning(
-                        f"Compound {formula} is in FREED tables but not at this temperature! {error}"
+                        f"Compound {formula} is in FREED tables but not at this"
+                        f" temperature! {error}"
                     )
 
             if experimental:
@@ -421,18 +424,21 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             else:
                 structure = entry.structure
                 formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
-
-                new_entries.append(
-                    GibbsComputedEntry.from_structure(
-                        structure=structure,
-                        formation_energy_per_atom=formation_energy_per_atom,
-                        temperature=temperature,
-                        energy_adjustments=None,
-                        parameters=entry.parameters,
-                        data=entry.data,
-                        entry_id=entry.entry_id,
-                    )
+                gibbs_entry = GibbsComputedEntry.from_structure(
+                    structure=structure,
+                    formation_energy_per_atom=formation_energy_per_atom,
+                    temperature=temperature,
+                    energy_adjustments=None,
+                    parameters=entry.parameters,
+                    data=entry.data,
+                    entry_id=entry.entry_id,
                 )
+                if apply_carbonate_correction:
+                    carbonate_correction = cls._get_carbonate_correction(gibbs_entry)
+                    if carbonate_correction:
+                        gibbs_entry.energy_adjustments.append(carbonate_correction)
+
+                new_entries.append(gibbs_entry)
 
             gibbs_entries.extend(new_entries)
 
@@ -446,6 +452,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_nist_data=True,
         include_barin_data=False,
         include_freed_data=False,
+        apply_carbonate_correction=True,
     ) -> "GibbsEntrySet":
         """
         Constructor method for initializing GibbsEntrySet from T = 0 K
@@ -474,12 +481,18 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_nist_data=include_nist_data,
                 include_barin_data=include_barin_data,
                 include_freed_data=include_freed_data,
+                apply_carbonate_correction=apply_carbonate_correction,
             )
 
         pd_dict = expand_pd(list(e_set))
         for _, pd in tqdm(pd_dict.items()):
             gibbs_set = cls.from_pd(
-                pd, temperature, include_nist_data, include_barin_data
+                pd,
+                temperature,
+                include_nist_data=include_nist_data,
+                include_barin_data=include_barin_data,
+                include_freed_data=include_freed_data,
+                apply_carbonate_correction=apply_carbonate_correction,
             )
             new_entries.update(gibbs_set)
 
@@ -533,6 +546,38 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         d["entries"] = [e.as_dict() for e in self.entries]
         d["calculate_e_above_hulls"] = self.calculate_e_above_hulls
         return d
+
+    @staticmethod
+    def _get_carbonate_correction(entry):
+        """
+        Helper method for determining the carbonate correction for an entry.
+        WARNING: Correction has been fit only to MP-derived entries (i.e., entries run
+        with MP input sets). Please check that the correction is valid for your entry.
+        """
+        comp = entry.composition
+
+        if not {Element("C"), Element("O")}.issubset(
+            comp.elements
+        ):  # Skip phases that don't contain C and O
+            return None
+
+        # only correct GGA or GGA+U entries
+        if entry.parameters.get("run_type", None) not in ["GGA", "GGA+U"]:
+            return None
+
+        # Check for number of carbonate ions
+        el_amts = comp.get_el_amt_dict()
+
+        num_c = el_amts.get("C", 0)
+        num_o = el_amts.get("O", 0)
+
+        if num_c == 0 or num_o == 0:
+            return None
+
+        if not math.isclose(num_o / num_c, 3):
+            return None
+
+        return CarbonateCorrection(num_c)
 
     def _clear_cache(self):
         """
