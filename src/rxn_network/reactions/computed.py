@@ -77,6 +77,29 @@ class ComputedReaction(BasicReaction):
             lowest_num_errors=lowest_num_errors,
         )
 
+    def get_new_temperature(self, new_temperature: float):
+        """
+        Returns a new reaction with the temperature changed.
+
+        Args:
+            new_temperature: New temperature in Kelvin
+        """
+        try:
+            new_entries = [e.get_new_temperature(new_temperature) for e in self.entries]
+        except AttributeError as e:
+            raise AttributeError(
+                "One or more of the entries in the reaction is not associated with a"
+                " temperature. Please use the GibbsComputedEntry class for all entries"
+                " in the reaction."
+            ) from e
+
+        return ComputedReaction(
+            new_entries,
+            self.coefficients,
+            data=self.data,
+            lowest_num_errors=self.lowest_num_errors,
+        )
+
     @property
     def energy(self) -> float:
         """

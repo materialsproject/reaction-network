@@ -49,6 +49,7 @@ class BasicEnumerator(Enumerator):
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = True,
         quiet: bool = False,
+        parallel: bool = True,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -89,6 +90,7 @@ class BasicEnumerator(Enumerator):
         self.remove_changed = remove_changed
         self.calculate_e_above_hulls = calculate_e_above_hulls
         self.quiet = quiet
+        self.parallel = parallel
 
         self._stabilize = False
 
@@ -131,14 +133,16 @@ class BasicEnumerator(Enumerator):
         if not open_combos:
             open_combos = []
 
-        items = sorted(
-            combos_dict.items(), key=lambda e: len(e[1]), reverse=True
-        )  # sorted for better parallelization
+        items = combos_dict.items()
 
         parallel = False
         median_comp_size = median([len(v) for v in combos_dict.values()])
 
-        if median_comp_size > PARALLEL_THRESHOLD and len(combos_dict) > 1:
+        if (
+            median_comp_size > PARALLEL_THRESHOLD
+            and len(combos_dict) > 1
+            and self.parallel
+        ):
             parallel = True
 
             initialize_ray()
@@ -157,10 +161,8 @@ class BasicEnumerator(Enumerator):
             ]
         else:
             rxns = []
-            iterator = items
-            if not self.quiet:
-                iterator = tqdm(items, total=len(items))
-            for item in items:
+
+            for item in tqdm(items, disable=self.quiet):
                 rxns.append(
                     self._get_rxns_in_chemsys(
                         item, open_combos, entries, open_entries, precursors, targets
@@ -169,12 +171,12 @@ class BasicEnumerator(Enumerator):
 
         results = []
 
-        iterator = rxns
-
         if parallel:
             iterator = to_iterator(rxns)
             if not self.quiet:
-                iterator = tqdm(iterator, total=len(rxns))
+                iterator = tqdm(iterator, total=len(rxns), disable=self.quiet)
+        else:
+            iterator = rxns
 
         for r in iterator:
             results.extend(r)
@@ -493,6 +495,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
+        parallel: bool = True,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -529,6 +532,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             remove_unbalanced=remove_unbalanced,
             remove_changed=remove_changed,
             quiet=quiet,
+            parallel=parallel,
         )
         self.open_phases: List[str] = open_phases
 

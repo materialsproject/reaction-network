@@ -4,6 +4,7 @@ from pathlib import Path
 from monty.serialization import loadfn
 
 from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.entries.gibbs import GibbsComputedEntry
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 ENTRIES_FILE = "yocl_namno2_rxn_entries.json.gz"
@@ -40,6 +41,18 @@ def auto_balanced_rxn(reactants, products):
     """Returns the same iron oxidation reaction, after automatically balancing"""
     return ComputedReaction.balance(
         reactant_entries=reactants, product_entries=products
+    )
+
+
+@pytest.fixture(scope="session")
+def gibbs_balanced_rxn(gibbs_entries):
+    """Returns a simple, pre-balanced computed reaction using GibbsComputedentry objects."""
+    return ComputedReaction.balance(
+        reactant_entries=[
+            gibbs_entries.get_min_entry_by_formula("Y2O3"),
+            gibbs_entries.get_min_entry_by_formula("Mn2O3"),
+        ],
+        product_entries=[gibbs_entries.get_min_entry_by_formula("YMnO3")],
     )
 
 
@@ -97,3 +110,14 @@ def test_reverse(pre_balanced_rxn):
     assert pre_balanced_rxn.energy == -pre_balanced_rxn_rev.energy
 
     assert pre_balanced_rxn == pre_balanced_rxn_rev.reverse()
+
+
+def test_get_new_temperature(pre_balanced_rxn, gibbs_balanced_rxn):
+    with pytest.raises(AttributeError):
+        new_rxn = pre_balanced_rxn.get_new_temperature(
+            1500
+        )  # this reaction only uses ComputedStructureEntry
+
+    new_rxn = gibbs_balanced_rxn.get_new_temperature(1500)
+    for e in new_rxn.entries:
+        assert e.temperature == 1500

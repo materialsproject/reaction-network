@@ -110,7 +110,9 @@ class GibbsComputedEntry(ComputedEntry):
                 self.gibbs_adjustment(temperature),
                 uncertainty=0.05 * num_atoms,  # descriptor has ~50 meV/atom MAD
                 name="Gibbs SISSO Correction",
-                description=f"Gibbs correction: dGf({self.temperature} K) - dHf (298 K)",
+                description=(
+                    f"Gibbs correction: dGf({self.temperature} K) - dHf (298 K)"
+                ),
             )
         )
 

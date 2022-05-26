@@ -9,7 +9,7 @@ from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
 from pymatgen.core.composition import Composition, Element
 
-from rxn_network.costs.competitiveness import CompetitivenessScoreCalculator
+from rxn_network.costs.competition import CompetitionScoreCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.firetasks.utils import get_logger, load_json, load_entry_set
@@ -127,6 +127,7 @@ class CalculateCScores(FiretaskBase):
         "use_minimize",
         "basic_enumerator_kwargs",
         "minimize_enumerator_kwargs",
+        "target_formulas",
         "entries_fn",
     ]
 
@@ -143,6 +144,7 @@ class CalculateCScores(FiretaskBase):
         use_minimize = self.get("use_minimize", True)
         basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
         minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
+        target_formulas = self.get("target_formulas")
 
         if use_minimize and open_phases and not open_elem:
             open_comp = Composition(open_phases[0])
@@ -150,7 +152,7 @@ class CalculateCScores(FiretaskBase):
                 open_elem = open_comp.elements[0]
                 warnings.warn(f"Using open phase element {open_elem}")
 
-        calc = CompetitivenessScoreCalculator(
+        calc = CompetitionScoreCalculator(
             entries=entries,
             cost_function=cost_function,
             open_phases=open_phases,
@@ -160,6 +162,7 @@ class CalculateCScores(FiretaskBase):
             use_minimize=use_minimize,
             basic_enumerator_kwargs=basic_enumerator_kwargs,
             minimize_enumerator_kwargs=minimize_enumerator_kwargs,
+            target_formulas=target_formulas,
         )
 
         costs = [cost_function.evaluate(r) for r in rxns]
