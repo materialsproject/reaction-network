@@ -1,4 +1,4 @@
-# ![Reaction Network](images/logo.png)
+# ![Reaction Network](docs/images/logo.png)
 
 [![Pytest Status](https://github.com/GENESIS-EFRC/reaction-network/workflows/testing/badge.svg)](https://github.com/GENESIS-EFRC/reaction-network/actions?query=workflow%3Atesting)
 [![Code Coverage](https://codecov.io/gh/GENESIS-EFRC/reaction-network/branch/main/graph/badge.svg)](https://codecov.io/gh/GENESIS-EFRC/reaction-network)
@@ -8,19 +8,23 @@ pathways in solid-state materials synthesis using combinatorial and graph-theort
 
 # Installation directions
 
-The rxn-network package has several dependencies, most of which can be installed
-through PyPI. However, graph-tool must be installed through a more customized method;
-please see https://graph-tool.skewed.de/ for more details. We recommend the
-following installation procedure which creates a new conda environment with Python 3.9,
-activates it, and then installs graph-tool through conda-forge.
+This package can be easily installed using pip:
 
 ```properties
-conda create -n gt python=3.9
-conda activate gt
+pip install reaction-network
+```
+
+:warning: While this will take care of most dependencies, if you are using any of the network-based features (i.e. within `rxn_network.network`), then `graph-tool` must be installed. Unfortunately, this cannot
+be installed through pip; please see https://graph-tool.skewed.de/ for more details. :warning:
+
+We recommend the following installation procedure which installs graph-tool through conda-forge.
+
+```properties
 conda install -c conda-forge graph-tool
 ```
 
-To install an editable version of the rxn-network code, simply download (clone) the
+## For developers: 
+To install an editable version of the rxn-network code, simply clone the
 code from this repository, navigate to its directory, and then run the
 following command to install the requirements:
 
@@ -28,6 +32,9 @@ following command to install the requirements:
 pip install -r requirements.txt
 pip install -e .
 ```
+
+Note that this only works if the repository is cloned from GitHub, such that it contains
+the proper metadata.
 
 # Tutorial notebooks
 

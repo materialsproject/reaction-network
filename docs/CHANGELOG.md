@@ -1,9 +1,5 @@
 # Changelog
 
-## [v6.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.0.0) (2022-03-31)
-
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v5.0.0...v6.0.0)
-
 ## [v5.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v5.0.0) (2022-03-31)
 
 [Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.3.0...v5.0.0)
