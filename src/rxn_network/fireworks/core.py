@@ -119,7 +119,7 @@ class EnumeratorFW(Firework):
                     "entries": entry_set,
                     "cost_function": cost_function,
                     "k": calculate_c_scores,
-                    "target_formulas": [f for f in targets],
+                    "target_formulas": list(targets),
                 }
             )
             tasks.append(CalculateCScores(**c_score_kwargs))
