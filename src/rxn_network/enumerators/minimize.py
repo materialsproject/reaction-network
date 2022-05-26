@@ -38,6 +38,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         exclusive_targets: bool = False,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
+        parallel: bool = True,
     ):
         """
         Args:
@@ -61,6 +62,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             exclusive_targets=exclusive_targets,
             calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
+            parallel=parallel,
         )
         self._build_pd = True
 
@@ -164,6 +166,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         exclusive_targets: bool = False,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
+        parallel: bool = True,
     ):
         """
         Args:
@@ -190,6 +193,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             exclusive_targets=exclusive_targets,
             calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
+            parallel=parallel,
         )
         self.open_elem = Element(open_elem)  # type: ignore
         self.open_phases = [Composition(str(self.open_elem)).reduced_formula]  # type: ignore
