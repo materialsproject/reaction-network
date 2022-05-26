@@ -8,22 +8,19 @@ pathways in solid-state materials synthesis using combinatorial and graph-theort
 
 # Installation directions
 
-The rxn-network package has several dependencies, most of which can be installed
-through PyPI. However, graph-tool must be installed through a more customized method;
-please see https://graph-tool.skewed.de/ for more details. We recommend the
-following installation procedure which creates a new conda environment with Python 3.9,
-activates it, and then installs graph-tool through conda-forge.
-
-```properties
-conda create -n gt python=3.9
-conda activate gt
-conda install -c conda-forge graph-tool
-```
-
-Reaction network can then simply be installed via pip:
+This package can be easily installed using pip:
 
 ```properties
 pip install reaction-network
+```
+
+:warning: While this will take care of most dependencies, if you are using any of the network-based features (i.e. within `rxn_network.network`), then `graph-tool` must be installed. Unfortunately, this cannot
+be installed through pip; please see https://graph-tool.skewed.de/ for more details. :warning:
+
+We recommend the following installation procedure which installs graph-tool through conda-forge.
+
+```properties
+conda install -c conda-forge graph-tool
 ```
 
 ## For developers: 
