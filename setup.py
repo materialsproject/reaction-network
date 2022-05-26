@@ -13,8 +13,10 @@ setup(
     name="reaction-network",
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    description="Reaction-network is a Python package for predicting likely inorganic "
-    "chemical reaction pathways using graph theory.",
+    description=(
+        "Reaction-network is a Python package for predicting likely inorganic "
+        "chemical reaction pathways using graph theory."
+    ),
     long_description=long_desc,
     long_description_content_type="text/markdown",
     url="https://github.com/GENESIS-EFRC/reaction-network",
@@ -29,10 +31,11 @@ setup(
     include_package_data=True,
     install_requires=[
         "setuptools",
-        "pymatgen>=2022.0.16",
-        "fireworks>=1.9.7",
-        "maggma>=0.38.1",
-        "numba>=0.53.0",
+        "pymatgen>=2022.5.26",
+        "fireworks>=2.0.3",
+        "maggma>=0.46.1",
+        "numba>=0.55.2",
+        "ray>=1.12.1",
     ],
     extra_requires={"demo": ["jupyter>=1.0.0"]},
     classifiers=[
