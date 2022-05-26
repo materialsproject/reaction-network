@@ -1,0 +1,5076 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the reaction-network package">
+      
+      
+      
+        <link rel="canonical" href="https://genesis-efrc.github.io/reaction-network/reference/utils/models/">
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.15">
+    
+    
+      
+        <title>Models - Reaction-network documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.c382b1dc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.cc9b2e1e.min.css">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../css/mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#rxn_network.utils.models" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Reaction-network documentation" class="md-header__button md-logo" aria-label="Reaction-network documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4.41 3 3 4.41 5.69 7.1A7.924 7.924 0 0 0 4 12c0 1.85.63 3.55 1.69 4.9L3 19.59 4.41 21l2.69-2.69A7.924 7.924 0 0 0 12 20c1.85 0 3.55-.63 4.9-1.69L19.59 21 21 19.59l-2.69-2.69A7.924 7.924 0 0 0 20 12c0-1.85-.63-3.55-1.69-4.9L21 4.41 19.59 3 16.9 5.69A7.924 7.924 0 0 0 12 4c-1.85 0-3.55.63-4.9 1.69L4.41 3M12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Reaction-network documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Models
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/GENESIS-EFRC/reaction-network/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Github
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../.." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../enumerators/" class="md-tabs__link">
+        Notebooks
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../builders/retrosynthesis/" class="md-tabs__link md-tabs__link--active">
+        Reference
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../../CHANGELOG/" class="md-tabs__link">
+      CHANGELOG
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Reaction-network documentation" class="md-nav__button md-logo" aria-label="Reaction-network documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4.41 3 3 4.41 5.69 7.1A7.924 7.924 0 0 0 4 12c0 1.85.63 3.55 1.69 4.9L3 19.59 4.41 21l2.69-2.69A7.924 7.924 0 0 0 12 20c1.85 0 3.55-.63 4.9-1.69L19.59 21 21 19.59l-2.69-2.69A7.924 7.924 0 0 0 20 12c0-1.85-.63-3.55-1.69-4.9L21 4.41 19.59 3 16.9 5.69A7.924 7.924 0 0 0 12 4c-1.85 0-3.55.63-4.9 1.69L4.41 3M12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6Z"/></svg>
+
+    </a>
+    Reaction-network documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/GENESIS-EFRC/reaction-network/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Github
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Notebooks
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Notebooks" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Notebooks
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_1">
+          Enumerators
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Enumerators" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_1">
+          <span class="md-nav__icon md-icon"></span>
+          Enumerators
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../enumerators/" class="md-nav__link">
+        reaction-network (Demo Notebook): Enumerators
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2" type="checkbox" id="__nav_2_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_2">
+          Network
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Network" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          Network
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../network/" class="md-nav__link">
+        reaction-network (Demo Notebook): Networks
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_1">
+          Builders
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Builders" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          Builders
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../builders/retrosynthesis/" class="md-nav__link">
+        Retrosynthesis
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_2">
+          Core
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Core" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Core
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/calculator/" class="md-nav__link">
+        Calculator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/cost_function/" class="md-nav__link">
+        Cost Function
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/enumerator/" class="md-nav__link">
+        Enumerator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/network/" class="md-nav__link">
+        Network
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/pathway/" class="md-nav__link">
+        Pathway
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/reaction/" class="md-nav__link">
+        Reaction
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core/solver/" class="md-nav__link">
+        Solver
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_3">
+          Costs
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Costs" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          Costs
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/calculators/" class="md-nav__link">
+        Calculators
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/competition/" class="md-nav__link">
+        Competition
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/softplus/" class="md-nav__link">
+        Softplus
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/data/" class="md-nav__link">
+        Data
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_5" type="checkbox" id="__nav_3_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_5">
+          Entries
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Entries" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_5">
+          <span class="md-nav__icon md-icon"></span>
+          Entries
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/barin/" class="md-nav__link">
+        Barin
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/corrections/" class="md-nav__link">
+        Corrections
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/entry_set/" class="md-nav__link">
+        Entry Set
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/experimental/" class="md-nav__link">
+        Experimental
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/freed/" class="md-nav__link">
+        Freed
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/gibbs/" class="md-nav__link">
+        Gibbs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entries/nist/" class="md-nav__link">
+        Nist
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_6" type="checkbox" id="__nav_3_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_6">
+          Enumerators
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Enumerators" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_6">
+          <span class="md-nav__icon md-icon"></span>
+          Enumerators
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enumerators/basic/" class="md-nav__link">
+        Basic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enumerators/minimize/" class="md-nav__link">
+        Minimize
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enumerators/utils/" class="md-nav__link">
+        Utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_7" type="checkbox" id="__nav_3_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_7">
+          Firetasks
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Firetasks" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_7">
+          <span class="md-nav__icon md-icon"></span>
+          Firetasks
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../firetasks/build_inputs/" class="md-nav__link">
+        Build Inputs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../firetasks/parse_outputs/" class="md-nav__link">
+        Parse Outputs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../firetasks/run_calc/" class="md-nav__link">
+        Run Calc
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../firetasks/utils/" class="md-nav__link">
+        Utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_8" type="checkbox" id="__nav_3_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_8">
+          Fireworks
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Fireworks" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_8">
+          <span class="md-nav__icon md-icon"></span>
+          Fireworks
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fireworks/core/" class="md-nav__link">
+        Core
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_9" type="checkbox" id="__nav_3_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_9">
+          Network
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Network" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_9">
+          <span class="md-nav__icon md-icon"></span>
+          Network
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network/entry/" class="md-nav__link">
+        Entry
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network/gt/" class="md-nav__link">
+        Graph-tool
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network/network/" class="md-nav__link">
+        Network
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network/utils/" class="md-nav__link">
+        Utils
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network/visualize/" class="md-nav__link">
+        Visualize
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_10" type="checkbox" id="__nav_3_10" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_10">
+          Pathways
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Pathways" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_10">
+          <span class="md-nav__icon md-icon"></span>
+          Pathways
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/balanced/" class="md-nav__link">
+        Balanced
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/basic/" class="md-nav__link">
+        Basic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/pathway_set/" class="md-nav__link">
+        Pathway Set
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/plotting/" class="md-nav__link">
+        Plotting
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pathways/solver/" class="md-nav__link">
+        Solver
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_11" type="checkbox" id="__nav_3_11" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_11">
+          Reactions
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reactions" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_11">
+          <span class="md-nav__icon md-icon"></span>
+          Reactions
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/basic/" class="md-nav__link">
+        Basic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/computed/" class="md-nav__link">
+        Computed
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/open/" class="md-nav__link">
+        Open
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/plotting/" class="md-nav__link">
+        Plotting
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reactions/reaction_set/" class="md-nav__link">
+        Reaction Set
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_12" type="checkbox" id="__nav_3_12" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_12">
+          Thermo
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Thermo" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_12">
+          <span class="md-nav__icon md-icon"></span>
+          Thermo
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../thermo/chempot_diagram/" class="md-nav__link">
+        Chempot Diagram
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../thermo/utils/" class="md-nav__link">
+        Utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_13" type="checkbox" id="__nav_3_13" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_13">
+          Utils
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Utils" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_13">
+          <span class="md-nav__icon md-icon"></span>
+          Utils
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../database/" class="md-nav__link">
+        Database
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../funcs/" class="md-nav__link">
+        Funcs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Models
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Models
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models" class="md-nav__link">
+    rxn_network.utils.models
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe" class="md-nav__link">
+    ComputedSynthesisRecipe
+  </a>
+  
+    <nav class="md-nav" aria-label="ComputedSynthesisRecipe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.byproducts" class="md-nav__link">
+    byproducts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.cost" class="md-nav__link">
+    cost
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.heuristics" class="md-nav__link">
+    heuristics
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.rxn" class="md-nav__link">
+    rxn
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.selectivity" class="md-nav__link">
+    selectivity
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.thermo" class="md-nav__link">
+    thermo
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.from_computed_rxn" class="md-nav__link">
+    from_computed_rxn()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc" class="md-nav__link">
+    ComputedSynthesisRecipesDoc
+  </a>
+  
+    <nav class="md-nav" aria-label="ComputedSynthesisRecipesDoc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.added_chemsys" class="md-nav__link">
+    added_chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.added_elements" class="md-nav__link">
+    added_elements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.chemsys" class="md-nav__link">
+    chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.cost_function" class="md-nav__link">
+    cost_function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.elements" class="md-nav__link">
+    elements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.enumerators" class="md-nav__link">
+    enumerators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.last_updated" class="md-nav__link">
+    last_updated
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.recipes" class="md-nav__link">
+    recipes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.target_composition" class="md-nav__link">
+    target_composition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.target_formula" class="md-nav__link">
+    target_formula
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.task_id" class="md-nav__link">
+    task_id
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.task_label" class="md-nav__link">
+    task_label
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.use_gridfs" class="md-nav__link">
+    use_gridfs
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask" class="md-nav__link">
+    EnumeratorTask
+  </a>
+  
+    <nav class="md-nav" aria-label="EnumeratorTask">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.added_chemsys" class="md-nav__link">
+    added_chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.added_elements" class="md-nav__link">
+    added_elements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.chemsys" class="md-nav__link">
+    chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.cost_function" class="md-nav__link">
+    cost_function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.dir_name" class="md-nav__link">
+    dir_name
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.elements" class="md-nav__link">
+    elements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.enumerators" class="md-nav__link">
+    enumerators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.last_updated" class="md-nav__link">
+    last_updated
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.rxns" class="md-nav__link">
+    rxns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.targets" class="md-nav__link">
+    targets
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.task_id" class="md-nav__link">
+    task_id
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.task_label" class="md-nav__link">
+    task_label
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.from_rxns_and_metadata" class="md-nav__link">
+    from_rxns_and_metadata()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask" class="md-nav__link">
+    NetworkTask
+  </a>
+  
+    <nav class="md-nav" aria-label="NetworkTask">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.dir_name" class="md-nav__link">
+    dir_name
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.last_updated" class="md-nav__link">
+    last_updated
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.task_id" class="md-nav__link">
+    task_id
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.task_label" class="md-nav__link">
+    task_label
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.from_network_and_metadata" class="md-nav__link">
+    from_network_and_metadata()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase" class="md-nav__link">
+    Phase
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.e_above_hull" class="md-nav__link">
+    e_above_hull
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.energy" class="md-nav__link">
+    energy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.energy_per_atom" class="md-nav__link">
+    energy_per_atom
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.entry_id" class="md-nav__link">
+    entry_id
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.formula" class="md-nav__link">
+    formula
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.icsd_ids" class="md-nav__link">
+    icsd_ids
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.is_experimental" class="md-nav__link">
+    is_experimental
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.is_metastable" class="md-nav__link">
+    is_metastable
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.name" class="md-nav__link">
+    name
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.temp" class="md-nav__link">
+    temp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.from_computed_entry" class="md-nav__link">
+    from_computed_entry()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction" class="md-nav__link">
+    Reaction
+  </a>
+  
+    <nav class="md-nav" aria-label="Reaction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.chemsys" class="md-nav__link">
+    chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.products" class="md-nav__link">
+    products
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.reactants" class="md-nav__link">
+    reactants
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.rxn_str" class="md-nav__link">
+    rxn_str
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.from_computed_rxn" class="md-nav__link">
+    from_computed_rxn()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionHeuristics" class="md-nav__link">
+    ReactionHeuristics
+  </a>
+  
+    <nav class="md-nav" aria-label="ReactionHeuristics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionHeuristics.is_separable" class="md-nav__link">
+    is_separable
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionSelectivity" class="md-nav__link">
+    ReactionSelectivity
+  </a>
+  
+    <nav class="md-nav" aria-label="ReactionSelectivity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionSelectivity.c_score" class="md-nav__link">
+    c_score
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionSelectivity.chempot_distance" class="md-nav__link">
+    chempot_distance
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionSelectivity.mu_func" class="md-nav__link">
+    mu_func
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionThermo" class="md-nav__link">
+    ReactionThermo
+  </a>
+  
+    <nav class="md-nav" aria-label="ReactionThermo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionThermo.energy_per_atom" class="md-nav__link">
+    energy_per_atom
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionThermo.uncertainty_per_atom" class="md-nav__link">
+    uncertainty_per_atom
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ray/" class="md-nav__link">
+        Ray
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        CHANGELOG
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models" class="md-nav__link">
+    rxn_network.utils.models
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe" class="md-nav__link">
+    ComputedSynthesisRecipe
+  </a>
+  
+    <nav class="md-nav" aria-label="ComputedSynthesisRecipe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.byproducts" class="md-nav__link">
+    byproducts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.cost" class="md-nav__link">
+    cost
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.heuristics" class="md-nav__link">
+    heuristics
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.rxn" class="md-nav__link">
+    rxn
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.selectivity" class="md-nav__link">
+    selectivity
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.thermo" class="md-nav__link">
+    thermo
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipe.from_computed_rxn" class="md-nav__link">
+    from_computed_rxn()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc" class="md-nav__link">
+    ComputedSynthesisRecipesDoc
+  </a>
+  
+    <nav class="md-nav" aria-label="ComputedSynthesisRecipesDoc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.added_chemsys" class="md-nav__link">
+    added_chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.added_elements" class="md-nav__link">
+    added_elements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.chemsys" class="md-nav__link">
+    chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.cost_function" class="md-nav__link">
+    cost_function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.elements" class="md-nav__link">
+    elements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.enumerators" class="md-nav__link">
+    enumerators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.last_updated" class="md-nav__link">
+    last_updated
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.recipes" class="md-nav__link">
+    recipes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.target_composition" class="md-nav__link">
+    target_composition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.target_formula" class="md-nav__link">
+    target_formula
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.task_id" class="md-nav__link">
+    task_id
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.task_label" class="md-nav__link">
+    task_label
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ComputedSynthesisRecipesDoc.use_gridfs" class="md-nav__link">
+    use_gridfs
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask" class="md-nav__link">
+    EnumeratorTask
+  </a>
+  
+    <nav class="md-nav" aria-label="EnumeratorTask">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.added_chemsys" class="md-nav__link">
+    added_chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.added_elements" class="md-nav__link">
+    added_elements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.chemsys" class="md-nav__link">
+    chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.cost_function" class="md-nav__link">
+    cost_function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.dir_name" class="md-nav__link">
+    dir_name
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.elements" class="md-nav__link">
+    elements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.enumerators" class="md-nav__link">
+    enumerators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.last_updated" class="md-nav__link">
+    last_updated
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.rxns" class="md-nav__link">
+    rxns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.targets" class="md-nav__link">
+    targets
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.task_id" class="md-nav__link">
+    task_id
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.task_label" class="md-nav__link">
+    task_label
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.EnumeratorTask.from_rxns_and_metadata" class="md-nav__link">
+    from_rxns_and_metadata()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask" class="md-nav__link">
+    NetworkTask
+  </a>
+  
+    <nav class="md-nav" aria-label="NetworkTask">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.dir_name" class="md-nav__link">
+    dir_name
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.last_updated" class="md-nav__link">
+    last_updated
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.task_id" class="md-nav__link">
+    task_id
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.task_label" class="md-nav__link">
+    task_label
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.NetworkTask.from_network_and_metadata" class="md-nav__link">
+    from_network_and_metadata()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase" class="md-nav__link">
+    Phase
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.e_above_hull" class="md-nav__link">
+    e_above_hull
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.energy" class="md-nav__link">
+    energy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.energy_per_atom" class="md-nav__link">
+    energy_per_atom
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.entry_id" class="md-nav__link">
+    entry_id
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.formula" class="md-nav__link">
+    formula
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.icsd_ids" class="md-nav__link">
+    icsd_ids
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.is_experimental" class="md-nav__link">
+    is_experimental
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.is_metastable" class="md-nav__link">
+    is_metastable
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.name" class="md-nav__link">
+    name
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.temp" class="md-nav__link">
+    temp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Phase.from_computed_entry" class="md-nav__link">
+    from_computed_entry()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction" class="md-nav__link">
+    Reaction
+  </a>
+  
+    <nav class="md-nav" aria-label="Reaction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.chemsys" class="md-nav__link">
+    chemsys
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.products" class="md-nav__link">
+    products
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.reactants" class="md-nav__link">
+    reactants
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.rxn_str" class="md-nav__link">
+    rxn_str
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.Reaction.from_computed_rxn" class="md-nav__link">
+    from_computed_rxn()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionHeuristics" class="md-nav__link">
+    ReactionHeuristics
+  </a>
+  
+    <nav class="md-nav" aria-label="ReactionHeuristics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionHeuristics.is_separable" class="md-nav__link">
+    is_separable
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionSelectivity" class="md-nav__link">
+    ReactionSelectivity
+  </a>
+  
+    <nav class="md-nav" aria-label="ReactionSelectivity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionSelectivity.c_score" class="md-nav__link">
+    c_score
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionSelectivity.chempot_distance" class="md-nav__link">
+    chempot_distance
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionSelectivity.mu_func" class="md-nav__link">
+    mu_func
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionThermo" class="md-nav__link">
+    ReactionThermo
+  </a>
+  
+    <nav class="md-nav" aria-label="ReactionThermo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionThermo.energy_per_atom" class="md-nav__link">
+    energy_per_atom
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rxn_network.utils.models.ReactionThermo.uncertainty_per_atom" class="md-nav__link">
+    uncertainty_per_atom
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+  <a href="https://github.com/GENESIS-EFRC/reaction-network/edit/master/docs/reference/utils/models.md" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+  <h1>Models</h1>
+
+<div class="doc doc-object doc-module">
+
+<a id="rxn_network.utils.models"></a>
+    <div class="doc doc-contents first">
+
+      <p>Core definition for various task and synthesis recipe documents</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.utils.models.ComputedSynthesisRecipe" class="doc doc-heading">
+        <code>
+ComputedSynthesisRecipe            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Model for a document containing synthesis description data</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ComputedSynthesisRecipe</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Model for a document containing synthesis description data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">rxn</span><span class="p">:</span> <span class="n">Reaction</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Balanced reaction&quot;</span><span class="p">)</span>
+    <span class="n">thermo</span><span class="p">:</span> <span class="n">ReactionThermo</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reaction thermodynamics data&quot;</span><span class="p">)</span>
+    <span class="n">selectivity</span><span class="p">:</span> <span class="n">ReactionSelectivity</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reaction selectivity data&quot;</span>
+    <span class="p">)</span>
+    <span class="n">heuristics</span><span class="p">:</span> <span class="n">ReactionHeuristics</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reaction heuristics data&quot;</span><span class="p">)</span>
+    <span class="n">cost</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Calculated cost of the reaction&quot;</span><span class="p">)</span>
+    <span class="n">byproducts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of byproduct formulas&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_computed_rxn</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">,</span>
+        <span class="n">cost</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Composition</span><span class="p">,</span>
+        <span class="n">mu_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ComputedSynthesisRecipe&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple constructor for a Reaction model from a ComputedReaction object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chempot_distance</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chempot_distance&quot;</span><span class="p">)</span>
+        <span class="n">c_score</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;c_score&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Reaction</span><span class="o">.</span><span class="n">from_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;thermo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ReactionThermo</span><span class="p">(</span>
+            <span class="n">energy_per_atom</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="n">uncertainty_per_atom</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">energy_uncertainty_per_atom</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;selectivity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ReactionSelectivity</span><span class="p">(</span>
+            <span class="n">chempot_distance</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">chempot_distance</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">chempot_distance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">c_score</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">c_score</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="k">if</span> <span class="n">c_score</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">mu_func</span><span class="o">=</span><span class="n">mu_func</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;heuristics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ReactionHeuristics</span><span class="p">(</span>
+            <span class="n">is_separable</span><span class="o">=</span><span class="n">rxn</span><span class="o">.</span><span class="n">is_separable</span><span class="p">(</span><span class="n">target</span><span class="p">),</span>
+            <span class="n">fraction_experimental</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span>
+                <span class="nb">sum</span><span class="p">([</span><span class="nb">getattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;is_experimental&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">])</span>
+                <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">),</span>
+                <span class="mi">5</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cost</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;byproducts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">products</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="n">target</span><span class="p">})]</span>
+        <span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipe.byproducts" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">byproducts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>List of byproduct formulas</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipe.cost" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">cost</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Calculated cost of the reaction</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipe.heuristics" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">heuristics</span><span class="p">:</span> <span class="n">ReactionHeuristics</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Reaction heuristics data</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipe.rxn" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">rxn</span><span class="p">:</span> <span class="n">Reaction</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Balanced reaction</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipe.selectivity" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">selectivity</span><span class="p">:</span> <span class="n">ReactionSelectivity</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Reaction selectivity data</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipe.thermo" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">thermo</span><span class="p">:</span> <span class="n">ReactionThermo</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Reaction thermodynamics data</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipe.from_computed_rxn" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">mu_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Simple constructor for a Reaction model from a ComputedReaction object.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_computed_rxn</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span>
+    <span class="n">rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">,</span>
+    <span class="n">cost</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Composition</span><span class="p">,</span>
+    <span class="n">mu_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ComputedSynthesisRecipe&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple constructor for a Reaction model from a ComputedReaction object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chempot_distance</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chempot_distance&quot;</span><span class="p">)</span>
+    <span class="n">c_score</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;c_score&quot;</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Reaction</span><span class="o">.</span><span class="n">from_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;thermo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ReactionThermo</span><span class="p">(</span>
+        <span class="n">energy_per_atom</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="n">uncertainty_per_atom</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">energy_uncertainty_per_atom</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;selectivity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ReactionSelectivity</span><span class="p">(</span>
+        <span class="n">chempot_distance</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">chempot_distance</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">chempot_distance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">c_score</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">c_score</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="k">if</span> <span class="n">c_score</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mu_func</span><span class="o">=</span><span class="n">mu_func</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;heuristics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ReactionHeuristics</span><span class="p">(</span>
+        <span class="n">is_separable</span><span class="o">=</span><span class="n">rxn</span><span class="o">.</span><span class="n">is_separable</span><span class="p">(</span><span class="n">target</span><span class="p">),</span>
+        <span class="n">fraction_experimental</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span>
+            <span class="nb">sum</span><span class="p">([</span><span class="nb">getattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;is_experimental&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">])</span>
+            <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">),</span>
+            <span class="mi">5</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cost</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;byproducts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">products</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="n">target</span><span class="p">})]</span>
+    <span class="p">)</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc" class="doc doc-heading">
+        <code>
+ComputedSynthesisRecipesDoc            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Model for a document containing computed synthesis recipes for one material</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ComputedSynthesisRecipesDoc</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Model for a document containing computed synthesis recipes for one material</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Task ID&quot;</span><span class="p">)</span>
+    <span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task document&quot;</span><span class="p">)</span>
+    <span class="n">last_updated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The last updated time&quot;</span><span class="p">)</span>
+    <span class="n">recipes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComputedSynthesisRecipe</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of computed synthesis recipes&quot;</span>
+    <span class="p">)</span>
+    <span class="n">target_composition</span><span class="p">:</span> <span class="n">Composition</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Target composition&quot;</span><span class="p">)</span>
+    <span class="n">target_formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target formula&quot;</span><span class="p">)</span>
+    <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of elements in the recipe&quot;</span><span class="p">)</span>
+    <span class="n">chemsys</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The total chemical system string (e.g., Fe-Li-O).&quot;</span>
+    <span class="p">)</span>
+    <span class="n">added_elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of elements added&quot;</span><span class="p">)</span>
+    <span class="n">added_chemsys</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The chemical system string of the added elements (e.g., Fe-Li-O)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">enumerators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A list of the enumerator objects used to calculate the reactions.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The cost function used to calculate the cost.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">use_gridfs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether or not GridFS was used to store recipes.&quot;</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.added_chemsys" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">added_chemsys</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The chemical system string of the added elements (e.g., Fe-Li-O)</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.added_elements" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">added_elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">pymatgen</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">periodic_table</span><span class="o">.</span><span class="n">Element</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>List of elements added</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.chemsys" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">chemsys</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The total chemical system string (e.g., Fe-Li-O).</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.cost_function" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The cost function used to calculate the cost.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.elements" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">pymatgen</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">periodic_table</span><span class="o">.</span><span class="n">Element</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>List of elements in the recipe</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.enumerators" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">enumerators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">rxn_network</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">enumerator</span><span class="o">.</span><span class="n">Enumerator</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>A list of the enumerator objects used to calculate the reactions.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.last_updated" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The last updated time</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.recipes" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">recipes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">rxn_network</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">ComputedSynthesisRecipe</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>List of computed synthesis recipes</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.target_composition" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">target_composition</span><span class="p">:</span> <span class="n">Composition</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Target composition</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.target_formula" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">target_formula</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The target formula</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.task_id" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Task ID</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.task_label" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The name of the task document</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ComputedSynthesisRecipesDoc.use_gridfs" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">use_gridfs</span><span class="p">:</span> <span class="nb">bool</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Whether or not GridFS was used to store recipes.</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.utils.models.EnumeratorTask" class="doc doc-heading">
+        <code>
+EnumeratorTask            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>A single task object from the reaction enumerator workflow.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EnumeratorTask</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A single task object from the reaction enumerator workflow.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The task id&quot;</span><span class="p">)</span>
+    <span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
+    <span class="n">last_updated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The last updated time&quot;</span><span class="p">)</span>
+    <span class="n">dir_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The directory name&quot;</span><span class="p">)</span>
+    <span class="n">rxns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ReactionSet</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The reaction set. Optional to allow for storing in GridFS.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target formulas used in the enumerator(s).&quot;</span>
+    <span class="p">)</span>
+    <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The elements of the total chemical system&quot;</span>
+    <span class="p">)</span>
+    <span class="n">chemsys</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The total chemical system string (e.g., Fe-Li-O).&quot;</span>
+    <span class="p">)</span>
+    <span class="n">added_elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The elements added beyond the elements of the target(s).&quot;</span>
+    <span class="p">)</span>
+    <span class="n">added_chemsys</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The chemical system of the added elements&quot;</span>
+    <span class="p">)</span>
+    <span class="n">enumerators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A list of the enumerator objects used to calculate the reactions.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The cost function used to calculate the cost.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_rxns_and_metadata</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rxns</span><span class="p">:</span> <span class="n">ReactionSet</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an EnumeratorTask from the reaction enumerator outputs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rxns: the reaction set</span>
+<span class="sd">            metadata: The metadata dictionary.</span>
+<span class="sd">            **kwargs: Additional keyword arguments to pass to the EnumeratorTask constructor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;rxns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxns</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.added_chemsys" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">added_chemsys</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The chemical system of the added elements</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.added_elements" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">added_elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">pymatgen</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">periodic_table</span><span class="o">.</span><span class="n">Element</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The elements added beyond the elements of the target(s).</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.chemsys" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">chemsys</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The total chemical system string (e.g., Fe-Li-O).</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.cost_function" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The cost function used to calculate the cost.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.dir_name" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">dir_name</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The directory name</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.elements" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">pymatgen</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">periodic_table</span><span class="o">.</span><span class="n">Element</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The elements of the total chemical system</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.enumerators" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">enumerators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">rxn_network</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">enumerator</span><span class="o">.</span><span class="n">Enumerator</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>A list of the enumerator objects used to calculate the reactions.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.last_updated" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The last updated time</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.rxns" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">rxns</span><span class="p">:</span> <span class="n">ReactionSet</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The reaction set. Optional to allow for storing in GridFS.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.targets" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The target formulas used in the enumerator(s).</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.task_id" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The task id</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.task_label" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The name of the task.</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.utils.models.EnumeratorTask.from_rxns_and_metadata" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_rxns_and_metadata</span><span class="p">(</span><span class="n">rxns</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Create an EnumeratorTask from the reaction enumerator outputs.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>rxns</code></td>
+        <td><code>ReactionSet</code></td>
+        <td><p>the reaction set</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>metadata</code></td>
+        <td><code>dict</code></td>
+        <td><p>The metadata dictionary.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td></td>
+        <td><p>Additional keyword arguments to pass to the EnumeratorTask constructor.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_rxns_and_metadata</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rxns</span><span class="p">:</span> <span class="n">ReactionSet</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create an EnumeratorTask from the reaction enumerator outputs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rxns: the reaction set</span>
+<span class="sd">        metadata: The metadata dictionary.</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the EnumeratorTask constructor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;rxns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxns</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.utils.models.NetworkTask" class="doc doc-heading">
+        <code>
+NetworkTask            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>TODO: Finish model</p>
+<p>A single task object from the reaction network workflow.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">NetworkTask</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TODO: Finish model</span>
+
+<span class="sd">    A single task object from the reaction network workflow.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The task id&quot;</span><span class="p">)</span>
+    <span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
+    <span class="n">last_updated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The last updated time&quot;</span><span class="p">)</span>
+    <span class="n">dir_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The directory name&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_network_and_metadata</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">network</span><span class="p">:</span> <span class="n">Network</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a NetworkTask from the reaction network workflow outputs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            network: the Network object</span>
+<span class="sd">            metadata: The metadata dictionary.</span>
+<span class="sd">            **kwargs: Additional keyword arguments to pass to the EnumeratorTask constructor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">network</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.NetworkTask.dir_name" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">dir_name</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The directory name</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.NetworkTask.last_updated" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The last updated time</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.NetworkTask.task_id" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The task id</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.NetworkTask.task_label" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The name of the task.</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.utils.models.NetworkTask.from_network_and_metadata" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_network_and_metadata</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Create a NetworkTask from the reaction network workflow outputs.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>network</code></td>
+        <td><code>Network</code></td>
+        <td><p>the Network object</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>metadata</code></td>
+        <td><code>dict</code></td>
+        <td><p>The metadata dictionary.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td></td>
+        <td><p>Additional keyword arguments to pass to the EnumeratorTask constructor.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_network_and_metadata</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">network</span><span class="p">:</span> <span class="n">Network</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a NetworkTask from the reaction network workflow outputs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        network: the Network object</span>
+<span class="sd">        metadata: The metadata dictionary.</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the EnumeratorTask constructor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">network</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.utils.models.Phase" class="doc doc-heading">
+        <code>
+Phase            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>A phase of a synthesis recipe.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Phase</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A phase of a synthesis recipe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of the phase.&quot;</span><span class="p">)</span>
+    <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The energy of the phase&quot;</span><span class="p">)</span>
+    <span class="n">energy_per_atom</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The energy per atom of the phase.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The reduced formula of the phase.&quot;</span><span class="p">)</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The temperature at which the energy was calculated.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">entry_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The entry id (usually mp-id) of the phase.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">e_above_hull</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The calculated e above hull of the phase&quot;</span>
+    <span class="p">)</span>
+    <span class="n">is_metastable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether the phase has a positive e above hull.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">is_experimental</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether the phase has been observed experimentally in the literature.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">icsd_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A list of ICSD ids for the phase.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_computed_entry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">ComputedEntry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Phase&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple constructor for a phase from a pymatgen ComputedEntry object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">e_above_hull</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;energy_per_atom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;formula&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;entry_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">entry_id</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">round</span><span class="p">(</span><span class="n">e_above_hull</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="k">if</span> <span class="n">e_above_hull</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;is_metastable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e_above_hull</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">e_above_hull</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;is_experimental&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;is_experimental&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;icsd_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;icsd_ids&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.e_above_hull" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">e_above_hull</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The calculated e above hull of the phase</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.energy" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">energy</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The energy of the phase</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.energy_per_atom" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">energy_per_atom</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The energy per atom of the phase.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.entry_id" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">entry_id</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The entry id (usually mp-id) of the phase.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.formula" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">formula</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The reduced formula of the phase.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.icsd_ids" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">icsd_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>A list of ICSD ids for the phase.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.is_experimental" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">is_experimental</span><span class="p">:</span> <span class="nb">bool</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Whether the phase has been observed experimentally in the literature.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.is_metastable" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">is_metastable</span><span class="p">:</span> <span class="nb">bool</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Whether the phase has a positive e above hull.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.name" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">name</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Name of the phase.</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.temp" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">temp</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The temperature at which the energy was calculated.</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.utils.models.Phase.from_computed_entry" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_computed_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Simple constructor for a phase from a pymatgen ComputedEntry object.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_computed_entry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">ComputedEntry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Phase&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple constructor for a phase from a pymatgen ComputedEntry object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">e_above_hull</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;energy_per_atom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;formula&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;entry_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">entry_id</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">round</span><span class="p">(</span><span class="n">e_above_hull</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="k">if</span> <span class="n">e_above_hull</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;is_metastable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e_above_hull</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">e_above_hull</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;is_experimental&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;is_experimental&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;icsd_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;icsd_ids&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.utils.models.Reaction" class="doc doc-heading">
+        <code>
+Reaction            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>A class to represent a computed reaction.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Reaction</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to represent a computed reaction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">rxn_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;String of balanced reaction&quot;</span><span class="p">)</span>
+    <span class="n">reactants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Phase</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of reactant phases&quot;</span><span class="p">)</span>
+    <span class="n">products</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Phase</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of product phases&quot;</span><span class="p">)</span>
+    <span class="n">chemsys</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The chemical system string (e.g., Fe-Li-O)&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_computed_rxn</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Reaction&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple constructor for a Reaction model from a ComputedReaction object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;rxn_str&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;reactants&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Phase</span><span class="o">.</span><span class="n">from_computed_entry</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactant_entries</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Phase</span><span class="o">.</span><span class="n">from_computed_entry</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">product_entries</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;chemsys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">chemical_system</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Reaction.chemsys" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">chemsys</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>The chemical system string (e.g., Fe-Li-O)</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Reaction.products" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">products</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">rxn_network</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Phase</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>List of product phases</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Reaction.reactants" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">reactants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">rxn_network</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Phase</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>List of reactant phases</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.Reaction.rxn_str" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">rxn_str</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>String of balanced reaction</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="rxn_network.utils.models.Reaction.from_computed_rxn" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_computed_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Simple constructor for a Reaction model from a ComputedReaction object.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_computed_rxn</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Reaction&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple constructor for a Reaction model from a ComputedReaction object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;rxn_str&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;reactants&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Phase</span><span class="o">.</span><span class="n">from_computed_entry</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactant_entries</span><span class="p">]</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Phase</span><span class="o">.</span><span class="n">from_computed_entry</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">product_entries</span><span class="p">]</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;chemsys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">chemical_system</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.utils.models.ReactionHeuristics" class="doc doc-heading">
+        <code>
+ReactionHeuristics            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>A class for storing user-defined heuristics about the reaction (e.g., products separable)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReactionHeuristics</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for storing user-defined heuristics about the reaction (e.g., products separable)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">is_separable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether reaction products are separable&quot;</span>
+    <span class="p">)</span>
+    <span class="n">fraction_experimental</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ReactionHeuristics.is_separable" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">is_separable</span><span class="p">:</span> <span class="nb">bool</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Whether reaction products are separable</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.utils.models.ReactionSelectivity" class="doc doc-heading">
+        <code>
+ReactionSelectivity            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>A class for storing the reaction selectivity related parameters (e.g., chemical
+potential distance)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReactionSelectivity</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for storing the reaction selectivity related parameters (e.g., chemical</span>
+<span class="sd">    potential distance)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">chempot_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Chemical potential distance score of the reaction&quot;</span>
+    <span class="p">)</span>
+    <span class="n">c_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Competition score of the reaction&quot;</span><span class="p">)</span>
+    <span class="n">mu_func</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of function used to calculate chempot_distance metric&quot;</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ReactionSelectivity.c_score" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">c_score</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Competition score of the reaction</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ReactionSelectivity.chempot_distance" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">chempot_distance</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Chemical potential distance score of the reaction</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ReactionSelectivity.mu_func" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">mu_func</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Name of function used to calculate chempot_distance metric</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="rxn_network.utils.models.ReactionThermo" class="doc doc-heading">
+        <code>
+ReactionThermo            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>A class for storing the reaction energetics and thermodynamics related parameters.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>rxn_network/utils/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReactionThermo</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for storing the reaction energetics and thermodynamics related parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">energy_per_atom</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reaction energy in eV/atom&quot;</span><span class="p">)</span>
+    <span class="n">uncertainty_per_atom</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reaction energy uncertainty in eV/atom&quot;</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ReactionThermo.energy_per_atom" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">energy_per_atom</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Reaction energy in eV/atom</p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="rxn_network.utils.models.ReactionThermo.uncertainty_per_atom" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">uncertainty_per_atom</span><span class="p">:</span> <span class="nb">float</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Reaction energy uncertainty in eV/atom</p>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../funcs/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Funcs" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Funcs
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../ray/" class="md-footer__link md-footer__link--next" aria-label="Next: Ray" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Ray
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Built by Matthew McDermott (GENESIS-EFRC)
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top"], "search": "../../../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.a6c66575.min.js"></script>
+      
+    
+  </body>
+</html>
