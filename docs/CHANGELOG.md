@@ -1,5 +1,29 @@
 # Changelog
 
+## [v5.1.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v5.1.0) (2022-05-26)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.0...v5.1.0)
+
+**Implemented enhancements:**
+
+- Reaction enumerators can be sped up with multiprocessing [\#101](https://github.com/GENESIS-EFRC/reaction-network/issues/101)
+
+**Fixed bugs:**
+
+- Oversight: `calculate_e_above_hulls` function in `GibbsEntrySet` only works when entries cover whole phase diagram [\#103](https://github.com/GENESIS-EFRC/reaction-network/issues/103)
+
+**Closed issues:**
+
+- ReactionsToDb often encounters MongoDB doc limit [\#104](https://github.com/GENESIS-EFRC/reaction-network/issues/104)
+
+**Merged pull requests:**
+
+- Add carbonate correction, ability to turn off enumeration parallelization, minor bug fixes, new numba [\#133](https://github.com/GENESIS-EFRC/reaction-network/pull/133) ([mattmcdermott](https://github.com/mattmcdermott))
+
+## [v6.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.0.0) (2022-03-31)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v5.0.0...v6.0.0)
+
 ## [v5.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v5.0.0) (2022-03-31)
 
 [Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v4.3.0...v5.0.0)
