@@ -119,7 +119,9 @@ class Phase(BaseModel):
     )
     is_experimental: bool = Field(
         None,
-        description="Whether the phase has been observed experimentally in the literature.",
+        description=(
+            "Whether the phase has been observed experimentally in the literature."
+        ),
     )
     icsd_ids: List[int] = Field(None, description="A list of ICSD ids for the phase.")
 
