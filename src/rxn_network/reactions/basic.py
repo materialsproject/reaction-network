@@ -243,6 +243,30 @@ class BasicReaction(Reaction):
 
         return found
 
+    @property
+    def reactant_fractions(self) -> dict:
+        """
+        Returns the mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        total = sum(self.reactant_coeffs.values())
+
+        return {c: coeff / total for c, coeff in self.reactant_coeffs.items()}
+
+    @property
+    def product_fractions(self) -> dict:
+        """
+        Returns the mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        total = sum(self.product_coeffs.values())
+
+        return {c: coeff / total for c, coeff in self.product_coeffs.items()}
+
     @classmethod
     def from_string(cls, rxn_string) -> "BasicReaction":
         """
