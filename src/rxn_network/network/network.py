@@ -7,8 +7,8 @@ from graph_tool.util import find_edge, find_vertex
 from pymatgen.entries import Entry
 
 from rxn_network.core import CostFunction, Enumerator, Network
-from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.gt import (
     initialize_graph,

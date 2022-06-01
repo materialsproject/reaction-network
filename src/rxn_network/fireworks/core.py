@@ -10,7 +10,6 @@ from pymatgen.core.composition import Composition
 
 from rxn_network.core import CostFunction, Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
-
 from rxn_network.enumerators.basic import BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (
     MinimizeGibbsEnumerator,
@@ -20,9 +19,9 @@ from rxn_network.firetasks.build_inputs import get_entry_task
 from rxn_network.firetasks.parse_outputs import NetworkToDb, ReactionsToDb
 from rxn_network.firetasks.run_calc import (
     BuildNetwork,
+    CalculateCScores,
     RunEnumerators,
     RunSolver,
-    CalculateCScores,
 )
 
 

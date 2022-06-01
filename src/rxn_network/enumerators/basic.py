@@ -24,7 +24,6 @@ from rxn_network.enumerators.utils import (
 from rxn_network.reactions import ComputedReaction
 from rxn_network.utils import initialize_ray, limited_powerset, to_iterator
 
-
 PARALLEL_THRESHOLD = 4  # median computation size above which parallelization enabled
 
 

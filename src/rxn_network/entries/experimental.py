@@ -4,9 +4,9 @@ Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 import hashlib
 from typing import Dict, List, Optional
 
+from monty.json import MontyDecoder
 from pymatgen.core.composition import Composition
 from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
-from monty.json import MontyDecoder
 from scipy.interpolate import interp1d
 
 

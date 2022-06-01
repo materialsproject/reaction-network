@@ -12,7 +12,7 @@ from pymatgen.core.composition import Composition, Element
 from rxn_network.costs.competition import CompetitionScoreCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import get_computed_rxn
-from rxn_network.firetasks.utils import get_logger, load_json, load_entry_set
+from rxn_network.firetasks.utils import get_logger, load_entry_set, load_json
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver

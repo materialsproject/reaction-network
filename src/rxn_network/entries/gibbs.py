@@ -4,9 +4,9 @@ this is similar to the implementation within pymatgen, but has been refactored h
 add extra functionality.
 """
 import hashlib
+from functools import cached_property
 from itertools import combinations
 from typing import List, Optional
-from functools import cached_property
 
 import numpy as np
 from monty.json import MontyDecoder

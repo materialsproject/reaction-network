@@ -1,7 +1,7 @@
 """
 Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin tables.
 """
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 
 from pymatgen.core.composition import Composition
 from pymatgen.entries.computed_entries import EnergyAdjustment

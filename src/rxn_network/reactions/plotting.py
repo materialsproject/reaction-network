@@ -1,8 +1,8 @@
 """
 Utility functions for plotting reaction data/analysis.
 """
-from pandas import DataFrame
 import plotly.express as px
+from pandas import DataFrame
 
 
 def plot_reaction_scatter(

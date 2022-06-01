@@ -5,7 +5,7 @@ import itertools
 import warnings
 from typing import Iterable, List, Optional, Union
 
-from fireworks import FWAction, FiretaskBase, explicit_serialize
+from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore
 from monty.serialization import dumpfn
 from pymatgen.core.structure import Structure

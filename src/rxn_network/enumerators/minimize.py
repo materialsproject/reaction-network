@@ -15,10 +15,7 @@ from pymatgen.core.composition import Composition, Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.enumerators.basic import BasicEnumerator
-from rxn_network.enumerators.utils import (
-    apply_calculators,
-    get_computed_rxn,
-)
+from rxn_network.enumerators.utils import apply_calculators, get_computed_rxn
 
 
 class MinimizeGibbsEnumerator(BasicEnumerator):

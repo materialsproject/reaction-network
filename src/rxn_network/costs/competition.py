@@ -2,7 +2,7 @@
 A calculator class for determining competitiveness score of a reaction.
 """
 from functools import lru_cache
-from typing import Dict, Iterable, List, Optional, Union, Set
+from typing import Dict, Iterable, List, Optional, Set, Union
 
 import numpy as np
 import ray

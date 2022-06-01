@@ -4,11 +4,11 @@ code has been adapted from the EntrySet class in pymatgen.
 """
 import collections
 import logging
-import warnings
 import math
+import warnings
 from copy import deepcopy
-from typing import Dict, Iterable, List, Optional, Set, Union
 from functools import cached_property
+from typing import Dict, Iterable, List, Optional, Set, Union
 
 from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
@@ -26,8 +26,8 @@ from tqdm import tqdm
 from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.entries.corrections import CarbonateCorrection
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
-from rxn_network.entries.gibbs import GibbsComputedEntry
 from rxn_network.entries.freed import FREEDReferenceEntry
+from rxn_network.entries.gibbs import GibbsComputedEntry
 from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd
 

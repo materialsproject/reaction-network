@@ -2,7 +2,7 @@
 This module contains functions for plotting experimental reaction pathway data.
 """
 
-from typing import List, Dict
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import pandas

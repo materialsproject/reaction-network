@@ -1,8 +1,8 @@
 """ Utility functions used throughout the reaction-network package."""
 
-from typing import Iterable, Any
 from itertools import chain, combinations, zip_longest
 from pathlib import Path
+from typing import Any, Iterable
 
 
 def limited_powerset(iterable, max_size) -> Iterable:

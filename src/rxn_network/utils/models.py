@@ -1,6 +1,6 @@
 """Core definition for various task and synthesis recipe documents"""
 from datetime import datetime
-from typing import List, Optional, Any, Dict
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 from pymatgen.core.composition import Composition, Element
