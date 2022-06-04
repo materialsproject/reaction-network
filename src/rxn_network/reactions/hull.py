@@ -5,7 +5,8 @@ from functools import cached_property
 
 import numpy as np
 from monty.json import MSONable
-from plotly.express import scatter
+from plotly.express import scatter, line
+from plotly.graph_objs import Figure
 from pymatgen.core.composition import Composition
 from scipy.spatial import ConvexHull
 
@@ -65,11 +66,25 @@ class InterfaceReactionHull(MSONable):
         self.reactions = [reactions_with_endpoints[i] for i in idx_sort]
         self.hull = ConvexHull(self.coords)
 
-    def plot(self):
+    def plot(self, y_max=0.2):
         """
         Plot the reaction hull.
         """
-        return scatter(x=self.coords[:, 0], y=self.coords[:, 1])
+        pts = self._get_scatter()
+        lines = self._get_lines()
+
+        fig = Figure(data=lines + [pts])
+
+        fig.update_traces(
+            hovertemplate=(
+                "<b>%{hovertext}</b><br> <br><b>Mixing ratio</b>:"
+                " %{x:.3f}<br><b>Energy</b>: %{y:.3f} (eV/atom)"
+            )
+        )
+        fig.update_layout(yaxis_range=[min(self.coords[:, 1]) - 0.01, y_max])
+        fig.update_layout()
+
+        return fig
 
     def get_energy_above_hull(self, reaction):
         """
@@ -81,8 +96,8 @@ class InterfaceReactionHull(MSONable):
 
     def get_x_coordinate(self, reaction):
         """Get coordinate of reaction in reaction hull."""
-        x1 = reaction.reactant_fractions[self.c1]
-        x2 = reaction.reactant_fractions[self.c2]
+        x1 = reaction.reactant_fractions.get(self.c1, 0)
+        x2 = reaction.reactant_fractions.get(self.c2, 0)
         return x2 / (x1 + x2)
 
     def get_hull_energy(self, coordinate):
@@ -114,7 +129,7 @@ class InterfaceReactionHull(MSONable):
 
         raise ValueError("No reactions found!")
 
-    def get_competition_score(self, reaction: ComputedReaction, scale=1000):
+    def get_competition_score(self, reaction: ComputedReaction, scale=100):
         """
         Calculates the competition score (c-score) for a given reaction. This formula is
         based on a methodology presented in the following paper: (TBD)
@@ -137,16 +152,14 @@ class InterfaceReactionHull(MSONable):
         )
         return c_score
 
-    def get_selectivity_score(self, reaction: ComputedReaction):
+    def get_selectivity_score(self, reaction: ComputedReaction, normalize=True):
         """ """
         x = self.get_x_coordinate(reaction)
-        return (
-            reaction.energy_per_atom
-            + self.get_decomposition_energy(0, x)
-            + self.get_decomposition_energy(x, 1)
-        )
+        left = self.get_decomposition_energy(0, x)
+        right = self.get_decomposition_energy(x, 1)
+        return left + right
 
-    def get_decomposition_energy(self, x1: float, x2: float):
+    def get_decomposition_energy_and_num_paths(self, x1: float, x2: float):
         """ """
         pts = sorted([x1, x2])
         x_min = pts[0]
@@ -164,21 +177,74 @@ class InterfaceReactionHull(MSONable):
         ]
 
         if len(coords) == 0:
-            return 0
+            val = 0
+            total = 1
+            return val, total
         elif len(coords) == 1:
-            return self.calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])
+            val = self.calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])
+            total = 1
+            return val, total
         else:
             val = 0
+            total = 0
             for c in coords:
                 height = self.calculate_altitude([x_min, y_min], c, [x_max, y_max])
-                left_decomp = self.get_decomposition_energy(x_min, c[0])
-                right_decomp = self.get_decomposition_energy(c[0], x_max)
+                left_decomp, left_total = self.get_decomposition_energy_and_num_paths(
+                    x_min, c[0]
+                )
+                right_decomp, right_total = self.get_decomposition_energy_and_num_paths(
+                    c[0], x_max
+                )
                 val += height + left_decomp + right_decomp
-            return val
+                total += left_total * right_total
+
+        return val, total
+
+    def get_decomposition_energy(self, x1: float, x2: float):
+        return self.get_decomposition_energy_and_num_paths(x1, x2)[0]
+
+    def get_num_decomposition_paths(self, x1: float, x2: float):
+        return self.get_decomposition_energy_and_num_paths(x1, x2)[1]
+
+    def _get_scatter(self):
+        marker_size = 10
+
+        pts = scatter(
+            x=self.coords[:, 0],
+            y=self.coords[:, 1],
+            hover_name=[str(r) for r in self.reactions],
+            labels={
+                "x": "Mixing Ratio",
+                "y": (
+                    r"$\Delta G_{\mathrm{rxn}} ~"
+                    r" \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
+                ),
+            },
+        )
+        pts.update_traces(marker={"size": marker_size})
+
+        return pts.data[0]
+
+    def _get_lines(self):
+        coords = self.coords[self.hull.simplices]
+
+        coords = coords[(coords[:, :, 1] <= 0).all(axis=1)]
+        coords = coords[~(coords[:, :, 1] == 0).all(axis=1)]
+
+        lines = [line(x=c[:, 0], y=c[:, 1]) for c in coords if not (c[:, 1] == 0).all()]
+
+        line_data = []
+        for l in lines:
+            l.update_traces(line={"color": "black"})
+            line_data.append(l.data[0])
+
+        return line_data
 
     @cached_property
     def hull_vertices(self):
-        return np.array([i for i in self.hull.vertices if self.coords[i, 1] <= 0])
+        return np.array(
+            [i for i in self.hull.vertices if self.coords[i, 1] <= 0]
+        )  # pylint: disable=not-an-iterable
 
     @cached_property
     def stable_reactions(self):
