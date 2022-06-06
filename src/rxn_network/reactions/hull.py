@@ -155,9 +155,16 @@ class InterfaceReactionHull(MSONable):
     def get_selectivity_score(self, reaction: ComputedReaction, normalize=True):
         """ """
         x = self.get_x_coordinate(reaction)
-        left = self.get_decomposition_energy(0, x)
-        right = self.get_decomposition_energy(x, 1)
-        return left + right
+        left_energy, left_num_paths = self.get_decomposition_energy_and_num_paths(0, x)
+        right_energy, right_num_paths = self.get_decomposition_energy_and_num_paths(
+            x, 1
+        )
+
+        if normalize:
+            left_energy = left_energy / left_num_paths
+            right_energy = right_energy / right_num_paths
+
+        return left_energy + right_energy
 
     def get_decomposition_energy_and_num_paths(self, x1: float, x2: float):
         """ """
