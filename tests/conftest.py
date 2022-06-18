@@ -7,6 +7,8 @@ TEST_FILES_PATH = Path(__file__).parent / "test_files"
 
 MN_O_Y_ENTRIES = loadfn(TEST_FILES_PATH / "Mn_O_Y_entries.json.gz")
 CL_MN_NA_O_Y_ENTRIES = loadfn(TEST_FILES_PATH / "Cl_Mn_Na_O_Y_entries.json.gz")
+YMNO_RXNS = loadfn(TEST_FILES_PATH / "ymno3_rxns.json.gz")
+BAO_TIO2_RXNS = loadfn(TEST_FILES_PATH / "bao_tio2_rxns.json.gz")
 
 
 @pytest.fixture(scope="session")
@@ -31,6 +33,16 @@ def gibbs_entries():
 def filtered_entries(gibbs_entries):
     filtered_entries = gibbs_entries.filter_by_stability(0.0)
     return filtered_entries
+
+
+@pytest.fixture(scope="session")
+def ymno_rxns():
+    return YMNO_RXNS
+
+
+@pytest.fixture(scope="session")
+def bao_tio2_rxns():
+    return BAO_TIO2_RXNS
 
 
 @pytest.fixture(scope="session")

@@ -1,7 +1,7 @@
 """Code for analyzing sets of reactions between two phases."""
 
 from typing import List
-from functools import cached_property
+from functools import cached_property, lru_cache
 
 import numpy as np
 from monty.json import MSONable
@@ -153,19 +153,34 @@ class InterfaceReactionHull(MSONable):
         return c_score
 
     def get_selectivity_score(self, reaction: ComputedReaction, normalize=True):
-        """ """
+        """
+        Calculates the score for a given reaction. This formula is based on a
+        methodology presented in the following paper: (TBD)
+
+        Args:
+            reaction: Reaction to calculate the selectivity score for.
+
+        Returns:
+            The selectivity score for the reaction
+        """
         x = self.get_x_coordinate(reaction)
         left_energy, left_num_paths = self.get_decomposition_energy_and_num_paths(0, x)
         right_energy, right_num_paths = self.get_decomposition_energy_and_num_paths(
             x, 1
         )
 
+        if left_num_paths == 0:
+            left_num_paths = 1
+        if right_num_paths == 0:
+            right_num_paths = 1
+
         if normalize:
             left_energy = left_energy / left_num_paths
             right_energy = right_energy / right_num_paths
 
-        return left_energy + right_energy
+        return -1 * (left_energy + right_energy)
 
+    # @lru_cache(maxsize=None)
     def get_decomposition_energy_and_num_paths(self, x1: float, x2: float):
         """ """
         pts = sorted([x1, x2])
@@ -184,8 +199,7 @@ class InterfaceReactionHull(MSONable):
         ]
 
         if len(coords) == 0:
-            val = 0
-            total = 1
+            val, total = 0, 1
             return val, total
         elif len(coords) == 1:
             val = self.calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])
@@ -202,8 +216,18 @@ class InterfaceReactionHull(MSONable):
                 right_decomp, right_total = self.get_decomposition_energy_and_num_paths(
                     c[0], x_max
                 )
-                val += height + left_decomp + right_decomp
+
+                # for debug counting purposes
+                for _ in range(right_total - 1):
+                    self.get_decomposition_energy_and_num_paths(x_min, c[0])
+                for _ in range(left_total - 1):
+                    self.get_decomposition_energy_and_num_paths(c[0], x_max)
+
+                val += height + left_decomp * right_total + right_decomp * left_total
                 total += left_total * right_total
+
+                for j in range(left_total * right_total - 1):
+                    self.calculate_altitude([x_min, y_min], c, [x_max, y_max])
 
         return val, total
 
@@ -250,8 +274,12 @@ class InterfaceReactionHull(MSONable):
     @cached_property
     def hull_vertices(self):
         return np.array(
-            [i for i in self.hull.vertices if self.coords[i, 1] <= 0]
-        )  # pylint: disable=not-an-iterable
+            [
+                i
+                for i in self.hull.vertices  # pylint: disable=not-an-iterable
+                if self.coords[i, 1] <= 0
+            ]
+        )
 
     @cached_property
     def stable_reactions(self):
@@ -300,5 +328,11 @@ class InterfaceReactionHull(MSONable):
 
         xd = (x2 - x1) / (x3 - x1)
         yd = y1 + xd * (y3 - y1)
+
+        l = round(c_left[0], 3)
+        m = round(c_mid[0], 3)
+        r = round(c_right[0], 3)
+
+        print(l, m, r)
 
         return y2 - yd
