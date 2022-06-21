@@ -2,6 +2,7 @@
 
 from typing import List
 from functools import cached_property, lru_cache
+from itertools import combinations
 
 import numpy as np
 from monty.json import MSONable
@@ -152,7 +153,9 @@ class InterfaceReactionHull(MSONable):
         )
         return c_score
 
-    def get_selectivity_score(self, reaction: ComputedReaction, normalize=True):
+    def get_selectivity_score(
+        self, reaction: ComputedReaction, normalize=True, recursive=False
+    ):
         """
         Calculates the score for a given reaction. This formula is based on a
         methodology presented in the following paper: (TBD)
@@ -164,10 +167,20 @@ class InterfaceReactionHull(MSONable):
             The selectivity score for the reaction
         """
         x = self.get_x_coordinate(reaction)
-        left_energy, left_num_paths = self.get_decomposition_energy_and_num_paths(0, x)
-        right_energy, right_num_paths = self.get_decomposition_energy_and_num_paths(
-            x, 1
-        )
+        if recursive:
+            (
+                left_energy,
+                left_num_paths,
+            ) = self.get_decomposition_energy_and_num_paths_recursive(0, x)
+            (
+                right_energy,
+                right_num_paths,
+            ) = self.get_decomposition_energy_and_num_paths_recursive(x, 1)
+        else:
+            left_energy = self.get_decomposition_energy(0, x)
+            left_num_paths = self.count(len(self.get_coords_in_range(0, x)) - 2)
+            right_energy = self.get_decomposition_energy(x, 1)
+            right_num_paths = self.count(len(self.get_coords_in_range(x, 1)) - 2)
 
         if left_num_paths == 0:
             left_num_paths = 1
@@ -180,23 +193,79 @@ class InterfaceReactionHull(MSONable):
 
         return -1 * (left_energy + right_energy)
 
-    # @lru_cache(maxsize=None)
-    def get_decomposition_energy_and_num_paths(self, x1: float, x2: float):
-        """ """
-        pts = sorted([x1, x2])
-        x_min = pts[0]
-        x_max = pts[1]
+    def get_decomposition_energy(self, x1: float, x2: float):
+        coords = self.get_coords_in_range(x1, x2)
+        n = len(coords) - 2
 
+        energy = 0
+        for c in combinations(range(len(coords)), 3):
+            i_left, i_mid, i_right = sorted(c)
+
+            c_left, c_mid, c_right = coords[[i_left, i_mid, i_right]]
+
+            n_left = (i_mid - i_left) - 1
+            n_right = (i_right - i_mid) - 1
+
+            count = self.altitude_multiplicity(n_left, n_right, n)
+            energy += count * self.calculate_altitude(c_left, c_mid, c_right)
+
+        return energy
+
+    def get_coords_in_range(self, x1, x2):
+        x_min, x_max = sorted([x1, x2])
+        y_min, y_max = self.get_hull_energy(x_min), self.get_hull_energy(x_max)
+
+        coords = [[x_min, y_min]]
+
+        coords.extend(
+            [
+                self.coords[i]
+                for i in self.hull_vertices
+                if self.coords[i, 0] < x_max
+                and self.coords[i, 0] > x_min
+                and self.coords[i, 1] <= 0
+            ]
+        )
+        coords.append([x_max, y_max])
+
+        return np.array(coords)
+
+    def count(self, num):
+        counts = [
+            1,
+            1,
+            2,
+            5,
+            14,
+            42,
+            132,
+            429,
+            1430,
+            4862,
+            16796,
+            58786,
+            208012,
+            742900,
+            2674440,
+        ]
+        if num < 15:
+            count = counts[num]
+        else:
+            count = self.count_recursive(num)[0]
+
+        return count
+
+    @lru_cache(maxsize=None)
+    def get_decomposition_energy_and_num_paths_recursive(self, x1: float, x2: float):
+        """ """
+        all_coords = self.get_coords_in_range(x1, x2)
+
+        x_min = all_coords[0, 0]
+        x_max = all_coords[-1, 0]
         y_min = self.get_hull_energy(x_min)
         y_max = self.get_hull_energy(x_max)
 
-        coords = [
-            self.coords[i]
-            for i in self.hull_vertices
-            if self.coords[i, 0] < x_max
-            and self.coords[i, 0] > x_min
-            and self.coords[i, 1] <= 0
-        ]
+        coords = all_coords[1:-1, :]
 
         if len(coords) == 0:
             val, total = 0, 1
@@ -210,32 +279,69 @@ class InterfaceReactionHull(MSONable):
             total = 0
             for c in coords:
                 height = self.calculate_altitude([x_min, y_min], c, [x_max, y_max])
-                left_decomp, left_total = self.get_decomposition_energy_and_num_paths(
-                    x_min, c[0]
-                )
-                right_decomp, right_total = self.get_decomposition_energy_and_num_paths(
-                    c[0], x_max
-                )
+                (
+                    left_decomp,
+                    left_total,
+                ) = self.get_decomposition_energy_and_num_paths_recursive(x_min, c[0])
+                (
+                    right_decomp,
+                    right_total,
+                ) = self.get_decomposition_energy_and_num_paths_recursive(c[0], x_max)
 
-                # for debug counting purposes
-                for _ in range(right_total - 1):
-                    self.get_decomposition_energy_and_num_paths(x_min, c[0])
-                for _ in range(left_total - 1):
-                    self.get_decomposition_energy_and_num_paths(c[0], x_max)
+                # # for debug counting purposes
+                # for _ in range(right_total - 1):
+                #     self.get_decomposition_energy_and_num_paths(x_min, c[0])
+                # for _ in range(left_total - 1):
+                #     self.get_decomposition_energy_and_num_paths(c[0], x_max)
 
-                val += height + left_decomp * right_total + right_decomp * left_total
+                val += (
+                    height * (left_total * right_total)
+                    + left_decomp * right_total
+                    + right_decomp * left_total
+                )
                 total += left_total * right_total
 
-                for j in range(left_total * right_total - 1):
-                    self.calculate_altitude([x_min, y_min], c, [x_max, y_max])
+                # for j in range(left_total * right_total - 1):
+                #     self.calculate_altitude([x_min, y_min], c, [x_max, y_max])
 
         return val, total
 
-    def get_decomposition_energy(self, x1: float, x2: float):
-        return self.get_decomposition_energy_and_num_paths(x1, x2)[0]
+    def count_recursive(self, n, cache=[]):
+        """
+        Courtesy Max G.
+        """
+        if N == 0:
+            return 1, [1]
+        elif N == 1:
+            return 1, [1, 1]
+        elif len(cache) >= n:
+            return cache[n], cache
+        else:
+            total = 0
+            biggest_cache = []
+            for i in range(n):
+                left = i
+                right = n - i - 1
+                left_divs, c1 = self.count_recursive(left, biggest_cache)
 
-    def get_num_decomposition_paths(self, x1: float, x2: float):
-        return self.get_decomposition_energy_and_num_paths(x1, x2)[1]
+                right_divs, c2 = self.count_recursive(right, biggest_cache)
+
+                if len(c1) > len(biggest_cache):
+                    biggest_cache = c1
+
+                if len(c2) > len(biggest_cache):
+                    biggest_cache = c2
+
+                total += left_divs * right_divs
+            return total, biggest_cache + [total]
+
+    @lru_cache(maxsize=None)
+    def altitude_multiplicity(self, n_left, n_right, n):
+        remainder = n - n_left - n_right - 1
+        if remainder < 0:
+            return 0
+
+        return self.count(n_left) * self.count(n_right) * self.count(remainder)
 
     def _get_scatter(self):
         marker_size = 10
@@ -329,10 +435,10 @@ class InterfaceReactionHull(MSONable):
         xd = (x2 - x1) / (x3 - x1)
         yd = y1 + xd * (y3 - y1)
 
-        l = round(c_left[0], 3)
-        m = round(c_mid[0], 3)
-        r = round(c_right[0], 3)
+        # l = round(c_left[0], 3)
+        # m = round(c_mid[0], 3)
+        # r = round(c_right[0], 3)
 
-        print(l, m, r)
+        # print(l, m, r)
 
         return y2 - yd
