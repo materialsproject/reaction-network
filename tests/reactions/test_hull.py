@@ -34,10 +34,14 @@ def test_calculate_altitude():
     expected_altitude_1 = -1.0
 
     c4 = (0.25, -0.5)
-    c5 = (0.4,)
+    c5 = (0.4, -0.8)
+    c6 = (0.9, -0.63)
+    expected_altitude_2 = -0.27
 
     c7 = (0.33333, -0.23)
-    c8 = 0.777
+    c8 = (0.67777, 5.50)
+    c9 = (0.8, 1.0)
+    expected_altitude_3 = 4.822161
 
     assert InterfaceReactionHull.calculate_altitude(c1, c2, c3) == pytest.approx(
         expected_altitude_1
@@ -50,22 +54,16 @@ def test_calculate_altitude():
     )
 
 
-def test_get_competition_score():
+def test_get_primary_selectivity():
     pass
 
 
-def test_get_selectivity_score():
+def test_get_secondary_selectivity():
     pass
 
 
 def test_get_energy_above_hull(irh_basic, selected_rxn):
-    altitude = irh_basic.calculate_altitude(
-        [0, 0], [0.250, -0.2824416739], [0.3333333, -0.3837805055]
-    )
-    e_above_hull = irh.get_energy_above_hull(selected_rxn)
-    precalculated_answer == 0.005393734008540763
-
-    assert altitude == pytest.approx(e_above_hull)
+    pass
 
 
 def test_decomposition_energy_and_num_paths():

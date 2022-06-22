@@ -3,6 +3,7 @@ Basic interface for a (chemical) Reaction
 """
 from abc import ABCMeta, abstractmethod
 from typing import List
+from functools import cached_property
 
 import numpy as np
 from monty.json import MSONable
@@ -43,22 +44,3 @@ class Reaction(MSONable, metaclass=ABCMeta):
     def elements(self) -> List[Element]:
         """List of elements in the reaction"""
         return list(set(el for comp in self.compositions for el in comp.elements))
-
-    @property
-    def num_atoms(self) -> float:
-        """Total number of atoms in this reaction"""
-        return (
-            sum(
-                [
-                    comp[element] * abs(coeff)
-                    for element in self.elements
-                    for coeff, comp in zip(self.coefficients, self.compositions)
-                ]
-            )
-            / 2
-        )
-
-    @property
-    def energy_per_atom(self) -> float:
-        """The energy per atom of this reaction in eV"""
-        return self.energy / self.num_atoms

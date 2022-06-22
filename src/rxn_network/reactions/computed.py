@@ -3,6 +3,7 @@ A reaction class that builds reactions based on ComputedEntry objects and provid
 information about reaction thermodynamics.
 """
 from typing import Dict, List, Optional, Union
+from functools import cached_property
 
 import numpy as np
 from pymatgen.core.composition import Composition
@@ -121,7 +122,7 @@ class ComputedReaction(BasicReaction):
             ]
         )
 
-    @property
+    @cached_property
     def energy_per_atom(self) -> float:
         """
         Returns (float):

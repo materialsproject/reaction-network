@@ -6,6 +6,7 @@ pymatgen and streamlined for the reaction-network code.
 import re
 from copy import deepcopy
 from itertools import chain, combinations
+from functools import cached_property, lru_cache
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -13,6 +14,19 @@ from monty.fractions import gcd_float
 from pymatgen.core.composition import Composition, Element
 
 from rxn_network.core import Reaction
+
+# TO-DO: Find better method for caching formula than monkey patching a class from pymatgen.
+@cached_property  # type: ignore
+def cached_reduced_formula(self):
+    """
+    Simple caching for Composition's reduced formula. Due to repetitive calls to this
+    property, this can offer a significant speedup.
+    """
+    return self.get_reduced_formula_and_factor()[0]
+
+
+Composition.reduced_formula = cached_reduced_formula  # type: ignore # noqa
+Composition.reduced_formula.__set_name__(Composition, "reduced_formula")  # type: ignore # noqa
 
 
 class BasicReaction(Reaction):
@@ -336,6 +350,16 @@ class BasicReaction(Reaction):
     def coefficients(self) -> np.ndarray:  # pylint: disable = W0236
         """Array of reaction coefficients"""
         return self._coefficients
+
+    @property
+    def num_atoms(self) -> float:
+        """Total number of atoms in this reaction"""
+        return round(
+            sum(
+                coeff * sum([c[el] for el in self.elements])
+                for c, coeff in self.product_coeffs.items()
+            )
+        )
 
     @property
     def energy(self) -> float:

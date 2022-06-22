@@ -130,7 +130,7 @@ class InterfaceReactionHull(MSONable):
 
         raise ValueError("No reactions found!")
 
-    def get_competition_score(self, reaction: ComputedReaction, scale=100):
+    def get_primary_selectivity(self, reaction: ComputedReaction, scale=100):
         """
         Calculates the competition score (c-score) for a given reaction. This formula is
         based on a methodology presented in the following paper: (TBD)
@@ -145,15 +145,12 @@ class InterfaceReactionHull(MSONable):
         competing_rxns = [
             r for r in self.reactions if r != reaction and not r.is_identity
         ]
-        c_score = np.sum(
-            [
-                np.log(1 + np.exp(scale * (energy - r.energy_per_atom)))
-                for r in competing_rxns
-            ]
-        )
+        energies = np.array([energy - r.energy_per_atom for r in competing_rxns])
+        c_score = np.sum(np.log(1 + np.exp(scale * energies)))
+
         return c_score
 
-    def get_selectivity_score(
+    def get_secondary_selectivity(
         self, reaction: ComputedReaction, normalize=True, recursive=False
     ):
         """
@@ -187,11 +184,16 @@ class InterfaceReactionHull(MSONable):
         if right_num_paths == 0:
             right_num_paths = 1
 
-        if normalize:
-            left_energy = left_energy / left_num_paths
-            right_energy = right_energy / right_num_paths
+        energy = left_energy * right_num_paths + right_energy * left_num_paths
+        total = left_num_paths * right_num_paths
 
-        return -1 * (left_energy + right_energy)
+        if normalize:
+            energy = energy / total
+
+        e_above_hull = self.get_energy_above_hull(reaction)
+        energy -= e_above_hull
+
+        return -1 * energy
 
     def get_decomposition_energy(self, x1: float, x2: float):
         coords = self.get_coords_in_range(x1, x2)
@@ -310,9 +312,9 @@ class InterfaceReactionHull(MSONable):
         """
         Courtesy Max G.
         """
-        if N == 0:
+        if n == 0:
             return 1, [1]
-        elif N == 1:
+        elif n == 1:
             return 1, [1, 1]
         elif len(cache) >= n:
             return cache[n], cache
