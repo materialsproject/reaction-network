@@ -9,7 +9,8 @@ from typing import Dict
 
 import numpy as np
 import pandas
-from pymatgen.core.composition import Composition
+from rxn_network.core.composition import Composition
+
 from thermochem.janaf import Janafdb
 from tqdm import tqdm
 

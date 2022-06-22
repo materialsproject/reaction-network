@@ -7,7 +7,8 @@ from typing import List
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
-from pymatgen.core.composition import Composition, Element
+from rxn_network.core.composition import Composition
+from pymatgen.core.composition import Element
 
 from rxn_network.costs.competition import CompetitionScoreCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
@@ -253,7 +254,7 @@ class BuildNetwork(FiretaskBase):
         rn.write_graph(graph_fn)
         dumpfn(rn, network_fn)
 
-        name = f"Reaction Network (Targets: " f"{targets}): {chemsys}"
+        name = f"Reaction Network (Targets: {targets}): {chemsys}"
 
         return FWAction(
             update_spec={

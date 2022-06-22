@@ -5,7 +5,7 @@ import hashlib
 from typing import Dict, List, Optional
 
 from monty.json import MontyDecoder
-from pymatgen.core.composition import Composition
+from rxn_network.core.composition import Composition
 from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
 from scipy.interpolate import interp1d
 

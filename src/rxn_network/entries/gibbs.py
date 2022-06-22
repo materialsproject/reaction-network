@@ -10,7 +10,7 @@ from typing import List, Optional
 
 import numpy as np
 from monty.json import MontyDecoder
-from pymatgen.core.composition import Composition
+from rxn_network.core.composition import Composition
 from pymatgen.core.structure import Structure
 from pymatgen.entries.computed_entries import (
     ComputedEntry,
@@ -20,20 +20,6 @@ from pymatgen.entries.computed_entries import (
 from scipy.interpolate import interp1d
 
 from rxn_network.data import G_ELEMS
-
-
-# TO-DO: Find better method for caching formula than monkey patching a class from pymatgen.
-@cached_property  # type: ignore
-def cached_reduced_formula(self):
-    """
-    Simple caching for Composition's reduced formula. Due to repetitive calls to this
-    property, this can offer a significant speedup.
-    """
-    return self.get_reduced_formula_and_factor()[0]
-
-
-Composition.reduced_formula = cached_reduced_formula  # type: ignore # noqa
-Composition.reduced_formula.__set_name__(Composition, "reduced_formula")  # type: ignore # noqa
 
 
 class GibbsComputedEntry(ComputedEntry):

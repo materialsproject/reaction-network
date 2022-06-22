@@ -9,7 +9,7 @@ from typing import List
 
 import numpy as np
 from numba import njit, prange
-from pymatgen.core.composition import Composition
+from rxn_network.core.composition import Composition
 from scipy.special import comb
 from tqdm import tqdm
 

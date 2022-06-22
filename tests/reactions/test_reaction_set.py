@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from monty.serialization import loadfn
+from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet

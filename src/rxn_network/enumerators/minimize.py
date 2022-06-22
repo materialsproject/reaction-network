@@ -11,7 +11,8 @@ from pymatgen.analysis.interface_reactions import (
     GrandPotentialInterfacialReactivity,
     InterfacialReactivity,
 )
-from pymatgen.core.composition import Composition, Element
+from rxn_network.core.composition import Composition
+from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.enumerators.basic import BasicEnumerator

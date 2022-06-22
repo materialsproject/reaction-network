@@ -6,7 +6,7 @@ from typing import Dict, Iterable, Optional, Union
 
 from fireworks import Firework
 from pymatgen.analysis.reaction_calculator import Reaction, ReactionError
-from pymatgen.core.composition import Composition
+from rxn_network.core.composition import Composition
 
 from rxn_network.core import CostFunction, Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet

@@ -6,7 +6,8 @@ from typing import Dict, Iterable, List, Optional, Set, Union
 
 import numpy as np
 import ray
-from pymatgen.core.composition import Composition, Element
+from rxn_network.core.composition import Composition
+from pymatgen.core.composition import Element
 from tqdm import tqdm
 
 from rxn_network.core.calculator import Calculator

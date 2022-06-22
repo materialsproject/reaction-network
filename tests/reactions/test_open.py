@@ -1,6 +1,7 @@
 """ Tests for OpenComputedReaction. """
 import pytest
 
+from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
 from rxn_network.reactions.open import OpenComputedReaction
 

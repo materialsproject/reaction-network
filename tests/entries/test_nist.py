@@ -1,7 +1,7 @@
 """ Tests for NistReferenceEntry. """
 import pytest
 
-from pymatgen.core.composition import Composition
+from rxn_network.core.composition import Composition
 
 from rxn_network.entries.nist import NISTReferenceEntry
 
