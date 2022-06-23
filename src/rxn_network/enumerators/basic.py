@@ -3,9 +3,11 @@ This module implements two types of basic reaction enumerators, differing in the
 to consider open entries.
 """
 from copy import deepcopy
-from itertools import combinations, product
+from itertools import combinations, product, cycle
 from math import comb
 from typing import List, Optional, Set
+
+import multiprocessing as mp
 
 import ray
 from numpy import median
@@ -135,49 +137,18 @@ class BasicEnumerator(Enumerator):
         items = combos_dict.items()
 
         parallel = False
-        median_comp_size = median([len(v) for v in combos_dict.values()])
+        rxns = []
 
-        if (
-            median_comp_size > PARALLEL_THRESHOLD
-            and len(combos_dict) > 1
-            and self.parallel
-        ):
-            parallel = True
-
-            initialize_ray()
-            obj = ray.put(self)
-            open_combos = ray.put(open_combos)
-            entries = ray.put(entries)
-            open_entries = ray.put(open_entries)
-            precursors = ray.put(precursors)
-            targets = ray.put(targets)
-
-            rxns = [
-                _get_rxns_from_chemsys_ray.remote(
-                    obj, item, open_combos, entries, open_entries, precursors, targets
+        for item in tqdm(items, disable=self.quiet):
+            rxns.append(
+                self._get_rxns_in_chemsys(
+                    item, open_combos, entries, open_entries, precursors, targets
                 )
-                for item in items
-            ]
-        else:
-            rxns = []
-
-            for item in tqdm(items, disable=self.quiet):
-                rxns.append(
-                    self._get_rxns_in_chemsys(
-                        item, open_combos, entries, open_entries, precursors, targets
-                    )
-                )
+            )
 
         results = []
 
-        if parallel:
-            iterator = to_iterator(rxns)
-            if not self.quiet:
-                iterator = tqdm(iterator, total=len(rxns), disable=self.quiet)
-        else:
-            iterator = rxns
-
-        for r in iterator:
+        for r in rxns:
             results.extend(r)
 
         return list(set(results))
@@ -283,83 +254,82 @@ class BasicEnumerator(Enumerator):
         if not open_entries:
             open_entries = set()
 
+        with mp.get_context("fork").Pool(mp.cpu_count() - 1) as pool:
+            rxns = pool.starmap(
+                self.get_rxns,
+                zip(
+                    rxn_iterable,
+                    cycle([open_entries]),
+                    cycle([precursors]),
+                    cycle([targets]),
+                    cycle([p_set_func]),
+                    cycle([t_set_func]),
+                    cycle([self.remove_unbalanced]),
+                    cycle([self.remove_changed]),
+                ),
+                10000,
+            )
+        return [r for rxn_list in rxns for r in rxn_list]
+
+    @staticmethod
+    def get_rxns(
+        rp,
+        open_entries,
+        precursors,
+        targets,
+        p_set_func,
+        t_set_func,
+        remove_unbalanced,
+        remove_changed,
+    ):
+        def react(reactants, products):
+            forward_rxn = ComputedReaction.balance(reactants, products)
+            backward_rxn = forward_rxn.reverse()
+            return [forward_rxn, backward_rxn]
+
+        r = set(rp[0]) if rp[0] else set()
+        p = set(rp[1]) if rp[1] else set()
+        all_phases = r | p
+
+        precursor_func = (
+            getattr(precursors | open_entries, p_set_func)
+            if precursors
+            else lambda e: True
+        )
+        target_func = (
+            getattr(targets | open_entries, t_set_func) if targets else lambda e: True
+        )
+
+        if (
+            (r & p)
+            or (precursors and not precursors & all_phases)
+            or (p and targets and not targets & all_phases)
+        ):
+            return []
+
+        if not (precursor_func(r) or (p and precursor_func(p))):
+            return []
+        if p and not (target_func(r) or target_func(p)):
+            return []
+
+        suggested_rxns = react(r, p)
+
         rxns = []
-
-        for reactants, products in rxn_iterable:
-            r = set(reactants) if reactants else set()
-            p = set(products) if products else set()
-            all_phases = r | p
-
-            precursor_func = (
-                getattr(precursors | open_entries, p_set_func)
-                if precursors
-                else lambda e: True
-            )
-            target_func = (
-                getattr(targets | open_entries, t_set_func)
-                if targets
-                else lambda e: True
-            )
-
+        for rxn in suggested_rxns:
             if (
-                (r & p)
-                or (precursors and not precursors & all_phases)
-                or (p and targets and not targets & all_phases)
+                rxn.is_identity
+                or (remove_unbalanced and not rxn.balanced)
+                or (remove_changed and rxn.lowest_num_errors != 0)
             ):
                 continue
 
-            if not (precursor_func(r) or (p and precursor_func(p))):
-                continue
-            if p and not (target_func(r) or target_func(p)):
-                continue
+            reactant_entries = set(rxn.reactant_entries) - open_entries
+            product_entries = set(rxn.product_entries) - open_entries
 
-            suggested_rxns = self._react(
-                r, p, calculators, filtered_entries, pd, grand_pd
-            )
-
-            for rxn in suggested_rxns:
-                if (
-                    rxn.is_identity
-                    or (self.remove_unbalanced and not rxn.balanced)
-                    or (self.remove_changed and rxn.lowest_num_errors != 0)
-                ):
-                    continue
-
-                reactant_entries = set(rxn.reactant_entries) - open_entries
-                product_entries = set(rxn.product_entries) - open_entries
-
-                if precursor_func(reactant_entries) and target_func(product_entries):
-                    rxns.append(rxn)
+            if precursor_func(reactant_entries) and target_func(product_entries):
+                rxns.append(rxn)
 
         return rxns
-
-    def _react(
-        self,
-        reactants,
-        products,
-        calculators,
-        filtered_entries=None,
-        pd=None,
-        grand_pd=None,
-    ):
-        """
-        Generates reactions from a list of reactants, products, and optional
-        calculator(s)
-        """
-        _ = (
-            filtered_entries,
-            pd,
-            grand_pd,
-            self,
-        )  # unused arguments in BasicEnumerator class
-
-        forward_rxn = ComputedReaction.balance(reactants, products)
-        backward_rxn = forward_rxn.reverse()
-
-        forward_rxn = apply_calculators(forward_rxn, calculators)
-        backward_rxn = apply_calculators(backward_rxn, calculators)
-
-        return [forward_rxn, backward_rxn]
 
     @staticmethod
     def _get_rxn_iterable(combos, open_combos):
