@@ -16,13 +16,11 @@ from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import (
     group_by_chemsys,
-    initialize_calculators,
     initialize_entry,
     react,
 )
 from rxn_network.reactions import ComputedReaction
-from rxn_network.utils import limited_powerset, to_iterator
-
+from rxn_network.utils import limited_powerset
 
 
 class BasicEnumerator(Enumerator):
