@@ -139,12 +139,19 @@ class BasicEnumerator(Enumerator):
         parallel = False
         rxns = []
 
-        for item in tqdm(items, disable=self.quiet):
-            rxns.append(
-                self._get_rxns_in_chemsys(
-                    item, open_combos, entries, open_entries, precursors, targets
+        with mp.Pool(mp.cpu_count() - 1) as pool:
+            for item in tqdm(items, disable=self.quiet):
+                rxns.append(
+                    self._get_rxns_in_chemsys(
+                        pool,
+                        item,
+                        open_combos,
+                        entries,
+                        open_entries,
+                        precursors,
+                        targets,
+                    )
                 )
-            )
 
         results = []
 
@@ -200,6 +207,7 @@ class BasicEnumerator(Enumerator):
 
     def _get_rxns_in_chemsys(
         self,
+        pool,
         item,
         open_combos,
         entries,
@@ -217,6 +225,7 @@ class BasicEnumerator(Enumerator):
         rxn_iter = self._get_rxn_iterable(combos, open_combos)
 
         rxns = self._get_rxns_from_iterable(
+            pool,
             rxn_iter,
             precursors,
             targets,
@@ -228,6 +237,7 @@ class BasicEnumerator(Enumerator):
 
     def _get_rxns_from_iterable(
         self,
+        pool,
         rxn_iterable,
         precursors,
         targets,
@@ -254,21 +264,20 @@ class BasicEnumerator(Enumerator):
         if not open_entries:
             open_entries = set()
 
-        with mp.get_context("fork").Pool(mp.cpu_count() - 1) as pool:
-            rxns = pool.starmap(
-                self.get_rxns,
-                zip(
-                    rxn_iterable,
-                    cycle([open_entries]),
-                    cycle([precursors]),
-                    cycle([targets]),
-                    cycle([p_set_func]),
-                    cycle([t_set_func]),
-                    cycle([self.remove_unbalanced]),
-                    cycle([self.remove_changed]),
-                ),
-                10000,
-            )
+        rxns = pool.starmap(
+            self.get_rxns,
+            zip(
+                rxn_iterable,
+                cycle([open_entries]),
+                cycle([precursors]),
+                cycle([targets]),
+                cycle([p_set_func]),
+                cycle([t_set_func]),
+                cycle([self.remove_unbalanced]),
+                cycle([self.remove_changed]),
+            ),
+            10000,
+        )
         return [r for rxn_list in rxns for r in rxn_list]
 
     @staticmethod
