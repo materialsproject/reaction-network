@@ -1,6 +1,6 @@
 from pymatgen.core.composition import Composition as PymatgenComposition
 from pymatgen.core.composition import reduce_formula
-from functools import lru_cache
+from functools import lru_cache, cached_property
 
 
 class Composition(PymatgenComposition):
@@ -43,3 +43,11 @@ class Composition(PymatgenComposition):
             factor /= 2
 
         return formula, factor
+
+    @cached_property
+    def reduced_formula(self) -> str:
+        """
+        Returns a pretty normalized formula, i.e., LiFePO4 instead of
+        Li4Fe4P4O16.
+        """
+        return self.get_reduced_formula_and_factor()[0]

@@ -5,7 +5,8 @@ forming a reaction pathway.
 
 from typing import List, Optional
 
-from rxn_network.core import Pathway, Reaction
+from rxn_network.core.reaction import Reaction
+from rxn_network.core.pathway import Pathway
 
 
 class BasicPathway(Pathway):

@@ -9,7 +9,7 @@ from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry
 
 import rxn_network.costs.calculators as calcs
-from rxn_network.core import Reaction
+from rxn_network.core.reaction import Reaction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction

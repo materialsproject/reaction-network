@@ -101,7 +101,7 @@ class ComputedReaction(BasicReaction):
             lowest_num_errors=self.lowest_num_errors,
         )
 
-    @property
+    @cached_property
     def energy(self) -> float:
         """
         Returns (float):
@@ -131,7 +131,7 @@ class ComputedReaction(BasicReaction):
         """
         return self.energy / self.num_atoms
 
-    @property
+    @cached_property
     def energy_uncertainty(self) -> float:
         """
         Calculates the uncertainty in the reaction energy based on the uncertainty in the
@@ -156,7 +156,7 @@ class ComputedReaction(BasicReaction):
 
         return energy_with_uncertainty.s  # type: ignore
 
-    @property
+    @cached_property
     def energy_uncertainty_per_atom(self) -> float:
         """
         Returns the energy_uncertainty divided by the total number of atoms in

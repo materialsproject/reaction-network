@@ -150,7 +150,7 @@ def test_reverse():
     rxn_reverse = rxn.reverse()
 
     assert (
-        rxn_reverse
+        str(rxn_reverse)
         == "Li2O + La2Zr2O7 + 0.6667 Li3CoO3 -> La2O3 + 0.3333 Co2O3 + 2 Li2ZrO3"
     )
     assert rxn_reverse.reverse() == rxn
@@ -161,10 +161,10 @@ def test_normalize(pre_balanced_rxn):
     rxn_o2_norm = pre_balanced_rxn.normalize_to(Composition("O2"))
     rxn_o2_norm_5 = pre_balanced_rxn.normalize_to(Composition("O2"), 5)
 
-    assert rxn == "4 Fe + 3 O2 -> 2 Fe2O3"
+    assert str(rxn) == "4 Fe + 3 O2 -> 2 Fe2O3"
     assert factor == 2
-    assert rxn_o2_norm == "1.333 Fe + O2 -> 0.6667 Fe2O3"
-    assert rxn_o2_norm_5 == "6.667 Fe + 5 O2 -> 3.333 Fe2O3"
+    assert str(rxn_o2_norm) == "1.333 Fe + O2 -> 0.6667 Fe2O3"
+    assert str(rxn_o2_norm_5) == "6.667 Fe + 5 O2 -> 3.333 Fe2O3"
 
 
 def test_from_string(pre_balanced_rxn):

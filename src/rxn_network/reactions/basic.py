@@ -4,17 +4,19 @@ pymatgen and streamlined for the reaction-network code.
 """
 
 import re
+import math
 from copy import deepcopy
 from itertools import chain, combinations
 from functools import cached_property, lru_cache
 from typing import Dict, List, Optional, Tuple, Union
+from pytest import approx
 
 import numpy as np
 from monty.fractions import gcd_float
 from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
 
-from rxn_network.core import Reaction
+from rxn_network.core.reaction import Reaction
 
 
 class BasicReaction(Reaction):
@@ -339,7 +341,7 @@ class BasicReaction(Reaction):
         """Array of reaction coefficients"""
         return self._coefficients
 
-    @property
+    @cached_property
     def num_atoms(self) -> float:
         """Total number of atoms in this reaction"""
         return round(
@@ -359,8 +361,12 @@ class BasicReaction(Reaction):
         """The energy per atom of this reaction"""
         raise ValueError("No energy per atom for a basic reaction!")
 
-    @property
+    @cached_property
     def is_identity(self):
+        """Returns True if the reaction has identical reactants and products"""
+        return self.get_is_identity()
+
+    def get_is_identity(self):
         """Returns True if the reaction has identical reactants and products"""
         if set(self.reactants) != set(self.products):
             return False
@@ -371,7 +377,7 @@ class BasicReaction(Reaction):
             for c in self.reactant_coeffs
         )
 
-    @property
+    @cached_property
     def chemical_system(self):
         """Returns the chemical system as string in the form of A-B-C-..."""
         return "-".join(sorted([str(el) for el in self.elements]))
@@ -497,13 +503,24 @@ class BasicReaction(Reaction):
         if self is other:
             return True
 
-        if str(self) == str(other):
-            is_equal = True
-        else:
-            is_equal = (set(self.reactants) == set(other.reactants)) & (
-                set(self.products) == set(other.products)
-            )
-        return is_equal
+        if not self.chemical_system == other.chemical_system:
+            return False
+
+        if not len(self.products) == len(other.products):
+            return False
+
+        if not len(self.reactants) == len(other.reactants):
+            return False
+
+        if not sorted(self.coefficients) == approx(sorted(other.coefficients)):
+            return False
+
+        if not set(self.compositions) == set(other.compositions):
+            return False
+
+        return (set(self.reactants) == set(other.reactants)) & (
+            set(self.products) == set(other.products)
+        )
 
     def __hash__(self):
         return hash(

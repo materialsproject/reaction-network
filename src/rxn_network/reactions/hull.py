@@ -142,9 +142,8 @@ class InterfaceReactionHull(MSONable):
             The c-score for the reaction
         """
         energy = reaction.energy_per_atom
-        competing_rxns = [
-            r for r in self.reactions if r != reaction and not r.is_identity
-        ]
+        idx = self.reactions.index(reaction)
+        competing_rxns = self.reactions[:idx] + self.reactions[idx + 1 :]
         energies = np.array([energy - r.energy_per_atom for r in competing_rxns])
         c_score = np.sum(np.log(1 + np.exp(scale * energies)))
 

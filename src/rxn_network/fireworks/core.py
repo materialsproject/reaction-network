@@ -8,7 +8,8 @@ from fireworks import Firework
 from pymatgen.analysis.reaction_calculator import Reaction, ReactionError
 from rxn_network.core.composition import Composition
 
-from rxn_network.core import CostFunction, Enumerator
+from rxn_network.core.cost_function import CostFunction
+from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (

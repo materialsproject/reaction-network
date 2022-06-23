@@ -13,7 +13,7 @@ from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDia
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
 
-from rxn_network.core import Enumerator
+from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import (
     apply_calculators,
