@@ -3,7 +3,7 @@ This module implements added features to the ChemicalPotentialDiagram class from
 pymatgen.
 """
 import logging
-from functools import cached_property
+from functools import cached_property, lru_cache
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -83,6 +83,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             range(num_hyperplanes, num_hyperplanes + num_border_hyperplanes)
         )
 
+    @lru_cache
     def shortest_domain_distance(self, f1: str, f2: str) -> float:
         """
         Args:
@@ -186,6 +187,11 @@ class ChemicalPotentialDiagram(ChempotDiagram):
     def hs_int(self):
         """Returns the scipy HalfSpaceIntersection object"""
         return self._hs_int
+
+    @cached_property
+    def domains(self) -> dict[str, np.ndarray]:
+        """Mapping of formulas to array of domain boundary points"""
+        return self._get_domains()
 
     @cached_property
     def metastable_domains(self) -> Dict[str, np.ndarray]:
