@@ -2,15 +2,12 @@
 This module implements two types of basic reaction enumerators, differing in the option
 to consider open entries.
 """
+import multiprocessing as mp
 from copy import deepcopy
-from itertools import combinations, product, cycle
+from itertools import combinations, cycle, product
 from math import comb
 from typing import List, Optional, Set
 
-import multiprocessing as mp
-
-import ray
-from numpy import median
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
@@ -18,15 +15,14 @@ from tqdm import tqdm
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import (
-    apply_calculators,
     group_by_chemsys,
     initialize_calculators,
     initialize_entry,
+    react,
 )
 from rxn_network.reactions import ComputedReaction
-from rxn_network.utils import initialize_ray, limited_powerset, to_iterator
+from rxn_network.utils import limited_powerset, to_iterator
 
-PARALLEL_THRESHOLD = 4  # median computation size above which parallelization enabled
 
 
 class BasicEnumerator(Enumerator):
@@ -42,7 +38,6 @@ class BasicEnumerator(Enumerator):
         self,
         precursors: Optional[List[str]] = None,
         targets: Optional[List[str]] = None,
-        calculators: Optional[List[str]] = None,
         n: int = 2,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
@@ -50,7 +45,6 @@ class BasicEnumerator(Enumerator):
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = True,
         quiet: bool = False,
-        parallel: bool = True,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -80,9 +74,7 @@ class BasicEnumerator(Enumerator):
                 removing a reactant/product or having it change sides. Defaults to True.
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
-        super().__init__(
-            precursors=precursors, targets=targets, calculators=calculators
-        )
+        super().__init__(precursors=precursors, targets=targets)
 
         self.n = n
         self.exclusive_precursors = exclusive_precursors
@@ -91,7 +83,6 @@ class BasicEnumerator(Enumerator):
         self.remove_changed = remove_changed
         self.calculate_e_above_hulls = calculate_e_above_hulls
         self.quiet = quiet
-        self.parallel = parallel
 
         self._stabilize = False
 
@@ -136,7 +127,6 @@ class BasicEnumerator(Enumerator):
 
         items = combos_dict.items()
 
-        parallel = False
         rxns = []
 
         with mp.Pool(mp.cpu_count() - 1) as pool:
@@ -159,18 +149,6 @@ class BasicEnumerator(Enumerator):
             results.extend(r)
 
         return list(set(results))
-
-    def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
-        """
-        Estimate the upper bound of the number of possible reactions. This will
-        correlate with the amount of time it takes to enumerate reactions.
-
-        Args:
-            entries: A list of all entries to consider
-
-        Returns: The upper bound on the number of possible reactions
-        """
-        return sum([comb(len(entries), i) for i in range(1, self.n + 1)]) ** 2
 
     def _get_combos_dict(
         self, entries, precursor_entries, target_entries, open_entries
@@ -220,7 +198,6 @@ class BasicEnumerator(Enumerator):
 
         elems = chemsys.split("-")
         filtered_entries = entries.get_subset_in_chemsys(elems)
-        calculators = initialize_calculators(self.calculators, filtered_entries)
 
         rxn_iter = self._get_rxn_iterable(combos, open_combos)
 
@@ -229,7 +206,6 @@ class BasicEnumerator(Enumerator):
             rxn_iter,
             precursors,
             targets,
-            calculators,
             filtered_entries,
             open_entries,
         )
@@ -241,7 +217,6 @@ class BasicEnumerator(Enumerator):
         rxn_iterable,
         precursors,
         targets,
-        calculators,
         filtered_entries=None,
         open_entries=None,
     ):
@@ -265,9 +240,10 @@ class BasicEnumerator(Enumerator):
             open_entries = set()
 
         rxns = pool.starmap(
-            self.get_rxns,
+            react,
             zip(
                 rxn_iterable,
+                cycle([self._react_function]),
                 cycle([open_entries]),
                 cycle([precursors]),
                 cycle([targets]),
@@ -275,70 +251,19 @@ class BasicEnumerator(Enumerator):
                 cycle([t_set_func]),
                 cycle([self.remove_unbalanced]),
                 cycle([self.remove_changed]),
+                cycle([filtered_entries]),
+                cycle([pd]),
+                cycle([grand_pd]),
             ),
             10000,
         )
         return [r for rxn_list in rxns for r in rxn_list]
 
     @staticmethod
-    def get_rxns(
-        rp,
-        open_entries,
-        precursors,
-        targets,
-        p_set_func,
-        t_set_func,
-        remove_unbalanced,
-        remove_changed,
-    ):
-        def react(reactants, products):
-            forward_rxn = ComputedReaction.balance(reactants, products)
-            backward_rxn = forward_rxn.reverse()
-            return [forward_rxn, backward_rxn]
-
-        r = set(rp[0]) if rp[0] else set()
-        p = set(rp[1]) if rp[1] else set()
-        all_phases = r | p
-
-        precursor_func = (
-            getattr(precursors | open_entries, p_set_func)
-            if precursors
-            else lambda e: True
-        )
-        target_func = (
-            getattr(targets | open_entries, t_set_func) if targets else lambda e: True
-        )
-
-        if (
-            (r & p)
-            or (precursors and not precursors & all_phases)
-            or (p and targets and not targets & all_phases)
-        ):
-            return []
-
-        if not (precursor_func(r) or (p and precursor_func(p))):
-            return []
-        if p and not (target_func(r) or target_func(p)):
-            return []
-
-        suggested_rxns = react(r, p)
-
-        rxns = []
-        for rxn in suggested_rxns:
-            if (
-                rxn.is_identity
-                or (remove_unbalanced and not rxn.balanced)
-                or (remove_changed and rxn.lowest_num_errors != 0)
-            ):
-                continue
-
-            reactant_entries = set(rxn.reactant_entries) - open_entries
-            product_entries = set(rxn.product_entries) - open_entries
-
-            if precursor_func(reactant_entries) and target_func(product_entries):
-                rxns.append(rxn)
-
-        return rxns
+    def _react_function(reactants, products, **kwargs):
+        forward_rxn = ComputedReaction.balance(reactants, products)
+        backward_rxn = forward_rxn.reverse()
+        return [forward_rxn, backward_rxn]
 
     @staticmethod
     def _get_rxn_iterable(combos, open_combos):
@@ -434,6 +359,18 @@ class BasicEnumerator(Enumerator):
 
         return filtered_dict
 
+    def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
+        """
+        Estimate the upper bound of the number of possible reactions. This will
+        correlate with the amount of time it takes to enumerate reactions.
+
+        Args:
+            entries: A list of all entries to consider
+
+        Returns: The upper bound on the number of possible reactions
+        """
+        return sum([comb(len(entries), i) for i in range(1, self.n + 1)]) ** 2
+
     @property
     def stabilize(self):
         """Whether or not to use only stable entries in analysis"""
@@ -503,14 +440,11 @@ class BasicOpenEnumerator(BasicEnumerator):
         super().__init__(
             precursors=precursors,
             targets=targets,
-            calculators=calculators,
             n=n,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
             remove_unbalanced=remove_unbalanced,
             remove_changed=remove_changed,
-            quiet=quiet,
-            parallel=parallel,
         )
         self.open_phases: List[str] = open_phases
 
@@ -556,16 +490,3 @@ class BasicOpenEnumerator(BasicEnumerator):
         rxn_iter = product(combos, combos_with_open)
 
         return rxn_iter
-
-
-@ray.remote
-def _get_rxns_from_chemsys_ray(
-    obj, item, open_combos, entries, open_entries, precursors, targets
-):
-    """
-    Wrapper function for parallelizing reaction enumeration using ray. See
-    _get_rxns_in_chemsys in BasicEnumerator for more details.
-    """
-    return obj._get_rxns_in_chemsys(  # pylint: disable=protected-access
-        item, open_combos, entries, open_entries, precursors, targets
-    )

@@ -7,10 +7,10 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
-from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
+from rxn_network.core.composition import Composition
 from rxn_network.reactions.computed import ComputedReaction
 
 

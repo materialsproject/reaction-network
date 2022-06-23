@@ -4,6 +4,10 @@ Utility functions used by the enumerator classes.
 import warnings
 from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 
+from pymatgen.analysis.interface_reactions import (
+    GrandPotentialInterfacialReactivity,
+    InterfacialReactivity,
+)
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry
@@ -13,6 +17,99 @@ from rxn_network.core.reaction import Reaction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
+
+
+def react(
+    rp,
+    react_function,
+    open_entries,
+    precursors,
+    targets,
+    p_set_func,
+    t_set_func,
+    remove_unbalanced,
+    remove_changed,
+    filtered_entries=None,
+    pd=None,
+    grand_pd=None,
+):
+    """Generalized react function"""
+
+    r = set(rp[0]) if rp[0] else set()
+    p = set(rp[1]) if rp[1] else set()
+    all_phases = r | p
+
+    precursor_func = (
+        getattr(precursors | open_entries, p_set_func) if precursors else lambda e: True
+    )
+    target_func = (
+        getattr(targets | open_entries, t_set_func) if targets else lambda e: True
+    )
+
+    if (
+        (r & p)
+        or (precursors and not precursors & all_phases)
+        or (p and targets and not targets & all_phases)
+    ):
+        return []
+
+    if not (precursor_func(r) or (p and precursor_func(p))):
+        return []
+    if p and not (target_func(r) or target_func(p)):
+        return []
+
+    suggested_rxns = react_function(
+        r, p, filtered_entries=filtered_entries, pd=pd, grand_pd=grand_pd
+    )
+
+    rxns = []
+    for rxn in suggested_rxns:
+        if (
+            rxn.is_identity
+            or (remove_unbalanced and not rxn.balanced)
+            or (remove_changed and rxn.lowest_num_errors != 0)
+        ):
+            continue
+
+        reactant_entries = set(rxn.reactant_entries) - open_entries
+        product_entries = set(rxn.product_entries) - open_entries
+
+        if precursor_func(reactant_entries) and target_func(product_entries):
+            rxns.append(rxn)
+
+    return rxns
+
+
+def react_interface(r1, r2, filtered_entries, pd, grand_pd=None):
+    """Simple API for InterfacialReactivity module from pymatgen."""
+    chempots = None
+
+    if grand_pd:
+        interface = GrandPotentialInterfacialReactivity(
+            r1,
+            r2,
+            grand_pd,
+            pd_non_grand=pd,
+            norm=True,
+            include_no_mixing_energy=True,
+            use_hull_energy=True,
+        )
+        chempots = grand_pd.chempots
+
+    else:
+        interface = InterfacialReactivity(
+            r1,
+            r2,
+            pd,
+            use_hull_energy=True,
+        )
+
+    rxns = []
+    for _, _, _, rxn, _ in interface.get_kinks():
+        rxn = get_computed_rxn(rxn, filtered_entries, chempots)
+        rxns.append(rxn)
+
+    return rxns
 
 
 def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = False):

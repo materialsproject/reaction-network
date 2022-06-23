@@ -5,9 +5,10 @@ import hashlib
 from typing import Dict, List, Optional
 
 from monty.json import MontyDecoder
-from rxn_network.core.composition import Composition
 from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
 from scipy.interpolate import interp1d
+
+from rxn_network.core.composition import Composition
 
 
 class ExperimentalReferenceEntry(ComputedEntry):

@@ -2,13 +2,14 @@
 Basic interface for a (chemical) Reaction
 """
 from abc import ABCMeta, abstractmethod
-from typing import List
 from functools import cached_property
+from typing import List
 
 import numpy as np
 from monty.json import MSONable
-from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
+
+from rxn_network.core.composition import Composition
 
 
 class Reaction(MSONable, metaclass=ABCMeta):

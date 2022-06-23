@@ -7,9 +7,9 @@ from typing import List
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
-from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
 
+from rxn_network.core.composition import Composition
 from rxn_network.costs.competition import CompetitionScoreCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import get_computed_rxn

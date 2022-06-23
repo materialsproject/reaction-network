@@ -8,10 +8,10 @@ from typing import Collection, List, Optional, Set, Union
 import numpy as np
 from monty.json import MSONable
 from pandas import DataFrame
-from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
+from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction

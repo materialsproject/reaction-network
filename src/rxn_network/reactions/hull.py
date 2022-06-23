@@ -1,12 +1,12 @@
 """Code for analyzing sets of reactions between two phases."""
 
-from typing import List
 from functools import cached_property, lru_cache
 from itertools import combinations
+from typing import List
 
 import numpy as np
 from monty.json import MSONable
-from plotly.express import scatter, line
+from plotly.express import line, scatter
 from plotly.graph_objs import Figure
 from pymatgen.core.composition import Composition
 from scipy.spatial import ConvexHull

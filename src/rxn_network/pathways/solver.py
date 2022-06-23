@@ -9,10 +9,10 @@ from typing import List
 
 import numpy as np
 from numba import njit, prange
-from rxn_network.core.composition import Composition
 from scipy.special import comb
 from tqdm import tqdm
 
+from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.pathway import Pathway
 from rxn_network.core.solver import Solver

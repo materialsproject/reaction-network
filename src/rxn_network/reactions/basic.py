@@ -3,19 +3,19 @@ This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.
 """
 
-import re
 import math
+import re
 from copy import deepcopy
-from itertools import chain, combinations
 from functools import cached_property, lru_cache
+from itertools import chain, combinations
 from typing import Dict, List, Optional, Tuple, Union
-from pytest import approx
 
 import numpy as np
 from monty.fractions import gcd_float
-from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
+from pytest import approx
 
+from rxn_network.core.composition import Composition
 from rxn_network.core.reaction import Reaction
 
 

@@ -10,7 +10,6 @@ from typing import List, Optional
 
 import numpy as np
 from monty.json import MontyDecoder
-from rxn_network.core.composition import Composition
 from pymatgen.core.structure import Structure
 from pymatgen.entries.computed_entries import (
     ComputedEntry,
@@ -19,6 +18,7 @@ from pymatgen.entries.computed_entries import (
 )
 from scipy.interpolate import interp1d
 
+from rxn_network.core.composition import Composition
 from rxn_network.data import G_ELEMS
 
 

@@ -6,11 +6,11 @@ from typing import Dict, Iterable, List, Optional, Set, Union
 
 import numpy as np
 import ray
-from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
 from tqdm import tqdm
 
 from rxn_network.core.calculator import Calculator
+from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.reaction import Reaction
 from rxn_network.entries.entry_set import GibbsEntrySet

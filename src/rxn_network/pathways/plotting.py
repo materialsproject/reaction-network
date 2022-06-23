@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 import pandas
 from monty.json import MSONable
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
 from scipy.ndimage.filters import median_filter
 from tqdm import tqdm
 
+from rxn_network.core.composition import Composition
 from rxn_network.entries import GibbsEntrySet
 
 
