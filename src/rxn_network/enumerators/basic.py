@@ -7,6 +7,7 @@ from copy import deepcopy
 from itertools import combinations, cycle, product
 from math import comb
 from typing import List, Optional, Set
+import ray
 
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
@@ -20,7 +21,7 @@ from rxn_network.enumerators.utils import (
     react,
 )
 from rxn_network.reactions import ComputedReaction
-from rxn_network.utils import limited_powerset
+from rxn_network.utils import limited_powerset, initialize_ray, to_iterator, grouper
 
 
 class BasicEnumerator(Enumerator):
@@ -32,7 +33,7 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    CHUNK_SIZE = 50
+    CHUNK_SIZE = 500
 
     def __init__(
         self,
@@ -116,6 +117,8 @@ class BasicEnumerator(Enumerator):
             entries: the set of all entries to enumerate from
         """
 
+        initialize_ray()
+
         entries, precursors, targets, open_entries = self._get_initialized_entries(
             entries
         )
@@ -127,27 +130,31 @@ class BasicEnumerator(Enumerator):
 
         items = combos_dict.items()
 
+        precursors = ray.put(precursors)
+        targets = ray.put(targets)
+
         rxns = []
 
-        with mp.Pool(mp.cpu_count() - 1) as pool:
-            for item in tqdm(items, disable=self.quiet):
-                rxns.append(
-                    self._get_rxns_in_chemsys(
-                        pool,
-                        item,
-                        open_combos,
-                        entries,
-                        open_entries,
-                        precursors,
-                        targets,
-                    )
+        for item in items:
+            rxns.extend(
+                self._get_rxns_in_chemsys(
+                    item,
+                    open_combos,
+                    entries,
+                    open_entries,
+                    precursors,
+                    targets,
                 )
+            )
 
         results = []
 
-        for rxns_ in rxns:
-            chemsys_rxns = [r for rxn_set in rxns_ for r in rxn_set]
-            results.extend(chemsys_rxns)
+        iterator = to_iterator(rxns)
+        if not self.quiet:
+            iterator = tqdm(iterator, total=len(rxns), disable=self.quiet)
+
+        for r in iterator:
+            results.extend(r)
 
         return list(set(results))
 
@@ -186,7 +193,6 @@ class BasicEnumerator(Enumerator):
 
     def _get_rxns_in_chemsys(
         self,
-        pool,
         item,
         open_combos,
         entries,
@@ -203,7 +209,6 @@ class BasicEnumerator(Enumerator):
         rxn_iter = self._get_rxn_iterable(combos, open_combos)
 
         rxns = self._get_rxns_from_iterable(
-            pool,
             rxn_iter,
             precursors,
             targets,
@@ -214,7 +219,6 @@ class BasicEnumerator(Enumerator):
 
     def _get_rxns_from_iterable(
         self,
-        pool,
         rxn_iterable,
         precursors,
         targets,
@@ -240,24 +244,33 @@ class BasicEnumerator(Enumerator):
         if not open_entries:
             open_entries = set()
 
-        rxns = pool.starmap(
-            react,
-            zip(
-                rxn_iterable,
-                cycle([self._react_function]),
-                cycle([open_entries]),
-                cycle([precursors]),
-                cycle([targets]),
-                cycle([p_set_func]),
-                cycle([t_set_func]),
-                cycle([self.remove_unbalanced]),
-                cycle([self.remove_changed]),
-                cycle([filtered_entries]),
-                cycle([pd]),
-                cycle([grand_pd]),
-            ),
-            self.CHUNK_SIZE,
-        )
+        react_function = ray.put(self._react_function)
+        open_entries = ray.put(open_entries)
+        p_set_func = ray.put(p_set_func)
+        t_set_func = ray.put(t_set_func)
+        remove_unbalanced = ray.put(self.remove_unbalanced)
+        remove_changed = ray.put(self.remove_changed)
+        filtered_entries = ray.put(filtered_entries)
+        pd = ray.put(pd)
+        grand_pd = ray.put(grand_pd)
+
+        rxns = [
+            react.remote(
+                rxn_iterable_chunk,
+                react_function,
+                open_entries,
+                precursors,
+                targets,
+                p_set_func,
+                t_set_func,
+                remove_unbalanced,
+                remove_changed,
+                filtered_entries,
+                pd,
+                grand_pd,
+            )
+            for rxn_iterable_chunk in grouper(rxn_iterable, self.CHUNK_SIZE)
+        ]
         return rxns
 
     @staticmethod
@@ -398,7 +411,7 @@ class BasicOpenEnumerator(BasicEnumerator):
     the ReactionSet class).
     """
 
-    CHUNK_SIZE = 2500
+    CHUNK_SIZE = 500
 
     def __init__(
         self,
