@@ -25,6 +25,8 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     automatically excluded.
     """
 
+    CHUNK_SIZE = 1000
+
     def __init__(
         self,
         precursors: Optional[List[str]] = None,
@@ -107,6 +109,8 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     convex hull along a straight line connecting any two phases in Phi-x
     phase space. Identity reactions are excluded.
     """
+
+    CHUNK_SIZE = 250
 
     def __init__(
         self,

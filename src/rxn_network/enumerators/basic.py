@@ -32,6 +32,8 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
+    CHUNK_SIZE = 50
+
     def __init__(
         self,
         precursors: Optional[List[str]] = None,
@@ -143,8 +145,9 @@ class BasicEnumerator(Enumerator):
 
         results = []
 
-        for r in rxns:
-            results.extend(r)
+        for rxns_ in rxns:
+            chemsys_rxns = [r for rxn_set in rxns_ for r in rxn_set]
+            results.extend(chemsys_rxns)
 
         return list(set(results))
 
@@ -253,9 +256,9 @@ class BasicEnumerator(Enumerator):
                 cycle([pd]),
                 cycle([grand_pd]),
             ),
-            10000,
+            self.CHUNK_SIZE,
         )
-        return [r for rxn_list in rxns for r in rxn_list]
+        return rxns
 
     @staticmethod
     def _react_function(reactants, products, **kwargs):
@@ -394,6 +397,8 @@ class BasicOpenEnumerator(BasicEnumerator):
     this does not return OpenComputedReaction objects (this can be calculated using
     the ReactionSet class).
     """
+
+    CHUNK_SIZE = 2500
 
     def __init__(
         self,
