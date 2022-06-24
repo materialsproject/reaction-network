@@ -13,11 +13,6 @@ def gibbs_enumerator_default():
 
 
 @pytest.fixture
-def gibbs_enumerator_with_calculator():
-    return MinimizeGibbsEnumerator(calculators=["ChempotDistanceCalculator"])
-
-
-@pytest.fixture
 def gibbs_enumerator_with_precursors():
     return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"])
 
@@ -61,20 +56,15 @@ def grand_potential_enumerator_with_precursors_and_target():
     )
 
 
-def test_enumerate_gibbs(
-    filtered_entries, gibbs_enumerator_default, gibbs_enumerator_with_calculator
-):
+def test_enumerate_gibbs(filtered_entries, gibbs_enumerator_default):
     expected_num_rxns = 109
 
-    for enumerator in [gibbs_enumerator_default, gibbs_enumerator_with_calculator]:
+    for enumerator in [gibbs_enumerator_default]:
         rxns = enumerator.enumerate(filtered_entries)
 
         assert len(rxns) == expected_num_rxns
         assert len(rxns) == len(set(rxns))
         assert all([not r.is_identity for r in rxns])
-
-        if enumerator.calculators:
-            assert all([r.data["chempot_distance"] is not None for r in rxns])
 
 
 def test_enumerate_gibbs_with_precursors(

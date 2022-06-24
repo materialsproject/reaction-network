@@ -2,7 +2,8 @@
 Utility functions used by the enumerator classes.
 """
 import warnings
-from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
+from typing import Dict, Iterable, List, Optional, Set, Tuple
+
 import ray
 from pymatgen.analysis.interface_reactions import (
     GrandPotentialInterfacialReactivity,
@@ -12,7 +13,6 @@ from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry
 
-import rxn_network.costs.calculators as calcs
 from rxn_network.core.reaction import Reaction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
@@ -147,35 +147,35 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = F
     return entry
 
 
-def initialize_calculators(
-    calculators: Union[List[calcs.Calculator], List[str]], entries: GibbsEntrySet
-):
-    """
-    Initialize a list of Calculators given a list of their names (strings) or
-    uninitialized objects, and a provided list of entries.
+# def initialize_calculators(
+#     calculators: Union[List[calcs.Calculator], List[str]], entries: GibbsEntrySet
+# ):
+#     """
+#     Initialize a list of Calculators given a list of their names (strings) or
+#     uninitialized objects, and a provided list of entries.
 
-    Args:
-        calculators: List of names of calculators
-        entries: List of entries or EntrySet-type object
-    """
-    calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in calculators]
-    return [c.from_entries(entries) for c in calculators]  # type: ignore
+#     Args:
+#         calculators: List of names of calculators
+#         entries: List of entries or EntrySet-type object
+#     """
+#     calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in calculators]
+#     return [c.from_entries(entries) for c in calculators]  # type: ignore
 
 
-def apply_calculators(
-    rxn: ComputedReaction, calculators: List[calcs.Calculator]
-) -> ComputedReaction:
-    """
-    Decorates a reaction by applying decorate() from a list of calculators.
+# def apply_calculators(
+#     rxn: ComputedReaction, calculators: List[calcs.Calculator]
+# ) -> ComputedReaction:
+#     """
+#     Decorates a reaction by applying decorate() from a list of calculators.
 
-    Args:
-        rxn: ComputedReaction object
-        calculators: List of (initialized) calculators
+#     Args:
+#         rxn: ComputedReaction object
+#         calculators: List of (initialized) calculators
 
-    """
-    for calc in calculators:
-        rxn = calc.decorate(rxn)
-    return rxn
+#     """
+#     for calc in calculators:
+#         rxn = calc.decorate(rxn)
+#     return rxn
 
 
 def get_elems_set(entries: Iterable[Entry]) -> Set[str]:

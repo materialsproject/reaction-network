@@ -1,17 +1,21 @@
 """Functions for working with Ray."""
 import os
+import logging
 
 import ray
 
 
-def initialize_ray():
+def initialize_ray(quiet=False):
     """
     Simple function to initialize ray. Checks enviornment for existence of "ip_head" for
     situations where the user is running on multiple nodes. Automatically creats a new
     ray cluster if it has not been initialized.
     """
+    logger = logging.getLogger("enumerator")
+    if not quiet:
+        logger.setLevel("INFO")
     if not ray.is_initialized():
-        print("Ray is not initialized. Trying with environment variables!")
+        logger.info("Ray is not initialized. Checking for existing cluster...")
         if os.environ.get("ip_head"):
             ray.init(
                 address="auto",
@@ -19,9 +23,11 @@ def initialize_ray():
                 _redis_password=os.environ["redis_password"],
             )
         else:
-            print("Could not identify existing Ray instance. Creating a new one...")
+            logger.info(
+                "Could not identify existing Ray instance. Creating a new one..."
+            )
             ray.init(_redis_password="default_password")
-        print(ray.nodes())
+            logger.info(ray.nodes())
 
 
 def to_iterator(obj_ids):

@@ -20,11 +20,6 @@ def basic_enumerator_default():
 
 
 @pytest.fixture
-def basic_enumerator_with_calculator():
-    return BasicEnumerator(calculators=["ChempotDistanceCalculator"])
-
-
-@pytest.fixture
 def basic_enumerator_with_precursors():
     return BasicEnumerator(precursors=["Y2O3", "Mn2O3"])
 
@@ -61,20 +56,15 @@ def basic_open_enumerator_with_precursors_and_target():
     )
 
 
-def test_enumerate(
-    filtered_entries, basic_enumerator_default, basic_enumerator_with_calculator
-):
+def test_enumerate(filtered_entries, basic_enumerator_default):
     expected_num_rxns = 538
 
-    for enumerator in [basic_enumerator_default, basic_enumerator_with_calculator]:
+    for enumerator in [basic_enumerator_default]:
         rxns = enumerator.enumerate(filtered_entries)
 
         assert expected_num_rxns == len(rxns)
         assert len(rxns) == len(set(rxns))
         assert all([not r.is_identity for r in rxns])
-
-        if enumerator.calculators:
-            assert all([r.data["chempot_distance"] is not None for r in rxns])
 
 
 def test_enumerate_with_precursors(

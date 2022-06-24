@@ -12,9 +12,7 @@ from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core.composition import Composition
 from rxn_network.enumerators.basic import BasicEnumerator
-from rxn_network.enumerators.utils import (
-    react_interface,
-)
+from rxn_network.enumerators.utils import react_interface
 
 
 class MinimizeGibbsEnumerator(BasicEnumerator):

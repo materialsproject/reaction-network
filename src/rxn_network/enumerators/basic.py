@@ -2,26 +2,22 @@
 This module implements two types of basic reaction enumerators, differing in the option
 to consider open entries.
 """
-import multiprocessing as mp
+import logging
 from copy import deepcopy
-from itertools import combinations, cycle, product
+from itertools import combinations, product
 from math import comb
 from typing import List, Optional, Set
-import ray
 
+import ray
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
 
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.enumerators.utils import (
-    group_by_chemsys,
-    initialize_entry,
-    react,
-)
+from rxn_network.enumerators.utils import group_by_chemsys, initialize_entry, react
 from rxn_network.reactions import ComputedReaction
-from rxn_network.utils import limited_powerset, initialize_ray, to_iterator, grouper
+from rxn_network.utils import grouper, initialize_ray, limited_powerset, to_iterator
 
 
 class BasicEnumerator(Enumerator):
@@ -90,6 +86,7 @@ class BasicEnumerator(Enumerator):
         self.open_phases: Optional[List] = None
         self._build_pd = False
         self._build_grand_pd = False
+        self.logger = logging.Logger("enumerator")
 
     def enumerate(self, entries: GibbsEntrySet) -> List[ComputedReaction]:
         """
@@ -117,7 +114,7 @@ class BasicEnumerator(Enumerator):
             entries: the set of all entries to enumerate from
         """
 
-        initialize_ray()
+        initialize_ray(quiet=self.quiet)
 
         entries, precursors, targets, open_entries = self._get_initialized_entries(
             entries
@@ -132,6 +129,7 @@ class BasicEnumerator(Enumerator):
 
         precursors = ray.put(precursors)
         targets = ray.put(targets)
+        react_function = ray.put(self._react_function)
 
         rxns = []
 
@@ -140,6 +138,7 @@ class BasicEnumerator(Enumerator):
                 self._get_rxns_in_chemsys(
                     item,
                     open_combos,
+                    react_function,
                     entries,
                     open_entries,
                     precursors,
@@ -195,6 +194,7 @@ class BasicEnumerator(Enumerator):
         self,
         item,
         open_combos,
+        react_function,
         entries,
         open_entries,
         precursors,
@@ -212,6 +212,7 @@ class BasicEnumerator(Enumerator):
             rxn_iter,
             precursors,
             targets,
+            react_function,
             filtered_entries,
             open_entries,
         )
@@ -222,6 +223,7 @@ class BasicEnumerator(Enumerator):
         rxn_iterable,
         precursors,
         targets,
+        react_function,
         filtered_entries=None,
         open_entries=None,
     ):
@@ -244,7 +246,6 @@ class BasicEnumerator(Enumerator):
         if not open_entries:
             open_entries = set()
 
-        react_function = ray.put(self._react_function)
         open_entries = ray.put(open_entries)
         p_set_func = ray.put(p_set_func)
         t_set_func = ray.put(t_set_func)
@@ -426,7 +427,6 @@ class BasicOpenEnumerator(BasicEnumerator):
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
-        parallel: bool = True,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
