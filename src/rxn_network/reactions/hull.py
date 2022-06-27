@@ -8,9 +8,9 @@ import numpy as np
 from monty.json import MSONable
 from plotly.express import line, scatter
 from plotly.graph_objs import Figure
-from pymatgen.core.composition import Composition
 from scipy.spatial import ConvexHull
 
+from rxn_network.core.composition import Composition
 from rxn_network.reactions.computed import ComputedReaction
 
 
@@ -18,8 +18,8 @@ class InterfaceReactionHull(MSONable):
     """
     A class for storing and analyzing a set of reactions at an interface between two
     reactants. This class is more generalized than the InterfacialReactivity class and
-    can encompass any set of reactions between two reactants, regardless of whether they
-    are on the convex hull.
+    can encompass any set of reactions between two reactants, regardless of whether
+    the reaction products are "stable" (i.e. together on the convex hull)
     """
 
     def __init__(
@@ -29,7 +29,8 @@ class InterfaceReactionHull(MSONable):
         Args:
             c1: Composition of reactant 1
             c2: Composition of reactant 2
-            reactions: Reaction set containing known reactions between the two reactants
+            reactions: List of reactions containing all enumerated reactions between the
+                two reactants. Note that this list should
         """
         self.c1 = c1.reduced_composition
         self.c2 = c2.reduced_composition
@@ -78,12 +79,13 @@ class InterfaceReactionHull(MSONable):
 
         fig.update_traces(
             hovertemplate=(
-                "<b>%{hovertext}</b><br> <br><b>Mixing ratio</b>:"
+                "<b>%{hovertext}</b><br> <br><b>Atomic fraction</b>:"
                 " %{x:.3f}<br><b>Energy</b>: %{y:.3f} (eV/atom)"
             )
         )
         fig.update_layout(yaxis_range=[min(self.coords[:, 1]) - 0.01, y_max])
-        fig.update_layout()
+        fig.update_layout(xaxis_title="Mixing ratio")
+        fig.update_layout(yaxis_title="Energy (eV/atom)")
 
         return fig
 
@@ -97,9 +99,8 @@ class InterfaceReactionHull(MSONable):
 
     def get_x_coordinate(self, reaction):
         """Get coordinate of reaction in reaction hull."""
-        x1 = reaction.reactant_fractions.get(self.c1, 0)
-        x2 = reaction.reactant_fractions.get(self.c2, 0)
-        return x2 / (x1 + x2)
+        x = reaction.reactant_atomic_fractions.get(self.c2, 0)
+        return x
 
     def get_hull_energy(self, coordinate):
         """ """

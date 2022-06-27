@@ -8,8 +8,8 @@ from maggma.core import Store
 from maggma.stores import GridFSStore
 from maggma.utils import grouper
 from monty.json import MontyDecoder, jsanitize
-from pymatgen.core.composition import Composition
 
+from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.utils.models import (
     ComputedSynthesisRecipe,

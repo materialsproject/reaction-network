@@ -1,6 +1,6 @@
 """Functions for working with Ray."""
-import os
 import logging
+import os
 
 import ray
 

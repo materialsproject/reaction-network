@@ -69,6 +69,8 @@ class BasicEnumerator(Enumerator):
                 Defaults to True.
             remove_changed: Whether to remove reactions which can only be balanced by
                 removing a reactant/product or having it change sides. Defaults to True.
+            calculate_e_above_hulls: Whether to calculate e_above_hull for each entry
+                upon initialization of the entries at the beginning of enumeration.
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
         super().__init__(precursors=precursors, targets=targets)
@@ -174,7 +176,11 @@ class BasicEnumerator(Enumerator):
 
         entries = entries - open_entries
 
-        combos = [set(c) for c in limited_powerset(entries, self.n)]
+        combos = []
+        for c in limited_powerset(entries, self.n):
+            c_set = set(c)
+            combos.append(c_set)
+
         combos_dict = group_by_chemsys(combos)
 
         filtered_combos = self._filter_dict_by_elems(

@@ -83,7 +83,6 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             range(num_hyperplanes, num_hyperplanes + num_border_hyperplanes)
         )
 
-    @lru_cache
     def shortest_domain_distance(self, f1: str, f2: str) -> float:
         """
         Args:

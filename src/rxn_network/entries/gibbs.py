@@ -4,7 +4,7 @@ this is similar to the implementation within pymatgen, but has been refactored h
 add extra functionality.
 """
 import hashlib
-from functools import cached_property
+from functools import cached_property, lru_cache
 from itertools import combinations
 from typing import List, Optional
 
@@ -72,13 +72,10 @@ class GibbsComputedEntry(ComputedEntry):
             data: Optional dictionary containing entry data
             entry_id: Optional entry-id, such as the entry's mp-id
         """
-        self._composition = Composition(composition)
-        self.formation_energy_per_atom = formation_energy_per_atom
+        composition = Composition(composition)
+        self._composition = composition
         self.volume_per_atom = volume_per_atom
-        self.temperature = temperature
-
-        num_atoms = self._composition.num_atoms
-
+        num_atoms = composition.num_atoms
         if temperature < 300 or temperature > 2000:
             raise ValueError("Temperature must be selected from range: [300, 2000] K.")
 
@@ -96,9 +93,7 @@ class GibbsComputedEntry(ComputedEntry):
                 self.gibbs_adjustment(temperature),
                 uncertainty=0.05 * num_atoms,  # descriptor has ~50 meV/atom MAD
                 name="Gibbs SISSO Correction",
-                description=(
-                    f"Gibbs correction: dGf({self.temperature} K) - dHf (298 K)"
-                ),
+                description=f"Gibbs correction: dGf({temperature} K) - dHf (298 K)",
             )
         )
 
@@ -112,6 +107,9 @@ class GibbsComputedEntry(ComputedEntry):
             data=data,
             entry_id=entry_id,
         )
+        self._composition = composition
+        self.formation_energy_per_atom = formation_energy_per_atom
+        self.temperature = temperature
 
     def get_new_temperature(self, new_temperature: float) -> "GibbsComputedEntry":
         """
@@ -252,7 +250,7 @@ class GibbsComputedEntry(ComputedEntry):
         Returns:
             A new GibbsComputedEntry object
         """
-        composition = structure.composition
+        composition = Composition(structure.composition)
         volume_per_atom = structure.volume / structure.num_sites
         entry = cls(
             composition=composition,
@@ -311,10 +309,11 @@ class GibbsComputedEntry(ComputedEntry):
         return False
 
     def __hash__(self):
-        data_md5 = hashlib.md5(
-            "GibbsComputedEntry"
-            f"{self.composition}_"
-            f"{self.energy}_{self.entry_id}_"
-            f"{self.temperature}".encode("utf-8")
-        ).hexdigest()
-        return int(data_md5, 16)
+        return hash(
+            (
+                self.composition,
+                self.energy,
+                self.entry_id,
+                self.temperature,
+            )
+        )

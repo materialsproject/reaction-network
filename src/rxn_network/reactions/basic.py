@@ -3,7 +3,6 @@ This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.
 """
 
-import math
 import re
 from copy import deepcopy
 from functools import cached_property, lru_cache
@@ -247,10 +246,36 @@ class BasicReaction(Reaction):
 
         return found
 
-    @property
-    def reactant_fractions(self) -> dict:
+    @cached_property
+    def reactant_atomic_fractions(self) -> dict:
         """
-        Returns the mixing ratio of reactants in the reaction
+        Returns the atomic mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        return {
+            c: -coeff * c.num_atoms / self.num_atoms
+            for c, coeff in self.reactant_coeffs.items()
+        }
+
+    @cached_property
+    def product_atomic_fractions(self) -> dict:
+        """
+        Returns the atomic mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        return {
+            c: coeff * c.num_atoms / self.num_atoms
+            for c, coeff in self.product_coeffs.items()
+        }
+
+    @cached_property
+    def reactant_molar_fractions(self) -> dict:
+        """
+        Returns the molar mixing ratio of reactants in the reaction
         """
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
@@ -259,10 +284,10 @@ class BasicReaction(Reaction):
 
         return {c: coeff / total for c, coeff in self.reactant_coeffs.items()}
 
-    @property
-    def product_fractions(self) -> dict:
+    @cached_property
+    def product_molar_fractions(self) -> dict:
         """
-        Returns the mixing ratio of reactants in the reaction
+        Returns the molar mixing ratio of products in the reaction
         """
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
@@ -344,19 +369,17 @@ class BasicReaction(Reaction):
     @cached_property
     def num_atoms(self) -> float:
         """Total number of atoms in this reaction"""
-        return round(
-            sum(
-                coeff * sum([c[el] for el in self.elements])
-                for c, coeff in self.product_coeffs.items()
-            )
+        return sum(
+            coeff * sum([c[el] for el in self.elements])
+            for c, coeff in self.product_coeffs.items()
         )
 
-    @property
+    @cached_property
     def energy(self) -> float:
         """The energy of this reaction"""
         raise ValueError("No energy for a basic reaction!")
 
-    @property
+    @cached_property
     def energy_per_atom(self) -> float:
         """The energy per atom of this reaction"""
         raise ValueError("No energy per atom for a basic reaction!")
@@ -530,6 +553,7 @@ class BasicReaction(Reaction):
             )
         )
 
+    @lru_cache
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]
 

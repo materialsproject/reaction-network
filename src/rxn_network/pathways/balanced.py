@@ -4,8 +4,8 @@ Implements a class for storing balanced reaction pathways.
 from typing import List, Union
 
 import numpy as np
-from pymatgen.core.composition import Composition
 
+from rxn_network.core.composition import Composition
 from rxn_network.core.pathway import Pathway
 from rxn_network.core.reaction import Reaction
 from rxn_network.pathways.basic import BasicPathway

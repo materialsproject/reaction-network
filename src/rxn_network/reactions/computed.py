@@ -101,6 +101,22 @@ class ComputedReaction(BasicReaction):
             lowest_num_errors=self.lowest_num_errors,
         )
 
+    def get_energy(self):
+        calc_energies: Dict[Composition, float] = {}
+
+        for entry in self._entries:
+            (comp, factor) = entry.composition.get_reduced_composition_and_factor()
+            calc_energies[comp] = min(
+                calc_energies.get(comp, float("inf")), entry.energy / factor
+            )
+
+        return sum(
+            [
+                amt * calc_energies[c]
+                for amt, c in zip(self.coefficients, self.compositions)
+            ]
+        )
+
     @cached_property
     def energy(self) -> float:
         """

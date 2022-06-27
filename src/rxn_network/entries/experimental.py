@@ -35,7 +35,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
                 interpolated. Defaults to 300 K.
             data: Optional dictionary containing entry data
         """
-        formula = Composition(composition).reduced_formula
+        formula = composition.reduced_formula
         entry_id = self.__class__.__name__
 
         self._temperature = temperature
@@ -50,6 +50,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
             data=data,
             entry_id=entry_id,
         )
+        self._composition = composition
 
         self.name = formula
 
@@ -138,7 +139,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
     def from_dict(cls, d):
         dec = MontyDecoder()
         entry = cls(
-            composition=d["composition"],
+            composition=Composition(d["composition"]),
             temperature=d["temperature"],
             energy_adjustments=dec.process_decoded(d["energy_adjustments"]),
             data=d["data"],
@@ -163,8 +164,8 @@ class ExperimentalReferenceEntry(ComputedEntry):
 
     def __hash__(self):
         data_md5 = hashlib.md5(
-            f"{self.__class__.__name__}"
-            f"{self.composition}_"
-            f"{self.temperature}".encode("utf-8")
+            f"{self.__class__.__name__}{self.composition}_{self.temperature}".encode(
+                "utf-8"
+            )
         ).hexdigest()
         return int(data_md5, 16)

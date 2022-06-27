@@ -3,20 +3,30 @@ Firetasks for running enumeration and network calculations
 """
 import os
 import warnings
-from typing import List
+from typing import List, Set
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
 from pymatgen.core.composition import Element
 
 from rxn_network.core.composition import Composition
-from rxn_network.costs.competition import CompetitionScoreCalculator
+from rxn_network.core.reaction import Reaction
+from rxn_network.costs.calculators import (
+    PrimarySelectivityCalculator,
+    SecondarySelectivityCalculator,
+)
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
+from rxn_network.enumerators.minimize import (
+    MinimizeGibbsEnumerator,
+    MinimizeGrandPotentialEnumerator,
+)
 from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.firetasks.utils import get_logger, load_entry_set, load_json
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
+from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
 
 logger = get_logger(__name__)
@@ -86,7 +96,7 @@ class RunEnumerators(FiretaskBase):
 
 
 @explicit_serialize
-class CalculateCScores(FiretaskBase):
+class CalculateSelectivity(FiretaskBase):
     """
     Calculates the competitiveness score using the CompetitivenessScoreCalculator for a
     set of reactions and stores that within the reaction object data.
@@ -94,8 +104,6 @@ class CalculateCScores(FiretaskBase):
     Required params:
         entries (GibbsEntrySet): An entry set to be used for the calculation of
             competitiveness scores.
-        cost_function (CostFunction): The cost function to be used in determining the
-            cost of competing reactions.
 
     Optional params:
         rxns (ReactionSet): A set of reactions of interest. If not provided, will load
@@ -117,10 +125,9 @@ class CalculateCScores(FiretaskBase):
             MinimizeGibbsEnumerator (and MinimizeGrandPotentialEnumerator)
     """
 
-    required_params: List[str] = ["entries", "cost_function"]
+    required_params: List[str] = ["entries"]
     optional_params: List[str] = [
         "rxns",
-        "k",
         "open_phases",
         "open_elem",
         "chempot",
@@ -134,7 +141,6 @@ class CalculateCScores(FiretaskBase):
 
     def run_task(self, fw_spec):
         entries = load_entry_set(self, fw_spec)
-        cost_function = self["cost_function"]
         rxns = load_json(self, "rxns", fw_spec)
         metadata = load_json(self, "metadata", fw_spec)
         k = self.get("k", 15)
@@ -145,7 +151,6 @@ class CalculateCScores(FiretaskBase):
         use_minimize = self.get("use_minimize", True)
         basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
         minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
-        target_formulas = self.get("target_formulas")
 
         if use_minimize and open_phases and not open_elem:
             open_comp = Composition(open_phases[0])
@@ -153,31 +158,70 @@ class CalculateCScores(FiretaskBase):
                 open_elem = open_comp.elements[0]
                 warnings.warn(f"Using open phase element {open_elem}")
 
-        calc = CompetitionScoreCalculator(
-            entries=entries,
-            cost_function=cost_function,
-            open_phases=open_phases,
-            open_elem=open_elem,
-            chempot=chempot,
-            use_basic=use_basic,
-            use_minimize=use_minimize,
-            basic_enumerator_kwargs=basic_enumerator_kwargs,
-            minimize_enumerator_kwargs=minimize_enumerator_kwargs,
-            target_formulas=target_formulas,
-        )
+        new_rxns = []
+        for rxn in rxns:
+            chemsys = rxn.chemical_system.split("-")
+            precursors = [r.reduced_formula for r in rxn.reactants]
 
-        costs = [cost_function.evaluate(r) for r in rxns]
-        sorted_rxns = [r for _, r in sorted(zip(costs, rxns), key=lambda x: x[0])]
+            open_phases = (
+                [Composition(p).reduced_formula for p in open_phases]
+                if open_phases
+                else None
+            )
+            if open_phases:
+                precursors = list(set(precursors) - set(open_phases))
 
-        new_rxns = calc.decorate_many(sorted_rxns[:k])
+            entries = entries.filter_by_stability(0.0).get_subset_in_chemsys(chemsys)
+            entries.update(rxn.entries)
 
-        for rxn in sorted_rxns[k:]:
-            rxn.data.update({"c_score": None})
-            new_rxns.append(rxn)
+            enumerators = []
+            if use_basic:
+                kwargs = basic_enumerator_kwargs.copy()
+                kwargs["precursors"] = precursors
+                be = BasicEnumerator(**kwargs)
+                enumerators.append(be)
+
+                if open_phases:
+                    kwargs["open_phases"] = open_phases
+                    boe = BasicOpenEnumerator(**kwargs)
+                    enumerators.append(boe)
+
+            if use_minimize:
+                kwargs = minimize_enumerator_kwargs.copy()
+                kwargs["precursors"] = precursors
+                mge = MinimizeGibbsEnumerator(**kwargs)
+                enumerators.append(mge)
+
+                if open_elem:
+                    kwargs["open_elem"] = open_elem
+                    kwargs["mu"] = chempot
+
+                    mgpe = MinimizeGrandPotentialEnumerator(**kwargs)
+                    enumerators.append(mgpe)
+
+            competing_rxns = set()
+            for e in enumerators:
+                competing_rxns.update(e.enumerate(entries))
+
+            rxns_cleaned: Set[Reaction] = set()
+
+            rxns_updated = ReactionSet.from_rxns(
+                rxns_cleaned, open_elem=open_elem, chempot=chempot
+            ).get_rxns()
+
+            irh = InterfaceReactionHull(
+                Composition(precursors[0]), Composition(precursors[1]), rxns_updated
+            )
+
+            calc_1 = PrimarySelectivityCalculator(irh=irh)
+            calc_2 = SecondarySelectivityCalculator(irh=irh)
+
+            new_rxn = calc_1.decorate(rxn)
+            new_rxn = calc_2.decorate(new_rxn)
+
+            new_rxns.append(new_rxn)
 
         results = ReactionSet.from_rxns(new_rxns)
-
-        metadata["cost_function"] = cost_function
 
         dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
         dumpfn(metadata, "metadata.json.gz")  # will overwrite existing metadata.json.gz

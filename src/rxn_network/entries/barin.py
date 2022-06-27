@@ -3,9 +3,9 @@ Implements an Entry that looks up pre-tabulated Gibbs free energies from the Bar
 """
 from typing import Dict, List, Optional
 
-from pymatgen.core.composition import Composition
 from pymatgen.entries.computed_entries import EnergyAdjustment
 
+from rxn_network.core.composition import Composition
 from rxn_network.data import PATH_TO_BARIN, load_experimental_data
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 

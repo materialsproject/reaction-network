@@ -14,7 +14,7 @@ from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
 from numpy.random import normal
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-from pymatgen.core import Composition, Element
+from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import (
     ComputedEntry,
     ComputedStructureEntry,
@@ -23,6 +23,7 @@ from pymatgen.entries.computed_entries import (
 from pymatgen.entries.entry_tools import EntrySet
 from tqdm import tqdm
 
+from rxn_network.core.composition import Composition
 from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.entries.corrections import CarbonateCorrection
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
@@ -51,6 +52,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         Args:
             entries: A collection of entry objects that will make up the entry set.
+            calculate_e_above_hulls: Whether to pre-calculate the energy above hull for
+                each entry and store that in that entry's data.
         """
         self.entries = set(entries)
         self.calculate_e_above_hulls = calculate_e_above_hulls
@@ -503,7 +506,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """Returns a list of all entries in the entry set."""
         return list(sorted(self.entries, key=lambda e: e.composition.reduced_formula))
 
-    @property
+    @cached_property
     def min_entries_by_formula(self) -> Dict[str, ComputedEntry]:
         """
         Returns a dict of minimum energy entries in the entry set, indexed by
