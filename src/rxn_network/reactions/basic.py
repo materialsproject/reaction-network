@@ -535,7 +535,8 @@ class BasicReaction(Reaction):
         if not len(self.reactants) == len(other.reactants):
             return False
 
-        if not sorted(self.coefficients) == approx(sorted(other.coefficients)):
+        coeff_ratio = np.sort(self.coefficients) / np.sort(other.coefficients)
+        if not np.isclose(coeff_ratio, coeff_ratio[0]).all():
             return False
 
         if not set(self.compositions) == set(other.compositions):
@@ -553,7 +554,7 @@ class BasicReaction(Reaction):
             )
         )
 
-    @lru_cache
+    @lru_cache(maxsize=1)
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]
 

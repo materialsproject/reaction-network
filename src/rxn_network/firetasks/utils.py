@@ -101,9 +101,9 @@ def load_entry_set(firetask, fw_spec):
     file given the entries_fn attribute.
     """
     entries = firetask["entries"]
-    entries_fn = firetask.get("entries_fn")
 
     if not entries:
+        entries_fn = firetask.get("entries_fn")
         entries_fn = entries_fn if entries_fn else fw_spec["entries_fn"]
         entries = loadfn(entries_fn)
 

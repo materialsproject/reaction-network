@@ -3,15 +3,16 @@ Firetasks for running enumeration and network calculations
 """
 import os
 import warnings
-from typing import List, Set
+from itertools import groupby
+from typing import List
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
 from pymatgen.core.composition import Element
 
 from rxn_network.core.composition import Composition
-from rxn_network.core.reaction import Reaction
 from rxn_network.costs.calculators import (
+    ChempotDistanceCalculator,
     PrimarySelectivityCalculator,
     SecondarySelectivityCalculator,
 )
@@ -96,6 +97,41 @@ class RunEnumerators(FiretaskBase):
 
 
 @explicit_serialize
+class CalculateChempotDistance(FiretaskBase):
+    """
+    Calculates the chemical potential distance using the ChempotDistanceCalculator for a
+    set of reactions and stores that within the reaction object data.
+
+    Required params:
+        entries (GibbsEntrySet): An entry set to be used for the calculation of
+            competitiveness scores.
+
+    Optional params:
+        rxns (ReactionSet): A set of reactions of interest. If not provided, will load
+            from a rxns.json.gz file
+    """
+
+    required_params: List[str] = ["entries"]
+    optional_params: List[str] = ["rxns", "cpd_kwargs", "metadata"]
+
+    def run_task(self, fw_spec):
+        entries = load_entry_set(self, fw_spec)
+        rxns = load_json(self, "rxns", fw_spec)
+        cpd_kwargs = self.get("cpd_kwargs", {})
+        metadata = load_json(self, "metadata", fw_spec)
+
+        cpd_calculator = ChempotDistanceCalculator.from_entries(entries, **cpd_kwargs)
+
+        new_rxns = cpd_calculator.decorate_many(rxns)
+        results = ReactionSet.from_rxns(new_rxns)
+
+        metadata["cpd_kwargs"] = cpd_kwargs
+
+        dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
+        dumpfn(metadata, "metadata.json.gz")  # will overwrite existing metadata.json.gz
+
+
+@explicit_serialize
 class CalculateSelectivity(FiretaskBase):
     """
     Calculates the competitiveness score using the CompetitivenessScoreCalculator for a
@@ -142,8 +178,6 @@ class CalculateSelectivity(FiretaskBase):
     def run_task(self, fw_spec):
         entries = load_entry_set(self, fw_spec)
         rxns = load_json(self, "rxns", fw_spec)
-        metadata = load_json(self, "metadata", fw_spec)
-        k = self.get("k", 15)
         open_phases = self.get("open_phases")
         open_elem = self.get("open_elem")
         chempot = self.get("chempot", 0.0)
@@ -158,21 +192,38 @@ class CalculateSelectivity(FiretaskBase):
                 open_elem = open_comp.elements[0]
                 warnings.warn(f"Using open phase element {open_elem}")
 
-        new_rxns = []
+        all_precursors = []
         for rxn in rxns:
-            chemsys = rxn.chemical_system.split("-")
-            precursors = [r.reduced_formula for r in rxn.reactants]
-
+            precursors = {r.reduced_formula for r in rxn.reactants}
             open_phases = (
-                [Composition(p).reduced_formula for p in open_phases]
+                {Composition(p).reduced_formula for p in open_phases}
                 if open_phases
                 else None
             )
             if open_phases:
-                precursors = list(set(precursors) - set(open_phases))
+                precursors = precursors - open_phases
 
-            entries = entries.filter_by_stability(0.0).get_subset_in_chemsys(chemsys)
-            entries.update(rxn.entries)
+            if len(precursors) == 1:
+                precursors.add(
+                    rxn.products[0].reduced_formula
+                )  # add a 2nd precursor if decomposition rxn
+
+            all_precursors.append(precursors)
+
+        new_rxns = []
+        for precursors, group_obj in groupby(
+            enumerate(rxns), key=lambda i: all_precursors[i[0]]
+        ):
+            _, selected_rxns = zip(*group_obj)
+            precursors = list(precursors)
+            first_rxn = selected_rxns[0]
+            chemsys = first_rxn.chemical_system.split("-")
+
+            filtered_entries = entries.filter_by_stability(0.0).get_subset_in_chemsys(
+                chemsys
+            )
+            for r in selected_rxns:
+                filtered_entries.update(r.entries)
 
             enumerators = []
             if use_basic:
@@ -201,30 +252,31 @@ class CalculateSelectivity(FiretaskBase):
 
             competing_rxns = set()
             for e in enumerators:
-                competing_rxns.update(e.enumerate(entries))
-
-            rxns_cleaned: Set[Reaction] = set()
+                competing_rxns.update(e.enumerate(filtered_entries))
 
             rxns_updated = ReactionSet.from_rxns(
-                rxns_cleaned, open_elem=open_elem, chempot=chempot
+                competing_rxns, open_elem=open_elem, chempot=chempot
             ).get_rxns()
+
+            print(selected_rxns, "\n")
+            print(rxns_updated)
 
             irh = InterfaceReactionHull(
                 Composition(precursors[0]), Composition(precursors[1]), rxns_updated
             )
 
-            calc_1 = PrimarySelectivityCalculator(irh=irh)
-            calc_2 = SecondarySelectivityCalculator(irh=irh)
+            for rxn in selected_rxns:
+                calc_1 = PrimarySelectivityCalculator(irh=irh)
+                calc_2 = SecondarySelectivityCalculator(irh=irh)
 
-            new_rxn = calc_1.decorate(rxn)
-            new_rxn = calc_2.decorate(new_rxn)
+                new_rxn = calc_1.decorate(rxn)
+                new_rxn = calc_2.decorate(new_rxn)
 
-            new_rxns.append(new_rxn)
+                new_rxns.append(new_rxn)
 
         results = ReactionSet.from_rxns(new_rxns)
 
         dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
-        dumpfn(metadata, "metadata.json.gz")  # will overwrite existing metadata.json.gz
 
 
 @explicit_serialize

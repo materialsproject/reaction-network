@@ -5,7 +5,6 @@ construction
 from typing import Dict, Iterable, Optional, Union
 
 from fireworks import Firework
-from pymatgen.analysis.reaction_calculator import Reaction, ReactionError
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
@@ -19,11 +18,13 @@ from rxn_network.enumerators.minimize import (
 from rxn_network.firetasks.build_inputs import get_entry_task
 from rxn_network.firetasks.parse_outputs import NetworkToDb, ReactionsToDb
 from rxn_network.firetasks.run_calc import (
-    BuildNetwork,
-    CalculateCScores,
     RunEnumerators,
+    CalculateChempotDistance,
+    CalculateSelectivity,
+    BuildNetwork,
     RunSolver,
 )
+from rxn_network.reactions.basic import BasicReaction
 
 
 class EnumeratorFW(Firework):
@@ -39,9 +40,9 @@ class EnumeratorFW(Firework):
         entries: Optional[GibbsEntrySet] = None,
         chemsys: Optional[Union[str, Iterable[str]]] = None,
         entry_set_params: Optional[Dict] = None,
-        calculate_c_scores: Optional[Union[bool, int]] = False,
-        cost_function: Optional[CostFunction] = None,
-        c_score_kwargs: Optional[Dict] = None,
+        calculate_selectivity: bool = True,
+        selectivity_kwargs: Optional[Dict] = None,
+        calculate_chempot_distance: bool = False,
         db_file: str = ">>db_file<<",
         entry_db_file: str = ">>entry_db_file<<",
         parents=None,
@@ -94,35 +95,27 @@ class EnumeratorFW(Firework):
             )
         )
 
-        if calculate_c_scores:
-            if not cost_function:
-                raise ValueError("Must provide a cost function to calculate C-scores!")
-
-            c_score_kwargs = c_score_kwargs or {}
+        if calculate_selectivity:
+            selectivity_kwargs = selectivity_kwargs or {}
 
             for enumerator in enumerators:
                 if isinstance(enumerator, BasicOpenEnumerator):
-                    if not c_score_kwargs.get("open_phases"):
-                        c_score_kwargs["open_phases"] = enumerator.open_phases
+                    if not selectivity_kwargs.get("open_phases"):
+                        selectivity_kwargs["open_phases"] = enumerator.open_phases
                 elif isinstance(enumerator, MinimizeGibbsEnumerator):
-                    if not c_score_kwargs.get("use_minimize"):
-                        c_score_kwargs["use_minimize"] = True
+                    if not selectivity_kwargs.get("use_minimize"):
+                        selectivity_kwargs["use_minimize"] = True
                 elif isinstance(enumerator, MinimizeGrandPotentialEnumerator):
-                    if not c_score_kwargs.get("use_minimize"):
-                        c_score_kwargs["use_minimize"] = True
-                    if not c_score_kwargs.get("open_elem"):
-                        c_score_kwargs["open_elem"] = enumerator.open_elem
-                        c_score_kwargs["chempot"] = enumerator.mu
+                    if not selectivity_kwargs.get("use_minimize"):
+                        selectivity_kwargs["use_minimize"] = True
+                    if not selectivity_kwargs.get("open_elem"):
+                        selectivity_kwargs["open_elem"] = enumerator.open_elem
+                        selectivity_kwargs["chempot"] = enumerator.mu
 
-            c_score_kwargs.update(
-                {
-                    "entries": entry_set,
-                    "cost_function": cost_function,
-                    "k": calculate_c_scores,
-                    "target_formulas": list(targets),
-                }
-            )
-            tasks.append(CalculateCScores(**c_score_kwargs))
+            tasks.append(CalculateSelectivity(**selectivity_kwargs))
+
+        if calculate_chempot_distance:
+            tasks.append(CalculateChempotDistance())
 
         tasks.append(ReactionsToDb(db_file=db_file, use_gridfs=True))
 
@@ -211,16 +204,15 @@ class NetworkFW(Firework):
         )
 
         if solve_balanced_paths:
-            try:
-                net_rxn = Reaction(
-                    [Composition(r) for r in precursors],
-                    [Composition(p) for p in targets],
-                )
-            except ReactionError as e:
+            net_rxn = BasicReaction.balance(
+                [Composition(r) for r in precursors],
+                [Composition(p) for p in targets],
+            )
+            if not net_rxn.balanced:
                 raise ValueError(
                     "Can not balance pathways with specified precursors/targets."
                     "Please make sure a balanced net reaction can be written!"
-                ) from e
+                )
 
             solver = RunSolver(
                 pathways=None,

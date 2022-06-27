@@ -1,22 +1,16 @@
 """
 A calculator class for determining chemical potential distance of reactions
 """
-from functools import lru_cache
 from itertools import chain, combinations, product
-from typing import Callable, Dict, Iterable, List, Optional, Set, Union
+from typing import Callable, List
 
 import numpy as np
-import ray
 from pymatgen.analysis.phase_diagram import PDEntry
-from tqdm import tqdm
 
 from rxn_network.core.calculator import Calculator
-from rxn_network.core.composition import Composition
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
-from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
-from rxn_network.utils import initialize_ray, to_iterator
 
 
 class ChempotDistanceCalculator(Calculator):
@@ -106,14 +100,11 @@ class ChempotDistanceCalculator(Calculator):
                 reaction.
             name: the data dictionary key by which to store the calculated value,
                 defaults to "chempot_distance"
-            **kwargs: optional kwargs passed to ChemicalPotentialDiagram. By default, passes
-                {"default_min_limit": -100}.
+            **kwargs: optional kwargs passed to ChemicalPotentialDiagram.
 
         Returns:
             A ChempotDistanceCalculator object
         """
-        if not kwargs.get("default_min_limit"):
-            kwargs["default_min_limit"] = -100
 
         cpd = ChemicalPotentialDiagram(entries=entries, **kwargs)
         return cls(cpd, mu_func, name)
