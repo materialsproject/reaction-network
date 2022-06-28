@@ -216,14 +216,9 @@ class CalculateSelectivity(FiretaskBase):
         ):
             _, selected_rxns = zip(*group_obj)
             precursors = list(precursors)
-            first_rxn = selected_rxns[0]
-            chemsys = first_rxn.chemical_system.split("-")
+            chemsys = selected_rxns[0].chemical_system.split("-")
 
-            filtered_entries = entries.filter_by_stability(0.0).get_subset_in_chemsys(
-                chemsys
-            )
-            for r in selected_rxns:
-                filtered_entries.update(r.entries)
+            filtered_entries = entries.get_subset_in_chemsys(chemsys)
 
             enumerators = []
             if use_basic:
@@ -250,16 +245,16 @@ class CalculateSelectivity(FiretaskBase):
                     mgpe = MinimizeGrandPotentialEnumerator(**kwargs)
                     enumerators.append(mgpe)
 
-            competing_rxns = set()
+            competing_rxns = []
             for e in enumerators:
-                competing_rxns.update(e.enumerate(filtered_entries))
+                competing_rxns.extend(e.enumerate(filtered_entries))
+            for rxn in selected_rxns:
+                if rxn not in competing_rxns:
+                    competing_rxns.append(rxn)
 
             rxns_updated = ReactionSet.from_rxns(
-                competing_rxns, open_elem=open_elem, chempot=chempot
+                competing_rxns,  # open_elem=open_elem, chempot=chempot  TO-DO: Figure out open states, what do we do
             ).get_rxns()
-
-            print(selected_rxns, "\n")
-            print(rxns_updated)
 
             irh = InterfaceReactionHull(
                 Composition(precursors[0]), Composition(precursors[1]), rxns_updated

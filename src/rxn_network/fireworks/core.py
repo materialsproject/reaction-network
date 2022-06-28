@@ -49,16 +49,15 @@ class EnumeratorFW(Firework):
     ):
         """
         Args:
-            enumerators: List of enumerators to run
-            entries: EntrySet object containing entries to use for enumeration
+            enumerators: List of enumerator objects to run
+            entries: GibbsEntrySet object containing entries to use for enumeration
             chemsys: If entries aren't provided, they will be retrivied either from
-                MPRester or from the entry_db corresponding to this chemsys.
+                MPRester or from the entry_db corresponding to this chemical system.
             entry_set_params: Parameters to pass to the GibbsEntrySet constructor
-            calculate_c_scores: Whether or not to calculate c_scores; if an integer is
-                provided, this will specify the maximum number of highest ranked reactions
-                the calculation on.
-            cost_function: The cost function used to rank reactions and then calculate c-scores.
-            c_score_kwargs: Parameters to pass to the CompetitivenessScoreCalculator constructor.
+            calculate_selectivity: Whether to calculate selectivity for the reactions
+            selectivity_kwargs: Optional kwargs to pass to the CalculateSelectivity task
+            calculate_chempot_distance: Whether to calculate the chemical potential
+                distance as an additional selectivity metric. Defaults to False.
             db_file: Path to the database file to store the reactions in.
             entry_db_file: Path to the database file containing entries (see chemsys
                 parameter above)
@@ -112,10 +111,10 @@ class EnumeratorFW(Firework):
                         selectivity_kwargs["open_elem"] = enumerator.open_elem
                         selectivity_kwargs["chempot"] = enumerator.mu
 
-            tasks.append(CalculateSelectivity(**selectivity_kwargs))
+            tasks.append(CalculateSelectivity(entries=entries, **selectivity_kwargs))
 
         if calculate_chempot_distance:
-            tasks.append(CalculateChempotDistance())
+            tasks.append(CalculateChempotDistance(entries=entries))
 
         tasks.append(ReactionsToDb(db_file=db_file, use_gridfs=True))
 

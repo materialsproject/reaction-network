@@ -282,6 +282,7 @@ class BasicEnumerator(Enumerator):
 
     @staticmethod
     def _react_function(reactants, products, **kwargs):
+        _ = kwargs  # unused_argument
         forward_rxn = ComputedReaction.balance(reactants, products)
         backward_rxn = forward_rxn.reverse()
         return [forward_rxn, backward_rxn]
@@ -289,7 +290,7 @@ class BasicEnumerator(Enumerator):
     @staticmethod
     def _get_rxn_iterable(combos, open_combos):
         """Get all reaction/product combinations"""
-        _ = open_combos  # unused argument in BasicEnumerator class
+        _ = open_combos  # unused argument
 
         return combinations(combos, 2)
 
@@ -425,7 +426,6 @@ class BasicOpenEnumerator(BasicEnumerator):
         open_phases: List[str],
         precursors: Optional[List[str]] = None,
         targets: Optional[List[str]] = None,
-        calculators: Optional[List[str]] = None,
         n: int = 2,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,

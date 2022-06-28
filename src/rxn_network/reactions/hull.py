@@ -58,7 +58,7 @@ class InterfaceReactionHull(MSONable):
         reactions_with_endpoints = reactions + endpoint_reactions
 
         coords = np.array(
-            [(self.get_x_coordinate(r), r.energy_per_atom) for r in reactions]
+            [(self.get_coordinate(r), r.energy_per_atom) for r in reactions]
         )
         coords = np.append(coords, [[0, 0], [1, 0]], axis=0)
 
@@ -97,7 +97,7 @@ class InterfaceReactionHull(MSONable):
         x, y = self.coords[idx]
         return y - self.get_hull_energy(x)
 
-    def get_x_coordinate(self, reaction):
+    def get_coordinate(self, reaction):
         """Get coordinate of reaction in reaction hull."""
         x = reaction.reactant_atomic_fractions.get(self.c2, 0)
         return x
@@ -163,7 +163,7 @@ class InterfaceReactionHull(MSONable):
         Returns:
             The selectivity score for the reaction
         """
-        x = self.get_x_coordinate(reaction)
+        x = self.get_coordinate(reaction)
         if recursive:
             (
                 left_energy,
@@ -190,8 +190,8 @@ class InterfaceReactionHull(MSONable):
         if normalize:
             energy = energy / total
 
-        e_above_hull = self.get_energy_above_hull(reaction)
-        energy -= e_above_hull
+        # e_above_hull = self.get_energy_above_hull(reaction)
+        # energy -= e_above_hull
 
         return -1 * energy
 
@@ -230,7 +230,8 @@ class InterfaceReactionHull(MSONable):
         )
         coords.append([x_max, y_max])
 
-        return np.array(coords)
+        coords = np.array(coords)
+        return coords[coords[:, 0].argsort()]
 
     def count(self, num):
         counts = [
@@ -257,7 +258,7 @@ class InterfaceReactionHull(MSONable):
 
         return count
 
-    @lru_cache(maxsize=None)
+    @lru_cache(maxsize=128)
     def get_decomposition_energy_and_num_paths_recursive(self, x1: float, x2: float):
         """ """
         all_coords = self.get_coords_in_range(x1, x2)
@@ -290,12 +291,6 @@ class InterfaceReactionHull(MSONable):
                     right_total,
                 ) = self.get_decomposition_energy_and_num_paths_recursive(c[0], x_max)
 
-                # # for debug counting purposes
-                # for _ in range(right_total - 1):
-                #     self.get_decomposition_energy_and_num_paths(x_min, c[0])
-                # for _ in range(left_total - 1):
-                #     self.get_decomposition_energy_and_num_paths(c[0], x_max)
-
                 val += (
                     height * (left_total * right_total)
                     + left_decomp * right_total
@@ -303,15 +298,14 @@ class InterfaceReactionHull(MSONable):
                 )
                 total += left_total * right_total
 
-                # for j in range(left_total * right_total - 1):
-                #     self.calculate_altitude([x_min, y_min], c, [x_max, y_max])
-
         return val, total
 
-    def count_recursive(self, n, cache=[]):
+    def count_recursive(self, n, cache=None):
         """
         Courtesy Max G.
         """
+        if cache is None:
+            cache = []
         if n == 0:
             return 1, [1]
         elif n == 1:
@@ -337,7 +331,7 @@ class InterfaceReactionHull(MSONable):
                 total += left_divs * right_divs
             return total, biggest_cache + [total]
 
-    @lru_cache(maxsize=None)
+    @lru_cache(maxsize=128)
     def altitude_multiplicity(self, n_left, n_right, n):
         remainder = n - n_left - n_right - 1
         if remainder < 0:
@@ -379,7 +373,7 @@ class InterfaceReactionHull(MSONable):
 
         return line_data
 
-    @cached_property
+    @property
     def hull_vertices(self):
         return np.array(
             [
@@ -398,24 +392,6 @@ class InterfaceReactionHull(MSONable):
     def unstable_reactions(self):
         """ """
         return [r for i, r in enumerate(self.reactions) if i not in self.hull_vertices]
-
-    @staticmethod
-    def _get_c_score(cost, competing_costs, scale=1000):
-        """
-        Calculates the c-score for a given reaction.
-
-        This formula is based on a methodology presented in the following paper:
-        (TBD)
-
-        Args:
-            cost: the cost of the selected reaction
-            competing_costs: the costs of all other competing reactions
-            scale: the (abritrary) scale factor used to scale the c-score. Defaults to 10.
-
-        Returns:
-            The c-score for the reaction
-        """
-        return np.sum([np.log(1 + np.exp(scale * (cost - c))) for c in competing_costs])
 
     @staticmethod
     def calculate_altitude(c_left, c_mid, c_right):

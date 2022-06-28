@@ -12,7 +12,6 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 from monty.fractions import gcd_float
 from pymatgen.core.composition import Element
-from pytest import approx
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.reaction import Reaction
@@ -535,8 +534,11 @@ class BasicReaction(Reaction):
         if not len(self.reactants) == len(other.reactants):
             return False
 
-        coeff_ratio = np.sort(self.coefficients) / np.sort(other.coefficients)
-        if not np.isclose(coeff_ratio, coeff_ratio[0]).all():
+        # coeff_ratio = np.sort(self.coefficients) / np.sort(other.coefficients)
+        # if not np.isclose(coeff_ratio, coeff_ratio[0]).all():
+        #     return False
+
+        if not np.allclose(np.sort(self.coefficients), np.sort(other.coefficients)):
             return False
 
         if not set(self.compositions) == set(other.compositions):

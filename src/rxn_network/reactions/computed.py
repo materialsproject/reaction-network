@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.core.composition import Element
 from uncertainties import ufloat
 
 from rxn_network.core.composition import Composition
@@ -203,6 +204,44 @@ class ComputedReaction(BasicReaction):
         return ComputedReaction(
             self.entries, -1 * self.coefficients, self.data, self.lowest_num_errors
         )
+
+    def normalize_to(self, comp: Composition, factor: float = 1) -> "ComputedReaction":
+        """
+        Normalizes the reaction to one of the compositions via the provided factor.
+
+        By default, normalizes such that the composition given has a coefficient of
+        1.
+
+        Args:
+            comp: Composition object to normalize to
+            factor: factor to normalize to. Defaults to 1.
+        """
+        coeffs = self.coefficients
+        scale_factor = abs(1 / coeffs[self.compositions.index(comp)] * factor)
+        coeffs *= scale_factor
+        return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
+
+    def normalize_to_element(
+        self, element: Element, factor: float = 1
+    ) -> "ComputedReaction":
+        """
+        Normalizes the reaction to one of the elements.
+        By default, normalizes such that the amount of the element is 1.
+        Another factor can be specified.
+
+        Args:
+            element (Element/Species): Element to normalize to.
+            factor (float): Factor to normalize to. Defaults to 1.
+        """
+        all_comp = self.compositions
+        coeffs = self.coefficients
+        current_el_amount = (
+            sum([all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))])
+            / 2
+        )
+        scale_factor = factor / current_el_amount
+        coeffs *= scale_factor
+        return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
 
     def __hash__(self):
         return BasicReaction.__hash__(self)
