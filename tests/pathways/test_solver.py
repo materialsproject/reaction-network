@@ -14,7 +14,7 @@ def comp_matrices():
     return np.load(str(TEST_FILES_PATH / ARRAY_FILE))
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def net_coeffs():
     return np.array(
         [
@@ -58,7 +58,7 @@ def net_coeffs():
     )
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def c_mats():
     arr = np.array(
         [
@@ -299,7 +299,7 @@ def c_mats():
     return arr
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def m_mats():
     arr = np.array(
         [[0.55555556, 0.44444444, 0.11111111], [0.55555556, 0.48888889, 0.11111111]]

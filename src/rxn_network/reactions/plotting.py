@@ -18,27 +18,46 @@ def plot_reaction_scatter(
         Plotly scatter plot
     """
 
-    def get_label(name):
+    def get_label_and_units(name):
         label = ""
+        units = ""
         if name == "energy":
-            label = r"$\Delta G_{\mathrm{rxn}} ~ \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
+            label = (
+                r"$\Delta G_{\mathrm{rxn}} ~"
+                r" \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
+            )
+            units = "eV/atom"
         elif name == "chempot_distance":
-            label = r"$\Sigma \Delta \mu_{\mathrm{min}} ~ \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
-        elif name == "c_score":
-            label = "Competitiveness Score"
-        return label
+            label = (
+                r"$\Sigma \Delta \mu_{\mathrm{min}} ~"
+                r" \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
+            )
+            units = "eV/atom"
+        elif name == "primary_selectivity":
+            label = "Primary Selectivity"
+            units = "a.u."
+        elif name == "secondary_selectivity":
+            label = "Secondary Selectivity"
+            units = "eV/atom"
+        elif name == "dE":
+            label = "Uncertainty"
+            units = "eV/atom"
+        return label, units
 
     df = df.copy()
     df["rxn"] = df["rxn"].astype(str)
     if "added_elems" in df:
         df["has_added_elems"] = df["added_elems"] != ""
 
+    x_label, x_units = get_label_and_units(x)
+    y_label, y_units = get_label_and_units(y)
+
     fig = px.scatter(
         df,
         x=x,
         y=y,
         hover_name="rxn",
-        labels={i: get_label(i) for i in [x, y]},
+        labels={x: x_label, y: y_label},
         template="simple_white",
         color=color,
         color_discrete_map={True: "darkorange", False: "gray"},
@@ -48,50 +67,14 @@ def plot_reaction_scatter(
 
     fig.update_traces(
         hovertemplate="<b>%{hovertext}</b><br>"
-        + "<br><b>energy</b>: %{x:.3f} (eV/atom)"
-        + "<br><b>distance</b>: %{y:.3f} (eV/atom)<br>",
-    )
-
-    return fig
-
-
-def plot_energy_distance_scatter(df: DataFrame) -> px.scatter:
-    """
-    Plot a Plotly scatter plot of chemical potential distance vs energy.
-
-    Args:
-        df: DataFrame with columns: rxn, energy, distance, added_elems
-
-    Returns:
-        Plotly scatter plot
-    """
-
-    df = df.copy()
-    df["rxn"] = df["rxn"].astype(str)
-
-    fig = px.scatter(
-        df,
-        x="energy",
-        y="chempot_distance",
-        hover_name="rxn",
-        labels={
-            "energy": r"$\Delta G_{\mathrm{rxn}} ~ \mathrm{\left("
-            r"\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$",
-            "chempot_distance": r"$\Sigma \Delta \mu_{\mathrm{min}}"
-            r"~ \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$",
-        },
-        error_x="dE",
-        template="simple_white",
-        color="added_elems",
-        color_discrete_sequence=["darkorange", "gray"],
-        width=800,
-        height=800,
-    )
-
-    fig.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br>"
-        + "<br><b>energy</b>: %{x:.3f} (eV/atom)"
-        + "<br><b>distance</b>: %{y:.3f} (eV/atom)<br>",
+        + "<br><b>"
+        + f"{x_label}"
+        + "</b>: %{x:.3f}"
+        + f"{x_units}"
+        + "<br><b>"
+        + f"{y_label}"
+        + "</b>: %{y:.3f}"
+        + f"{y_units}<br>",
     )
 
     return fig

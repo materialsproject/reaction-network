@@ -9,7 +9,7 @@ from pymatgen.core.composition import Element
 from rxn_network.reactions.basic import BasicReaction
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def pre_balanced_rxn():
     """Returns a simple, pre-balanced iron oxidation reaction."""
     reactants = [Composition("Fe"), Composition("O2")]
@@ -19,10 +19,12 @@ def pre_balanced_rxn():
     rxn = BasicReaction(
         compositions=reactants + products, coefficients=coefficients, balanced=True
     )
+    print(rxn)
+    print(rxn.coefficients)
     return rxn
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def auto_balanced_rxn():
     """Returns the same iron oxidation reaction, after automatically balancing"""
     reactants = ["Fe", "O2"]

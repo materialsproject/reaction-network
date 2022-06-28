@@ -7,46 +7,46 @@ from rxn_network.enumerators.minimize import (
 )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def gibbs_enumerator_default():
     return MinimizeGibbsEnumerator()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def gibbs_enumerator_with_precursors():
     return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"])
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def gibbs_enumerator_with_target():
     return MinimizeGibbsEnumerator(targets=["YMnO3"])
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def gibbs_enumerator_with_precursors_and_target():
     return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"])
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def grand_potential_enumerator():
     return MinimizeGrandPotentialEnumerator(open_elem=Element("O"), mu=0.0)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def grand_potential_enumerator_with_precursors():
     return MinimizeGrandPotentialEnumerator(
         open_elem=Element("O"), mu=0.0, precursors=["Y2O3", "Mn2O3"]
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def grand_potential_enumerator_with_target():
     return MinimizeGrandPotentialEnumerator(
         open_elem=Element("O"), mu=0.0, targets=["Y2Mn2O7"]
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def grand_potential_enumerator_with_precursors_and_target():
     return MinimizeGrandPotentialEnumerator(
         open_elem=Element("O"),

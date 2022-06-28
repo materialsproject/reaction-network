@@ -7,21 +7,21 @@ from pymatgen.core.composition import Element
 from rxn_network.reactions.hull import InterfaceReactionHull
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def irh_batio(bao_tio2_rxns):
     return InterfaceReactionHull(
         c1=Composition("BaO"), c2=Composition("TiO2"), reactions=bao_tio2_rxns
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def stable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 2 BaO -> Ba2TiO4":
             return r
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def unstable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 0.9 BaO -> 0.9 BaO2 + 0.1 Ti10O11":

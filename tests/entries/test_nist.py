@@ -6,7 +6,7 @@ from rxn_network.core.composition import Composition
 from rxn_network.entries.nist import NISTReferenceEntry
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def entries():
     comp = Composition("CO2")
     temps = [300, 600, 900, 1200, 1500, 1800]

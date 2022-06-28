@@ -9,13 +9,13 @@ from rxn_network.entries.gibbs import GibbsComputedEntry
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def structure():
     struct = loadfn(TEST_FILES_PATH / "structure_LiFe4P4O16.json")
     return struct
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def entry(structure):
     entry = GibbsComputedEntry.from_structure(
         structure=structure,
@@ -27,7 +27,7 @@ def entry(structure):
     return entry
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def entries_temps_dict(structure):
     struct = structure
 

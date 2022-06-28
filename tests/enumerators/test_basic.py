@@ -9,47 +9,47 @@ TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 RXNS_FILE = "ymno3_rxns.json.gz"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def ymno3_rxns():
     return loadfn(TEST_FILES_PATH / RXNS_FILE)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_enumerator_default():
     return BasicEnumerator()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_enumerator_with_precursors():
     return BasicEnumerator(precursors=["Y2O3", "Mn2O3"])
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_enumerator_with_target():
     return BasicEnumerator(targets=["YMnO3"])
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_enumerator_with_precursors_and_target():
     return BasicEnumerator(precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"])
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_open_enumerator():
     return BasicOpenEnumerator(["O2"])
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_open_enumerator_with_precursors():
     return BasicOpenEnumerator(["O2"], precursors=["Y2O3", "Mn2O3"])
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_open_enumerator_with_target():
     return BasicOpenEnumerator(["O2"], targets=["Y2Mn2O7"])
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_open_enumerator_with_precursors_and_target():
     return BasicOpenEnumerator(
         ["O2"], precursors=["Y2O3", "Mn2O3"], targets=["Y2Mn2O7"]

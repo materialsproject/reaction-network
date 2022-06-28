@@ -31,7 +31,8 @@ answers = {
     params=[
         [["Y2O3", "Mn2O3"], ["YMnO3"]],
         [["YOCl", "NaMnO2", "O2"], ["Y2Mn2O7", "NaCl"]],
-    ]
+    ],
+    scope="module",
 )
 def rxn(entries, request):
     reactants = request.param[0]
@@ -41,7 +42,7 @@ def rxn(entries, request):
     return ComputedReaction.balance(reactant_entries, product_entries)
 
 
-@pytest.fixture(params=["sum", "max", "mean"])
+@pytest.fixture(params=["sum", "max", "mean"], scope="module")
 def mu_func(request):
     return request.param
 

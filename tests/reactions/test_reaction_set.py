@@ -10,12 +10,12 @@ from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.costs.softplus import Softplus
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def rxn_set(ymno_rxns):
     return ReactionSet.from_rxns(ymno_rxns)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def open_rxn_set(ymno_rxns):
     return ReactionSet.from_rxns(ymno_rxns, open_elem="O", chempot=0)
 
