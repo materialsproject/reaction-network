@@ -482,7 +482,7 @@ def get_entry_task(
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
             property_data=["icsd_ids"],
-            formulas_to_include=formulas_to_include
+            formulas_to_include=formulas_to_include,
         )
     else:
         entry_task = EntriesFromMPRester(
@@ -493,7 +493,7 @@ def get_entry_task(
             include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
-            formulas_to_include=formulas_to_include
+            formulas_to_include=formulas_to_include,
         )
 
     return entry_task

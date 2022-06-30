@@ -1,6 +1,5 @@
 """ Utility functions used throughout the reaction-network package."""
 
-
 import logging
 import sys
 from itertools import chain, combinations, zip_longest
