@@ -10,11 +10,6 @@ from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.enumerators.basic import BasicOpenEnumerator
-from rxn_network.enumerators.minimize import (
-    MinimizeGibbsEnumerator,
-    MinimizeGrandPotentialEnumerator,
-)
 from rxn_network.firetasks.build_inputs import get_entry_task
 from rxn_network.firetasks.parse_outputs import NetworkToDb, ReactionsToDb
 from rxn_network.firetasks.run_calc import (

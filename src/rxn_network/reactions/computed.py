@@ -103,6 +103,7 @@ class ComputedReaction(BasicReaction):
         )
 
     def get_energy(self):
+        """ """
         calc_energies: Dict[Composition, float] = {}
 
         for entry in self._entries:

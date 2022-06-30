@@ -104,9 +104,13 @@ class InterfaceReactionHull(MSONable):
         amt_c2 = reaction.reactant_atomic_fractions.get(self.c2, 0)
         total = amt_c1 + amt_c2  # will add to 1.0 with two-component reactions
         try:
-            return amt_c2 / total
-        except:
-            raise ValueError(f"{reaction}, {self.c1}, {self.c2}")
+            coordinate = amt_c2 / total
+        except ZeroDivisionError as e:
+            raise ValueError(
+                f"Can't compute coordinate for {reaction} with {self.c1}, {self.c2}"
+            ) from e
+
+        return coordinate
 
     def get_hull_energy(self, coordinate):
         """ """
@@ -430,6 +434,6 @@ class InterfaceReactionHull(MSONable):
     @staticmethod
     def primary_selectivity_from_energy_diffs(energy_differences, scale):
         """
-        Calculates the primary selectivity given a list of reaction energy differences./PropertyAdvocateAPI/ClickRedirect
+        Calculates the primary selectivity given a list of reaction energy differences
         """
         return np.sum(np.log(1 + np.exp(scale * energy_differences)))

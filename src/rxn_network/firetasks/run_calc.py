@@ -2,8 +2,6 @@
 Firetasks for running enumeration and network calculations
 """
 import os
-import warnings
-from itertools import groupby
 from typing import List
 
 import numpy as np
@@ -36,7 +34,7 @@ from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils.funcs import get_logger, grouper, to_iterator
+from rxn_network.utils.funcs import get_logger
 
 logger = get_logger(__name__)
 
@@ -201,7 +199,6 @@ class CalculateSelectivity(FiretaskBase):
         "entries_fn",
         "scale",
     ]
-    CHUNK_SIZE = 10
 
     def run_task(self, fw_spec):
         entries = load_entry_set(self, fw_spec)
@@ -244,7 +241,7 @@ class CalculateSelectivity(FiretaskBase):
             logger.info(f"Running {e.__class__.__name__}")
             all_possible_rxns.extend(e.enumerate(entries))
 
-        all_poossible_rxns = set(all_possible_rxns)
+        all_possible_rxns = set(all_possible_rxns)
 
         all_possible_rxns_dict = {}
         for r in all_possible_rxns:
@@ -257,6 +254,7 @@ class CalculateSelectivity(FiretaskBase):
         open_phases = {Composition(p) for p in open_phases}
 
         decorated_rxns = []
+        logger.info("Decorating reaction...")
         for rxn in tqdm(rxns):
             if rxn is None:
                 continue
