@@ -45,9 +45,6 @@ class EnumeratorTask(BaseModel):
         None,
         description="A list of the enumerator objects used to calculate the reactions.",
     )
-    cost_function: CostFunction = Field(
-        None, description="The cost function used to calculate the cost."
-    )
 
     @classmethod
     def from_rxns_and_metadata(cls, rxns: ReactionSet, metadata: dict, **kwargs):
