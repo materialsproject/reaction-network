@@ -18,10 +18,10 @@ from rxn_network.enumerators.minimize import (
 from rxn_network.firetasks.build_inputs import get_entry_task
 from rxn_network.firetasks.parse_outputs import NetworkToDb, ReactionsToDb
 from rxn_network.firetasks.run_calc import (
-    RunEnumerators,
+    BuildNetwork,
     CalculateChempotDistance,
     CalculateSelectivity,
-    BuildNetwork,
+    RunEnumerators,
     RunSolver,
 )
 from rxn_network.reactions.basic import BasicReaction

@@ -6,10 +6,10 @@ from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
+from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.core.network import Network
-from rxn_network.core.composition import Composition
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 

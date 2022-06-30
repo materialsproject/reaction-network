@@ -113,7 +113,6 @@ class ReactionSet(MSONable):
             entries = cls._get_unique_entries(rxns)
 
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
-        rxns = set(rxns)
 
         indices, coeffs, data = [], [], []
         for rxn in rxns:

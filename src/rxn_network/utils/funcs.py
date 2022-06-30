@@ -1,5 +1,8 @@
 """ Utility functions used throughout the reaction-network package."""
 
+
+import logging
+import sys
 from itertools import chain, combinations, zip_longest
 from pathlib import Path
 from typing import Any, Iterable
@@ -47,3 +50,28 @@ def get_project_root() -> Path:
         Path object for the project root directory.
     """
     return Path(__file__).parent.parent.parent
+
+
+def get_logger(
+    name: str,
+    level=logging.DEBUG,
+    log_format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    stream=sys.stdout,
+):
+    """
+    Code borrowed from the atomate package.
+
+    Helper method for acquiring logger.
+    """
+
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+
+    formatter = logging.Formatter(log_format)
+
+    sh = logging.StreamHandler(stream=stream)
+    sh.setFormatter(formatter)
+
+    logger.addHandler(sh)
+
+    return logger

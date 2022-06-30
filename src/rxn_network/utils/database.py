@@ -10,7 +10,7 @@ from maggma.core import StoreError
 from maggma.stores import GridFSStore, MongoStore
 from monty.json import MSONable, jsanitize
 
-from rxn_network.firetasks.utils import get_logger
+from rxn_network.utils.funcs import get_logger
 
 logger = get_logger(__name__)
 

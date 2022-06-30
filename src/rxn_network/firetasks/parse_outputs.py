@@ -7,8 +7,9 @@ from typing import List
 from fireworks import FiretaskBase, explicit_serialize
 from monty.json import jsanitize
 
-from rxn_network.firetasks.utils import env_chk, get_logger, load_json
+from rxn_network.firetasks.utils import env_chk, load_json
 from rxn_network.utils.database import CalcDb
+from rxn_network.utils.funcs import get_logger
 from rxn_network.utils.models import EnumeratorTask
 
 logger = get_logger(__name__)

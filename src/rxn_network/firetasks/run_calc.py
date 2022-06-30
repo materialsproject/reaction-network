@@ -5,13 +5,13 @@ import os
 import warnings
 from itertools import groupby
 from typing import List
-from tqdm import tqdm
+
 import numpy as np
 import ray
-
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
 from pymatgen.core.composition import Element
+from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
 from rxn_network.costs.calculators import (
@@ -27,17 +27,16 @@ from rxn_network.enumerators.minimize import (
 )
 from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.firetasks.utils import (
-    get_logger,
+    get_all_precursor_strs,
     load_entry_set,
     load_json,
-    get_all_precursor_strs,
 )
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils import to_iterator, grouper
+from rxn_network.utils.funcs import get_logger, grouper, to_iterator
 
 logger = get_logger(__name__)
 
@@ -92,9 +91,11 @@ class RunEnumerators(FiretaskBase):
 
         results = []
         for enumerator in enumerators:
+            logger.info(f"Running {enumerator.__class__.__name__}")
             rxns = enumerator.enumerate(entries)
             results.extend(rxns)
 
+        results = set(results)
         results = ReactionSet.from_rxns(results)
 
         dumpfn(results, "rxns.json.gz")
@@ -129,9 +130,25 @@ class CalculateChempotDistance(FiretaskBase):
         cpd_kwargs = self.get("cpd_kwargs", {})
         metadata = load_json(self, "metadata", fw_spec)
 
-        cpd_calculator = ChempotDistanceCalculator.from_entries(entries, **cpd_kwargs)
+        cpd_calc_dict = {}
+        new_rxns = []
 
-        new_rxns = cpd_calculator.decorate_many(rxns)
+        for rxn in sorted(rxns, key=lambda rxn: len(rxn.elements), reverse=True):
+            chemsys = rxn.chemical_system
+            elems = chemsys.split("-")
+            for c, cpd_calc in cpd_calc_dict.items():
+                if set(c.split("-")).issuperset(elems):
+                    break
+            else:
+                filtered_entries = entries.get_subset_in_chemsys(elems)
+                cpd_calc = ChempotDistanceCalculator.from_entries(
+                    filtered_entries, **cpd_kwargs
+                )
+                cpd_calc_dict[chemsys] = cpd_calc
+
+            new_rxn = cpd_calc.decorate(rxn)
+            new_rxns.append(new_rxn)
+
         results = ReactionSet.from_rxns(new_rxns)
 
         metadata["cpd_kwargs"] = cpd_kwargs
@@ -224,7 +241,10 @@ class CalculateSelectivity(FiretaskBase):
         all_possible_rxns = []
         logger.info("Getting competing reactions...")
         for e in enumerators:
+            logger.info(f"Running {e.__class__.__name__}")
             all_possible_rxns.extend(e.enumerate(entries))
+
+        all_poossible_rxns = set(all_possible_rxns)
 
         all_possible_rxns_dict = {}
         for r in all_possible_rxns:
@@ -285,6 +305,7 @@ class CalculateSelectivity(FiretaskBase):
 
             decorated_rxns.append(decorated_rxn)
 
+        logger.info("Saving decorated reactions.")
         results = ReactionSet.from_rxns(decorated_rxns)
 
         dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz

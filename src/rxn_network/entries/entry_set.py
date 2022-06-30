@@ -31,6 +31,9 @@ from rxn_network.entries.freed import FREEDReferenceEntry
 from rxn_network.entries.gibbs import GibbsComputedEntry
 from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd
+from rxn_network.utils.funcs import get_logger
+
+logger = get_logger(__name__)
 
 
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):

@@ -16,8 +16,9 @@ from pymatgen.ext.matproj import MPRester
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.firetasks.utils import env_chk, get_logger
 from rxn_network.enumerators.utils import initialize_entry
+from rxn_network.firetasks.utils import env_chk
+from rxn_network.utils.funcs import get_logger
 
 logger = get_logger(__name__)
 

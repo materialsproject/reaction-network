@@ -1,8 +1,6 @@
 """
 Utility Fireworks functions. Some of these functions are borrowed from the atomate package.
 """
-import logging
-import sys
 from typing import Optional
 
 from fireworks import FireTaskBase
@@ -40,31 +38,6 @@ def env_chk(
             return fw_spec["_fw_env"][val[2:-2]]
         return fw_spec.get("_fw_env", {}).get(val[2:-2], default)
     return val
-
-
-def get_logger(
-    name: str,
-    level=logging.DEBUG,
-    log_format="%(asctime)s %(levelname)s %(name)s %(message)s",
-    stream=sys.stdout,
-):
-    """
-    Code borrowed from the atomate package.
-
-    Helper method for acquiring logger.
-    """
-
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-
-    formatter = logging.Formatter(log_format)
-
-    sh = logging.StreamHandler(stream=stream)
-    sh.setFormatter(formatter)
-
-    logger.addHandler(sh)
-
-    return logger
 
 
 def load_json(firetask: FireTaskBase, param: str, fw_spec: dict) -> dict:

@@ -6,8 +6,8 @@ from functools import cached_property
 from typing import Dict, List, Optional, Union
 
 import numpy as np
-from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.core.composition import Element
+from pymatgen.entries.computed_entries import ComputedEntry
 from uncertainties import ufloat
 
 from rxn_network.core.composition import Composition
