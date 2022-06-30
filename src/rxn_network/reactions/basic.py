@@ -130,7 +130,7 @@ class BasicReaction(Reaction):
             factor: factor to normalize to. Defaults to 1.
         """
         all_comp = self.compositions
-        coeffs = self.coefficients
+        coeffs = self.coefficients.copy()
         scale_factor = abs(1 / coeffs[self.compositions.index(comp)] * factor)
         coeffs *= scale_factor
         return BasicReaction(all_comp, coeffs)
@@ -148,7 +148,7 @@ class BasicReaction(Reaction):
             factor (float): Factor to normalize to. Defaults to 1.
         """
         all_comp = self.compositions
-        coeffs = self.coefficients
+        coeffs = self.coefficients.copy()
         current_el_amount = (
             sum([all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))])
             / 2
@@ -194,7 +194,7 @@ class BasicReaction(Reaction):
         """Returns a copy of the BasicReaction object"""
         return BasicReaction(
             compositions=self.compositions,
-            coefficients=self.coefficients,
+            coefficients=self.coefficients.copy(),
             balanced=self.balanced,
             data=self.data,
             lowest_num_errors=self.lowest_num_errors,
@@ -207,7 +207,7 @@ class BasicReaction(Reaction):
         """
         return BasicReaction(
             compositions=self.compositions,
-            coefficients=-1 * self.coefficients,
+            coefficients=-1 * self.coefficients.copy(),
             balanced=self.balanced,
             data=self.data,
             lowest_num_errors=self.lowest_num_errors,
@@ -254,7 +254,7 @@ class BasicReaction(Reaction):
             raise ValueError("Reaction is not balanced")
 
         return {
-            c: -coeff * c.num_atoms / self.num_atoms
+            c.reduced_composition: -coeff * c.num_atoms / self.num_atoms
             for c, coeff in self.reactant_coeffs.items()
         }
 
@@ -267,7 +267,7 @@ class BasicReaction(Reaction):
             raise ValueError("Reaction is not balanced")
 
         return {
-            c: coeff * c.num_atoms / self.num_atoms
+            c.reduced_composition: coeff * c.num_atoms / self.num_atoms
             for c, coeff in self.product_coeffs.items()
         }
 
@@ -556,7 +556,7 @@ class BasicReaction(Reaction):
             )
         )
 
-    @lru_cache(maxsize=1)
+    @lru_cache
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]
 

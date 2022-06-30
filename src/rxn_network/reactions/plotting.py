@@ -68,13 +68,13 @@ def plot_reaction_scatter(
     fig.update_traces(
         hovertemplate="<b>%{hovertext}</b><br>"
         + "<br><b>"
-        + f"{x_label}"
+        + f"{x}"
         + "</b>: %{x:.3f}"
-        + f"{x_units}"
+        + f" {x_units}"
         + "<br><b>"
-        + f"{y_label}"
+        + f"{y}"
         + "</b>: %{y:.3f}"
-        + f"{y_units}<br>",
+        + f" {y_units}<br>",
     )
 
     return fig

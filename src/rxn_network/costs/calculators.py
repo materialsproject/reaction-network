@@ -134,6 +134,7 @@ class PrimarySelectivityCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
+        scale=100,
         name="primary_selectivity",
     ):
         """
@@ -144,6 +145,7 @@ class PrimarySelectivityCalculator(Calculator):
             name: the data dictionary key with which to store the calculated value.
         """
         self.irh = irh
+        self.scale = scale
         self._name = name
 
     def calculate(self, rxn: ComputedReaction) -> float:
@@ -159,7 +161,7 @@ class PrimarySelectivityCalculator(Calculator):
         Returns:
             The competitiveness score
         """
-        return self.irh.get_primary_selectivity(rxn)
+        return self.irh.get_primary_selectivity(rxn, scale=self.scale)
 
     @property
     def name(self):

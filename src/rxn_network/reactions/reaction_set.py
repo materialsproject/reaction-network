@@ -55,7 +55,7 @@ class ReactionSet(MSONable):
         if open_elem:
             self.mu_dict = {Element(open_elem): chempot}  # type: ignore
 
-    @lru_cache(1)
+    @lru_cache(maxsize=1)
     def get_rxns(
         self,
     ) -> List[Union[ComputedReaction, OpenComputedReaction]]:
@@ -113,6 +113,7 @@ class ReactionSet(MSONable):
             entries = cls._get_unique_entries(rxns)
 
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
+        rxns = set(rxns)
 
         indices, coeffs, data = [], [], []
         for rxn in rxns:
@@ -144,7 +145,7 @@ class ReactionSet(MSONable):
             all_data=data,
         )
 
-    @lru_cache(1)
+    @lru_cache(maxsize=1)
     def to_dataframe(
         self, cost_function: CostFunction, target: Optional[Composition] = None
     ) -> DataFrame:
@@ -227,3 +228,9 @@ class ReactionSet(MSONable):
         Iterate over the reactions in the set.
         """
         return iter(self.get_rxns())
+
+    def __len__(self):
+        """
+        Return length of reactions stored in the set.
+        """
+        return len(self.coeffs)

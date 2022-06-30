@@ -17,6 +17,7 @@ from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.firetasks.utils import env_chk, get_logger
+from rxn_network.enumerators.utils import initialize_entry
 
 logger = get_logger(__name__)
 
@@ -54,6 +55,7 @@ class EntriesFromMPRester(FiretaskBase):
         "include_barin_data",
         "include_freed_data",
         "include_polymorphs",
+        "formulas_to_include",
     ]
 
     def run_task(self, fw_spec):
@@ -64,6 +66,7 @@ class EntriesFromMPRester(FiretaskBase):
         include_barin_data = self.get("include_barin_data", False)
         include_freed_data = self.get("include_freed_data", False)
         include_polymorphs = self.get("include_polymorphs", False)
+        formulas_to_include = self.get("formulas_to_include", [])
 
         with MPRester() as mpr:
             entries = mpr.get_entries_in_chemsys(
@@ -78,6 +81,7 @@ class EntriesFromMPRester(FiretaskBase):
             include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
+            formulas_to_include=formulas_to_include,
         )
 
         dumpfn(entries, "entries.json.gz")
@@ -121,6 +125,7 @@ class EntriesFromDb(FiretaskBase):
         "include_barin_data",
         "include_freed_data",
         "include_polymorphs",
+        "formulas_to_include",
         "inc_structure",
         "compatible_only",
         "property_data",
@@ -134,6 +139,7 @@ class EntriesFromDb(FiretaskBase):
         include_barin_data = self.get("include_barin_data", False)
         include_freed_data = self.get("include_freed_data", False)
         e_above_hull = self["e_above_hull"]
+        formulas_to_include = self.get("formulas_to_include", [])
         include_polymorphs = self.get("include_polymorphs", False)
         inc_structure = self.get("inc_structure", "final")
         compatible_only = self.get("compatible_only", True)
@@ -157,6 +163,7 @@ class EntriesFromDb(FiretaskBase):
             include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
+            formulas_to_include=formulas_to_include,
         )
         dumpfn(entries, "entries.json.gz")
         return FWAction(update_spec={"entries_fn": "entries.json.gz"})
@@ -170,6 +177,7 @@ def process_entries(
     include_freed_data: bool,
     e_above_hull: float,
     include_polymorphs: bool,
+    formulas_to_include: Iterable[str],
 ) -> GibbsEntrySet:
     """
 
@@ -184,6 +192,7 @@ def process_entries(
         e_above_hull (float): Only include entries with an energy above hull below this value (eV)
         include_polymorphs (bool): Whether or not to include metastable polymorphs.
             Defaults to False.
+        formulas_to_include: Formulas to ensure are in the entries.
 
     Returns:
         A GibbsEntrySet object containing GibbsComputedEntry objects with specified constraints.
@@ -198,6 +207,10 @@ def process_entries(
     entry_set = entry_set.filter_by_stability(
         e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
     )
+    included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include]
+
+    entry_set.update(included_entries)
+
     return entry_set
 
 
@@ -455,6 +468,7 @@ def get_entry_task(
     include_barin_data = entry_set_params.get("include_barin_data", False)
     include_freed_data = entry_set_params.get("include_freed_data", False)
     include_polymorphs = entry_set_params.get("include_polymorphs", False)
+    formulas_to_include = entry_set_params.get("formulas_to_include", None)
 
     if bool(entry_db_file):
         entry_task = EntriesFromDb(
@@ -467,6 +481,7 @@ def get_entry_task(
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
             property_data=["icsd_ids"],
+            formulas_to_include=formulas_to_include
         )
     else:
         entry_task = EntriesFromMPRester(
@@ -477,6 +492,7 @@ def get_entry_task(
             include_freed_data=include_freed_data,
             e_above_hull=e_above_hull,
             include_polymorphs=include_polymorphs,
+            formulas_to_include=formulas_to_include
         )
 
     return entry_task

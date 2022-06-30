@@ -216,7 +216,7 @@ class ComputedReaction(BasicReaction):
             comp: Composition object to normalize to
             factor: factor to normalize to. Defaults to 1.
         """
-        coeffs = self.coefficients
+        coeffs = self.coefficients.copy()
         scale_factor = abs(1 / coeffs[self.compositions.index(comp)] * factor)
         coeffs *= scale_factor
         return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
@@ -234,7 +234,7 @@ class ComputedReaction(BasicReaction):
             factor (float): Factor to normalize to. Defaults to 1.
         """
         all_comp = self.compositions
-        coeffs = self.coefficients
+        coeffs = self.coefficients.copy()
         current_el_amount = (
             sum([all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))])
             / 2

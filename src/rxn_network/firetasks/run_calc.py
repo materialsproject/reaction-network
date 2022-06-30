@@ -5,6 +5,9 @@ import os
 import warnings
 from itertools import groupby
 from typing import List
+from tqdm import tqdm
+import numpy as np
+import ray
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
@@ -23,12 +26,18 @@ from rxn_network.enumerators.minimize import (
     MinimizeGrandPotentialEnumerator,
 )
 from rxn_network.enumerators.utils import get_computed_rxn
-from rxn_network.firetasks.utils import get_logger, load_entry_set, load_json
+from rxn_network.firetasks.utils import (
+    get_logger,
+    load_entry_set,
+    load_json,
+    get_all_precursor_strs,
+)
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.utils import to_iterator, grouper
 
 logger = get_logger(__name__)
 
@@ -173,103 +182,110 @@ class CalculateSelectivity(FiretaskBase):
         "minimize_enumerator_kwargs",
         "target_formulas",
         "entries_fn",
+        "scale",
     ]
+    CHUNK_SIZE = 10
 
     def run_task(self, fw_spec):
         entries = load_entry_set(self, fw_spec)
         rxns = load_json(self, "rxns", fw_spec)
-        open_phases = self.get("open_phases")
+        open_phases = self.get("open_phases", {})
         open_elem = self.get("open_elem")
         chempot = self.get("chempot", 0.0)
         use_basic = self.get("use_basic", True)
         use_minimize = self.get("use_minimize", True)
         basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
         minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
+        scale = self.get("scale", 100)
 
-        if use_minimize and open_phases and not open_elem:
-            open_comp = Composition(open_phases[0])
-            if open_comp.is_element:
-                open_elem = open_comp.elements[0]
-                warnings.warn(f"Using open phase element {open_elem}")
+        enumerators = []
+        if use_basic:
+            kwargs = basic_enumerator_kwargs.copy()
+            be = BasicEnumerator(**kwargs)
+            enumerators.append(be)
 
-        all_precursors = []
-        for rxn in rxns:
-            precursors = {r.reduced_formula for r in rxn.reactants}
-            open_phases = (
-                {Composition(p).reduced_formula for p in open_phases}
-                if open_phases
-                else None
-            )
             if open_phases:
-                precursors = precursors - open_phases
+                kwargs["open_phases"] = open_phases
+                boe = BasicOpenEnumerator(**kwargs)
+                enumerators.append(boe)
 
-            if len(precursors) == 1:
-                precursors.add(
-                    rxn.products[0].reduced_formula
-                )  # add a 2nd precursor if decomposition rxn
+        if use_minimize:
+            kwargs = minimize_enumerator_kwargs.copy()
+            mge = MinimizeGibbsEnumerator(**kwargs)
+            enumerators.append(mge)
 
-            all_precursors.append(precursors)
+            if open_elem:
+                kwargs["open_elem"] = open_elem
+                kwargs["mu"] = chempot
 
-        new_rxns = []
-        for precursors, group_obj in groupby(
-            enumerate(rxns), key=lambda i: all_precursors[i[0]]
-        ):
-            _, selected_rxns = zip(*group_obj)
-            precursors = list(precursors)
-            chemsys = selected_rxns[0].chemical_system.split("-")
+                mgpe = MinimizeGrandPotentialEnumerator(**kwargs)
+                enumerators.append(mgpe)
 
-            filtered_entries = entries.get_subset_in_chemsys(chemsys)
+        all_possible_rxns = []
+        logger.info("Getting competing reactions...")
+        for e in enumerators:
+            all_possible_rxns.extend(e.enumerate(entries))
 
-            enumerators = []
-            if use_basic:
-                kwargs = basic_enumerator_kwargs.copy()
-                kwargs["precursors"] = precursors
-                be = BasicEnumerator(**kwargs)
-                enumerators.append(be)
+        all_possible_rxns_dict = {}
+        for r in all_possible_rxns:
+            precursors_str = "-".join(sorted([p.reduced_formula for p in r.reactants]))
+            if precursors_str in all_possible_rxns_dict:
+                all_possible_rxns_dict[precursors_str].append(r)
+            else:
+                all_possible_rxns_dict[precursors_str] = [r]
 
-                if open_phases:
-                    kwargs["open_phases"] = open_phases
-                    boe = BasicOpenEnumerator(**kwargs)
-                    enumerators.append(boe)
+        open_phases = {Composition(p) for p in open_phases}
 
-            if use_minimize:
-                kwargs = minimize_enumerator_kwargs.copy()
-                kwargs["precursors"] = precursors
-                mge = MinimizeGibbsEnumerator(**kwargs)
-                enumerators.append(mge)
+        decorated_rxns = []
+        for rxn in tqdm(rxns):
+            if rxn is None:
+                continue
 
-                if open_elem:
-                    kwargs["open_elem"] = open_elem
-                    kwargs["mu"] = chempot
+            precursors = set(rxn.reactants)
+            all_possible_strs = get_all_precursor_strs(precursors, open_phases)
 
-                    mgpe = MinimizeGrandPotentialEnumerator(**kwargs)
-                    enumerators.append(mgpe)
+            competing_rxns = [
+                r
+                for rxn_set in [
+                    all_possible_rxns_dict.get(s, []) for s in all_possible_strs
+                ]
+                for r in rxn_set
+            ]
 
-            competing_rxns = []
-            for e in enumerators:
-                competing_rxns.extend(e.enumerate(filtered_entries))
-            for rxn in selected_rxns:
+            precursors_list = list(precursors - open_phases)
+            if len(precursors_list) == 1:
+                energy_diffs = np.array(
+                    [rxn.energy_per_atom - r.energy_per_atom for r in competing_rxns]
+                )
+                primary_selectivity = (
+                    InterfaceReactionHull.primary_selectivity_from_energy_diffs(
+                        energy_diffs, scale=100
+                    )
+                )
+                max_diff = energy_diffs.max()
+                secondary_selectivity = max_diff if max_diff > 0 else 0.0
+                rxn.data["primary_selectivity"] = primary_selectivity
+                rxn.data["secondary_selectivity"] = secondary_selectivity
+                decorated_rxn = rxn
+            else:
                 if rxn not in competing_rxns:
                     competing_rxns.append(rxn)
 
-            rxns_updated = ReactionSet.from_rxns(
-                competing_rxns,  # open_elem=open_elem, chempot=chempot  TO-DO: Figure out open states, what do we do
-            ).get_rxns()
+                irh = InterfaceReactionHull(
+                    precursors_list[0],
+                    precursors_list[1],
+                    competing_rxns,
+                )
 
-            irh = InterfaceReactionHull(
-                Composition(precursors[0]), Composition(precursors[1]), rxns_updated
-            )
-
-            for rxn in selected_rxns:
-                calc_1 = PrimarySelectivityCalculator(irh=irh)
+                calc_1 = PrimarySelectivityCalculator(irh=irh, scale=scale)
                 calc_2 = SecondarySelectivityCalculator(irh=irh)
 
-                new_rxn = calc_1.decorate(rxn)
-                new_rxn = calc_2.decorate(new_rxn)
+                decorated_rxn = calc_1.decorate(rxn)
+                decorated_rxn = calc_2.decorate(decorated_rxn)
 
-                new_rxns.append(new_rxn)
+            decorated_rxns.append(decorated_rxn)
 
-        results = ReactionSet.from_rxns(new_rxns)
+        results = ReactionSet.from_rxns(decorated_rxns)
 
         dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
 
@@ -418,3 +434,71 @@ class RunSolver(FiretaskBase):
         dumpfn(pathway_set, balanced_pathways_fn)
 
         return FWAction(update_spec={"balanced_pathways_fn": balanced_pathways_fn})
+
+
+@ray.remote
+def get_decorated_rxns(rxns, open_phases, all_possible_rxns_dict, scale):
+    """
+    Given a list of ComputedReactions, decorate them with selectivity metrics.
+
+    Args:
+        rxns (List[ComputedReaction]): List of ComputedReactions to be decorated.
+        open_phases (List[str]): List of phases to be considered open.
+        all_possible_rxns_dict (Dict[str, List[ComputedReaction]]): Dictionary of
+            all possible reactions grouped by sorted precursor strings.
+        scale (float): Scale factor to apply to the selectivity metrics.
+
+    Returns:
+        List[ComputedReaction]: List of decorated ComputedReactions.
+    """
+    decorated_rxns = []
+
+    for rxn in rxns:
+        if rxn is None:
+            continue
+
+        precursors = set(rxn.reactants)
+        all_possible_strs = get_all_precursor_strs(precursors, open_phases)
+
+        competing_rxns = [
+            r
+            for rxn_set in [
+                all_possible_rxns_dict.get(s, []) for s in all_possible_strs
+            ]
+            for r in rxn_set
+        ]
+
+        precursors_list = list(precursors - open_phases)
+        if len(precursors_list) == 1:
+            energy_diffs = np.array(
+                [rxn.energy_per_atom - r.energy_per_atom for r in competing_rxns]
+            )
+            primary_selectivity = (
+                InterfaceReactionHull.primary_selectivity_from_energy_diffs(
+                    energy_diffs, scale=100
+                )
+            )
+            max_diff = energy_diffs.max()
+            secondary_selectivity = max_diff if max_diff > 0 else 0.0
+            rxn.data["primary_selectivity"] = primary_selectivity
+            rxn.data["secondary_selectivity"] = secondary_selectivity
+            decorated_rxn = rxn
+        else:
+            if rxn not in competing_rxns:
+                competing_rxns.append(rxn)
+
+            irh = InterfaceReactionHull(
+                precursors_list[0],
+                precursors_list[1],
+                competing_rxns,
+            )
+
+            calc_1 = PrimarySelectivityCalculator(irh=irh, scale=scale)
+            calc_2 = SecondarySelectivityCalculator(irh=irh)
+
+            decorated_rxn = calc_1.decorate(rxn)
+            decorated_rxn = calc_2.decorate(decorated_rxn)
+
+        decorated_rxns.append(decorated_rxn)
+
+    return decorated_rxns

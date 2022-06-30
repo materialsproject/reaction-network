@@ -9,6 +9,7 @@ from fireworks import FireTaskBase
 from monty.serialization import loadfn
 
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.utils import limited_powerset
 
 
 def env_chk(
@@ -109,3 +110,9 @@ def load_entry_set(firetask, fw_spec):
 
     entries = GibbsEntrySet(entries)
     return entries
+
+
+def get_all_precursor_strs(precursors, open_phases):
+    formulas = [comp.reduced_formula for comp in precursors | open_phases]
+    combos = limited_powerset(formulas, len(formulas))
+    return ["-".join(sorted(c)) for c in combos]

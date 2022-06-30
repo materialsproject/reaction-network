@@ -98,9 +98,15 @@ class InterfaceReactionHull(MSONable):
         return y - self.get_hull_energy(x)
 
     def get_coordinate(self, reaction):
-        """Get coordinate of reaction in reaction hull."""
-        x = reaction.reactant_atomic_fractions.get(self.c2, 0)
-        return x
+        """Get coordinate of reaction in reaction hull. This is expressed as the atomic
+        mixing ratio of component 2 in the reaction."""
+        amt_c1 = reaction.reactant_atomic_fractions.get(self.c1, 0)
+        amt_c2 = reaction.reactant_atomic_fractions.get(self.c2, 0)
+        total = amt_c1 + amt_c2  # will add to 1.0 with two-component reactions
+        try:
+            return amt_c2 / total
+        except:
+            raise ValueError(f"{reaction}, {self.c1}, {self.c2}")
 
     def get_hull_energy(self, coordinate):
         """ """
@@ -146,9 +152,9 @@ class InterfaceReactionHull(MSONable):
         idx = self.reactions.index(reaction)
         competing_rxns = self.reactions[:idx] + self.reactions[idx + 1 :]
         energies = np.array([energy - r.energy_per_atom for r in competing_rxns])
-        c_score = np.sum(np.log(1 + np.exp(scale * energies)))
+        primary = self.primary_selectivity_from_energy_diffs(energies, scale)
 
-        return c_score
+        return primary
 
     def get_secondary_selectivity(
         self, reaction: ComputedReaction, normalize=True, recursive=False
@@ -190,8 +196,8 @@ class InterfaceReactionHull(MSONable):
         if normalize:
             energy = energy / total
 
-        # e_above_hull = self.get_energy_above_hull(reaction)
-        # energy -= e_above_hull
+        e_above_hull = self.get_energy_above_hull(reaction)
+        energy -= e_above_hull
 
         return -1 * energy
 
@@ -258,7 +264,7 @@ class InterfaceReactionHull(MSONable):
 
         return count
 
-    @lru_cache(maxsize=128)
+    @lru_cache
     def get_decomposition_energy_and_num_paths_recursive(self, x1: float, x2: float):
         """ """
         all_coords = self.get_coords_in_range(x1, x2)
@@ -331,7 +337,7 @@ class InterfaceReactionHull(MSONable):
                 total += left_divs * right_divs
             return total, biggest_cache + [total]
 
-    @lru_cache(maxsize=128)
+    @lru_cache
     def altitude_multiplicity(self, n_left, n_right, n):
         remainder = n - n_left - n_right - 1
         if remainder < 0:
@@ -420,3 +426,10 @@ class InterfaceReactionHull(MSONable):
         # print(l, m, r)
 
         return y2 - yd
+
+    @staticmethod
+    def primary_selectivity_from_energy_diffs(energy_differences, scale):
+        """
+        Calculates the primary selectivity given a list of reaction energy differences./PropertyAdvocateAPI/ClickRedirect
+        """
+        return np.sum(np.log(1 + np.exp(scale * energy_differences)))

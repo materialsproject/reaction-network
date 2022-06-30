@@ -63,6 +63,16 @@ class EnumeratorFW(Firework):
                 parameter above)
             parents: Parents of this Firework.
         """
+
+        precursors = {
+            precursor
+            for enumerator in enumerators
+            for precursor in enumerator.precursors
+        }
+        targets = {
+            target for enumerator in enumerators for target in enumerator.targets
+        }
+
         tasks = []
 
         entry_set = None
@@ -74,6 +84,10 @@ class EnumeratorFW(Firework):
                 raise ValueError(
                     "If entries are not provided, a chemsys must be provided!"
                 )
+
+            entry_set_params = entry_set_params or {}
+            entry_set_params["formulas_to_include"] = list(precursors | targets)
+
             tasks.append(
                 get_entry_task(
                     chemsys=chemsys,
@@ -82,11 +96,10 @@ class EnumeratorFW(Firework):
                 )
             )
 
-        targets = {
-            target for enumerator in enumerators for target in enumerator.targets
-        }
-
-        fw_name = f"Reaction Enumeration (Targets: {targets}): {chemsys}"
+        fw_name = (
+            f"Reaction Enumeration (Precursors: {precursors}, Targets: {targets}):"
+            f" {chemsys}"
+        )
 
         tasks.append(
             RunEnumerators(
@@ -98,13 +111,14 @@ class EnumeratorFW(Firework):
             selectivity_kwargs = selectivity_kwargs or {}
 
             for enumerator in enumerators:
-                if isinstance(enumerator, BasicOpenEnumerator):
+                class_name = enumerator.__class__.__name__
+                if class_name == "BasicOpenEnumerator":
                     if not selectivity_kwargs.get("open_phases"):
                         selectivity_kwargs["open_phases"] = enumerator.open_phases
-                elif isinstance(enumerator, MinimizeGibbsEnumerator):
+                elif class_name == "MinimizeGibbsEnumerator":
                     if not selectivity_kwargs.get("use_minimize"):
                         selectivity_kwargs["use_minimize"] = True
-                elif isinstance(enumerator, MinimizeGrandPotentialEnumerator):
+                elif class_name == "MinimizeGrandPotentialEnumerator":
                     if not selectivity_kwargs.get("use_minimize"):
                         selectivity_kwargs["use_minimize"] = True
                     if not selectivity_kwargs.get("open_elem"):

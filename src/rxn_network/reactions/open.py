@@ -4,6 +4,7 @@ presence of an open entry (e.g. O2), and provides information about reaction
 thermodynamics computed as changes in grand potential.
 """
 from typing import Dict, List, Optional, Union
+from functools import cached_property
 
 import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
@@ -167,6 +168,34 @@ class OpenComputedReaction(ComputedReaction):
             self.data,
             self.lowest_num_errors,
         )
+
+    @cached_property
+    def reactant_atomic_fractions(self) -> dict:
+        """
+        Returns the atomic mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        return {
+            c.reduced_composition: -coeff
+            * sum(c[el] for el in self.elements)
+            / self.num_atoms
+            for c, coeff in self.reactant_coeffs.items()
+        }
+
+    @cached_property
+    def product_atomic_fractions(self) -> dict:
+        """
+        Returns the atomic mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        return {
+            c.reduced_composition: sum(c[el] for el in self.elements) / self.num_atoms
+            for c, coeff in self.product_coeffs.items()
+        }
 
     def __repr__(self):
         cp = f"({','.join([f'mu_{e}={m}' for e, m in self.chempots.items()])})"
