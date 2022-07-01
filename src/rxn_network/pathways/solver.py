@@ -10,7 +10,7 @@ from typing import List
 import numpy as np
 from numba import njit, prange
 from scipy.special import comb
-from tqdm import tqdm
+import ray
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
@@ -24,7 +24,9 @@ from rxn_network.enumerators.minimize import (
 )
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.utils import grouper
+from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.utils.ray import initialize_ray, to_iterator
+from rxn_network.utils.funcs import grouper
 
 
 class PathwaySolver(Solver):
@@ -33,8 +35,6 @@ class PathwaySolver(Solver):
     reaction pathways from a list of graph-derived reaction pathways (i.e. a list of
     lists of reactions)
     """
-
-    BATCH_SIZE = 500000  # how many reactions to process in parallel using numba
 
     def __init__(
         self,
@@ -90,6 +90,8 @@ class PathwaySolver(Solver):
         Returns:
             A list of BalancedPathway objects.
         """
+        initialize_ray()
+
         entries = deepcopy(self.entries)
         entries = entries.entries_list
         num_entries = len(entries)
@@ -124,41 +126,39 @@ class PathwaySolver(Solver):
                     reactions.append(r)
                     costs.append(c)
 
-        net_rxn_vector = self._build_idx_vector(net_rxn, num_entries)
+        net_rxn_vector = build_idx_vector(net_rxn, num_entries)
+
         if net_rxn in reactions:
             reactions.remove(net_rxn)
 
+        rxn_set = ReactionSet.from_rxns(reactions)
+
+        num_rxns = len(reactions)
+        rxn_set = ray.put(rxn_set)
+        num_entries = ray.put(num_entries)
+
+        num_cpus = ray.nodes()[0]["Resources"]["CPU"]
+
         paths = []
         for n in range(1, max_num_combos + 1):
-            total = int(comb(len(reactions), n) / self.BATCH_SIZE) + 1
-            groups = grouper(combinations(range(len(reactions)), n), self.BATCH_SIZE)
+            self.logger.info(f"Balancing pathways of size {n}...")
 
-            pbar = groups
-            if n >= 4:
-                self.logger.info(f"Solving for balanced pathways of size {n} ...")
-                pbar = tqdm(groups, total=total, desc="PathwaySolver")
+            batch_size = int(comb(num_rxns, n) // num_cpus) + 1
 
-            all_c_mats, all_m_mats = [], []
-            for idx, combos in enumerate(pbar):
-                if n >= 4:
-                    pbar.set_description(
-                        f"{self.BATCH_SIZE*idx}/{total*self.BATCH_SIZE}"
-                    )
-                comp_matrices = np.stack(
-                    [
-                        np.vstack(
-                            [
-                                self._build_idx_vector(reactions[r], num_entries)
-                                for r in combo
-                            ]
-                        )
-                        for combo in combos
-                        if combo
-                    ]
-                )
-                c_mats, m_mats = balance_path_arrays(comp_matrices, net_rxn_vector)
-                all_c_mats.extend(c_mats)
-                all_m_mats.extend(m_mats)
+            groups = grouper(combinations(range(num_rxns), n), batch_size)
+
+            comp_matrices_refs = [
+                create_comp_matrices.remote(combos, rxn_set, num_entries)
+                for combos in groups
+            ]
+
+            comp_matrices = []
+            for batch in to_iterator(comp_matrices_refs):
+                comp_matrices.extend(batch)
+
+            comp_matrices = np.stack(comp_matrices)
+
+            all_c_mats, all_m_mats = balance_path_arrays(comp_matrices, net_rxn_vector)
 
             for c_mat, m_mat in zip(all_c_mats, all_m_mats):
                 path_rxns = []
@@ -198,31 +198,6 @@ class PathwaySolver(Solver):
 
         filtered_paths = sorted(list(set(filtered_paths)), key=lambda p: p.average_cost)
         return filtered_paths
-
-    @staticmethod
-    def _build_idx_vector(rxn: ComputedReaction, num_entries: int) -> np.ndarray:
-        """
-        Builds a vector of indices for a reaction based on the data["idx"] attribute of
-        each entry in the reaction. This allows for reactions to be more easily
-        represented as vectors.
-
-        Args:
-            rxn: a ComputedReaction object
-            num_entries: The number of total entries in the entry set (that the reaction
-                comes from).
-
-        Returns:
-            A vector of indices for the reaction.
-        """
-        indices = [e.data.get("idx") for e in rxn.entries]
-        if None in indices:
-            raise ValueError(
-                f"Could not find index for one or more entries in reaction: {rxn}"
-            )
-
-        v = np.zeros(num_entries)
-        v[indices] = rxn.coefficients
-        return v
 
     def _find_intermediate_rxns(
         self,
@@ -271,7 +246,6 @@ class PathwaySolver(Solver):
                     open_elem=self.open_elem,
                     mu=self.chempot,
                     targets=target_formulas,
-                    calculate_e_above_hulls=False,
                 )
                 rxns.extend(mgpe.enumerate(ents))
 
@@ -344,3 +318,41 @@ def balance_path_arrays(
         filtered_multiplicities[i] = all_multiplicities[idx]
 
     return filtered_comp_matrices, filtered_multiplicities
+
+
+@ray.remote
+def create_comp_matrices(combos, rxn_set, num_entries):
+    reactions = rxn_set.get_rxns()
+    comp_matrices = np.stack(
+        [
+            np.vstack([build_idx_vector(reactions[r], num_entries) for r in combo])
+            for combo in combos
+            if combo
+        ]
+    )
+    return comp_matrices
+
+
+def build_idx_vector(rxn: ComputedReaction, num_entries: int) -> np.ndarray:
+    """
+    Builds a vector of indices for a reaction based on the data["idx"] attribute of
+    each entry in the reaction. This allows for reactions to be more easily
+    represented as vectors.
+
+    Args:
+        rxn: a ComputedReaction object
+        num_entries: The number of total entries in the entry set (that the reaction
+            comes from).
+
+    Returns:
+        A vector of indices for the reaction.
+    """
+    indices = [e.data.get("idx") for e in rxn.entries]
+    if None in indices:
+        raise ValueError(
+            f"Could not find index for one or more entries in reaction: {rxn}"
+        )
+
+    v = np.zeros(num_entries)
+    v[indices] = rxn.coefficients
+    return v
