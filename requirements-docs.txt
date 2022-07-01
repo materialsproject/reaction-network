@@ -4,4 +4,4 @@ mkdocs-coverage==0.2.5
 mkdocs-jupyter==0.21.0
 mkdocs-section-index==0.3.4
 mkdocstrings==0.18.1
-pymdown-extensions==9.4
+pymdown-extensions==9.5
