@@ -33,6 +33,7 @@ from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.hull import InterfaceReactionHull
+from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger
 
@@ -105,57 +106,6 @@ class RunEnumerators(FiretaskBase):
 
 
 @explicit_serialize
-class CalculateChempotDistance(FiretaskBase):
-    """
-    Calculates the chemical potential distance using the ChempotDistanceCalculator for a
-    set of reactions and stores that within the reaction object data.
-
-    Required params:
-        entries (GibbsEntrySet): An entry set to be used for the calculation of
-            competitiveness scores.
-
-    Optional params:
-        rxns (ReactionSet): A set of reactions of interest. If not provided, will load
-            from a rxns.json.gz file
-    """
-
-    required_params: List[str] = ["entries"]
-    optional_params: List[str] = ["rxns", "cpd_kwargs", "metadata"]
-
-    def run_task(self, fw_spec):
-        entries = load_entry_set(self, fw_spec)
-        rxns = load_json(self, "rxns", fw_spec)
-        cpd_kwargs = self.get("cpd_kwargs", {})
-        metadata = load_json(self, "metadata", fw_spec)
-
-        cpd_calc_dict = {}
-        new_rxns = []
-
-        for rxn in sorted(rxns, key=lambda rxn: len(rxn.elements), reverse=True):
-            chemsys = rxn.chemical_system
-            elems = chemsys.split("-")
-            for c, cpd_calc in cpd_calc_dict.items():
-                if set(c.split("-")).issuperset(elems):
-                    break
-            else:
-                filtered_entries = entries.get_subset_in_chemsys(elems)
-                cpd_calc = ChempotDistanceCalculator.from_entries(
-                    filtered_entries, **cpd_kwargs
-                )
-                cpd_calc_dict[chemsys] = cpd_calc
-
-            new_rxn = cpd_calc.decorate(rxn)
-            new_rxns.append(new_rxn)
-
-        results = ReactionSet.from_rxns(new_rxns)
-
-        metadata["cpd_kwargs"] = cpd_kwargs
-
-        dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
-        dumpfn(metadata, "metadata.json.gz")  # will overwrite existing metadata.json.gz
-
-
-@explicit_serialize
 class CalculateSelectivity(FiretaskBase):
     """
     Calculates the competitiveness score using the CompetitivenessScoreCalculator for a
@@ -210,7 +160,11 @@ class CalculateSelectivity(FiretaskBase):
         use_minimize = self.get("use_minimize", True)
         basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
         minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
-        scale = self.get("scale", 100)
+        scale = self.get("scale", 10)
+
+        chempots = {open_elem: chempot}
+
+        mgpe = None
 
         enumerators = []
         if use_basic:
@@ -235,26 +189,20 @@ class CalculateSelectivity(FiretaskBase):
                 mgpe = MinimizeGrandPotentialEnumerator(**kwargs)
                 enumerators.append(mgpe)
 
-        all_possible_rxns = []
+        competing_rxns = []
         logger.info("Getting competing reactions...")
         for e in enumerators:
             logger.info(f"Running {e.__class__.__name__}")
-            all_possible_rxns.extend(e.enumerate(entries))
+            competing_rxns.extend(e.enumerate(entries))
 
-        all_possible_rxns = set(all_possible_rxns)
-
-        all_possible_rxns_dict = {}
-        for r in all_possible_rxns:
-            precursors_str = "-".join(sorted([p.reduced_formula for p in r.reactants]))
-            if precursors_str in all_possible_rxns_dict:
-                all_possible_rxns_dict[precursors_str].append(r)
-            else:
-                all_possible_rxns_dict[precursors_str] = [r]
+        competing_rxns_dict = self._create_reactions_dict(competing_rxns)
 
         open_phases = {Composition(p) for p in open_phases}
 
         decorated_rxns = []
-        logger.info("Decorating reaction...")
+        decorated_open_rxns = []
+
+        logger.info("Decorating reactions...")
         for rxn in tqdm(rxns):
             if rxn is None:
                 continue
@@ -265,48 +213,143 @@ class CalculateSelectivity(FiretaskBase):
             competing_rxns = [
                 r
                 for rxn_set in [
-                    all_possible_rxns_dict.get(s, []) for s in all_possible_strs
+                    competing_rxns_dict.get(s, []) for s in all_possible_strs
                 ]
                 for r in rxn_set
             ]
 
             precursors_list = list(precursors - open_phases)
-            if len(precursors_list) == 1:
-                energy_diffs = np.array(
-                    [rxn.energy_per_atom - r.energy_per_atom for r in competing_rxns]
-                )
-                primary_selectivity = (
-                    InterfaceReactionHull.primary_selectivity_from_energy_diffs(
-                        energy_diffs, scale=100
+
+            decorated_rxns.append(
+                self._get_decorated_rxn(rxn, competing_rxns, precursors_list, scale)
+            )
+            if open_elem:
+                open_rxn = OpenComputedReaction.from_computed_rxn(rxn, chempots)
+                competing_open_rxns = [
+                    OpenComputedReaction.from_computed_rxn(r, chempots)
+                    for r in competing_rxns
+                    if not r.__class__.__name__ == "OpenComputedReaction"
+                ]
+                decorated_open_rxns.append(
+                    self._get_decorated_rxn(
+                        open_rxn, competing_open_rxns, precursors_list, scale
                     )
                 )
-                max_diff = energy_diffs.max()
-                secondary_selectivity = max_diff if max_diff > 0 else 0.0
-                rxn.data["primary_selectivity"] = primary_selectivity
-                rxn.data["secondary_selectivity"] = secondary_selectivity
-                decorated_rxn = rxn
-            else:
-                if rxn not in competing_rxns:
-                    competing_rxns.append(rxn)
-
-                irh = InterfaceReactionHull(
-                    precursors_list[0],
-                    precursors_list[1],
-                    competing_rxns,
-                )
-
-                calc_1 = PrimarySelectivityCalculator(irh=irh, scale=scale)
-                calc_2 = SecondarySelectivityCalculator(irh=irh)
-
-                decorated_rxn = calc_1.decorate(rxn)
-                decorated_rxn = calc_2.decorate(decorated_rxn)
-
-            decorated_rxns.append(decorated_rxn)
 
         logger.info("Saving decorated reactions.")
+
         results = ReactionSet.from_rxns(decorated_rxns)
+        dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
+
+        if decorated_open_rxns:
+            open_results = ReactionSet.from_rxns(
+                decorated_open_rxns, open_elem=open_elem, chempot=chempot
+            )
+            dumpfn(open_results, "rxns_open.json.gz")
+
+            return FWAction(update_spec={"rxns_open_fn": "rxns_open.json.gz"})
+
+    @staticmethod
+    def _create_reactions_dict(all_rxns):
+        all_rxns_dict = {}
+        for r in all_rxns:
+            precursors_str = "-".join(sorted([p.reduced_formula for p in r.reactants]))
+            if precursors_str in all_rxns_dict:
+                all_rxns_dict[precursors_str].add(r)
+            else:
+                all_rxns_dict[precursors_str] = {r}
+
+        return all_rxns_dict
+
+    @staticmethod
+    def _get_decorated_rxn(rxn, competing_rxns, precursors_list, scale):
+        if len(precursors_list) == 1:
+            energy_diffs = np.array(
+                [rxn.energy_per_atom - r.energy_per_atom for r in competing_rxns]
+            )
+            primary_selectivity = (
+                InterfaceReactionHull.primary_selectivity_from_energy_diffs(
+                    energy_diffs, scale=scale
+                )
+            )
+            max_diff = energy_diffs.max()
+            secondary_selectivity = max_diff if max_diff > 0 else 0.0
+            rxn.data["primary_selectivity"] = primary_selectivity
+            rxn.data["secondary_selectivity"] = secondary_selectivity
+            decorated_rxn = rxn
+        else:
+            if rxn not in competing_rxns:
+                competing_rxns.append(rxn)
+
+            irh = InterfaceReactionHull(
+                precursors_list[0],
+                precursors_list[1],
+                competing_rxns,
+            )
+
+            calc_1 = PrimarySelectivityCalculator(irh=irh, scale=scale)
+            calc_2 = SecondarySelectivityCalculator(irh=irh)
+
+            decorated_rxn = calc_1.decorate(rxn)
+            decorated_rxn = calc_2.decorate(decorated_rxn)
+
+        return decorated_rxn
+
+
+@explicit_serialize
+class CalculateChempotDistance(FiretaskBase):
+    """
+    Calculates the chemical potential distance using the ChempotDistanceCalculator for a
+    set of reactions and stores that within the reaction object data.
+
+    Required params:
+        entries (GibbsEntrySet): An entry set to be used for the calculation of
+            competitiveness scores.
+
+    Optional params:
+        rxns (ReactionSet): A set of reactions of interest. If not provided, will load
+            from a rxns.json.gz file
+    """
+
+    required_params: List[str] = ["entries"]
+    optional_params: List[str] = ["rxns", "rxns_opencpd_kwargs", "metadata"]
+
+    def run_task(self, fw_spec):
+        entries = load_entry_set(self, fw_spec)
+        rxns = load_json(self, "rxns", fw_spec)
+        rxns_open = (
+            load_json(self, "rxns_open", fw_spec)
+            if self.get(rxns) or "rxns_open" in fw_spec
+            else None
+        )
+        cpd_kwargs = self.get("cpd_kwargs", {})
+        metadata = load_json(self, "metadata", fw_spec)
+
+        cpd_calc_dict = {}
+        new_rxns = []
+
+        for rxn in sorted(rxns, key=lambda rxn: len(rxn.elements), reverse=True):
+            chemsys = rxn.chemical_system
+            elems = chemsys.split("-")
+            for c, cpd_calc in cpd_calc_dict.items():
+                if set(c.split("-")).issuperset(elems):
+                    break
+            else:
+                filtered_entries = entries.get_subset_in_chemsys(elems)
+                cpd_calc = ChempotDistanceCalculator.from_entries(
+                    filtered_entries, **cpd_kwargs
+                )
+                cpd_calc_dict[chemsys] = cpd_calc
+
+            new_rxn = cpd_calc.decorate(rxn)
+            new_rxns.append(new_rxn)
+
+        results = ReactionSet.from_rxns(new_rxns)
+
+        metadata["cpd_kwargs"] = cpd_kwargs
 
         dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
+        dumpfn(metadata, "metadata.json.gz")  # will overwrite existing metadata.json.gz
 
 
 @explicit_serialize

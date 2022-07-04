@@ -197,6 +197,18 @@ class OpenComputedReaction(ComputedReaction):
             for c, coeff in self.product_coeffs.items()
         }
 
+    @classmethod
+    def from_computed_rxn(
+        cls, reaction: ComputedReaction, chempots: Dict[Element, float]
+    ):
+        return cls(
+            entries=reaction.entries.copy(),
+            coefficients=reaction.coefficients.copy(),
+            chempots=chempots,
+            data=reaction.data.copy(),
+            lowest_num_errors=reaction.lowest_num_errors,
+        )
+
     def __repr__(self):
         cp = f"({','.join([f'mu_{e}={m}' for e, m in self.chempots.items()])})"
         return f"{super().__repr__()} {cp}"

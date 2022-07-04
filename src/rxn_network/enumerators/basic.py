@@ -29,7 +29,7 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    CHUNK_SIZE = 500
+    CHUNK_SIZE = 5000
 
     def __init__(
         self,
@@ -419,7 +419,7 @@ class BasicOpenEnumerator(BasicEnumerator):
     the ReactionSet class).
     """
 
-    CHUNK_SIZE = 500
+    CHUNK_SIZE = 1000
 
     def __init__(
         self,

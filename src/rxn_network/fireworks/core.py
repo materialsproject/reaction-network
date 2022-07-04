@@ -34,10 +34,10 @@ class EnumeratorFW(Firework):
         enumerators: Iterable[Enumerator],
         entries: Optional[GibbsEntrySet] = None,
         chemsys: Optional[Union[str, Iterable[str]]] = None,
-        entry_set_params: Optional[Dict] = None,
         calculate_selectivity: bool = True,
-        selectivity_kwargs: Optional[Dict] = None,
         calculate_chempot_distance: bool = False,
+        selectivity_kwargs: Optional[Dict] = None,
+        entry_set_params: Optional[Dict] = None,
         db_file: str = ">>db_file<<",
         entry_db_file: str = ">>entry_db_file<<",
         parents=None,
@@ -91,10 +91,12 @@ class EnumeratorFW(Firework):
                 )
             )
 
-        fw_name = (
-            f"Reaction Enumeration (Precursors: {precursors}, Targets: {targets}):"
-            f" {chemsys}"
-        )
+        fw_name = "Reaction Enumeration ("
+        if precursors:
+            fw_name += f"Precursors: {precursors},"
+        if targets:
+            fw_name += f"Targets: {targets},"
+        fw_name += f"{chemsys})"
 
         tasks.append(
             RunEnumerators(
