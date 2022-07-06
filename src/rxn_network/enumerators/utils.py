@@ -2,7 +2,7 @@
 Utility functions used by the enumerator classes.
 """
 import warnings
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 
 import ray
 from pymatgen.analysis.interface_reactions import (
@@ -162,7 +162,7 @@ def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
 
 
 def get_total_chemsys_str(
-    entries: Iterable[Entry], open_elems: Optional[Iterable[str]] = None
+    entries: Iterable[Entry], open_elems: Optional[Iterable[Union[str, Element]]] = None
 ) -> str:
     """
     Returns chemical system string for set of entries, with optional open element.

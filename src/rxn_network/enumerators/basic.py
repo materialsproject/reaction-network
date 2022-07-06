@@ -124,6 +124,7 @@ class BasicEnumerator(Enumerator):
 
         combos_dict = self._get_combos_dict(entries, precursors, targets, open_entries)
         open_combos = self._get_open_combos(open_entries)
+
         if not open_combos:
             open_combos = []
 
@@ -163,8 +164,8 @@ class BasicEnumerator(Enumerator):
         self, entries, precursor_entries, target_entries, open_entries
     ):
         """
-        Gets all possible entry combinations up to predefined cardinality n, filtered and
-        grouped by chemical system
+        Gets all possible entry combinations up to predefined cardinality (n), filtered and
+        grouped by chemical system.
         """
         precursor_elems = [
             [str(el) for el in e.composition.elements] for e in precursor_entries
@@ -172,20 +173,24 @@ class BasicEnumerator(Enumerator):
         target_elems = [
             [str(el) for el in e.composition.elements] for e in target_entries
         ]
-        open_elems = [[str(el) for el in e.composition.elements] for e in open_entries]
+        all_open_elems = {
+            str(el) for e in open_entries for el in e.composition.elements
+        }
 
         entries = entries - open_entries
 
-        combos = []
-        for c in limited_powerset(entries, self.n):
-            c_set = set(c)
-            combos.append(c_set)
-
-        combos_dict = group_by_chemsys(combos, [el for g in open_elems for el in g])
+        combos = [set(c) for c in limited_powerset(entries, self.n)]
+        combos_dict = group_by_chemsys(combos, all_open_elems)
 
         filtered_combos = self._filter_dict_by_elems(
-            combos_dict, precursor_elems, target_elems, open_elems
+            combos_dict, precursor_elems, target_elems, all_open_elems
         )
+
+        # for k, v in filtered_combos.items():
+        #     print(k)
+        #     for j in v:
+        #         print(j)
+        #         print("\n")
 
         return filtered_combos
 
@@ -336,12 +341,9 @@ class BasicEnumerator(Enumerator):
 
         return entries_new, precursors, targets, open_entries
 
+    @staticmethod
     def _filter_dict_by_elems(
-        self,
-        combos_dict,
-        precursor_elems,
-        target_elems,
-        open_elems,
+        combos_dict, precursor_elems, target_elems, all_open_elems
     ):
         """Filters the dictionary of combinations by elements"""
         filtered_dict = {}
@@ -352,30 +354,16 @@ class BasicEnumerator(Enumerator):
         for chemsys, combos in combos_dict.items():
             elems = set(chemsys.split("-"))
 
-            if len(elems) >= 10 or len(elems) == 1:
-                continue
-
-            all_open_elems = {el for g in open_elems for el in g}
-            if not all_open_elems.issubset(elems):
+            if len(elems) >= 10 or len(elems) == 1:  # too few or too many elements
                 continue
 
             if precursor_elems:
-                if self.exclusive_precursors:
-                    if not all_precursor_elems == elems:
-                        continue
-                else:
-                    if not any(
-                        elems.issuperset(el_group) for el_group in precursor_elems
-                    ):
-                        continue
+                if not (all_precursor_elems | all_open_elems).issuperset(elems):
+                    continue
 
             if target_elems:
-                if self.exclusive_targets:
-                    if not all_target_elems == elems:
-                        continue
-                else:
-                    if not any(elems.issuperset(el_group) for el_group in target_elems):
-                        continue
+                if not (all_target_elems | all_open_elems).issuperset(elems):
+                    continue
 
             filtered_dict[chemsys] = combos
 
