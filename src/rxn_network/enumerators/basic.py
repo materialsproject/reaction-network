@@ -181,7 +181,7 @@ class BasicEnumerator(Enumerator):
             c_set = set(c)
             combos.append(c_set)
 
-        combos_dict = group_by_chemsys(combos)
+        combos_dict = group_by_chemsys(combos, [el for g in open_elems for el in g])
 
         filtered_combos = self._filter_dict_by_elems(
             combos_dict, precursor_elems, target_elems, open_elems

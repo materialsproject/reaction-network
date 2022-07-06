@@ -316,6 +316,13 @@ class CalculateSelectivity(FiretaskBase):
             decorated_rxn = calc_1.decorate(rxn)
             decorated_rxn = calc_2.decorate(decorated_rxn)
 
+            if (
+                Composition("YMn12") in precursors_list
+                and decorated_rxn.data["secondary_selectivity"] < 0.1
+                and not hasattr(decorated_rxn, "chempots")
+            ):
+                dumpfn(irh, "bad_irh.json.gz")
+
         return decorated_rxn
 
 

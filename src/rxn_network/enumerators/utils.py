@@ -43,6 +43,7 @@ def react(
 
         r = set(rp[0]) if rp[0] else set()
         p = set(rp[1]) if rp[1] else set()
+
         all_phases = r | p
 
         precursor_func = (
@@ -147,37 +148,6 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = F
     return entry
 
 
-# def initialize_calculators(
-#     calculators: Union[List[calcs.Calculator], List[str]], entries: GibbsEntrySet
-# ):
-#     """
-#     Initialize a list of Calculators given a list of their names (strings) or
-#     uninitialized objects, and a provided list of entries.
-
-#     Args:
-#         calculators: List of names of calculators
-#         entries: List of entries or EntrySet-type object
-#     """
-#     calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in calculators]
-#     return [c.from_entries(entries) for c in calculators]  # type: ignore
-
-
-# def apply_calculators(
-#     rxn: ComputedReaction, calculators: List[calcs.Calculator]
-# ) -> ComputedReaction:
-#     """
-#     Decorates a reaction by applying decorate() from a list of calculators.
-
-#     Args:
-#         rxn: ComputedReaction object
-#         calculators: List of (initialized) calculators
-
-#     """
-#     for calc in calculators:
-#         rxn = calc.decorate(rxn)
-#     return rxn
-
-
 def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
     """
     Returns chemical system as a set of element names, for set of entries.
@@ -192,7 +162,7 @@ def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
 
 
 def get_total_chemsys_str(
-    entries: Iterable[Entry], open_elem: Optional[Element] = None
+    entries: Iterable[Entry], open_elems: Optional[Iterable[str]] = None
 ) -> str:
     """
     Returns chemical system string for set of entries, with optional open element.
@@ -202,13 +172,13 @@ def get_total_chemsys_str(
         open_elem: optional open element to include in chemical system
     """
     elements = {elem for entry in entries for elem in entry.composition.elements}
-    if open_elem:
-        elements.add(open_elem)
+    if open_elems:
+        elements.update([Element(e) for e in open_elems])
     return "-".join(sorted([str(e) for e in elements]))
 
 
 def group_by_chemsys(
-    combos: Iterable[Tuple[Entry]], open_elem: Optional[Element] = None
+    combos: Iterable[Tuple[Entry]], open_elems: Optional[Iterable[Element]] = None
 ) -> dict:
     """
     Groups entry combinations by chemical system, with optional open element.
@@ -222,7 +192,7 @@ def group_by_chemsys(
     """
     combo_dict: Dict[str, List[Tuple[Entry]]] = {}
     for combo in combos:
-        key = get_total_chemsys_str(combo, open_elem)
+        key = get_total_chemsys_str(combo, open_elems)
         if key in combo_dict:
             combo_dict[key].append(combo)
         else:
