@@ -85,7 +85,7 @@ def load_entry_set(firetask, fw_spec):
     return entries
 
 
-def get_all_precursor_strs(precursors, open_phases):
-    formulas = [comp.reduced_formula for comp in precursors | open_phases]
+def get_all_precursor_strs(precursors):
+    formulas = [comp.reduced_formula for comp in precursors]
     combos = limited_powerset(formulas, len(formulas))
     return ["-".join(sorted(c)) for c in combos]

@@ -211,15 +211,10 @@ class CalculateSelectivity(FiretaskBase):
         )
 
         logger.info("Decorating reactions with selectivities...")
-        for precursors, rxn_group in tqdm(
+        for precursors_with_open, rxn_group in tqdm(
             zip(precursors_groups, rxn_groups), total=len(precursors_groups)
         ):
-            if len(precursors) >= 3:
-                precursors_list = list(precursors - open_phases)
-            else:
-                precursors_list = list(precursors)
-
-            all_possible_strs = get_all_precursor_strs(precursors, open_phases)
+            all_possible_strs = get_all_precursor_strs(precursors_with_open)
 
             competing_rxns = ReactionSet.from_rxns(
                 [
@@ -241,6 +236,13 @@ class CalculateSelectivity(FiretaskBase):
             for rxn in rxn_group:
                 if rxn is None:
                     continue
+
+                precursors = rxn.reactants
+
+                if len(precursors) >= 3:
+                    precursors_list = list(set(precursors) - open_phases)
+                else:
+                    precursors_list = precursors
 
                 decorated_rxns.append(
                     self._get_decorated_rxn(rxn, competing_rxns, precursors_list, scale)
