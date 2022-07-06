@@ -7,6 +7,7 @@ from functools import cached_property
 from typing import Dict, List, Optional, Union
 
 import numpy as np
+from monty.json import MontyDecoder
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
@@ -208,6 +209,22 @@ class OpenComputedReaction(ComputedReaction):
             data=reaction.data.copy(),
             lowest_num_errors=reaction.lowest_num_errors,
         )
+
+    def as_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the reaction.
+        """
+        d = super().as_dict()
+        d["chempots"] = {el.symbol: u for el, u in self.chempots.items()}
+        return d
+
+    @classmethod
+    def from_dict(cls, d):
+        """
+        Returns an OpenComputedReaction object from a dictionary representation.
+        """
+        d["chempots"] = {Element(symbol): u for symbol, u in d["chempots"].items()}
+        return super().from_dict(d)
 
     def __repr__(self):
         cp = f"({','.join([f'mu_{e}={m}' for e, m in self.chempots.items()])})"

@@ -225,7 +225,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Returns:
             A new ComputedEntry with energy adjustment making it appear to be stable.
         """
-        e_above_hull = entry.data.get("e_above_hull")
+        e_above_hull = None
+        if hasattr(entry, "data"):
+            e_above_hull = entry.data.get("e_above_hull")
 
         if e_above_hull is None:
             e_above_hull = self.get_e_above_hull(entry)
@@ -241,7 +243,14 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             )
 
             entry_dict = entry.as_dict()
-            entry_dict["energy_adjustments"].append(adjustment)
+            original_entry = entry_dict.get("entry", None)
+
+            if original_entry:
+                energy_adjustments = original_entry["energy_adjustments"]
+            else:
+                energy_adjustments = entry_dict["energy_adjustments"]
+
+            energy_adjustments.append(adjustment.as_dict())
             new_entry = MontyDecoder().process_decoded(entry_dict)
 
         return new_entry

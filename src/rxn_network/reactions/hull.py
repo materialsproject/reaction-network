@@ -32,8 +32,8 @@ class InterfaceReactionHull(MSONable):
             reactions: List of reactions containing all enumerated reactions between the
                 two reactants. Note that this list should
         """
-        self.c1 = c1.reduced_composition
-        self.c2 = c2.reduced_composition
+        self.c1 = Composition(c1).reduced_composition
+        self.c2 = Composition(c2).reduced_composition
         self.e1 = None
         self.e2 = None
 
@@ -95,7 +95,9 @@ class InterfaceReactionHull(MSONable):
         """
         idx = self.reactions.index(reaction)
         x, y = self.coords[idx]
-        return y - self.get_hull_energy(x)
+        e_above_hull = y - self.get_hull_energy(x)
+
+        return e_above_hull
 
     def get_coordinate(self, reaction):
         """Get coordinate of reaction in reaction hull. This is expressed as the atomic
@@ -383,13 +385,17 @@ class InterfaceReactionHull(MSONable):
 
         return line_data
 
-    @property
+    @cached_property
     def hull_vertices(self):
         return np.array(
             [
                 i
                 for i in self.hull.vertices  # pylint: disable=not-an-iterable
                 if self.coords[i, 1] <= 0
+                and np.isclose(
+                    self.coords[self.coords[:, 0] == self.coords[i, 0]][:, 1].min(),
+                    self.coords[i, 1],  # make sure point is lower than others on same x
+                )
             ]
         )
 

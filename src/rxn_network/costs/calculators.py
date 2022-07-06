@@ -7,6 +7,7 @@ from typing import Callable, List
 import numpy as np
 from pymatgen.analysis.phase_diagram import PDEntry
 
+from rxn_network.core.composition import Composition
 from rxn_network.core.calculator import Calculator
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
@@ -54,6 +55,10 @@ class ChempotDistanceCalculator(Calculator):
         elif mu_func == "sum":
             self._mu_func = sum  # type: ignore
 
+        self._open_elems = set()
+        if cpd.entries[0].__class__.__name__ == "GrandPotPDEntry":
+            self._open_elems = set(cpd.entries[0].chempots.keys())
+
     def calculate(self, rxn: ComputedReaction) -> float:
         """
         Calculates the (aggregate) chemical potential distance in eV/atom. The mu_func parameter
@@ -66,20 +71,43 @@ class ChempotDistanceCalculator(Calculator):
         Returns:
             The chemical potential distance of the reaction.
         """
+        reactant_entries = [
+            e
+            for e in rxn.reactant_entries
+            if not self._open_elems.issuperset(e.composition.elements)
+        ]
+        product_entries = [
+            e
+            for e in rxn.product_entries
+            if not self._open_elems.issuperset(e.composition.elements)
+        ]
+
         combos = chain(
-            product(rxn.reactant_entries, rxn.product_entries),
-            combinations(rxn.product_entries, 2),
+            product(reactant_entries, product_entries),
+            combinations(product_entries, 2),
         )
         distances = [
             self.cpd.shortest_domain_distance(
-                combo[0].composition.reduced_formula,
-                combo[1].composition.reduced_formula,
+                self._get_reduced_formula(combo[0]), self._get_reduced_formula(combo[1])
             )
             for combo in combos
         ]
 
         distance = float(self._mu_func(distances))
         return distance
+
+    def _get_reduced_formula(self, entry):
+        if not self._open_elems:
+            comp = entry.composition
+        else:
+            comp = Composition(
+                {
+                    elem: entry.composition[elem]
+                    for elem in entry.composition
+                    if elem not in self._open_elems
+                }
+            )
+        return comp.reduced_formula
 
     @classmethod
     def from_entries(

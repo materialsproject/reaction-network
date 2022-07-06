@@ -3,14 +3,13 @@ A computed entry object for estimating the Gibbs free energy of formation. Note 
 this is similar to the implementation within pymatgen, but has been refactored here to
 add extra functionality.
 """
-import hashlib
-from functools import cached_property, lru_cache
 from itertools import combinations
 from typing import List, Optional
 
 import numpy as np
 from monty.json import MontyDecoder
 from pymatgen.core.structure import Structure
+from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import (
     ComputedEntry,
     ConstantEnergyAdjustment,
@@ -150,6 +149,18 @@ class GibbsComputedEntry(ComputedEntry):
         return num_atoms * self._g_delta_sisso(
             self.volume_per_atom, reduced_mass, temperature
         ) - self._sum_g_i(self._composition, temperature)
+
+    def to_grand_entry(self, chempots):
+        """
+        Convert a GibbsComputedEntry to a GrandComputedEntry.
+
+        Args:
+            chempots: A dictionary of {element: chempot} pairs.
+
+        Returns:
+            A GrandComputedEntry.
+        """
+        return GrandPotPDEntry(self, chempots)
 
     @staticmethod
     def _g_delta_sisso(
