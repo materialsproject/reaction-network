@@ -2,6 +2,7 @@
 Firetasks for running enumeration and network calculations
 """
 import os
+from itertools import groupby
 from typing import List
 
 import numpy as np
@@ -9,7 +10,6 @@ import ray
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
 from pymatgen.core.composition import Element
-from itertools import groupby
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
@@ -148,7 +148,7 @@ class CalculateSelectivity(FiretaskBase):
         "minimize_enumerator_kwargs",
         "target_formulas",
         "entries_fn",
-        "scale",
+        "temp",
     ]
 
     def run_task(self, fw_spec):
@@ -161,7 +161,7 @@ class CalculateSelectivity(FiretaskBase):
         use_minimize = self.get("use_minimize", True)
         basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
         minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
-        scale = self.get("scale", 10)
+        temp = self.get("temp", None)
 
         chempots = {open_elem: chempot}
 
@@ -245,14 +245,14 @@ class CalculateSelectivity(FiretaskBase):
                     precursors_list = precursors
 
                 decorated_rxns.append(
-                    self._get_decorated_rxn(rxn, competing_rxns, precursors_list, scale)
+                    self._get_decorated_rxn(rxn, competing_rxns, precursors_list, temp)
                 )
 
                 if open_elem:
                     open_rxn = OpenComputedReaction.from_computed_rxn(rxn, chempots)
                     decorated_open_rxns.append(
                         self._get_decorated_rxn(
-                            open_rxn, competing_open_rxns, precursors_list, scale
+                            open_rxn, competing_open_rxns, precursors_list, temp
                         )
                     )
 
@@ -280,19 +280,17 @@ class CalculateSelectivity(FiretaskBase):
         return all_rxns_dict
 
     @staticmethod
-    def _get_decorated_rxn(rxn, competing_rxns, precursors_list, scale):
+    def _get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         if len(precursors_list) == 1:
-            energy_diffs = np.array(
-                [rxn.energy_per_atom - r.energy_per_atom for r in competing_rxns]
+            other_energies = np.array(
+                [r.energy_per_atom for r in competing_rxns if r != rxn]
             )
-            energy_diffs = np.append(
-                energy_diffs, rxn.energy_per_atom - 0.0
-            )  # identity reaction
             primary_selectivity = (
-                InterfaceReactionHull.primary_selectivity_from_energy_diffs(
-                    energy_diffs, scale=scale
+                InterfaceReactionHull.primary_selectivity_from_energies(
+                    rxn.energy_per_atom, other_energies, temp=temp
                 )
             )
+            energy_diffs = rxn.energy_per_atom - other_energies
             max_diff = energy_diffs.max()
             secondary_selectivity = max_diff if max_diff > 0 else 0.0
             rxn.data["primary_selectivity"] = primary_selectivity
@@ -310,7 +308,7 @@ class CalculateSelectivity(FiretaskBase):
                 competing_rxns,
             )
 
-            calc_1 = PrimarySelectivityCalculator(irh=irh, scale=scale)
+            calc_1 = PrimarySelectivityCalculator(irh=irh, temp=temp)
             calc_2 = SecondarySelectivityCalculator(irh=irh)
 
             decorated_rxn = calc_1.decorate(rxn)

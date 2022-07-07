@@ -8,6 +8,7 @@ import numpy as np
 from monty.json import MSONable
 from plotly.express import line, scatter
 from plotly.graph_objs import Figure
+from pymatgen.core.units import kb
 from scipy.spatial import ConvexHull
 
 from rxn_network.core.composition import Composition
@@ -67,6 +68,7 @@ class InterfaceReactionHull(MSONable):
         self.coords = coords[idx_sort]
         self.reactions = [reactions_with_endpoints[i] for i in idx_sort]
         self.hull = ConvexHull(self.coords)
+        self.endpoint_reactions = endpoint_reactions
 
     def plot(self, y_max=0.2):
         """
@@ -115,7 +117,15 @@ class InterfaceReactionHull(MSONable):
         return coordinate
 
     def get_hull_energy(self, coordinate):
-        """ """
+        """
+        Get the energy of the reaction at a given coordinate.
+
+        Args:
+            coordinate: Coordinate of reaction in reaction hull.
+
+        Returns:
+            Energy of reaction at given coordinate.
+        """
         reactions = self.get_reactions_by_coordinate(coordinate)
         return sum(weight * r.energy_per_atom for r, weight in reactions.items())
 
@@ -143,7 +153,7 @@ class InterfaceReactionHull(MSONable):
 
         raise ValueError("No reactions found!")
 
-    def get_primary_selectivity(self, reaction: ComputedReaction, scale=100):
+    def get_primary_selectivity(self, reaction: ComputedReaction, temp=300):
         """
         Calculates the competition score (c-score) for a given reaction. This formula is
         based on a methodology presented in the following paper: (TBD)
@@ -157,8 +167,9 @@ class InterfaceReactionHull(MSONable):
         energy = reaction.energy_per_atom
         idx = self.reactions.index(reaction)
         competing_rxns = self.reactions[:idx] + self.reactions[idx + 1 :]
-        energies = np.array([energy - r.energy_per_atom for r in competing_rxns])
-        primary = self.primary_selectivity_from_energy_diffs(energies, scale)
+        primary = self.primary_selectivity_from_energies(
+            energy, [r.energy_per_atom for r in competing_rxns], temp
+        )
 
         return primary
 
@@ -208,6 +219,16 @@ class InterfaceReactionHull(MSONable):
         return -1 * energy
 
     def get_decomposition_energy(self, x1: float, x2: float):
+        """
+        Calculates the energy of the reaction decomposition between two points.
+
+        Args:
+            x1: Coordinate of first point.
+            x2: Coordinate of second point.
+
+        Returns:
+            The energy of the reaction decomposition between the two points.
+        """
         coords = self.get_coords_in_range(x1, x2)
         n = len(coords) - 2
 
@@ -226,10 +247,36 @@ class InterfaceReactionHull(MSONable):
         return energy
 
     def get_coords_in_range(self, x1, x2):
+        """
+        Get the coordinates in the range [x1, x2].
+
+        Args:
+            x1: Start of range.
+            x2: End of range.
+
+        Returns:
+            Array of coordinates in the range.
+
+        """
         x_min, x_max = sorted([x1, x2])
         y_min, y_max = self.get_hull_energy(x_min), self.get_hull_energy(x_max)
 
-        coords = [[x_min, y_min]]
+        coords = []
+
+        if x_min == 0.0:
+            coords.append([0.0, 0.0])
+
+        coords.append([x_min, y_min])
+
+        hull_vertices = self.hull_vertices.copy()
+
+        left_endpoint = self.reactions.index(self.endpoint_reactions[0])
+        right_endpoint = self.reactions.index(self.endpoint_reactions[1])
+
+        if left_endpoint not in hull_vertices:
+            hull_vertices = np.concatenate(([left_endpoint], hull_vertices))
+        if right_endpoint not in hull_vertices:
+            hull_vertices = np.append(hull_vertices, right_endpoint)
 
         coords.extend(
             [
@@ -240,9 +287,13 @@ class InterfaceReactionHull(MSONable):
                 and self.coords[i, 1] <= 0
             ]
         )
-        coords.append([x_max, y_max])
+        if x_max != x_min:
+            coords.append([x_max, y_max])
+        if x_max == 1.0:
+            coords.append([1.0, 0.0])
 
         coords = np.array(coords)
+
         return coords[coords[:, 0].argsort()]
 
     def count(self, num):
@@ -387,17 +438,17 @@ class InterfaceReactionHull(MSONable):
 
     @cached_property
     def hull_vertices(self):
-        return np.array(
-            [
-                i
-                for i in self.hull.vertices  # pylint: disable=not-an-iterable
-                if self.coords[i, 1] <= 0
-                and np.isclose(
-                    self.coords[self.coords[:, 0] == self.coords[i, 0]][:, 1].min(),
-                    self.coords[i, 1],  # make sure point is lower than others on same x
-                )
-            ]
-        )
+        hull_vertices = [
+            i
+            for i in self.hull.vertices  # pylint: disable=not-an-iterable
+            if self.coords[i, 1] <= 0
+            and np.isclose(
+                self.coords[self.coords[:, 0] == self.coords[i, 0]][:, 1].min(),
+                self.coords[i, 1],  # make sure point is lower than others on same x
+            )
+        ]
+
+        return np.array(hull_vertices)
 
     @cached_property
     def stable_reactions(self):
@@ -429,17 +480,17 @@ class InterfaceReactionHull(MSONable):
         xd = (x2 - x1) / (x3 - x1)
         yd = y1 + xd * (y3 - y1)
 
-        # l = round(c_left[0], 3)
-        # m = round(c_mid[0], 3)
-        # r = round(c_right[0], 3)
-
-        # print(l, m, r)
-
         return y2 - yd
 
     @staticmethod
-    def primary_selectivity_from_energy_diffs(energy_differences, scale):
+    def primary_selectivity_from_energies(rxn_energy, other_rxn_energies, temp):
         """
         Calculates the primary selectivity given a list of reaction energy differences
         """
-        return np.sum(np.log(1 + np.exp(scale * energy_differences)))
+        # return np.sum(np.log(1 + np.exp(scale * energy_differences)))
+        all_rxn_energies = np.append(other_rxn_energies, rxn_energy)
+        Q = np.sum(np.exp(-all_rxn_energies / (kb * temp)))
+
+        probability = np.exp(-rxn_energy / (kb * temp)) / Q
+
+        return -np.log(probability)

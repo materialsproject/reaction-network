@@ -8,8 +8,8 @@ from typing import List, Optional
 
 import numpy as np
 from monty.json import MontyDecoder
-from pymatgen.core.structure import Structure
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
+from pymatgen.core.structure import Structure
 from pymatgen.entries.computed_entries import (
     ComputedEntry,
     ConstantEnergyAdjustment,

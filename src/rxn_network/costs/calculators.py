@@ -7,8 +7,8 @@ from typing import Callable, List
 import numpy as np
 from pymatgen.analysis.phase_diagram import PDEntry
 
-from rxn_network.core.composition import Composition
 from rxn_network.core.calculator import Calculator
+from rxn_network.core.composition import Composition
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
@@ -162,7 +162,7 @@ class PrimarySelectivityCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        scale=100,
+        temp=300,
         name="primary_selectivity",
     ):
         """
@@ -173,7 +173,7 @@ class PrimarySelectivityCalculator(Calculator):
             name: the data dictionary key with which to store the calculated value.
         """
         self.irh = irh
-        self.scale = scale
+        self.temp = temp
         self._name = name
 
     def calculate(self, rxn: ComputedReaction) -> float:
@@ -189,7 +189,7 @@ class PrimarySelectivityCalculator(Calculator):
         Returns:
             The competitiveness score
         """
-        return self.irh.get_primary_selectivity(rxn, scale=self.scale)
+        return self.irh.get_primary_selectivity(rxn, temp=self.temp)
 
     @property
     def name(self):

@@ -85,6 +85,9 @@ class BasicEnumerator(Enumerator):
 
         self._stabilize = False
 
+        self._p_set_func = "issuperset" if self.exclusive_precursors else "intersection"
+        self._t_set_func = "issuperset" if self.exclusive_targets else "intersection"
+
         self.open_phases: Optional[List] = None
         self._build_pd = False
         self._build_grand_pd = False
@@ -173,9 +176,7 @@ class BasicEnumerator(Enumerator):
         target_elems = [
             [str(el) for el in e.composition.elements] for e in target_entries
         ]
-        all_open_elems = {
-            str(el) for e in open_entries for el in e.composition.elements
-        }
+        all_open_elems = {el for e in open_entries for el in e.composition.elements}
 
         entries = entries - open_entries
 
@@ -183,7 +184,10 @@ class BasicEnumerator(Enumerator):
         combos_dict = group_by_chemsys(combos, all_open_elems)
 
         filtered_combos = self._filter_dict_by_elems(
-            combos_dict, precursor_elems, target_elems, all_open_elems
+            combos_dict,
+            precursor_elems,
+            target_elems,
+            all_open_elems,
         )
 
         # for k, v in filtered_combos.items():
@@ -251,15 +255,12 @@ class BasicEnumerator(Enumerator):
             chempots = getattr(self, "chempots")
             grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
 
-        p_set_func = "issuperset" if self.exclusive_precursors else "intersection"
-        t_set_func = "issuperset" if self.exclusive_targets else "intersection"
-
         if not open_entries:
             open_entries = set()
 
         open_entries = ray.put(open_entries)
-        p_set_func = ray.put(p_set_func)
-        t_set_func = ray.put(t_set_func)
+        p_set_func = ray.put(self._p_set_func)
+        t_set_func = ray.put(self._t_set_func)
         remove_unbalanced = ray.put(self.remove_unbalanced)
         remove_changed = ray.put(self.remove_changed)
         filtered_entries = ray.put(filtered_entries)
@@ -341,15 +342,19 @@ class BasicEnumerator(Enumerator):
 
         return entries_new, precursors, targets, open_entries
 
-    @staticmethod
     def _filter_dict_by_elems(
-        combos_dict, precursor_elems, target_elems, all_open_elems
+        self,
+        combos_dict,
+        precursor_elems,
+        target_elems,
+        all_open_elems,
     ):
         """Filters the dictionary of combinations by elements"""
         filtered_dict = {}
 
         all_precursor_elems = {el for g in precursor_elems for el in g}
         all_target_elems = {el for g in target_elems for el in g}
+        all_open_elems = {str(el) for el in all_open_elems}
 
         for chemsys, combos in combos_dict.items():
             elems = set(chemsys.split("-"))
@@ -358,11 +363,15 @@ class BasicEnumerator(Enumerator):
                 continue
 
             if precursor_elems:
-                if not (all_precursor_elems | all_open_elems).issuperset(elems):
+                if not getattr(all_precursor_elems | all_open_elems, self._p_set_func)(
+                    elems
+                ):
                     continue
 
             if target_elems:
-                if not (all_target_elems | all_open_elems).issuperset(elems):
+                if not getattr(all_target_elems | all_open_elems, self._t_set_func)(
+                    elems
+                ):
                     continue
 
             filtered_dict[chemsys] = combos

@@ -25,7 +25,7 @@ from rxn_network.reactions.basic import BasicReaction
 class EnumeratorFW(Firework):
     """
     Firework for running a list of enumerators and storing the resulting reactions in a database.
-    An option is included to calculate competitiveness scores and store those as data
+    An option is included to calculate selectivity score(s) and store those as data
     within the reactions.
     """
 

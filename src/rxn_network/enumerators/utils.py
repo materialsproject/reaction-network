@@ -162,7 +162,7 @@ def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
 
 
 def get_total_chemsys_str(
-    entries: Iterable[Entry], open_elems: Optional[Iterable[Union[str, Element]]] = None
+    entries: Iterable[Entry], open_elems: Optional[Iterable[Union[Element]]] = None
 ) -> str:
     """
     Returns chemical system string for set of entries, with optional open element.
@@ -173,7 +173,7 @@ def get_total_chemsys_str(
     """
     elements = {elem for entry in entries for elem in entry.composition.elements}
     if open_elems:
-        elements.update([Element(e) for e in open_elems])
+        elements.update([e for e in open_elems])
     return "-".join(sorted([str(e) for e in elements]))
 
 
