@@ -5,6 +5,7 @@ import hashlib
 from typing import Dict, List, Optional
 
 from monty.json import MontyDecoder
+from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
 from scipy.interpolate import interp1d
 
@@ -71,6 +72,18 @@ class ExperimentalReferenceEntry(ComputedEntry):
 
         new_entry = self.from_dict(new_entry_dict)
         return new_entry
+
+    def to_grand_entry(self, chempots):
+        """
+        Convert a GibbsComputedEntry to a GrandComputedEntry.
+
+        Args:
+            chempots: A dictionary of {element: chempot} pairs.
+
+        Returns:
+            A GrandComputedEntry.
+        """
+        return GrandPotPDEntry(self, chempots)
 
     @classmethod
     def _validate_temperature(cls, formula: str, temperature: float) -> None:

@@ -29,6 +29,7 @@ from rxn_network.firetasks.utils import (
     get_all_precursor_strs,
     load_entry_set,
     load_json,
+    get_decorated_rxn,
 )
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
@@ -36,7 +37,8 @@ from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils.funcs import get_logger
+from rxn_network.utils.funcs import get_logger, grouper
+from rxn_network.utils.ray import to_iterator
 
 logger = get_logger(__name__)
 
@@ -210,51 +212,32 @@ class CalculateSelectivity(FiretaskBase):
             ]
         )
 
+        competing_rxns_dict = ray.put(competing_rxns_dict)
+        open_elem = ray.put(open_elem)
+        open_phases = ray.put(open_phases)
+        chempots = ray.put(chempots)
+        temp = ray.put(temp)
+
+        num_cpus = ray.nodes()[0]["Resources"]["CPU"]
+        batch_size = int(len(precursors_groups) // num_cpus) + 1
+
         logger.info("Decorating reactions with selectivities...")
-        for precursors_with_open, rxn_group in tqdm(
-            zip(precursors_groups, rxn_groups), total=len(precursors_groups)
-        ):
-            all_possible_strs = get_all_precursor_strs(precursors_with_open)
 
-            competing_rxns = ReactionSet.from_rxns(
-                [
-                    r
-                    for rxn_set in [
-                        competing_rxns_dict.get(s, []) for s in all_possible_strs
-                    ]
-                    for r in rxn_set
-                ]
+        chunks = [
+            get_decorated_rxns_from_chunk.remote(
+                rxn_chunk, competing_rxns_dict, open_elem, open_phases, chempots, temp
             )
-            if open_elem:
-                competing_open_rxns = ReactionSet.from_rxns(
-                    [
-                        OpenComputedReaction.from_computed_rxn(r, chempots)
-                        for r in competing_rxns
-                    ]
-                )
+            for rxn_chunk in tqdm(
+                grouper(zip(precursors_groups, rxn_groups), batch_size)
+            )
+        ]
 
-            for rxn in rxn_group:
-                if rxn is None:
-                    continue
+        decorated_rxns = []
+        decorated_open_rxns = []
 
-                precursors = rxn.reactants
-
-                if len(precursors) >= 3:
-                    precursors_list = list(set(precursors) - open_phases)
-                else:
-                    precursors_list = precursors
-
-                decorated_rxns.append(
-                    self._get_decorated_rxn(rxn, competing_rxns, precursors_list, temp)
-                )
-
-                if open_elem:
-                    open_rxn = OpenComputedReaction.from_computed_rxn(rxn, chempots)
-                    decorated_open_rxns.append(
-                        self._get_decorated_rxn(
-                            open_rxn, competing_open_rxns, precursors_list, temp
-                        )
-                    )
+        for r in tqdm(to_iterator(chunks), total=len(chunks)):
+            decorated_rxns.extend(r[0])
+            decorated_open_rxns.extend(r[1])
 
         logger.info("Saving decorated reactions.")
 
@@ -278,50 +261,6 @@ class CalculateSelectivity(FiretaskBase):
                 all_rxns_dict[precursors_str] = {r}
 
         return all_rxns_dict
-
-    @staticmethod
-    def _get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
-        if len(precursors_list) == 1:
-            other_energies = np.array(
-                [r.energy_per_atom for r in competing_rxns if r != rxn]
-            )
-            primary_selectivity = (
-                InterfaceReactionHull.primary_selectivity_from_energies(
-                    rxn.energy_per_atom, other_energies, temp=temp
-                )
-            )
-            energy_diffs = rxn.energy_per_atom - other_energies
-            max_diff = energy_diffs.max()
-            secondary_selectivity = max_diff if max_diff > 0 else 0.0
-            rxn.data["primary_selectivity"] = primary_selectivity
-            rxn.data["secondary_selectivity"] = secondary_selectivity
-            decorated_rxn = rxn
-        else:
-            competing_rxns = competing_rxns.get_rxns()
-
-            if rxn not in competing_rxns:
-                competing_rxns.append(rxn)
-
-            irh = InterfaceReactionHull(
-                precursors_list[0],
-                precursors_list[1],
-                competing_rxns,
-            )
-
-            calc_1 = PrimarySelectivityCalculator(irh=irh, temp=temp)
-            calc_2 = SecondarySelectivityCalculator(irh=irh)
-
-            decorated_rxn = calc_1.decorate(rxn)
-            decorated_rxn = calc_2.decorate(decorated_rxn)
-
-            if (
-                Composition("YMn12") in precursors_list
-                and decorated_rxn.data["secondary_selectivity"] < 0.1
-                and not hasattr(decorated_rxn, "chempots")
-            ):
-                dumpfn(irh, "bad_irh.json.gz")
-
-        return decorated_rxn
 
 
 @explicit_serialize
@@ -561,3 +500,61 @@ class RunSolver(FiretaskBase):
         dumpfn(pathway_set, balanced_pathways_fn)
 
         return FWAction(update_spec={"balanced_pathways_fn": balanced_pathways_fn})
+
+
+@ray.remote
+def get_decorated_rxns_from_chunk(
+    rxn_chunk, competing_rxns_dict, open_elem, open_phases, chempots, temp
+):
+    decorated_rxns = []
+    decorated_open_rxns = []
+
+    for c in rxn_chunk:
+        if c is None:
+            continue
+
+        precursors_with_open, rxn_group = c
+
+        all_possible_strs = get_all_precursor_strs(precursors_with_open)
+
+        competing_rxns = ReactionSet.from_rxns(
+            [
+                r
+                for rxn_set in [
+                    competing_rxns_dict.get(s, []) for s in all_possible_strs
+                ]
+                for r in rxn_set
+            ]
+        )
+        if open_elem:
+            competing_open_rxns = ReactionSet.from_rxns(
+                [
+                    OpenComputedReaction.from_computed_rxn(r, chempots)
+                    for r in competing_rxns
+                ]
+            )
+
+        for rxn in rxn_group:
+            if rxn is None:
+                continue
+
+            precursors = rxn.reactants
+
+            if len(precursors) >= 3:
+                precursors_list = list(set(precursors) - open_phases)
+            else:
+                precursors_list = precursors
+
+            decorated_rxns.append(
+                get_decorated_rxn(rxn, competing_rxns, precursors_list, temp)
+            )
+
+            if open_elem:
+                open_rxn = OpenComputedReaction.from_computed_rxn(rxn, chempots)
+                decorated_open_rxns.append(
+                    get_decorated_rxn(
+                        open_rxn, competing_open_rxns, precursors_list, temp
+                    )
+                )
+
+    return decorated_rxns, decorated_open_rxns

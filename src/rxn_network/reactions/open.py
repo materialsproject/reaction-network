@@ -7,7 +7,6 @@ from functools import cached_property
 from typing import Dict, List, Optional, Union
 
 import numpy as np
-from monty.json import MontyDecoder
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
