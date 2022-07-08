@@ -22,7 +22,7 @@ def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         other_energies = np.array(
             [r.energy_per_atom for r in competing_rxns if r != rxn]
         )
-        primary_selectivity = InterfaceReactionHull.primary_selectivity_from_energies(
+        primary_selectivity = InterfaceReactionHull._primary_selectivity_from_energies(
             rxn.energy_per_atom, other_energies, temp=temp
         )
         energy_diffs = rxn.energy_per_atom - other_energies

@@ -23,10 +23,4 @@ class Enumerator(MSONable, metaclass=ABCMeta):
         """
         Enumerates the potential reactions from the list of entries
         """
-
-    @abstractmethod
-    def estimate_max_num_reactions(self, entries) -> int:
-        """
-        Estimate of the maximum number of reactions that may be enumerated
-        from a list of entries
-        """
+        

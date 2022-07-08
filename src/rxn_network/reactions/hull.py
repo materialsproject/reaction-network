@@ -167,7 +167,7 @@ class InterfaceReactionHull(MSONable):
         energy = reaction.energy_per_atom
         idx = self.reactions.index(reaction)
         competing_rxns = self.reactions[:idx] + self.reactions[idx + 1 :]
-        primary = self.primary_selectivity_from_energies(
+        primary = self._primary_selectivity_from_energies(
             energy, [r.energy_per_atom for r in competing_rxns], temp
         )
 
@@ -365,7 +365,9 @@ class InterfaceReactionHull(MSONable):
 
     def count_recursive(self, n, cache=None):
         """
-        Courtesy Max G.
+        A recursive implementation of the counting function.
+
+        This implementation is courtesy of @mcgalcode.
         """
         if cache is None:
             cache = []
@@ -483,11 +485,10 @@ class InterfaceReactionHull(MSONable):
         return y2 - yd
 
     @staticmethod
-    def primary_selectivity_from_energies(rxn_energy, other_rxn_energies, temp):
+    def _primary_selectivity_from_energies(rxn_energy, other_rxn_energies, temp):
         """
         Calculates the primary selectivity given a list of reaction energy differences
         """
-        # return np.sum(np.log(1 + np.exp(scale * energy_differences)))
         all_rxn_energies = np.append(other_rxn_energies, rxn_energy)
         Q = np.sum(np.exp(-all_rxn_energies / (kb * temp)))
 

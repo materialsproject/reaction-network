@@ -97,7 +97,6 @@ class RunEnumerators(FiretaskBase):
             rxns = enumerator.enumerate(entries)
             results.extend(rxns)
 
-        results = set(results)
         results = ReactionSet.from_rxns(results, filter_duplicates=True)
 
         dumpfn(results, "rxns.json.gz")

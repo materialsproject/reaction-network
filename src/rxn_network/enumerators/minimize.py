@@ -57,18 +57,6 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         )
         self._build_pd = True
 
-    def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
-        """
-        Estimate the upper bound of the number of possible reactions. This will
-        correlate with the amount of time it takes to enumerate reactions.
-
-        Args:
-            entries: A list of all entries to consider
-
-        Returns: The upper bound on the number of possible reactions
-        """
-        return comb(len(entries), 2) * 2
-
     @staticmethod
     def _react_function(
         reactants, products, filtered_entries=None, pd=None, grand_pd=None, **kwargs

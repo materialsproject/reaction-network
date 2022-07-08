@@ -378,18 +378,6 @@ class BasicEnumerator(Enumerator):
 
         return filtered_dict
 
-    def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
-        """
-        Estimate the upper bound of the number of possible reactions. This will
-        correlate with the amount of time it takes to enumerate reactions.
-
-        Args:
-            entries: A list of all entries to consider
-
-        Returns: The upper bound on the number of possible reactions
-        """
-        return sum([comb(len(entries), i) for i in range(1, self.n + 1)]) ** 2
-
     @property
     def stabilize(self):
         """Whether or not to use only stable entries in analysis"""
@@ -466,28 +454,6 @@ class BasicOpenEnumerator(BasicEnumerator):
             remove_changed=remove_changed,
         )
         self.open_phases: List[str] = open_phases
-
-    def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
-        """
-        Estimate the upper bound of the number of possible reactions. This will
-        correlate with the amount of time it takes to enumerate reactions.
-
-        Args:
-            entries: A list of all entries to consider
-
-        Returns: The upper bound on the number of possible reactions
-        """
-        num_open_phases = len(self.open_phases)
-        num_combos_with_open = sum(
-            [comb(num_open_phases, i) for i in range(1, num_open_phases + 1)]
-        )
-
-        num_total_combos = 0
-        for i in range(1, self.n + 1):
-            num_combos = comb(len(entries), i)
-            num_total_combos += num_combos_with_open * num_combos
-
-        return num_total_combos**2
 
     def _get_open_combos(self, open_entries):
         """Get all possible combinations of open entries. For a single entry,
