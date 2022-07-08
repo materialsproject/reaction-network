@@ -19,8 +19,6 @@ def pre_balanced_rxn():
     rxn = BasicReaction(
         compositions=reactants + products, coefficients=coefficients, balanced=True
     )
-    print(rxn)
-    print(rxn.coefficients)
     return rxn
 
 

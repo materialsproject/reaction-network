@@ -4,6 +4,7 @@ objects which share entries.
 """
 from functools import lru_cache
 from typing import Collection, List, Optional, Set, Union
+from itertools import combinations
 
 import numpy as np
 from monty.json import MSONable
@@ -98,6 +99,7 @@ class ReactionSet(MSONable):
         entries: Optional[Collection[ComputedEntry]] = None,
         open_elem: Optional[Union[str, Element]] = None,
         chempot: float = 0.0,
+        filter_duplicates: bool = False,
     ) -> "ReactionSet":
         """
         Initiate a ReactionSet object from a list of reactions. Including a list of
@@ -109,6 +111,10 @@ class ReactionSet(MSONable):
             open_elem: Open element, e.g. "O2"
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
         """
+
+        if filter_duplicates:
+            rxns = cls._filter_duplicates(set(rxns))
+
         if not entries:
             entries = cls._get_unique_entries(rxns)
 
@@ -211,6 +217,41 @@ class ReactionSet(MSONable):
         added_elems_str = "-".join(sorted(list(added_elems)))
 
         return added_elems_str
+
+    @staticmethod
+    def _filter_duplicates(rxns):
+        rxn_dict = {}
+        for rxn in rxns:
+            reactants_str = "-".join(sorted([c.reduced_formula for c in rxn.reactants]))
+            products_str = "-".join(sorted([c.reduced_formula for c in rxn.products]))
+            rxn_str = f"{reactants_str}->{products_str}"
+
+            if rxn_str not in rxn_dict:
+                rxn_dict[rxn_str] = {rxn}
+            else:
+                rxn_dict[rxn_str].add(rxn)
+
+        for rxn_str, possible_duplicates in rxn_dict.items():
+            removed_rxns = []
+            if len(possible_duplicates) > 1:
+                for rxn1, rxn2 in combinations(possible_duplicates, 2):
+                    if rxn1 in removed_rxns or rxn2 in removed_rxns:
+                        continue
+
+                    rxn1_coeffs = rxn1.reactant_coeffs | rxn1.product_coeffs
+                    rxn2_coeffs = rxn2.reactant_coeffs | rxn2.product_coeffs
+                    ratios = []
+
+                    for c, coeff1 in rxn1_coeffs.items():
+                        coeff2 = rxn2_coeffs.get(c, 0)
+
+                        ratio = coeff1 / coeff2
+                        ratios.append(ratio)
+
+                    if not np.isclose(ratios[0], ratios).all():
+                        removed_rxns.append(rxn2)
+
+        return rxns - set(removed_rxns)
 
     @staticmethod
     def _get_unique_entries(rxns: Collection[ComputedReaction]) -> Set[ComputedEntry]:
