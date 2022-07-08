@@ -248,7 +248,7 @@ class ReactionSet(MSONable):
                         ratio = coeff1 / coeff2
                         ratios.append(ratio)
 
-                    if not np.isclose(ratios[0], ratios).all():
+                    if np.isclose(ratios[0], ratios).all():
                         removed_rxns.append(rxn2)
 
         return rxns - set(removed_rxns)

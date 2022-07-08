@@ -5,6 +5,7 @@ import pytest
 from monty.serialization import loadfn
 from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
+from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.costs.softplus import Softplus
@@ -31,3 +32,14 @@ def test_get_rxns(ymno_rxns, rxn_set, open_rxn_set):
 def test_calculate_costs(ymno_rxns, rxn_set):
     cf = Softplus()
     assert rxn_set.calculate_costs(cf) == [cf.evaluate(r) for r in ymno_rxns]
+
+
+def test_filter_duplicates(computed_rxn):
+    computed_rxn2 = ComputedReaction(
+        computed_rxn.entries, computed_rxn.coefficients * 2
+    )
+
+    assert computed_rxn2 != computed_rxn
+    assert ReactionSet._filter_duplicates({computed_rxn, computed_rxn2}) == {
+        computed_rxn
+    }

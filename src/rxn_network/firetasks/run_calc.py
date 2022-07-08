@@ -98,7 +98,7 @@ class RunEnumerators(FiretaskBase):
             results.extend(rxns)
 
         results = set(results)
-        results = ReactionSet.from_rxns(results)
+        results = ReactionSet.from_rxns(results, filter_duplicates=True)
 
         dumpfn(results, "rxns.json.gz")
         dumpfn(metadata, "metadata.json.gz")
@@ -197,6 +197,10 @@ class CalculateSelectivity(FiretaskBase):
         for e in enumerators:
             logger.info(f"Running {e.__class__.__name__}")
             competing_rxns.extend(e.enumerate(entries))
+
+        competing_rxns = ReactionSet.from_rxns(
+            competing_rxns, filter_duplicates=True
+        ).get_rxns()
 
         competing_rxns_dict = self._create_reactions_dict(competing_rxns)
 
@@ -524,14 +528,14 @@ def get_decorated_rxns_from_chunk(
                     competing_rxns_dict.get(s, []) for s in all_possible_strs
                 ]
                 for r in rxn_set
-            ]
+            ],
         )
         if open_elem:
             competing_open_rxns = ReactionSet.from_rxns(
                 [
                     OpenComputedReaction.from_computed_rxn(r, chempots)
                     for r in competing_rxns
-                ]
+                ],
             )
 
         for rxn in rxn_group:
