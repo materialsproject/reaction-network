@@ -30,6 +30,7 @@ def react(
     t_set_func,
     remove_unbalanced,
     remove_changed,
+    max_num_constraints,
     filtered_entries=None,
     pd=None,
     grand_pd=None,
@@ -77,6 +78,7 @@ def react(
                 rxn.is_identity
                 or (remove_unbalanced and not rxn.balanced)
                 or (remove_changed and rxn.lowest_num_errors != 0)
+                or rxn.data["num_constraints"] > max_num_constraints
             ):
                 continue
 

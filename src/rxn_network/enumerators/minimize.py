@@ -29,6 +29,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         targets: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        max_num_constraints: int = 1,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
     ):
@@ -104,6 +105,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         targets: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        max_num_constraints=1,
         quiet: bool = False,
     ):
         """

@@ -38,6 +38,7 @@ class BasicEnumerator(Enumerator):
         n: int = 2,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        max_num_constraints=1,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = True,
@@ -78,6 +79,7 @@ class BasicEnumerator(Enumerator):
         self.n = n
         self.exclusive_precursors = exclusive_precursors
         self.exclusive_targets = exclusive_targets
+        self.max_num_constraints = max_num_constraints
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
         self.calculate_e_above_hulls = calculate_e_above_hulls
@@ -263,6 +265,7 @@ class BasicEnumerator(Enumerator):
         t_set_func = ray.put(self._t_set_func)
         remove_unbalanced = ray.put(self.remove_unbalanced)
         remove_changed = ray.put(self.remove_changed)
+        max_num_constraints = ray.put(self.max_num_constraints)
         filtered_entries = ray.put(filtered_entries)
         pd = ray.put(pd)
         grand_pd = ray.put(grand_pd)
@@ -278,6 +281,7 @@ class BasicEnumerator(Enumerator):
                 t_set_func,
                 remove_unbalanced,
                 remove_changed,
+                max_num_constraints,
                 filtered_entries,
                 pd,
                 grand_pd,
@@ -414,6 +418,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         n: int = 2,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        max_num_constraints: int = 1,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
@@ -450,6 +455,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             n=n,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
+            max_num_constraints=max_num_constraints,
             remove_unbalanced=remove_unbalanced,
             remove_changed=remove_changed,
         )
