@@ -249,7 +249,13 @@ class ComputedReaction(BasicReaction):
         return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
 
     def __hash__(self):
-        return BasicReaction.__hash__(self)
+        return hash(
+            "-".join(
+                [e.reduced_formula for e in sorted(self.reactants)]
+                + [e.reduced_formula for e in sorted(self.products)]
+                + [str(round(self.energy_per_atom, 4))]
+            )
+        )
 
     def __eq__(self, other):
         is_equal = BasicReaction.__eq__(self, other)

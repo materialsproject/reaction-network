@@ -16,15 +16,14 @@ from pymatgen.core.composition import Element
 from rxn_network.core.composition import Composition
 from rxn_network.core.reaction import Reaction
 
+TOLERANCE = 1e-6  # Tolerance for determining if a particular component fraction is > 0.
+
 
 class BasicReaction(Reaction):
     """
     An object representing a basic chemical reaction: compositions and their
     coefficients.
     """
-
-    # Tolerance for determining if a particular component fraction is > 0.
-    TOLERANCE = 1e-6
 
     def __init__(
         self,
@@ -76,9 +75,7 @@ class BasicReaction(Reaction):
                 [k * abs(v) for k, v in self.product_coeffs.items()], Composition({})
             )
 
-            if not sum_reactants.almost_equals(
-                sum_products, rtol=0, atol=self.TOLERANCE
-            ):
+            if not sum_reactants.almost_equals(sum_products, rtol=0, atol=TOLERANCE):
                 self.balanced = False
             else:
                 self.balanced = True
@@ -473,9 +470,7 @@ class BasicReaction(Reaction):
 
             if np.allclose(np.matmul(comp_matrix, coeffs), np.zeros((num_elems, 1))):
                 expected_signs = np.array([-1] * len(reactants) + [+1] * len(products))
-                num_errors = np.sum(
-                    np.multiply(expected_signs, coeffs.T) < cls.TOLERANCE
-                )
+                num_errors = np.sum(np.multiply(expected_signs, coeffs.T) < TOLERANCE)
                 if num_errors == 0:
                     lowest_num_errors = 0
                     best_soln = coeffs
@@ -494,11 +489,10 @@ class BasicReaction(Reaction):
         product_comps, p_coefs = zip(*list(product_coeffs.items()))
         return BasicReaction(reactant_comps + product_comps, r_coefs + p_coefs)
 
-    @classmethod
-    def _str_from_formulas(cls, coeffs, formulas) -> str:
+    @staticmethod
+    def _str_from_formulas(coeffs, formulas, tol=TOLERANCE) -> str:
         reactant_str = []
         product_str = []
-        tol = cls.TOLERANCE
         for amt, formula in zip(coeffs, formulas):
             if abs(amt + 1) < tol:
                 reactant_str.append(formula)
@@ -538,10 +532,6 @@ class BasicReaction(Reaction):
 
         if not len(self.reactants) == len(other.reactants):
             return False
-
-        # coeff_ratio = np.sort(self.coefficients) / np.sort(other.coefficients)
-        # if not np.isclose(coeff_ratio, coeff_ratio[0]).all():
-        #     return False
 
         if not np.allclose(np.sort(self.coefficients), np.sort(other.coefficients)):
             return False
