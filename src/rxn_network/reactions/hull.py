@@ -323,14 +323,19 @@ class InterfaceReactionHull(MSONable):
         return count
 
     @lru_cache
-    def get_decomposition_energy_and_num_paths_recursive(self, x1: float, x2: float):
+    def get_decomposition_energy_and_num_paths_recursive(
+        self, x1: float, x2: float, use_x_min_ref=True, use_x_max_ref=True
+    ):
         """ """
         all_coords = self.get_coords_in_range(x1, x2)
 
-        x_min = all_coords[0, 0]
-        x_max = all_coords[-1, 0]
-        y_min = self.get_hull_energy(x_min)
-        y_max = self.get_hull_energy(x_max)
+        if not use_x_min_ref and all_coords[1, 0] == 0.0:
+            all_coords = all_coords[1:]
+        if not use_x_max_ref and all_coords[-1, 0] == 1.0:
+            all_coords = all_coords[:-1]
+
+        x_min, y_min = all_coords[0]
+        x_max, y_max = all_coords[-1]
 
         coords = all_coords[1:-1, :]
 
@@ -345,15 +350,24 @@ class InterfaceReactionHull(MSONable):
             val = 0
             total = 0
             for c in coords:
+                if c[0] == 0.0 and not np.isclose(c[1], 0.0):
+                    use_x_min_ref = False
+                elif c[0] == 1.0 and not np.isclose(c[1], 0.0):
+                    use_x_max_ref = False
+
                 height = self.calculate_altitude([x_min, y_min], c, [x_max, y_max])
                 (
                     left_decomp,
                     left_total,
-                ) = self.get_decomposition_energy_and_num_paths_recursive(x_min, c[0])
+                ) = self.get_decomposition_energy_and_num_paths_recursive(
+                    x_min, c[0], use_x_min_ref, use_x_max_ref
+                )
                 (
                     right_decomp,
                     right_total,
-                ) = self.get_decomposition_energy_and_num_paths_recursive(c[0], x_max)
+                ) = self.get_decomposition_energy_and_num_paths_recursive(
+                    c[0], x_max, use_x_min_ref, use_x_max_ref
+                )
 
                 val += (
                     height * (left_total * right_total)

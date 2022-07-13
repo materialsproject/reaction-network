@@ -20,6 +20,11 @@ def basic_enumerator_default():
 
 
 @pytest.fixture(scope="module")
+def basic_enumerator_more_constraints():
+    return BasicEnumerator(quiet=True, max_num_constraints=2)
+
+
+@pytest.fixture(scope="module")
 def basic_enumerator_with_precursors():
     return BasicEnumerator(precursors=["Y2O3", "Mn2O3"], quiet=True)
 
@@ -52,14 +57,23 @@ def basic_open_enumerator_with_target():
 @pytest.fixture(scope="module")
 def basic_open_enumerator_with_precursors_and_target():
     return BasicOpenEnumerator(
-        ["O2"], precursors=["Y2O3", "Mn2O3"], targets=["Y2Mn2O7"], quiet=True
+        ["O2"],
+        precursors=["Y2O3", "Mn2O3"],
+        targets=["Y2Mn2O7"],
+        quiet=True,
     )
 
 
-def test_enumerate(filtered_entries, basic_enumerator_default):
-    expected_num_rxns = 538
+def test_enumerate(
+    filtered_entries, basic_enumerator_default, basic_enumerator_more_constraints
+):
+    expected_num_rxns_1 = 496
+    expected_num_rxns_2 = 538
 
-    for enumerator in [basic_enumerator_default]:
+    for enumerator, expected_num_rxns in zip(
+        [basic_enumerator_default, basic_enumerator_more_constraints],
+        [expected_num_rxns_1, expected_num_rxns_2],
+    ):
         rxns = enumerator.enumerate(filtered_entries)
 
         assert expected_num_rxns == len(rxns)
@@ -118,17 +132,13 @@ def test_open_enumerate_with_precursors_and_target(
 ):
     rxns = basic_open_enumerator_with_precursors_and_target.enumerate(filtered_entries)
 
-    assert len(rxns) == 11
-
-    for r in rxns:
-        reactants = [i.reduced_formula for i in r.reactants]
-        products = [i.reduced_formula for i in r.products]
-        assert "O2" in reactants or "O2" in products
-        assert "Y2Mn2O7" in products
+    assert len(rxns) == 1
+    assert {c.reduced_formula for c in rxns[0].reactants} == {"Y2O3", "Mn2O3", "O2"}
+    assert {c.reduced_formula for c in rxns[0].products} == {"Y2Mn2O7"}
 
 
 def test_open_enumerate(filtered_entries, basic_open_enumerator):
-    expected_num_rxns = 1592
+    expected_num_rxns = 168
 
     rxns = basic_open_enumerator.enumerate(filtered_entries)
 
