@@ -73,7 +73,7 @@ def test_calculate_altitude(c1, c2, c3, expected_altitude):
 
 @pytest.mark.parametrize(
     "x1, x2, expected_length",
-    [(0, 1, 10), (0.3, 1, 10), (0.8, 0.9, 4), (0.9, 1, 5), (0.3, 0.4, 2)],
+    [(0, 1, 10), (0.3, 1, 10), (0.8, 0.9, 4), (0.9, 1, 45), (0.3, 0.4, 2)],
 )
 def test_get_coords_in_range(x1, x2, expected_length, irh_batio):
     coords = irh_batio.get_coords_in_range(x1, x2)
@@ -83,20 +83,20 @@ def test_get_coords_in_range(x1, x2, expected_length, irh_batio):
 
 
 def test_get_primary_selectivity(irh_batio, stable_rxn, unstable_rxn):
-    assert irh_batio.get_primary_selectivity(stable_rxn) == pytest.approx(
-        8.911788674589733
+    assert irh_batio.get_primary_selectivity(stable_rxn, temp=300) == pytest.approx(
+        3.287317251853353
     )
-    assert irh_batio.get_primary_selectivity(unstable_rxn) == pytest.approx(
-        15138.791429443967
+    assert irh_batio.get_primary_selectivity(unstable_rxn, temp=300) == pytest.approx(
+        42.826116419641934
     )
 
 
 def test_get_secondary_selectivity(irh_batio, stable_rxn, unstable_rxn):
     assert irh_batio.get_secondary_selectivity(stable_rxn) == pytest.approx(
-        0.4127238275943615
+        0.4127238275943621
     )
     assert irh_batio.get_secondary_selectivity(unstable_rxn) == pytest.approx(
-        0.422163062679169
+        1.458743931650056
     )
 
 
@@ -151,7 +151,7 @@ def test_count(num, answer, irh_batio):
 
 
 def test_hull_vertices(irh_batio):
-    correct = np.array([0, 3, 42, 73, 117, 162, 177, 207, 216, 217])
+    correct = np.array([0, 4, 41, 71, 119, 162, 176, 207, 216, 217])
     np.testing.assert_almost_equal(irh_batio.hull_vertices, correct)
 
     assert 89 not in irh_batio.hull_vertices  # 89 is above zero and not relevant

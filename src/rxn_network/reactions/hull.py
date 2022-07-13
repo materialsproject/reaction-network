@@ -24,7 +24,11 @@ class InterfaceReactionHull(MSONable):
     """
 
     def __init__(
-        self, c1: Composition, c2: Composition, reactions: List[ComputedReaction]
+        self,
+        c1: Composition,
+        c2: Composition,
+        reactions: List[ComputedReaction],
+        max_num_constraints=1,
     ):
         """
         Args:
@@ -50,6 +54,12 @@ class InterfaceReactionHull(MSONable):
             raise ValueError(
                 "Provided reactions do not correspond to reactant compositons!"
             )
+
+        reactions = [
+            r
+            for r in reactions
+            if r.data.get("num_constraints", 1) <= max_num_constraints
+        ]
 
         endpoint_reactions = [
             ComputedReaction.balance([self.e1], [self.e1]),
@@ -114,7 +124,7 @@ class InterfaceReactionHull(MSONable):
                 f"Can't compute coordinate for {reaction} with {self.c1}, {self.c2}"
             ) from e
 
-        return coordinate
+        return round(coordinate, 12)  # avoids numerical issues
 
     def get_hull_energy(self, coordinate):
         """
@@ -263,20 +273,10 @@ class InterfaceReactionHull(MSONable):
 
         coords = []
 
-        if x_min == 0.0:
+        if np.isclose(x_min, 0.0) and not np.isclose(y_min, 0.0):
             coords.append([0.0, 0.0])
 
         coords.append([x_min, y_min])
-
-        hull_vertices = self.hull_vertices.copy()
-
-        left_endpoint = self.reactions.index(self.endpoint_reactions[0])
-        right_endpoint = self.reactions.index(self.endpoint_reactions[1])
-
-        if left_endpoint not in hull_vertices:
-            hull_vertices = np.concatenate(([left_endpoint], hull_vertices))
-        if right_endpoint not in hull_vertices:
-            hull_vertices = np.append(hull_vertices, right_endpoint)
 
         coords.extend(
             [
@@ -287,9 +287,10 @@ class InterfaceReactionHull(MSONable):
                 and self.coords[i, 1] <= 0
             ]
         )
+
         if x_max != x_min:
             coords.append([x_max, y_max])
-        if x_max == 1.0:
+        if np.isclose(x_max, 1.0) and not np.isclose(y_max, 0.0):
             coords.append([1.0, 0.0])
 
         coords = np.array(coords)

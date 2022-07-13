@@ -81,9 +81,13 @@ class OpenComputedReaction(ComputedReaction):
         """
         reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
         product_comps = [e.composition.reduced_composition for e in product_entries]
-        coefficients, lowest_num_errors = cls._balance_coeffs(
+        coefficients, lowest_num_errors, num_constraints = cls._balance_coeffs(
             reactant_comps, product_comps
         )
+
+        if not data:
+            data = {}
+        data["num_constraints"] = num_constraints
 
         entries = list(reactant_entries) + list(product_entries)
 

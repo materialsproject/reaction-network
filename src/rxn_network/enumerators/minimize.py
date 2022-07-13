@@ -4,11 +4,9 @@ minimization technique, with or without the option of an open entry.
 """
 
 from itertools import product
-from math import comb
 from typing import List, Optional
 
 from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core.composition import Composition
 from rxn_network.enumerators.basic import BasicEnumerator

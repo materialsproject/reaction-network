@@ -9,40 +9,42 @@ from rxn_network.enumerators.minimize import (
 
 @pytest.fixture(scope="module")
 def gibbs_enumerator_default():
-    return MinimizeGibbsEnumerator()
+    return MinimizeGibbsEnumerator(quiet=True)
 
 
 @pytest.fixture(scope="module")
 def gibbs_enumerator_with_precursors():
-    return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"])
+    return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"], quiet=True)
 
 
 @pytest.fixture(scope="module")
 def gibbs_enumerator_with_target():
-    return MinimizeGibbsEnumerator(targets=["YMnO3"])
+    return MinimizeGibbsEnumerator(targets=["YMnO3"], quiet=True)
 
 
 @pytest.fixture(scope="module")
 def gibbs_enumerator_with_precursors_and_target():
-    return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"])
+    return MinimizeGibbsEnumerator(
+        precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"], quiet=True
+    )
 
 
 @pytest.fixture(scope="module")
 def grand_potential_enumerator():
-    return MinimizeGrandPotentialEnumerator(open_elem=Element("O"), mu=0.0)
+    return MinimizeGrandPotentialEnumerator(open_elem=Element("O"), mu=0.0, quiet=True)
 
 
 @pytest.fixture(scope="module")
 def grand_potential_enumerator_with_precursors():
     return MinimizeGrandPotentialEnumerator(
-        open_elem=Element("O"), mu=0.0, precursors=["Y2O3", "Mn2O3"]
+        open_elem=Element("O"), mu=0.0, precursors=["Y2O3", "Mn2O3"], quiet=True
     )
 
 
 @pytest.fixture(scope="module")
 def grand_potential_enumerator_with_target():
     return MinimizeGrandPotentialEnumerator(
-        open_elem=Element("O"), mu=0.0, targets=["Y2Mn2O7"]
+        open_elem=Element("O"), mu=0.0, targets=["Y2Mn2O7"], quiet=True
     )
 
 
@@ -53,6 +55,7 @@ def grand_potential_enumerator_with_precursors_and_target():
         mu=0.0,
         precursors=["Y2O3", "Mn2O3"],
         targets=["Y2Mn2O7"],
+        quiet=True,
     )
 
 
@@ -111,7 +114,7 @@ def test_enumerate_gibbs_with_precursors_and_target(
 
 
 def test_enumerate_grand_potential(filtered_entries, grand_potential_enumerator):
-    expected_num_rxns = 38
+    expected_num_rxns = 42
 
     rxns = grand_potential_enumerator.enumerate(filtered_entries)
 
@@ -136,7 +139,7 @@ def test_enumerate_grand_potential_precursors(
 def test_enumerate_grand_potential_target(
     filtered_entries, grand_potential_enumerator_with_target
 ):
-    expected_num_rxns = 12
+    expected_num_rxns = 14
 
     rxns = grand_potential_enumerator_with_target.enumerate(filtered_entries)
     targets = grand_potential_enumerator_with_target.targets

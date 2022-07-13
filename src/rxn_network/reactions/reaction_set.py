@@ -112,9 +112,6 @@ class ReactionSet(MSONable):
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
         """
 
-        if filter_duplicates:
-            rxns = cls._filter_duplicates(set(rxns))
-
         if not entries:
             entries = cls._get_unique_entries(rxns)
 
@@ -141,7 +138,7 @@ class ReactionSet(MSONable):
                 chempot = all_chempots.pop()
                 open_elem = all_open_elems.pop()
 
-        return cls(
+        rxn_set = cls(
             entries=entries,
             indices=indices,
             coeffs=coeffs,
@@ -149,6 +146,11 @@ class ReactionSet(MSONable):
             chempot=chempot,
             all_data=data,
         )
+
+        if filter_duplicates:
+            rxn_set = cls.from_rxns(cls._filter_duplicates(set(rxn_set.get_rxns())))
+
+        return rxn_set
 
     @lru_cache(maxsize=1)
     def to_dataframe(
@@ -231,9 +233,10 @@ class ReactionSet(MSONable):
             else:
                 rxn_dict[rxn_str].add(rxn)
 
+        removed_rxns = []
         for rxn_str, possible_duplicates in rxn_dict.items():
-            removed_rxns = []
             if len(possible_duplicates) > 1:
+
                 for rxn1, rxn2 in combinations(possible_duplicates, 2):
                     if rxn1 in removed_rxns or rxn2 in removed_rxns:
                         continue

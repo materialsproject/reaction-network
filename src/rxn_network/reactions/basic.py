@@ -103,7 +103,12 @@ class BasicReaction(Reaction):
             data: Optional dictionary containing extra data about the reaction.
         """
         compositions = list(reactants + products)
-        coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)
+        coeffs, lowest_num_errors, num_constraints = cls._balance_coeffs(
+            reactants, products
+        )
+        if not data:
+            data = {}
+        data["num_constraints"] = num_constraints
 
         balanced = True
         if coeffs is None or lowest_num_errors == np.inf:
@@ -415,7 +420,7 @@ class BasicReaction(Reaction):
     @classmethod
     def _balance_coeffs(
         cls, reactants: List[Composition], products: List[Composition]
-    ) -> Tuple[np.ndarray, Union[int, float]]:
+    ) -> Tuple[np.ndarray, Union[int, float], int]:
         """
         Balances the reaction and returns the new coefficient matrix
         """
@@ -479,7 +484,7 @@ class BasicReaction(Reaction):
                     lowest_num_errors = num_errors
                     best_soln = coeffs
 
-        return np.squeeze(best_soln), lowest_num_errors
+        return np.squeeze(best_soln), lowest_num_errors, num_constraints
 
     @staticmethod
     def _from_coeff_dicts(reactant_coeffs, product_coeffs) -> "BasicReaction":
