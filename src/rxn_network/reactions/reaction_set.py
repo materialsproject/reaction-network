@@ -148,7 +148,9 @@ class ReactionSet(MSONable):
         )
 
         if filter_duplicates:
-            rxn_set = cls.from_rxns(cls._filter_duplicates(set(rxn_set.get_rxns())))
+            all_rxns = rxn_set.get_rxns()
+            set_of_rxns = set(all_rxns)
+            rxn_set = cls.from_rxns(cls._filter_duplicates(set_of_rxns))
 
         return rxn_set
 

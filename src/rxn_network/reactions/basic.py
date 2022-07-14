@@ -545,13 +545,12 @@ class BasicReaction(Reaction):
 
     def __hash__(self):
         return hash(
-            "-".join(
-                [e.reduced_formula for e in sorted(self.reactants)]
-                + [e.reduced_formula for e in sorted(self.products)]
+            (
+                tuple(sorted(r.reduced_formula for r in self.reactant_coeffs)),
+                tuple(sorted(p.reduced_formula for p in self.product_coeffs)),
             )
         )
 
-    @lru_cache
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]
 

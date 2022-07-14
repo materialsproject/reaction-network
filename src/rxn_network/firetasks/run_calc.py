@@ -96,7 +96,9 @@ class RunEnumerators(FiretaskBase):
             rxns = enumerator.enumerate(entries)
             results.extend(rxns)
 
-        results = ReactionSet.from_rxns(results, filter_duplicates=True)
+        results = ReactionSet.from_rxns(
+            results, filter_duplicates=True, entries=entries
+        )
 
         dumpfn(results, "rxns.json.gz")
         dumpfn(metadata, "metadata.json.gz")
@@ -196,9 +198,8 @@ class CalculateSelectivity(FiretaskBase):
             logger.info(f"Running {e.__class__.__name__}")
             competing_rxns.extend(e.enumerate(entries))
 
-        competing_rxns = ReactionSet.from_rxns(
-            competing_rxns, filter_duplicates=True
-        ).get_rxns()
+        logger.info(f"Found {len(competing_rxns)} competing reactions")
+        logger.info("Getting competing reactions dict...")
 
         competing_rxns_dict = self._create_reactions_dict(competing_rxns)
 
@@ -207,6 +208,7 @@ class CalculateSelectivity(FiretaskBase):
         decorated_rxns = []
         decorated_open_rxns = []
 
+        logger.info("Grouping reactions...")
         precursors_groups, rxn_groups = zip(
             *[
                 (i[0], list(i[1]))
@@ -214,6 +216,7 @@ class CalculateSelectivity(FiretaskBase):
             ]
         )
 
+        logger.info("Putting it into ray memory")
         competing_rxns_dict = ray.put(competing_rxns_dict)
         open_elem = ray.put(open_elem)
         open_phases = ray.put(open_phases)
@@ -243,11 +246,11 @@ class CalculateSelectivity(FiretaskBase):
 
         logger.info("Saving decorated reactions.")
 
-        results = ReactionSet.from_rxns(decorated_rxns)
+        results = ReactionSet.from_rxns(decorated_rxns, entries=entries)
         dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
 
         if decorated_open_rxns:
-            open_results = ReactionSet.from_rxns(decorated_open_rxns)
+            open_results = ReactionSet.from_rxns(decorated_open_rxns, entries=entries)
             dumpfn(open_results, "rxns_open.json.gz")
 
             return FWAction(update_spec={"rxns_open_fn": "rxns_open.json.gz"})
@@ -255,6 +258,7 @@ class CalculateSelectivity(FiretaskBase):
     @staticmethod
     def _create_reactions_dict(all_rxns):
         all_rxns_dict = {}
+
         for r in all_rxns:
             precursors_str = "-".join(sorted([p.reduced_formula for p in r.reactants]))
             if precursors_str in all_rxns_dict:
@@ -354,7 +358,7 @@ class CalculateChempotDistance(FiretaskBase):
             new_rxn = cpd_calc.decorate(rxn)
             new_rxns.append(new_rxn)
 
-        results = ReactionSet.from_rxns(new_rxns)
+        results = ReactionSet.from_rxns(new_rxns, entries=entries)
         return results
 
 
