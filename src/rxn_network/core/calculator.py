@@ -2,8 +2,8 @@
 Basic interface for a reaction cost Calculator
 """
 from abc import ABCMeta, abstractmethod
-from typing import List
 from copy import deepcopy
+from typing import List
 
 from monty.json import MSONable
 

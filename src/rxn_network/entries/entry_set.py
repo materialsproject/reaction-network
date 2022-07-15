@@ -29,6 +29,7 @@ from rxn_network.entries.corrections import CarbonateCorrection
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.freed import FREEDReferenceEntry
 from rxn_network.entries.gibbs import GibbsComputedEntry
+from rxn_network.entries.interpolated import InterpolatedEntry
 from rxn_network.entries.nist import NISTReferenceEntry
 from rxn_network.thermo.utils import expand_pd
 from rxn_network.utils.funcs import get_logger
@@ -315,7 +316,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             description="Keeps track of uncertainty in interpolation",
         )
 
-        return ComputedEntry(
+        return InterpolatedEntry(
             comp,
             energy,
             energy_adjustments=[adj],

@@ -7,14 +7,13 @@ import numpy as np
 from fireworks import FireTaskBase
 from monty.serialization import loadfn
 
-from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.utils import limited_powerset
-
-from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.costs.calculators import (
     PrimarySelectivityCalculator,
     SecondarySelectivityCalculator,
 )
+from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.reactions.hull import InterfaceReactionHull
+from rxn_network.utils import limited_powerset
 
 
 def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):

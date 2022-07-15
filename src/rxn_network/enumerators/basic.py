@@ -5,7 +5,6 @@ to consider open entries.
 import logging
 from copy import deepcopy
 from itertools import combinations, product
-from math import comb
 from typing import List, Optional, Set
 
 import ray

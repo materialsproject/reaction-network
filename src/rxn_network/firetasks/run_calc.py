@@ -5,7 +5,6 @@ import os
 from itertools import groupby
 from typing import List
 
-import numpy as np
 import ray
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
@@ -13,9 +12,7 @@ from pymatgen.core.composition import Element
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
-from rxn_network.costs.calculators import (
-    ChempotDistanceCalculator,
-)
+from rxn_network.costs.calculators import ChempotDistanceCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (
@@ -25,9 +22,9 @@ from rxn_network.enumerators.minimize import (
 from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.firetasks.utils import (
     get_all_precursor_strs,
+    get_decorated_rxn,
     load_entry_set,
     load_json,
-    get_decorated_rxn,
 )
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
