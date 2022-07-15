@@ -203,46 +203,73 @@ class CalculateSelectivity(FiretaskBase):
 
         competing_rxns_dict = self._create_reactions_dict(competing_rxns)
 
+        del competing_rxns  # Free up memory (this is a large list)
+
         open_phases = {Composition(p) for p in open_phases}
 
         decorated_rxns = []
         decorated_open_rxns = []
 
-        logger.info("Grouping reactions...")
-        precursors_groups, rxn_groups = zip(
-            *[
-                (i[0], list(i[1]))
-                for i in groupby(rxns, key=lambda r: set(r.reactants) | open_phases)
-            ]
-        )
-
-        logger.info("Putting it into ray memory")
-        competing_rxns_dict = ray.put(competing_rxns_dict)
-        open_elem = ray.put(open_elem)
-        open_phases = ray.put(open_phases)
-        chempots = ray.put(chempots)
-        temp = ray.put(temp)
-
-        num_cpus = ray.nodes()[0]["Resources"]["CPU"]
-        batch_size = int(len(precursors_groups) // num_cpus) + 1
-
-        logger.info("Decorating reactions with selectivities...")
-
-        chunks = [
-            get_decorated_rxns_from_chunk.remote(
-                rxn_chunk, competing_rxns_dict, open_elem, open_phases, chempots, temp
-            )
-            for rxn_chunk in tqdm(
-                grouper(zip(precursors_groups, rxn_groups), batch_size)
-            )
-        ]
+        logger.info("Calculating selectivites...")
 
         decorated_rxns = []
         decorated_open_rxns = []
 
-        for r in tqdm(to_iterator(chunks), total=len(chunks)):
-            decorated_rxns.extend(r[0])
-            decorated_open_rxns.extend(r[1])
+        num_cpus = ray.nodes()[0]["Resources"]["CPU"]
+
+        open_elem = ray.put(open_elem)
+        chempots = ray.put(chempots)
+        temp = ray.put(temp)
+
+        for group in grouper(
+            groupby(rxns, key=lambda r: set(r.reactants) | open_phases),
+            n=10000,
+            fillvalue=(None, None),
+        ):  # do this in chunks to avoid running out of memory
+
+            precursors_group_chunk, rxn_group_chunk = zip(
+                *[(i[0], i[1]) for i in group if i[0] is not None and i[1] is not None]
+            )
+
+            competing_rxns = [
+                self._get_all_competing_rxns_from_dict(
+                    precursors_with_open, competing_rxns_dict
+                )
+                for precursors_with_open in precursors_group_chunk
+            ]
+
+            batch_size = int(len(precursors_group_chunk) // num_cpus) + 1
+
+            processed_chunks = []
+            for group_chunk in tqdm(
+                grouper(
+                    zip(rxn_group_chunk, competing_rxns),
+                    batch_size,
+                    fillvalue=(None, None),
+                ),
+            ):
+                rxn_chunk, competing_rxns_chunk = zip(
+                    *[
+                        (i[0], i[1])
+                        for i in group_chunk
+                        if i[0] is not None and i[1] is not None
+                    ]
+                )
+
+                processed_chunks.append(
+                    get_decorated_rxns_from_chunk.remote(
+                        rxn_chunk,
+                        competing_rxns_chunk,
+                        open_elem,
+                        open_phases,
+                        chempots,
+                        temp,
+                    )
+                )
+
+            for r in tqdm(to_iterator(processed_chunks), total=len(processed_chunks)):
+                decorated_rxns.extend(r[0])
+                decorated_open_rxns.extend(r[1])
 
         logger.info("Saving decorated reactions.")
 
@@ -267,6 +294,21 @@ class CalculateSelectivity(FiretaskBase):
                 all_rxns_dict[precursors_str] = {r}
 
         return all_rxns_dict
+
+    @staticmethod
+    def _get_all_competing_rxns_from_dict(precursors_with_open, competing_rxns_dict):
+        all_possible_strs = get_all_precursor_strs(precursors_with_open)
+
+        competing_rxns = ReactionSet.from_rxns(
+            [
+                r
+                for rxn_set in [
+                    competing_rxns_dict.get(s, []) for s in all_possible_strs
+                ]
+                for r in rxn_set
+            ],
+        )
+        return competing_rxns
 
 
 @explicit_serialize
@@ -510,28 +552,12 @@ class RunSolver(FiretaskBase):
 
 @ray.remote
 def get_decorated_rxns_from_chunk(
-    rxn_chunk, competing_rxns_dict, open_elem, open_phases, chempots, temp
+    rxn_chunk, competing_rxns_chunk, open_elem, open_phases, chempots, temp
 ):
     decorated_rxns = []
     decorated_open_rxns = []
 
-    for c in rxn_chunk:
-        if c is None:
-            continue
-
-        precursors_with_open, rxn_group = c
-
-        all_possible_strs = get_all_precursor_strs(precursors_with_open)
-
-        competing_rxns = ReactionSet.from_rxns(
-            [
-                r
-                for rxn_set in [
-                    competing_rxns_dict.get(s, []) for s in all_possible_strs
-                ]
-                for r in rxn_set
-            ],
-        )
+    for rxns, competing_rxns in zip(rxn_chunk, competing_rxns_chunk):
         if open_elem:
             competing_open_rxns = ReactionSet.from_rxns(
                 [
@@ -540,7 +566,7 @@ def get_decorated_rxns_from_chunk(
                 ],
             )
 
-        for rxn in rxn_group:
+        for rxn in rxns:
             if rxn is None:
                 continue
 
