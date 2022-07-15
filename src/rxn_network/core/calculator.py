@@ -3,6 +3,7 @@ Basic interface for a reaction cost Calculator
 """
 from abc import ABCMeta, abstractmethod
 from typing import List
+from copy import deepcopy
 
 from monty.json import MSONable
 
@@ -22,7 +23,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
 
     def decorate(self, rxn: Reaction) -> Reaction:
         """
-        Decorates the reaction (in place) with the calculated property by
+        Returns a copy of the reaction with the calculated property by
         storing the value within the reaction's data dictionary.
 
         Args:
@@ -31,12 +32,13 @@ class Calculator(MSONable, metaclass=ABCMeta):
         Returns:
             The reaction object, modified in place
         """
-        if not getattr(rxn, "data"):
-            rxn.data = {}
+        new_rxn = deepcopy(rxn)
 
-        rxn.data[self.name] = self.calculate(rxn)
+        if not getattr(new_rxn, "data"):
+            new_rxn.data = {}
 
-        return rxn
+        new_rxn.data[self.name] = self.calculate(new_rxn)
+        return new_rxn
 
     def calculate_many(self, rxns: List[Reaction]) -> List[float]:
         """
@@ -59,8 +61,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
 
     def decorate_many(self, rxns: List[Reaction]) -> List[Reaction]:
         """
-        Decorates a list of reactions with the competitiveness score. Parallelized with
-        ray.
+        Decorates a list of reactions with the calculated properties.
 
         Args:
             rxns: the list of ComputedReaction objects to be decorated
@@ -68,11 +69,10 @@ class Calculator(MSONable, metaclass=ABCMeta):
         Returns:
             The list of decorated ComputedReaction objects
         """
-        decorated_rxns = []
+        new_rxns = []
         for rxn in rxns:
-            decorated_rxns.append(self.decorate(rxn))
-
-        return decorated_rxns
+            new_rxns.append(self.decorate(rxn))
+        return new_rxns
 
     @property
     @abstractmethod

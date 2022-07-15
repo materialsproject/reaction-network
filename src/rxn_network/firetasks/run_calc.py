@@ -15,8 +15,6 @@ from tqdm import tqdm
 from rxn_network.core.composition import Composition
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
-    PrimarySelectivityCalculator,
-    SecondarySelectivityCalculator,
 )
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
@@ -221,12 +219,16 @@ class CalculateSelectivity(FiretaskBase):
         chempots = ray.put(chempots)
         temp = ray.put(temp)
 
+        groups = [
+            (i[0], list(i[1]))
+            for i in groupby(rxns, key=lambda r: set(r.reactants) | open_phases)
+        ]
+
         for group in grouper(
-            groupby(rxns, key=lambda r: set(r.reactants) | open_phases),
+            groups,
             n=10000,
             fillvalue=(None, None),
         ):  # do this in chunks to avoid running out of memory
-
             precursors_group_chunk, rxn_group_chunk = zip(
                 *[(i[0], i[1]) for i in group if i[0] is not None and i[1] is not None]
             )
@@ -397,8 +399,7 @@ class CalculateChempotDistance(FiretaskBase):
                 )
                 cpd_calc_dict[chemsys] = cpd_calc
 
-            new_rxn = cpd_calc.decorate(rxn)
-            new_rxns.append(new_rxn)
+            new_rxns.append(cpd_calc.decorate(rxn))
 
         results = ReactionSet.from_rxns(new_rxns, entries=entries)
         return results
