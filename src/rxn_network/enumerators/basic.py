@@ -3,6 +3,7 @@ This module implements two types of basic reaction enumerators, differing in the
 to consider open entries.
 """
 import logging
+import os
 from copy import deepcopy
 from itertools import combinations, product
 from typing import List, Optional, Set
@@ -160,7 +161,11 @@ class BasicEnumerator(Enumerator):
             iterator = tqdm(iterator, total=len(rxns), disable=self.quiet)
 
         for r in iterator:
-            results.extend(r)
+            results.extend(deepcopy(r))
+
+        del rxns
+
+        os.system("ray memory")
 
         return list(set(results))
 
@@ -224,7 +229,7 @@ class BasicEnumerator(Enumerator):
 
         rxn_iter = self._get_rxn_iterable(combos, open_combos)
 
-        rxns = self._get_rxns_from_iterable(
+        return self._get_rxns_from_iterable(
             rxn_iter,
             precursors,
             targets,
@@ -232,7 +237,6 @@ class BasicEnumerator(Enumerator):
             filtered_entries,
             open_entries,
         )
-        return rxns
 
     def _get_rxns_from_iterable(
         self,
@@ -269,7 +273,7 @@ class BasicEnumerator(Enumerator):
         pd = ray.put(pd)
         grand_pd = ray.put(grand_pd)
 
-        rxns = [
+        return [
             react.remote(
                 rxn_iterable_chunk,
                 react_function,
@@ -287,7 +291,6 @@ class BasicEnumerator(Enumerator):
             )
             for rxn_iterable_chunk in grouper(rxn_iterable, self.CHUNK_SIZE)
         ]
-        return rxns
 
     @staticmethod
     def _react_function(reactants, products, **kwargs):

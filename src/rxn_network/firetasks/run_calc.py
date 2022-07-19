@@ -2,6 +2,7 @@
 Firetasks for running enumeration and network calculations
 """
 import os
+from copy import deepcopy
 from itertools import groupby
 from typing import List
 
@@ -223,7 +224,7 @@ class CalculateSelectivity(FiretaskBase):
 
         for group in grouper(
             groups,
-            n=10000,
+            n=100000,
             fillvalue=(None, None),
         ):  # do this in chunks to avoid running out of memory
             precursors_group_chunk, rxn_group_chunk = zip(
@@ -267,8 +268,11 @@ class CalculateSelectivity(FiretaskBase):
                 )
 
             for r in tqdm(to_iterator(processed_chunks), total=len(processed_chunks)):
-                decorated_rxns.extend(r[0])
-                decorated_open_rxns.extend(r[1])
+                r_copy = deepcopy(r)
+                decorated_rxns.extend(r_copy[0])
+                decorated_open_rxns.extend(r_copy[1])
+
+            del processed_chunks
 
         logger.info("Saving decorated reactions.")
 
