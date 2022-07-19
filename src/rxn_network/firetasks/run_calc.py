@@ -165,27 +165,34 @@ class CalculateSelectivity(FiretaskBase):
 
         mgpe = None
 
+        all_precursors = list(
+            {c.reduced_formula for rxn in rxns for c in rxn.reactants}
+        )
+        all_precursors.extend(list(open_phases))
+
         enumerators = []
         if use_basic:
             kwargs = basic_enumerator_kwargs.copy()
-            be = BasicEnumerator(**kwargs)
+            be = BasicEnumerator(precursors=all_precursors, **kwargs)
             enumerators.append(be)
 
             if open_phases:
                 kwargs["open_phases"] = open_phases
-                boe = BasicOpenEnumerator(**kwargs)
+                boe = BasicOpenEnumerator(precursors=all_precursors, **kwargs)
                 enumerators.append(boe)
 
         if use_minimize:
             kwargs = minimize_enumerator_kwargs.copy()
-            mge = MinimizeGibbsEnumerator(**kwargs)
+            mge = MinimizeGibbsEnumerator(precursors=all_precursors, **kwargs)
             enumerators.append(mge)
 
             if open_elem:
                 kwargs["open_elem"] = open_elem
                 kwargs["mu"] = chempot
 
-                mgpe = MinimizeGrandPotentialEnumerator(**kwargs)
+                mgpe = MinimizeGrandPotentialEnumerator(
+                    precursors=all_precursors, **kwargs
+                )
                 enumerators.append(mgpe)
 
         competing_rxns = []
@@ -200,6 +207,7 @@ class CalculateSelectivity(FiretaskBase):
         competing_rxns_dict = self._create_reactions_dict(competing_rxns)
 
         del competing_rxns  # Free up memory (this is a large list)
+        del enumerators
 
         open_phases = {Composition(p) for p in open_phases}
 
@@ -271,6 +279,7 @@ class CalculateSelectivity(FiretaskBase):
                 r_copy = deepcopy(r)
                 decorated_rxns.extend(r_copy[0])
                 decorated_open_rxns.extend(r_copy[1])
+                del r
 
             del processed_chunks
 

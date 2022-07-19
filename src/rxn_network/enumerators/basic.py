@@ -29,7 +29,7 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    CHUNK_SIZE = 5000
+    CHUNK_SIZE = 10000
 
     def __init__(
         self,
@@ -162,10 +162,9 @@ class BasicEnumerator(Enumerator):
 
         for r in iterator:
             results.extend(deepcopy(r))
+            del r
 
         del rxns
-
-        os.system("ray memory")
 
         return list(set(results))
 
@@ -410,7 +409,7 @@ class BasicOpenEnumerator(BasicEnumerator):
     the ReactionSet class).
     """
 
-    CHUNK_SIZE = 1000
+    CHUNK_SIZE = 5000
 
     def __init__(
         self,
