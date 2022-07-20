@@ -225,7 +225,7 @@ class CalculateSelectivity(FiretaskBase):
         chempots = ray.put(chempots)
         temp = ray.put(temp)
 
-        chunk_size = num_cpus * 2  # arbitrary
+        chunk_size = int(num_cpus * 2)  # arbitrary
 
         for rxn_group in tqdm(
             grouper(rxns, n=chunk_size, fillvalue=None),
