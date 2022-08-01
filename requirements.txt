@@ -1,5 +1,5 @@
 numba==0.56.0
 pymatgen==2022.5.26
 fireworks==2.0.3
-maggma==0.47.3
+maggma==0.47.5
 ray==1.13.0
