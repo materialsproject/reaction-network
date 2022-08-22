@@ -193,6 +193,8 @@ class ReactionSet(MSONable):
 
         data["cost"] = costs
         df = DataFrame(data).sort_values("cost").reset_index(drop=True)
+        if "num_constraints" in attrs:
+            df = df.drop(columns=["num_constraints"])
 
         return df
 

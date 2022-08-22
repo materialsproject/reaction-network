@@ -151,7 +151,7 @@ class ChempotDistanceCalculator(Calculator):
 
 class PrimarySelectivityCalculator(Calculator):
     """
-    Calculator for determining the primary and secondary selectivity for a reaction
+    Calculator for determining the primary selectivity for a reaction
     (in eV/atom).
 
     WARNING: This calculator is working but has not been sufficiently tested. Use at
@@ -199,7 +199,7 @@ class PrimarySelectivityCalculator(Calculator):
 
 class SecondarySelectivityCalculator(Calculator):
     """
-    Calculator for determining the primary and secondary selectivity for a reaction
+    Calculator for determining the secondary selectivity for a reaction
     (in eV/atom).
 
     WARNING: This calculator is working but has not been sufficiently tested. Use at
