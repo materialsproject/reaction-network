@@ -137,7 +137,7 @@ class PathwaySolver(Solver):
         rxn_set = ray.put(rxn_set)
         num_entries = ray.put(num_entries)
 
-        num_cpus = ray.nodes()[0]["Resources"]["CPU"]
+        num_cpus = ray.cluster_resources()["CPU"]
 
         paths = []
         for n in range(1, max_num_combos + 1):

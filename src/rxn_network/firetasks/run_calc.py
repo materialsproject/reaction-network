@@ -22,7 +22,7 @@ from rxn_network.enumerators.minimize import (
 )
 from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.firetasks.utils import (
-    get_all_precursor_strs,
+    get_all_reactant_strs,
     get_decorated_rxn,
     load_entry_set,
     load_json,
@@ -219,7 +219,7 @@ class CalculateSelectivity(FiretaskBase):
         decorated_rxns = []
         decorated_open_rxns = []
 
-        num_cpus = ray.nodes()[0]["Resources"]["CPU"]
+        num_cpus = ray.cluster_resources()["CPU"]
 
         open_elem = ray.put(open_elem)
         chempots = ray.put(chempots)
@@ -301,8 +301,10 @@ class CalculateSelectivity(FiretaskBase):
         return all_rxns_dict
 
     @staticmethod
-    def _get_all_competing_rxns_from_dict(precursors_with_open, competing_rxns_dict):
-        all_possible_strs = get_all_precursor_strs(precursors_with_open)
+    def _get_all_competing_rxns_from_dict(
+        competing_rxns_dict, precursors_and_open_formulas
+    ):
+        all_possible_strs = get_all_reactant_strs(precursors_and_open_formulas)
 
         competing_rxns = ReactionSet.from_rxns(
             [
@@ -314,6 +316,101 @@ class CalculateSelectivity(FiretaskBase):
             ],
         )
         return competing_rxns
+
+
+@explicit_serialize
+class CalculateSelectivitiesFromNetwork(FiretaskBase):
+    required_params: List[str] = ["target_formula"]
+    optional_params: List[str] = ["rxns", "open_formula"]
+
+    def run_task(self, fw_spec):
+        all_rxns = load_json(self, "rxns", fw_spec)
+        target_formula = self["target_formula"]
+        open_formula = self.get("open_formula")
+
+        logger.info("Identifying target reactions...")
+
+        target_rxns = []
+        for rxn in all_rxns:
+            product_formulas = [str(p) for p in rxn.products]
+            if target_formula in product_formulas:
+                target_rxns.append(rxn)
+
+        competing_rxns_dict = self._create_reactions_dict(all_rxns)
+        competing_rxns_dict = ray.put(competing_rxns_dict)
+
+        logger.info("Calculating selectivites...")
+
+        num_cpus = ray.cluster_resources()["CPU"]
+        batch_size = int(num_cpus * 2)  # arbitrary
+
+        for rxn_group in grouper(target_rxns, batch_size, fillvalue=None):
+            precursors_and_open_formulas = [str(r) for r in rxn.reactants]
+            if open_formula:
+                precursors_and_open_formulas.append(open_formula)
+
+            competing_rxns = self._get_all_competing_rxns_from_dict(
+                competing_rxns_dict, precursors_and_open_formulas
+            )
+
+            batch_size = int(chunk_size // num_cpus) + 1
+
+            processed_chunks = []
+            for group_chunk in grouper(
+                zip(rxn_group, competing_rxns),
+                batch_size,
+                fillvalue=(None, None),
+            ):
+                rxns_chunk, competing_rxns_chunk = zip(
+                    *[
+                        (i[0], i[1])
+                        for i in group_chunk
+                        if i[0] is not None and i[1] is not None
+                    ]
+                )
+
+                processed_chunks.append(
+                    get_decorated_rxns_from_chunk.remote(
+                        rxns_chunk,
+                        competing_rxns_chunk,
+                        open_elem,
+                        open_phases,
+                        chempots,
+                        temp,
+                    )
+                )
+
+            for r in to_iterator(processed_chunks):
+                r_copy = deepcopy(r)
+                decorated_rxns.extend(r_copy[0])
+                decorated_open_rxns.extend(r_copy[1])
+                del r
+
+            del processed_chunks
+
+        logger.info("Saving decorated reactions.")
+
+        results = ReactionSet.from_rxns(decorated_rxns)
+        dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
+
+        if decorated_open_rxns:
+            open_results = ReactionSet.from_rxns(decorated_open_rxns, entries=entries)
+            dumpfn(open_results, "rxns_open.json.gz")
+
+            return FWAction(update_spec={"rxns_open_fn": "rxns_open.json.gz"})
+
+    @staticmethod
+    def _create_reactions_dict(all_rxns):
+        all_rxns_dict = {}
+
+        for r in all_rxns:
+            precursors_str = "-".join(sorted([p.reduced_formula for p in r.reactants]))
+            if precursors_str in all_rxns_dict:
+                all_rxns_dict[precursors_str].add(r)
+            else:
+                all_rxns_dict[precursors_str] = {r}
+
+        return all_rxns_dict
 
 
 @explicit_serialize
@@ -588,3 +685,41 @@ def get_decorated_rxns_from_chunk(
             )
 
     return decorated_rxns, decorated_open_rxns
+
+
+@ray.remote
+def get_decorated_rxns_by_chunk(rxn_chunk, competing_rxns_dict, open_formula):
+    decorated_rxns = []
+
+    for rxn in rxn_chunk:
+        precursors_and_open_formulas = [str(r) for r in rxn.reactants]
+        if open_formula:
+            precursors_and_open_formulas.append(open_formula)
+
+        competing_rxns = get_all_competing_rxns_from_dict(
+            competing_rxns_dict, precursors_and_open_formulas
+        )
+
+        if len(precursors_and_open_formulas) >= 3:
+            precursors_list = list(set(precursors) - {open_formula})
+        else:
+            precursors_list = precursors
+
+        decorated_rxns.append(
+            get_decorated_rxn(rxn, competing_rxns, precursors_list, temp)
+        )
+
+    return decorated_rxns
+
+
+def get_all_competing_rxns_from_dict(competing_rxns_dict, precursors_and_open_formulas):
+    all_possible_strs = get_all_reactant_strs(precursors_and_open_formulas)
+
+    competing_rxns = ReactionSet.from_rxns(
+        [
+            r
+            for rxn_set in [competing_rxns_dict.get(s, []) for s in all_possible_strs]
+            for r in rxn_set
+        ],
+    )
+    return competing_rxns

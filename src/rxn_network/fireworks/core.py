@@ -10,6 +10,11 @@ from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
+from rxn_network.enumerators.minimize import (
+    MinimizeGibbsEnumerator,
+    MinimizeGrandPotentialEnumerator,
+)
 from rxn_network.firetasks.build_inputs import get_entry_task
 from rxn_network.firetasks.parse_outputs import NetworkToDb, ReactionsToDb
 from rxn_network.firetasks.run_calc import (
@@ -236,5 +241,96 @@ class NetworkFW(Firework):
         tasks.append(NetworkToDb(db_file=db_file))
 
         fw_name = f"Reaction Network (Targets: {targets}): {chemsys}"
+
+        super().__init__(tasks, parents=parents, name=fw_name)
+
+
+class RetrosynthesisFW(Firework):
+    """
+    Firework for performing retrosynthesis workflow. Automatically creates and runs enumerators
+    to identify all reactions to a specific target. If selectivity calculations are
+    desired, this will also acquire competing reactions and perform them.
+    """
+
+    def __init__(
+        self,
+        target_formula: str,
+        entries: Optional[GibbsEntrySet] = None,
+        chemsys: Optional[Union[str, Iterable[str]]] = None,
+        use_minimize_enumerators: bool = True,
+        open_formula: Optional[str] = None,
+        chempot: Optional[float] = None,
+        calculate_selectivity: bool = True,
+        calculate_chempot_distance: bool = True,
+        selectivity_kwargs: Optional[Dict] = None,
+        entry_set_params: Optional[Dict] = None,
+        db_file: str = ">>db_file<<",
+        entry_db_file: str = ">>entry_db_file<<",
+        parents=None,
+    ):
+        """
+        Args:
+        """
+        tasks = []
+
+        entry_set = None
+        if entries:
+            entry_set = GibbsEntrySet(entries)
+            chemsys = "-".join(sorted(list(entry_set.chemsys)))
+        else:
+            if not chemsys:
+                raise ValueError(
+                    "If entries are not provided, a chemsys must be provided!"
+                )
+
+            entry_set_params = entry_set_params or {}
+            if entry_set_params.get("formulas_to_include"):
+                entry_set_params["formulas_to_include"].append(target_formula)
+            else:
+                entry_set_params["formulas_to_include"] = [target_formula]
+
+            tasks.append(
+                get_entry_task(
+                    chemsys=chemsys,
+                    entry_set_params=entry_set_params,
+                    entry_db_file=entry_db_file,
+                )
+            )
+
+        fw_name = f"Retrosynthesis Workflow: {target_formula} ({chemsys})"
+
+        enumerators = []
+        enumerators.append(BasicEnumerator())
+
+        tasks.append(
+            RunEnumerators(
+                enumerators=enumerators, entries=entry_set, task_label=fw_name
+            )
+        )
+
+        if calculate_selectivity:
+            selectivity_kwargs = selectivity_kwargs or {}
+
+            for enumerator in enumerators:
+                class_name = enumerator.__class__.__name__
+                if class_name == "BasicOpenEnumerator":
+                    if not selectivity_kwargs.get("open_phases"):
+                        selectivity_kwargs["open_phases"] = enumerator.open_phases
+                elif class_name == "MinimizeGibbsEnumerator":
+                    if not selectivity_kwargs.get("use_minimize"):
+                        selectivity_kwargs["use_minimize"] = True
+                elif class_name == "MinimizeGrandPotentialEnumerator":
+                    if not selectivity_kwargs.get("use_minimize"):
+                        selectivity_kwargs["use_minimize"] = True
+                    if not selectivity_kwargs.get("open_elem"):
+                        selectivity_kwargs["open_elem"] = enumerator.open_elem
+                        selectivity_kwargs["chempot"] = enumerator.mu
+
+            tasks.append(CalculateSelectivity(entries=entries, **selectivity_kwargs))
+
+        if calculate_chempot_distance:
+            tasks.append(CalculateChempotDistance(entries=entries))
+
+        tasks.append(ReactionsToDb(db_file=db_file, use_gridfs=True))
 
         super().__init__(tasks, parents=parents, name=fw_name)
