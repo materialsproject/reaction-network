@@ -40,7 +40,11 @@ def initialize_ray(quiet=False):
                 "Could not identify existing Ray instance. Creating a new one..."
             )
             ray.init(_redis_password="default_password")
-            logger.info(ray.nodes())
+
+            logger.info(
+                f"HOST: {ray.nodes()[0]['NodeManagerHostname']},"
+                f" {ray.nodes()[0]['Resources']}"
+            )
 
 
 def to_iterator(obj_ids):

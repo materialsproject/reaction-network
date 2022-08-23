@@ -251,7 +251,7 @@ class PathwaySolver(Solver):
 
         rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxns))
         rxns = [r for r in rxns if all(e in intermediates for e in r.entries)]
-        rxns = ReactionSet.from_rxns(rxns, filter_duplicates=True)
+        rxns = ReactionSet.from_rxns(rxns, filter_duplicates=True).get_rxns()
 
         self.logger.info(f"Found {len(rxns)} intermediate reactions!")
 

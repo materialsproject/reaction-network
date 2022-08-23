@@ -7,12 +7,13 @@ from typing import Iterable, List, Optional, Union
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore
+from mp_api import MPRester
 from monty.serialization import dumpfn
 from pymatgen.core.structure import Structure
 from pymatgen.entries import Entry
 from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
-from pymatgen.ext.matproj import MPRester
+from pymatgen.ext.matproj import _MPResterLegacy
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 from rxn_network.entries.entry_set import GibbsEntrySet
@@ -71,7 +72,7 @@ class EntriesFromMPRester(FiretaskBase):
 
         with MPRester() as mpr:
             entries = mpr.get_entries_in_chemsys(
-                elements=chemsys, inc_structure="final", property_data=["icsd_ids"]
+                elements=chemsys,
             )
 
         entries = process_entries(
@@ -282,7 +283,7 @@ def get_entries(  # noqa: C901
             props.append("structure")
 
     if not isinstance(chemsys_formula_id_criteria, dict):
-        criteria = MPRester.parse_criteria(chemsys_formula_id_criteria)
+        criteria = _MPResterLegacy.parse_criteria(chemsys_formula_id_criteria)
     else:
         criteria = chemsys_formula_id_criteria
 

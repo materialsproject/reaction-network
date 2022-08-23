@@ -175,6 +175,12 @@ class NetworkFW(Firework):
                 raise ValueError(
                     "If entries are not provided, a chemsys must be provided!"
                 )
+
+            entry_set_params = entry_set_params or {}
+            entry_set_params["formulas_to_include"] = list(
+                set(precursors) | set(targets)
+            )
+
             tasks.append(
                 get_entry_task(
                     chemsys=chemsys,

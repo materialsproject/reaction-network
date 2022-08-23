@@ -323,7 +323,6 @@ class BuildNetwork(FiretaskBase):
         open_elem = self.get("open_elem")
         chempot = self.get("chempot")
 
-        entries = GibbsEntrySet(entries)
         chemsys = "-".join(sorted(list(entries.chemsys)))
 
         rn = ReactionNetwork(
@@ -335,6 +334,7 @@ class BuildNetwork(FiretaskBase):
         )
         rn.build()
 
+        entries_fn = "entries.json.gz"
         graph_fn = "graph.gt.gz"
         network_fn = "network.json.gz"
         pathways_fn = None
@@ -351,6 +351,7 @@ class BuildNetwork(FiretaskBase):
 
         rn.write_graph(graph_fn)
         dumpfn(rn, network_fn)
+        dumpfn(entries, entries_fn)  # will overwrite existing entries.json.gz
 
         name = f"Reaction Network (Targets: {targets}): {chemsys}"
 
@@ -408,6 +409,7 @@ class RunSolver(FiretaskBase):
         cost_function = self["cost_function"]
         if not self.get("pathways"):
             pathways = loadfn(fw_spec["pathways_fn"])
+
         net_rxn = get_computed_rxn(self["net_rxn"], entries)
 
         solver = PathwaySolver(
