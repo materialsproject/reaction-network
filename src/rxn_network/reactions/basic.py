@@ -388,9 +388,9 @@ class BasicReaction(Reaction):
     @cached_property
     def is_identity(self):
         """Returns True if the reaction has identical reactants and products"""
-        return self.get_is_identity()
+        return self._get_is_identity()
 
-    def get_is_identity(self):
+    def _get_is_identity(self):
         """Returns True if the reaction has identical reactants and products"""
         if set(self.reactants) != set(self.products):
             return False

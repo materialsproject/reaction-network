@@ -207,7 +207,7 @@ class PathwaySolver(Solver):
         use_minimize_enumerator,
     ):
         """
-        Internal method for finding intermediate reactions using enumerators and
+        Method for finding intermediate reactions using enumerators and
         specified settings.
         """
         rxns = []
@@ -251,7 +251,7 @@ class PathwaySolver(Solver):
 
         rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxns))
         rxns = [r for r in rxns if all(e in intermediates for e in r.entries)]
-        rxns = [r for r in rxns if (len(r.reactants) < 4 and len(r.products) < 4)]
+        rxns = ReactionSet.from_rxns(rxns, filter_duplicates=True)
 
         self.logger.info(f"Found {len(rxns)} intermediate reactions!")
 

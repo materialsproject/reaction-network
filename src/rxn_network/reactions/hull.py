@@ -300,6 +300,17 @@ class InterfaceReactionHull(MSONable):
         return coords[coords[:, 0].argsort()]
 
     def count(self, num):
+        """
+        Reurns the number of decomposition pathways for the interface reaction hull
+        based on the number of **product** vertices (i.e., total # of vertices
+        considered - 2 reactant vertices).
+
+        Precomputed for hulls up to size 15. Otherwise, calls recursive implementation
+        of counting function.
+
+        Args:
+            num: Number of product vertices.
+        """
         counts = [
             1,
             1,
@@ -320,7 +331,7 @@ class InterfaceReactionHull(MSONable):
         if num < 15:
             count = counts[num]
         else:
-            count = self.count_recursive(num)[0]
+            count = self._count_recursive(num)[0]
 
         return count
 
@@ -380,7 +391,15 @@ class InterfaceReactionHull(MSONable):
 
         return val, total
 
-    def count_recursive(self, n, cache=None):
+    @lru_cache
+    def altitude_multiplicity(self, n_left, n_right, n):
+        remainder = n - n_left - n_right - 1
+        if remainder < 0:
+            return 0
+
+        return self.count(n_left) * self.count(n_right) * self.count(remainder)
+
+    def _count_recursive(self, n, cache=None):
         """
         A recursive implementation of the counting function.
 
@@ -400,9 +419,9 @@ class InterfaceReactionHull(MSONable):
             for i in range(n):
                 left = i
                 right = n - i - 1
-                left_divs, c1 = self.count_recursive(left, biggest_cache)
+                left_divs, c1 = self._count_recursive(left, biggest_cache)
 
-                right_divs, c2 = self.count_recursive(right, biggest_cache)
+                right_divs, c2 = self._count_recursive(right, biggest_cache)
 
                 if len(c1) > len(biggest_cache):
                     biggest_cache = c1
@@ -412,14 +431,6 @@ class InterfaceReactionHull(MSONable):
 
                 total += left_divs * right_divs
             return total, biggest_cache + [total]
-
-    @lru_cache
-    def altitude_multiplicity(self, n_left, n_right, n):
-        remainder = n - n_left - n_right - 1
-        if remainder < 0:
-            return 0
-
-        return self.count(n_left) * self.count(n_right) * self.count(remainder)
 
     def _get_scatter(self):
         marker_size = 10

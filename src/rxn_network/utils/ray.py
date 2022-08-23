@@ -7,7 +7,8 @@ import ray
 
 def initialize_ray(quiet=False):
     """
-    Simple function to initialize ray. Basic support for running ray on multiple nodes. Currently supports SLURM and PBS job schedulers.
+    Simple function to initialize ray. Basic support for running ray on multiple nodes.
+    Currently supports SLURM and PBS job schedulers.
 
     SLURM:
         Checks enviornment for existence of "ip_head" for situations where the user is
@@ -30,9 +31,10 @@ def initialize_ray(quiet=False):
                 _node_ip_address=os.environ["ip_head"].split(":")[0],
                 _redis_password=os.environ["redis_password"],
             )
-        elif int(os.environ.get("PBS_NNODES")) > 1:
+        elif os.environ.get("PBS_NNODES"):
             # initialise ray if using PBS submission script (thanks @jx-fan)
-            ray.init(address="auto")
+            if int(os.environ["PBS_NNODES"]) > 1:
+                ray.init(address="auto")
         else:
             logger.info(
                 "Could not identify existing Ray instance. Creating a new one..."
