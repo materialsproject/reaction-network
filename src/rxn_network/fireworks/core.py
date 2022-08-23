@@ -281,7 +281,7 @@ class RetrosynthesisFW(Firework):
         fw_name = f"RetrosynthesisFW: {target_formula} ({chemsys}"
         if open_formula:
             fw_name += f", open: {open_formula}"
-        if chempot:
+        if chempot is not None:
             fw_name += f", mu: {chempot}"
 
         fw_name += ")"
