@@ -55,18 +55,22 @@ class RunEnumerators(FiretaskBase):
     """
 
     required_params: List[str] = ["enumerators", "entries"]
-    optional_params: List[str] = ["task_label", "entries_fn"]
+    optional_params: List[str] = ["task_label", "entries_fn", "open_elem", "chempot"]
 
     def run_task(self, fw_spec):
         enumerators = self["enumerators"]
         task_label = self.get("task_label", "")
+        open_elem = self.get("open_elem")
+        chempot = self.get("chempot")
         entries = load_entry_set(self, fw_spec)
         chemsys = "-".join(sorted(list(entries.chemsys)))
 
         targets = {
             target for enumerator in enumerators for target in enumerator.targets
         }
-        added_elems = None
+
+        added_elements = None
+        added_chemsys = None
 
         if targets:
             added_elems = entries.chemsys - {
@@ -84,6 +88,8 @@ class RunEnumerators(FiretaskBase):
             "targets": list(sorted(targets)),
             "added_elements": added_elements,
             "added_chemsys": added_chemsys,
+            "open_elem": open_elem,
+            "chempot": chempot,
         }
 
         results = []
@@ -92,8 +98,14 @@ class RunEnumerators(FiretaskBase):
             rxns = enumerator.enumerate(entries)
             results.extend(rxns)
 
+        logger.info("Saving reactions...")
+
         results = ReactionSet.from_rxns(
-            results, filter_duplicates=True, entries=entries
+            results,
+            filter_duplicates=True,
+            entries=entries,
+            open_elem=open_elem,
+            chempot=chempot,
         )
 
         dumpfn(results, "rxns.json.gz")
@@ -105,14 +117,13 @@ class RunEnumerators(FiretaskBase):
 
 
 @explicit_serialize
-class CalculateSelectivity(FiretaskBase):
+class CalculateSelectivitiesFromNetwork(FiretaskBase):
     """
     Calculates the competitiveness score using the CompetitivenessScoreCalculator for a
     set of reactions and stores that within the reaction object data.
 
     Required params:
-        entries (GibbsEntrySet): An entry set to be used for the calculation of
-            competitiveness scores.
+        target_formula
 
     Optional params:
         rxns (ReactionSet): A set of reactions of interest. If not provided, will load
@@ -134,207 +145,27 @@ class CalculateSelectivity(FiretaskBase):
             MinimizeGibbsEnumerator (and MinimizeGrandPotentialEnumerator)
     """
 
-    required_params: List[str] = ["entries"]
-    optional_params: List[str] = [
-        "rxns",
-        "open_phases",
-        "open_elem",
-        "chempot",
-        "use_basic",
-        "use_minimize",
-        "basic_enumerator_kwargs",
-        "minimize_enumerator_kwargs",
-        "target_formulas",
-        "entries_fn",
-        "temp",
-    ]
-
-    def run_task(self, fw_spec):
-        entries = load_entry_set(self, fw_spec)
-        rxns = load_json(self, "rxns", fw_spec)
-        open_phases = self.get("open_phases", {})
-        open_elem = self.get("open_elem")
-        chempot = self.get("chempot", 0.0)
-        use_basic = self.get("use_basic", True)
-        use_minimize = self.get("use_minimize", True)
-        basic_enumerator_kwargs = self.get("basic_enumerator_kwargs", {})
-        minimize_enumerator_kwargs = self.get("minimize_enumerator_kwargs", {})
-        temp = self.get("temp", None)
-
-        chempots = {open_elem: chempot}
-
-        mgpe = None
-
-        all_precursors = list(
-            {c.reduced_formula for rxn in rxns for c in rxn.reactants}
-        )
-        all_precursors.extend(list(open_phases))
-
-        enumerators = []
-        if use_basic:
-            kwargs = basic_enumerator_kwargs.copy()
-            be = BasicEnumerator(precursors=all_precursors, **kwargs)
-            enumerators.append(be)
-
-            if open_phases:
-                kwargs["open_phases"] = open_phases
-                boe = BasicOpenEnumerator(precursors=all_precursors, **kwargs)
-                enumerators.append(boe)
-
-        if use_minimize:
-            kwargs = minimize_enumerator_kwargs.copy()
-            mge = MinimizeGibbsEnumerator(precursors=all_precursors, **kwargs)
-            enumerators.append(mge)
-
-            if open_elem:
-                kwargs["open_elem"] = open_elem
-                kwargs["mu"] = chempot
-
-                mgpe = MinimizeGrandPotentialEnumerator(
-                    precursors=all_precursors, **kwargs
-                )
-                enumerators.append(mgpe)
-
-        competing_rxns = []
-        logger.info("Getting competing reactions...")
-        for e in enumerators:
-            logger.info(f"Running {e.__class__.__name__}")
-            competing_rxns.extend(e.enumerate(entries))
-
-        logger.info(f"Found {len(competing_rxns)} competing reactions")
-        logger.info("Getting competing reactions dict...")
-
-        competing_rxns_dict = self._create_reactions_dict(competing_rxns)
-
-        del competing_rxns  # Free up memory (this is a large list)
-        del enumerators
-
-        open_phases = {Composition(p) for p in open_phases}
-
-        decorated_rxns = []
-        decorated_open_rxns = []
-
-        logger.info("Calculating selectivites...")
-
-        decorated_rxns = []
-        decorated_open_rxns = []
-
-        num_cpus = ray.cluster_resources()["CPU"]
-
-        open_elem = ray.put(open_elem)
-        chempots = ray.put(chempots)
-        temp = ray.put(temp)
-
-        chunk_size = int(num_cpus * 2)  # arbitrary
-
-        for rxn_group in tqdm(
-            grouper(rxns, n=chunk_size, fillvalue=None),
-            total=len(rxns) // chunk_size + 1,
-        ):  # do this in chunks to avoid running out of memory
-            precursors_with_open = [
-                set(r.reactants) | open_phases for r in rxn_group if r is not None
-            ]
-            competing_rxns = [
-                self._get_all_competing_rxns_from_dict(
-                    precursor_set, competing_rxns_dict
-                )
-                for precursor_set in precursors_with_open
-            ]
-
-            batch_size = int(chunk_size // num_cpus) + 1
-
-            processed_chunks = []
-            for group_chunk in grouper(
-                zip(rxn_group, competing_rxns),
-                batch_size,
-                fillvalue=(None, None),
-            ):
-                rxns_chunk, competing_rxns_chunk = zip(
-                    *[
-                        (i[0], i[1])
-                        for i in group_chunk
-                        if i[0] is not None and i[1] is not None
-                    ]
-                )
-
-                processed_chunks.append(
-                    get_decorated_rxns_from_chunk.remote(
-                        rxns_chunk,
-                        competing_rxns_chunk,
-                        open_elem,
-                        open_phases,
-                        chempots,
-                        temp,
-                    )
-                )
-
-            for r in to_iterator(processed_chunks):
-                r_copy = deepcopy(r)
-                decorated_rxns.extend(r_copy[0])
-                decorated_open_rxns.extend(r_copy[1])
-                del r
-
-            del processed_chunks
-
-        logger.info("Saving decorated reactions.")
-
-        results = ReactionSet.from_rxns(decorated_rxns, entries=entries)
-        dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
-
-        if decorated_open_rxns:
-            open_results = ReactionSet.from_rxns(decorated_open_rxns, entries=entries)
-            dumpfn(open_results, "rxns_open.json.gz")
-
-            return FWAction(update_spec={"rxns_open_fn": "rxns_open.json.gz"})
-
-    @staticmethod
-    def _create_reactions_dict(all_rxns):
-        all_rxns_dict = {}
-
-        for r in all_rxns:
-            precursors_str = "-".join(sorted([p.reduced_formula for p in r.reactants]))
-            if precursors_str in all_rxns_dict:
-                all_rxns_dict[precursors_str].add(r)
-            else:
-                all_rxns_dict[precursors_str] = {r}
-
-        return all_rxns_dict
-
-    @staticmethod
-    def _get_all_competing_rxns_from_dict(
-        competing_rxns_dict, precursors_and_open_formulas
-    ):
-        all_possible_strs = get_all_reactant_strs(precursors_and_open_formulas)
-
-        competing_rxns = ReactionSet.from_rxns(
-            [
-                r
-                for rxn_set in [
-                    competing_rxns_dict.get(s, []) for s in all_possible_strs
-                ]
-                for r in rxn_set
-            ],
-        )
-        return competing_rxns
-
-
-@explicit_serialize
-class CalculateSelectivitiesFromNetwork(FiretaskBase):
     required_params: List[str] = ["target_formula"]
-    optional_params: List[str] = ["rxns", "open_formula"]
+    optional_params: List[str] = ["rxns", "open_formula", "temp"]
 
     def run_task(self, fw_spec):
         all_rxns = load_json(self, "rxns", fw_spec)
         target_formula = self["target_formula"]
         open_formula = self.get("open_formula")
+        temp = self.get("temp", 300)
 
         logger.info("Identifying target reactions...")
 
         target_rxns = []
         for rxn in all_rxns:
-            product_formulas = [str(p) for p in rxn.products]
+            product_formulas = [p.reduced_formula for p in rxn.products]
             if target_formula in product_formulas:
                 target_rxns.append(rxn)
+
+        logger.info(
+            f"Identified {len(target_rxns)} target reactions out of"
+            f" {len(all_rxns)} total reactions."
+        )
 
         competing_rxns_dict = self._create_reactions_dict(all_rxns)
         competing_rxns_dict = ray.put(competing_rxns_dict)
@@ -342,62 +173,26 @@ class CalculateSelectivitiesFromNetwork(FiretaskBase):
         logger.info("Calculating selectivites...")
 
         num_cpus = ray.cluster_resources()["CPU"]
-        batch_size = int(num_cpus * 2)  # arbitrary
+        batch_size = int(num_cpus * 10)  # arbitrary
 
-        for rxn_group in grouper(target_rxns, batch_size, fillvalue=None):
-            precursors_and_open_formulas = [str(r) for r in rxn.reactants]
-            if open_formula:
-                precursors_and_open_formulas.append(open_formula)
-
-            competing_rxns = self._get_all_competing_rxns_from_dict(
-                competing_rxns_dict, precursors_and_open_formulas
+        processed_chunks = []
+        for rxns_chunk in grouper(target_rxns, batch_size, fillvalue=None):
+            processed_chunks.append(
+                get_decorated_rxns_by_chunk.remote(
+                    rxns_chunk, competing_rxns_dict, open_formula, temp
+                )
             )
 
-            batch_size = int(chunk_size // num_cpus) + 1
+        decorated_rxns = []
+        for r in tqdm(to_iterator(processed_chunks), total=len(processed_chunks)):
+            decorated_rxns.extend(r)
 
-            processed_chunks = []
-            for group_chunk in grouper(
-                zip(rxn_group, competing_rxns),
-                batch_size,
-                fillvalue=(None, None),
-            ):
-                rxns_chunk, competing_rxns_chunk = zip(
-                    *[
-                        (i[0], i[1])
-                        for i in group_chunk
-                        if i[0] is not None and i[1] is not None
-                    ]
-                )
-
-                processed_chunks.append(
-                    get_decorated_rxns_from_chunk.remote(
-                        rxns_chunk,
-                        competing_rxns_chunk,
-                        open_elem,
-                        open_phases,
-                        chempots,
-                        temp,
-                    )
-                )
-
-            for r in to_iterator(processed_chunks):
-                r_copy = deepcopy(r)
-                decorated_rxns.extend(r_copy[0])
-                decorated_open_rxns.extend(r_copy[1])
-                del r
-
-            del processed_chunks
+        del processed_chunks
 
         logger.info("Saving decorated reactions.")
 
         results = ReactionSet.from_rxns(decorated_rxns)
-        dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
-
-        if decorated_open_rxns:
-            open_results = ReactionSet.from_rxns(decorated_open_rxns, entries=entries)
-            dumpfn(open_results, "rxns_open.json.gz")
-
-            return FWAction(update_spec={"rxns_open_fn": "rxns_open.json.gz"})
+        dumpfn(results, "rxns.json.gz")  # may overwrite existing rxns.json.gz
 
     @staticmethod
     def _create_reactions_dict(all_rxns):
@@ -429,7 +224,7 @@ class CalculateChempotDistance(FiretaskBase):
     """
 
     required_params: List[str] = ["entries"]
-    optional_params: List[str] = ["rxns", "rxns_open", "cpd_kwargs", "metadata"]
+    optional_params: List[str] = ["rxns", "cpd_kwargs", "metadata"]
 
     def run_task(self, fw_spec):
         entries = load_entry_set(self, fw_spec)
@@ -438,31 +233,18 @@ class CalculateChempotDistance(FiretaskBase):
         except KeyError:
             rxns = None
 
-        try:
-            rxns_open = load_json(self, "rxns_open", fw_spec)
-        except KeyError:
-            rxns_open = None
-
-        if rxns is None and rxns_open is None:
-            raise ValueError("Must provide either rxns or rxns_open")
-
         cpd_kwargs = self.get("cpd_kwargs", {})
         metadata = load_json(self, "metadata", fw_spec)
 
         if rxns:
             logger.info("Decorating reactions with chemical potential distance...")
             results = self._get_decorated_rxns(rxns, entries, cpd_kwargs)
-        if rxns_open:
-            logger.info("Decorating open reactions with chemical potential distance...")
-            results_open = self._get_decorated_rxns(rxns_open, entries, cpd_kwargs)
 
         metadata["cpd_kwargs"] = cpd_kwargs
         dumpfn(metadata, "metadata.json.gz")  # will overwrite existing metadata.json.gz
 
         if rxns:
             dumpfn(results, "rxns.json.gz")  # will overwrite existing rxns.json.gz
-        if rxns_open:
-            dumpfn(results_open, "rxns_open.json.gz")
 
     @staticmethod
     def _get_decorated_rxns(rxns, entries, cpd_kwargs):
@@ -652,47 +434,17 @@ class RunSolver(FiretaskBase):
 
 
 @ray.remote
-def get_decorated_rxns_from_chunk(
-    rxn_chunk, competing_rxns_chunk, open_elem, open_phases, chempots, temp
-):
-    decorated_rxns = []
-    decorated_open_rxns = []
-
-    for rxn, competing_rxns in zip(rxn_chunk, competing_rxns_chunk):
-        if open_elem:
-            competing_open_rxns = ReactionSet.from_rxns(
-                [
-                    OpenComputedReaction.from_computed_rxn(r, chempots)
-                    for r in competing_rxns
-                ],
-            )
-
-        precursors = rxn.reactants
-
-        if len(precursors) >= 3:
-            precursors_list = list(set(precursors) - open_phases)
-        else:
-            precursors_list = precursors
-
-        decorated_rxns.append(
-            get_decorated_rxn(rxn, competing_rxns, precursors_list, temp)
-        )
-
-        if open_elem:
-            open_rxn = OpenComputedReaction.from_computed_rxn(rxn, chempots)
-            decorated_open_rxns.append(
-                get_decorated_rxn(open_rxn, competing_open_rxns, precursors_list, temp)
-            )
-
-    return decorated_rxns, decorated_open_rxns
-
-
-@ray.remote
-def get_decorated_rxns_by_chunk(rxn_chunk, competing_rxns_dict, open_formula):
+def get_decorated_rxns_by_chunk(rxn_chunk, competing_rxns_dict, open_formula, temp):
     decorated_rxns = []
 
     for rxn in rxn_chunk:
-        precursors_and_open_formulas = [str(r) for r in rxn.reactants]
+        if not rxn:
+            continue
+
+        precursors = [r.reduced_formula for r in rxn.reactants]
+
+        precursors_and_open_formulas = deepcopy(precursors)
+
         if open_formula:
             precursors_and_open_formulas.append(open_formula)
 
@@ -700,14 +452,10 @@ def get_decorated_rxns_by_chunk(rxn_chunk, competing_rxns_dict, open_formula):
             competing_rxns_dict, precursors_and_open_formulas
         )
 
-        if len(precursors_and_open_formulas) >= 3:
-            precursors_list = list(set(precursors) - {open_formula})
-        else:
-            precursors_list = precursors
+        if len(precursors) >= 3:
+            precursors = list(set(precursors_and_open_formulas) - {open_formula})
 
-        decorated_rxns.append(
-            get_decorated_rxn(rxn, competing_rxns, precursors_list, temp)
-        )
+        decorated_rxns.append(get_decorated_rxn(rxn, competing_rxns, precursors, temp))
 
     return decorated_rxns
 

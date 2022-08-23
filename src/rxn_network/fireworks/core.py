@@ -20,7 +20,7 @@ from rxn_network.firetasks.parse_outputs import NetworkToDb, ReactionsToDb
 from rxn_network.firetasks.run_calc import (
     BuildNetwork,
     CalculateChempotDistance,
-    CalculateSelectivity,
+    CalculateSelectivitiesFromNetwork,
     RunEnumerators,
     RunSolver,
 )
@@ -39,9 +39,7 @@ class EnumeratorFW(Firework):
         enumerators: Iterable[Enumerator],
         entries: Optional[GibbsEntrySet] = None,
         chemsys: Optional[Union[str, Iterable[str]]] = None,
-        calculate_selectivity: bool = True,
         calculate_chempot_distance: bool = False,
-        selectivity_kwargs: Optional[Dict] = None,
         entry_set_params: Optional[Dict] = None,
         db_file: str = ">>db_file<<",
         entry_db_file: str = ">>entry_db_file<<",
@@ -108,26 +106,6 @@ class EnumeratorFW(Firework):
                 enumerators=enumerators, entries=entry_set, task_label=fw_name
             )
         )
-
-        if calculate_selectivity:
-            selectivity_kwargs = selectivity_kwargs or {}
-
-            for enumerator in enumerators:
-                class_name = enumerator.__class__.__name__
-                if class_name == "BasicOpenEnumerator":
-                    if not selectivity_kwargs.get("open_phases"):
-                        selectivity_kwargs["open_phases"] = enumerator.open_phases
-                elif class_name == "MinimizeGibbsEnumerator":
-                    if not selectivity_kwargs.get("use_minimize"):
-                        selectivity_kwargs["use_minimize"] = True
-                elif class_name == "MinimizeGrandPotentialEnumerator":
-                    if not selectivity_kwargs.get("use_minimize"):
-                        selectivity_kwargs["use_minimize"] = True
-                    if not selectivity_kwargs.get("open_elem"):
-                        selectivity_kwargs["open_elem"] = enumerator.open_elem
-                        selectivity_kwargs["chempot"] = enumerator.mu
-
-            tasks.append(CalculateSelectivity(entries=entries, **selectivity_kwargs))
 
         if calculate_chempot_distance:
             tasks.append(CalculateChempotDistance(entries=entries))
@@ -262,7 +240,8 @@ class RetrosynthesisFW(Firework):
         chempot: Optional[float] = None,
         calculate_selectivity: bool = True,
         calculate_chempot_distance: bool = True,
-        selectivity_kwargs: Optional[Dict] = None,
+        basic_enumerator_kwargs: Optional[Dict] = None,
+        minimize_enumerator_kwargs: Optional[Dict] = None,
         entry_set_params: Optional[Dict] = None,
         db_file: str = ">>db_file<<",
         entry_db_file: str = ">>entry_db_file<<",
@@ -271,6 +250,10 @@ class RetrosynthesisFW(Firework):
         """
         Args:
         """
+        basic_enumerator_kwargs = basic_enumerator_kwargs or {}
+        minimize_enumerator_kwargs = minimize_enumerator_kwargs or {}
+        entry_set_params = entry_set_params or {}
+
         tasks = []
 
         entry_set = None
@@ -282,8 +265,6 @@ class RetrosynthesisFW(Firework):
                 raise ValueError(
                     "If entries are not provided, a chemsys must be provided!"
                 )
-
-            entry_set_params = entry_set_params or {}
             if entry_set_params.get("formulas_to_include"):
                 entry_set_params["formulas_to_include"].append(target_formula)
             else:
@@ -297,36 +278,64 @@ class RetrosynthesisFW(Firework):
                 )
             )
 
-        fw_name = f"Retrosynthesis Workflow: {target_formula} ({chemsys})"
+        fw_name = f"RetrosynthesisFW: {target_formula} ({chemsys}"
+        if open_formula:
+            fw_name += f", open: {open_formula}"
+        if chempot:
+            fw_name += f", mu: {chempot}"
+
+        fw_name += ")"
+
+        targets = None
+        if not calculate_selectivity:
+            targets = [target_formula]
+
+        open_elem = None
 
         enumerators = []
-        enumerators.append(BasicEnumerator())
+        enumerators.append(BasicEnumerator(targets=targets, **basic_enumerator_kwargs))
+        if open_formula:
+            enumerators.append(
+                BasicOpenEnumerator(
+                    open_phases=[open_formula],
+                    targets=targets,
+                    **basic_enumerator_kwargs,
+                )
+            )
+        if use_minimize_enumerators:
+            enumerators.append(
+                MinimizeGibbsEnumerator(targets=targets, **minimize_enumerator_kwargs)
+            )
+            if open_formula and chempot is not None:
+                elems = Composition(open_formula).elements
+                if len(elems) > 1:
+                    raise ValueError(
+                        "Chempot can only be provided for elemental composition!"
+                    )
+                open_elem = elems[0]
+                enumerators.append(
+                    MinimizeGrandPotentialEnumerator(
+                        open_elem=open_elem, mu=chempot, targets=targets
+                    )
+                )
 
         tasks.append(
             RunEnumerators(
-                enumerators=enumerators, entries=entry_set, task_label=fw_name
+                enumerators=enumerators,
+                entries=entry_set,
+                task_label=fw_name,
+                open_elem=open_elem,
+                chempot=chempot,
             )
         )
 
         if calculate_selectivity:
-            selectivity_kwargs = selectivity_kwargs or {}
-
-            for enumerator in enumerators:
-                class_name = enumerator.__class__.__name__
-                if class_name == "BasicOpenEnumerator":
-                    if not selectivity_kwargs.get("open_phases"):
-                        selectivity_kwargs["open_phases"] = enumerator.open_phases
-                elif class_name == "MinimizeGibbsEnumerator":
-                    if not selectivity_kwargs.get("use_minimize"):
-                        selectivity_kwargs["use_minimize"] = True
-                elif class_name == "MinimizeGrandPotentialEnumerator":
-                    if not selectivity_kwargs.get("use_minimize"):
-                        selectivity_kwargs["use_minimize"] = True
-                    if not selectivity_kwargs.get("open_elem"):
-                        selectivity_kwargs["open_elem"] = enumerator.open_elem
-                        selectivity_kwargs["chempot"] = enumerator.mu
-
-            tasks.append(CalculateSelectivity(entries=entries, **selectivity_kwargs))
+            temp = entry_set_params.get("temp", 300)
+            tasks.append(
+                CalculateSelectivitiesFromNetwork(
+                    target_formula=target_formula, open_formula=open_formula, temp=temp
+                )
+            )
 
         if calculate_chempot_distance:
             tasks.append(CalculateChempotDistance(entries=entries))

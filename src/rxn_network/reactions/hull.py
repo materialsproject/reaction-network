@@ -51,6 +51,8 @@ class InterfaceReactionHull(MSONable):
             if self.e1 is not None and self.e2 is not None:
                 break
         else:
+            print(c1, c2)
+            print(reactions)
             raise ValueError(
                 "Provided reactions do not correspond to reactant compositons!"
             )
