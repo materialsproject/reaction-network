@@ -15,7 +15,8 @@ from tqdm import tqdm
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.utils import _react, group_by_chemsys, initialize_entry
-from rxn_network.reactions import ComputedReaction
+from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import grouper, initialize_ray, limited_powerset, to_iterator
 
 
@@ -94,7 +95,7 @@ class BasicEnumerator(Enumerator):
         self._build_grand_pd = False
         self.logger = logging.Logger("enumerator")
 
-    def enumerate(self, entries: GibbsEntrySet) -> List[ComputedReaction]:
+    def enumerate(self, entries: GibbsEntrySet) -> ReactionSet:
         """
         Calculate all possible reactions given a set of entries. If the enumerator
         was initialized with specified precursors or target, the reactions will be
@@ -153,8 +154,6 @@ class BasicEnumerator(Enumerator):
                 )
             )
 
-        results = []
-
         iterator = to_iterator(rxns)
         if not self.quiet:
             iterator = tqdm(
@@ -164,12 +163,18 @@ class BasicEnumerator(Enumerator):
                 desc=f"{self.__class__.__name__}",
             )
 
+        rxn_set = None
+
         for r in iterator:
-            results.extend(r)
+            if rxn_set == None:
+                rxn_set = ReactionSet.from_rxns(r, entries=entries)
+            else:
+                rxn_set = rxn_set.add_rxns(r)
 
         del rxns
+        rxn_set = rxn_set.filter_duplicates()
 
-        return list(set(results))
+        return rxn_set
 
     def _get_combos_dict(
         self, entries, precursor_entries, target_entries, open_entries

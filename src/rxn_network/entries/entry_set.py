@@ -49,6 +49,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         self,
         entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]],
         calculate_e_above_hulls: bool = False,
+        minimize_obj_size: bool = False,
     ):
         """
         The supplied collection of entries will automatically be converted to a set of
@@ -58,10 +59,18 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entries: A collection of entry objects that will make up the entry set.
             calculate_e_above_hulls: Whether to pre-calculate the energy above hull for
                 each entry and store that in that entry's data.
+            minimize_object_size: Whether to reduce the size of the entry set by
+                removing metadata from each entry. This may be useful when working with
+                entry sets (or ComputedReaction sets).
         """
         self.entries = set(entries)
         self.calculate_e_above_hulls = calculate_e_above_hulls
+        self.minimize_obj_size = minimize_obj_size
 
+        if minimize_obj_size:
+            for e in self.entries:
+                e.parameters = {}
+                e.data = {}
         if calculate_e_above_hulls:
             for e in self.entries:
                 e.data["e_above_hull"] = self.get_e_above_hull(e)
@@ -356,6 +365,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_barin_data=False,
         include_freed_data=False,
         apply_carbonate_correction=True,
+        minimize_obj_size=False,
     ) -> "GibbsEntrySet":
         """
         Constructor method for building a GibbsEntrySet from an existing phase diagram.
@@ -458,7 +468,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
             gibbs_entries.extend(new_entries)
 
-        return cls(gibbs_entries)
+        return cls(gibbs_entries, minimize_obj_size=minimize_obj_size)
 
     @classmethod
     def from_entries(
@@ -469,6 +479,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_barin_data=False,
         include_freed_data=False,
         apply_carbonate_correction=True,
+        minimize_obj_size=False,
     ) -> "GibbsEntrySet":
         """
         Constructor method for initializing GibbsEntrySet from T = 0 K
@@ -498,6 +509,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_barin_data=include_barin_data,
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
+                minimize_obj_size=minimize_obj_size,
             )
 
         pd_dict = expand_pd(list(e_set))
@@ -510,6 +522,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_barin_data=include_barin_data,
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
+                minimize_obj_size=minimize_obj_size,
             )
             new_entries.update(gibbs_set)
 

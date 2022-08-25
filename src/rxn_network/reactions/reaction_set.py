@@ -3,8 +3,9 @@ Implements a class for conveniently and efficiently storing sets of ComputedReac
 objects which share entries.
 """
 from functools import lru_cache
-from itertools import combinations
+from itertools import combinations, groupby
 from typing import Collection, List, Optional, Set, Union
+from copy import deepcopy
 
 import numpy as np
 from monty.json import MSONable
@@ -24,6 +25,9 @@ class ReactionSet(MSONable):
     Automatically represents a set of reactions as an array of coefficients with
     a second array linking to a corresponding list of shared entries. This is useful for
     dumping large amounts of reaction data to a database.
+
+    Note: this is not a true "set"; there is the option for filtering duplicates but it
+        is not explicitly required.
     """
 
     def __init__(
@@ -79,18 +83,6 @@ class ReactionSet(MSONable):
                 rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
             rxns.append(rxn)
         return rxns
-
-    def calculate_costs(
-        self,
-        cf: CostFunction,
-    ) -> List[float]:
-        """
-        Evaluate a cost function on an acquired set of reactions.
-
-        Args:
-            cf: CostFunction object, e.g. Softplus()
-        """
-        return [cf.evaluate(rxn) for rxn in self.get_rxns()]
 
     @classmethod
     def from_rxns(
@@ -148,9 +140,7 @@ class ReactionSet(MSONable):
         )
 
         if filter_duplicates:
-            all_rxns = rxn_set.get_rxns()
-            set_of_rxns = set(all_rxns)
-            rxn_set = cls.from_rxns(cls._filter_duplicates(set_of_rxns))
+            rxn_set = rxn_set.filter_duplicates()
 
         return rxn_set
 
@@ -198,6 +188,61 @@ class ReactionSet(MSONable):
 
         return df
 
+    def calculate_costs(
+        self,
+        cf: CostFunction,
+    ) -> List[float]:
+        """
+        Evaluate a cost function on an acquired set of reactions.
+
+        Args:
+            cf: CostFunction object, e.g. Softplus()
+        """
+        return [cf.evaluate(rxn) for rxn in self.get_rxns()]
+
+    def add_rxns(self, rxns):
+        """
+        Return a new ReactionSet with the reactions added.
+
+        Warning: all new reactions must have the same entries as the current reaction set.
+        """
+        indices = deepcopy(self.indices)
+        coeffs = deepcopy(self.coeffs)
+        all_data = deepcopy(self.all_data)
+        open_elem = self.open_elem
+        chempot = self.chempot
+
+        indices.extend([[self.entries.index(e) for e in rxn.entries] for rxn in rxns])
+        coeffs.extend([list(rxn.coefficients) for rxn in rxns])
+        all_data.extend([rxn.data for rxn in rxns])
+
+        return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
+
+    def add_rxn_set(self, rxn_set):
+        """Adds a new reaction set to current reaction set.
+
+        Warning: new reaction set must have the same entries as the current reaction
+        set.
+
+        """
+        if self.entries != rxn_set.entries:
+            raise ValueError(
+                "Reaction sets must have identical entries property to add."
+            )
+
+        indices = deepcopy(self.indices)
+        coeffs = deepcopy(self.coeffs)
+        all_data = deepcopy(self.all_data)
+
+        open_elem = self.open_elem
+        chempot = self.chempot
+
+        indices.extend(rxn_set.indices)
+        coeffs.extend(rxn_set.coeffs)
+        all_data.extend(rxn_set.all_data)
+
+        return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
+
     @staticmethod
     def _get_added_elems(
         rxn: Union[ComputedReaction, OpenComputedReaction], target: Composition
@@ -224,43 +269,67 @@ class ReactionSet(MSONable):
 
         return added_elems_str
 
-    @staticmethod
-    def _filter_duplicates(rxns):
-        """Method for removing duplicate reactions, including those that are multiples
-        of other reactions. First step is a screening step to speed up the process."""
-        rxn_dict = {}
-        for rxn in rxns:
-            reactants_str = "-".join(sorted([c.reduced_formula for c in rxn.reactants]))
-            products_str = "-".join(sorted([c.reduced_formula for c in rxn.products]))
-            rxn_str = f"{reactants_str}->{products_str}"
+    def filter_duplicates(self):
+        """
+        Return a new ReactionSet object with duplicate reactions removed
+        """
+        indices_to_remove = []
 
-            if rxn_str not in rxn_dict:
-                rxn_dict[rxn_str] = {rxn}
-            else:
-                rxn_dict[rxn_str].add(rxn)
+        # groupby only works with pre-sorted arrays
+        sorted_coeffs, sorted_idxs, sorted_indices = zip(
+            *[
+                i
+                for i in sorted(
+                    zip(self.coeffs, range(len(self.indices)), self.indices),
+                    key=lambda x: sorted(x[2]),
+                )
+            ]
+        )
 
-        removed_rxns = []
-        for rxn_str, possible_duplicates in rxn_dict.items():
-            if len(possible_duplicates) > 1:
-
-                for rxn1, rxn2 in combinations(possible_duplicates, 2):
-                    if rxn1 in removed_rxns or rxn2 in removed_rxns:
+        for i, group in groupby(
+            zip(sorted_coeffs, sorted_idxs, sorted_indices),
+            key=lambda i: sorted(i[2]),
+        ):
+            coeffs_group, idx_group, indices_group = zip(*group)
+            if len(idx_group) > 1:
+                for (idx1, coeffs1, indices1), (
+                    idx2,
+                    coeffs2,
+                    indices2,
+                ) in combinations(zip(idx_group, coeffs_group, indices_group), 2):
+                    if idx2 in indices_to_remove:
                         continue
 
-                    rxn1_coeffs = rxn1.reactant_coeffs | rxn1.product_coeffs
-                    rxn2_coeffs = rxn2.reactant_coeffs | rxn2.product_coeffs
-                    ratios = []
+                    coeffs2_sorted = [coeffs2[indices2.index(i)] for i in indices1]
 
-                    for c, coeff1 in rxn1_coeffs.items():
-                        coeff2 = rxn2_coeffs.get(c, 0)
-
-                        ratio = coeff1 / coeff2
-                        ratios.append(ratio)
+                    ratios = np.array(coeffs1) / np.array(coeffs2_sorted)
+                    if (
+                        ratios <= 1e-8
+                    ).any():  # do not remove any reaction with negative ratio
+                        continue
 
                     if np.isclose(ratios[0], ratios).all():
-                        removed_rxns.append(rxn2)
+                        indices_to_remove.append(idx2)
 
-        return rxns - set(removed_rxns)
+        new_indices = []
+        new_coeffs = []
+        new_all_data = []
+
+        for idx in range(len(self)):
+            if idx in indices_to_remove:
+                continue
+            new_indices.append(self.indices[idx])
+            new_coeffs.append(self.coeffs[idx])
+            new_all_data.append(self.all_data[idx])
+
+        return ReactionSet(
+            self.entries,
+            new_indices,
+            new_coeffs,
+            self.open_elem,
+            self.chempot,
+            new_all_data,
+        )
 
     @staticmethod
     def _get_unique_entries(rxns: Collection[ComputedReaction]) -> Set[ComputedEntry]:

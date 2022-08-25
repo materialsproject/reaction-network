@@ -85,23 +85,21 @@ class RunEnumerators(FiretaskBase):
             "chempot": chempot,
         }
 
-        results = []
+        rxn_set = None
         for enumerator in enumerators:
             logger.info(f"Running {enumerator.__class__.__name__}")
             rxns = enumerator.enumerate(entries)
-            results.extend(rxns)
+
+            if rxn_set is None:
+                rxn_set = rxns
+            else:
+                rxn_set = rxn_set.add_rxn_set(rxns)
+
+        rxn_set = rxn_set.filter_duplicates()
 
         logger.info("Saving reactions...")
 
-        results = ReactionSet.from_rxns(
-            results,
-            filter_duplicates=True,
-            entries=entries,
-            open_elem=open_elem,
-            chempot=chempot,
-        )
-
-        dumpfn(results, "rxns.json.gz")
+        dumpfn(rxn_set, "rxns.json.gz")
         dumpfn(metadata, "metadata.json.gz")
 
         return FWAction(
