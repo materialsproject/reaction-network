@@ -20,7 +20,7 @@ from rxn_network.reactions.open import OpenComputedReaction
 
 
 @ray.remote
-def react(
+def _react(
     rxn_iterable,
     react_function,
     open_entries,
@@ -35,7 +35,15 @@ def react(
     pd=None,
     grand_pd=None,
 ):
-    """Generalized react function"""
+    """
+    This function is a wrapper for the specific react function of each enumerator. This
+    wrapper contains the logic used for filtering out reactions based on the
+    user-defined enumerator settings. It can also be called as a remote function using
+    ray, allowing for parallel computation during reaction enumeration.
+
+    Note: this function is not intended to to be called directly!
+
+    """
 
     all_rxns = []
     for rp in rxn_iterable:

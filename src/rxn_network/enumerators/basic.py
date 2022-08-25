@@ -3,7 +3,6 @@ This module implements two types of basic reaction enumerators, differing in the
 to consider open entries.
 """
 import logging
-import os
 from copy import deepcopy
 from itertools import combinations, product
 from typing import List, Optional, Set
@@ -15,7 +14,7 @@ from tqdm import tqdm
 
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.enumerators.utils import group_by_chemsys, initialize_entry, react
+from rxn_network.enumerators.utils import _react, group_by_chemsys, initialize_entry
 from rxn_network.reactions import ComputedReaction
 from rxn_network.utils import grouper, initialize_ray, limited_powerset, to_iterator
 
@@ -158,11 +157,15 @@ class BasicEnumerator(Enumerator):
 
         iterator = to_iterator(rxns)
         if not self.quiet:
-            iterator = tqdm(iterator, total=len(rxns), disable=self.quiet)
+            iterator = tqdm(
+                iterator,
+                total=len(rxns),
+                disable=self.quiet,
+                desc=f"{self.__class__.__name__}",
+            )
 
         for r in iterator:
-            results.extend(deepcopy(r))
-            del r
+            results.extend(r)
 
         del rxns
 
@@ -194,12 +197,6 @@ class BasicEnumerator(Enumerator):
             target_elems,
             all_open_elems,
         )
-
-        # for k, v in filtered_combos.items():
-        #     print(k)
-        #     for j in v:
-        #         print(j)
-        #         print("\n")
 
         return filtered_combos
 
@@ -273,7 +270,7 @@ class BasicEnumerator(Enumerator):
         grand_pd = ray.put(grand_pd)
 
         return [
-            react.remote(
+            _react.remote(
                 rxn_iterable_chunk,
                 react_function,
                 open_entries,

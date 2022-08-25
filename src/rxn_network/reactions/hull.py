@@ -2,7 +2,7 @@
 
 from functools import cached_property, lru_cache
 from itertools import combinations
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 from monty.json import MSONable
@@ -253,8 +253,8 @@ class InterfaceReactionHull(MSONable):
             n_left = (i_mid - i_left) - 1
             n_right = (i_right - i_mid) - 1
 
-            count = self.altitude_multiplicity(n_left, n_right, n)
-            energy += count * self.calculate_altitude(c_left, c_mid, c_right)
+            count = self._altitude_multiplicity(n_left, n_right, n)
+            energy += count * self._calculate_altitude(c_left, c_mid, c_right)
 
         return energy
 
@@ -335,11 +335,30 @@ class InterfaceReactionHull(MSONable):
 
         return count
 
-    @lru_cache
+    @lru_cache(maxsize=128)
     def get_decomposition_energy_and_num_paths_recursive(
         self, x1: float, x2: float, use_x_min_ref=True, use_x_max_ref=True
-    ):
-        """ """
+    ) -> Tuple[float, int]:
+        """
+        This is a recursive implementation of the get_decomposition_energy function. It
+        significantly slower than the non-recursive implementation but is more
+        straightforward to understand. Both should return the same answer, however the
+        refcursive implementation also includes "free" computation of the total number
+        of paths. The function has been cached for speed.
+
+        Args:
+            x1: Coordinate of first point.
+            x2: Coordinate of second point.
+            use_x_min_ref: Useful for recursive calls. If true, uses the reactant at x=0
+                as the reference (sometimes there is a decomposition reaction of the reactant that is
+                lower in energy than the reactant).
+            use_x_max_ref: Useful for recursive calls. If true, uses the reactant at x=1.0
+                as the reference (sometimes there is a decomposition reaction of the reactant that is
+                lower in energy than the reactant).
+
+        Returns:
+            Tuple of decomposition energy and the number of decomposition pathways.
+        """
         all_coords = self.get_coords_in_range(x1, x2)
 
         if not use_x_min_ref and all_coords[1, 0] == 0.0:
@@ -356,7 +375,7 @@ class InterfaceReactionHull(MSONable):
             val, total = 0, 1
             return val, total
         elif len(coords) == 1:
-            val = self.calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])
+            val = self._calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])
             total = 1
             return val, total
         else:
@@ -368,7 +387,7 @@ class InterfaceReactionHull(MSONable):
                 elif c[0] == 1.0 and not np.isclose(c[1], 0.0):
                     use_x_max_ref = False
 
-                height = self.calculate_altitude([x_min, y_min], c, [x_max, y_max])
+                height = self._calculate_altitude([x_min, y_min], c, [x_max, y_max])
                 (
                     left_decomp,
                     left_total,
@@ -391,8 +410,20 @@ class InterfaceReactionHull(MSONable):
 
         return val, total
 
-    @lru_cache
-    def altitude_multiplicity(self, n_left, n_right, n):
+    @lru_cache(maxsize=128)
+    def _altitude_multiplicity(self, n_left, n_right, n):
+        """
+        This function is used in the non-recursive implementation of the
+        get_decomposition_energy function. It allows for rapid computation of the number
+        times (multiplicitly) that a particular altitude appears in the decomposition.
+
+        Args:
+            n_left: number of vertices occurring in between the leftmost and middle vertices.
+            n_right: number of vertices occurring in between the middle and rightmost
+            vertices.
+            n: total number of product vertices in the full interface reaction hull
+                (i.e., not including the 2 reactant reference vertices )
+        """
         remainder = n - n_left - n_right - 1
         if remainder < 0:
             return 0
@@ -482,18 +513,22 @@ class InterfaceReactionHull(MSONable):
 
     @cached_property
     def stable_reactions(self):
-        """ """
+        """
+        Returns the reactions that are stable (on the convex hull) of the interface reaction hull.
+        """
         return [r for i, r in enumerate(self.reactions) if i in self.hull_vertices]
 
     @cached_property
     def unstable_reactions(self):
-        """ """
+        """
+        Returns the reactions that are unstable (NOT on the convex hull) of the interface reaction hull.
+        """
         return [r for i, r in enumerate(self.reactions) if i not in self.hull_vertices]
 
     @staticmethod
-    def calculate_altitude(c_left, c_mid, c_right):
+    def _calculate_altitude(c_left, c_mid, c_right):
         """
-        Calculates the altitude of a point on a line defined by three points.
+        Helper geometry method: calculates the altitude of a point on a line defined by three points.
 
         Args:
             x1: point 1

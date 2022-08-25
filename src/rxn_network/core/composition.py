@@ -1,4 +1,4 @@
-from functools import cached_property, lru_cache
+from functools import cached_property
 
 from pymatgen.core.composition import Composition as PymatgenComposition
 from pymatgen.core.composition import reduce_formula

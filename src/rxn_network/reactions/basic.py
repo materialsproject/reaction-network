@@ -5,7 +5,7 @@ pymatgen and streamlined for the reaction-network code.
 
 import re
 from copy import deepcopy
-from functools import cached_property, lru_cache
+from functools import cached_property
 from itertools import chain, combinations
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -533,23 +533,21 @@ class BasicReaction(Reaction):
         if not len(self.reactants) == len(other.reactants):
             return False
 
-        if not np.allclose(np.sort(self.coefficients), np.sort(other.coefficients)):
+        if not np.allclose(sorted(self.coefficients), sorted(other.coefficients)):
             return False
 
-        if not set(self.compositions) == set(other.compositions):
+        if not set(self.reactants) == set(other.reactants):
             return False
 
-        return (set(self.reactants) == set(other.reactants)) & (
-            set(self.products) == set(other.products)
-        )
+        if not set(self.products) == set(other.products):
+            return False
+
+        return True
 
     def __hash__(self):
         return hash(
-            (
-                tuple(sorted(r.reduced_formula for r in self.reactant_coeffs)),
-                tuple(sorted(p.reduced_formula for p in self.product_coeffs)),
-            )
-        )
+            (self.chemical_system, tuple(sorted(self.coefficients)))
+        )  # not checking here for reactions that are multiples (too expensive)
 
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]

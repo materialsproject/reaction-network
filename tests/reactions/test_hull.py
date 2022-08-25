@@ -64,7 +64,7 @@ def test_unstable_reactions(irh_batio):
     ],
 )
 def test_calculate_altitude(c1, c2, c3, expected_altitude):
-    assert InterfaceReactionHull.calculate_altitude(c1, c2, c3) == pytest.approx(
+    assert InterfaceReactionHull._calculate_altitude(c1, c2, c3) == pytest.approx(
         expected_altitude
     )
 
@@ -145,7 +145,7 @@ def test_get_decomposition_energy_and_num_paths_recursive(irh_batio):
     [(0, 1), (1, 1), (2, 2), (3, 5), (6, 132), (12, 208012), (18, 477638700)],
 )
 def test_count(num, answer, irh_batio):
-    assert irh_batio.count(num) == irh_batio.count_recursive(num)[0] == answer
+    assert irh_batio.count(num) == irh_batio._count_recursive(num)[0] == answer
 
 
 def test_hull_vertices(irh_batio):

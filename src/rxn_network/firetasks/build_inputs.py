@@ -7,8 +7,8 @@ from typing import Iterable, List, Optional, Union
 
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore
-from mp_api import MPRester
 from monty.serialization import dumpfn
+from mp_api import MPRester
 from pymatgen.core.structure import Structure
 from pymatgen.entries import Entry
 from pymatgen.entries.compatibility import MaterialsProject2020Compatibility

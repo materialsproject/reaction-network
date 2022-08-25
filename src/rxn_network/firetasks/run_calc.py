@@ -3,9 +3,9 @@ Firetasks for running enumeration and network calculations
 """
 import os
 from copy import deepcopy
-from itertools import groupby
 from typing import List
 
+import numpy as np
 import ray
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from monty.serialization import dumpfn, loadfn
@@ -13,18 +13,17 @@ from pymatgen.core.composition import Element
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
-from rxn_network.costs.calculators import ChempotDistanceCalculator
-from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.enumerators.utils import get_computed_rxn
-from rxn_network.firetasks.utils import (
-    get_all_reactant_strs,
-    get_decorated_rxn,
-    load_entry_set,
-    load_json,
+from rxn_network.costs.calculators import (
+    ChempotDistanceCalculator,
+    PrimarySelectivityCalculator,
+    SecondarySelectivityCalculator,
 )
+from rxn_network.enumerators.utils import get_computed_rxn
+from rxn_network.firetasks.utils import get_all_reactant_strs, load_entry_set, load_json
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
+from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger, grouper
 from rxn_network.utils.ray import to_iterator
@@ -166,8 +165,7 @@ class CalculateSelectivitiesFromNetwork(FiretaskBase):
 
         logger.info("Calculating selectivites...")
 
-        num_cpus = ray.cluster_resources()["CPU"]
-        batch_size = int(num_cpus * 10)  # arbitrary
+        batch_size = 10  # arbitrary
 
         processed_chunks = []
         for rxns_chunk in grouper(target_rxns, batch_size, fillvalue=None):
@@ -178,7 +176,11 @@ class CalculateSelectivitiesFromNetwork(FiretaskBase):
             )
 
         decorated_rxns = []
-        for r in tqdm(to_iterator(processed_chunks), total=len(processed_chunks)):
+        for r in tqdm(
+            to_iterator(processed_chunks),
+            total=len(processed_chunks),
+            desc="Selectivity",
+        ):
             decorated_rxns.extend(r)
 
         del processed_chunks
@@ -427,6 +429,41 @@ class RunSolver(FiretaskBase):
         dumpfn(pathway_set, balanced_pathways_fn)
 
         return FWAction(update_spec={"balanced_pathways_fn": balanced_pathways_fn})
+
+
+def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
+    if len(precursors_list) == 1:
+        other_energies = np.array(
+            [r.energy_per_atom for r in competing_rxns if r != rxn]
+        )
+        primary_selectivity = InterfaceReactionHull._primary_selectivity_from_energies(  # pylint: disable=protected-access
+            rxn.energy_per_atom, other_energies, temp=temp
+        )
+        energy_diffs = rxn.energy_per_atom - other_energies
+        max_diff = energy_diffs.max()
+        secondary_selectivity = max_diff if max_diff > 0 else 0.0
+        rxn.data["primary_selectivity"] = primary_selectivity
+        rxn.data["secondary_selectivity"] = secondary_selectivity
+        decorated_rxn = rxn
+    else:
+        competing_rxns = competing_rxns.get_rxns()
+
+        if rxn not in competing_rxns:
+            competing_rxns.append(rxn)
+
+        irh = InterfaceReactionHull(
+            precursors_list[0],
+            precursors_list[1],
+            competing_rxns,
+        )
+
+        calc_1 = PrimarySelectivityCalculator(irh=irh, temp=temp)
+        calc_2 = SecondarySelectivityCalculator(irh=irh)
+
+        decorated_rxn = calc_1.decorate(rxn)
+        decorated_rxn = calc_2.decorate(decorated_rxn)
+
+    return decorated_rxn
 
 
 @ray.remote

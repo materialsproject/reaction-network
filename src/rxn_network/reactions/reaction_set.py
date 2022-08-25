@@ -226,6 +226,8 @@ class ReactionSet(MSONable):
 
     @staticmethod
     def _filter_duplicates(rxns):
+        """Method for removing duplicate reactions, including those that are multiples
+        of other reactions. First step is a screening step to speed up the process."""
         rxn_dict = {}
         for rxn in rxns:
             reactants_str = "-".join(sorted([c.reduced_formula for c in rxn.reactants]))

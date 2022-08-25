@@ -502,7 +502,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         pd_dict = expand_pd(list(e_set))
         logger.info("Building entries from expanded phase diagrams...")
-        for _, pd in tqdm(pd_dict.items()):
+        for _, pd in tqdm(pd_dict.items(), desc="GibbsComputedEntry"):
             gibbs_set = cls.from_pd(
                 pd,
                 temperature,

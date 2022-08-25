@@ -33,7 +33,7 @@ class ChempotDistanceCalculator(Calculator):
     def __init__(
         self,
         cpd: ChemicalPotentialDiagram,
-        mu_func: str = "sum",
+        mu_func: str = "mean",
         name: str = "chempot_distance",
     ):
         """

@@ -1,54 +1,14 @@
 """
-Utility Fireworks functions. Some of these functions are borrowed from the atomate package.
+Utility Fireworks functions to assist with operations in firetasks.
+Some of these functions are borrowed from the atomate package.
 """
 from typing import Optional
 
-import numpy as np
 from fireworks import FireTaskBase
 from monty.serialization import loadfn
 
-from rxn_network.costs.calculators import (
-    PrimarySelectivityCalculator,
-    SecondarySelectivityCalculator,
-)
 from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.utils import limited_powerset
-
-
-def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
-    if len(precursors_list) == 1:
-        other_energies = np.array(
-            [r.energy_per_atom for r in competing_rxns if r != rxn]
-        )
-        primary_selectivity = InterfaceReactionHull._primary_selectivity_from_energies(
-            rxn.energy_per_atom, other_energies, temp=temp
-        )
-        energy_diffs = rxn.energy_per_atom - other_energies
-        max_diff = energy_diffs.max()
-        secondary_selectivity = max_diff if max_diff > 0 else 0.0
-        rxn.data["primary_selectivity"] = primary_selectivity
-        rxn.data["secondary_selectivity"] = secondary_selectivity
-        decorated_rxn = rxn
-    else:
-        competing_rxns = competing_rxns.get_rxns()
-
-        if rxn not in competing_rxns:
-            competing_rxns.append(rxn)
-
-        irh = InterfaceReactionHull(
-            precursors_list[0],
-            precursors_list[1],
-            competing_rxns,
-        )
-
-        calc_1 = PrimarySelectivityCalculator(irh=irh, temp=temp)
-        calc_2 = SecondarySelectivityCalculator(irh=irh)
-
-        decorated_rxn = calc_1.decorate(rxn)
-        decorated_rxn = calc_2.decorate(decorated_rxn)
-
-    return decorated_rxn
 
 
 def env_chk(
