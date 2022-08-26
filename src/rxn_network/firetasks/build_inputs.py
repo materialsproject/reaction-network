@@ -8,7 +8,7 @@ from typing import Iterable, List, Optional, Union
 from fireworks import FiretaskBase, FWAction, explicit_serialize
 from maggma.stores import MongoStore
 from monty.serialization import dumpfn
-from mp_api import MPRester
+from pymatgen.ext.matproj import MPRester
 from pymatgen.core.structure import Structure
 from pymatgen.entries import Entry
 from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
@@ -72,7 +72,7 @@ class EntriesFromMPRester(FiretaskBase):
 
         with MPRester() as mpr:
             entries = mpr.get_entries_in_chemsys(
-                elements=chemsys,
+                elements=chemsys, inc_structure="final"
             )
 
         entries = process_entries(
