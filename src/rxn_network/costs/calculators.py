@@ -71,6 +71,9 @@ class ChempotDistanceCalculator(Calculator):
         Returns:
             The chemical potential distance of the reaction.
         """
+        reactant_entries = rxn.reactant_entries
+        product_entries = rxn.product_entries
+
         if hasattr(rxn, "grand_entries"):
             reactant_entries = [
                 e
@@ -80,20 +83,8 @@ class ChempotDistanceCalculator(Calculator):
             product_entries = [
                 e
                 for e, c in zip(rxn.grand_entries, rxn.coefficients)
-                if c < 0 and e.__class__.__name__ == "GrandPotPDEntry"
+                if c > 0 and e.__class__.__name__ == "GrandPotPDEntry"
             ]
-        else:
-            reactant_entries = [
-                e
-                for e in rxn.reactant_entries
-                if not self._open_elems.issuperset(e.composition.elements)
-            ]
-            product_entries = [
-                e
-                for e in rxn.product_entries
-                if not self._open_elems.issuperset(e.composition.elements)
-            ]
-
         combos = chain(
             product(reactant_entries, product_entries),
             combinations(product_entries, 2),
