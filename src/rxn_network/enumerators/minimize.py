@@ -29,6 +29,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         targets: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        filter_by_chemsys: Optional[str] = None,
         max_num_constraints: int = 1,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
@@ -52,6 +53,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             targets=targets,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
+            filter_by_chemsys=filter_by_chemsys,
             quiet=quiet,
         )
         self._build_pd = True
@@ -105,6 +107,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         targets: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        filter_by_chemsys: Optional[str] = None,
         max_num_constraints=1,
         quiet: bool = False,
     ):
@@ -130,6 +133,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             targets=targets,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
+            filter_by_chemsys=filter_by_chemsys,
             quiet=quiet,
         )
         self.open_elem = Element(open_elem)  # type: ignore

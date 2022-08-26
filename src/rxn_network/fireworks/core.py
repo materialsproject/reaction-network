@@ -293,24 +293,38 @@ class RetrosynthesisFW(Firework):
         fw_name += ")"
 
         targets = None
+        filter_by_chemsys = Composition(target_formula).chemical_system
+
         if not calculate_selectivity:
             targets = [target_formula]
+            filter_by_chemsys = None
 
         open_elem = None
 
         enumerators = []
-        enumerators.append(BasicEnumerator(targets=targets, **basic_enumerator_kwargs))
+        enumerators.append(
+            BasicEnumerator(
+                targets=targets,
+                filter_by_chemsys=filter_by_chemsys,
+                **basic_enumerator_kwargs,
+            )
+        )
         if open_formula:
             enumerators.append(
                 BasicOpenEnumerator(
                     open_phases=[open_formula],
                     targets=targets,
+                    filter_by_chemsys=filter_by_chemsys,
                     **basic_enumerator_kwargs,
                 )
             )
         if use_minimize_enumerators:
             enumerators.append(
-                MinimizeGibbsEnumerator(targets=targets, **minimize_enumerator_kwargs)
+                MinimizeGibbsEnumerator(
+                    targets=targets,
+                    filter_by_chemsys=filter_by_chemsys,
+                    **minimize_enumerator_kwargs,
+                )
             )
             if open_formula and chempot is not None:
                 elems = Composition(open_formula).elements
@@ -321,7 +335,10 @@ class RetrosynthesisFW(Firework):
                 open_elem = elems[0]
                 enumerators.append(
                     MinimizeGrandPotentialEnumerator(
-                        open_elem=open_elem, mu=chempot, targets=targets
+                        open_elem=open_elem,
+                        mu=chempot,
+                        targets=targets,
+                        filter_by_chemsys=filter_by_chemsys,
                     )
                 )
 

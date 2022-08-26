@@ -8,6 +8,7 @@ from itertools import combinations, product
 from typing import List, Optional, Set
 
 import ray
+from pymatgen.core.composition import Element
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
@@ -38,6 +39,7 @@ class BasicEnumerator(Enumerator):
         n: int = 2,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        filter_by_chemsys: Optional[str] = None,
         max_num_constraints=1,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
@@ -79,6 +81,7 @@ class BasicEnumerator(Enumerator):
         self.n = n
         self.exclusive_precursors = exclusive_precursors
         self.exclusive_targets = exclusive_targets
+        self.filter_by_chemsys = filter_by_chemsys
         self.max_num_constraints = max_num_constraints
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
@@ -127,7 +130,12 @@ class BasicEnumerator(Enumerator):
             entries
         )
 
-        combos_dict = self._get_combos_dict(entries, precursors, targets, open_entries)
+        combos_dict = self._get_combos_dict(
+            entries,
+            precursors,
+            targets,
+            open_entries,
+        )
         open_combos = self._get_open_combos(open_entries)
 
         if not open_combos:
@@ -360,8 +368,16 @@ class BasicEnumerator(Enumerator):
         all_target_elems = {el for g in target_elems for el in g}
         all_open_elems = {str(el) for el in all_open_elems}
 
+        filter_elems = None
+        if self.filter_by_chemsys:
+            filter_elems = {el for el in self.filter_by_chemsys.split("-")}
+
         for chemsys, combos in combos_dict.items():
             elems = set(chemsys.split("-"))
+
+            if filter_elems:
+                if not elems.issuperset(filter_elems):
+                    continue
 
             if len(elems) >= 10 or len(elems) == 1:  # too few or too many elements
                 continue
@@ -418,6 +434,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         n: int = 2,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        filter_by_chemsys: Optional[str] = None,
         max_num_constraints: int = 1,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
@@ -455,6 +472,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             n=n,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
+            filter_by_chemsys=filter_by_chemsys,
             max_num_constraints=max_num_constraints,
             remove_unbalanced=remove_unbalanced,
             remove_changed=remove_changed,
