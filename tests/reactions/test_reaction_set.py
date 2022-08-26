@@ -22,8 +22,8 @@ def open_rxn_set(ymno_rxns):
 
 
 def test_get_rxns(ymno_rxns, rxn_set, open_rxn_set):
-    open_rxns = open_rxn_set.get_rxns()
-    assert rxn_set.get_rxns() == ymno_rxns
+    open_rxns = list(open_rxn_set.get_rxns())
+    assert list(rxn_set.get_rxns()) == ymno_rxns
     assert open_rxns != ymno_rxns
     assert all([type(r) == OpenComputedReaction for r in open_rxns])
     assert all([r.chempots == {Element("O"): 0} for r in open_rxns])
@@ -40,6 +40,8 @@ def test_filter_duplicates(computed_rxn):
     )
 
     assert computed_rxn2 != computed_rxn
-    assert ReactionSet._filter_duplicates({computed_rxn, computed_rxn2}) == {
-        computed_rxn
-    }
+    assert list(
+        ReactionSet.from_rxns(
+            [computed_rxn, computed_rxn2], filter_duplicates=True
+        ).get_rxns()
+    ) == [computed_rxn]

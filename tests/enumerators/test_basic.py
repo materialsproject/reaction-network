@@ -120,7 +120,11 @@ def test_enumerate_with_target(
 def test_enumerate_with_precursors_and_target(
     filtered_entries, basic_enumerator_with_precursors_and_target
 ):
-    rxns = basic_enumerator_with_precursors_and_target.enumerate(filtered_entries)
+    rxns = list(
+        basic_enumerator_with_precursors_and_target.enumerate(
+            filtered_entries
+        ).get_rxns()
+    )
 
     assert len(rxns) == 1
     rxn_str = str(rxns[0])
@@ -130,7 +134,11 @@ def test_enumerate_with_precursors_and_target(
 def test_open_enumerate_with_precursors_and_target(
     filtered_entries, basic_open_enumerator_with_precursors_and_target
 ):
-    rxns = basic_open_enumerator_with_precursors_and_target.enumerate(filtered_entries)
+    rxns = list(
+        basic_open_enumerator_with_precursors_and_target.enumerate(
+            filtered_entries
+        ).get_rxns()
+    )
 
     assert len(rxns) == 1
     assert {c.reduced_formula for c in rxns[0].reactants} == {"Y2O3", "Mn2O3", "O2"}
@@ -140,7 +148,7 @@ def test_open_enumerate_with_precursors_and_target(
 def test_open_enumerate(filtered_entries, basic_open_enumerator):
     expected_num_rxns = 168
 
-    rxns = basic_open_enumerator.enumerate(filtered_entries)
+    rxns = list(basic_open_enumerator.enumerate(filtered_entries).get_rxns())
 
     assert expected_num_rxns == len(rxns)
     assert len(rxns) == len(set(rxns))

@@ -157,8 +157,10 @@ def test_enumerate_grand_potential_target(
 def test_enumerate_grand_potential_precursors_target(
     filtered_entries, grand_potential_enumerator_with_precursors_and_target
 ):
-    rxns = grand_potential_enumerator_with_precursors_and_target.enumerate(
-        filtered_entries
+    rxns = list(
+        grand_potential_enumerator_with_precursors_and_target.enumerate(
+            filtered_entries
+        ).get_rxns()
     )
 
     assert len(rxns) == 1
