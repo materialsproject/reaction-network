@@ -137,18 +137,19 @@ class CalculateSelectivitiesFromNetwork(FiretaskBase):
     """
 
     required_params: List[str] = ["target_formula"]
-    optional_params: List[str] = ["rxns", "open_formula", "temp"]
+    optional_params: List[str] = ["rxns", "open_formula", "temp", "batch_size"]
 
     def run_task(self, fw_spec):
         all_rxns = load_json(self, "rxns", fw_spec)
         target_formula = self["target_formula"]
         open_formula = self.get("open_formula")
         temp = self.get("temp", 300)
+        batch_size = self.get("batch_size", 10)
 
         logger.info("Identifying target reactions...")
 
         target_rxns = []
-        for rxn in all_rxns:
+        for rxn in all_rxns.get_rxns():
             product_formulas = [p.reduced_formula for p in rxn.products]
             if target_formula in product_formulas:
                 target_rxns.append(rxn)
@@ -158,18 +159,15 @@ class CalculateSelectivitiesFromNetwork(FiretaskBase):
             f" {len(all_rxns)} total reactions."
         )
 
-        competing_rxns_dict = self._create_reactions_dict(all_rxns)
-        competing_rxns_dict = ray.put(competing_rxns_dict)
+        all_rxns = ray.put(all_rxns)
 
         logger.info("Calculating selectivites...")
-
-        batch_size = 10  # arbitrary
 
         processed_chunks = []
         for rxns_chunk in grouper(target_rxns, batch_size, fillvalue=None):
             processed_chunks.append(
                 get_decorated_rxns_by_chunk.remote(
-                    rxns_chunk, competing_rxns_dict, open_formula, temp
+                    rxns_chunk, all_rxns, open_formula, temp
                 )
             )
 
@@ -187,19 +185,6 @@ class CalculateSelectivitiesFromNetwork(FiretaskBase):
 
         results = ReactionSet.from_rxns(decorated_rxns)
         dumpfn(results, "rxns.json.gz")  # may overwrite existing rxns.json.gz
-
-    @staticmethod
-    def _create_reactions_dict(all_rxns):
-        all_rxns_dict = {}
-
-        for r in all_rxns:
-            precursors_str = "-".join(sorted([p.reduced_formula for p in r.reactants]))
-            if precursors_str in all_rxns_dict:
-                all_rxns_dict[precursors_str].add(r)
-            else:
-                all_rxns_dict[precursors_str] = {r}
-
-        return all_rxns_dict
 
 
 @explicit_serialize
@@ -444,8 +429,6 @@ def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         rxn.data["secondary_selectivity"] = secondary_selectivity
         decorated_rxn = rxn
     else:
-        competing_rxns = competing_rxns.get_rxns()
-
         if rxn not in competing_rxns:
             competing_rxns.append(rxn)
 
@@ -465,7 +448,7 @@ def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
 
 
 @ray.remote
-def get_decorated_rxns_by_chunk(rxn_chunk, competing_rxns_dict, open_formula, temp):
+def get_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
     decorated_rxns = []
 
     for rxn in rxn_chunk:
@@ -473,32 +456,16 @@ def get_decorated_rxns_by_chunk(rxn_chunk, competing_rxns_dict, open_formula, te
             continue
 
         precursors = [r.reduced_formula for r in rxn.reactants]
-
-        precursors_and_open_formulas = deepcopy(precursors)
+        competing_rxns = list(all_rxns.get_rxns_by_reactants(precursors))
 
         if open_formula:
-            precursors_and_open_formulas.append(open_formula)
-
-        competing_rxns = get_all_competing_rxns_from_dict(
-            competing_rxns_dict, precursors_and_open_formulas
-        )
+            competing_rxns.extend(
+                all_rxns.get_rxns_by_reactants(precursors + [open_formula])
+            )
 
         if len(precursors) >= 3:
-            precursors = list(set(precursors_and_open_formulas) - {open_formula})
+            precursors = list(set(precursors) - {open_formula})
 
         decorated_rxns.append(get_decorated_rxn(rxn, competing_rxns, precursors, temp))
 
     return decorated_rxns
-
-
-def get_all_competing_rxns_from_dict(competing_rxns_dict, precursors_and_open_formulas):
-    all_possible_strs = get_all_reactant_strs(precursors_and_open_formulas)
-
-    competing_rxns = ReactionSet.from_rxns(
-        [
-            r
-            for rxn_set in [competing_rxns_dict.get(s, []) for s in all_possible_strs]
-            for r in rxn_set
-        ],
-    )
-    return competing_rxns

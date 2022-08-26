@@ -4,7 +4,7 @@ objects which share entries.
 """
 from functools import lru_cache
 from itertools import combinations, groupby
-from typing import Collection, List, Optional, Set, Union
+from typing import Collection, List, Optional, Set, Union, Iterable
 from copy import deepcopy
 
 import numpy as np
@@ -60,29 +60,14 @@ class ReactionSet(MSONable):
         if open_elem:
             self.mu_dict = {Element(open_elem): chempot}  # type: ignore
 
-    @lru_cache(maxsize=1)
     def get_rxns(
         self,
-    ) -> List[Union[ComputedReaction, OpenComputedReaction]]:
+    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
         """
         Returns list of ComputedReaction objects or OpenComputedReaction objects (when
         open element and chempot are specified) for the reaction set.
         """
-        rxns = []
-
-        for indices, coeffs, data in zip(self.indices, self.coeffs, self.all_data):
-            entries = [self.entries[i] for i in indices]
-            if self.mu_dict:
-                rxn = OpenComputedReaction(
-                    entries=entries,
-                    coefficients=coeffs,
-                    data=data,
-                    chempots=self.mu_dict,
-                )
-            else:
-                rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
-            rxns.append(rxn)
-        return rxns
+        return self._get_rxns_by_indices(idxs=range(len(self.coeffs)))
 
     @classmethod
     def from_rxns(
@@ -164,7 +149,7 @@ class ReactionSet(MSONable):
                 cost: Cost of reaction
 
         """
-        rxns = self.get_rxns()
+        rxns = list(self.get_rxns())
         costs = [cost_function.evaluate(rxn) for rxn in rxns]
 
         data = {
@@ -243,6 +228,61 @@ class ReactionSet(MSONable):
 
         return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
 
+    def get_rxns_by_reactants(self, reactants: List[str]):
+        """
+        Return a list of reactions with the given reactants.
+        """
+        idxs = []
+        reactant_indices = {
+            idx
+            for idx, e in enumerate(self.entries)
+            if e.composition.reduced_formula in reactants
+        }
+        for idx, (coeffs, indices) in enumerate(zip(self.coeffs, self.indices)):
+            r_indices = {
+                i
+                for c, i in zip(coeffs, indices)
+                if c < 1e-12 and i in reactant_indices
+            }
+            if r_indices == reactant_indices:
+                idxs.append(idx)
+
+        return self._get_rxns_by_indices(idxs)
+
+    def _get_rxns_by_indices(
+        self, idxs: Union[List[int], range]
+    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
+        """
+        Return a list of reactions with the given indices.
+        """
+        if idxs == range(len(self.coeffs)):
+            indices_slice = self.indices
+            coeffs_slice = self.coeffs
+            data_slice = self.all_data
+        else:
+            indices_slice = []
+            coeffs_slice = []
+            data_slice = []
+
+            for idx in idxs:
+                indices_slice.append(self.indices[idx])
+                coeffs_slice.append(self.coeffs[idx])
+                data_slice.append(self.all_data[idx])
+
+        for indices, coeffs, data in zip(indices_slice, coeffs_slice, data_slice):
+            entries = [self.entries[i] for i in indices]
+            if self.mu_dict:
+                rxn = OpenComputedReaction(
+                    entries=entries,
+                    coefficients=coeffs,
+                    data=data,
+                    chempots=self.mu_dict,
+                )
+            else:
+                rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
+
+            yield rxn
+
     @staticmethod
     def _get_added_elems(
         rxn: Union[ComputedReaction, OpenComputedReaction], target: Composition
@@ -292,7 +332,7 @@ class ReactionSet(MSONable):
         ):
             coeffs_group, idx_group, indices_group = zip(*group)
             if len(idx_group) > 1:
-                for (idx1, coeffs1, indices1), (
+                for (_, coeffs1, indices1), (
                     idx2,
                     coeffs2,
                     indices2,

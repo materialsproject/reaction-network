@@ -163,13 +163,10 @@ class BasicEnumerator(Enumerator):
                 desc=f"{self.__class__.__name__}",
             )
 
-        rxn_set = None
+        rxn_set = ReactionSet(entries.entries_list, [], [])
 
         for r in iterator:
-            if rxn_set == None:
-                rxn_set = ReactionSet.from_rxns(r, entries=entries)
-            else:
-                rxn_set = rxn_set.add_rxns(r)
+            rxn_set = rxn_set.add_rxns(r)
 
         del rxns
         rxn_set = rxn_set.filter_duplicates()
