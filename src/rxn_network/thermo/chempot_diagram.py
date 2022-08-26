@@ -46,7 +46,10 @@ class ChemicalPotentialDiagram(ChempotDiagram):
                 unspecified elements within the "limits" argument. This results in
                 default limits of (-100, 0)
         """
-        self.entries = list(entries)
+        self.entries = list(
+            sorted(entries, key=lambda e: e.composition.reduced_formula)
+        )
+        self._entry_set = GibbsEntrySet(self.entries)
         self.limits = limits
         self.default_min_limit = default_min_limit
         self.elements = list(
@@ -83,7 +86,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             range(num_hyperplanes, num_hyperplanes + num_border_hyperplanes)
         )
 
-    def shortest_domain_distance(self, f1: str, f2: str) -> float:
+    def shortest_domain_distance(self, f1: str, f2: str, offset=0.0) -> float:
         """
         Args:
             f1: chemical formula (1)
@@ -110,7 +113,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         tree = KDTree(pts1)
 
-        return min(tree.query(pts2)[0])
+        return min(tree.query(pts2)[0]) + offset
 
     def _get_halfspace_intersection(self):
         hs_hyperplanes = np.vstack([self._hyperplanes, self._border_hyperplanes])
@@ -156,8 +159,28 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         )
         return data
 
+    def get_offset(self, entry):
+        if (
+            entry in self._min_entries
+            and entry.composition.reduced_formula in self.domains
+        ):
+            offset = 0.0
+        else:
+            e_above_hull = self._entry_set.get_e_above_hull(entry)
+            hyperplane = self._get_hyperplane(entry)
+            offset = self._get_distance_between_parallel_hyperplanes(
+                hyperplane[:-1], e_above_hull
+            )
+
+        return offset
+
+    @staticmethod
+    def _get_distance_between_parallel_hyperplanes(a, delta_b):
+        """Returns the distance between two parallel hyperplanes"""
+        return np.abs(delta_b) / np.linalg.norm(a)
+
     def _get_metastable_domains(self):
-        e_set = GibbsEntrySet(self.entries)
+        e_set = self._entry_set
         e_dict = e_set.min_entries_by_formula
         stable_formulas = list(self.domains.keys())
         stable_formulas.extend([str(e) for e in self.elements])

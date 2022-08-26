@@ -241,6 +241,7 @@ class RetrosynthesisFW(Firework):
         target_formula: str,
         entries: Optional[GibbsEntrySet] = None,
         chemsys: Optional[Union[str, Iterable[str]]] = None,
+        use_basic_enumerators: bool = True,
         use_minimize_enumerators: bool = True,
         open_formula: Optional[str] = None,
         chempot: Optional[float] = None,
@@ -302,22 +303,23 @@ class RetrosynthesisFW(Firework):
         open_elem = None
 
         enumerators = []
-        enumerators.append(
-            BasicEnumerator(
-                targets=targets,
-                filter_by_chemsys=filter_by_chemsys,
-                **basic_enumerator_kwargs,
-            )
-        )
-        if open_formula:
+        if use_basic_enumerators:
             enumerators.append(
-                BasicOpenEnumerator(
-                    open_phases=[open_formula],
+                BasicEnumerator(
                     targets=targets,
                     filter_by_chemsys=filter_by_chemsys,
                     **basic_enumerator_kwargs,
                 )
             )
+            if open_formula:
+                enumerators.append(
+                    BasicOpenEnumerator(
+                        open_phases=[open_formula],
+                        targets=targets,
+                        filter_by_chemsys=filter_by_chemsys,
+                        **basic_enumerator_kwargs,
+                    )
+                )
         if use_minimize_enumerators:
             enumerators.append(
                 MinimizeGibbsEnumerator(

@@ -102,6 +102,7 @@ class ChempotDistanceCalculator(Calculator):
             self.cpd.shortest_domain_distance(
                 combo[0].composition.reduced_formula,
                 combo[1].composition.reduced_formula,
+                offset=self.cpd.get_offset(combo[0]) + self.cpd.get_offset(combo[1]),
             )
             for combo in combos
         ]
