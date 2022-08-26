@@ -41,7 +41,7 @@ class BasicEnumerator(Enumerator):
         max_num_constraints=1,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
-        calculate_e_above_hulls: bool = True,
+        calculate_e_above_hulls: bool = False,
         quiet: bool = False,
     ):
         """

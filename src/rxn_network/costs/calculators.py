@@ -33,7 +33,7 @@ class ChempotDistanceCalculator(Calculator):
     def __init__(
         self,
         cpd: ChemicalPotentialDiagram,
-        mu_func: str = "mean",
+        mu_func: str = "sum",
         name: str = "chempot_distance",
     ):
         """
@@ -71,16 +71,28 @@ class ChempotDistanceCalculator(Calculator):
         Returns:
             The chemical potential distance of the reaction.
         """
-        reactant_entries = [
-            e
-            for e in rxn.reactant_entries
-            if not self._open_elems.issuperset(e.composition.elements)
-        ]
-        product_entries = [
-            e
-            for e in rxn.product_entries
-            if not self._open_elems.issuperset(e.composition.elements)
-        ]
+        if hasattr(rxn, "grand_entries"):
+            reactant_entries = [
+                e
+                for e, c in zip(rxn.grand_entries, rxn.coefficients)
+                if c < 0 and e.__class__.__name__ == "GrandPotPDEntry"
+            ]
+            product_entries = [
+                e
+                for e, c in zip(rxn.grand_entries, rxn.coefficients)
+                if c < 0 and e.__class__.__name__ == "GrandPotPDEntry"
+            ]
+        else:
+            reactant_entries = [
+                e
+                for e in rxn.reactant_entries
+                if not self._open_elems.issuperset(e.composition.elements)
+            ]
+            product_entries = [
+                e
+                for e in rxn.product_entries
+                if not self._open_elems.issuperset(e.composition.elements)
+            ]
 
         combos = chain(
             product(reactant_entries, product_entries),
@@ -88,26 +100,14 @@ class ChempotDistanceCalculator(Calculator):
         )
         distances = [
             self.cpd.shortest_domain_distance(
-                self._get_reduced_formula(combo[0]), self._get_reduced_formula(combo[1])
+                combo[0].composition.reduced_formula,
+                combo[1].composition.reduced_formula,
             )
             for combo in combos
         ]
 
         distance = float(self._mu_func(distances))
         return distance
-
-    def _get_reduced_formula(self, entry):
-        if not self._open_elems:
-            comp = entry.composition
-        else:
-            comp = Composition(
-                {
-                    elem: entry.composition[elem]
-                    for elem in entry.composition
-                    if elem not in self._open_elems
-                }
-            )
-        return comp.reduced_formula
 
     @classmethod
     def from_entries(

@@ -19,7 +19,7 @@ from rxn_network.costs.calculators import (
     SecondarySelectivityCalculator,
 )
 from rxn_network.enumerators.utils import get_computed_rxn
-from rxn_network.firetasks.utils import get_all_reactant_strs, load_entry_set, load_json
+from rxn_network.firetasks.utils import load_entry_set, load_json
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.pathways.solver import PathwaySolver
@@ -96,6 +96,15 @@ class RunEnumerators(FiretaskBase):
                 rxn_set = rxn_set.add_rxn_set(rxns)
 
         rxn_set = rxn_set.filter_duplicates()
+        if open_elem:
+            rxn_set = ReactionSet(
+                rxn_set.entries,
+                rxn_set.indices,
+                rxn_set.coeffs,
+                open_elem,
+                chempot,
+                rxn_set.all_data,
+            )
 
         logger.info("Saving reactions...")
 
