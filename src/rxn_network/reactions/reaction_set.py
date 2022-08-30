@@ -233,17 +233,19 @@ class ReactionSet(MSONable):
         Return a list of reactions with the given reactants.
         """
         idxs = []
+        reactants = [Composition(r).reduced_formula for r in reactants]
+
         reactant_indices = {
             idx
             for idx, e in enumerate(self.entries)
             if e.composition.reduced_formula in reactants
         }
+
+        if not reactant_indices:
+            return []
+
         for idx, (coeffs, indices) in enumerate(zip(self.coeffs, self.indices)):
-            r_indices = {
-                i
-                for c, i in zip(coeffs, indices)
-                if c < 1e-12 and i in reactant_indices
-            }
+            r_indices = {i for c, i in zip(coeffs, indices) if c < 1e-12}
             if r_indices == reactant_indices:
                 idxs.append(idx)
 

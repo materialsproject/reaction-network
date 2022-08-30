@@ -160,6 +160,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         return data
 
     def get_offset(self, entry):
+        """ """
         if (
             entry in self._min_entries
             and entry.composition.reduced_formula in self.domains

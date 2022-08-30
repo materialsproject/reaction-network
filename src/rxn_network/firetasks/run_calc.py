@@ -150,10 +150,10 @@ class CalculateSelectivitiesFromNetwork(FiretaskBase):
 
     def run_task(self, fw_spec):
         all_rxns = load_json(self, "rxns", fw_spec)
-        target_formula = self["target_formula"]
+        target_formula = Composition(self["target_formula"]).reduced_formula
         open_formula = self.get("open_formula")
         temp = self.get("temp", 300)
-        batch_size = self.get("batch_size", 10)
+        batch_size = self.get("batch_size", 20)
 
         logger.info("Identifying target reactions...")
 
@@ -424,6 +424,7 @@ class RunSolver(FiretaskBase):
 
 
 def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
+    """ """
     if len(precursors_list) == 1:
         other_energies = np.array(
             [r.energy_per_atom for r in competing_rxns if r != rxn]
@@ -432,8 +433,10 @@ def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
             rxn.energy_per_atom, other_energies, temp=temp
         )
         energy_diffs = rxn.energy_per_atom - other_energies
-        max_diff = energy_diffs.max()
-        secondary_selectivity = max_diff if max_diff > 0 else 0.0
+        secondary_rxn_energies = energy_diffs[energy_diffs > 0]
+        secondary_selectivity = (
+            secondary_rxn_energies.max() if secondary_rxn_energies.any() else 0.0
+        )
         rxn.data["primary_selectivity"] = primary_selectivity
         rxn.data["secondary_selectivity"] = secondary_selectivity
         decorated_rxn = rxn
@@ -468,6 +471,7 @@ def get_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
         competing_rxns = list(all_rxns.get_rxns_by_reactants(precursors))
 
         if open_formula:
+            open_formula = Composition(open_formula).reduced_formula
             competing_rxns.extend(
                 all_rxns.get_rxns_by_reactants(precursors + [open_formula])
             )
