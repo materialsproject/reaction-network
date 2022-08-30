@@ -23,4 +23,3 @@ class Enumerator(MSONable, metaclass=ABCMeta):
         """
         Enumerates the potential reactions from the list of entries
         """
-        
