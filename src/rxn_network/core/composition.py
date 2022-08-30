@@ -1,7 +1,7 @@
+"""Composition class used to represent a chemical composition."""
 from functools import cached_property
 
 from pymatgen.core.composition import Composition as PymatgenComposition
-from pymatgen.core.composition import reduce_formula
 
 
 class Composition(PymatgenComposition):

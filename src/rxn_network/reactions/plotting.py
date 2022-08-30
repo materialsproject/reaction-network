@@ -1,10 +1,10 @@
 """
 Utility functions for plotting reaction data/analysis.
 """
-import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from pandas import DataFrame
+import numpy as np
 from pymatgen.analysis.chempot_diagram import plotly_layouts
 
 
@@ -65,7 +65,7 @@ def plot_reaction_scatter(
     y_label, y_units = get_label_and_units(y)
     z_label, z_units = None, None
 
-    cols = (x, y)
+    cols: tuple = (x, y)
 
     if z is not None:
         z_label, z_units = get_label_and_units(z)
