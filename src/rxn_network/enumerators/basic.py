@@ -8,7 +8,6 @@ from itertools import combinations, product
 from typing import List, Optional, Set
 
 import ray
-from pymatgen.core.composition import Element
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
