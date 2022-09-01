@@ -14,7 +14,8 @@ from tqdm import tqdm
 
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.enumerators.utils import _react, group_by_chemsys, initialize_entry
+from rxn_network.entries.utils import initialize_entry
+from rxn_network.enumerators.utils import _react, group_by_chemsys
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import grouper, initialize_ray, limited_powerset, to_iterator
