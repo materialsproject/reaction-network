@@ -133,31 +133,6 @@ def react_interface(r1, r2, filtered_entries, pd, grand_pd=None):
     return rxns
 
 
-def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = False):
-    """
-    Acquire a (stabilized) entry by user-specified formula.
-
-    Args:
-        formula: Chemical formula
-        entry_set: GibbsEntrySet containing 1 or more entries corresponding to
-            given formula
-        stabilize: Whether or not to stabilize the entry by decreasing its energy
-            such that it is 'on the hull'
-    """
-    try:
-        entry = entry_set.get_min_entry_by_formula(formula)
-    except KeyError:
-        entry = entry_set.get_interpolated_entry(formula)
-        warnings.warn(
-            f"Using interpolated entry for {entry.composition.reduced_formula}"
-        )
-
-    if stabilize:
-        entry = entry_set.get_stabilized_entry(entry, tol=1e-3)
-
-    return entry
-
-
 def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
     """
     Returns chemical system as a set of element names, for set of entries.
