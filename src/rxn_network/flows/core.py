@@ -21,36 +21,42 @@ logger = logging.getLogger(__name__)
 @dataclass
 class RetrosynthesisFlowMaker(Maker):
     name: str = "enumerate reactions"
-    calculate_chempot_distance: bool = field(default=False)
     get_entry_set_maker: GetEntrySetMaker = field(default_factory=GetEntrySetMaker)
     enumeration_maker: ReactionEnumerationMaker = field(
         default_factory=ReactionEnumerationMaker
     )
-    calculate_selectivities_maker: Optional[CalculateSelectivitiesMaker] = None
+    calculate_selectivities_maker: CalculateSelectivitiesMaker = field(
+        default_factory=CalculateSelectivitiesMaker
+    )
     open_elem: Optional[Element] = None
     chempot: Optional[float] = None
 
-    def make(self, target_formula, added_elems):
+    def make(self, target_formula, added_elems=None, entries=None):
         jobs = []
+
+        if added_elems is None:
+            added_elems = []
 
         chemsys = "-".join(
             {str(e) for e in Composition(target_formula).elements}
             | {str(e) for e in added_elems}
         )
 
-        get_entry_set_job = self.get_entry_set_maker.make(chemsys)
-        jobs.append(get_entry_set_job)
+        if entries is None:
+            get_entry_set_job = self.get_entry_set_maker.make(chemsys)
+            jobs.append(get_entry_set_job)
+            entries = get_entry_set_job.output.entries
 
         enumerators = [BasicEnumerator(targets=[target_formula])]
 
         enumeration_job = self.enumeration_maker.make(
-            enumerators=enumerators, entries=get_entry_set_job.output["entries"]
+            enumerators=enumerators, entries=entries
         )
         jobs.append(enumeration_job)
 
         calculate_selectivities_job = self.calculate_selectivities_maker.make(
-            rxn_sets=[enumeration_job.output["rxns"]],
-            entries=get_entry_set_job.output["entries"],
+            rxn_sets=[enumeration_job.output.rxns],
+            entries=get_entry_set_job.output.entries,
             target_formula=target_formula,
         )
         jobs.append(calculate_selectivities_job)

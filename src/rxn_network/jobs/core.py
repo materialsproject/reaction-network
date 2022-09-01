@@ -142,23 +142,28 @@ class CalculateSelectivitiesMaker(Maker):
     cpd_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self):
-        self.open_formula = Composition(self.open_elem).reduced_formula
+        self.open_formula = (
+            Composition(self.open_elem).reduced_formula if self.open_elem else None
+        )
 
     @job(rxns="rxns")
     def make(self, rxn_sets, entries, target_formula):
         logger.info("Identifying target reactions...")
         all_rxns = ReactionSet.from_rxns(
-            [r.get_rxns() for r in rxn_sets],
+            [rxn for rxn_set in rxn_sets for rxn in rxn_set.get_rxns()],
             entries=entries,
             open_elem=self.open_elem,
             chempot=self.chempot,
         )
+        all_rxns = all_rxns.filter_duplicates()
 
         target_rxns = []
         for rxn in all_rxns:
             product_formulas = [p.reduced_formula for p in rxn.products]
             if target_formula in product_formulas:
                 target_rxns.append(rxn)
+
+        target_rxns = ReactionSet.from_rxns(target_rxns)
 
         logger.info(
             f"Identified {len(target_rxns)} target reactions out of"
@@ -186,7 +191,9 @@ class CalculateSelectivitiesMaker(Maker):
         logger.info("Calculating selectivites...")
 
         processed_chunks = []
-        for rxns_chunk in grouper(target_rxns, self.batch_size, fillvalue=None):
+        for rxns_chunk in grouper(
+            target_rxns.get_rxns(), self.batch_size, fillvalue=None
+        ):
             processed_chunks.append(
                 get_decorated_rxns_by_chunk.remote(
                     rxns_chunk, all_rxns, self.open_formula, self.temp
@@ -203,7 +210,7 @@ class CalculateSelectivitiesMaker(Maker):
 
         del processed_chunks
 
-        return decorated_rxns
+        return ReactionSet.from_rxns(decorated_rxns)
 
     def _get_chempot_decorated_rxns(self, rxns, entries):
         cpd_calc_dict = {}
