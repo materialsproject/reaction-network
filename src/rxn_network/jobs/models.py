@@ -70,7 +70,12 @@ class SelectivitiesTaskDocument(BaseModel):
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
-    rxns: ReactionSet = Field(description="The reaction set.")
+    rxns: ReactionSet = Field(
+        description=(
+            "The reaction set (reactions have calculated selectivities stored in data"
+            " attribute"
+        )
+    )
     target_formula: str = Field(
         description="The reduced chemical formula of the target material."
     )
@@ -78,13 +83,24 @@ class SelectivitiesTaskDocument(BaseModel):
     chempot: float = Field(
         None, description="The chemical potential of the open element"
     )
+    added_elements: List[Element] = Field(
+        None, description="The elements added beyond the elements of the target(s)."
+    )
+    added_chemsys: str = Field(
+        None, description="The chemical system of the added elements"
+    )
     calculate_selectivities: bool = Field(
         None, description="Whether to calculate selectivities"
     )
     calculate_chempot_distances: bool = Field(
         None, description="Whether to calculate chempot distances"
     )
-    temp: float = Field(None, description="The temperature in K")
+    temp: float = Field(
+        None,
+        description=(
+            "The temperature in K used to determine the primary selectivity weightings."
+        ),
+    )
     batch_size: int = Field(None, description="The batch size for the reaction set")
     cpd_kwargs: Dict[str, Any] = Field(
         None, description="The kwargs for ChempotDistanceCalculator"

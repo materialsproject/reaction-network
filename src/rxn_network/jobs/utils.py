@@ -1,6 +1,10 @@
 """Definitions of common job functions"""
 import logging
 
+from pymatgen.core.composition import Element
+
+from rxn_network.core.composition import Composition
+
 logger = logging.getLogger(__name__)
 
 
@@ -25,3 +29,13 @@ def build_network(enumerators, entries):
 
 def run_solver():
     return None
+
+
+def get_added_elem_data(entries, targets):
+    added_elems = entries.chemsys - {
+        str(e) for target in targets for e in Composition(target).elements
+    }
+    added_chemsys = "-".join(sorted(list(added_elems)))
+    added_elements = [Element(e) for e in added_elems]
+
+    return added_elements, added_chemsys

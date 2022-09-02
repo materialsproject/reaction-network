@@ -1,26 +1,23 @@
 import logging
 from dataclasses import dataclass, field
-from typing import Optional, List, Collection, Union
+from typing import Collection, List, Optional, Union
 
-from jobflow import Maker, Response, job, Flow
+from jobflow import Flow, Maker, Response, job
 from pymatgen.core.composition import Element
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.enumerator import Enumerator
-from rxn_network.enumerators.basic import (
-    BasicEnumerator,
-    BasicOpenEnumerator,
-)
+from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (
     MinimizeGibbsEnumerator,
     MinimizeGrandPotentialEnumerator,
 )
-from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.jobs.core import (
     CalculateSelectivitiesMaker,
-    ReactionEnumerationMaker,
     GetEntrySetMaker,
     NetworkMaker,
+    ReactionEnumerationMaker,
 )
 from rxn_network.jobs.models import EnumeratorTaskDocument, NetworkTaskDocument
 
@@ -58,8 +55,12 @@ class RetrosynthesisFlowMaker(Maker):
     ):
         target_formula = Composition(target_formula).reduced_formula
 
+        flow_name = f"Retrosynthesis: {target_formula}"
+
         if added_elems is None:
             added_elems = []
+        else:
+            flow_name = flow_name + f" (+ {'-'.join(sorted(added_elems))})"
 
         chemsys = "-".join(
             {str(e) for e in Composition(target_formula).elements}
@@ -69,7 +70,14 @@ class RetrosynthesisFlowMaker(Maker):
         jobs = []
 
         if entries is None:
-            get_entry_set_job = self.get_entry_set_maker.make(chemsys)
+            get_entry_set_maker = self.get_entry_set_maker.update_kwargs(
+                {
+                    "name": self.get_entry_set_maker.name
+                    + f" ({chemsys}, T={self.get_entry_set_maker.temperature} K,"
+                    f" +{round(self.get_entry_set_maker.e_above_hull, 3)} eV)"
+                }
+            )
+            get_entry_set_job = get_entry_set_maker.make(chemsys)
             jobs.append(get_entry_set_job)
             entries = get_entry_set_job.output.entries
 
@@ -160,7 +168,7 @@ class RetrosynthesisFlowMaker(Maker):
 
                 jobs.append(calculate_selectivities_job)
 
-        return Flow(jobs, name=f"Retrosynthesis: {target_formula}")
+        return Flow(jobs, name=flow_name)
 
 
 # @dataclass

@@ -25,7 +25,12 @@ from rxn_network.jobs.models import (
     NetworkTaskDocument,
     SelectivitiesTaskDocument,
 )
-from rxn_network.jobs.utils import build_network, run_enumerators, run_solver
+from rxn_network.jobs.utils import (
+    build_network,
+    get_added_elem_data,
+    run_enumerators,
+    run_solver,
+)
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import grouper
@@ -87,6 +92,7 @@ class GetEntrySetMaker(Maker):
             include_polymorphs=self.include_polymorphs,
             formulas_to_include=self.formulas_to_include,
         )
+        doc.task_label = self.name
 
         return doc
 
@@ -114,11 +120,7 @@ class ReactionEnumerationMaker(Maker):
         added_chemsys = None
 
         if targets:
-            added_elems = set(chemsys.split("-")) - {
-                str(e) for target in targets for e in Composition(target).elements
-            }
-            added_chemsys = "-".join(sorted(list(added_elems)))
-            added_elements = [Element(e) for e in added_elems]
+            added_elements, added_chemsys = get_added_elem_data(entries, targets)
 
         metadata = {
             "elements": [Element(e) for e in chemsys.split("-")],
@@ -151,6 +153,7 @@ class CalculateSelectivitiesMaker(Maker):
     @job(rxns="rxns", output_schema=SelectivitiesTaskDocument)
     def make(self, rxn_sets, entries, target_formula):
         target_formula = Composition(target_formula).reduced_formula
+        added_elements, added_chemsys = get_added_elem_data(entries, [target_formula])
 
         logger.info("Identifying target reactions...")
         all_rxns = ReactionSet.from_rxns(
@@ -191,6 +194,8 @@ class CalculateSelectivitiesMaker(Maker):
             "target_formula": target_formula,
             "open_elem": self.open_elem,
             "chempot": self.chempot,
+            "added_elements": added_elements,
+            "added_chemsys": added_chemsys,
             "calculate_selectivities": self.calculate_selectivities,
             "calculate_chempot_distances": self.calculate_chempot_distances,
             "temp": self.temp,
@@ -199,6 +204,7 @@ class CalculateSelectivitiesMaker(Maker):
         }
 
         doc = SelectivitiesTaskDocument(**data)
+        doc.task_label = self.name
         return doc
 
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns):
