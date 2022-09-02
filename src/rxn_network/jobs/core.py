@@ -23,6 +23,7 @@ from rxn_network.jobs.models import (
     EntrySetDocument,
     EnumeratorTaskDocument,
     NetworkTaskDocument,
+    SelectivitiesTaskDocument,
 )
 from rxn_network.jobs.utils import build_network, run_enumerators, run_solver
 from rxn_network.reactions.hull import InterfaceReactionHull
@@ -136,18 +137,21 @@ class CalculateSelectivitiesMaker(Maker):
     open_elem: Optional[Element] = None
     chempot: Optional[float] = 0.0
     calculate_selectivities: bool = True
-    calculate_chempot_distance: bool = True
+    calculate_chempot_distances: bool = True
     temp: float = 300.0
     batch_size: int = 20
     cpd_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self):
+        self.open_elem = Element(self.open_elem) if self.open_elem else None
         self.open_formula = (
-            Composition(self.open_elem).reduced_formula if self.open_elem else None
+            Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
         )
 
-    @job(rxns="rxns")
+    @job(rxns="rxns", output_schema=SelectivitiesTaskDocument)
     def make(self, rxn_sets, entries, target_formula):
+        target_formula = Composition(target_formula).reduced_formula
+
         logger.info("Identifying target reactions...")
         all_rxns = ReactionSet.from_rxns(
             [rxn for rxn_set in rxn_sets for rxn in rxn_set.get_rxns()],
@@ -177,12 +181,25 @@ class CalculateSelectivitiesMaker(Maker):
 
         logger.info("Saving decorated reactions.")
 
-        if self.calculate_chempot_distance:
+        if self.calculate_chempot_distances:
             decorated_rxns = self._get_chempot_decorated_rxns(decorated_rxns, entries)
 
         results = ReactionSet.from_rxns(decorated_rxns, entries=entries)
 
-        return results
+        data = {
+            "rxns": results,
+            "target_formula": target_formula,
+            "open_elem": self.open_elem,
+            "chempot": self.chempot,
+            "calculate_selectivities": self.calculate_selectivities,
+            "calculate_chempot_distances": self.calculate_chempot_distances,
+            "temp": self.temp,
+            "batch_size": self.batch_size,
+            "cpd_kwargs": self.cpd_kwargs,
+        }
+
+        doc = SelectivitiesTaskDocument(**data)
+        return doc
 
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns):
 

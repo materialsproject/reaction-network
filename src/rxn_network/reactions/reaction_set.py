@@ -316,6 +316,8 @@ class ReactionSet(MSONable):
         Return a new ReactionSet object with duplicate reactions removed
         """
         indices_to_remove = []
+        if len(self.coeffs) == 0:
+            return self
 
         # groupby only works with pre-sorted arrays
         sorted_coeffs, sorted_idxs, sorted_indices = zip(

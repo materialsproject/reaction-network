@@ -2,6 +2,7 @@
 
 import logging
 import sys
+from datetime import datetime
 from itertools import chain, combinations, zip_longest
 from pathlib import Path
 from typing import Any, Iterable
@@ -74,3 +75,10 @@ def get_logger(
     logger.addHandler(sh)
 
     return logger
+
+
+def datetime_str() -> str:
+    """
+    Get a string representation of the current time. Borrowed from atomate2.
+    """
+    return str(datetime.utcnow())
