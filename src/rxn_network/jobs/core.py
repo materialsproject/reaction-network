@@ -70,7 +70,7 @@ class GetEntrySetMaker(Maker):
                 use_premade_entries=False,
             )
         else:
-            from mp_api import MPRester
+            from mp_api.client import MPRester
 
             with MPRester() as mpr:
                 entries = mpr.get_entries_in_chemsys(elements=chemsys)
