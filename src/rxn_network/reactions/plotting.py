@@ -31,7 +31,7 @@ def plot_reaction_scatter(
         units = ""
         if name == "energy":
             label = (
-                r"$\textrm{Reaction driving force} ~"
+                r"$\mathsf{Reaction~driving~force} ~"
                 r"\mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
             )
             units = "eV/atom"
@@ -81,8 +81,9 @@ def plot_reaction_scatter(
                 x=arr[:, 0],
                 y=arr[:, 1],
                 hovertext=df["rxn"],
-                marker=dict(size=10, color="green"),
+                marker=dict(size=10, color="seagreen", symbol="star"),
                 mode="markers",
+                name="Pareto Front",
             )
         else:
             scatter = go.Scatter3d(
@@ -90,8 +91,9 @@ def plot_reaction_scatter(
                 y=arr[:, 1],
                 z=arr[:, 2],
                 hovertext=df["rxn"],
-                marker=dict(size=10, color="green"),
+                marker=dict(size=10, color="seagreen", symbol="star"),
                 mode="markers",
+                name="Pareto Front",
             )
 
     if z is None:
@@ -103,7 +105,7 @@ def plot_reaction_scatter(
             hover_name="rxn",
             labels={x: x_label, y: y_label},
             color=color,
-            color_discrete_map={True: "darkorange", False: "gray"},
+            color_discrete_map={True: "darkorange", False: "lightgray"},
         )
         fig.update_layout(layout_2d)
     else:
@@ -128,7 +130,7 @@ def plot_reaction_scatter(
             labels={x: x_label, y: y_label, z: z_label},
             template="simple_white",
             color=color,
-            color_discrete_map={True: "darkorange", False: "gray"},
+            color_discrete_map={True: "darkorange", False: "lightgray"},
         )
 
         fig.update_layout(layout_3d)
