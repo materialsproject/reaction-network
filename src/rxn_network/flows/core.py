@@ -19,7 +19,7 @@ from rxn_network.jobs.core import (
     NetworkMaker,
     ReactionEnumerationMaker,
 )
-from rxn_network.jobs.models import EnumeratorTaskDocument, NetworkTaskDocument
+from rxn_network.jobs.schema import EnumeratorTaskDocument, NetworkTaskDocument
 
 logger = logging.getLogger(__name__)
 

@@ -81,7 +81,7 @@ def plot_reaction_scatter(
                 x=arr[:, 0],
                 y=arr[:, 1],
                 hovertext=df["rxn"],
-                marker=dict(size=10, color="seagreen", symbol="star"),
+                marker=dict(size=10, color="seagreen", symbol="diamond"),
                 mode="markers",
                 name="Pareto Front",
             )
@@ -91,7 +91,7 @@ def plot_reaction_scatter(
                 y=arr[:, 1],
                 z=arr[:, 2],
                 hovertext=df["rxn"],
-                marker=dict(size=10, color="seagreen", symbol="star"),
+                marker=dict(size=10, color="seagreen", symbol="diamond"),
                 mode="markers",
                 name="Pareto Front",
             )

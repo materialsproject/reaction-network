@@ -68,7 +68,6 @@ nav:
       - Utils:
           Database: reference/utils/database.md
           Funcs: reference/utils/funcs.md
-          Models: reference/utils/models.md
           Ray: reference/utils/ray.md
   - CHANGELOG: CHANGELOG.md
 

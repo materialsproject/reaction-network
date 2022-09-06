@@ -11,7 +11,7 @@ from monty.json import MontyDecoder, jsanitize
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
-from rxn_network.utils.models import (
+from rxn_network.builders.schema import (
     ComputedSynthesisRecipe,
     ComputedSynthesisRecipesDoc,
 )

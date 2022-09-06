@@ -10,7 +10,7 @@ from monty.json import jsanitize
 from rxn_network.firetasks.utils import env_chk, load_json
 from rxn_network.utils.database import CalcDb
 from rxn_network.utils.funcs import get_logger
-from rxn_network.utils.models import EnumeratorTask
+from rxn_network.jobs.schema import EnumeratorTaskDocument
 
 logger = get_logger(__name__)
 
@@ -49,7 +49,7 @@ class ReactionsToDb(FiretaskBase):
 
         db = CalcDb(db_file)
 
-        task = EnumeratorTask.from_rxns_and_metadata(rxns, metadata)
+        task = EnumeratorTaskDocument.from_rxns_and_metadata(rxns, metadata)
         d = jsanitize(task.dict(), strict=True, allow_bson=True)
 
         if use_gridfs:

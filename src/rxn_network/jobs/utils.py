@@ -23,7 +23,7 @@ def run_enumerators(enumerators, entries):
     return rxn_set
 
 
-def build_network(enumerators, entries):
+def build_network(rxns):
     return None
 
 

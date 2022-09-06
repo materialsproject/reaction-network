@@ -17,7 +17,7 @@ from rxn_network.costs.calculators import (
     SecondarySelectivityCalculator,
 )
 from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
-from rxn_network.jobs.models import (
+from rxn_network.jobs.schema import (
     EntrySetDocument,
     EnumeratorTaskDocument,
     NetworkTaskDocument,
@@ -97,6 +97,10 @@ class GetEntrySetMaker(Maker):
 
 @dataclass
 class ReactionEnumerationMaker(Maker):
+    """
+    Maker to create job for enumerating reactions from a set of entries.
+    """
+
     name: str = "enumerate reactions"
 
     @job(rxns="rxns", output_schema=EnumeratorTaskDocument)
@@ -106,6 +110,7 @@ class ReactionEnumerationMaker(Maker):
         data.update(self._get_metadata(enumerators, entries))
 
         enumerator_task = EnumeratorTaskDocument(**data)
+        enumerator_task.task_label = self.name
         return enumerator_task
 
     def _get_metadata(self, enumerators, entries):
@@ -133,6 +138,9 @@ class ReactionEnumerationMaker(Maker):
 
 @dataclass
 class CalculateSelectivitiesMaker(Maker):
+    """Maker to create job for calculating selectivities for a set of reactions and
+    target formula."""
+
     name: str = "calculate selectivities"
     open_elem: Optional[Element] = None
     chempot: Optional[float] = 0.0
@@ -275,11 +283,15 @@ class CalculateSelectivitiesMaker(Maker):
 
 @dataclass
 class NetworkMaker(Maker):
+    """
+    Maker for generating reaction networks from a set of reactions.
+    """
+
     name: str = "build/analyze network"
 
     @job
-    def make(self, enumerators, entries=None):
-        network = build_network(enumerators, entries)
+    def make(self, reactions):
+        network = build_network()
         data = {"network": network}
         network_task = NetworkTaskDocument(**data)
         return network_task
