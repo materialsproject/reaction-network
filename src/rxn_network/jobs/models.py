@@ -2,7 +2,6 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from monty.serialization import loadfn
 from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry

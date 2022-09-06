@@ -2,7 +2,6 @@
 Firetasks for running enumeration and network calculations
 """
 import os
-from copy import deepcopy
 from typing import List
 
 import numpy as np

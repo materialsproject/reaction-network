@@ -1,8 +1,8 @@
 import logging
 from dataclasses import dataclass, field
-from typing import Collection, List, Optional, Union
+from typing import Collection, List, Optional
 
-from jobflow import Flow, Maker, Response, job
+from jobflow import Flow, Maker, job
 from pymatgen.core.composition import Element
 
 from rxn_network.core.composition import Composition
@@ -47,7 +47,7 @@ class RetrosynthesisFlowMaker(Maker):
             Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
         )
 
-    def make(
+    def make(  # type: ignore
         self,
         target_formula: str,
         added_elems: Optional[Collection[str]] = None,

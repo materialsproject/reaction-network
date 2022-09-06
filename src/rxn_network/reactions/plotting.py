@@ -31,8 +31,8 @@ def plot_reaction_scatter(
         units = ""
         if name == "energy":
             label = (
-                r"$\Delta \Phi_{\mathrm{rxn}} ~"
-                r" \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
+                r"$\textrm{Reaction driving force} ~"
+                r"\mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
             )
             units = "eV/atom"
             if z is not None:

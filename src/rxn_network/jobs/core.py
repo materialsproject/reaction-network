@@ -1,14 +1,12 @@
 """Core jobs for reaction-network creation and analysis."""
 
 import logging
-import os
 from dataclasses import dataclass, field
 from typing import Optional
 
 import numpy as np
 import ray
-from jobflow import SETTINGS, Maker, Response, job
-from maggma.stores import Store
+from jobflow import SETTINGS, Maker, job
 from pymatgen.core.composition import Element
 from tqdm import tqdm
 
@@ -46,7 +44,7 @@ class GetEntrySetMaker(Maker):
     enumeration or network building.
     """
 
-    name: str = "get & process entries"
+    name: str = "get and process entries"
     entry_db_name: str = "entries_db"
     temperature: int = 300
     include_nist_data: bool = True
@@ -275,6 +273,18 @@ class CalculateSelectivitiesMaker(Maker):
         return results
 
 
+@dataclass
+class NetworkMaker(Maker):
+    name: str = "build/analyze network"
+
+    @job
+    def make(self, enumerators, entries=None):
+        network = build_network(enumerators, entries)
+        data = {"network": network}
+        network_task = NetworkTaskDocument(**data)
+        return network_task
+
+
 @ray.remote
 def get_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
     decorated_rxns = []
@@ -300,18 +310,6 @@ def get_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
     return decorated_rxns
 
 
-@dataclass
-class NetworkMaker(Maker):
-    name: str = "build/analyze network"
-
-    @job
-    def make(self, enumerators, entries=None):
-        network = build_network(enumerators, entries)
-        data = {"network": network}
-        network_task = NetworkTaskDocument(**data)
-        return network_task
-
-
 def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
     """ """
     if len(precursors_list) == 1:
@@ -321,7 +319,10 @@ def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         primary_selectivity = InterfaceReactionHull._primary_selectivity_from_energies(  # pylint: disable=protected-access
             rxn.energy_per_atom, other_energies, temp=temp
         )
-        energy_diffs = rxn.energy_per_atom - other_energies
+        energy_diffs = rxn.energy_per_atom - np.append(
+            other_energies, 0.0
+        )  # consider identity reaction as well
+
         secondary_rxn_energies = energy_diffs[energy_diffs > 0]
         secondary_selectivity = (
             secondary_rxn_energies.max() if secondary_rxn_energies.any() else 0.0
