@@ -83,7 +83,7 @@ def plot_reaction_scatter(
                 hovertext=df["rxn"],
                 marker=dict(size=10, color="seagreen", symbol="diamond"),
                 mode="markers",
-                name="Pareto Front",
+                name="Pareto front",
             )
         else:
             scatter = go.Scatter3d(
@@ -93,7 +93,7 @@ def plot_reaction_scatter(
                 hovertext=df["rxn"],
                 marker=dict(size=10, color="seagreen", symbol="diamond"),
                 mode="markers",
-                name="Pareto Front",
+                name="Pareto front",
             )
 
     if z is None:

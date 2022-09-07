@@ -2,7 +2,7 @@
 A reaction class that builds reactions based on ComputedEntry objects and provides
 information about reaction thermodynamics.
 """
-from functools import cached_property
+from functools import cached_property, lru_cache
 from typing import Dict, List, Optional, Union
 
 import numpy as np
@@ -247,6 +247,17 @@ class ComputedReaction(BasicReaction):
         scale_factor = factor / current_el_amount
         coeffs *= scale_factor
         return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
+
+    def get_entry_idx_vector(self, n):
+        indices = [e.data.get("idx") for e in self.entries]
+        if None in indices:
+            raise ValueError(
+                f"Could not find index for one or more entries in reaction: {self}"
+            )
+
+        v = np.zeros(n)
+        v[indices] = self.coefficients
+        return v
 
     def __hash__(self):
         return BasicReaction.__hash__(self)

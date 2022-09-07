@@ -44,8 +44,6 @@ class PathwaySet(MSONable):
         self.coefficients = coefficients
         self.costs = costs
 
-        self._rxns = self.reaction_set.get_rxns()
-
     @lru_cache(1)
     def get_paths(
         self,
@@ -55,12 +53,15 @@ class PathwaySet(MSONable):
         for efficiency.
         """
         paths = []
+
+        rxns = list(self.reaction_set.get_rxns())
+
         for indices, coefficients, costs in zip(
             self.indices,
             self.coefficients,
             self.costs,
         ):
-            reactions = [self._rxns[i] for i in indices]
+            reactions = [rxns[i] for i in indices]
             if coefficients is not None:
                 path = BalancedPathway(
                     reactions=reactions, coefficients=coefficients, costs=costs
@@ -88,7 +89,7 @@ class PathwaySet(MSONable):
         indices, coefficients, costs = [], [], []
 
         reaction_set = cls._get_reaction_set(paths)
-        rxns = reaction_set.get_rxns()
+        rxns = list(reaction_set.get_rxns())
 
         for path in paths:
             indices.append([rxns.index(r) for r in path.reactions])
