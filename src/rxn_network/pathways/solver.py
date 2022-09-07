@@ -10,7 +10,6 @@ from typing import List
 import numpy as np
 import ray
 from numba import njit, prange
-from scipy.special import comb
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
@@ -137,12 +136,13 @@ class PathwaySolver(Solver):
         if net_rxn in reactions:
             reactions.remove(net_rxn)
 
-        num_rxns = len(reactions)
-        reactions = ray.put(reactions)
+        reaction_set = ray.put(ReactionSet.from_rxns(reactions))
         entries = ray.put(entries)
         costs = ray.put(costs)
         num_entries = ray.put(num_entries)
         net_rxn_vector = ray.put(net_rxn_vector)
+
+        num_rxns = len(reactions)
 
         paths_refs = []
         for n in range(1, max_num_combos + 1):
@@ -151,7 +151,7 @@ class PathwaySolver(Solver):
             for group in groups:
                 paths_refs.append(
                     _get_balanced_paths_ray.remote(
-                        group, reactions, costs, entries, num_entries, net_rxn_vector
+                        group, reaction_set, costs, entries, num_entries, net_rxn_vector
                     )
                 )
 
@@ -161,7 +161,8 @@ class PathwaySolver(Solver):
             total=len(paths_refs),
             desc="Solving pathways by batch...",
         ):
-            paths.extend(paths_ref)
+            paths.extend(deepcopy(paths_ref))
+            del paths_ref
 
         filtered_paths = []
         if filter_interdependent:
@@ -319,8 +320,9 @@ def _create_comp_matrices(combos, rxns, num_entries):
 
 @ray.remote
 def _get_balanced_paths_ray(
-    combos, reactions, costs, entries, num_entries, net_rxn_vector
+    combos, reaction_set, costs, entries, num_entries, net_rxn_vector
 ):
+    reactions = list(reaction_set.get_rxns())
     comp_matrices = _create_comp_matrices(combos, reactions, num_entries)
 
     paths = []

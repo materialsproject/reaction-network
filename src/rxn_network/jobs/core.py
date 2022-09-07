@@ -2,7 +2,7 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, List
 
 import numpy as np
 import ray
@@ -16,6 +16,8 @@ from rxn_network.costs.calculators import (
     PrimarySelectivityCalculator,
     SecondarySelectivityCalculator,
 )
+from rxn_network.core.cost_function import CostFunction
+from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
 from rxn_network.jobs.schema import (
     EntrySetDocument,
@@ -24,11 +26,11 @@ from rxn_network.jobs.schema import (
     SelectivitiesTaskDocument,
 )
 from rxn_network.jobs.utils import (
-    build_network,
     get_added_elem_data,
     run_enumerators,
     run_solver,
 )
+from rxn_network.network import ReactionNetwork
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import grouper
@@ -288,10 +290,26 @@ class NetworkMaker(Maker):
     """
 
     name: str = "build/analyze network"
+    cost_function: CostFunction = field(default_factory=Softplus)
+    precursors: Optional[List[str]] = None
+    targets: Optional[List[str]] = None
+    calculate_pathways: Optional[int] = 10
 
     @job
-    def make(self, reactions):
-        network = build_network()
+    def make(
+        self,
+        reactions: ReactionSet,
+    ):
+        rn = ReactionNetwork(reactions, cost_function=self.cost_function)
+        rn.build()
+
+        if self.precursors:
+            rn.set_precursors(self.precursors)
+        if self.targets:
+            rn.set_target(self.targets[0])
+        if self.calculate_pathways and self.targets:
+            rn.find_pathways(self.targets, k=self.calculate_pathways)
+
         data = {"network": network}
         network_task = NetworkTaskDocument(**data)
         return network_task

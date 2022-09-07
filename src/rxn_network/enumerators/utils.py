@@ -1,10 +1,7 @@
 """
 Utility functions used by the enumerator classes.
 """
-import warnings
 from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
-
-import ray
 from pymatgen.analysis.interface_reactions import (
     GrandPotentialInterfacialReactivity,
     InterfacialReactivity,
@@ -17,88 +14,6 @@ from rxn_network.core.reaction import Reaction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
-
-
-@ray.remote
-def _react(
-    rxn_iterable,
-    react_function,
-    open_entries,
-    precursors,
-    targets,
-    p_set_func,
-    t_set_func,
-    remove_unbalanced,
-    remove_changed,
-    max_num_constraints,
-    filtered_entries=None,
-    pd=None,
-    grand_pd=None,
-):
-    """
-    This function is a wrapper for the specific react function of each enumerator. This
-    wrapper contains the logic used for filtering out reactions based on the
-    user-defined enumerator settings. It can also be called as a remote function using
-    ray, allowing for parallel computation during reaction enumeration.
-
-    Note: this function is not intended to to be called directly!
-
-    """
-
-    all_rxns = []
-    for rp in rxn_iterable:
-        if not rp:
-            continue
-
-        r = set(rp[0]) if rp[0] else set()
-        p = set(rp[1]) if rp[1] else set()
-
-        all_phases = r | p
-
-        precursor_func = (
-            getattr(precursors | open_entries, p_set_func)
-            if precursors
-            else lambda e: True
-        )
-        target_func = (
-            getattr(targets | open_entries, t_set_func) if targets else lambda e: True
-        )
-
-        if (
-            (r & p)
-            or (precursors and not precursors & all_phases)
-            or (p and targets and not targets & all_phases)
-        ):
-            continue
-
-        if not (precursor_func(r) or (p and precursor_func(p))):
-            continue
-        if p and not (target_func(r) or target_func(p)):
-            continue
-
-        suggested_rxns = react_function(
-            r, p, filtered_entries=filtered_entries, pd=pd, grand_pd=grand_pd
-        )
-
-        rxns = []
-        for rxn in suggested_rxns:
-            if (
-                rxn.is_identity
-                or (remove_unbalanced and not rxn.balanced)
-                or (remove_changed and rxn.lowest_num_errors != 0)
-                or rxn.data["num_constraints"] > max_num_constraints
-            ):
-                continue
-
-            reactant_entries = set(rxn.reactant_entries) - open_entries
-            product_entries = set(rxn.product_entries) - open_entries
-
-            if precursor_func(reactant_entries) and target_func(product_entries):
-                rxns.append(rxn)
-
-        all_rxns.extend(rxns)
-
-    return all_rxns
 
 
 def react_interface(r1, r2, filtered_entries, pd, grand_pd=None):

@@ -2,7 +2,7 @@
 A reaction class that builds reactions based on ComputedEntry objects and provides
 information about reaction thermodynamics.
 """
-from functools import cached_property, lru_cache
+from functools import cached_property
 from typing import Dict, List, Optional, Union
 
 import numpy as np

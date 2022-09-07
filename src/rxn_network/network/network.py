@@ -10,9 +10,7 @@ from pymatgen.entries import Entry
 
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.costs.softplus import Softplus
-from rxn_network.core.enumerator import Enumerator
 from rxn_network.core.network import Network
-from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.gt import (
