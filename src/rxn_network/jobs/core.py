@@ -226,7 +226,7 @@ class CalculateSelectivitiesMaker(Maker):
             target_rxns.get_rxns(), self.batch_size, fillvalue=None
         ):
             processed_chunks.append(
-                get_decorated_rxns_by_chunk.remote(
+                _get_decorated_rxns_by_chunk.remote(
                     rxns_chunk, all_rxns, self.open_formula, self.temp
                 )
             )
@@ -316,7 +316,7 @@ class NetworkMaker(Maker):
 
 
 @ray.remote
-def get_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
+def _get_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
     decorated_rxns = []
 
     for rxn in rxn_chunk:
@@ -335,12 +335,12 @@ def get_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
         if len(precursors) >= 3:
             precursors = list(set(precursors) - {open_formula})
 
-        decorated_rxns.append(get_decorated_rxn(rxn, competing_rxns, precursors, temp))
+        decorated_rxns.append(_get_decorated_rxn(rxn, competing_rxns, precursors, temp))
 
     return decorated_rxns
 
 
-def get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
+def _get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
     """ """
     if len(precursors_list) == 1:
         other_energies = np.array(

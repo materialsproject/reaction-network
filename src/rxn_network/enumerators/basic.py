@@ -63,8 +63,8 @@ class BasicEnumerator(Enumerator):
                 entries on either side of the reaction. Defaults to 2.
             exclusive_precursors: Whether to consider only reactions that have
             reactants which are a subset of the provided list of precursors. In other
-                words, if True, this only identifies reactions with reactants selected from the precursors
-                argument. Defaults to True.
+                words, if True, this only identifies reactions with reactants selected
+                from the precursors argument. Defaults to True.
             exclusive_targets: Whether to consider only reactions that make the
                 form products that are a subset of the provided list of targets. If False,
                 this only identifies reactions with no unspecified byproducts. Defualts to False.
@@ -146,29 +146,69 @@ class BasicEnumerator(Enumerator):
         precursors = ray.put(precursors)
         targets = ray.put(targets)
         react_function = ray.put(self._react_function)
+        open_entries = ray.put(open_entries)
+        p_set_func = ray.put(self._p_set_func)
+        t_set_func = ray.put(self._t_set_func)
+        remove_unbalanced = ray.put(self.remove_unbalanced)
+        remove_changed = ray.put(self.remove_changed)
+        max_num_constraints = ray.put(self.max_num_constraints)
 
         rxn_set = ReactionSet(entries.entries_list, [], [])
 
+        for item in items:
+            chemsys, combos = item
+
+            elems = chemsys.split("-")
+
+            filtered_entries = None
+            pd = None
+
+            if self.build_pd or self.build_grand_pd:
+                filtered_entries = entries.get_subset_in_chemsys(elems)
+
+            if self.build_pd:
+                pd = PhaseDiagram(filtered_entries)
+
+            grand_pd = None
+            if self.build_grand_pd:
+                chempots = getattr(self, "chempots")
+                grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
+
+            filtered_entries = ray.put(filtered_entries)
+            pd = ray.put(pd)
+            grand_pd = ray.put(grand_pd)
+
+            reaction_objs = []
+            for rxn_iterable_chunk in grouper(
+                self._get_rxn_iterable(combos, open_combos), self.CHUNK_SIZE
+            ):
+                c = _react.remote(
+                    rxn_iterable_chunk,
+                    react_function,
+                    open_entries,
+                    precursors,
+                    targets,
+                    p_set_func,
+                    t_set_func,
+                    remove_unbalanced,
+                    remove_changed,
+                    max_num_constraints,
+                    filtered_entries,
+                    pd,
+                    grand_pd,
+                )
+                reaction_objs.append(c)
+
         for r in tqdm(
-            to_iterator(
-                [
-                    r
-                    for item in items
-                    for r in self._get_rxns_in_chemsys(
-                        item,
-                        open_combos,
-                        react_function,
-                        entries,
-                        open_entries,
-                        precursors,
-                        targets,
-                    )
-                ]
-            ),
+            to_iterator(reaction_objs),
             disable=self.quiet,
             desc=f"{self.__class__.__name__}",
         ):
             rxn_set = rxn_set.add_rxns(r)
+
+        del filtered_entries
+        del pd
+        del grand_pd
 
         rxn_set = rxn_set.filter_duplicates()
 
@@ -209,89 +249,6 @@ class BasicEnumerator(Enumerator):
         """No open entries for BasicEnumerator, returns None"""
         _ = (self, open_entries)  # unused_arguments
         return None
-
-    def _get_rxns_in_chemsys(
-        self,
-        item,
-        open_combos,
-        react_function,
-        entries,
-        open_entries,
-        precursors,
-        targets,
-    ):
-        """ """
-        chemsys, combos = item
-
-        elems = chemsys.split("-")
-        filtered_entries = entries.get_subset_in_chemsys(elems)
-
-        rxn_iter = self._get_rxn_iterable(combos, open_combos)
-
-        return self._get_rxns_from_iterable(
-            rxn_iter,
-            precursors,
-            targets,
-            react_function,
-            filtered_entries,
-            open_entries,
-        )
-
-    def _get_rxns_from_iterable(
-        self,
-        rxn_iterable,
-        precursors,
-        targets,
-        react_function,
-        filtered_entries=None,
-        open_entries=None,
-    ):
-        """
-        Returns reactions from an iterable representing the combination of 2 sets
-        of phases. Works for reactions with open phases.
-        """
-        pd = None
-        if self.build_pd:
-            pd = PhaseDiagram(filtered_entries)
-
-        grand_pd = None
-        if self.build_grand_pd:
-            chempots = getattr(self, "chempots")
-            grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
-
-        if not open_entries:
-            open_entries = set()
-
-        open_entries = ray.put(open_entries)
-        p_set_func = ray.put(self._p_set_func)
-        t_set_func = ray.put(self._t_set_func)
-        remove_unbalanced = ray.put(self.remove_unbalanced)
-        remove_changed = ray.put(self.remove_changed)
-        max_num_constraints = ray.put(self.max_num_constraints)
-        filtered_entries = ray.put(filtered_entries)
-        pd = ray.put(pd)
-        grand_pd = ray.put(grand_pd)
-
-        reactions = []
-        for rxn_iterable_chunk in grouper(rxn_iterable, self.CHUNK_SIZE):
-            c = self._react.remote(
-                rxn_iterable_chunk,
-                react_function,
-                open_entries,
-                precursors,
-                targets,
-                p_set_func,
-                t_set_func,
-                remove_unbalanced,
-                remove_changed,
-                max_num_constraints,
-                filtered_entries,
-                pd,
-                grand_pd,
-            )
-            reactions.append(c)
-
-        return reactions
 
     @staticmethod
     def _react_function(reactants, products, **kwargs):
@@ -365,7 +322,7 @@ class BasicEnumerator(Enumerator):
 
         filter_elems = None
         if self.filter_by_chemsys:
-            filter_elems = {el for el in self.filter_by_chemsys.split("-")}
+            filter_elems = set(self.filter_by_chemsys.split("-"))
 
         for chemsys, combos in combos_dict.items():
             elems = set(chemsys.split("-"))
@@ -392,91 +349,6 @@ class BasicEnumerator(Enumerator):
             filtered_dict[chemsys] = combos
 
         return filtered_dict
-
-    @staticmethod
-    @ray.remote
-    def _react(
-        rxn_iterable,
-        react_function,
-        open_entries,
-        precursors,
-        targets,
-        p_set_func,
-        t_set_func,
-        remove_unbalanced,
-        remove_changed,
-        max_num_constraints,
-        filtered_entries=None,
-        pd=None,
-        grand_pd=None,
-    ):
-        """
-        This function is a wrapper for the specific react function of each enumerator. This
-        wrapper contains the logic used for filtering out reactions based on the
-        user-defined enumerator settings. It can also be called as a remote function using
-        ray, allowing for parallel computation during reaction enumeration.
-
-        Note: this function is not intended to to be called directly!
-
-        """
-
-        all_rxns = []
-
-        for rp in rxn_iterable:
-            if not rp:
-                continue
-
-            r = set(rp[0]) if rp[0] else set()
-            p = set(rp[1]) if rp[1] else set()
-
-            all_phases = r | p
-
-            precursor_func = (
-                getattr(precursors | open_entries, p_set_func)
-                if precursors
-                else lambda e: True
-            )
-            target_func = (
-                getattr(targets | open_entries, t_set_func)
-                if targets
-                else lambda e: True
-            )
-
-            if (
-                (r & p)
-                or (precursors and not precursors & all_phases)
-                or (p and targets and not targets & all_phases)
-            ):
-                continue
-
-            if not (precursor_func(r) or (p and precursor_func(p))):
-                continue
-            if p and not (target_func(r) or target_func(p)):
-                continue
-
-            suggested_rxns = react_function(
-                r, p, filtered_entries=filtered_entries, pd=pd, grand_pd=grand_pd
-            )
-
-            rxns = []
-            for rxn in suggested_rxns:
-                if (
-                    rxn.is_identity
-                    or (remove_unbalanced and not rxn.balanced)
-                    or (remove_changed and rxn.lowest_num_errors != 0)
-                    or rxn.data["num_constraints"] > max_num_constraints
-                ):
-                    continue
-
-                reactant_entries = set(rxn.reactant_entries) - open_entries
-                product_entries = set(rxn.product_entries) - open_entries
-
-                if precursor_func(reactant_entries) and target_func(product_entries):
-                    rxns.append(rxn)
-
-            all_rxns.extend(rxns)
-
-        return all_rxns
 
     @property
     def stabilize(self):
@@ -579,3 +451,86 @@ class BasicOpenEnumerator(BasicEnumerator):
         rxn_iter = product(combos, combos_with_open)
 
         return rxn_iter
+
+
+@ray.remote
+def _react(
+    rxn_iterable,
+    react_function,
+    open_entries,
+    precursors,
+    targets,
+    p_set_func,
+    t_set_func,
+    remove_unbalanced,
+    remove_changed,
+    max_num_constraints,
+    filtered_entries=None,
+    pd=None,
+    grand_pd=None,
+):
+    """
+    This function is a wrapper for the specific react function of each enumerator. This
+    wrapper contains the logic used for filtering out reactions based on the
+    user-defined enumerator settings. It can also be called as a remote function using
+    ray, allowing for parallel computation during reaction enumeration.
+
+    Note: this function is not intended to to be called directly!
+
+    """
+
+    all_rxns = []
+
+    for rp in rxn_iterable:
+        if not rp:
+            continue
+
+        r = set(rp[0]) if rp[0] else set()
+        p = set(rp[1]) if rp[1] else set()
+
+        all_phases = r | p
+
+        precursor_func = (
+            getattr(precursors | open_entries, p_set_func)
+            if precursors
+            else lambda e: True
+        )
+        target_func = (
+            getattr(targets | open_entries, t_set_func) if targets else lambda e: True
+        )
+
+        if (
+            (r & p)
+            or (precursors and not precursors & all_phases)
+            or (p and targets and not targets & all_phases)
+        ):
+            continue
+
+        if not (precursor_func(r) or (p and precursor_func(p))):
+            continue
+        if p and not (target_func(r) or target_func(p)):
+            continue
+
+        suggested_rxns = react_function(
+            r, p, filtered_entries=filtered_entries, pd=pd, grand_pd=grand_pd
+        )
+
+        rxns = []
+        for rxn in suggested_rxns:
+            if (
+                rxn.is_identity
+                or (remove_unbalanced and not rxn.balanced)
+                or (remove_changed and rxn.lowest_num_errors != 0)
+                or rxn.data["num_constraints"] > max_num_constraints
+            ):
+                continue
+
+            reactant_entries = set(rxn.reactant_entries) - open_entries
+            product_entries = set(rxn.product_entries) - open_entries
+
+            if precursor_func(reactant_entries) and target_func(product_entries):
+                rxns.append(rxn)
+
+        all_rxns.extend(rxns)
+
+    return all_rxns

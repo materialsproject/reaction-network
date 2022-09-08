@@ -29,15 +29,14 @@ from rxn_network.utils.funcs import grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
 
 
-BATCH_SIZE = 100000
-
-
 class PathwaySolver(Solver):
     """
     Solver that implements an efficient method (using numba) for finding balanced
     reaction pathways from a list of graph-derived reaction pathways (i.e. a list of
     lists of reactions)
     """
+
+    BATCH_SIZE = 100000
 
     def __init__(
         self,
@@ -146,7 +145,7 @@ class PathwaySolver(Solver):
 
         paths_refs = []
         for n in range(1, max_num_combos + 1):
-            groups = grouper(combinations(range(num_rxns), n), BATCH_SIZE)
+            groups = grouper(combinations(range(num_rxns), n), self.BATCH_SIZE)
 
             for group in groups:
                 paths_refs.append(
@@ -162,7 +161,6 @@ class PathwaySolver(Solver):
             desc="Solving pathways by batch...",
         ):
             paths.extend(deepcopy(paths_ref))
-            del paths_ref
 
         filtered_paths = []
         if filter_interdependent:
