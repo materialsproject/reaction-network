@@ -89,6 +89,11 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
 
         return product(combos, [None])
 
+    @staticmethod
+    def _rxn_iter_length(combos, open_combos):
+        _ = open_combos
+        return len(combos)
+
 
 class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     """

@@ -164,7 +164,7 @@ class BasicEnumerator(Enumerator):
         if not batch_size:
             batch_size = ray.cluster_resources()["CPU"]
 
-        with tqdm(total=self.num_chunks(items)) as pbar:
+        with tqdm(total=self._num_chunks(items, open_combos)) as pbar:
             for item in items:
                 chemsys, combos = item
 
@@ -225,6 +225,7 @@ class BasicEnumerator(Enumerator):
                 results.append(ray.get(completed_ref))
                 pbar.update(1)
 
+        self.logger.info("Finalizing reaction set and removing duplicates...")
         for r in results:
             rxn_set = rxn_set.add_rxns(r)
 
@@ -233,14 +234,21 @@ class BasicEnumerator(Enumerator):
         return rxn_set
 
     @classmethod
-    def num_chunks(cls, items):
+    def _num_chunks(cls, items, open_combos):
+        _ = open_combos  # not used
+
         n = 0
         for _, i in items:
-            num_combos = comb(len(i), 2)
+            num_combos = cls._rxn_iter_length(i, open_combos)
             if num_combos > 0:
                 n += num_combos // cls.CHUNK_SIZE + 1
 
         return n
+
+    @staticmethod
+    def _rxn_iter_length(combos, open_combos):
+        _ = open_combos  # not used
+        return comb(len(combos), 2)
 
     def _get_rxns_from_ray(self, rxn_refs, rxn_set, batch_count):
 
@@ -416,7 +424,7 @@ class BasicOpenEnumerator(BasicEnumerator):
     the ReactionSet class).
     """
 
-    CHUNK_SIZE = 5000
+    CHUNK_SIZE = 2500
 
     def __init__(
         self,
@@ -471,15 +479,13 @@ class BasicOpenEnumerator(BasicEnumerator):
         )
         self.open_phases: List[str] = open_phases
 
-    @classmethod
-    def num_chunks(cls, items):
-        n = 0
-        for _, i in items:
-            num_combos = comb(len(i), 2)
-            if num_combos > 0:
-                n += num_combos // cls.CHUNK_SIZE + 1
+    @staticmethod
+    def _rxn_iter_length(combos, open_combos):
+        num_combos_with_open = sum(
+            1 if not i & j else 0 for i in combos for j in open_combos
+        )
 
-        return n
+        return len(combos) * num_combos_with_open
 
     def _get_open_combos(self, open_entries):
         """Get all possible combinations of open entries. For a single entry,
