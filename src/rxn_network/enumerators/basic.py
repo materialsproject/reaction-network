@@ -31,8 +31,7 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    CHUNK_SIZE = 10000
-    BATCH_SIZE = 10  # max number of chunks to load at any given time
+    CHUNK_SIZE = 2500
 
     def __init__(
         self,
@@ -101,7 +100,7 @@ class BasicEnumerator(Enumerator):
         self._build_grand_pd = False
         self.logger = logging.Logger("enumerator")
 
-    def enumerate(self, entries: GibbsEntrySet) -> ReactionSet:
+    def enumerate(self, entries: GibbsEntrySet, batch_size=None) -> ReactionSet:
         """
         Calculate all possible reactions given a set of entries. If the enumerator
         was initialized with specified precursors or target, the reactions will be
@@ -162,6 +161,9 @@ class BasicEnumerator(Enumerator):
 
         count = 0
 
+        if not batch_size:
+            batch_size = ray.cluster_resources()["CPU"]
+
         with tqdm(total=self.num_chunks(items)) as pbar:
             for item in items:
                 chemsys, combos = item
@@ -189,8 +191,8 @@ class BasicEnumerator(Enumerator):
                 for rxn_iterable_chunk in grouper(
                     self._get_rxn_iterable(combos, open_combos), self.CHUNK_SIZE
                 ):
-                    if len(rxn_chunk_refs) > self.BATCH_SIZE:
-                        num_ready = len(rxn_chunk_refs) - self.BATCH_SIZE
+                    if len(rxn_chunk_refs) > batch_size:
+                        num_ready = len(rxn_chunk_refs) - batch_size
                         newly_completed, rxn_chunk_refs = ray.wait(
                             rxn_chunk_refs, num_returns=num_ready
                         )
@@ -468,6 +470,16 @@ class BasicOpenEnumerator(BasicEnumerator):
             remove_changed=remove_changed,
         )
         self.open_phases: List[str] = open_phases
+
+    @classmethod
+    def num_chunks(cls, items):
+        n = 0
+        for _, i in items:
+            num_combos = comb(len(i), 2)
+            if num_combos > 0:
+                n += num_combos // cls.CHUNK_SIZE + 1
+
+        return n
 
     def _get_open_combos(self, open_entries):
         """Get all possible combinations of open entries. For a single entry,
