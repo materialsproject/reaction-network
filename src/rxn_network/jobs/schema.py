@@ -13,6 +13,7 @@ from rxn_network.core.network import Network
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.utils.funcs import datetime_str
 
 
@@ -118,3 +119,8 @@ class NetworkTaskDocument(BaseModel):
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
+    network: Network = Field(description="The reaction network")
+    paths: PathwaySet = Field(description="The (simple) reaction pathways")
+    k: int = Field(None, description="The number of paths solved for")
+    precursors: List[str] = Field(None, description="The precursor compositions")
+    targets: List[str] = Field(None, description="The target compositions")

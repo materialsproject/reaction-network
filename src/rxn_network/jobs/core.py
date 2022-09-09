@@ -295,7 +295,7 @@ class NetworkMaker(Maker):
     targets: Optional[List[str]] = None
     calculate_pathways: Optional[int] = 10
 
-    @job
+    @job(network="network", output_schema=NetworkTaskDocument)
     def make(
         self,
         reactions: ReactionSet,
@@ -310,9 +310,26 @@ class NetworkMaker(Maker):
         if self.calculate_pathways and self.targets:
             rn.find_pathways(self.targets, k=self.calculate_pathways)
 
-        data = {"network": network}
+        data = {"network": rn}
         network_task = NetworkTaskDocument(**data)
         return network_task
+
+
+class PathwaySolverMaker(Maker):
+    """
+    Maker for solving balanced reaction pathways from a set of (unbalanced) pathways.
+    """
+
+    name: str = "solve pathways"
+    cost_function: CostFunction = field(default_factory=Softplus)
+    open_elem: Optional[Element] = None
+    chempot: Optional[float] = None
+
+    @job
+    def make(self, entries, pathways):
+        ps = PathwaySolver(
+            entries, pathways, self.cost_function, self.open_elem, self.chempot
+        )
 
 
 @ray.remote

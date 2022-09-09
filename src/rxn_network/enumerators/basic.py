@@ -6,6 +6,7 @@ import logging
 from copy import deepcopy
 from itertools import combinations, product
 from typing import List, Optional, Set
+from math import comb
 
 import ray
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
@@ -31,7 +32,7 @@ class BasicEnumerator(Enumerator):
     """
 
     CHUNK_SIZE = 1000
-    BATCH_SIZE = 1000000
+    BATCH_SIZE = 1000
 
     def __init__(
         self,
@@ -77,6 +78,7 @@ class BasicEnumerator(Enumerator):
                 upon initialization of the entries at the beginning of enumeration.
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
+
         super().__init__(precursors=precursors, targets=targets)
 
         self.n = n
@@ -125,7 +127,7 @@ class BasicEnumerator(Enumerator):
             entries: the set of all entries to enumerate from
         """
 
-        initialize_ray(quiet=self.quiet)
+        initialize_ray()
 
         entries, precursors, targets, open_entries = self._get_initialized_entries(
             entries
@@ -160,12 +162,15 @@ class BasicEnumerator(Enumerator):
         batch_count = 1
 
         for item in items:
+            # check to see if a new batch needs to be created (reduce memory usage)
+
             chemsys, combos = item
 
             elems = chemsys.split("-")
 
             filtered_entries = None
             pd = None
+            grand_pd = None
 
             if self.build_pd or self.build_grand_pd:
                 filtered_entries = entries.get_subset_in_chemsys(elems)
@@ -173,7 +178,6 @@ class BasicEnumerator(Enumerator):
             if self.build_pd:
                 pd = PhaseDiagram(filtered_entries)
 
-            grand_pd = None
             if self.build_grand_pd:
                 chempots = getattr(self, "chempots")
                 grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
@@ -202,20 +206,16 @@ class BasicEnumerator(Enumerator):
                 )
                 rxn_chunk_refs.append(c)
 
-                # If the total number of reaction combos queued is greater than batch
-                # size, process it and move to the next batch.
-                if len(rxn_chunk_refs) * self.CHUNK_SIZE > self.BATCH_SIZE:
+                if len(rxn_chunk_refs) >= self.BATCH_SIZE:
                     rxn_set = self._get_rxns_from_ray(
                         rxn_chunk_refs, rxn_set, batch_count
                     )
                     batch_count += 1
                     rxn_chunk_refs = []
 
-            del filtered_entries, pd, grand_pd
-
         rxn_set = self._get_rxns_from_ray(rxn_chunk_refs, rxn_set, batch_count)
-        del rxn_chunk_refs
 
+        del rxn_chunk_refs
         rxn_set = rxn_set.filter_duplicates()
 
         return rxn_set

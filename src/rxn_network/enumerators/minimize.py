@@ -11,6 +11,7 @@ from pymatgen.core.composition import Element
 from rxn_network.core.composition import Composition
 from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.enumerators.utils import react_interface
+from rxn_network.utils import initialize_ray
 
 
 class MinimizeGibbsEnumerator(BasicEnumerator):
