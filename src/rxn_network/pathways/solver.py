@@ -143,6 +143,7 @@ class PathwaySolver(Solver):
 
         num_rxns = len(reactions)
 
+        paths = []
         paths_refs = []
         for n in range(1, max_num_combos + 1):
             groups = grouper(combinations(range(num_rxns), n), self.BATCH_SIZE)
@@ -153,14 +154,22 @@ class PathwaySolver(Solver):
                         group, reaction_set, costs, entries, num_entries, net_rxn_vector
                     )
                 )
+                if len(paths_refs) > 10:
+                    for paths_ref in tqdm(
+                        to_iterator(paths_refs),
+                        total=len(paths_refs),
+                        desc="Solving pathways by batch...",
+                    ):
+                        paths.extend(paths_ref)
 
-        paths = []
+                    paths_refs = []
+
         for paths_ref in tqdm(
             to_iterator(paths_refs),
             total=len(paths_refs),
-            desc="Solving pathways by batch...",
+            desc="Continuing to solve pathways by batch...",
         ):
-            paths.extend(deepcopy(paths_ref))
+            paths.extend(paths_ref)
 
         filtered_paths = []
         if filter_interdependent:

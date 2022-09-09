@@ -30,7 +30,8 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    CHUNK_SIZE = 10000
+    CHUNK_SIZE = 1000
+    BATCH_SIZE = 1000000
 
     def __init__(
         self,
@@ -154,6 +155,9 @@ class BasicEnumerator(Enumerator):
         max_num_constraints = ray.put(self.max_num_constraints)
 
         rxn_set = ReactionSet(entries.entries_list, [], [])
+        rxn_chunk_refs = []
+
+        batch_count = 1
 
         for item in items:
             chemsys, combos = item
@@ -178,7 +182,6 @@ class BasicEnumerator(Enumerator):
             pd = ray.put(pd)
             grand_pd = ray.put(grand_pd)
 
-            reaction_objs = []
             for rxn_iterable_chunk in grouper(
                 self._get_rxn_iterable(combos, open_combos), self.CHUNK_SIZE
             ):
@@ -197,20 +200,35 @@ class BasicEnumerator(Enumerator):
                     pd,
                     grand_pd,
                 )
-                reaction_objs.append(c)
+                rxn_chunk_refs.append(c)
 
-        for r in tqdm(
-            to_iterator(reaction_objs),
-            disable=self.quiet,
-            desc=f"{self.__class__.__name__}",
-        ):
-            rxn_set = rxn_set.add_rxns(r)
+                # If the total number of reaction combos queued is greater than batch
+                # size, process it and move to the next batch.
+                if len(rxn_chunk_refs) * self.CHUNK_SIZE > self.BATCH_SIZE:
+                    rxn_set = self._get_rxns_from_ray(
+                        rxn_chunk_refs, rxn_set, batch_count
+                    )
+                    batch_count += 1
+                    rxn_chunk_refs = []
 
-        del filtered_entries
-        del pd
-        del grand_pd
+            del filtered_entries, pd, grand_pd
+
+        rxn_set = self._get_rxns_from_ray(rxn_chunk_refs, rxn_set, batch_count)
+        del rxn_chunk_refs
 
         rxn_set = rxn_set.filter_duplicates()
+
+        return rxn_set
+
+    def _get_rxns_from_ray(self, rxn_refs, rxn_set, batch_count):
+
+        for r in tqdm(
+            to_iterator(rxn_refs),
+            disable=self.quiet,
+            desc=f"{self.__class__.__name__} (Batch {batch_count})",
+            total=len(rxn_refs),
+        ):
+            rxn_set = rxn_set.add_rxns(r)
 
         return rxn_set
 
@@ -465,9 +483,9 @@ def _react(
     remove_unbalanced,
     remove_changed,
     max_num_constraints,
-    filtered_entries=None,
-    pd=None,
-    grand_pd=None,
+    filtered_entries,
+    pd,
+    grand_pd,
 ):
     """
     This function is a wrapper for the specific react function of each enumerator. This
@@ -478,7 +496,6 @@ def _react(
     Note: this function is not intended to to be called directly!
 
     """
-
     all_rxns = []
 
     for rp in rxn_iterable:
