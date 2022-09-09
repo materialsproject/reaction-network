@@ -31,8 +31,8 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    CHUNK_SIZE = 1000
-    BATCH_SIZE = 1000
+    CHUNK_SIZE = 2000
+    BATCH_SIZE = 200
 
     def __init__(
         self,
