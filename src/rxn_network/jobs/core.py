@@ -151,7 +151,7 @@ class CalculateSelectivitiesMaker(Maker):
     calculate_chempot_distances: bool = True
     temp: float = 300.0
     chunk_size: int = 20
-    batch_size = Optional[int] = None
+    batch_size: Optional[int] = None
     cpd_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self):
