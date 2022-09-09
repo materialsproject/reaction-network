@@ -33,8 +33,9 @@ from rxn_network.jobs.utils import (
 from rxn_network.network import ReactionNetwork
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.utils import grouper
-from rxn_network.utils.ray import to_iterator
+from rxn_network.utils.ray import initialize_ray
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +150,8 @@ class CalculateSelectivitiesMaker(Maker):
     calculate_selectivities: bool = True
     calculate_chempot_distances: bool = True
     temp: float = 300.0
-    batch_size: int = 20
+    chunk_size: int = 20
+    batch_size = Optional[int] = None
     cpd_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self):
@@ -216,30 +218,40 @@ class CalculateSelectivitiesMaker(Maker):
         return doc
 
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns):
-
+        initialize_ray()
         all_rxns = ray.put(all_rxns)
 
         logger.info("Calculating selectivites...")
 
-        processed_chunks = []
-        for rxns_chunk in grouper(
-            target_rxns.get_rxns(), self.batch_size, fillvalue=None
-        ):
-            processed_chunks.append(
-                _get_decorated_rxns_by_chunk.remote(
-                    rxns_chunk, all_rxns, self.open_formula, self.temp
+        rxn_chunk_refs = []
+        results = []
+        with tqdm(total=len(target_rxns) // self.chunk_size + 1) as pbar:
+            for chunk in grouper(
+                target_rxns.get_rxns(), self.chunk_size, fillvalue=None
+            ):
+                if len(rxn_chunk_refs) > self.batch_size:
+                    num_ready = len(rxn_chunk_refs) - self.batch_size
+                    newly_completed, rxn_chunk_refs = ray.wait(
+                        rxn_chunk_refs, num_returns=num_ready
+                    )
+                    for completed_ref in newly_completed:
+                        results.append(ray.get(completed_ref))
+                        pbar.update(1)
+
+                rxn_chunk_refs.append(
+                    _get_decorated_rxns_by_chunk.remote(
+                        chunk, all_rxns, self.open_formula, self.temp
+                    )
                 )
+
+            newly_completed, rxn_chunk_refs = ray.wait(
+                rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
             )
+            for completed_ref in newly_completed:
+                results.append(ray.get(completed_ref))
+                pbar.update(1)
 
-        decorated_rxns = []
-        for r in tqdm(
-            to_iterator(processed_chunks),
-            total=len(processed_chunks),
-            desc="Selectivity",
-        ):
-            decorated_rxns.extend(r)
-
-        del processed_chunks
+        decorated_rxns = [rxn for r_set in results for rxn in r_set]
 
         return ReactionSet.from_rxns(decorated_rxns)
 
