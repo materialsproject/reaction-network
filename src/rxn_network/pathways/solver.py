@@ -9,7 +9,7 @@ from typing import List
 
 import numpy as np
 import ray
-from numba import njit, prange
+from numba import njit, prange, jit
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
@@ -36,7 +36,8 @@ class PathwaySolver(Solver):
     lists of reactions)
     """
 
-    BATCH_SIZE = 100000
+    CHUNK_SIZE = 100000
+    BATCH_SIZE = 250
 
     def __init__(
         self,
@@ -145,29 +146,35 @@ class PathwaySolver(Solver):
 
         paths = []
         paths_refs = []
+        batch_count = 1
         for n in range(1, max_num_combos + 1):
-            groups = grouper(combinations(range(num_rxns), n), self.BATCH_SIZE)
-
-            for group in groups:
+            for group in grouper(combinations(range(num_rxns), n), self.CHUNK_SIZE):
                 paths_refs.append(
                     _get_balanced_paths_ray.remote(
-                        group, reaction_set, costs, entries, num_entries, net_rxn_vector
+                        group,
+                        reaction_set,
+                        costs,
+                        entries,
+                        num_entries,
+                        net_rxn_vector,
                     )
                 )
-                if len(paths_refs) > 10:
+                if len(paths_refs) >= self.BATCH_SIZE:
                     for paths_ref in tqdm(
                         to_iterator(paths_refs),
                         total=len(paths_refs),
-                        desc="Solving pathways by batch...",
+                        desc=f"{self.__class__.__name__} (Batch {batch_count})",
                     ):
                         paths.extend(paths_ref)
+
+                    batch_count += 1
 
                     paths_refs = []
 
         for paths_ref in tqdm(
             to_iterator(paths_refs),
             total=len(paths_refs),
-            desc="Continuing to solve pathways by batch...",
+            desc=f"{self.__class__.__name__} (Batch {batch_count})",
         ):
             paths.extend(paths_ref)
 
@@ -246,7 +253,7 @@ class PathwaySolver(Solver):
         num_rxns = len(rxns)
         rxns = ReactionSet.from_rxns(rxns, filter_duplicates=True)
 
-        self.logger.info(f"Found {num_rxns} intermediate reactions!")
+        self.logger.info(f"Found {num_rxns} intermediate reactions! \n")
 
         return rxns
 
@@ -333,6 +340,7 @@ def _get_balanced_paths_ray(
     comp_matrices = _create_comp_matrices(combos, reactions, num_entries)
 
     paths = []
+
     c_mats, m_mats = _balance_path_arrays(comp_matrices, net_rxn_vector)
 
     for c_mat, m_mat in zip(c_mats, m_mats):
