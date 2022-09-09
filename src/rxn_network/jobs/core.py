@@ -221,6 +221,8 @@ class CalculateSelectivitiesMaker(Maker):
         initialize_ray()
         all_rxns = ray.put(all_rxns)
 
+        batch_size = self.batch_size or ray.cluster_resources()["CPU"]
+
         logger.info("Calculating selectivites...")
 
         rxn_chunk_refs = []
@@ -229,8 +231,8 @@ class CalculateSelectivitiesMaker(Maker):
             for chunk in grouper(
                 target_rxns.get_rxns(), self.chunk_size, fillvalue=None
             ):
-                if len(rxn_chunk_refs) > self.batch_size:
-                    num_ready = len(rxn_chunk_refs) - self.batch_size
+                if len(rxn_chunk_refs) > batch_size:
+                    num_ready = len(rxn_chunk_refs) - batch_size
                     newly_completed, rxn_chunk_refs = ray.wait(
                         rxn_chunk_refs, num_returns=num_ready
                     )
