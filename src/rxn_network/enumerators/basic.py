@@ -31,8 +31,8 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    CHUNK_SIZE = 2000
-    BATCH_SIZE = 200
+    CHUNK_SIZE = 10000
+    BATCH_SIZE = 10  # max number of chunks to load at any given time
 
     def __init__(
         self,
@@ -158,67 +158,87 @@ class BasicEnumerator(Enumerator):
 
         rxn_set = ReactionSet(entries.entries_list, [], [])
         rxn_chunk_refs = []
+        results = []
 
-        batch_count = 1
+        count = 0
 
-        for item in items:
-            # check to see if a new batch needs to be created (reduce memory usage)
+        with tqdm(total=self.num_chunks(items)) as pbar:
+            for item in items:
+                chemsys, combos = item
 
-            chemsys, combos = item
+                elems = chemsys.split("-")
 
-            elems = chemsys.split("-")
+                filtered_entries = None
+                pd = None
+                grand_pd = None
 
-            filtered_entries = None
-            pd = None
-            grand_pd = None
+                if self.build_pd or self.build_grand_pd:
+                    filtered_entries = entries.get_subset_in_chemsys(elems)
 
-            if self.build_pd or self.build_grand_pd:
-                filtered_entries = entries.get_subset_in_chemsys(elems)
+                if self.build_pd:
+                    pd = PhaseDiagram(filtered_entries)
 
-            if self.build_pd:
-                pd = PhaseDiagram(filtered_entries)
+                if self.build_grand_pd:
+                    chempots = getattr(self, "chempots")
+                    grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
 
-            if self.build_grand_pd:
-                chempots = getattr(self, "chempots")
-                grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
+                filtered_entries = ray.put(filtered_entries)
+                pd = ray.put(pd)
+                grand_pd = ray.put(grand_pd)
 
-            filtered_entries = ray.put(filtered_entries)
-            pd = ray.put(pd)
-            grand_pd = ray.put(grand_pd)
+                for rxn_iterable_chunk in grouper(
+                    self._get_rxn_iterable(combos, open_combos), self.CHUNK_SIZE
+                ):
+                    if len(rxn_chunk_refs) > self.BATCH_SIZE:
+                        num_ready = len(rxn_chunk_refs) - self.BATCH_SIZE
+                        newly_completed, rxn_chunk_refs = ray.wait(
+                            rxn_chunk_refs, num_returns=num_ready
+                        )
+                        for completed_ref in newly_completed:
+                            results.append(ray.get(completed_ref))
+                            pbar.update(1)
 
-            for rxn_iterable_chunk in grouper(
-                self._get_rxn_iterable(combos, open_combos), self.CHUNK_SIZE
-            ):
-                c = _react.remote(
-                    rxn_iterable_chunk,
-                    react_function,
-                    open_entries,
-                    precursors,
-                    targets,
-                    p_set_func,
-                    t_set_func,
-                    remove_unbalanced,
-                    remove_changed,
-                    max_num_constraints,
-                    filtered_entries,
-                    pd,
-                    grand_pd,
-                )
-                rxn_chunk_refs.append(c)
-
-                if len(rxn_chunk_refs) >= self.BATCH_SIZE:
-                    rxn_set = self._get_rxns_from_ray(
-                        rxn_chunk_refs, rxn_set, batch_count
+                    rxn_chunk_refs.append(
+                        _react.remote(
+                            rxn_iterable_chunk,
+                            react_function,
+                            open_entries,
+                            precursors,
+                            targets,
+                            p_set_func,
+                            t_set_func,
+                            remove_unbalanced,
+                            remove_changed,
+                            max_num_constraints,
+                            filtered_entries,
+                            pd,
+                            grand_pd,
+                        )
                     )
-                    batch_count += 1
-                    rxn_chunk_refs = []
 
-        rxn_set = self._get_rxns_from_ray(rxn_chunk_refs, rxn_set, batch_count)
+            newly_completed, rxn_chunk_refs = ray.wait(
+                rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
+            )
+            for completed_ref in newly_completed:
+                results.append(ray.get(completed_ref))
+                pbar.update(1)
 
-        del rxn_chunk_refs
+        for r in results:
+            rxn_set = rxn_set.add_rxns(r)
+
         rxn_set = rxn_set.filter_duplicates()
 
         return rxn_set
+
+    @classmethod
+    def num_chunks(cls, items):
+        n = 0
+        for _, i in items:
+            num_combos = comb(len(i), 2)
+            if num_combos > 0:
+                n += num_combos // cls.CHUNK_SIZE + 1
+
+        return n
 
     def _get_rxns_from_ray(self, rxn_refs, rxn_set, batch_count):
 
