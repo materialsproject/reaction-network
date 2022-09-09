@@ -191,15 +191,14 @@ class ReactionSet(MSONable):
 
         Warning: all new reactions must have the same entries as the current reaction set.
         """
-        indices = deepcopy(self.indices)
-        coeffs = deepcopy(self.coeffs)
-        all_data = deepcopy(self.all_data)
         open_elem = self.open_elem
         chempot = self.chempot
 
-        indices.extend([[self.entries.index(e) for e in rxn.entries] for rxn in rxns])
-        coeffs.extend([list(rxn.coefficients) for rxn in rxns])
-        all_data.extend([rxn.data for rxn in rxns])
+        indices = self.indices + [
+            [self.entries.index(e) for e in rxn.entries] for rxn in rxns
+        ]
+        coeffs = self.coeffs + [list(rxn.coefficients) for rxn in rxns]
+        all_data = self.all_data + [rxn.data for rxn in rxns]
 
         return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
 
@@ -214,17 +213,12 @@ class ReactionSet(MSONable):
             raise ValueError(
                 "Reaction sets must have identical entries property to add."
             )
-
-        indices = deepcopy(self.indices)
-        coeffs = deepcopy(self.coeffs)
-        all_data = deepcopy(self.all_data)
-
         open_elem = self.open_elem
         chempot = self.chempot
 
-        indices.extend(rxn_set.indices)
-        coeffs.extend(rxn_set.coeffs)
-        all_data.extend(rxn_set.all_data)
+        indices = self.indices + rxn_set.indices
+        coeffs = self.coeffs + rxn_set.coeffs
+        all_data = self.all_data + rxn_set.all_data
 
         return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
 
