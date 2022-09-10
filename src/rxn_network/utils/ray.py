@@ -28,8 +28,8 @@ def initialize_ray(quiet=False):
             # See https://github.com/NERSC/slurm-ray-cluster/blob/master/submit-ray-cluster.sbatch
             ray.init(
                 address="auto",
-                _node_ip_address=os.environ["ip_head"].split(":")[0],
-                _redis_password=os.environ["redis_password"],
+                # _node_ip_address=os.environ["ip_head"].split(":")[0],
+                # _redis_password=os.environ["redis_password"],
             )
         elif os.environ.get("PBS_NNODES"):
             # initialise ray if using PBS submission script (thanks @jx-fan)
