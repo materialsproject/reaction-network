@@ -3,6 +3,7 @@
 import logging
 from dataclasses import dataclass, field
 from typing import Optional, List
+from pathlib import Path
 
 import numpy as np
 import ray
@@ -308,6 +309,7 @@ class NetworkMaker(Maker):
     precursors: Optional[List[str]] = None
     targets: Optional[List[str]] = None
     calculate_pathways: Optional[int] = 10
+    graph_fn: Optional[str] = None
 
     @job(network="network", output_schema=NetworkTaskDocument)
     def make(
@@ -322,9 +324,20 @@ class NetworkMaker(Maker):
         if self.targets:
             rn.set_target(self.targets[0])
         if self.calculate_pathways and self.targets:
-            rn.find_pathways(self.targets, k=self.calculate_pathways)
+            paths = rn.find_pathways(self.targets, k=self.calculate_pathways)
 
-        data = {"network": rn}
+        graph_fn = self.graph_fn or "network.json.gz"
+        graph_fn = str(Path(graph_fn).absolute())
+        rn.graph.save(graph_fn)
+
+        data = {
+            "network": rn,
+            "graph_fn": graph_fn,
+            "paths": paths,
+            "k": self.calculate_pathways,
+            "precursors": self.precursors,
+            "targets": self.targets,
+        }
         network_task = NetworkTaskDocument(**data)
         return network_task
 

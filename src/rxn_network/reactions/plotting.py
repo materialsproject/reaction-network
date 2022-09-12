@@ -152,7 +152,7 @@ def plot_reaction_scatter(
 
     if z is not None:
         hovertemplate = (
-            hovertemplate + "<br><b>" + f"{z}" + "</b>: %{y:.3f}" + f" {z_units}<br>"
+            hovertemplate + "<br><b>" + f"{z}" + "</b>: %{z:.3f}" + f" {z_units}<br>"
         )
 
     fig.update_traces(hovertemplate=hovertemplate)

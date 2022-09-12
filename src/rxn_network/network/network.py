@@ -314,7 +314,7 @@ class ReactionNetwork(Network):
     def as_dict(self) -> dict:
         """Return MSONable dict"""
         d = super().as_dict()
-        d["precursors"] = list(self.precursors)
+        d["precursors"] = list(self.precursors) if self.precursors else None
         d["target"] = self.target
         return d
 
