@@ -2,10 +2,6 @@
 Utility functions used by the enumerator classes.
 """
 from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
-from pymatgen.analysis.interface_reactions import (
-    GrandPotentialInterfacialReactivity,
-    InterfacialReactivity,
-)
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry
@@ -14,38 +10,6 @@ from rxn_network.core.reaction import Reaction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
-
-
-def react_interface(r1, r2, filtered_entries, pd, grand_pd=None):
-    """Simple API for InterfacialReactivity module from pymatgen."""
-    chempots = None
-
-    if grand_pd:
-        interface = GrandPotentialInterfacialReactivity(
-            r1,
-            r2,
-            grand_pd,
-            pd_non_grand=pd,
-            norm=True,
-            include_no_mixing_energy=True,
-            use_hull_energy=True,
-        )
-        chempots = grand_pd.chempots
-
-    else:
-        interface = InterfacialReactivity(
-            r1,
-            r2,
-            pd,
-            use_hull_energy=True,
-        )
-
-    rxns = []
-    for _, _, _, rxn, _ in interface.get_kinks():
-        rxn = get_computed_rxn(rxn, filtered_entries, chempots)
-        rxns.append(rxn)
-
-    return rxns
 
 
 def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
