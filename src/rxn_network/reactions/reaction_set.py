@@ -3,6 +3,7 @@ Implements a class for conveniently and efficiently storing sets of ComputedReac
 objects which share entries.
 """
 from copy import deepcopy
+from collections import OrderedDict
 from functools import lru_cache
 from itertools import combinations, groupby
 from typing import Collection, Iterable, List, Optional, Set, Union
@@ -131,7 +132,11 @@ class ReactionSet(MSONable):
 
     @lru_cache(maxsize=1)
     def to_dataframe(
-        self, cost_function: CostFunction, target: Optional[Composition] = None
+        self,
+        cost_function: CostFunction,
+        target: Optional[Composition] = None,
+        calculate_uncertainties=False,
+        calculate_separable=False,
     ) -> DataFrame:
         """
         Make a dataframe of reactions from a ReactionSet object.
@@ -149,28 +154,41 @@ class ReactionSet(MSONable):
                 cost: Cost of reaction
 
         """
-        rxns = list(self.get_rxns())
-        costs = [cost_function.evaluate(rxn) for rxn in rxns]
+        attrs = []
+        for r in self.get_rxns():
+            attrs = list(r.data.keys())  # get extra attributes from first reaction
+            break
 
-        data = {
-            "rxn": rxns,
-            "energy": [rxn.energy_per_atom for rxn in rxns],
-            "dE": [rxn.energy_uncertainty_per_atom for rxn in rxns],  # type: ignore
-        }
+        target = Composition(target) if target else None
 
-        if target:
-            data["added_elems"] = [self._get_added_elems(rxn, target) for rxn in rxns]
-            data["separable"] = [rxn.is_separable(target) for rxn in rxns]
-
-        attrs = list(rxns[0].data.keys())
-        for attr in attrs:
-            data.update({attr: [rxn.data.get(attr) for rxn in rxns]})
-
-        data["cost"] = costs
-        df = DataFrame(data).sort_values("cost").reset_index(drop=True)
         if "num_constraints" in attrs:
-            df = df.drop(columns=["num_constraints"])
+            attrs.remove("num_constraints")
 
+        data = OrderedDict({k: [] for k in ["rxn", "energy"]})
+        if calculate_uncertainties:
+            data["dE"] = []
+        if target:
+            data["added_elems"] = []
+            if calculate_separable:
+                data["separable"] = []
+        data.update({k: [] for k in attrs + ["cost"]})
+
+        for rxn in self.get_rxns():
+            data["rxn"].append(rxn)
+            data["energy"].append(rxn.energy_per_atom)
+            if calculate_uncertainties:
+                data["dE"].append(rxn.energy_uncertainty_per_atom)
+            if target:
+                data["added_elems"].append(self._get_added_elems(rxn, target))
+                if calculate_separable:
+                    data["separable"].append(rxn.is_separable(target))
+
+            for attr in attrs:
+                data[attr].append(rxn.data.get(attr))
+
+            data["cost"].append(cost_function.evaluate(rxn))
+
+        df = DataFrame(data).sort_values("cost").reset_index(drop=True)
         return df
 
     def calculate_costs(
