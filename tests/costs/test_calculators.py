@@ -42,6 +42,20 @@ def rxn(entries, request):
     return ComputedReaction.balance(reactant_entries, product_entries)
 
 
+@pytest.fixture
+def rxns(entries):
+    return [
+        ComputedReaction.balance(
+            [entries.get_min_entry_by_formula(r) for r in reactants],
+            [entries.get_min_entry_by_formula(p) for p in products],
+        )
+        for reactants, products in [
+            (["Y2O3", "Mn2O3"], ["YMnO3"]),
+            (["YOCl", "NaMnO2", "O2"], ["Y2Mn2O7", "NaCl"]),
+        ]
+    ]
+
+
 @pytest.fixture(params=["sum", "max", "mean"], scope="module")
 def mu_func(request):
     return request.param
@@ -65,13 +79,41 @@ def test_calculate(calculator, rxn):
 
 
 def test_decorate(calculator, rxn):
+    rxn_missing_data = rxn.copy()
+    rxn_missing_data.data = None
+
     rxn_dec = calculator.decorate(rxn)
+    rxn_missing_data_dec = calculator.decorate(rxn_missing_data)
 
     actual_cost = rxn_dec.data[calculator.name]
     expected_cost = answers[str(rxn)][calculator.mu_func.__name__]
 
     assert type(rxn_dec) == ComputedReaction
     assert actual_cost == pytest.approx(expected_cost)
+    assert rxn_missing_data_dec.data[calculator.name] == actual_cost
+
+
+def test_calculate_many(calculator, rxns):
+    actual_costs = calculator.calculate_many(rxns)
+    expected_costs = [calculator.calculate(rxn) for rxn in rxns]
+
+    assert actual_costs == pytest.approx(expected_costs)
+
+
+def test_decorate_many(calculator, rxns):
+    rxns_missing_data = [rxn.copy() for rxn in rxns]
+    for rxn in rxns_missing_data:
+        rxn.data = None
+
+    rxns_dec = calculator.decorate_many(rxns)
+    rxns_missing_data_dec = calculator.decorate_many(rxns_missing_data)
+
+    actual_costs = [rxn.data[calculator.name] for rxn in rxns_dec]
+    expected_costs = [calculator.calculate(rxn) for rxn in rxns]
+
+    assert type(rxns_dec) == list
+    assert actual_costs == pytest.approx(expected_costs)
+    assert rxns_missing_data_dec == rxns_dec
 
 
 def test_from_entries(entries, mu_func, rxn):

@@ -57,6 +57,7 @@ class GetEntrySetMaker(Maker):
     e_above_hull: float = 0.0
     include_polymorphs: bool = False
     formulas_to_include: list = field(default_factory=list)
+    calculate_e_above_hulls: bool = True
 
     @job(entries="entries", output_schema=EntrySetDocument)
     def make(self, chemsys):

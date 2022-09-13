@@ -9,7 +9,8 @@ from rxn_network.reactions.reaction_set import ReactionSet
 
 @pytest.fixture(scope="module")
 def df(ymno_rxns):
-    return ReactionSet.from_rxns(ymno_rxns).to_dataframe(Softplus())
+    rxn_set = ReactionSet.from_rxns(ymno_rxns)
+    return rxn_set.to_dataframe(Softplus(), calculate_uncertainties=True)
 
 
 def test_plot_reaction_scatter(df):

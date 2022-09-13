@@ -26,6 +26,7 @@ def process_entries(
     e_above_hull: float,
     include_polymorphs: bool,
     formulas_to_include: Iterable[str],
+    calculate_e_above_hulls: bool = False,
 ) -> GibbsEntrySet:
     """
 
@@ -55,6 +56,8 @@ def process_entries(
     entry_set = entry_set.filter_by_stability(
         e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
     )
+    if calculate_e_above_hulls:
+        entry_set = GibbsEntrySet(entry_set, calculate_e_above_hulls=True)
     included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include]
 
     entry_set.update(included_entries)

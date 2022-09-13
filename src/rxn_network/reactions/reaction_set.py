@@ -144,14 +144,19 @@ class ReactionSet(MSONable):
         Args:
             cost_function: Cost function to use for evaluating reaction costs
             target: Optional target composition (used to determine added elements)
+            calculate_uncertainties: Whether to calculate uncertainties (dE column)
+            calculate_separable: Whether to calculate if the reaction products are
+                separable (see ComputedReaction.is_separable)
 
         Returns:
             Pandas DataFrame with columns:
                 rxn: Reaction object
                 energy: reaction energy in eV/atom
-                distance: Distance in eV/atom
-                added_elems: List of added elements
+                dE (optional): uncertainty in reaction energy in eV/atom
+                added_elems (optional): List of added elements
+                separable (optional): whether reaction products are separable
                 cost: Cost of reaction
+                other: any other data associated with reaction
 
         """
         attrs = []
