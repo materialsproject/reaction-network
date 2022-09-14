@@ -21,6 +21,7 @@ from rxn_network.network.gt import (
     yens_ksp,
 )
 from rxn_network.pathways.basic import BasicPathway
+from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.reaction_set import ReactionSet
 
 
@@ -105,6 +106,8 @@ class ReactionNetwork(Network):
             print("--------------------------------------- \n")
             pathways = self._shortest_paths(k=k)
             paths.extend(pathways)
+
+        paths = PathwaySet.from_paths(paths)
 
         return paths
 
@@ -250,7 +253,7 @@ class ReactionNetwork(Network):
 
         save_graph(self._g, filename)
 
-    def _shortest_paths(self, k=15):
+    def _shortest_paths(self, k):
         """Finds the k shortest paths using Yen's algorithm and returns BasicPathways"""
         g = self._g
         paths = []

@@ -17,17 +17,17 @@ class Solver(MSONable, metaclass=ABCMeta):
     Base definition for a pathway solver class.
     """
 
-    def __init__(self, entries, pathways):
+    def __init__(self, pathways, entries):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
 
-        self._entries = entries
         self._pathways = pathways
+        self._entries = entries
 
         rxns = []
         costs = []
 
-        for path in self._pathways:
+        for path in self._pathways.get_paths():
             for rxn, cost in zip(path.reactions, path.costs):
                 if rxn not in rxns:
                     rxns.append(rxn)

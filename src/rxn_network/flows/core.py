@@ -261,7 +261,8 @@ class NetworkFlowMaker(Maker):
 
         if self.solver_maker:
             base_pathway_job = self.solver_maker.make(
-                base_network_job.output.paths, entries=entries
+                base_network_job.output.paths,
+                entries=base_network_job.output.network.entries,
             )
             jobs.append(base_pathway_job)
 
@@ -296,7 +297,8 @@ class NetworkFlowMaker(Maker):
                 jobs.extend([enumeration_job, network_job])
                 if self.solver_maker:
                     pathway_job = solver_maker.make(
-                        network_job.output.paths, entries=entries
+                        network_job.output.paths,
+                        entries=network_job.output.network.entries,
                     )
                     jobs.append(pathway_job)
 

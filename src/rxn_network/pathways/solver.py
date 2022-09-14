@@ -23,6 +23,7 @@ from rxn_network.enumerators.minimize import (
     MinimizeGrandPotentialEnumerator,
 )
 from rxn_network.pathways.balanced import BalancedPathway
+from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import grouper
@@ -41,7 +42,7 @@ class PathwaySolver(Solver):
 
     def __init__(
         self,
-        pathways: List[Pathway],
+        pathways: PathwaySet,
         entries: GibbsEntrySet,
         cost_function: CostFunction,
         open_elem: str = None,
@@ -69,7 +70,7 @@ class PathwaySolver(Solver):
         use_basic_enumerator: bool = True,
         use_minimize_enumerator: bool = False,
         filter_interdependent: bool = True,
-    ) -> List[BalancedPathway]:
+    ) -> PathwaySet:
         """
 
         Args:
@@ -189,7 +190,8 @@ class PathwaySolver(Solver):
             filtered_paths = paths
 
         filtered_paths = sorted(list(set(filtered_paths)), key=lambda p: p.average_cost)
-        return filtered_paths
+
+        return PathwaySet.from_paths(filtered_paths)
 
     def _find_intermediate_rxns(
         self,
