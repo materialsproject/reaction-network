@@ -1,5 +1,6 @@
 import itertools
 import warnings
+from copy import deepcopy
 from typing import Iterable, List, Optional, Union
 
 from maggma.stores import MongoStore
@@ -57,7 +58,7 @@ def process_entries(
         e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
     )
     if calculate_e_above_hulls:
-        entry_set = GibbsEntrySet(entry_set, calculate_e_above_hulls=True)
+        entry_set = GibbsEntrySet(deepcopy(entry_set), calculate_e_above_hulls=True)
     included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include]
 
     entry_set.update(included_entries)

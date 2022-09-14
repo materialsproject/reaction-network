@@ -15,7 +15,6 @@ from pymatgen.analysis.interface_reactions import (
 from rxn_network.core.composition import Composition
 from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.enumerators.utils import get_computed_rxn
-from rxn_network.utils import initialize_ray
 
 
 class MinimizeGibbsEnumerator(BasicEnumerator):

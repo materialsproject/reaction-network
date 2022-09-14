@@ -10,6 +10,7 @@ from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.core.network import Network
+from rxn_network.core.solver import Solver
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
@@ -109,9 +110,9 @@ class SelectivitiesTaskDocument(BaseModel):
 
 class NetworkTaskDocument(BaseModel):
     """
-    TODO: Finish model
-
-    A single task object from the reaction network workflow.
+    The calculation output from the NetworkMaker workflow. Contains the ReactionNetwork
+    object and a link to the file where the graph-tool Graph object is stored.
+    Optional: includes unbalanced paths found from pathfinding.
     """
 
     task_label: str = Field(None, description="The name of the task.")
@@ -125,3 +126,43 @@ class NetworkTaskDocument(BaseModel):
     k: int = Field(None, description="The number of paths solved for")
     precursors: List[str] = Field(None, description="The precursor compositions")
     targets: List[str] = Field(None, description="The target compositions")
+
+
+class PathwaySolverTaskDocument(BaseModel):
+    """
+    The calculation output from the PathwaySolverMaker workflow. Contains the pathway
+    solver object and its calculated balanced pathways.
+    """
+
+    task_label: str = Field(None, description="The name of the task.")
+    last_updated: datetime = Field(
+        default_factory=datetime_str,
+        description="Timestamp of when the document was last updated.",
+    )
+    solver: Solver = Field(description="The pathway solver used to calculate pathways")
+    balanced_paths: PathwaySet = Field(description="The balanced reaction pathways")
+    precursors: list[str] = Field(description="The precursor compositions")
+    targets: list[str] = Field(description="The target compositions")
+    net_rxn: ComputedReaction = Field(
+        description="The net reaction used for pathway solving"
+    )
+    max_num_combos: int = Field(
+        description=(
+            "The maximum number of combinations to consider in the pathway solver"
+        )
+    )
+    find_intermediate_rxns: bool = Field(
+        description="Whether to find reactions from intermediate compositions"
+    )
+    intermediate_rxn_energy_cutoff: float = Field(
+        description="The mximum energy cutoff for filtering intermediate reactions"
+    )
+    use_basic_enumerator: bool = Field(
+        description="Whether to use the basic enumerators in path solving"
+    )
+    use_minimize_enumerator: bool = Field(
+        description="Whether to use the minimize enumerators in path solving"
+    )
+    filter_interdependent: bool = Field(
+        description="Whether to filter out interdependent pathways"
+    )

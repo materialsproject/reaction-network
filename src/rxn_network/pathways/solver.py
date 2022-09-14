@@ -41,16 +41,16 @@ class PathwaySolver(Solver):
 
     def __init__(
         self,
-        entries: GibbsEntrySet,
         pathways: List[Pathway],
+        entries: GibbsEntrySet,
         cost_function: CostFunction,
         open_elem: str = None,
         chempot: float = None,
     ):
         """
         Args:
-            entries: GibbsEntrySet containing all entries in the network.
             pathways: List of reaction pathways derived from the network.
+            entries: GibbsEntrySet containing all entries in the network.
             cost_function: CostFunction object to use for the solver.
             open_elem: Element to use for pathways with an open element.
             chempot: Chemical potential to use for pathways with an open element.

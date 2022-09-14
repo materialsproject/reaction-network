@@ -7,7 +7,6 @@ from rxn_network.core.composition import Composition
 
 logger = logging.getLogger(__name__)
 
-
 def run_enumerators(enumerators, entries):
     rxn_set = None
     for enumerator in enumerators:
@@ -21,10 +20,6 @@ def run_enumerators(enumerators, entries):
 
     rxn_set = rxn_set.filter_duplicates()
     return rxn_set
-
-
-def run_solver():
-    return None
 
 
 def get_added_elem_data(entries, targets):

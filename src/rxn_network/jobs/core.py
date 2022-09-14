@@ -2,7 +2,7 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional, List
+from typing import Optional, List, Iterable
 from pathlib import Path
 
 import numpy as np
@@ -25,15 +25,17 @@ from rxn_network.jobs.schema import (
     EnumeratorTaskDocument,
     NetworkTaskDocument,
     SelectivitiesTaskDocument,
+    PathwaySolverTaskDocument,
 )
 from rxn_network.jobs.utils import (
     get_added_elem_data,
     run_enumerators,
-    run_solver,
 )
-from rxn_network.network import ReactionNetwork
+from rxn_network.network.network import ReactionNetwork
+from rxn_network.reactions.basic import BasicReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.utils import grouper
 from rxn_network.utils.ray import initialize_ray
@@ -46,9 +48,24 @@ class GetEntrySetMaker(Maker):
     """
     Maker to create job for acquiring and processing entries to be used in reaction
     enumeration or network building.
+
+    Args (A list of argumnets provided to the dataclass)
+        name: Name of the job.
+        entry_db_name: Name of the entry database store to use. If none is available,
+            will automatically use MPRester to acquire entries.
+        temperature: Temperature to use for computing thermodynamic properties.
+        include_nist_data: Whether to include NIST data in the entry set.
+        include_barin_data: Whether to include Barin data in the entry set.
+        include_freed_data: Whether to include FREED data in the entry set.
+        e_above_hull: Energy above hull to use for filtering entries.
+        include_polymorphs: Whether to include polymorphs in the entry set.
+        formulas_to_include: List of formulas to include in the entry set.
+        calculate_e_above_hulls: Whether to calculate e_above_hulls for all entries in the entry set.
+        MP_API_KEY: API key for Materials Project. Note: if not provided, MPRester will
+            automatically look for an environment variable.
     """
 
-    name: str = "get and process entries"
+    name: str = "get_and_process_entries"
     entry_db_name: str = "entries_db"
     temperature: int = 300
     include_nist_data: bool = True
@@ -58,6 +75,7 @@ class GetEntrySetMaker(Maker):
     include_polymorphs: bool = False
     formulas_to_include: list = field(default_factory=list)
     calculate_e_above_hulls: bool = True
+    MP_API_KEY: Optional[str] = None
 
     @job(entries="entries", output_schema=EntrySetDocument)
     def make(self, chemsys):
@@ -75,7 +93,7 @@ class GetEntrySetMaker(Maker):
         else:
             from mp_api.client import MPRester
 
-            with MPRester() as mpr:
+            with MPRester(self.MP_API_KEY) as mpr:
                 entries = mpr.get_entries_in_chemsys(elements=chemsys)
 
         entries = process_entries(
@@ -87,6 +105,7 @@ class GetEntrySetMaker(Maker):
             e_above_hull=self.e_above_hull,
             include_polymorphs=self.include_polymorphs,
             formulas_to_include=self.formulas_to_include,
+            calculate_e_above_hulls=self.calculate_e_above_hulls,
         )
 
         doc = EntrySetDocument(
@@ -106,7 +125,7 @@ class ReactionEnumerationMaker(Maker):
     Maker to create job for enumerating reactions from a set of entries.
     """
 
-    name: str = "enumerate reactions"
+    name: str = "enumerate_reactions"
 
     @job(rxns="rxns", output_schema=EnumeratorTaskDocument)
     def make(self, enumerators, entries):
@@ -143,10 +162,10 @@ class ReactionEnumerationMaker(Maker):
 
 @dataclass
 class CalculateSelectivitiesMaker(Maker):
-    """Maker to create job for calculating selectivities for a set of reactions and
+    """Maker to create job for calculating selectivities of a set of reactions and
     target formula."""
 
-    name: str = "calculate selectivities"
+    name: str = "calculate_selectivities"
     open_elem: Optional[Element] = None
     chempot: Optional[float] = 0.0
     calculate_selectivities: bool = True
@@ -302,22 +321,32 @@ class CalculateSelectivitiesMaker(Maker):
 @dataclass
 class NetworkMaker(Maker):
     """
-    Maker for generating reaction networks from a set of reactions.
+    Maker for generating reaction networks and performing pathfinding from a set of
+    previously enumerated reactions.
     """
 
-    name: str = "build/analyze network"
+    name: str = "build_and_analyze_network"
     cost_function: CostFunction = field(default_factory=Softplus)
     precursors: Optional[List[str]] = None
     targets: Optional[List[str]] = None
     calculate_pathways: Optional[int] = 10
+    open_elem: Optional[Element] = None
+    chempot: float = 0.0
     graph_fn: Optional[str] = None
 
     @job(network="network", output_schema=NetworkTaskDocument)
     def make(
         self,
-        reactions: ReactionSet,
+        rxn_sets: Iterable[ReactionSet],
     ):
-        rn = ReactionNetwork(reactions, cost_function=self.cost_function)
+        all_rxns = ReactionSet.from_rxns(
+            [rxn for rxn_set in rxn_sets for rxn in rxn_set.get_rxns()],
+            open_elem=self.open_elem,
+            chempot=self.chempot,
+        )
+        all_rxns = all_rxns.filter_duplicates()
+
+        rn = ReactionNetwork(all_rxns, cost_function=self.cost_function)
         rn.build()
 
         if self.precursors:
@@ -327,7 +356,7 @@ class NetworkMaker(Maker):
         if self.calculate_pathways and self.targets:
             paths = rn.find_pathways(self.targets, k=self.calculate_pathways)
 
-        graph_fn = self.graph_fn or "network.json.gz"
+        graph_fn = self.graph_fn or "network.gt.gz"
         graph_fn = str(Path(graph_fn).absolute())
         rn.graph.save(graph_fn)
 
@@ -339,25 +368,82 @@ class NetworkMaker(Maker):
             "precursors": self.precursors,
             "targets": self.targets,
         }
-        network_task = NetworkTaskDocument(**data)
-        return network_task
+        doc = NetworkTaskDocument(**data)
+        doc.task_label = self.name
+        return doc
 
 
+@dataclass
 class PathwaySolverMaker(Maker):
     """
-    Maker for solving balanced reaction pathways from a set of (unbalanced) pathways.
+    Maker for solving balanced reaction pathways from a set of (unbalanced) pathways
+    returned as part of reaction network analysis.
     """
 
     name: str = "solve pathways"
     cost_function: CostFunction = field(default_factory=Softplus)
+    precursors: list[str] = field(default_factory=list)
+    targets: list[str] = field(default_factory=list)
     open_elem: Optional[Element] = None
     chempot: Optional[float] = None
+    max_num_combos: int = 4
+    find_intermediate_rxns: bool = True
+    intermediate_rxn_energy_cutoff: float = 0.0
+    use_basic_enumerator: bool = True
+    use_minimize_enumerator: bool = False
+    filter_interdependent: bool = True
 
-    @job
-    def make(self, entries, pathways):
-        ps = PathwaySolver(
-            entries, pathways, self.cost_function, self.open_elem, self.chempot
+    def __post_init__(self):
+        net_rxn = BasicReaction.balance(
+            [Composition(r) for r in self.precursors],
+            [Composition(p) for p in self.targets],
         )
+        if not net_rxn.balanced:
+            raise ValueError(
+                "Can not balance pathways with specified precursors/targets. Please"
+                " make sure a balanced net reaction can be written from the provided"
+                " reactant and product formulas!"
+            )
+        self.net_rxn = net_rxn
+
+    @job(paths="paths", output_schema=PathwaySolverTaskDocument)
+    def make(self, pathways, entries):
+        net_rxn = get_computed_rxn(self.net_rxn, entries)
+
+        ps = PathwaySolver(
+            pathways=pathways,
+            entries=entries,
+            cost_function=self.cost_function,
+            open_elem=self.open_elem,
+            chempot=self.chempot,
+        )
+        balanced_paths = ps.solve(
+            net_rxn=net_rxn,
+            max_num_combos=self.max_num_combos,
+            find_intermediate_rxns=self.find_intermediate_rxns,
+            intermediate_rxn_energy_cutoff=self.intermediate_rxn_energy_cutoff,
+            use_basic_enumerator=self.use_basic_enumerator,
+            use_minimize_enumerator=self.use_minimize_enumerator,
+            filter_interdependent=self.filter_interdependent,
+        )
+        data = {
+            "solver": ps,
+            "balanced_paths": balanced_paths,
+            "precursors": self.precursors,
+            "targets": self.targets,
+            "net_rxn": net_rxn,
+            "max_num_combos": self.max_num_combos,
+            "find_intermediate_rxns": self.find_intermediate_rxns,
+            "intermediate_rxn_energy_cutoff": self.intermediate_rxn_energy_cutoff,
+            "use_basic_enumerator": self.use_basic_enumerator,
+            "use_minimize_enumerator": self.use_minimize_enumerator,
+            "filter_interdependent": self.filter_interdependent,
+        }
+
+        doc = PathwaySolverTaskDocument(**data)
+        doc.task_label = self.name
+
+        return doc
 
 
 @ray.remote
