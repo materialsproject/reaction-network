@@ -194,3 +194,29 @@ def get_pareto_front(
         pts = pts[undominated[:n]]
 
     return df_original.loc[pts[:, 0]]
+
+
+def pretty_df_layout(df):
+    """Improve visibility for a pandas DataFrame with wide column names"""
+    return df.style.set_table_styles(
+        [
+            dict(
+                selector="th",
+                props=[
+                    ("max-width", "70px"),
+                    ("text-overflow", "ellipsis"),
+                    ("overflow", "hidden"),
+                ],
+            )
+        ]
+    )  # improve rendering in Jupyter
+
+
+def filter_df_by_precursors(df, precursors):
+    """Filter a reaction DataFrame by available precursors"""
+    df = df.copy()
+    df["precursors"] = [
+        list(sorted([r.reduced_formula for r in rxn.reactants])) for rxn in df["rxn"]
+    ]
+    selected = df[df["precursors"].apply(lambda x: all([p in precursors for p in x]))]
+    return selected.drop(columns=["precursors"])

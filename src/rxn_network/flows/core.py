@@ -103,13 +103,6 @@ class RetrosynthesisFlowMaker(Maker):
                     **self.basic_enumerator_kwargs,
                 )
             )
-            if self.open_formula:
-                enumerators.append(
-                    BasicOpenEnumerator(
-                        open_phases=[self.open_formula],
-                        **self.basic_enumerator_kwargs,
-                    )
-                )
         if self.use_minimize_enumerators:
             enumerators.append(
                 MinimizeGibbsEnumerator(
@@ -127,12 +120,12 @@ class RetrosynthesisFlowMaker(Maker):
         base_rxn_set = enumeration_job.output.rxns
         base_calculate_selectivities_job = self.calculate_selectivities_maker.make(
             rxn_sets=[base_rxn_set],
-            entries=get_entry_set_job.output.entries,
+            entries=entries,
             target_formula=target_formula,
         )
         jobs.append(base_calculate_selectivities_job)
 
-        if self.use_minimize_enumerators and self.open_elem and self.chempots:
+        if self.open_elem and self.chempots:
             for chempot in self.chempots:
                 subname = f"(open {str(self.open_elem)}, mu={chempot})"
                 enumeration_maker = self.enumeration_maker.update_kwargs(
@@ -149,15 +142,29 @@ class RetrosynthesisFlowMaker(Maker):
                         nested=False,
                     )
                 )
-                enumerator = MinimizeGrandPotentialEnumerator(
-                    open_elem=self.open_elem,
-                    mu=chempot,
-                    targets=targets,
-                    filter_by_chemsys=filter_by_chemsys,
-                    **self.minimize_enumerator_kwargs,
-                )
+
+                open_enumerators = []
+
+                if self.use_basic_enumerators:
+                    open_enumerators.append(
+                        BasicOpenEnumerator(
+                            open_phases=[self.open_formula],
+                            **self.basic_enumerator_kwargs,
+                        )
+                    )
+                if self.use_minimize_enumerators:
+                    open_enumerators.append(
+                        MinimizeGrandPotentialEnumerator(
+                            open_elem=self.open_elem,
+                            mu=chempot,
+                            targets=targets,
+                            filter_by_chemsys=filter_by_chemsys,
+                            **self.minimize_enumerator_kwargs,
+                        )
+                    )
                 enumeration_job = enumeration_maker.make(
-                    enumerators=[enumerator], entries=get_entry_set_job.output.entries
+                    enumerators=open_enumerators,
+                    entries=entries,
                 )
                 jobs.append(enumeration_job)
 
@@ -274,12 +281,20 @@ class NetworkFlowMaker(Maker):
                     nested=False,
                 )
                 network_maker = self.network_maker.update_kwargs(
-                    {"name": self.network_maker.name + subname},
+                    {
+                        "name": self.network_maker.name + subname,
+                        "chempot": chempot,
+                        "open_elem": self.open_elem,
+                    },
                     nested=False,
                 )
                 if self.solver_maker:
                     solver_maker = self.solver_maker.update_kwargs(
-                        {"name": self.solver_maker.name + subname},
+                        {
+                            "name": self.solver_maker.name + subname,
+                            "chempot": chempot,
+                            "open_elem": self.open_elem,
+                        },
                         nested=False,
                     )
 

@@ -5,12 +5,13 @@ equations using matrix operations.
 
 from copy import deepcopy
 from itertools import combinations
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import ray
 from numba import njit, prange, jit
 from tqdm import tqdm
+from pymatgen.core.composition import Element
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
@@ -26,6 +27,7 @@ from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.utils.funcs import grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
 
@@ -58,12 +60,12 @@ class PathwaySolver(Solver):
         """
         super().__init__(entries=deepcopy(entries), pathways=deepcopy(pathways))
         self.cost_function = cost_function
-        self.open_elem = open_elem
+        self.open_elem = Element(open_elem) if open_elem else None
         self.chempot = chempot
 
     def solve(
         self,
-        net_rxn: ComputedReaction,
+        net_rxn: Union[ComputedReaction, OpenComputedReaction],
         max_num_combos: int = 4,
         find_intermediate_rxns: bool = True,
         intermediate_rxn_energy_cutoff: float = 0.0,
@@ -142,6 +144,8 @@ class PathwaySolver(Solver):
         costs = ray.put(costs)
         num_entries = ray.put(num_entries)
         net_rxn_vector = ray.put(net_rxn_vector)
+        open_elem = ray.put(self.open_elem)
+        chempot = ray.put(self.chempot)
 
         num_rxns = len(reactions)
 
@@ -158,6 +162,8 @@ class PathwaySolver(Solver):
                         entries,
                         num_entries,
                         net_rxn_vector,
+                        open_elem,
+                        chempot,
                     )
                 )
                 if len(paths_refs) >= self.BATCH_SIZE:
@@ -336,7 +342,14 @@ def _create_comp_matrices(combos, rxns, num_entries):
 
 @ray.remote
 def _get_balanced_paths_ray(
-    combos, reaction_set, costs, entries, num_entries, net_rxn_vector
+    combos,
+    reaction_set,
+    costs,
+    entries,
+    num_entries,
+    net_rxn_vector,
+    open_elem,
+    chempot,
 ):
     reactions = list(reaction_set.get_rxns())
     comp_matrices = _create_comp_matrices(combos, reactions, num_entries)
@@ -358,7 +371,15 @@ def _get_balanced_paths_ray(
                 ]
             )
 
-            rxn = ComputedReaction(entries=ents, coefficients=coeffs)
+            if open_elem is not None:
+                rxn = OpenComputedReaction(
+                    entries=ents,
+                    coefficients=coeffs,
+                    chempots={open_elem: chempot},
+                )
+
+            else:
+                rxn = ComputedReaction(entries=ents, coefficients=coeffs)
 
             try:
                 path_rxns.append(rxn)

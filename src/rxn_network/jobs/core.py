@@ -76,10 +76,17 @@ class GetEntrySetMaker(Maker):
     formulas_to_include: list = field(default_factory=list)
     calculate_e_above_hulls: bool = True
     MP_API_KEY: Optional[str] = None
+    property_data: Optional[List[str]] = None
 
     @job(entries="entries", output_schema=EntrySetDocument)
     def make(self, chemsys):
         entry_db = SETTINGS.JOB_STORE.additional_stores.get(self.entry_db_name)
+
+        property_data = self.property_data
+        if property_data is None:
+            property_data = ["theoretical"]
+        elif "theoretical" not in property_data:
+            property_data.append("theoretical")
 
         if entry_db:
             entries = get_all_entries_in_chemsys(
@@ -87,7 +94,7 @@ class GetEntrySetMaker(Maker):
                 chemsys,
                 inc_structure=True,
                 compatible_only=True,
-                property_data=None,
+                property_data=property_data,
                 use_premade_entries=False,
             )
         else:
@@ -262,7 +269,7 @@ class CalculateSelectivitiesMaker(Maker):
                         pbar.update(1)
 
                 rxn_chunk_refs.append(
-                    _get_decorated_rxns_by_chunk.remote(
+                    _get_selectivity_decorated_rxns_by_chunk.remote(
                         chunk, all_rxns, self.open_formula, self.temp
                     )
                 )
@@ -408,7 +415,10 @@ class PathwaySolverMaker(Maker):
 
     @job(paths="paths", output_schema=PathwaySolverTaskDocument)
     def make(self, pathways, entries):
-        net_rxn = get_computed_rxn(self.net_rxn, entries)
+        chempots = None
+        if self.open_elem:
+            chempots = {Element(self.open_elem): self.chempot}
+        net_rxn = get_computed_rxn(self.net_rxn, entries, chempots)
 
         ps = PathwaySolver(
             pathways=pathways,
@@ -447,7 +457,7 @@ class PathwaySolverMaker(Maker):
 
 
 @ray.remote
-def _get_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
+def _get_selectivity_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
     decorated_rxns = []
 
     for rxn in rxn_chunk:
@@ -466,12 +476,14 @@ def _get_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
         if len(precursors) >= 3:
             precursors = list(set(precursors) - {open_formula})
 
-        decorated_rxns.append(_get_decorated_rxn(rxn, competing_rxns, precursors, temp))
+        decorated_rxns.append(
+            _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors, temp)
+        )
 
     return decorated_rxns
 
 
-def _get_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
+def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
     """ """
     if len(precursors_list) == 1:
         other_energies = np.array(

@@ -159,23 +159,40 @@ class ReactionSet(MSONable):
                 other: any other data associated with reaction
 
         """
+
+        data = OrderedDict({k: [] for k in ["rxn", "energy"]})
         attrs = []
+
+        calculate_e_above_hulls = False
+        determine_theoretical = False
+
         for r in self.get_rxns():
             attrs = list(r.data.keys())  # get extra attributes from first reaction
+            entry_data = r.entries[0].data
+            if "e_above_hull" in entry_data:
+                calculate_e_above_hulls = True
+                data["max_e_hull_reactants"] = []
+                data["max_e_hull_products"] = []
+            if "icsd_ids" in entry_data or "theoretical" in entry_data:
+                determine_theoretical = True
+                data["num_theoretical_reactants"] = []
+                data["num_theoretical_products"] = []
+
             break
 
         target = Composition(target) if target else None
 
         if "num_constraints" in attrs:
             attrs.remove("num_constraints")
-
-        data = OrderedDict({k: [] for k in ["rxn", "energy"]})
         if calculate_uncertainties:
             data["dE"] = []
         if target:
             data["added_elems"] = []
             if calculate_separable:
                 data["separable"] = []
+
+        data["max_num_precursor_elems"] = []
+
         data.update({k: [] for k in attrs + ["cost"]})
 
         for rxn in self.get_rxns():
@@ -187,6 +204,25 @@ class ReactionSet(MSONable):
                 data["added_elems"].append(self._get_added_elems(rxn, target))
                 if calculate_separable:
                     data["separable"].append(rxn.is_separable(target))
+
+            if calculate_e_above_hulls:
+                data["max_e_hull_reactants"].append(
+                    max(e.data["e_above_hull"] for e in rxn.reactant_entries)
+                )
+                data["max_e_hull_products"].append(
+                    max(e.data["e_above_hull"] for e in rxn.product_entries)
+                )
+            if determine_theoretical:
+                data["num_theoretical_reactants"].append(
+                    sum(bool(not e.is_experimental) for e in rxn.reactant_entries)
+                )
+                data["num_theoretical_products"].append(
+                    sum(bool(not e.is_experimental) for e in rxn.product_entries)
+                )
+
+            data["max_num_precursor_elems"].append(
+                max(len(precursor.elements) for precursor in rxn.reactants)
+            )
 
             for attr in attrs:
                 data[attr].append(rxn.data.get(attr))
@@ -263,7 +299,7 @@ class ReactionSet(MSONable):
 
         for idx, (coeffs, indices) in enumerate(zip(self.coeffs, self.indices)):
             r_indices = {i for c, i in zip(coeffs, indices) if c < 1e-12}
-            if r_indices == reactant_indices:
+            if r_indices.issubset(reactant_indices):
                 idxs.append(idx)
 
         return self._get_rxns_by_indices(idxs)

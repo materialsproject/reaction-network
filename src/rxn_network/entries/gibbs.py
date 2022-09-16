@@ -274,9 +274,18 @@ class GibbsComputedEntry(ComputedEntry):
 
     @property
     def is_experimental(self) -> bool:
-        """Returns True if the entry contains at least one ICSD id stored in the data dictionary"""
-        return bool(self.data.get("icsd_ids"))
-
+        """
+        Returns True if self.data contains {"theoretical": False}. If
+        theoretical is not specified but there is greater than 1 icsd_id provided,
+        assumes that the presence of an icsd_id means the entry is experimental.
+        """
+        if "theoretical" in self.data:
+            return not self.data["theoretical"]
+        elif "icsd_ids" in self.data:
+            return len(self.data["icsd_ids"]) > 1
+        else:
+            return False
+            
     def as_dict(self) -> dict:
         """Returns an MSONable dict."""
         data = super().as_dict()
@@ -303,8 +312,10 @@ class GibbsComputedEntry(ComputedEntry):
 
     def __repr__(self):
         output = [
-            f"GibbsComputedEntry | {self.entry_id} | {self.composition.formula} "
-            f"({self.composition.reduced_formula})",
+            (
+                f"GibbsComputedEntry | {self.entry_id} | {self.composition.formula} "
+                f"({self.composition.reduced_formula})"
+            ),
             f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
         ]
         return "\n".join(output)

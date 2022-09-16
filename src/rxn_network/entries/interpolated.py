@@ -57,3 +57,8 @@ class InterpolatedEntry(ComputedEntry):
             A GrandComputedEntry.
         """
         return GrandPotPDEntry(self, chempots)
+
+    @property
+    def is_experimental(self) -> bool:
+        """Returns True by default."""
+        return False
