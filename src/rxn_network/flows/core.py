@@ -98,7 +98,6 @@ class RetrosynthesisFlowMaker(Maker):
         if self.use_basic_enumerators:
             enumerators.append(
                 BasicEnumerator(
-                    targets=targets,
                     filter_by_chemsys=filter_by_chemsys,
                     **self.basic_enumerator_kwargs,
                 )
@@ -106,7 +105,6 @@ class RetrosynthesisFlowMaker(Maker):
         if self.use_minimize_enumerators:
             enumerators.append(
                 MinimizeGibbsEnumerator(
-                    targets=targets,
                     filter_by_chemsys=filter_by_chemsys,
                     **self.minimize_enumerator_kwargs,
                 )
@@ -157,7 +155,6 @@ class RetrosynthesisFlowMaker(Maker):
                         MinimizeGrandPotentialEnumerator(
                             open_elem=self.open_elem,
                             mu=chempot,
-                            targets=targets,
                             filter_by_chemsys=filter_by_chemsys,
                             **self.minimize_enumerator_kwargs,
                         )

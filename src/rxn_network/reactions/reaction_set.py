@@ -46,7 +46,7 @@ class ReactionSet(MSONable):
             indices: Array indexing the entry list; gets entries used by each
                 reaction object
             coeffs: Array of all reaction coefficients
-            open_elem: Open element, e.g. "O2"
+            open_elem: Open element, e.g., "O"
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
             all_data: Optional list of data for each reaction
         """

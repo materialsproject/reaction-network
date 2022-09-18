@@ -294,7 +294,8 @@ class CalculateSelectivitiesMaker(Maker):
             open_elem_set = {open_elem}
         chempot = rxns.chempot
 
-        for rxn in sorted(rxns, key=lambda rxn: len(rxn.elements), reverse=True):
+        logger.info("Calculating chemical potential distances...")
+        for rxn in tqdm(sorted(rxns, key=lambda rxn: len(rxn.elements), reverse=True)):
             chemsys = rxn.chemical_system
             elems = chemsys.split("-")
 
@@ -465,16 +466,18 @@ def _get_selectivity_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, 
             continue
 
         precursors = [r.reduced_formula for r in rxn.reactants]
-        competing_rxns = list(all_rxns.get_rxns_by_reactants(precursors))
+        precursors_with_open = precursors
 
         if open_formula:
-            open_formula = Composition(open_formula).reduced_formula
-            competing_rxns.extend(
-                all_rxns.get_rxns_by_reactants(precursors + [open_formula])
-            )
+            precursors_with_open.append(open_formula)
+
+        competing_rxns = list(all_rxns.get_rxns_by_reactants(precursors_with_open))
 
         if len(precursors) >= 3:
-            precursors = list(set(precursors) - {open_formula})
+            if open_formula:
+                precursors = list(set(precursors) - {open_formula})
+            else:
+                raise ValueError("Can only have 2 precursors, excluding open element!")
 
         decorated_rxns.append(
             _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors, temp)
