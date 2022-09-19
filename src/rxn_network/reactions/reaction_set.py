@@ -207,10 +207,10 @@ class ReactionSet(MSONable):
 
             if calculate_e_above_hulls:
                 data["max_e_hull_reactants"].append(
-                    max(e.data["e_above_hull"] for e in rxn.reactant_entries)
+                    max(e.data.get("e_above_hull", 0.0) for e in rxn.reactant_entries)
                 )
                 data["max_e_hull_products"].append(
-                    max(e.data["e_above_hull"] for e in rxn.product_entries)
+                    max(e.data.get("e_above_hull", 0.0) for e in rxn.product_entries)
                 )
             if determine_theoretical:
                 data["num_theoretical_reactants"].append(
