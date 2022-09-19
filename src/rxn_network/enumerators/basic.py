@@ -162,7 +162,7 @@ class BasicEnumerator(Enumerator):
         count = 0
 
         if not batch_size:
-            batch_size = ray.cluster_resources()["CPU"]
+            batch_size = ray.cluster_resources()["CPU"] * 2
 
         with tqdm(total=self._num_chunks(items, open_combos)) as pbar:
             for item in items:

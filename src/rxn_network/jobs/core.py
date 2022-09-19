@@ -178,7 +178,7 @@ class CalculateSelectivitiesMaker(Maker):
     calculate_selectivities: bool = True
     calculate_chempot_distances: bool = True
     temp: float = 300.0
-    chunk_size: int = 20
+    chunk_size: int = 200
     batch_size: Optional[int] = None
     cpd_kwargs: dict = field(default_factory=dict)
 
@@ -204,8 +204,7 @@ class CalculateSelectivitiesMaker(Maker):
 
         target_rxns = []
         for rxn in all_rxns:
-            product_formulas = [p.reduced_formula for p in rxn.products]
-            if target_formula in product_formulas:
+            if target_formula in [p.reduced_formula for p in rxn.products]:
                 target_rxns.append(rxn)
 
         target_rxns = ReactionSet.from_rxns(target_rxns)
@@ -247,18 +246,23 @@ class CalculateSelectivitiesMaker(Maker):
 
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns):
         initialize_ray()
-        all_rxns = ray.put(all_rxns)
 
-        batch_size = self.batch_size or ray.cluster_resources()["CPU"]
+        batch_size = self.batch_size or ray.cluster_resources()["CPU"] * 2
 
         logger.info("Calculating selectivites...")
 
         rxn_chunk_refs = []
         results = []
+
+        all_rxns = ray.put(all_rxns)
+
         with tqdm(total=len(target_rxns) // self.chunk_size + 1) as pbar:
             for chunk in grouper(
-                target_rxns.get_rxns(), self.chunk_size, fillvalue=None
+                target_rxns.get_rxns(),
+                self.chunk_size,
+                fillvalue=None,
             ):
+                rxns_chunk = list(chunk)
                 if len(rxn_chunk_refs) > batch_size:
                     num_ready = len(rxn_chunk_refs) - batch_size
                     newly_completed, rxn_chunk_refs = ray.wait(
@@ -270,7 +274,7 @@ class CalculateSelectivitiesMaker(Maker):
 
                 rxn_chunk_refs.append(
                     _get_selectivity_decorated_rxns_by_chunk.remote(
-                        chunk, all_rxns, self.open_formula, self.temp
+                        rxns_chunk, all_rxns, self.open_formula, self.temp
                     )
                 )
 
@@ -465,22 +469,22 @@ def _get_selectivity_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, 
         if not rxn:
             continue
 
-        precursors = [r.reduced_formula for r in rxn.reactants]
-        precursors_with_open = precursors
+        reactant_formulas = [r.reduced_formula for r in rxn.reactants]
+        reactants_with_open = reactant_formulas.copy()
 
         if open_formula:
-            precursors_with_open.append(open_formula)
+            reactants_with_open.append(open_formula)
 
-        competing_rxns = list(all_rxns.get_rxns_by_reactants(precursors_with_open))
+        competing_rxns = all_rxns.get_rxns_by_reactants(reactants_with_open)
 
-        if len(precursors) >= 3:
+        if len(reactant_formulas) >= 3:
             if open_formula:
-                precursors = list(set(precursors) - {open_formula})
+                reactant_formulas = list(set(reactant_formulas) - {open_formula})
             else:
                 raise ValueError("Can only have 2 precursors, excluding open element!")
 
         decorated_rxns.append(
-            _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors, temp)
+            _get_selectivity_decorated_rxn(rxn, competing_rxns, reactant_formulas, temp)
         )
 
     return decorated_rxns
@@ -507,6 +511,7 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         rxn.data["secondary_selectivity"] = secondary_selectivity
         decorated_rxn = rxn
     else:
+        competing_rxns = list(competing_rxns)
         if rxn not in competing_rxns:
             competing_rxns.append(rxn)
 
