@@ -222,7 +222,7 @@ class BasicEnumerator(Enumerator):
                 rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
             )
             for completed_ref in newly_completed:
-                rxn_set = rxn_set.add_rxn_set(ray.get(completed_ref))
+                rxn_set = rxn_set.add_rxns(ray.get(completed_ref))
                 pbar.update(1)
 
         self.logger.info("Finalizing reaction set and removing duplicates...")
