@@ -340,13 +340,15 @@ class BasicEnumerator(Enumerator):
             entries_new = entries_new.filter_by_stability(e_above_hull=0.0)
             self.logger.info("Filtering by stable entries!")
 
+        entries_new.build_indices()
+
         open_entries = set()
         if self.open_phases:
             open_entries = {
-                e for e in entries if e.composition.reduced_formula in self.open_phases
+                e
+                for e in entries_new
+                if e.composition.reduced_formula in self.open_phases
             }
-
-        entries_new.build_indices()
 
         return entries_new, precursors, targets, open_entries
 
