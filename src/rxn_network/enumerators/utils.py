@@ -125,3 +125,7 @@ def get_computed_rxn(
         rxn = ComputedReaction.balance(reactant_entries, product_entries)
 
     return rxn
+
+
+def get_rxn_info(rxn):
+    return [e.data["idx"] for e in rxn.entries], list(rxn.coefficients), rxn.data

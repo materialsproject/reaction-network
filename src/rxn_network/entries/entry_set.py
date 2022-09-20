@@ -531,7 +531,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     @cached_property
     def entries_list(self) -> List[ComputedEntry]:
         """Returns a list of all entries in the entry set."""
-        return list(sorted(self.entries, key=lambda e: e.composition.reduced_formula))
+        return list(sorted(self.entries, key=lambda e: e.composition))
 
     @cached_property
     def min_entries_by_formula(self) -> Dict[str, ComputedEntry]:

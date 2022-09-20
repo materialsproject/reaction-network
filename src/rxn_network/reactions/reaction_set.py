@@ -248,18 +248,23 @@ class ReactionSet(MSONable):
         """
         Return a new ReactionSet with the reactions added.
 
-        Warning: all new reactions must have the same entries as the current reaction set.
+        Warning: all new reactions must only have entires contained in the entries of
+        the current reaction set.
         """
-        open_elem = self.open_elem
-        chempot = self.chempot
+        new_indices, new_coeffs, new_data = [], [], []
+        for rxn in rxns:
+            new_indices.append([self.entries.index(e) for e in rxn.entries])
+            new_coeffs.append(list(rxn.coefficients))
+            new_data.append(rxn.data)
 
-        indices = self.indices + [
-            [self.entries.index(e) for e in rxn.entries] for rxn in rxns
-        ]
-        coeffs = self.coeffs + [list(rxn.coefficients) for rxn in rxns]
-        all_data = self.all_data + [rxn.data for rxn in rxns]
-
-        return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
+        return ReactionSet(
+            self.entries,
+            self.indices + new_indices,
+            self.coeffs + new_coeffs,
+            self.open_elem,
+            self.chempot,
+            self.all_data + new_data,
+        )
 
     def add_rxn_set(self, rxn_set):
         """Adds a new reaction set to current reaction set.

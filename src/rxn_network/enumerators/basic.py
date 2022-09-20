@@ -16,7 +16,7 @@ from tqdm import tqdm
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.entries.utils import initialize_entry
-from rxn_network.enumerators.utils import group_by_chemsys
+from rxn_network.enumerators.utils import group_by_chemsys, get_rxn_info
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import grouper, initialize_ray, limited_powerset, to_iterator
@@ -155,8 +155,8 @@ class BasicEnumerator(Enumerator):
         remove_changed = ray.put(self.remove_changed)
         max_num_constraints = ray.put(self.max_num_constraints)
 
-        rxn_set = ReactionSet(entries.entries_list, [], [])
         rxn_chunk_refs = []
+        results = []
 
         count = 0
 
@@ -196,7 +196,8 @@ class BasicEnumerator(Enumerator):
                             rxn_chunk_refs, num_returns=num_ready
                         )
                         for completed_ref in newly_completed:
-                            rxn_set = rxn_set.add_rxns(ray.get(completed_ref))
+                            results.extend(ray.get(completed_ref))
+
                             pbar.update(1)
 
                     rxn_chunk_refs.append(
@@ -221,12 +222,20 @@ class BasicEnumerator(Enumerator):
                 rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
             )
             for completed_ref in newly_completed:
-                rxn_set = rxn_set.add_rxns(ray.get(completed_ref))
+                results.extend(ray.get(completed_ref))
                 pbar.update(1)
 
-        self.logger.info("Finalizing reaction set and removing duplicates...")
+        self.logger.info("Finalizing reaction set...")
 
-        rxn_set = rxn_set.filter_duplicates()
+        all_indices, all_coeffs, all_data = [], [], []
+        for r in results:
+            all_indices.append(r[0])
+            all_coeffs.append(r[1])
+            all_data.append(r[2])
+
+        rxn_set = ReactionSet(
+            entries.entries_list, all_indices, all_coeffs, all_data=all_data
+        )
 
         return rxn_set
 
@@ -246,18 +255,6 @@ class BasicEnumerator(Enumerator):
     def _rxn_iter_length(combos, open_combos):
         _ = open_combos  # not used
         return comb(len(combos), 2)
-
-    def _get_rxns_from_ray(self, rxn_refs, rxn_set, batch_count):
-
-        for r in tqdm(
-            to_iterator(rxn_refs),
-            disable=self.quiet,
-            desc=f"{self.__class__.__name__} (Batch {batch_count})",
-            total=len(rxn_refs),
-        ):
-            rxn_set = rxn_set.add_rxns(r)
-
-        return rxn_set
 
     def _get_combos_dict(
         self, entries, precursor_entries, target_entries, open_entries
@@ -348,6 +345,8 @@ class BasicEnumerator(Enumerator):
             open_entries = {
                 e for e in entries if e.composition.reduced_formula in self.open_phases
             }
+
+        entries_new.build_indices()
 
         return entries_new, precursors, targets, open_entries
 
@@ -581,7 +580,7 @@ def _react(
             product_entries = set(rxn.product_entries) - open_entries
 
             if precursor_func(reactant_entries) and target_func(product_entries):
-                rxns.append(rxn)
+                rxns.append(get_rxn_info(rxn))
 
         all_rxns.extend(rxns)
 
