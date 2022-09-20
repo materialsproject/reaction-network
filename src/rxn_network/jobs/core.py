@@ -200,6 +200,7 @@ class CalculateSelectivitiesMaker(Maker):
             open_elem=self.open_elem,
             chempot=self.chempot,
         )
+
         all_rxns = all_rxns.filter_duplicates()
 
         target_rxns = []
