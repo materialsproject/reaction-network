@@ -157,7 +157,6 @@ class BasicEnumerator(Enumerator):
 
         rxn_set = ReactionSet(entries.entries_list, [], [])
         rxn_chunk_refs = []
-        results = []
 
         count = 0
 
@@ -197,7 +196,7 @@ class BasicEnumerator(Enumerator):
                             rxn_chunk_refs, num_returns=num_ready
                         )
                         for completed_ref in newly_completed:
-                            results.append(ray.get(completed_ref))
+                            rxn_set = rxn_set.add_rxns(ray.get(completed_ref))
                             pbar.update(1)
 
                     rxn_chunk_refs.append(
