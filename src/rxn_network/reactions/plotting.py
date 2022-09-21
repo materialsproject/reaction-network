@@ -80,7 +80,7 @@ def plot_reaction_scatter(
             scatter = go.Scatter(
                 x=arr[:, 0],
                 y=arr[:, 1],
-                hovertext=df["rxn"],
+                hovertext=pareto_df["rxn"],
                 marker=dict(size=10, color="seagreen", symbol="diamond"),
                 mode="markers",
                 name="Pareto front",
@@ -90,7 +90,7 @@ def plot_reaction_scatter(
                 x=arr[:, 0],
                 y=arr[:, 1],
                 z=arr[:, 2],
-                hovertext=df["rxn"],
+                hovertext=pareto_df["rxn"],
                 marker=dict(size=10, color="seagreen", symbol="diamond"),
                 mode="markers",
                 name="Pareto front",

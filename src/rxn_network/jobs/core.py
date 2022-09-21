@@ -248,7 +248,7 @@ class CalculateSelectivitiesMaker(Maker):
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns):
         initialize_ray()
 
-        batch_size = self.batch_size or ray.cluster_resources()["CPU"] * 2
+        batch_size = self.batch_size or ray.cluster_resources()["CPU"]
 
         logger.info("Calculating selectivites...")
 
