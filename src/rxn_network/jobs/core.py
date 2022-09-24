@@ -39,8 +39,9 @@ from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.utils import grouper
 from rxn_network.utils.ray import initialize_ray
+from rxn_network.utils.funcs import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -178,7 +179,7 @@ class CalculateSelectivitiesMaker(Maker):
     calculate_selectivities: bool = True
     calculate_chempot_distances: bool = True
     temp: float = 300.0
-    chunk_size: int = 200
+    chunk_size: int = 150
     batch_size: Optional[int] = None
     cpd_kwargs: dict = field(default_factory=dict)
 
@@ -193,38 +194,34 @@ class CalculateSelectivitiesMaker(Maker):
         target_formula = Composition(target_formula).reduced_formula
         added_elements, added_chemsys = get_added_elem_data(entries, [target_formula])
 
-        logger.info("Identifying target reactions...")
+        logger.info("Loading reactions..")
         all_rxns = ReactionSet.from_rxns(
-            [rxn for rxn_set in rxn_sets for rxn in rxn_set.get_rxns()],
+            [rxn for rxn_set in rxn_sets for rxn in rxn_set],
             entries=entries,
             open_elem=self.open_elem,
             chempot=self.chempot,
+            filter_duplicates=True,
         )
+        logger.info("Identifying target reactions...")
 
-        all_rxns = all_rxns.filter_duplicates()
-
-        target_rxns = []
-        for rxn in all_rxns:
-            if target_formula in [p.reduced_formula for p in rxn.products]:
-                target_rxns.append(rxn)
-
-        target_rxns = ReactionSet.from_rxns(target_rxns)
-
+        target_rxns = ReactionSet.from_rxns(
+            list(all_rxns.get_rxns_by_product(target_formula))
+        )
         logger.info(
             f"Identified {len(target_rxns)} target reactions out of"
             f" {len(all_rxns)} total reactions."
         )
+        all_rxns = ray.put(all_rxns)
 
         decorated_rxns = target_rxns
 
         if self.calculate_selectivities:
             decorated_rxns = self._get_selectivity_decorated_rxns(target_rxns, all_rxns)
 
-        logger.info("Saving decorated reactions.")
-
         if self.calculate_chempot_distances:
             decorated_rxns = self._get_chempot_decorated_rxns(decorated_rxns, entries)
 
+        logger.info("Saving decorated reactions.")
         results = ReactionSet.from_rxns(decorated_rxns, entries=entries)
 
         data = {
@@ -248,22 +245,22 @@ class CalculateSelectivitiesMaker(Maker):
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns):
         initialize_ray()
 
-        batch_size = self.batch_size or ray.cluster_resources()["CPU"]
+        batch_size = self.batch_size or int(
+            ray.cluster_resources()["CPU"] / 2
+        )  # arbitrary default
 
         logger.info("Calculating selectivites...")
 
         rxn_chunk_refs = []
         results = []
 
-        all_rxns = ray.put(all_rxns)
-
         with tqdm(total=len(target_rxns) // self.chunk_size + 1) as pbar:
             for chunk in grouper(
-                target_rxns.get_rxns(),
+                target_rxns,
                 self.chunk_size,
                 fillvalue=None,
             ):
-                rxns_chunk = list(chunk)
+                chunk = [c for c in chunk if c is not None]
                 if len(rxn_chunk_refs) > batch_size:
                     num_ready = len(rxn_chunk_refs) - batch_size
                     newly_completed, rxn_chunk_refs = ray.wait(
@@ -273,9 +270,15 @@ class CalculateSelectivitiesMaker(Maker):
                         results.append(ray.get(completed_ref))
                         pbar.update(1)
 
+                reactant_formulas = [
+                    c.reduced_formula for rxn in chunk for c in rxn.reactants
+                ]
+                if self.open_formula:
+                    reactant_formulas.append(self.open_formula)
+
                 rxn_chunk_refs.append(
                     _get_selectivity_decorated_rxns_by_chunk.remote(
-                        rxns_chunk, all_rxns, self.open_formula, self.temp
+                        chunk, all_rxns, self.open_formula, self.temp
                     )
                 )
 
@@ -512,14 +515,10 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         rxn.data["secondary_selectivity"] = secondary_selectivity
         decorated_rxn = rxn
     else:
-        competing_rxns = list(competing_rxns)
-        if rxn not in competing_rxns:
-            competing_rxns.append(rxn)
-
         irh = InterfaceReactionHull(
             precursors_list[0],
             precursors_list[1],
-            competing_rxns,
+            list(competing_rxns),
         )
 
         calc_1 = PrimarySelectivityCalculator(irh=irh, temp=temp)

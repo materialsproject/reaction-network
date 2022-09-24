@@ -69,6 +69,9 @@ def get_logger(
 
     formatter = logging.Formatter(log_format)
 
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
     sh = logging.StreamHandler(stream=stream)
     sh.setFormatter(formatter)
 

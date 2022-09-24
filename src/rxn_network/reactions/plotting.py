@@ -163,37 +163,47 @@ def plot_reaction_scatter(
 def get_pareto_front(
     df: DataFrame,
     cols=("energy", "primary_selectivity", "secondary_selectivity"),
-    minimize=True,
-) -> DataFrame:
-    """
+    maximize=False,
+):
 
-    Returns a new reaction DataFrame containing only reactions on the Pareto front for
-    the specified columns (i.e., reaction parameters)
-
-    This function has been adapted from user @hilberts_drinking_problem on
-    StackOverflow. Thanks for the great answer!
-
-    https://stackoverflow.com/questions/32791911/fast-calculation-of-pareto-front-in-python
-
-    """
     df_original = df.copy()
     df = df_original[list(cols)]
-    pts = df.reset_index().to_numpy()
+    pts = df.to_numpy()
 
-    if minimize:
+    if maximize:
         pts[:, 1:] = pts[:, 1:] * -1
 
-    pts = pts[pts[:, 1:].sum(axis=1).argsort()[::-1]]
-    undominated = np.ones(pts.shape[0], dtype=bool)
+    return df_original[is_pareto_efficient(pts, return_mask=True)]
 
-    for i in range(pts.shape[0]):
-        n = pts.shape[0]
-        if i >= n:
-            break
-        undominated[i + 1 : n] = (pts[i + 1 :, 1:] >= pts[i, 1:]).any(1)
-        pts = pts[undominated[:n]]
 
-    return df_original.loc[pts[:, 0]]
+def is_pareto_efficient(costs, return_mask=True):
+    """
+    Directly borrowed from @Peter's numpy-based solution on stackoverflow. Please
+    give him an upvote here: https://stackoverflow.com/a/40239615.
+    Thank you @Peter!
+
+    Find the pareto-efficient points
+    :param costs: An (n_points, n_costs) array
+    :param return_mask: True to return a mask
+    :return: An array of indices of pareto-efficient points.
+        If return_mask is True, this will be an (n_points, ) boolean array
+        Otherwise it will be a (n_efficient_points, ) integer array of indices.
+    """
+    is_efficient = np.arange(costs.shape[0])
+    n_points = costs.shape[0]
+    next_point_index = 0  # Next index in the is_efficient array to search for
+    while next_point_index < len(costs):
+        nondominated_point_mask = np.any(costs < costs[next_point_index], axis=1)
+        nondominated_point_mask[next_point_index] = True
+        is_efficient = is_efficient[nondominated_point_mask]  # Remove dominated points
+        costs = costs[nondominated_point_mask]
+        next_point_index = np.sum(nondominated_point_mask[:next_point_index]) + 1
+    if return_mask:
+        is_efficient_mask = np.zeros(n_points, dtype=bool)
+        is_efficient_mask[is_efficient] = True
+        return is_efficient_mask
+    else:
+        return is_efficient
 
 
 def pretty_df_layout(df):

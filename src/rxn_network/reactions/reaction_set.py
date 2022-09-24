@@ -309,6 +309,29 @@ class ReactionSet(MSONable):
 
         return self._get_rxns_by_indices(idxs)
 
+    def get_rxns_by_product(self, product: str):
+        """
+        Return a list of reactions which contain the given product formula.
+        """
+        idxs = []
+        product = Composition(product).reduced_formula
+
+        product_index = None
+        for idx, e in enumerate(self.entries):
+            if e.composition.reduced_formula == product:
+                product_index = idx
+                break
+
+        if not product_index:
+            return []
+
+        for idx, (coeffs, indices) in enumerate(zip(self.coeffs, self.indices)):
+            p_indices = {i for c, i in zip(coeffs, indices) if c > -1e-12}
+            if product_index in p_indices:
+                idxs.append(idx)
+
+        return self._get_rxns_by_indices(idxs)
+
     def _get_rxns_by_indices(
         self, idxs: Union[List[int], range]
     ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:

@@ -21,8 +21,9 @@ from rxn_network.jobs.core import (
     PathwaySolverMaker,
 )
 from rxn_network.jobs.schema import EnumeratorTaskDocument, NetworkTaskDocument
+from rxn_network.utils.funcs import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 @dataclass
