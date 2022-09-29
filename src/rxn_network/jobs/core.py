@@ -211,7 +211,10 @@ class CalculateSelectivitiesMaker(Maker):
             f"Identified {len(target_rxns)} target reactions out of"
             f" {len(all_rxns)} total reactions."
         )
+        logger.info("Placing reactions in ray object store...")
+
         all_rxns = ray.put(all_rxns)
+        logger.info("Beginning selectivity calculations...")
 
         decorated_rxns = target_rxns
 
@@ -248,8 +251,6 @@ class CalculateSelectivitiesMaker(Maker):
         batch_size = self.batch_size or int(
             ray.cluster_resources()["CPU"] / 2
         )  # arbitrary default
-
-        logger.info("Calculating selectivites...")
 
         rxn_chunk_refs = []
         results = []
