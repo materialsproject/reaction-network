@@ -6,7 +6,7 @@ from copy import deepcopy
 from collections import OrderedDict
 from functools import lru_cache
 from itertools import combinations, groupby
-from typing import Collection, Iterable, List, Optional, Set, Union
+from typing import Collection, Iterable, List, Optional, Set, Union, Dict
 
 import numpy as np
 from monty.json import MSONable
@@ -95,9 +95,19 @@ class ReactionSet(MSONable):
 
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
 
+        all_entry_indices: Dict[str, ComputedEntry] = {}
         indices, coeffs, data = [], [], []
+
         for rxn in rxns:
-            indices.append([entries.index(e) for e in rxn.entries])
+            rxn_indices = []
+            for e in rxn.entries:
+                idx = all_entry_indices.get(e.composition.reduced_formula)
+                if idx is None:
+                    idx = entries.index(e)
+                    all_entry_indices[e.composition.reduced_formula] = idx
+                rxn_indices.append(idx)
+
+            indices.append(rxn_indices)
             coeffs.append(list(rxn.coefficients))
             data.append(rxn.data)
 
