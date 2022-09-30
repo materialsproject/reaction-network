@@ -306,6 +306,9 @@ class CalculateSelectivitiesMaker(Maker):
         rxn_chunk_refs = []
         results = []
 
+        open_elem = target_rxns.open_elem
+        chempot = target_rxns.chempot
+
         entries = ray.put(entries)
         cpd_kwargs = ray.put(self.cpd_kwargs)
 
@@ -327,7 +330,7 @@ class CalculateSelectivitiesMaker(Maker):
 
                 rxn_chunk_refs.append(
                     _get_chempot_decorated_rxns_by_chunk.remote(
-                        chunk, entries, cpd_kwargs
+                        chunk, entries, cpd_kwargs, open_elem, chempot
                     )
                 )
 
@@ -540,14 +543,14 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
 
 
 @ray.remote
-def _get_chempot_decorated_rxns_by_chunk(rxn_chunk, entries, cpd_kwargs):
+def _get_chempot_decorated_rxns_by_chunk(
+    rxn_chunk, entries, cpd_kwargs, open_elem, chempot
+):
     cpd_calc_dict = {}
     new_rxns = []
 
-    open_elem = rxns.open_elem
     if open_elem:
         open_elem_set = {open_elem}
-    chempot = rxns.chempot
 
     for rxn in sorted(rxn_chunk, key=lambda rxn: len(rxn.elements), reverse=True):
         chemsys = rxn.chemical_system
