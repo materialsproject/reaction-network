@@ -221,6 +221,8 @@ class CalculateSelectivitiesMaker(Maker):
         if self.calculate_selectivities:
             decorated_rxns = self._get_selectivity_decorated_rxns(target_rxns, all_rxns)
 
+        logger.info("Calculating chemical potential distances...")
+
         if self.calculate_chempot_distances:
             decorated_rxns = self._get_chempot_decorated_rxns(decorated_rxns, entries)
 
@@ -294,45 +296,51 @@ class CalculateSelectivitiesMaker(Maker):
 
         return ReactionSet.from_rxns(decorated_rxns)
 
-    def _get_chempot_decorated_rxns(self, rxns, entries):
-        cpd_calc_dict = {}
-        new_rxns = []
+    def _get_chempot_decorated_rxns(self, target_rxns, entries):
+        initialize_ray()
 
-        open_elem = rxns.open_elem
-        if open_elem:
-            open_elem_set = {open_elem}
-        chempot = rxns.chempot
+        batch_size = self.batch_size or int(
+            ray.cluster_resources()["CPU"] / 2
+        )  # arbitrary default
 
-        logger.info("Calculating chemical potential distances...")
-        for rxn in tqdm(sorted(rxns, key=lambda rxn: len(rxn.elements), reverse=True)):
-            chemsys = rxn.chemical_system
-            elems = chemsys.split("-")
+        rxn_chunk_refs = []
+        results = []
 
-            for c, cpd_calc in cpd_calc_dict.items():
-                if set(c.split("-")).issuperset(elems):
-                    break
-            else:
-                if open_elem:
-                    filtered_entries = entries.get_subset_in_chemsys(
-                        elems + [str(open_elem)]
+        entries = ray.put(entries)
+        cpd_kwargs = ray.put(self.cpd_kwargs)
+
+        with tqdm(total=len(target_rxns) // self.chunk_size + 1) as pbar:
+            for chunk in grouper(
+                sorted(target_rxns, key=lambda r: r.chemical_system),
+                self.chunk_size,
+                fillvalue=None,
+            ):
+                chunk = [c for c in chunk if c is not None]
+                if len(rxn_chunk_refs) > batch_size:
+                    num_ready = len(rxn_chunk_refs) - batch_size
+                    newly_completed, rxn_chunk_refs = ray.wait(
+                        rxn_chunk_refs, num_returns=num_ready
                     )
-                    filtered_entries = [
-                        e.to_grand_entry({Element(open_elem): chempot})
-                        for e in filtered_entries
-                        if set(e.composition.elements) != open_elem_set
-                    ]
-                else:
-                    filtered_entries = entries.get_subset_in_chemsys(elems)
+                    for completed_ref in newly_completed:
+                        results.append(ray.get(completed_ref))
+                        pbar.update(1)
 
-                cpd_calc = ChempotDistanceCalculator.from_entries(
-                    filtered_entries, **self.cpd_kwargs
+                rxn_chunk_refs.append(
+                    _get_chempot_decorated_rxns_by_chunk.remote(
+                        chunk, entries, cpd_kwargs
+                    )
                 )
-                cpd_calc_dict[chemsys] = cpd_calc
 
-            new_rxns.append(cpd_calc.decorate(rxn))
+            newly_completed, rxn_chunk_refs = ray.wait(
+                rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
+            )
+            for completed_ref in newly_completed:
+                results.append(ray.get(completed_ref))
+                pbar.update(1)
 
-        results = ReactionSet.from_rxns(new_rxns, entries=entries)
-        return results
+        decorated_rxns = [rxn for r_set in results for rxn in r_set]
+
+        return ReactionSet.from_rxns(decorated_rxns)
 
 
 @dataclass
@@ -529,3 +537,44 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         decorated_rxn = calc_2.decorate(decorated_rxn)
 
     return decorated_rxn
+
+
+@ray.remote
+def _get_chempot_decorated_rxns_by_chunk(rxn_chunk, entries, cpd_kwargs):
+    cpd_calc_dict = {}
+    new_rxns = []
+
+    open_elem = rxns.open_elem
+    if open_elem:
+        open_elem_set = {open_elem}
+    chempot = rxns.chempot
+
+    for rxn in sorted(rxn_chunk, key=lambda rxn: len(rxn.elements), reverse=True):
+        chemsys = rxn.chemical_system
+        elems = chemsys.split("-")
+
+        for c, cpd_calc in cpd_calc_dict.items():
+            if set(c.split("-")).issuperset(elems):
+                break
+        else:
+            if open_elem:
+                filtered_entries = entries.get_subset_in_chemsys(
+                    elems + [str(open_elem)]
+                )
+                filtered_entries = [
+                    e.to_grand_entry({Element(open_elem): chempot})
+                    for e in filtered_entries
+                    if set(e.composition.elements) != open_elem_set
+                ]
+            else:
+                filtered_entries = entries.get_subset_in_chemsys(elems)
+
+            cpd_calc = ChempotDistanceCalculator.from_entries(
+                filtered_entries, **cpd_kwargs
+            )
+            cpd_calc_dict[chemsys] = cpd_calc
+
+        new_rxns.append(cpd_calc.decorate(rxn))
+
+    results = ReactionSet.from_rxns(new_rxns, entries=entries)
+    return results
