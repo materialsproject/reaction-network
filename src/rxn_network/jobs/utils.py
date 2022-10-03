@@ -4,8 +4,9 @@ import logging
 from pymatgen.core.composition import Element
 
 from rxn_network.core.composition import Composition
+from rxn_network.utils.funcs import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def run_enumerators(enumerators, entries):
