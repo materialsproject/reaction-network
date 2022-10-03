@@ -238,6 +238,7 @@ class BasicEnumerator(Enumerator):
         rxn_set = ReactionSet(
             entries.entries_list, all_indices, all_coeffs, all_data=all_data
         )
+        rxn_set = rxn_set.filter_duplicates()
 
         return rxn_set
 
