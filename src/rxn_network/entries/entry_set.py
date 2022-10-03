@@ -3,7 +3,6 @@ An entry set class for automatically building GibbsComputedEntry objects. Some o
 code has been adapted from the EntrySet class in pymatgen.
 """
 import collections
-import logging
 import math
 import warnings
 from copy import deepcopy
@@ -416,7 +415,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     experimental = True
                     new_entries.append(e)
                 except ValueError as error:
-                    logging.warning(
+                    logger.info(
                         f"Compound {formula} is in NIST-JANAF tables but at different"
                         f" temperatures!: {error}"
                     )
@@ -428,7 +427,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     experimental = True
                     new_entries.append(e)
                 except ValueError as error:
-                    logging.warning(
+                    logger.info(
                         f"Compound {formula} is in Barin tables but not at this"
                         f" temperature! {error}"
                     )
@@ -440,7 +439,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     experimental = True
                     new_entries.append(e)
                 except ValueError as error:
-                    logging.warning(
+                    logger.warning(
                         f"Compound {formula} is in FREED tables but not at this"
                         f" temperature! {error}"
                     )
