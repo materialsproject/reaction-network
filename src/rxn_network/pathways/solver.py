@@ -40,7 +40,7 @@ class PathwaySolver(Solver):
     """
 
     CHUNK_SIZE = 100000
-    BATCH_SIZE = 250
+    BATCH_SIZE = 500
 
     def __init__(
         self,

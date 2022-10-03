@@ -227,8 +227,6 @@ class BasicEnumerator(Enumerator):
                 results.extend(ray.get(completed_ref))
                 pbar.update(1)
 
-        logger.info("Finalizing reaction set...")
-
         all_indices, all_coeffs, all_data = [], [], []
         for r in results:
             all_indices.append(r[0])
