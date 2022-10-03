@@ -15,7 +15,7 @@ pip install reaction-network
 ```
 
 :warning: While this will take care of most dependencies, if you are using any of the network-based features (i.e. within `rxn_network.network`), then `graph-tool` must be installed. Unfortunately, this cannot
-be installed through pip; please see https://graph-tool.skewed.de/ for more details. :warning:
+be installed through pip. Please see https://graph-tool.skewed.de/ for more details. :warning:
 
 We recommend the following installation procedure which installs graph-tool through conda-forge.
 
