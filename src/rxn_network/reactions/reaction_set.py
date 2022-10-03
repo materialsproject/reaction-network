@@ -346,7 +346,7 @@ class ReactionSet(MSONable):
         """
         Return a new ReactionSet object with duplicate reactions removed
         """
-        indices_to_remove = []
+        indices_to_remove = set()
         if len(self.coeffs) == 0:
             return self
 
@@ -384,15 +384,13 @@ class ReactionSet(MSONable):
                         continue
 
                     if np.isclose(ratios[0], ratios).all():
-                        indices_to_remove.append(idx2)
+                        indices_to_remove.add(idx2)
 
         new_indices = []
         new_coeffs = []
         new_all_data = []
 
-        for idx in range(len(self)):
-            if idx in indices_to_remove:
-                continue
+        for idx in set(range(len(self))) - indices_to_remove:
             new_indices.append(self.indices[idx])
             new_coeffs.append(self.coeffs[idx])
             new_all_data.append(self.all_data[idx])
