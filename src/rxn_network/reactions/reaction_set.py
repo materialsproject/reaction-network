@@ -342,66 +342,6 @@ class ReactionSet(MSONable):
 
         return self._get_rxns_by_indices(idxs)
 
-    def _get_rxns_by_indices(
-        self, idxs: Union[List[int], range]
-    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
-        """
-        Return a list of reactions with the given indices.
-        """
-        if idxs == range(len(self.coeffs)):
-            indices_slice = self.indices
-            coeffs_slice = self.coeffs
-            data_slice = self.all_data
-        else:
-            indices_slice = []
-            coeffs_slice = []
-            data_slice = []
-
-            for idx in idxs:
-                indices_slice.append(self.indices[idx])
-                coeffs_slice.append(self.coeffs[idx])
-                data_slice.append(self.all_data[idx])
-
-        for indices, coeffs, data in zip(indices_slice, coeffs_slice, data_slice):
-            entries = [self.entries[i] for i in indices]
-            if self.mu_dict:
-                rxn = OpenComputedReaction(
-                    entries=entries,
-                    coefficients=coeffs,
-                    data=data,
-                    chempots=self.mu_dict,
-                )
-            else:
-                rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
-
-            yield rxn
-
-    @staticmethod
-    def _get_added_elems(
-        rxn: Union[ComputedReaction, OpenComputedReaction], target: Composition
-    ) -> str:
-        """
-        Get list of added elements for a reaction.
-
-        Args:
-            rxn: Reaction object
-            target: target composition (used to determine added elements)
-
-        """
-        target = Composition(target)
-        chemsys_prop = (
-            "total_chemical_system"
-            if rxn.__class__.__name__ == "OpenComputedReaction"
-            else "chemical_system"
-        )
-
-        added_elems = set(getattr(rxn, chemsys_prop).split("-")) - set(
-            target.chemical_system.split("-")
-        )
-        added_elems_str = "-".join(sorted(list(added_elems)))
-
-        return added_elems_str
-
     def filter_duplicates(self):
         """
         Return a new ReactionSet object with duplicate reactions removed
@@ -465,6 +405,66 @@ class ReactionSet(MSONable):
             self.chempot,
             new_all_data,
         )
+
+    def _get_rxns_by_indices(
+        self, idxs: Union[List[int], range]
+    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
+        """
+        Return a list of reactions with the given indices.
+        """
+        if idxs == range(len(self.coeffs)):
+            indices_slice = self.indices
+            coeffs_slice = self.coeffs
+            data_slice = self.all_data
+        else:
+            indices_slice = []
+            coeffs_slice = []
+            data_slice = []
+
+            for idx in idxs:
+                indices_slice.append(self.indices[idx])
+                coeffs_slice.append(self.coeffs[idx])
+                data_slice.append(self.all_data[idx])
+
+        for indices, coeffs, data in zip(indices_slice, coeffs_slice, data_slice):
+            entries = [self.entries[i] for i in indices]
+            if self.mu_dict:
+                rxn = OpenComputedReaction(
+                    entries=entries,
+                    coefficients=coeffs,
+                    data=data,
+                    chempots=self.mu_dict,
+                )
+            else:
+                rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
+
+            yield rxn
+
+    @staticmethod
+    def _get_added_elems(
+        rxn: Union[ComputedReaction, OpenComputedReaction], target: Composition
+    ) -> str:
+        """
+        Get list of added elements for a reaction.
+
+        Args:
+            rxn: Reaction object
+            target: target composition (used to determine added elements)
+
+        """
+        target = Composition(target)
+        chemsys_prop = (
+            "total_chemical_system"
+            if rxn.__class__.__name__ == "OpenComputedReaction"
+            else "chemical_system"
+        )
+
+        added_elems = set(getattr(rxn, chemsys_prop).split("-")) - set(
+            target.chemical_system.split("-")
+        )
+        added_elems_str = "-".join(sorted(list(added_elems)))
+
+        return added_elems_str
 
     @staticmethod
     def _get_unique_entries(rxns: Collection[ComputedReaction]) -> Set[ComputedEntry]:
