@@ -20,6 +20,9 @@ from rxn_network.enumerators.utils import group_by_chemsys, get_rxn_info
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import grouper, initialize_ray, limited_powerset, to_iterator
+from rxn_network.utils.funcs import get_logger
+
+logger = get_logger(__name__)
 
 
 class BasicEnumerator(Enumerator):
@@ -98,7 +101,6 @@ class BasicEnumerator(Enumerator):
         self.open_phases: Optional[List] = None
         self._build_pd = False
         self._build_grand_pd = False
-        self.logger = logging.Logger("enumerator")
 
     def enumerate(self, entries: GibbsEntrySet, batch_size=None) -> ReactionSet:
         """
@@ -225,7 +227,7 @@ class BasicEnumerator(Enumerator):
                 results.extend(ray.get(completed_ref))
                 pbar.update(1)
 
-        self.logger.info("Finalizing reaction set...")
+        logger.info("Finalizing reaction set...")
 
         all_indices, all_coeffs, all_data = [], [], []
         for r in results:
@@ -338,7 +340,7 @@ class BasicEnumerator(Enumerator):
 
         if self.stabilize:
             entries_new = entries_new.filter_by_stability(e_above_hull=0.0)
-            self.logger.info("Filtering by stable entries!")
+            logger.info("Filtering by stable entries!")
 
         entries_new.build_indices()
 

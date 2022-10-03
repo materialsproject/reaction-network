@@ -14,11 +14,14 @@ def run_enumerators(enumerators, entries):
         logger.info(f"Running {enumerator.__class__.__name__}")
         rxns = enumerator.enumerate(entries)
 
+        logger.info(f"Adding {len(rxns)} reactions to reaction set")
+
         if rxn_set is None:
             rxn_set = rxns
         else:
             rxn_set = rxn_set.add_rxn_set(rxns)
 
+    logger.info("Completed reaction enumeration. Filtering duplicates...")
     rxn_set = rxn_set.filter_duplicates()
     return rxn_set
 

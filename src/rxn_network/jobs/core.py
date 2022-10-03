@@ -6,6 +6,7 @@ from typing import Optional, List, Iterable
 from pathlib import Path
 
 import numpy as np
+from scipy.spatial._qhull import QhullError
 import ray
 from jobflow import SETTINGS, Maker, job
 from pymatgen.core.composition import Element
@@ -138,9 +139,12 @@ class ReactionEnumerationMaker(Maker):
     @job(rxns="rxns", output_schema=EnumeratorTaskDocument)
     def make(self, enumerators, entries):
         data = {}
+
+        logger.info("Running enumerators...")
         data["rxns"] = run_enumerators(enumerators, entries)
         data.update(self._get_metadata(enumerators, entries))
 
+        logger.info("Building task document...")
         enumerator_task = EnumeratorTaskDocument(**data)
         enumerator_task.task_label = self.name
         return enumerator_task
@@ -577,7 +581,17 @@ def _get_chempot_decorated_rxns_by_chunk(
             )
             cpd_calc_dict[chemsys] = cpd_calc
 
-        new_rxns.append(cpd_calc.decorate(rxn))
+        try:
+            new_rxn = cpd_calc.decorate(rxn)
+        except QhullError as e:
+            logger.warning(
+                f"QhullError encountered when decorating reaction, {rxn}, with chempot"
+                f" distance: {e}",
+                e,
+            )
+            new_rxn = rxn
+
+        new_rxns.append(new_rxn)
 
     results = ReactionSet.from_rxns(new_rxns, entries=entries)
     return results
