@@ -1,12 +1,10 @@
-import logging
 from dataclasses import dataclass, field
 from typing import Collection, List, Optional
 
-from jobflow import Flow, Maker, job
+from jobflow import Flow, Maker
 from pymatgen.core.composition import Element
 
 from rxn_network.core.composition import Composition
-from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (
@@ -20,7 +18,6 @@ from rxn_network.jobs.core import (
     PathwaySolverMaker,
     ReactionEnumerationMaker,
 )
-from rxn_network.jobs.schema import EnumeratorTaskDocument, NetworkTaskDocument
 from rxn_network.utils.funcs import get_logger
 
 logger = get_logger(__name__)
@@ -235,8 +232,8 @@ class NetworkFlowMaker(Maker):
             jobs.append(get_entry_set_job)
             entries = get_entry_set_job.output.entries
 
-        basic_enumerator_kwargs = self.basic_enumerator_kwargs.copy()
-        minimize_enumerator_kwargs = self.minimize_enumerator_kwargs.copy()
+        self.basic_enumerator_kwargs.copy()
+        self.minimize_enumerator_kwargs.copy()
 
         enumerators = []
 

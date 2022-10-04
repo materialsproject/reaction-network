@@ -4,12 +4,11 @@ from copy import deepcopy
 from typing import Iterable, List, Optional, Union
 
 from maggma.stores import MongoStore
-from monty.serialization import dumpfn
 from pymatgen.core.structure import Structure
 from pymatgen.entries import Entry
 from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
-from pymatgen.ext.matproj import MPRester, _MPResterLegacy
+from pymatgen.ext.matproj import _MPResterLegacy
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 from rxn_network.entries.entry_set import GibbsEntrySet

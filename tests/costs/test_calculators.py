@@ -8,11 +8,12 @@ from monty.serialization import loadfn
 from rxn_network.costs.calculators import ChempotDistanceCalculator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 
-answers = {
+cpd_expected_values = {
     "0.5 Y2O3 + 0.5 Mn2O3 -> YMnO3": {
         "sum": 0.480008216,
         "max": 0.480008216,
@@ -66,18 +67,42 @@ def cpd(entries):
 
 
 @pytest.fixture
-def calculator(cpd, mu_func):
+def cpd_calculator(cpd, mu_func):
     return ChempotDistanceCalculator(cpd=cpd, mu_func=mu_func)
 
 
-def test_calculate(calculator, rxn):
+@pytest.fixture
+def primary_selectivity_calculator(irh_batio):
+    return PrimarySelectivityCalculator(irh_batio)
+
+
+@pytest.fixture
+def secondary_selectivity_calculator(irh_batio):
+    return SecondarySelectivityCalculator(irh_batio)
+
+
+@pytest.fixture(scope="module")
+def stable_rxn(bao_tio2_rxns):
+    for r in bao_tio2_rxns:
+        if str(r) == "TiO2 + 2 BaO -> Ba2TiO4":
+            return r
+
+
+@pytest.fixture(scope="module")
+def unstable_rxn(bao_tio2_rxns):
+    for r in bao_tio2_rxns:
+        if str(r) == "TiO2 + 0.9 BaO -> 0.1 Ti10O11 + 0.9 BaO2":
+            return r
+
+
+def test_cpd_calculate(calculator, rxn):
     actual_cost = calculator.calculate(rxn)
-    expected_cost = answers[str(rxn)][calculator.mu_func.__name__]
+    expected_cost = cpd_expected_values[str(rxn)][calculator.mu_func.__name__]
 
     assert actual_cost == pytest.approx(expected_cost)
 
 
-def test_decorate(calculator, rxn):
+def test_cpd_decorate(calculator, rxn):
     rxn_missing_data = rxn.copy()
     rxn_missing_data.data = None
 
@@ -85,21 +110,21 @@ def test_decorate(calculator, rxn):
     rxn_missing_data_dec = calculator.decorate(rxn_missing_data)
 
     actual_cost = rxn_dec.data[calculator.name]
-    expected_cost = answers[str(rxn)][calculator.mu_func.__name__]
+    expected_cost = cpd_expected_values[str(rxn)][calculator.mu_func.__name__]
 
     assert type(rxn_dec) == ComputedReaction
     assert actual_cost == pytest.approx(expected_cost)
     assert rxn_missing_data_dec.data[calculator.name] == actual_cost
 
 
-def test_calculate_many(calculator, rxns):
+def test_cpd_calculate_many(calculator, rxns):
     actual_costs = calculator.calculate_many(rxns)
     expected_costs = [calculator.calculate(rxn) for rxn in rxns]
 
     assert actual_costs == pytest.approx(expected_costs)
 
 
-def test_decorate_many(calculator, rxns):
+def test_cpd_decorate_many(calculator, rxns):
     rxns_missing_data = [rxn.copy() for rxn in rxns]
     for rxn in rxns_missing_data:
         rxn.data = None
@@ -115,11 +140,25 @@ def test_decorate_many(calculator, rxns):
     assert rxns_missing_data_dec == rxns_dec
 
 
-def test_from_entries(entries, mu_func, rxn):
+def test_cpd_calculator_from_entries(entries, mu_func, rxn):
     calc = ChempotDistanceCalculator.from_entries(entries=entries, mu_func=mu_func)
 
     actual_cost = calc.calculate(rxn)
-    expected_cost = answers[str(rxn)][calc.mu_func.__name__]
+    expected_cost = cpd_expected_values[str(rxn)][calc.mu_func.__name__]
 
     assert type(calc) == ChempotDistanceCalculator
+    assert actual_cost == pytest.approx(expected_cost)
+
+
+def test_primary_selectivity_calculate(primary_selectivity_calculator, rxn):
+    actual_cost = primary_selectivity_calculator.calculate(rxn)
+    expected_cost = 0.0
+
+    assert actual_cost == pytest.approx(expected_cost)
+
+
+def test_secondary_selectivity_calculate(secondary_selectivity_calculator, rxn):
+    actual_cost = secondary_selectivity_calculator.calculate(rxn)
+    expected_cost = 0.0
+
     assert actual_cost == pytest.approx(expected_cost)

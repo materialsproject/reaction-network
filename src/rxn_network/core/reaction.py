@@ -2,7 +2,6 @@
 Basic interface for a (chemical) Reaction
 """
 from abc import ABCMeta, abstractmethod
-from functools import cached_property
 from typing import List
 
 import numpy as np

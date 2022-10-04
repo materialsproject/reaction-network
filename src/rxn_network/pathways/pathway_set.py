@@ -9,7 +9,8 @@ from typing import List, Union
 import numpy as np
 from monty.json import MSONable
 
-from rxn_network.pathways import BalancedPathway, BasicPathway
+from rxn_network.pathways.balanced import BalancedPathway
+from rxn_network.pathways.basic import BasicPathway
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet

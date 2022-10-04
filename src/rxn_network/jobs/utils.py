@@ -1,5 +1,4 @@
 """Definitions of common job functions"""
-import logging
 
 from pymatgen.core.composition import Element
 

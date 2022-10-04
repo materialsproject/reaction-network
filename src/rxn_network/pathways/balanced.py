@@ -9,7 +9,7 @@ from rxn_network.core.composition import Composition
 from rxn_network.core.pathway import Pathway
 from rxn_network.core.reaction import Reaction
 from rxn_network.pathways.basic import BasicPathway
-from rxn_network.utils import limited_powerset
+from rxn_network.utils.funcs import limited_powerset
 
 
 class BalancedPathway(BasicPathway):

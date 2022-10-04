@@ -1,6 +1,5 @@
 """Core jobs for reaction-network creation and analysis."""
 
-import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, List, Optional
@@ -35,8 +34,7 @@ from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.basic import BasicReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils import grouper
-from rxn_network.utils.funcs import get_logger
+from rxn_network.utils.funcs import get_logger, grouper
 from rxn_network.utils.ray import initialize_ray
 
 logger = get_logger(__name__)
@@ -198,7 +196,7 @@ class CalculateSelectivitiesMaker(Maker):
         logger.info("Loading reactions..")
         all_rxns = rxn_sets[0]
         for rxn_set in rxn_sets[1:]:
-            all_rxns.add_rxn_set(rxn_set)
+            all_rxns = all_rxns.add_rxn_set(rxn_set)
 
         logger.info("Identifying target reactions...")
 

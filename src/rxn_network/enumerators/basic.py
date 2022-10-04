@@ -2,7 +2,6 @@
 This module implements two types of basic reaction enumerators, differing in the option
 to consider open entries.
 """
-import logging
 from copy import deepcopy
 from itertools import combinations, product
 from math import comb
@@ -19,8 +18,8 @@ from rxn_network.entries.utils import initialize_entry
 from rxn_network.enumerators.utils import get_rxn_info, group_by_chemsys
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils import grouper, initialize_ray, limited_powerset, to_iterator
-from rxn_network.utils.funcs import get_logger
+from rxn_network.utils.funcs import get_logger, grouper, limited_powerset
+from rxn_network.utils.ray import initialize_ray
 
 logger = get_logger(__name__)
 
@@ -160,8 +159,6 @@ class BasicEnumerator(Enumerator):
         rxn_chunk_refs = []
         results = []
 
-        count = 0
-
         if not batch_size:
             batch_size = ray.cluster_resources()["CPU"] * 2
 
@@ -286,7 +283,7 @@ class BasicEnumerator(Enumerator):
 
         return filtered_combos
 
-    def _get_open_combos(  # pylint: disable=R1711
+    def _get_open_combos(  # pylint: disable=useless-return
         self, open_entries
     ) -> Optional[List[Set[ComputedEntry]]]:
         """No open entries for BasicEnumerator, returns None"""

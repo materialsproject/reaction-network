@@ -1,17 +1,10 @@
 """ Tests for InterfaceReactionHull. """
-import pytest
 import numpy as np
+import pytest
+from pymatgen.core.composition import Element
 
 from rxn_network.core.composition import Composition
-from pymatgen.core.composition import Element
 from rxn_network.reactions.hull import InterfaceReactionHull
-
-
-@pytest.fixture(scope="module")
-def irh_batio(bao_tio2_rxns):
-    return InterfaceReactionHull(
-        c1=Composition("BaO"), c2=Composition("TiO2"), reactions=bao_tio2_rxns
-    )
 
 
 @pytest.fixture(scope="module")

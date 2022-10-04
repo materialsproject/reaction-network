@@ -1,8 +1,11 @@
-import pytest
 from pathlib import Path
+
+import pytest
 from monty.serialization import loadfn
+
 from rxn_network.entries.entry_set import GibbsEntrySet
 
+# load files
 TEST_FILES_PATH = Path(__file__).parent / "test_files"
 
 MN_O_Y_ENTRIES = loadfn(TEST_FILES_PATH / "Mn_O_Y_entries.json.gz")
@@ -43,6 +46,13 @@ def ymno_rxns():
 @pytest.fixture(scope="session")
 def bao_tio2_rxns():
     return BAO_TIO2_RXNS
+
+
+@pytest.fixture(scope="session")
+def irh_batio(bao_tio2_rxns):
+    return InterfaceReactionHull(
+        c1=Composition("BaO"), c2=Composition("TiO2"), reactions=bao_tio2_rxns
+    )
 
 
 @pytest.fixture(scope="session")

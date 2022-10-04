@@ -5,17 +5,16 @@ equations using matrix operations.
 
 from copy import deepcopy
 from itertools import combinations
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 import ray
-from numba import jit, njit, prange
+from numba import njit, prange
 from pymatgen.core.composition import Element
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
-from rxn_network.core.pathway import Pathway
 from rxn_network.core.solver import Solver
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
