@@ -1,16 +1,16 @@
 """
 Implementation of reaction network interface.
 """
-from typing import Iterable, List, Optional, Union
 from dataclasses import field
-from tqdm import tqdm
+from typing import Iterable, List, Optional, Union
 
 from graph_tool.all import Graph, Vertex, find_edge, find_vertex
 from pymatgen.entries import Entry
+from tqdm import tqdm
 
 from rxn_network.core.cost_function import CostFunction
-from rxn_network.costs.softplus import Softplus
 from rxn_network.core.network import Network
+from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.gt import (

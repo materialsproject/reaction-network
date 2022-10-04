@@ -9,9 +9,9 @@ from typing import List, Union
 
 import numpy as np
 import ray
-from numba import njit, prange, jit
-from tqdm import tqdm
+from numba import jit, njit, prange
 from pymatgen.core.composition import Element
+from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
@@ -26,8 +26,8 @@ from rxn_network.enumerators.minimize import (
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.reactions.open import OpenComputedReaction
+from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
 

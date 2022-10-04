@@ -1,5 +1,6 @@
 """ Tests for Softplus """
 import pytest
+
 from rxn_network.costs.softplus import Softplus
 
 

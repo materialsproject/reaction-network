@@ -2,45 +2,42 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional, List, Iterable
 from pathlib import Path
+from typing import Iterable, List, Optional
 
 import numpy as np
-from scipy.spatial._qhull import QhullError
 import ray
 from jobflow import SETTINGS, Maker, job
 from pymatgen.core.composition import Element
+from scipy.spatial._qhull import QhullError
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
+from rxn_network.core.cost_function import CostFunction
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
     PrimarySelectivityCalculator,
     SecondarySelectivityCalculator,
 )
-from rxn_network.core.cost_function import CostFunction
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
+from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.jobs.schema import (
     EntrySetDocument,
     EnumeratorTaskDocument,
     NetworkTaskDocument,
-    SelectivitiesTaskDocument,
     PathwaySolverTaskDocument,
+    SelectivitiesTaskDocument,
 )
-from rxn_network.jobs.utils import (
-    get_added_elem_data,
-    run_enumerators,
-)
+from rxn_network.jobs.utils import get_added_elem_data, run_enumerators
 from rxn_network.network.network import ReactionNetwork
+from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.basic import BasicReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.enumerators.utils import get_computed_rxn
-from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.utils import grouper
-from rxn_network.utils.ray import initialize_ray
 from rxn_network.utils.funcs import get_logger
+from rxn_network.utils.ray import initialize_ray
 
 logger = get_logger(__name__)
 

@@ -17,8 +17,8 @@ from rxn_network.jobs.core import (
     CalculateSelectivitiesMaker,
     GetEntrySetMaker,
     NetworkMaker,
-    ReactionEnumerationMaker,
     PathwaySolverMaker,
+    ReactionEnumerationMaker,
 )
 from rxn_network.jobs.schema import EnumeratorTaskDocument, NetworkTaskDocument
 from rxn_network.utils.funcs import get_logger

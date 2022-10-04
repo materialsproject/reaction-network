@@ -285,7 +285,7 @@ class GibbsComputedEntry(ComputedEntry):
             return len(self.data["icsd_ids"]) > 1
         else:
             return False
-            
+
     def as_dict(self) -> dict:
         """Returns an MSONable dict."""
         data = super().as_dict()

@@ -2,11 +2,11 @@
 Implements a class for conveniently and efficiently storing sets of ComputedReaction
 objects which share entries.
 """
-from copy import deepcopy
 from collections import OrderedDict
+from copy import deepcopy
 from functools import lru_cache
 from itertools import combinations, groupby
-from typing import Collection, Iterable, List, Optional, Set, Union, Dict
+from typing import Collection, Dict, Iterable, List, Optional, Set, Union
 
 import numpy as np
 from monty.json import MSONable

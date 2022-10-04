@@ -5,8 +5,8 @@ to consider open entries.
 import logging
 from copy import deepcopy
 from itertools import combinations, product
-from typing import List, Optional, Set
 from math import comb
+from typing import List, Optional, Set
 
 import ray
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
@@ -16,7 +16,7 @@ from tqdm import tqdm
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.entries.utils import initialize_entry
-from rxn_network.enumerators.utils import group_by_chemsys, get_rxn_info
+from rxn_network.enumerators.utils import get_rxn_info, group_by_chemsys
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils import grouper, initialize_ray, limited_powerset, to_iterator

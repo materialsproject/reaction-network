@@ -2,6 +2,7 @@
 Utility functions used by the enumerator classes.
 """
 from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
+
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry

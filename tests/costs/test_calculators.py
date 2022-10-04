@@ -1,15 +1,14 @@
 """ Tests for ChempotDistanceCalculator """
 from pathlib import Path
 
+import numpy as np
 import pytest
 from monty.serialization import loadfn
 
-import numpy as np
-
 from rxn_network.costs.calculators import ChempotDistanceCalculator
-from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 

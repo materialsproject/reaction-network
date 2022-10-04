@@ -6,11 +6,11 @@ minimization technique, with or without the option of an open entry.
 from itertools import product
 from typing import List, Optional
 
-from pymatgen.core.composition import Element
 from pymatgen.analysis.interface_reactions import (
     GrandPotentialInterfacialReactivity,
     InterfacialReactivity,
 )
+from pymatgen.core.composition import Element
 
 from rxn_network.core.composition import Composition
 from rxn_network.enumerators.basic import BasicEnumerator
