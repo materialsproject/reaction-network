@@ -196,13 +196,10 @@ class CalculateSelectivitiesMaker(Maker):
         added_elements, added_chemsys = get_added_elem_data(entries, [target_formula])
 
         logger.info("Loading reactions..")
-        all_rxns = ReactionSet.from_rxns(
-            [rxn for rxn_set in rxn_sets for rxn in rxn_set],
-            entries=entries,
-            open_elem=self.open_elem,
-            chempot=self.chempot,
-            filter_duplicates=True,
-        )
+        all_rxns = rxn_sets[0]
+        for rxn_set in rxn_sets[1:]:
+            all_rxns.add_rxn_set(rxn_set)
+
         logger.info("Identifying target reactions...")
 
         target_rxns = ReactionSet.from_rxns(
