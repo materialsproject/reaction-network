@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=42", "wheel", "setuptools-git-versioning"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -136,8 +136,11 @@ ignore-patterns = "test_"
 [tool.pydocstyle]
 ignore = "D105,D2,D4"
 
+[tool.pytest]
+addopts = "--durations=30"
+
 [tool.setuptools.package-data]
 rxn_network = ["py.typed"]
 
-[tool.pytest]
-addopts = "--durations=30"
+[tool.setuptools-git-versioning]
+enabled = true
