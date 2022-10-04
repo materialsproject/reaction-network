@@ -39,9 +39,6 @@ class PathwaySolver(Solver):
     lists of reactions)
     """
 
-    CHUNK_SIZE = 100000
-    BATCH_SIZE = 500
-
     def __init__(
         self,
         pathways: PathwaySet,
@@ -49,6 +46,8 @@ class PathwaySolver(Solver):
         cost_function: CostFunction,
         open_elem: str = None,
         chempot: float = None,
+        chunk_size=100000,
+        batch_size=None,
     ):
         """
         Args:
@@ -62,6 +61,8 @@ class PathwaySolver(Solver):
         self.cost_function = cost_function
         self.open_elem = Element(open_elem) if open_elem else None
         self.chempot = chempot
+        self.chunk_size = chunk_size
+        self.batch_size = batch_size
 
     def solve(
         self,
@@ -151,9 +152,10 @@ class PathwaySolver(Solver):
 
         paths = []
         paths_refs = []
+        batch_size = self.batch_size or ray.cluster_resources()["CPU"]
         batch_count = 1
         for n in range(1, max_num_combos + 1):
-            for group in grouper(combinations(range(num_rxns), n), self.CHUNK_SIZE):
+            for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
                 paths_refs.append(
                     _get_balanced_paths_ray.remote(
                         group,
@@ -166,7 +168,7 @@ class PathwaySolver(Solver):
                         chempot,
                     )
                 )
-                if len(paths_refs) >= self.BATCH_SIZE:
+                if len(paths_refs) >= batch_size:
                     for paths_ref in tqdm(
                         to_iterator(paths_refs),
                         total=len(paths_refs),
