@@ -38,10 +38,10 @@ logger = get_logger(__name__)
 
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     """
-    This object is based on pymatgen's EntrySet class and includes factory methods for constructing
-    GibbsComputedEntry objects from zero-temperature ComputedStructureEntry objects. It
-    also offers convenient methods for acquiring entries from the entry set, whether
-    that be using composition, stability, chemical system, etc.
+    This object is based on pymatgen's EntrySet class and includes factory methods for
+    constructing GibbsComputedEntry objects from zero-temperature ComputedStructureEntry
+    objects. It also offers convenient methods for acquiring entries from the entry set,
+    whether that be using composition, stability, chemical system, etc.
     """
 
     def __init__(
@@ -394,7 +394,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             )
 
         for entry in pd.all_entries:
-            experimental = False
             composition = entry.composition
             formula = composition.reduced_formula
 
@@ -407,44 +406,21 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
             new_entries = []
 
-            if include_nist_data and formula in NISTReferenceEntry.REFERENCES:
-                try:
-                    e = NISTReferenceEntry(
-                        composition=Composition(formula), temperature=temperature
-                    )
-                    experimental = True
-                    new_entries.append(e)
-                except ValueError as error:
-                    logger.info(
-                        f"Compound {formula} is in NIST-JANAF tables but at different"
-                        f" temperatures!: {error}"
-                    )
-            if include_barin_data and formula in BarinReferenceEntry.REFERENCES:
-                try:
-                    e = BarinReferenceEntry(
-                        composition=Composition(formula), temperature=temperature
-                    )
-                    experimental = True
-                    new_entries.append(e)
-                except ValueError as error:
-                    logger.info(
-                        f"Compound {formula} is in Barin tables but not at this"
-                        f" temperature! {error}"
-                    )
-            if include_freed_data and formula in FREEDReferenceEntry.REFERENCES:
-                try:
-                    e = FREEDReferenceEntry(
-                        composition=Composition(formula), temperature=temperature
-                    )
-                    experimental = True
-                    new_entries.append(e)
-                except ValueError as error:
-                    logger.warning(
-                        f"Compound {formula} is in FREED tables but not at this"
-                        f" temperature! {error}"
-                    )
+            new_entry = None
+            if include_nist_data:
+                new_entry = cls._check_for_experimental(formula, "nist", temperature)
+                if new_entry:
+                    new_entries.append(new_entry)
+            if include_barin_data:
+                new_entry = cls._check_for_experimental(formula, "barin", temperature)
+                if new_entry:
+                    new_entries.append(new_entry)
+            if include_freed_data:
+                new_entry = cls._check_for_experimental(formula, "freed", temperature)
+                if new_entry:
+                    new_entries.append(new_entry)
 
-            if experimental:
+            if new_entry:
                 experimental_formulas.append(formula)
             else:
                 structure = entry.structure
@@ -575,6 +551,30 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         d["entries"] = [e.as_dict() for e in self.entries]
         d["calculate_e_above_hulls"] = self.calculate_e_above_hulls
         return d
+
+    @staticmethod
+    def _check_for_experimental(formula: str, cls_name: str, temperature: float):
+        cls_name = cls_name.lower()
+        if cls_name in ("nist", "nistreferenceentry"):
+            cl = NISTReferenceEntry
+        elif cls_name in ("barin", "barinreferenceentry"):
+            cl = BarinReferenceEntry
+        elif cls_name in ("freed", "freedreferenceentry"):
+            cl = FREEDReferenceEntry
+        else:
+            raise ValueError("Invalid class name for experimental reference entry.")
+
+        entry = None
+        if formula in cl.REFERENCES:
+            try:
+                entry = cl(composition=Composition(formula), temperature=temperature)
+            except ValueError as error:
+                logger.info(
+                    f"Compound {formula} is in {cl} tables but at different"
+                    f" temperatures!: {error}"
+                )
+
+        return entry
 
     @staticmethod
     def _get_carbonate_correction(entry):

@@ -103,6 +103,16 @@ def test_interpolate_energy(entries):
     )
 
 
+def test_get_new_temperature(entries):
+    entry = entries[300]
+
+    new_temp = 400
+    new_entry = entry.get_new_temperature(new_temp)
+
+    assert new_entry.temperature == new_temp
+    assert new_entry.energy_per_atom != pytest.approx(entry.energy_per_atom)
+
+
 def test_as_dict(entries):
     d = entries[300].as_dict()
 

@@ -58,14 +58,14 @@ class GibbsComputedEntry(ComputedEntry):
         Args:
             composition: The composition object (pymatgen)
             formation_energy_per_atom: Calculated formation enthalpy, dH, at T = 298 K,
-                normalized to the total number of atoms in the composition. NOTE: since this
-                is a _formation_ energy, it must be calculated using a phase diagram construction.
+                normalized to the total number of atoms in the composition. NOTE: since
+                this is a _formation_ energy, it must be calculated using a phase
+                diagram construction.
             volume_per_atom: The total volume of the associated structure divided by its
                 number of atoms.
             temperature: Temperature [K] by which to acquire dGf(T); must be selected
-                from a range of [300, 2000] K. If temperature is not selected from
-                one of [300, 400, 500, ... 2000 K], then free energies will be
-                interpolated.
+                from a range of [300, 2000] K. If temperature is not selected from one
+                of [300, 400, 500, ... 2000 K], then free energies will be interpolated.
             energy_adjustments: Optional list of energy adjustments
             parameters: Optional list of calculation parameters
             data: Optional dictionary containing entry data
@@ -118,7 +118,8 @@ class GibbsComputedEntry(ComputedEntry):
             new_temperature: The new temperature to use [K]
 
         Returns:
-            A copy of the GibbsComputedEntry, initialized at the new specified temperature.
+            A copy of the GibbsComputedEntry, initialized at the new specified
+            temperature.
         """
         new_entry_dict = self.as_dict()
         new_entry_dict["temperature"] = new_temperature
@@ -207,7 +208,7 @@ class GibbsComputedEntry(ComputedEntry):
                 sum_g_i += amt * g_interp(temperature)
         else:
             sum_g_i = sum(
-                [amt * G_ELEMS[str(temperature)][elem] for elem, amt in elems.items()]
+                amt * G_ELEMS[str(temperature)][elem] for elem, amt in elems.items()
             )
 
         return sum_g_i
@@ -281,10 +282,10 @@ class GibbsComputedEntry(ComputedEntry):
         """
         if "theoretical" in self.data:
             return not self.data["theoretical"]
-        elif "icsd_ids" in self.data:
-            return len(self.data["icsd_ids"]) > 1
-        else:
-            return False
+        if "icsd_ids" in self.data:
+            return len(self.data["icsd_ids"]) >= 1
+
+        return False
 
     def as_dict(self) -> dict:
         """Returns an MSONable dict."""

@@ -1,7 +1,7 @@
 """ Tests for entry corrections. """
 import pytest
 
-from rxn_network.entries.corrections import CarbonateCorrection
+from rxn_network.entries.corrections import CARBONATE_CORRECTION, CarbonateCorrection
 
 
 @pytest.fixture

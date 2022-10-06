@@ -3,9 +3,9 @@ Test for BasicReaction. Several tests adapted from
 test module for pymatgen.analysis.reaction_calculator
 """
 import pytest
-from rxn_network.core.composition import Composition
 from pymatgen.core.composition import Element
 
+from rxn_network.core.composition import Composition
 from rxn_network.reactions.basic import BasicReaction
 
 
@@ -104,6 +104,14 @@ def test_balance(reactants, products, expected_rxn, expected_lowest_num_errors):
     rxn = BasicReaction.from_formulas(reactants, products)
     assert str(rxn) == expected_rxn
     assert rxn.lowest_num_errors == expected_lowest_num_errors
+
+
+def test_compositions(pre_balanced_rxn):
+    assert pre_balanced_rxn.compositions == [
+        Composition("Fe"),
+        Composition("O2"),
+        Composition("Fe2O3"),
+    ]
 
 
 def test_equality(pre_balanced_rxn, auto_balanced_rxn):

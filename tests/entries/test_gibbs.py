@@ -10,13 +10,13 @@ from rxn_network.entries.gibbs import GibbsComputedEntry
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def structure():
     struct = loadfn(TEST_FILES_PATH / "structure_LiFe4P4O16.json")
     return struct
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def entry(structure):
     entry = GibbsComputedEntry.from_structure(
         structure=structure,
@@ -28,7 +28,7 @@ def entry(structure):
     return entry
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def entries_temps_dict(structure):
     struct = structure
 
@@ -107,6 +107,31 @@ def test_normalize(entries_temps_dict):
         assert e.uncorrected_energy == pytest.approx(
             normed_entry.uncorrected_energy * num_atoms
         )
+
+
+def test_is_experimental(entry):
+    assert not entry.is_experimental
+
+    entry2 = entry.get_new_temperature(300)
+    entry2.data["theoretical"] = False
+
+    entry3 = entry.get_new_temperature(300)
+    entry3.data["icsd_ids"] = ["123456"]
+
+    assert entry2.is_experimental
+    assert entry3.is_experimental
+
+
+def test_eq(entry):
+    entry2 = entry.get_new_temperature(600)
+    assert entry != entry2
+
+    entry3 = entry.get_new_temperature(300)
+    assert entry == entry3
+
+
+def test_eq_different_class(entry, mp_entries):
+    assert entry != mp_entries[0]
 
 
 def test_invalid_temperature(entry):

@@ -15,8 +15,8 @@ from rxn_network.core.composition import Composition
 class ExperimentalReferenceEntry(ComputedEntry):
     """
     An Entry class for experimental reference data, to be sub-classed for specific data
-    sources.  Given a composition, automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
-    reference values.
+    sources.  Given a composition, automatically finds the Gibbs free energy of
+    formation, dGf(T) from tabulated reference values.
     """
 
     REFERENCES: Dict = {}
@@ -30,12 +30,12 @@ class ExperimentalReferenceEntry(ComputedEntry):
     ):
         """
         Args:
-            composition: Composition object (pymatgen).
-            temperature: Temperature in Kelvin. If temperature is not selected within
-                the range of the reference data (see self._validate_temperature), then this
-                will raise an error.
-            energy_adjustments: A list of EnergyAdjustments to apply to the entry.
-            data: Optional dictionary containing entry data
+            composition: Composition object (pymatgen). temperature: Temperature in
+            Kelvin. If temperature is not selected within
+                the range of the reference data (see self._validate_temperature), then
+                this will raise an error.
+            energy_adjustments: A list of EnergyAdjustments to apply to the entry. data:
+            Optional dictionary containing entry data
         """
         formula = composition.reduced_formula
         entry_id = self.__class__.__name__
