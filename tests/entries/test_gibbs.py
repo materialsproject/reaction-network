@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 from monty.serialization import loadfn
+from pymatgen.core.composition import Element
 
 from rxn_network.entries.gibbs import GibbsComputedEntry
 
@@ -74,6 +75,27 @@ def test_to_from_dict(entry):
     assert e.energy == pytest.approx(entry.energy)
 
 
+def test_get_new_temperature(entry):
+    new_temp = 600  # != original temp of 450
+    new_entry = entry.get_new_temperature(new_temp)
+
+    assert new_entry.temperature == new_temp
+    assert new_entry.formation_energy_per_atom == pytest.approx(
+        entry.formation_energy_per_atom
+    )
+    assert new_entry.energy != entry.energy
+
+
+def test_to_grand_entry(entry):
+    chempots = {Element("O"): 0}
+    grand_entry = entry.to_grand_entry(chempots)
+
+    assert grand_entry.energy == pytest.approx(entry.energy)
+    assert grand_entry.energy_per_atom != pytest.approx(entry.energy_per_atom)
+    assert grand_entry.original_comp == entry.composition
+    assert grand_entry.composition != entry.composition
+
+
 def test_str(entry):
     assert str(entry) is not None
 
@@ -85,3 +107,10 @@ def test_normalize(entries_temps_dict):
         assert e.uncorrected_energy == pytest.approx(
             normed_entry.uncorrected_energy * num_atoms
         )
+
+
+def test_invalid_temperature(entry):
+    with pytest.raises(ValueError):
+        entry.get_new_temperature(299)
+    with pytest.raises(ValueError):
+        entry.get_new_temperature(2001)

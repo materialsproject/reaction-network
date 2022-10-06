@@ -60,9 +60,9 @@ class ChempotDistanceCalculator(Calculator):
 
     def calculate(self, rxn: ComputedReaction) -> float:
         """
-        Calculates the (aggregate) chemical potential distance in eV/atom. The mu_func parameter
-        determines how the individual pairwise interface distances are aggregated into a
-        single value describing the overall reaction.
+        Calculates the (aggregate) chemical potential distance in eV/atom. The mu_func
+        parameter determines how the individual pairwise interface distances are
+        aggregated into a single value describing the overall reaction.
 
         Args:
             rxn: the ComputedReaction object

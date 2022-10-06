@@ -1,10 +1,11 @@
 """ Tests for ComputedReaction. Some tests adapted from pymatgen. """
-import pytest
 from pathlib import Path
+
+import pytest
 from monty.serialization import loadfn
 
-from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.entries.gibbs import GibbsComputedEntry
+from rxn_network.reactions.computed import ComputedReaction
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 ENTRIES_FILE = "yocl_namno2_rxn_entries.json.gz"

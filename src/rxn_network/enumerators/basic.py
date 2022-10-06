@@ -55,22 +55,23 @@ class BasicEnumerator(Enumerator):
 
         Args:
             precursors: Optional list of precursor formulas; only reactions
-                which contain at least these phases as reactants will be enumerated. See the
-                "exclusive_precursors" parameter for more details.
+                which contain at least these phases as reactants will be enumerated. See
+                the "exclusive_precursors" parameter for more details.
             targets: Optional list of target formulas; only reactions which include
                 formation of at least one of these targets will be enumerated. See the
                 "exclusive_targets" parameter for more details.
-            calculators: Optional list of Calculator object names to be initialized; see calculators
-                module for options (e.g., ["ChempotDistanceCalculator"])
+            calculators: Optional list of Calculator object names to be initialized; see
+                calculators module for options (e.g., ["ChempotDistanceCalculator"])
             n: Maximum reactant/product cardinality; i.e., largest possible number of
                 entries on either side of the reaction. Defaults to 2.
-            exclusive_precursors: Whether to consider only reactions that have
-            reactants which are a subset of the provided list of precursors. In other
+            exclusive_precursors: Whether to consider only reactions that have reactants
+            which are a subset of the provided list of precursors. In other
                 words, if True, this only identifies reactions with reactants selected
                 from the precursors argument. Defaults to True.
             exclusive_targets: Whether to consider only reactions that make the
-                form products that are a subset of the provided list of targets. If False,
-                this only identifies reactions with no unspecified byproducts. Defualts to False.
+                form products that are a subset of the provided list of targets. If
+                False, this only identifies reactions with no unspecified byproducts.
+                Defualts to False.
             remove_unbalanced: Whether to remove reactions which are unbalanced.
                 Defaults to True.
             remove_changed: Whether to remove reactions which can only be balanced by
@@ -103,13 +104,13 @@ class BasicEnumerator(Enumerator):
 
     def enumerate(self, entries: GibbsEntrySet, batch_size=None) -> ReactionSet:
         """
-        Calculate all possible reactions given a set of entries. If the enumerator
-        was initialized with specified precursors or target, the reactions will be
-        filtered by these constraints. Every enumerator follows a standard procedure:
+        Calculate all possible reactions given a set of entries. If the enumerator was
+        initialized with specified precursors or target, the reactions will be filtered
+        by these constraints. Every enumerator follows a standard procedure:
 
         1. Initialize entries, i.e., ensure that precursors and target are considered
-        stable entries within the entry set. If using ChempotDistanceCalculator,
-        ensure that entries are filtered by stability.
+        stable entries within the entry set. If using ChempotDistanceCalculator, ensure
+        that entries are filtered by stability.
 
         2. Get a dictionary representing every possible "node", i.e. phase combination,
         grouped by chemical system.
@@ -258,8 +259,7 @@ class BasicEnumerator(Enumerator):
         self, entries, precursor_entries, target_entries, open_entries
     ):
         """
-        Gets all possible entry combinations up to predefined cardinality (n), filtered and
-        grouped by chemical system.
+        Gets all possible entry combinations up to predefined cardinality (n), filtered and grouped by chemical system.
         """
         precursor_elems = [
             [str(el) for el in e.composition.elements] for e in precursor_entries

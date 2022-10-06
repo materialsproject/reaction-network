@@ -3,7 +3,9 @@ from pathlib import Path
 import pytest
 from monty.serialization import loadfn
 
+from rxn_network.core.composition import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.reactions.hull import InterfaceReactionHull
 
 # load files
 TEST_FILES_PATH = Path(__file__).parent / "test_files"
@@ -12,11 +14,7 @@ MN_O_Y_ENTRIES = loadfn(TEST_FILES_PATH / "Mn_O_Y_entries.json.gz")
 CL_MN_NA_O_Y_ENTRIES = loadfn(TEST_FILES_PATH / "Cl_Mn_Na_O_Y_entries.json.gz")
 YMNO_RXNS = loadfn(TEST_FILES_PATH / "ymno3_rxns.json.gz")
 BAO_TIO2_RXNS = loadfn(TEST_FILES_PATH / "bao_tio2_rxns.json.gz")
-
-
-@pytest.fixture(scope="session")
-def entries():
-    return GibbsEntrySet(CL_MN_NA_O_Y_ENTRIES)
+COMPUTED_RXN = loadfn(TEST_FILES_PATH / "computed_rxn.json.gz")
 
 
 @pytest.fixture(scope="session")
@@ -33,9 +31,20 @@ def gibbs_entries():
 
 
 @pytest.fixture(scope="session")
+def entries():
+    return GibbsEntrySet(CL_MN_NA_O_Y_ENTRIES)
+
+
+@pytest.fixture(scope="session")
 def filtered_entries(gibbs_entries):
     filtered_entries = gibbs_entries.filter_by_stability(0.0)
     return filtered_entries
+
+
+@pytest.fixture(scope="session")
+def computed_rxn():
+    """2 YOCl + 2 NaMnO2 + 0.5 O2 -> Y2Mn2O7 + 2 NaCl"""
+    return COMPUTED_RXN
 
 
 @pytest.fixture(scope="session")
@@ -53,12 +62,6 @@ def irh_batio(bao_tio2_rxns):
     return InterfaceReactionHull(
         c1=Composition("BaO"), c2=Composition("TiO2"), reactions=bao_tio2_rxns
     )
-
-
-@pytest.fixture(scope="session")
-def computed_rxn():
-    """2 YOCl + 2 NaMnO2 + 0.5 O2 -> Y2Mn2O7 + 2 NaCl"""
-    return loadfn(TEST_FILES_PATH / "computed_rxn.json.gz")
 
 
 # def pytest_itemcollected(item):

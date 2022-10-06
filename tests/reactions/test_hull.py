@@ -1,9 +1,7 @@
 """ Tests for InterfaceReactionHull. """
 import numpy as np
 import pytest
-from pymatgen.core.composition import Element
 
-from rxn_network.core.composition import Composition
 from rxn_network.reactions.hull import InterfaceReactionHull
 
 

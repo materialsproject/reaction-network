@@ -1,15 +1,14 @@
 max-line-length: 88
+test-warnings: false
+doc-warnings: false
+ignore-paths:
+  - docs
+  - tests
 
 bandit:
   run: true
 
 pylint:
-  ignored-modules:
-    - scipy
-  extension-pkg-whitelist:
-    - scipy
-  ignore-patterns:
-    - test_
   disable:
     - unsubscriptable-object
     - invalid-name
@@ -31,12 +30,6 @@ pylint:
     - R0914
 mypy:
   run: true
-  ignore_missing_imports: true
-  no_strict_optional: true
-  ignored-modules: 
-    - scipy
-  extension-pkg-whitelist:
-    - scipy
-    - pydantic
-  ignore-patterns: 
-    - test_
+  options:
+    ignore-missing-imports: true
+    follow-imports: skip

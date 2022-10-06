@@ -5,10 +5,13 @@ import numpy as np
 import pytest
 from monty.serialization import loadfn
 
-from rxn_network.costs.calculators import ChempotDistanceCalculator
+from rxn_network.costs.calculators import (
+    ChempotDistanceCalculator,
+    PrimarySelectivityCalculator,
+    SecondarySelectivityCalculator,
+)
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
@@ -81,59 +84,59 @@ def secondary_selectivity_calculator(irh_batio):
     return SecondarySelectivityCalculator(irh_batio)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def stable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 2 BaO -> Ba2TiO4":
             return r
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def unstable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 0.9 BaO -> 0.1 Ti10O11 + 0.9 BaO2":
             return r
 
 
-def test_cpd_calculate(calculator, rxn):
-    actual_cost = calculator.calculate(rxn)
-    expected_cost = cpd_expected_values[str(rxn)][calculator.mu_func.__name__]
+def test_cpd_calculate(cpd_calculator, rxn):
+    actual_cost = cpd_calculator.calculate(rxn)
+    expected_cost = cpd_expected_values[str(rxn)][cpd_calculator.mu_func.__name__]
 
     assert actual_cost == pytest.approx(expected_cost)
 
 
-def test_cpd_decorate(calculator, rxn):
+def test_cpd_decorate(cpd_calculator, rxn):
     rxn_missing_data = rxn.copy()
     rxn_missing_data.data = None
 
-    rxn_dec = calculator.decorate(rxn)
-    rxn_missing_data_dec = calculator.decorate(rxn_missing_data)
+    rxn_dec = cpd_calculator.decorate(rxn)
+    rxn_missing_data_dec = cpd_calculator.decorate(rxn_missing_data)
 
-    actual_cost = rxn_dec.data[calculator.name]
-    expected_cost = cpd_expected_values[str(rxn)][calculator.mu_func.__name__]
+    actual_cost = rxn_dec.data[cpd_calculator.name]
+    expected_cost = cpd_expected_values[str(rxn)][cpd_calculator.mu_func.__name__]
 
     assert type(rxn_dec) == ComputedReaction
     assert actual_cost == pytest.approx(expected_cost)
-    assert rxn_missing_data_dec.data[calculator.name] == actual_cost
+    assert rxn_missing_data_dec.data[cpd_calculator.name] == actual_cost
 
 
-def test_cpd_calculate_many(calculator, rxns):
-    actual_costs = calculator.calculate_many(rxns)
-    expected_costs = [calculator.calculate(rxn) for rxn in rxns]
+def test_cpd_calculate_many(cpd_calculator, rxns):
+    actual_costs = cpd_calculator.calculate_many(rxns)
+    expected_costs = [cpd_calculator.calculate(rxn) for rxn in rxns]
 
     assert actual_costs == pytest.approx(expected_costs)
 
 
-def test_cpd_decorate_many(calculator, rxns):
+def test_cpd_decorate_many(cpd_calculator, rxns):
     rxns_missing_data = [rxn.copy() for rxn in rxns]
     for rxn in rxns_missing_data:
         rxn.data = None
 
-    rxns_dec = calculator.decorate_many(rxns)
-    rxns_missing_data_dec = calculator.decorate_many(rxns_missing_data)
+    rxns_dec = cpd_calculator.decorate_many(rxns)
+    rxns_missing_data_dec = cpd_calculator.decorate_many(rxns_missing_data)
 
-    actual_costs = [rxn.data[calculator.name] for rxn in rxns_dec]
-    expected_costs = [calculator.calculate(rxn) for rxn in rxns]
+    actual_costs = [rxn.data[cpd_calculator.name] for rxn in rxns_dec]
+    expected_costs = [cpd_calculator.calculate(rxn) for rxn in rxns]
 
     assert type(rxns_dec) == list
     assert actual_costs == pytest.approx(expected_costs)
@@ -150,15 +153,24 @@ def test_cpd_calculator_from_entries(entries, mu_func, rxn):
     assert actual_cost == pytest.approx(expected_cost)
 
 
-def test_primary_selectivity_calculate(primary_selectivity_calculator, rxn):
-    actual_cost = primary_selectivity_calculator.calculate(rxn)
-    expected_cost = 0.0
+def test_primary_selectivity_calculate(
+    primary_selectivity_calculator, stable_rxn, unstable_rxn, irh_batio
+):
 
-    assert actual_cost == pytest.approx(expected_cost)
+    assert primary_selectivity_calculator.calculate(stable_rxn) == pytest.approx(
+        irh_batio.get_primary_selectivity(stable_rxn)
+    )
+    assert primary_selectivity_calculator.calculate(unstable_rxn) == pytest.approx(
+        irh_batio.get_primary_selectivity(unstable_rxn)
+    )
 
 
-def test_secondary_selectivity_calculate(secondary_selectivity_calculator, rxn):
-    actual_cost = secondary_selectivity_calculator.calculate(rxn)
-    expected_cost = 0.0
-
-    assert actual_cost == pytest.approx(expected_cost)
+def test_secondary_selectivity_calculate(
+    secondary_selectivity_calculator, stable_rxn, unstable_rxn, irh_batio
+):
+    assert secondary_selectivity_calculator.calculate(stable_rxn) == pytest.approx(
+        irh_batio.get_secondary_selectivity(stable_rxn)
+    )
+    assert secondary_selectivity_calculator.calculate(unstable_rxn) == pytest.approx(
+        irh_batio.get_secondary_selectivity(unstable_rxn)
+    )

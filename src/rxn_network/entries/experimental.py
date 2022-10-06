@@ -31,9 +31,10 @@ class ExperimentalReferenceEntry(ComputedEntry):
         """
         Args:
             composition: Composition object (pymatgen).
-            temperature: Temperature in Kelvin. If temperature is not selected from
-                one of [300, 400, 500, ... 2000 K], then free energies will be
-                interpolated. Defaults to 300 K.
+            temperature: Temperature in Kelvin. If temperature is not selected within
+                the range of the reference data (see self._validate_temperature), then this
+                will raise an error.
+            energy_adjustments: A list of EnergyAdjustments to apply to the entry.
             data: Optional dictionary containing entry data
         """
         formula = composition.reduced_formula
@@ -75,7 +76,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
 
     def to_grand_entry(self, chempots):
         """
-        Convert a GibbsComputedEntry to a GrandComputedEntry.
+        Convert an ExperimentalReferenceEntry to a GrandComputedEntry.
 
         Args:
             chempots: A dictionary of {element: chempot} pairs.
@@ -111,6 +112,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
             Gibbs free energy of formation of formula at specified temperature [eV]
         """
         data = cls.REFERENCES[formula]
+
         if temperature % 100 > 0:
             g_interp = interp1d(list(data.keys()), list(data.values()))
             return g_interp(temperature)[()]
@@ -176,7 +178,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
         return False
 
     def __hash__(self):
-        data_md5 = hashlib.md5(
+        data_md5 = hashlib.md5(  # nosec
             f"{self.__class__.__name__}{self.composition}_{self.temperature}".encode(
                 "utf-8"
             )

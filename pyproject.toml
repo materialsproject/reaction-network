@@ -86,7 +86,7 @@ exclude_lines = [
 ]
 
 [tool.flake8]
-exclude = ".git,__pycache__,docs_rst/conf.py,tests"
+exclude = ".git,__pycache__,tests"
 max-line-length = 88
 max-doc-length = 88
 extend-ignore = "E741,W291,W293,E501,E231,E203,F401"
@@ -97,18 +97,8 @@ docstring-convention = "google"
 profile = "black"
 known_first_party = "rxn_network"
 
-[tool.mypy]
-ignore_missing_imports = true
-no_strict_optional = true
-ignored-modules = "scipy"
-extension-pkg-whitelist = ["scipy", "pydantic"]
-ignore-patterns = "test_"
-
-[tool.pydocstyle]
-ignore = "D105,D2,D4"
-
 [tool.pytest]
-addopts = "--durations=30"
+addopts = "--durations=10"
 
 [tool.setuptools.package-data]
 rxn_network = ["py.typed"]

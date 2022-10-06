@@ -34,8 +34,8 @@ class BarinReferenceEntry(ExperimentalReferenceEntry):
     ):
         """
         Args:
-            composition: Composition object (within pymatgen).
-            temperature: Absolute temperature in Kelvin. If temperature is not selected from
+            composition: Composition object (within pymatgen). temperature: Absolute
+            temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
         """

@@ -228,5 +228,5 @@ def filter_df_by_precursors(df, precursors):
     df["precursors"] = [
         list(sorted([r.reduced_formula for r in rxn.reactants])) for rxn in df["rxn"]
     ]
-    selected = df[df["precursors"].apply(lambda x: all([p in precursors for p in x]))]
+    selected = df[df["precursors"].apply(lambda x: all(p in precursors for p in x))]
     return selected.drop(columns=["precursors"])

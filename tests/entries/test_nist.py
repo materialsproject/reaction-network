@@ -1,8 +1,9 @@
 """ Tests for NistReferenceEntry. """
 import pytest
+from pymatgen.core.composition import Element
+from pymatgen.entries.computed_entries import ManualEnergyAdjustment
 
 from rxn_network.core.composition import Composition
-
 from rxn_network.entries.nist import NISTReferenceEntry
 
 
@@ -75,6 +76,33 @@ def test_is_experimental(entries):
     assert all([e.is_experimental for e in entries.values()])
 
 
+def test_is_element():
+    assert not NISTReferenceEntry(Composition("CO2"), 300).is_element
+
+
+def test_to_grand_entry(entries):
+    entry = entries[300]
+
+    chempots = {Element("O"): 0}
+    grand_entry = entry.to_grand_entry(chempots)
+
+    assert grand_entry.energy == pytest.approx(entry.energy)
+    assert grand_entry.energy_per_atom != pytest.approx(entry.energy_per_atom)
+    assert grand_entry.original_comp == entry.composition
+    assert grand_entry.composition != entry.composition
+
+
+def test_interpolate_energy(entries):
+    comp = Composition("CO2")
+    entry1 = NISTReferenceEntry(composition=comp, temperature=300)
+    entry2 = NISTReferenceEntry(composition=comp, temperature=400)
+
+    interpolated_entry = NISTReferenceEntry(composition=comp, temperature=350)
+    assert interpolated_entry.energy == pytest.approx(
+        0.5 * entry1.energy + 0.5 * entry2.energy
+    )
+
+
 def test_as_dict(entries):
     d = entries[300].as_dict()
 
@@ -87,3 +115,18 @@ def test_from_dict(entries):
     e = entries[300]
     d = e.as_dict()
     assert NISTReferenceEntry.from_dict(d) == e
+
+
+def test_equals(entries):
+    comp = Composition("CO2")
+    entry1 = NISTReferenceEntry(comp, temperature=300)
+    entry2 = NISTReferenceEntry(
+        composition=comp,
+        temperature=300,
+        energy_adjustments=[ManualEnergyAdjustment(0.1)],
+    )
+
+    assert entries[300] == entries[300]
+    assert entries[300] != entries[600]
+
+    assert entry1 != entry2

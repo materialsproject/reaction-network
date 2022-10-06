@@ -351,13 +351,12 @@ class ReactionSet(MSONable):
 
         # groupby only works with pre-sorted arrays
         sorted_coeffs, sorted_idxs, sorted_indices = zip(
-            *[
-                i
-                for i in sorted(
+            *list(
+                sorted(
                     zip(self.coeffs, range(len(self.indices)), self.indices),
                     key=lambda x: sorted(x[2]),
                 )
-            ]
+            )
         )
 
         for i, group in groupby(

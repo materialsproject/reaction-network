@@ -153,15 +153,15 @@ class InterfaceReactionHull(MSONable):
 
             if np.isclose(coordinate, x1):
                 return {self.reactions[v1]: 1.0}
-            elif np.isclose(coordinate, x2):
+            if np.isclose(coordinate, x2):
                 return {self.reactions[v2]: 1.0}
-            elif coordinate > x1 and coordinate < x2:
+            if coordinate > x1 and coordinate < x2:
                 return {
                     self.reactions[v1]: (x2 - coordinate) / (x2 - x1),
                     self.reactions[v2]: (coordinate - x1) / (x2 - x1),
                 }
-            else:
-                continue
+
+            continue
 
         raise ValueError("No reactions found!")
 

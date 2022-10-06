@@ -57,7 +57,8 @@ class GetEntrySetMaker(Maker):
         e_above_hull: Energy above hull to use for filtering entries.
         include_polymorphs: Whether to include polymorphs in the entry set.
         formulas_to_include: List of formulas to include in the entry set.
-        calculate_e_above_hulls: Whether to calculate e_above_hulls for all entries in the entry set.
+        calculate_e_above_hulls: Whether to calculate e_above_hulls for all entries
+            in the entry set.
         MP_API_KEY: API key for Materials Project. Note: if not provided, MPRester will
             automatically look for an environment variable.
     """

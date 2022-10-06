@@ -29,9 +29,11 @@ class BalancedPathway(BasicPathway):
         """
         Args:
             reactions: list of ComputedReaction objects which occur along path.
-            coefficients: list of coefficients to balance each of these reactions, respectively
+            coefficients: list of coefficients to balance each of these reactions, 
+                respectively
             costs: list of corresponding costs for each reaction.
-                balanced: whether or not the reaction pathway is balanced. Defaults to False.
+            balanced: whether or not the reaction pathway is balanced. 
+                Defaults to False.
         """
         self.coefficients = coefficients
         super().__init__(reactions=reactions, costs=costs)
