@@ -98,8 +98,12 @@ class GetEntrySetMaker(Maker):
         else:
             from mp_api.client import MPRester
 
-            with MPRester(self.MP_API_KEY) as mpr:
-                entries = mpr.get_entries_in_chemsys(elements=chemsys)
+            if self.MP_API_KEY:
+                with MPRester(self.MP_API_KEY) as mpr:
+                    entries = mpr.get_entries_in_chemsys(elements=chemsys)
+            else:
+                with MPRester() as mpr:  # let MPRester look for env variable
+                    entries = mpr.get_entries_in_chemsys(elements=chemsys)
 
         entries = process_entries(
             entries,
@@ -509,7 +513,7 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         other_energies = np.array(
             [r.energy_per_atom for r in competing_rxns if r != rxn]
         )
-        primary_selectivity = InterfaceReactionHull._primary_selectivity_from_energies(  # pylint: disable=protected-access
+        primary_selectivity = InterfaceReactionHull._primary_selectivity_from_energies(  # pylint: disable=protected-access, line-too-long # noqa: E501
             rxn.energy_per_atom, other_energies, temp=temp
         )
         energy_diffs = rxn.energy_per_atom - np.append(

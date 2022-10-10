@@ -12,6 +12,7 @@ pylint:
   disable:
     - unsubscriptable-object
     - invalid-name
+    - arguments-differ  # to account for jobflow
     - logging-fstring-interpolation
     - arguments-renamed
     - assignment-from-none

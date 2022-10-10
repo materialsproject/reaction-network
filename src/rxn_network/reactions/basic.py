@@ -152,8 +152,7 @@ class BasicReaction(Reaction):
         all_comp = self.compositions
         coeffs = self.coefficients.copy()
         current_el_amount = (
-            sum([all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))])
-            / 2
+            sum(all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))) / 2
         )
         scale_factor = factor / current_el_amount
         coeffs *= scale_factor
@@ -171,10 +170,8 @@ class BasicReaction(Reaction):
         """
         return (
             sum(
-                [
-                    self.compositions[i][element] * abs(self.coefficients[i])
-                    for i in range(len(self.compositions))
-                ]
+                self.compositions[i][element] * abs(self.coefficients[i])
+                for i in range(len(self.compositions))
             )
             / 2
         )
@@ -218,7 +215,8 @@ class BasicReaction(Reaction):
     def is_separable(self, target: Composition) -> bool:
         """
         Checks if the reaction forms byproducts which are separable from the target
-        composition; i.e., byproducts do not contain any of the elements in the target phase.
+        composition; i.e., byproducts do not contain any of the elements in the target
+        phase.
 
         Args:
             target: Composition object of target; elements in this phase will be used to
@@ -363,7 +361,7 @@ class BasicReaction(Reaction):
         return self._compositions
 
     @property
-    def coefficients(self) -> np.ndarray:  # pylint: disable = W0236
+    def coefficients(self) -> np.ndarray:
         """Array of reaction coefficients"""
         return self._coefficients
 
@@ -371,7 +369,7 @@ class BasicReaction(Reaction):
     def num_atoms(self) -> float:
         """Total number of atoms in this reaction"""
         return sum(
-            coeff * sum([c[el] for el in self.elements])
+            coeff * sum(c[el] for el in self.elements)
             for c, coeff in self.product_coeffs.items()
         )
 

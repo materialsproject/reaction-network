@@ -1,16 +1,18 @@
 import itertools
+import re
 import warnings
 from copy import deepcopy
 from typing import Iterable, List, Optional, Union
 
 from maggma.stores import MongoStore
+from pymatgen.core.composition import Element
 from pymatgen.core.structure import Structure
 from pymatgen.entries import Entry
 from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
-from pymatgen.ext.matproj import _MPResterLegacy
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
+from rxn_network.core.composition import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.utils.funcs import get_logger
 
@@ -36,15 +38,17 @@ def process_entries(
             objects
         include_nist_data (bool): Whether or not to include NIST data when constructing
             the GibbsComputedEntry objects. Defaults to True.
-        include_barin_data (bool): Whether or not to include Barin data when constructing
-            the GibbsComputedEntry objects. Defaults to False.
-        e_above_hull (float): Only include entries with an energy above hull below this value (eV)
+        include_barin_data (bool): Whether or not to include Barin data when
+            constructing the GibbsComputedEntry objects. Defaults to False.
+        e_above_hull (float): Only include entries with an energy above hull below this
+            value (eV)
         include_polymorphs (bool): Whether or not to include metastable polymorphs.
             Defaults to False.
         formulas_to_include: Formulas to ensure are in the entries.
 
     Returns:
-        A GibbsEntrySet object containing GibbsComputedEntry objects with specified constraints.
+        A GibbsEntrySet object containing GibbsComputedEntry objects with specified
+        constraints.
     """
     entry_set = GibbsEntrySet.from_entries(
         entries=entries,
@@ -90,7 +94,7 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = F
     return entry
 
 
-def get_entries(  # noqa: C901
+def get_entries(  # noqa: MC0001
     db: MongoStore,
     chemsys_formula_id_criteria: Union[str, dict],
     compatible_only: bool = True,
@@ -99,11 +103,16 @@ def get_entries(  # noqa: C901
     use_premade_entries: bool = False,
     conventional_unit_cell: bool = False,
     sort_by_e_above_hull: bool = False,
-):
+):  # pragma: no cover
     """
     Get a list of ComputedEntries or ComputedStructureEntries corresponding
-    to a chemical system, formula, or materials_id or full criteria. Code adapted
-    from pymatgen.ext.matproj.
+    to a chemical system, formula, or materials_id or full criteria.
+
+    WARNING:
+        This function is legacy code directly adapted from pymatgen.ext.matproj. It is
+        not broadly useful or applicable to other databases. It is only used in jobs
+        interfaced directly with internal databases at Materials Project. This code is
+        not adequately tested and may not work as expected.
 
     Args:
         db: MongoStore object with database connection
@@ -133,6 +142,7 @@ def get_entries(  # noqa: C901
     Returns:
         List of ComputedEntry or ComputedStructureEntry objects.
     """
+
     params = [
         "deprecated",
         "run_type",
@@ -157,7 +167,7 @@ def get_entries(  # noqa: C901
             props.append("structure")
 
     if not isinstance(chemsys_formula_id_criteria, dict):
-        criteria = _MPResterLegacy.parse_criteria(chemsys_formula_id_criteria)
+        criteria = parse_criteria(chemsys_formula_id_criteria)
     else:
         criteria = chemsys_formula_id_criteria
 
@@ -238,11 +248,17 @@ def get_all_entries_in_chemsys(
     use_premade_entries: bool = False,
     conventional_unit_cell: bool = False,
     n: int = 1000,
-) -> List[ComputedEntry]:
+) -> List[ComputedEntry]:  # noqa: MC0001  # pragma: no cover
     """
     Helper method for getting all entries in a total chemical system by querying
     database for all sub-chemical systems. Code adadpted from pymatgen.ext.matproj
     and modified to support very large chemical systems.
+
+    WARNING:
+        This function is legacy code directly adapted from pymatgen.ext.matproj. It is
+        not broadly useful or applicable to other databases. It is only used in jobs
+        interfaced directly with internal databases at Materials Project. This code is
+        not adequately tested and may not work as expected.
 
     Args:
         db: MongoStore object with database connection
@@ -300,7 +316,7 @@ def get_all_entries_in_chemsys(
                     conventional_unit_cell=conventional_unit_cell,
                 )
             )
-    else:
+    else:  # for very large chemical systems, use a different approach
         entries = get_entries(
             db,
             {"elements": {"$not": {"$elemMatch": {"$nin": elements}}}},
@@ -312,3 +328,74 @@ def get_all_entries_in_chemsys(
         )
 
     return entries
+
+
+def parse_criteria(criteria_string):  # pragma: no cover
+    """
+    Parses a powerful and simple string criteria and generates a proper
+    mongo syntax criteria.
+
+    Args:
+        criteria_string (str): A string representing a search criteria.
+            Also supports wild cards. E.g.,
+            something like "*2O" gets converted to
+            {'pretty_formula': {'$in': [u'B2O', u'Xe2O', u"Li2O", ...]}}
+
+            Other syntax examples:
+                mp-1234: Interpreted as a Materials ID.
+                Fe2O3 or *2O3: Interpreted as reduced formulas.
+                Li-Fe-O or *-Fe-O: Interpreted as chemical systems.
+
+            You can mix and match with spaces, which are interpreted as
+            "OR". E.g., "mp-1234 FeO" means query for all compounds with
+            reduced formula FeO or with materials_id mp-1234.
+
+    Returns:
+        A mongo query dict.
+    """
+    toks = criteria_string.split()
+
+    def parse_sym(sym):
+        if sym == "*":
+            return [el.symbol for el in Element]
+        m = re.match(r"\{(.*)\}", sym)
+        if m:
+            return [s.strip() for s in m.group(1).split(",")]
+        return [sym]
+
+    def parse_tok(t):
+        if re.match(r"\w+-\d+", t):
+            return {"task_id": t}
+        if "-" in t:
+            elements = [parse_sym(sym) for sym in t.split("-")]
+            chemsyss = []
+            for cs in itertools.product(*elements):
+                if len(set(cs)) == len(cs):
+                    # Check for valid symbols
+                    cs = [Element(s).symbol for s in cs]
+                    chemsyss.append("-".join(sorted(cs)))
+            return {"chemsys": {"$in": chemsyss}}
+        all_formulas = set()
+        explicit_els = []
+        wild_card_els = []
+        for sym in re.findall(r"(\*[\.\d]*|\{.*\}[\.\d]*|[A-Z][a-z]*)[\.\d]*", t):
+            if ("*" in sym) or ("{" in sym):
+                wild_card_els.append(sym)
+            else:
+                m = re.match(r"([A-Z][a-z]*)[\.\d]*", sym)
+                explicit_els.append(m.group(1))
+        nelements = len(wild_card_els) + len(set(explicit_els))
+        parts = re.split(r"(\*|\{.*\})", t)
+        parts = [parse_sym(s) for s in parts if s != ""]
+        for f in itertools.product(*parts):
+            c = Composition("".join(f))
+            if len(c) == nelements:
+                # Check for valid Elements in keys.
+                for e in c:
+                    Element(e.symbol)
+                all_formulas.add(c.reduced_formula)
+        return {"pretty_formula": {"$in": list(all_formulas)}}
+
+    if len(toks) == 1:
+        return parse_tok(toks[0])
+    return {"$or": list(map(parse_tok, toks))}

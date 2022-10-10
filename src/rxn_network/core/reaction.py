@@ -37,9 +37,9 @@ class Reaction(MSONable, metaclass=ABCMeta):
         """The energy of this reaction in total eV"""
 
     @property
+    @abstractmethod
     def compositions(self) -> List[Composition]:
         """List of all compositions in the reaction"""
-        return self.reactants + self.products
 
     @property
     def elements(self) -> List[Element]:

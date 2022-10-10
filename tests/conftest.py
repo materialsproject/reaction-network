@@ -1,6 +1,8 @@
 from pathlib import Path
 
 import pytest
+from jobflow.core.store import JobStore
+from maggma.stores import MemoryStore
 from monty.serialization import loadfn
 
 from rxn_network.core.composition import Composition
@@ -12,9 +14,10 @@ TEST_FILES_PATH = Path(__file__).parent / "test_files"
 
 MN_O_Y_ENTRIES = loadfn(TEST_FILES_PATH / "Mn_O_Y_entries.json.gz")
 CL_MN_NA_O_Y_ENTRIES = loadfn(TEST_FILES_PATH / "Cl_Mn_Na_O_Y_entries.json.gz")
-YMNO_RXNS = loadfn(TEST_FILES_PATH / "ymno3_rxns.json.gz")
+YMNO3_RXNS = loadfn(TEST_FILES_PATH / "ymno3_rxns.json.gz")
 BAO_TIO2_RXNS = loadfn(TEST_FILES_PATH / "bao_tio2_rxns.json.gz")
 COMPUTED_RXN = loadfn(TEST_FILES_PATH / "computed_rxn.json.gz")
+ALL_YMNO_RXNS = loadfn(TEST_FILES_PATH / "all_ymno_rxns.json.gz")
 
 
 @pytest.fixture(scope="session")
@@ -48,8 +51,13 @@ def computed_rxn():
 
 
 @pytest.fixture(scope="session")
-def ymno_rxns():
-    return YMNO_RXNS
+def ymno3_rxns():
+    return YMNO3_RXNS
+
+
+@pytest.fixture(scope="session")
+def all_ymno_rxns():
+    return ALL_YMNO_RXNS
 
 
 @pytest.fixture(scope="session")
@@ -62,6 +70,12 @@ def irh_batio(bao_tio2_rxns):
     return InterfaceReactionHull(
         c1=Composition("BaO"), c2=Composition("TiO2"), reactions=bao_tio2_rxns
     )
+
+
+@pytest.fixture(scope="session")
+def job_store():
+    additional_stores = {"rxns": MemoryStore(), "entries": MemoryStore()}
+    return JobStore(MemoryStore(), additional_stores=additional_stores)
 
 
 # def pytest_itemcollected(item):
