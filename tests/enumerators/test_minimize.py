@@ -61,7 +61,7 @@ def grand_potential_enumerator_with_precursors_and_target():
 
 
 def test_enumerate_gibbs(filtered_entries, gibbs_enumerator_default):
-    expected_num_rxns = 109
+    expected_num_rxns = 115
 
     for enumerator in [gibbs_enumerator_default]:
         rxns = enumerator.enumerate(filtered_entries)
@@ -99,6 +99,7 @@ def test_enumerate_gibbs_with_target(filtered_entries, gibbs_enumerator_with_tar
     assert len(rxns) == expected_num_rxns
 
     for r in rxns:
+        print(r)
         reactants = [i.reduced_formula for i in r.reactants]
         products = [i.reduced_formula for i in r.products]
         for target in targets:
@@ -118,8 +119,6 @@ def test_enumerate_grand_potential(filtered_entries, grand_potential_enumerator)
     expected_num_rxns = 42
 
     rxns = grand_potential_enumerator.enumerate(filtered_entries)
-
-    print(rxns)
 
     assert len(rxns) == expected_num_rxns
     assert all([not r.is_identity for r in rxns])

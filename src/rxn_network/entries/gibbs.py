@@ -167,8 +167,6 @@ class GibbsComputedEntry(ComputedEntry):
     def copy(self):
         return deepcopy(self)
 
-
-
     @staticmethod
     def _g_delta_sisso(
         volume_per_atom: float, reduced_mass: float, temp: float

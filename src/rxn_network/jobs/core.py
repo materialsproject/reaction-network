@@ -580,23 +580,7 @@ def _get_chempot_decorated_rxns_by_chunk(
             )
             cpd_calc_dict[chemsys] = cpd_calc
 
-        try:
-            new_rxn = cpd_calc.decorate(rxn)
-        except QhullError as e:
-            logger.warning(
-                f"QhullError encountered when decorating reaction, {rxn}, with chempot"
-                f" distance: {e}",
-                e,
-            )
-            new_rxn = rxn
-        except ValueError as e:
-            logger.warning(
-                f"ValueError encountered when decorating reaction, {rxn}, with chempot"
-                f" distance: {e}",
-                e,
-            )
-            new_rxn = rxn
-
+        new_rxn = cpd_calc.decorate(rxn)
         new_rxns.append(new_rxn)
 
     results = ReactionSet.from_rxns(new_rxns, entries=entries)
