@@ -121,7 +121,8 @@ def plot_network_on_graphistry(graph: gt.Graph):  # pragma: no cover
 
 def _get_cmap_string(palette, domain):
     """
-    Utility function for getting a matplotlib colormap string for a given palette and domain.
+    Utility function for getting a matplotlib colormap string for a given palette and
+    domain.
     """
     domain_unique = np.unique(domain)
     hash_table = {key: i_str for i_str, key in enumerate(domain_unique)}

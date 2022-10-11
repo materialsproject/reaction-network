@@ -580,7 +580,11 @@ def _get_chempot_decorated_rxns_by_chunk(
             )
             cpd_calc_dict[chemsys] = cpd_calc
 
-        new_rxn = cpd_calc.decorate(rxn)
+        try:
+            new_rxn = cpd_calc.decorate(rxn)
+        except:
+            for e in cpd_calc.cpd.entries:
+                print(e.as_dict())
         new_rxns.append(new_rxn)
 
     results = ReactionSet.from_rxns(new_rxns, entries=entries)

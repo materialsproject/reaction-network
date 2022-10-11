@@ -12,7 +12,7 @@ from scipy.ndimage.filters import median_filter
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
-from rxn_network.entries import GibbsEntrySet
+from rxn_network.entries.entry_set import GibbsEntrySet
 
 
 class PathwayPlotter(MSONable):
@@ -115,7 +115,7 @@ class PathwayPlotter(MSONable):
         """
         phase_df = pandas.DataFrame(self._phase_amounts, index=self._temps)
         if self._apply_smoothing:
-            phase_df = phase_df.apply(median_filter, axis=0, size=15)
+            phase_df = phase_df.apply(median_filter, axis=0, size=3)
 
         return phase_df
 

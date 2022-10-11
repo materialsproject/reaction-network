@@ -13,7 +13,7 @@ def initialize_ray(quiet=False):
     SLURM:
         Checks enviornment for existence of "ip_head" for situations where the user is
         running on multiple nodes. Automatically creats a new ray cluster if it has not
-        been initialized.
+        been initialized. See https://github.com/NERSC/slurm-ray-cluster/
     PBS:
         Checks environment for PBS_NNODES > 1.
 
@@ -23,23 +23,15 @@ def initialize_ray(quiet=False):
         logger.setLevel("INFO")
     if not ray.is_initialized():
         logger.info("Ray is not initialized. Checking for existing cluster...")
-        if os.environ.get("ip_head"):
-            # initialise ray if using NERSC slurm submission script:
-            # See https://github.com/NERSC/slurm-ray-cluster/blob/master/submit-ray-cluster.sbatch
+        if os.environ.get("ip_head") or int(os.environ.get("PBS_NNODES", 0)) > 1:
             ray.init(
                 address="auto",
-                # _node_ip_address=os.environ["ip_head"].split(":")[0],
-                # _redis_password=os.environ["redis_password"],
             )
-        elif os.environ.get("PBS_NNODES"):
-            # initialise ray if using PBS submission script (thanks @jx-fan)
-            if int(os.environ["PBS_NNODES"]) > 1:
-                ray.init(address="auto")
         else:
             logger.info(
                 "Could not identify existing Ray instance. Creating a new one..."
             )
-            ray.init(_redis_password="default_password")
+            ray.init()
 
             logger.info(
                 f"HOST: {ray.nodes()[0]['NodeManagerHostname']},"
@@ -49,7 +41,8 @@ def initialize_ray(quiet=False):
 
 def to_iterator(obj_ids):
     """
-    Method to convert a list of ray object ids to an iterator that can be used in a for loop.
+    Method to convert a list of ray object ids to an iterator that can be used in a for
+    loop.
     """
     while obj_ids:
         done, obj_ids = ray.wait(obj_ids)
