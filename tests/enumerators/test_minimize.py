@@ -1,6 +1,7 @@
 """ Tests for MinimizeGibbsEnumerator and MinimizeGrandPotentialEnumerator """
 import pytest
 from pymatgen.core.composition import Element
+
 from rxn_network.enumerators.minimize import (
     MinimizeGibbsEnumerator,
     MinimizeGrandPotentialEnumerator,

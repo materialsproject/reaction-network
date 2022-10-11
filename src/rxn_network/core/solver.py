@@ -17,12 +17,11 @@ class Solver(MSONable, metaclass=ABCMeta):
     Base definition for a pathway solver class.
     """
 
-    def __init__(self, pathways, entries):
+    def __init__(self, pathways):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
 
         self._pathways = pathways
-        self._entries = entries
 
         rxns = []
         costs = []
@@ -35,11 +34,6 @@ class Solver(MSONable, metaclass=ABCMeta):
 
         self._reactions = rxns
         self._costs = costs
-
-    @property
-    def entries(self) -> EntrySet:
-        """Entry set used in solver"""
-        return self._entries
 
     @property
     def pathways(self) -> List[Pathway]:

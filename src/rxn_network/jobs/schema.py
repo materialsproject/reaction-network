@@ -2,6 +2,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+from graph_tool.all import Graph
 from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element
 
@@ -123,7 +124,6 @@ class NetworkTaskDocument(BaseModel):
     k: int = Field(None, description="The number of paths solved for")
     precursors: List[str] = Field(None, description="The precursor compositions")
     targets: List[str] = Field(None, description="The target compositions")
-
 
 class PathwaySolverTaskDocument(BaseModel):
     """

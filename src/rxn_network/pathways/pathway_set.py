@@ -121,3 +121,9 @@ class PathwaySet(MSONable):
         Iterates over the PathwaySet.
         """
         return iter(self.get_paths())
+
+    def __len__(self):
+        """
+        Returns the number of pathways in the PathwaySet.
+        """
+        return len(self.indices)

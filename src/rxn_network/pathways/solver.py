@@ -41,7 +41,6 @@ class PathwaySolver(Solver):
     def __init__(
         self,
         pathways: PathwaySet,
-        entries: GibbsEntrySet,
         cost_function: CostFunction,
         open_elem: str = None,
         chempot: float = None,
@@ -56,7 +55,8 @@ class PathwaySolver(Solver):
             open_elem: Element to use for pathways with an open element.
             chempot: Chemical potential to use for pathways with an open element.
         """
-        super().__init__(entries=deepcopy(entries), pathways=deepcopy(pathways))
+        super().__init__(pathways=deepcopy(pathways))
+        self._entries = GibbsEntrySet(pathways.reaction_set.entries)
         self.cost_function = cost_function
         self.open_elem = Element(open_elem) if open_elem else None
         self.chempot = chempot
@@ -265,6 +265,11 @@ class PathwaySolver(Solver):
         self.logger.info(f"Found {num_rxns} intermediate reactions! \n")
 
         return rxns
+
+    @property
+    def entries(self) -> GibbsEntrySet:
+        """Entry set used in solver"""
+        return self._entries
 
 
 @njit(parallel=True, fastmath=True)

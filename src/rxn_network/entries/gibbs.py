@@ -3,6 +3,7 @@ A computed entry object for estimating the Gibbs free energy of formation. Note 
 this is similar to the implementation within pymatgen, but has been refactored here to
 add extra functionality.
 """
+from copy import deepcopy
 from itertools import combinations
 from typing import List, Optional
 
@@ -163,6 +164,11 @@ class GibbsComputedEntry(ComputedEntry):
         """
         return GrandPotPDEntry(self, chempots)
 
+    def copy(self):
+        return deepcopy(self)
+
+
+
     @staticmethod
     def _g_delta_sisso(
         volume_per_atom: float, reduced_mass: float, temp: float
@@ -322,14 +328,23 @@ class GibbsComputedEntry(ComputedEntry):
         return "\n".join(output)
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return (
-                (self.entry_id == other.entry_id)
-                and (self.temperature == other.temperature)
-                and (self.composition == other.composition)
-                and (self.energy == other.energy)
-            )
-        return False
+        if not type(other) is type(self):
+            return False
+
+        if getattr(self, "entry_id", None) and getattr(other, "entry_id", None):
+            if self.entry_id == other.entry_id and np.allclose(
+                self.energy, other.energy
+            ):
+                return True  # assumes diff temps --> different energies
+            return False
+
+        if not np.isclose(self.energy, other.energy):
+            return False
+
+        if self.composition != other.composition:
+            return False
+
+        return True
 
     def __hash__(self):
         return hash(

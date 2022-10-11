@@ -12,7 +12,7 @@ from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.network import Network
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
-from rxn_network.network.entry import NetworkEntry, NetworkEntryType
+from rxn_network.network.entry import DummyEntry, NetworkEntry, NetworkEntryType
 from rxn_network.network.gt import (
     initialize_graph,
     load_graph,
@@ -152,6 +152,7 @@ class ReactionNetwork(Network):
 
         precursors_v = g.add_vertex()
         precursors_entry = NetworkEntry(precursors, NetworkEntryType.Precursors)
+
         props = {"entry": precursors_entry, "type": precursors_entry.description.value}
         update_vertex_props(g, precursors_v, props)
 

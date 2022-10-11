@@ -378,6 +378,7 @@ class NetworkMaker(Maker):
         rn = ReactionNetwork(all_rxns, cost_function=self.cost_function)
         rn.build()
 
+        paths = None
         if self.precursors:
             rn.set_precursors(self.precursors)
         if self.targets:
@@ -436,19 +437,20 @@ class PathwaySolverMaker(Maker):
         self.net_rxn = net_rxn
 
     @job(paths="paths", output_schema=PathwaySolverTaskDocument)
-    def make(self, pathways, entries):
+    def make(self, pathways):
         chempots = None
         if self.open_elem:
             chempots = {Element(self.open_elem): self.chempot}
-        net_rxn = get_computed_rxn(self.net_rxn, entries, chempots)
 
         ps = PathwaySolver(
             pathways=pathways,
-            entries=entries,
             cost_function=self.cost_function,
             open_elem=self.open_elem,
             chempot=self.chempot,
         )
+
+        net_rxn = get_computed_rxn(self.net_rxn, ps.entries, chempots)
+
         balanced_paths = ps.solve(
             net_rxn=net_rxn,
             max_num_combos=self.max_num_combos,
@@ -583,6 +585,13 @@ def _get_chempot_decorated_rxns_by_chunk(
         except QhullError as e:
             logger.warning(
                 f"QhullError encountered when decorating reaction, {rxn}, with chempot"
+                f" distance: {e}",
+                e,
+            )
+            new_rxn = rxn
+        except ValueError as e:
+            logger.warning(
+                f"ValueError encountered when decorating reaction, {rxn}, with chempot"
                 f" distance: {e}",
                 e,
             )

@@ -138,6 +138,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         chem_sys = set(chemsys)
         if not chem_sys.issubset(self.chemsys):
             raise ValueError(f"{chem_sys} is not a subset of {self.chemsys}")
+
         subset = set()
         for e in self.entries:
             elements = [sp.symbol for sp in e.composition.keys()]
@@ -250,17 +251,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 name="Stabilization Adjustment",
                 description="Shifts energy so that entry is on the convex hull",
             )
-
-            entry_dict = entry.as_dict()
-            original_entry = entry_dict.get("entry", None)
-
-            if original_entry:
-                energy_adjustments = original_entry["energy_adjustments"]
-            else:
-                energy_adjustments = entry_dict["energy_adjustments"]
-
-            energy_adjustments.append(adjustment.as_dict())
-            new_entry = MontyDecoder().process_decoded(entry_dict)
+            new_entry = self.get_adjusted_entry(entry, adjustment)
 
         return new_entry
 
@@ -288,6 +279,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             random noise.
         """
         entries = deepcopy(self.entries_list)
+        new_entries = []
         jitter = normal(size=len(entries))
 
         for idx, entry in enumerate(entries):
@@ -298,9 +290,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 name="Random jitter",
                 description="Randomly sampled noise to account for uncertainty in data",
             )
-            entry.energy_adjustments.append(adj)
+            new_entries.append(self.get_adjusted_entry(entry, adj))
 
-        return GibbsEntrySet(entries)
+        return GibbsEntrySet(new_entries)
 
     def get_interpolated_entry(self, formula: str, tol=1e-6) -> ComputedEntry:
         """
@@ -348,12 +340,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
             if elems_entry.issubset(elems_pd):
                 e_above_hull = pd.get_e_above_hull(entry)
-                break
+                return e_above_hull
 
-        if e_above_hull is None:
-            raise ValueError("Entry not in any of the phase diagrams in pd_dict!")
-
-        return e_above_hull
+        raise ValueError("Entry not in any of the phase diagrams in pd_dict!")
 
     @classmethod
     def from_pd(
@@ -437,7 +426,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 if apply_carbonate_correction:
                     carbonate_correction = cls._get_carbonate_correction(gibbs_entry)
                     if carbonate_correction:
-                        gibbs_entry.energy_adjustments.append(carbonate_correction)
+                        gibbs_entry = cls.get_adjusted_entry(
+                            entry, carbonate_correction
+                        )
 
                 new_entries.append(gibbs_entry)
 
@@ -608,6 +599,21 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return CarbonateCorrection(num_c)
 
+    @staticmethod
+    def get_adjusted_entry(entry, adjustment):
+        entry_dict = entry.as_dict()
+        original_entry = entry_dict.get("entry", None)
+
+        if original_entry:
+            energy_adjustments = original_entry["energy_adjustments"]
+        else:
+            energy_adjustments = entry_dict["energy_adjustments"]
+
+        energy_adjustments.append(adjustment.as_dict())
+        new_entry = MontyDecoder().process_decoded(entry_dict)
+
+        return new_entry
+
     def _clear_cache(self):
         """
         Clears cached properties.
@@ -619,5 +625,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         try:
             del self.pd_dict
+        except AttributeError:
+            pass
+
+        try:
+            del self.min_entries_by_formula
         except AttributeError:
             pass
