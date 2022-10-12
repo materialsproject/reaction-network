@@ -38,7 +38,7 @@ def get_total_chemsys_str(
     """
     elements = {elem for entry in entries for elem in entry.composition.elements}
     if open_elems:
-        elements.update([e for e in open_elems])
+        elements.update(list(open_elems))
     return "-".join(sorted([str(e) for e in elements]))
 
 
@@ -79,7 +79,8 @@ def stabilize_entries(
     Args:
         pd: PhaseDiagram object
         entries_to_adjust: Iterable of entries requiring energies to be adjusted
-        tol: Numerical tolerance to ensure that the energy of the entry is below the hull
+        tol: Numerical tolerance to ensure that the energy of the entry is below the
+            hull
 
     Returns:
         A list of new entries with energies adjusted to be on the hull

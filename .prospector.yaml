@@ -8,6 +8,9 @@ ignore-paths:
 bandit:
   run: true
 
+mccabe:
+  run: false
+
 pylint:
   disable:
     - unsubscriptable-object

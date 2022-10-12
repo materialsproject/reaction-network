@@ -116,8 +116,10 @@ def initialize_graph(
     property and type is the data type.
 
     Args:
-        vertex_props: Dictionary of vertex property map properties in the form of {"prop": "type"}.
-        edge_props: Dictionary of edge property map properties in the form of {"prop": "type"}.
+        vertex_props: Dictionary of vertex property map properties in the form of
+            {"prop": "type"}.
+        edge_props: Dictionary of edge property map properties in the form of
+            {"prop": "type"}.
 
     Returns:
         Graph: a graph-tool graph object.

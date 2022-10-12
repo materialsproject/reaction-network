@@ -29,7 +29,8 @@ class NetworkEntry(MSONable):
         """
         Args:
             entries: list of Entry-like objects
-            description: Node type (e.g., Precursors, Target... see NetworkEntryType class)
+            description: Node type (e.g., Precursors, Target... see NetworkEntryType
+                class)
         """
         self.entries = set(entries)
         self.elements = sorted(

@@ -14,6 +14,9 @@ LOGGER = logging.getLogger(__name__)
 
 def test_initialize_ray(caplog):
     """Test initialize_ray"""
+    if ray.is_initialized():
+        ray.shutdown()
+
     with caplog.at_level(logging.INFO):
         initialize_ray(quiet=False)
 
@@ -25,6 +28,10 @@ def test_initialize_ray(caplog):
 
 def test_initialize_ray_quiet(caplog):
     """Test initialize_ray"""
+
+    if ray.is_initialized():
+        ray.shutdown()
+
     with caplog.at_level(logging.WARNING):
         initialize_ray(quiet=True)
 
@@ -40,6 +47,9 @@ def test_initialize_ray_with_slurm_cluster():
     original_ip_head = os.environ.get("ip_head")
     os.environ["ip_head"] = "test_ip_head"
 
+    if ray.is_initialized():
+        ray.shutdown()  # note: this test may still fail if ray is initialized elsewhere
+
     with pytest.raises(Exception) as error:
         initialize_ray(quiet=False)
     assert "ConnectionError" in str(error.type)
@@ -51,6 +61,9 @@ def test_initialize_ray_with_slurm_cluster():
 def test_initialize_ray_with_pbs_cluster():
     original_pbs_nnodes = os.environ.get("PBS_NNODES")
     os.environ["PBS_NNODES"] = "2"
+
+    if ray.is_initialized():
+        ray.shutdown()  # note: this test may still fail if ray is initialized elsewhere
 
     with pytest.raises(Exception) as error:
         initialize_ray(quiet=False)

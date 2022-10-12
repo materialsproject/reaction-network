@@ -96,7 +96,8 @@ class ReactionSelectivity(BaseModel):
 
 class ReactionHeuristics(BaseModel):
     """
-    A class for storing user-defined heuristics about the reaction (e.g., products separable)
+    A class for storing user-defined heuristics about the reaction (e.g., products
+        separable)
     """
 
     is_separable: bool = Field(
@@ -177,7 +178,7 @@ class ComputedSynthesisRecipe(BaseModel):
         data["heuristics"] = ReactionHeuristics(
             is_separable=rxn.is_separable(target),
             fraction_experimental=round(
-                sum([getattr(e, "is_experimental", False) for e in rxn.entries])
+                sum(getattr(e, "is_experimental", False) for e in rxn.entries)
                 / len(rxn.entries),
                 5,
             ),

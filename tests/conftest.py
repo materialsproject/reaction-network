@@ -19,6 +19,7 @@ BAO_TIO2_RXNS = loadfn(TEST_FILES_PATH / "bao_tio2_rxns.json.gz")
 COMPUTED_RXN = loadfn(TEST_FILES_PATH / "computed_rxn.json.gz")
 ALL_YMNO_RXNS = loadfn(TEST_FILES_PATH / "all_ymno_rxns.json.gz")
 YMN2O5_MN3O4_PATHS = loadfn(TEST_FILES_PATH / "ymn2o5_mn3o4_paths.json.gz")
+YMNO_RN = loadfn(TEST_FILES_PATH / "ymno_rn.json.gz")
 
 
 @pytest.fixture(scope="session")
@@ -78,6 +79,13 @@ def irh_batio(bao_tio2_rxns):
 @pytest.fixture(scope="session")
 def ymn2o5_mn3o4_paths():
     return YMN2O5_MN3O4_PATHS
+
+
+@pytest.fixture(scope="session")
+def ymno_rn():
+    rn = YMNO_RN
+    rn.load_graph(str(TEST_FILES_PATH / "ymno_rn_graph.gt.gz"))
+    return rn
 
 
 @pytest.fixture(scope="session")

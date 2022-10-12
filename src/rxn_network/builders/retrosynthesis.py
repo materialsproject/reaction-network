@@ -17,7 +17,7 @@ from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 
 
-class SynthesisRecipeBuilder(Builder):
+class SynthesisRecipeBuilder(Builder):  # pragma: no cover
     """
     Build a synthesis recipe document from the reaction results from EnumeratorWF.
     """
