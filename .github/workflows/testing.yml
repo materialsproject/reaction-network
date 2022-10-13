@@ -15,17 +15,25 @@ jobs:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Cache conda
+        uses: actions/cache@v2
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+            hashFiles('environment.yaml') }}
       - uses: conda-incubator/setup-miniconda@v2.1.1
         with:
-          miniconda-version: "latest"
-          python-version: "3.10"
-          activate-environment: foo
+          activate-environment: graph-tool
+          environment-file: environment.yaml
+          use-only-tar-bz2: true
 
-      - name: Install dependencies
+      - name: Install python dependencies
         run: |
           python -m pip install --upgrade pip
-          conda install -c conda-forge graph-tool
-          pip install .[strict]
+          pip install -e .[strict]
           pip install black prospector[with_mypy]
 
       - name: Lint with black
@@ -48,16 +56,24 @@ jobs:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Cache conda
+        uses: actions/cache@v2
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+            hashFiles('environment.yaml') }}
       - uses: conda-incubator/setup-miniconda@v2.1.1
         with:
-          miniconda-version: "latest"
-          python-version: ${{ matrix.python-version }}
-          activate-environment: foo
+          activate-environment: graph-tool
+          environment-file: environment.yaml
+          use-only-tar-bz2: true
 
-      - name: Install Python dependencies
+      - name: Install python dependencies
         run: |
           python -m pip install --upgrade pip
-          conda install -c conda-forge graph-tool
           pip install -e .[strict,tests]
 
       - name: Test with pytest
@@ -76,18 +92,25 @@ jobs:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Cache conda
+        uses: actions/cache@v2
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+            hashFiles('environment.yaml') }}
       - uses: conda-incubator/setup-miniconda@v2.1.1
         with:
-          miniconda-version: "latest"
-          python-version: "3.10"
-          activate-environment: foo
+          activate-environment: graph-tool
+          environment-file: environment.yaml
+          use-only-tar-bz2: true
 
-      - name: Install dependencies
+      - name: Install python dependencies
         run: |
           python -m pip install --upgrade pip
-          conda install -c conda-forge graph-tool
-          pip install -e .[strict]
-          pip install mkdocs
+          pip install -e .[strict,docs]
 
       - name: Build docs
         run: mkdocs build

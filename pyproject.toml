@@ -36,7 +36,7 @@ dependencies = [
     "pymatgen>=2022.8.23",
     "numba>=0.56.1",
     "jobflow>=0.1.8",
-    "ray>=1.7.0",
+    "ray>=2.0.0",
     "mp-api>=0.27.1",
 ]
 
