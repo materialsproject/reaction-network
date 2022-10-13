@@ -52,7 +52,7 @@ docs = [
 
 ]
 plotting = ["graphistry==0.28.0", "jupyter==1.0.0"]
-tests = ["pytest==7.1.3", "pytest-cov==4.0.0", "FireWorks==2.0.3"]
+tests = ["pytest==7.1.3", "pytest-cov==4.0.0"]
 strict = [
     "numba==0.56.2",
     "pymatgen==2022.09.21",
@@ -63,8 +63,8 @@ strict = [
 
 [project.urls]
 homepage = "https://genesis-efrc.github.io/reaction-network/"
-documentation = "https://genesis-efrc.github.io/reaction-network//"
-repository = "https://github.com/GENESIS-EFRC/reaction-network2"
+documentation = "https://genesis-efrc.github.io/reaction-network/"
+repository = "https://github.com/GENESIS-EFRC/reaction-network"
 changelog = "https://github.com/GENESIS-EFRC/reaction-network/blob/main/docs/CHANGELOG.md"
 
 [tool.coverage.run]
