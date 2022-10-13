@@ -73,7 +73,7 @@ class PathwayPlotter(MSONable):
         total_g = g_df.sum(axis=1)
         total_g = total_g - ground_state_energies
 
-        plot = total_g.plot(style="o")
+        plot = total_g.plot(backend="matplotlib", style="o")
         plt.xlabel("Temperature (K)", {"size": 11})
         plt.ylabel(r"Gibbs Free Energy, $G$ (eV/atom)", {"size": 11})
 

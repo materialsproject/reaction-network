@@ -8,7 +8,6 @@ import numpy as np
 import ray
 from jobflow import SETTINGS, Maker, job
 from pymatgen.core.composition import Element
-from scipy.spatial._qhull import QhullError
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition

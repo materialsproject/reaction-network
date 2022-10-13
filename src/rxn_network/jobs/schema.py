@@ -2,7 +2,6 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from graph_tool.all import Graph
 from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element
 
