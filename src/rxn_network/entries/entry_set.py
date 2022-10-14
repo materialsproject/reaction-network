@@ -412,23 +412,24 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             if new_entry:
                 experimental_formulas.append(formula)
             else:
+                corr = None
+                if apply_carbonate_correction:
+                    corr = cls._get_carbonate_correction(entry)
+
+                energy_adjustments = [corr] if corr else None
+
                 structure = entry.structure
                 formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
+
                 gibbs_entry = GibbsComputedEntry.from_structure(
                     structure=structure,
                     formation_energy_per_atom=formation_energy_per_atom,
                     temperature=temperature,
-                    energy_adjustments=None,
+                    energy_adjustments=energy_adjustments,
                     parameters=entry.parameters,
                     data=entry.data,
                     entry_id=entry.entry_id,
                 )
-                if apply_carbonate_correction:
-                    carbonate_correction = cls._get_carbonate_correction(gibbs_entry)
-                    if carbonate_correction:
-                        gibbs_entry = cls.get_adjusted_entry(
-                            entry, carbonate_correction
-                        )
 
                 new_entries.append(gibbs_entry)
 

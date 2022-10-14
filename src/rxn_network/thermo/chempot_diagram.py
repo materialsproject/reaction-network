@@ -86,6 +86,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         self._border_hyperplane_indices = list(
             range(num_hyperplanes, num_hyperplanes + num_border_hyperplanes)
         )
+        self._metastable_domains = {}  # for caching
 
     def shortest_domain_distance(self, f1: str, f2: str, offset=0.0) -> float:
         """
@@ -100,17 +101,13 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         if f1 in self.domains:
             pts1 = self.domains[f1]
-        elif f1 in self.metastable_domains:
-            pts1 = self.metastable_domains[f1]
         else:
-            raise ValueError(f"Formula {f1} not in domains!")
+            pts1 = self._get_metastable_domain(f1)
 
         if f2 in self.domains:
             pts2 = self.domains[f2]
-        elif f2 in self.metastable_domains:
-            pts2 = self.metastable_domains[f2]
         else:
-            raise ValueError(f"Formula {f2} not in domains!")
+            pts2 = self._get_metastable_domain(f2)
 
         tree = KDTree(pts1)
 
@@ -183,31 +180,27 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         """Returns the distance between two parallel hyperplanes"""
         return np.abs(delta_b) / np.linalg.norm(a)
 
-    def _get_metastable_domains(self):
-        e_set = self._entry_set
-        e_dict = e_set.min_entries_by_formula
-        stable_formulas = list(self.domains.keys())
-        stable_formulas.extend([str(e) for e in self.elements])
+    def _get_metastable_domain(self, formula):
+        """Returns the metastable domain for a given formula"""
+        if formula in self._metastable_domains:
+            return self._metastable_domains[formula]
 
-        metastable_entries = [e for f, e in e_dict.items() if f not in stable_formulas]
-        metastable_domains = {}
+        orig_entry = self._entry_set.get_min_entry_by_formula(formula)
+        new_entry = self._entry_set.get_stabilized_entry(orig_entry, tol=1e-1)
+        self._entry_set.add(new_entry)
+        cpd = ChemicalPotentialDiagram(self._entry_set, default_min_limit=-500)
 
-        for e in metastable_entries:
-            formula = e.composition.reduced_formula
-            new_entry = e_set.get_stabilized_entry(e, tol=1e-1)
-            e_set.add(new_entry)
-            cpd = ChemicalPotentialDiagram(e_set, default_min_limit=-500)
+        try:
+            metastable_domain = cpd.domains[formula]
+        except KeyError:
+            logging.warning(
+                f"Metastable domain for {formula} not found! Please investigate."
+            )
 
-            try:
-                metastable_domains[formula] = cpd.domains[formula]
-            except KeyError:
-                logging.warning(
-                    f"Metastable domain for {formula} not found! Please investigate."
-                )
+        self._metastable_domains[formula] = metastable_domain
+        self._entry_set.remove(new_entry)
 
-            e_set.remove(new_entry)
-
-        return metastable_domains
+        return metastable_domain
 
     @property
     def hs_int(self):
@@ -226,4 +219,8 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         formulas. This corresponds to the domains of the relevant phases if they were
         just barely stable
         """
-        return self._get_metastable_domains()
+        return {
+            e.composition.reduced_formula: self._get_metastable_domain(e)
+            for e in self._min_entries
+            if e.composition.reduced_formula not in self.domains
+        }
