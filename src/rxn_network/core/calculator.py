@@ -78,5 +78,6 @@ class Calculator(MSONable, metaclass=ABCMeta):
     @abstractmethod
     def name(self):
         """
-        The name of the calculator; used to store the value within the reaction's data dictionary
+        The name of the calculator; used to store the value within the reaction's data
+        dictionary
         """

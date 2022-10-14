@@ -6,7 +6,6 @@ from abc import ABCMeta
 from typing import List
 
 from monty.json import MSONable
-from pymatgen.entries.entry_tools import EntrySet
 
 from rxn_network.core.pathway import Pathway
 from rxn_network.core.reaction import Reaction

@@ -5,7 +5,7 @@ objects which share entries.
 from collections import OrderedDict
 from functools import lru_cache
 from itertools import combinations, groupby
-from typing import Collection, Dict, Iterable, List, Optional, Set, Union
+from typing import Any, Collection, Dict, Iterable, List, Optional, Set, Union
 
 import numpy as np
 from monty.json import MSONable
@@ -169,7 +169,7 @@ class ReactionSet(MSONable):
 
         """
 
-        data = OrderedDict({k: [] for k in ["rxn", "energy"]})
+        data: Dict[str, Any] = OrderedDict({k: [] for k in ["rxn", "energy"]})
         attrs = []
 
         calculate_e_above_hulls = False

@@ -1,5 +1,6 @@
 """
-Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin tables.
+Implements an Entry that looks up pre-tabulated Gibbs free energies from the Barin
+tables.
 """
 from typing import Dict, List, Optional
 

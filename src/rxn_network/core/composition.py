@@ -7,7 +7,9 @@ from pymatgen.core.composition import Composition as PymatgenComposition
 class Composition(PymatgenComposition):
     """Customized Composition class adapted from pymatgen"""
 
-    def __init__(self, *args, strict: bool = False, **kwargs):
+    def __init__(
+        self, *args, strict: bool = False, **kwargs
+    ):  # pylint: disable=useless-parent-delegation
         super().__init__(*args, strict=strict, **kwargs)
 
     @cached_property

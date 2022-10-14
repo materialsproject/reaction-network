@@ -6,7 +6,7 @@ from typing import List, Tuple
 
 import numpy as np
 from monty.json import MSONable
-from plotly.express import line, scatter
+from plotly.express import plotly_line, scatter
 from plotly.graph_objs import Figure
 from pymatgen.core.units import kb
 from scipy.spatial import ConvexHull
@@ -155,7 +155,7 @@ class InterfaceReactionHull(MSONable):
                 return {self.reactions[v1]: 1.0}
             if np.isclose(coordinate, x2):
                 return {self.reactions[v2]: 1.0}
-            if coordinate > x1 and coordinate < x2:
+            if x1 < coordinate < x2:
                 return {
                     self.reactions[v1]: (x2 - coordinate) / (x2 - x1),
                     self.reactions[v2]: (coordinate - x1) / (x2 - x1),
@@ -350,11 +350,11 @@ class InterfaceReactionHull(MSONable):
             x1: Coordinate of first point.
             x2: Coordinate of second point.
             use_x_min_ref: Useful for recursive calls. If true, uses the reactant at x=0
-                as the reference (sometimes there is a decomposition reaction of the reactant that is
-                lower in energy than the reactant).
-            use_x_max_ref: Useful for recursive calls. If true, uses the reactant at x=1.0
-                as the reference (sometimes there is a decomposition reaction of the reactant that is
-                lower in energy than the reactant).
+                as the reference (sometimes there is a decomposition reaction of the
+                reactant that is lower in energy than the reactant).
+            use_x_max_ref: Useful for recursive calls. If true, uses the reactant at
+                x=1.0 as the reference (sometimes there is a decomposition reaction of
+                the reactant that is lower in energy than the reactant).
 
         Returns:
             Tuple of decomposition energy and the number of decomposition pathways.
@@ -374,39 +374,39 @@ class InterfaceReactionHull(MSONable):
         if len(coords) == 0:
             val, total = 0, 1
             return val, total
-        elif len(coords) == 1:
+        if len(coords) == 1:
             val = self._calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])
             total = 1
             return val, total
-        else:
-            val = 0
-            total = 0
-            for c in coords:
-                if c[0] == 0.0 and not np.isclose(c[1], 0.0):
-                    use_x_min_ref = False
-                elif c[0] == 1.0 and not np.isclose(c[1], 0.0):
-                    use_x_max_ref = False
 
-                height = self._calculate_altitude([x_min, y_min], c, [x_max, y_max])
-                (
-                    left_decomp,
-                    left_total,
-                ) = self.get_decomposition_energy_and_num_paths_recursive(
-                    x_min, c[0], use_x_min_ref, use_x_max_ref
-                )
-                (
-                    right_decomp,
-                    right_total,
-                ) = self.get_decomposition_energy_and_num_paths_recursive(
-                    c[0], x_max, use_x_min_ref, use_x_max_ref
-                )
+        val = 0
+        total = 0
+        for c in coords:
+            if c[0] == 0.0 and not np.isclose(c[1], 0.0):
+                use_x_min_ref = False
+            elif c[0] == 1.0 and not np.isclose(c[1], 0.0):
+                use_x_max_ref = False
 
-                val += (
-                    height * (left_total * right_total)
-                    + left_decomp * right_total
-                    + right_decomp * left_total
-                )
-                total += left_total * right_total
+            height = self._calculate_altitude([x_min, y_min], c, [x_max, y_max])
+            (
+                left_decomp,
+                left_total,
+            ) = self.get_decomposition_energy_and_num_paths_recursive(
+                x_min, c[0], use_x_min_ref, use_x_max_ref
+            )
+            (
+                right_decomp,
+                right_total,
+            ) = self.get_decomposition_energy_and_num_paths_recursive(
+                c[0], x_max, use_x_min_ref, use_x_max_ref
+            )
+
+            val += (
+                height * (left_total * right_total)
+                + left_decomp * right_total
+                + right_decomp * left_total
+            )
+            total += left_total * right_total
 
         return val, total
 
@@ -418,9 +418,10 @@ class InterfaceReactionHull(MSONable):
         times (multiplicitly) that a particular altitude appears in the decomposition.
 
         Args:
-            n_left: number of vertices occurring in between the leftmost and middle vertices.
-            n_right: number of vertices occurring in between the middle and rightmost
-            vertices.
+            n_left: number of vertices occurring in between the leftmost and middle
+                vertices.
+            n_right: number of vertices occurring in between the middle and
+                rightmost vertices.
             n: total number of product vertices in the full interface reaction hull
                 (i.e., not including the 2 reactant reference vertices )
         """
@@ -440,28 +441,28 @@ class InterfaceReactionHull(MSONable):
             cache = []
         if n == 0:
             return 1, [1]
-        elif n == 1:
+        if n == 1:
             return 1, [1, 1]
-        elif len(cache) >= n:
+        if len(cache) >= n:
             return cache[n], cache
-        else:
-            total = 0
-            biggest_cache = []
-            for i in range(n):
-                left = i
-                right = n - i - 1
-                left_divs, c1 = self._count_recursive(left, biggest_cache)
 
-                right_divs, c2 = self._count_recursive(right, biggest_cache)
+        total = 0
+        biggest_cache = []
+        for i in range(n):
+            left = i
+            right = n - i - 1
+            left_divs, c1 = self._count_recursive(left, biggest_cache)
 
-                if len(c1) > len(biggest_cache):
-                    biggest_cache = c1
+            right_divs, c2 = self._count_recursive(right, biggest_cache)
 
-                if len(c2) > len(biggest_cache):
-                    biggest_cache = c2
+            if len(c1) > len(biggest_cache):
+                biggest_cache = c1
 
-                total += left_divs * right_divs
-            return total, biggest_cache + [total]
+            if len(c2) > len(biggest_cache):
+                biggest_cache = c2
+
+            total += left_divs * right_divs
+        return total, biggest_cache + [total]
 
     def _get_scatter(self):
         marker_size = 10
@@ -488,12 +489,16 @@ class InterfaceReactionHull(MSONable):
         coords = coords[(coords[:, :, 1] <= 0).all(axis=1)]
         coords = coords[~(coords[:, :, 1] == 0).all(axis=1)]
 
-        lines = [line(x=c[:, 0], y=c[:, 1]) for c in coords if not (c[:, 1] == 0).all()]
+        lines = [
+            plotly_line(x=c[:, 0], y=c[:, 1])
+            for c in coords
+            if not (c[:, 1] == 0).all()
+        ]
 
         line_data = []
-        for l in lines:
-            l.update_traces(line={"color": "black"})
-            line_data.append(l.data[0])
+        for line in lines:
+            line.update_traces(line={"color": "black"})
+            line_data.append(line.data[0])
 
         return line_data
 
@@ -501,7 +506,7 @@ class InterfaceReactionHull(MSONable):
     def hull_vertices(self):
         hull_vertices = [
             i
-            for i in self.hull.vertices  # pylint: disable=not-an-iterable
+            for i in self.hull.vertices
             if self.coords[i, 1] <= 0
             and np.isclose(
                 self.coords[self.coords[:, 0] == self.coords[i, 0]][:, 1].min(),
@@ -514,21 +519,24 @@ class InterfaceReactionHull(MSONable):
     @cached_property
     def stable_reactions(self):
         """
-        Returns the reactions that are stable (on the convex hull) of the interface reaction hull.
+        Returns the reactions that are stable (on the convex hull) of the interface
+        reaction hull.
         """
         return [r for i, r in enumerate(self.reactions) if i in self.hull_vertices]
 
     @cached_property
     def unstable_reactions(self):
         """
-        Returns the reactions that are unstable (NOT on the convex hull) of the interface reaction hull.
+        Returns the reactions that are unstable (NOT on the convex hull) of the
+        interface reaction hull.
         """
         return [r for i, r in enumerate(self.reactions) if i not in self.hull_vertices]
 
     @staticmethod
     def _calculate_altitude(c_left, c_mid, c_right):
         """
-        Helper geometry method: calculates the altitude of a point on a line defined by three points.
+        Helper geometry method: calculates the altitude of a point on a line defined by
+        three points.
 
         Args:
             x1: point 1
@@ -550,7 +558,7 @@ class InterfaceReactionHull(MSONable):
     @staticmethod
     def _primary_selectivity_from_energies(rxn_energy, other_rxn_energies, temp):
         """
-        Calculates the primary selectivity given a list of reaction energy differences
+        Calculates the primary selectivity given a list of reaction energy differences.
         """
         all_rxn_energies = np.append(other_rxn_energies, rxn_energy)
         Q = np.sum(np.exp(-all_rxn_energies / (kb * temp)))

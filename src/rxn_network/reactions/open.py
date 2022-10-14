@@ -35,7 +35,8 @@ class OpenComputedReaction(ComputedReaction):
             coefficients: List of reaction coefficients.
             chempots: Dict of chemical potentials corresponding to open elements
             data: Optional dict of data
-            lowest_num_errors: number of "errors" encountered during reaction balancing
+            lowest_num_errors: number of "errors" encountered during reaction
+                balancing
         """
         super().__init__(
             entries=entries,
@@ -58,7 +59,7 @@ class OpenComputedReaction(ComputedReaction):
         self.grand_entries = grand_entries
 
     @classmethod
-    def balance(  # type: ignore # pylint: disable = W0221
+    def balance(  # type: ignore
         cls,
         reactant_entries: List[ComputedEntry],
         product_entries: List[ComputedEntry],
@@ -71,12 +72,14 @@ class OpenComputedReaction(ComputedReaction):
         Reactants and products to be specified as a collection (list, set, etc.) of
         ComputedEntry objects.
 
-        A dictionary of open elements and their corresponding chemical potentials must be supplied.
+        A dictionary of open elements and their corresponding chemical potentials must
+        be supplied.
 
         Args:
             reactant_entries: List of reactant entries
             product_entries: List of product entries
-            chempots: Dict of chemical potentials corresponding to open element(s)
+            chempots: Dict of chemical potentials corresponding to open
+                element(s)
             data: Optional dict of data
         """
         reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
@@ -124,10 +127,8 @@ class OpenComputedReaction(ComputedReaction):
             )
 
         return sum(
-            [
-                amt * calc_energies[c]
-                for amt, c in zip(self.coefficients, self.compositions)
-            ]
+            amt * calc_energies[c]
+            for amt, c in zip(self.coefficients, self.compositions)
         )
 
     @property

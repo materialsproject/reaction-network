@@ -54,7 +54,7 @@ class ComputedReaction(BasicReaction):
         reactant_entries: List[ComputedEntry],
         product_entries: List[ComputedEntry],
         data: Optional[Dict] = None,
-    ) -> "ComputedReaction":  # pylint: disable = W0221
+    ) -> "ComputedReaction":
         """
         Balances and returns a new ComputedReaction.
 
@@ -117,10 +117,8 @@ class ComputedReaction(BasicReaction):
             )
 
         return sum(
-            [
-                amt * calc_energies[c]
-                for amt, c in zip(self.coefficients, self.compositions)
-            ]
+            amt * calc_energies[c]
+            for amt, c in zip(self.coefficients, self.compositions)
         )
 
     @cached_property
@@ -138,26 +136,24 @@ class ComputedReaction(BasicReaction):
             )
 
         return sum(
-            [
-                amt * calc_energies[c]
-                for amt, c in zip(self.coefficients, self.compositions)
-            ]
+            amt * calc_energies[c]
+            for amt, c in zip(self.coefficients, self.compositions)
         )
 
     @cached_property
     def energy_per_atom(self) -> float:
         """
         Returns (float):
-            The calculated reaction energy in eV, divided by the total number of
-            atoms in the reaction.
+            The calculated reaction energy in eV, divided by the total number of atoms
+            in the reaction.
         """
         return self.energy / self.num_atoms
 
     @cached_property
     def energy_uncertainty(self) -> float:
         """
-        Calculates the uncertainty in the reaction energy based on the uncertainty in the
-        energies of the reactants/products
+        Calculates the uncertainty in the reaction energy based on the uncertainty in
+        the energies of the reactants/products.
         """
 
         calc_energies: Dict[Composition, ufloat] = {}
@@ -170,10 +166,8 @@ class ComputedReaction(BasicReaction):
             )
 
         energy_with_uncertainty = sum(
-            [
-                amt * calc_energies[c]
-                for amt, c in zip(self.coefficients, self.compositions)
-            ]
+            amt * calc_energies[c]
+            for amt, c in zip(self.coefficients, self.compositions)
         )
 
         return energy_with_uncertainty.s  # type: ignore
@@ -181,8 +175,8 @@ class ComputedReaction(BasicReaction):
     @cached_property
     def energy_uncertainty_per_atom(self) -> float:
         """
-        Returns the energy_uncertainty divided by the total number of atoms in
-        the reaction.
+        Returns the energy_uncertainty divided by the total number of atoms in the
+        reaction.
         """
         return self.energy_uncertainty / self.num_atoms
 
@@ -241,8 +235,7 @@ class ComputedReaction(BasicReaction):
         all_comp = self.compositions
         coeffs = self.coefficients.copy()
         current_el_amount = (
-            sum([all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))])
-            / 2
+            sum(all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))) / 2
         )
         scale_factor = factor / current_el_amount
         coeffs *= scale_factor

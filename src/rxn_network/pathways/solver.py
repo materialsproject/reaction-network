@@ -82,13 +82,13 @@ class PathwaySolver(Solver):
                 At 5 or more, the solver will start to take a significant amount of time
                 to run.
             find_intermediate_rxns: Whether to find intermediate reactions; crucial for
-                finding pathways where intermediates react together, as these reactions may
-                not occur in the graph-derived pathways. Defaults to True.
+                finding pathways where intermediates react together, as these reactions
+                may not occur in the graph-derived pathways. Defaults to True.
             intermediate_rxn_energy_cutoff: An energy cutoff by which to filter down
-                intermediate reactions. This can be useful when there are a large number of
-                possible intermediates. < 0 means allow only exergonic reactions.
-            use_basic_enumerator: Whether to use the BasicEnumerator to find intermediate
-                reactions. Defaults to True.
+                intermediate reactions. This can be useful when there are a large number
+                of possible intermediates. < 0 means allow only exergonic reactions.
+            use_basic_enumerator: Whether to use the BasicEnumerator to find
+                intermediate reactions. Defaults to True.
             use_minimize_enumerator: Whether to use the MinimizeGibbsEnumerator to find
                 intermediate reactions. Defaults to False.
             filter_interdependent: Whether or not to filter out pathways where reaction
@@ -105,8 +105,8 @@ class PathwaySolver(Solver):
 
         initialize_ray()
 
-        entries = deepcopy(self.entries)
-        entries = entries.entries_list
+        entries_copy = deepcopy(self.entries)
+        entries = entries_copy.entries_list
         num_entries = len(entries)
 
         reactions = deepcopy(self.reactions)

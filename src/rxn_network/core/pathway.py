@@ -54,9 +54,9 @@ class Pathway(MSONable, metaclass=ABCMeta):
     @property
     def energy(self):
         """Total energy of this reaction pathway"""
-        return sum([rxn.energy for rxn in self._reactions])
+        return sum(rxn.energy for rxn in self._reactions)
 
     @property
     def energy_per_atom(self):
         """Total energy per atom of this reaction pathway"""
-        return sum([rxn.energy_per_atom for rxn in self._reactions])
+        return sum(rxn.energy_per_atom for rxn in self._reactions)

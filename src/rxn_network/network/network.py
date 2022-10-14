@@ -12,7 +12,7 @@ from rxn_network.core.cost_function import CostFunction
 from rxn_network.core.network import Network
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
-from rxn_network.network.entry import DummyEntry, NetworkEntry, NetworkEntryType
+from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.network.gt import (
     initialize_graph,
     load_graph,
@@ -55,8 +55,8 @@ class ReactionNetwork(Network):
     def build(self):
         """
         Construct the reaction network graph object and store under the "graph"
-        attribute. Does NOT initialize precursors or target; you must call set_precursors()
-        or set_target() to do so.
+        attribute. Does NOT initialize precursors or target; you must call
+        set_precursors() or set_target() to do so.
 
         Returns:
             None
@@ -117,7 +117,8 @@ class ReactionNetwork(Network):
         precursors.
 
         If entries are provided, will use the entries to set the precursors. If strings
-        are provided, will automatically find minimum-energy entries with matching reduced_formula.
+        are provided, will automatically find minimum-energy entries with matching
+        reduced_formula.
 
         Args:
             precursors: iterable of
@@ -233,7 +234,8 @@ class ReactionNetwork(Network):
         Loads graph-tool graph from file.
 
         Args:
-            filename: Filename of graph object to load (for example, .gt or .gt.gz format)
+            filename: Filename of graph object to load (for example, .gt or .gt.gz
+                format)
 
         Returns: None
         """
@@ -290,12 +292,14 @@ class ReactionNetwork(Network):
     @classmethod
     def from_dict_and_file(cls, d: dict, filename: str):
         """
-        Convenience constructor method that loads a ReactionNetwork object from a dictionary (MSONable version) and a
-        filename (to load graph object in graph-tool).
+        Convenience constructor method that loads a ReactionNetwork object from a
+        dictionary (MSONable version) and a filename (to load graph object in
+        graph-tool).
 
         Args:
             d: Dictionary containing the ReactionNetwork object
-            filename: Filename of graph object to load (for example, .gt or .gt.gz format)
+            filename: Filename of graph object to load (for example, .gt or .gt.gz
+                format)
 
         Returns:
             ReactionNetwork object with loaded graph
@@ -379,15 +383,16 @@ def get_rxn_nodes_and_edges(rxns: ReactionSet):
 
 def get_loopback_edges(g: Graph, nodes: List[Vertex]):
     """
-    Given a graph and a list of nodes to check, this function finds and returns loopback edges
-    (i.e., edges that connect a product node to its equivalent reactant node)
+    Given a graph and a list of nodes to check, this function finds and returns loopback
+    edges (i.e., edges that connect a product node to its equivalent reactant node)
 
     Args:
         g: graph-tool Graph object
         nodes: List of vertices from which to find loopback edges
 
     Returns:
-        A list of tuples of the form (source_idx, target_idx, cost=0, rxn=None, type="loopback")
+        A list of tuples of the form (source_idx, target_idx, cost=0, rxn=None,
+        type="loopback")
     """
     edges = []
     for idx1, p in enumerate(nodes):

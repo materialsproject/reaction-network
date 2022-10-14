@@ -41,8 +41,8 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         """
         Args:
             precursors: Optional formulas of precursors.
-            targets: Optional formulas of targets; only reactions which make these targets
-                will be enumerated.
+            targets: Optional formulas of targets; only reactions which make
+                these targets will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator"])
             exclusive_precursors: Whether to consider only reactions that have
@@ -125,8 +125,8 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             open_elem: The element to be considered as open
             mu: The chemical potential of the open element
             precursors: Optional formulas of precursors.
-            targets: Optional formulas of targets; only reactions which make these targets
-                will be enumerated.
+            targets: Optional formulas of targets; only reactions which make
+                these targets will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator])
             exclusive_precursors: Whether to consider only reactions that have
@@ -145,8 +145,8 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             filter_by_chemsys=filter_by_chemsys,
             quiet=quiet,
         )
-        self.open_elem = Element(open_elem)  # type: ignore
-        self.open_phases = [Composition(str(self.open_elem)).reduced_formula]  # type: ignore
+        self.open_elem = Element(open_elem)
+        self.open_phases = [Composition(str(self.open_elem)).reduced_formula]
         self.mu = mu
         self.chempots = {self.open_elem: self.mu}
         self._build_grand_pd = True

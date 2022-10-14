@@ -11,6 +11,10 @@ bandit:
 mccabe:
   run: false
 
+pycodestyle:
+  disable:
+    - E501
+
 pylint:
   disable:
     - unsubscriptable-object

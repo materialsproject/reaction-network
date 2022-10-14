@@ -157,7 +157,7 @@ class BasicEnumerator(Enumerator):
         remove_changed = ray.put(self.remove_changed)
         max_num_constraints = ray.put(self.max_num_constraints)
 
-        rxn_chunk_refs = []
+        rxn_chunk_refs = []  # type: ignore
         results = []
 
         if not batch_size:
@@ -259,7 +259,8 @@ class BasicEnumerator(Enumerator):
         self, entries, precursor_entries, target_entries, open_entries
     ):
         """
-        Gets all possible entry combinations up to predefined cardinality (n), filtered and grouped by chemical system.
+        Gets all possible entry combinations up to predefined cardinality (n), filtered
+        and grouped by chemical system.
         """
         precursor_elems = [
             [str(el) for el in e.composition.elements] for e in precursor_entries
@@ -445,8 +446,8 @@ class BasicOpenEnumerator(BasicEnumerator):
             open_phases: List of formulas of open entries (e.g. ["O2"])
             precursors: Optional list of formulas of precursor phases; only reactions
                 which have these phases as reactants will be enumerated.
-            targets: Optional list of formulas of targets; only reactions which make this target
-                will be enumerated.
+            targets: Optional list of formulas of targets; only reactions
+                which make this target will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator]).
             n: Maximum reactant/product cardinality; i.e., largest possible number of

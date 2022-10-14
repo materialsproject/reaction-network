@@ -18,8 +18,9 @@ from rxn_network.entries.entry_set import GibbsEntrySet
 class ChemicalPotentialDiagram(ChempotDiagram):
     """
     This class is an extension of the ChemicalPotentialDiagram class from pymatgen.
-    Several features have been added to the original class for the purpose of efficiently
-    calculating the shortest distance between two chemical potential domains.
+    Several features have been added to the original class for the purpose of
+    efficiently calculating the shortest distance between two chemical potential
+    domains.
     """
 
     def __init__(  # pylint: disable=super-init-not-called
@@ -34,12 +35,12 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         Args:
             entries: List of PDEntry-like objects containing a composition and
                 energy. Must contain elemental references and be suitable for typical
-                phase diagram construction. Entries must be within a chemical system
-                of with 2+ elements
+                phase diagram construction. Entries must be within a chemical system of
+                with 2+ elements
             limits: Bounds of elemental chemical potentials (min, max), which are
                 used to construct the border hyperplanes used in the
-                HalfspaceIntersection algorithm; these constrain the space over which the
-                domains are calculated and also determine the size of the plotted
+                HalfspaceIntersection algorithm; these constrain the space over which
+                the domains are calculated and also determine the size of the plotted
                 diagram. Any elemental limits not specified are covered in the
                 default_min_limit argument
             default_min_limit (float): Default minimum chemical potential limit for
@@ -122,7 +123,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     def _get_domains(self) -> Dict[str, np.ndarray]:
         """Returns a dictionary of domains as {formula: np.ndarray}"""
-        domains = {entry.composition.reduced_formula: [] for entry in self._hyperplane_entries}  # type: ignore
+        domains: Dict[str, List] = {
+            entry.composition.reduced_formula: [] for entry in self._hyperplane_entries
+        }
         entries = self._hyperplane_entries
 
         for intersection, facet in zip(

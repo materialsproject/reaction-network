@@ -11,8 +11,8 @@ from rxn_network.core.reaction import Reaction
 
 class BasicPathway(Pathway):
     """
-    Simple pathway class for storing multiple ComputedReaction objects which form a single
-    reaction pathway with no constraints on stoichiometry
+    Simple pathway class for storing multiple ComputedReaction objects which form a
+    single reaction pathway with no constraints on stoichiometry
     """
 
     def __init__(self, reactions: List[Reaction], costs: Optional[List[float]] = None):

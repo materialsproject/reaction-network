@@ -11,7 +11,7 @@ CARBONATE_CORRECTION = (
 
 class CarbonateCorrection(CompositionEnergyAdjustment):
     """
-    Correct carbonate energies to obtain the right formation energies. fffffffffffffffffff
+    Correct carbonate energies to obtain the right formation energies.
     """
 
     def __init__(self, num_ions, carbonate_correction=CARBONATE_CORRECTION):

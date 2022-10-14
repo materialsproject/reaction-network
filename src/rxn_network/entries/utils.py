@@ -189,8 +189,8 @@ def get_entries(  # noqa: MC0001
                 continue
         else:
             d["potcar_symbols"] = [
-                f"{d['pseudo_potential']['functional']} {l}"
-                for l in d["pseudo_potential"].get("labels", [])
+                f"{d['pseudo_potential']['functional']} {label}"
+                for label in d["pseudo_potential"].get("labels", [])
             ]
             data = {"oxide_type": d["oxide_type"]}
             if property_data:
@@ -288,9 +288,9 @@ def get_all_entries_in_chemsys(
         List of ComputedEntries.
     """
 
-    def divide_chunks(l, n):
-        for i in range(0, len(l), n):
-            yield l[i : i + n]
+    def divide_chunks(my_list, n):
+        for i in range(0, len(my_list), n):
+            yield my_list[i : i + n]
 
     if isinstance(elements, str):
         elements = elements.split("-")

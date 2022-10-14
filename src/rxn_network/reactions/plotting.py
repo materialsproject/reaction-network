@@ -202,8 +202,8 @@ def is_pareto_efficient(costs, return_mask=True):
         is_efficient_mask = np.zeros(n_points, dtype=bool)
         is_efficient_mask[is_efficient] = True
         return is_efficient_mask
-    else:
-        return is_efficient
+
+    return is_efficient
 
 
 def pretty_df_layout(df):

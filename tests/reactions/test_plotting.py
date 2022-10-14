@@ -1,5 +1,6 @@
 """ Tests for reaction plotting functions."""
 from pathlib import Path
+
 import pytest
 
 from rxn_network.costs.softplus import Softplus
