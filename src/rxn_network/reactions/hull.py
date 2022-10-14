@@ -490,9 +490,7 @@ class InterfaceReactionHull(MSONable):
         coords = coords[~(coords[:, :, 1] == 0).all(axis=1)]
 
         lines = [
-            px.line(x=c[:, 0], y=c[:, 1])
-            for c in coords
-            if not (c[:, 1] == 0).all()
+            px.line(x=c[:, 0], y=c[:, 1]) for c in coords if not (c[:, 1] == 0).all()
         ]
 
         line_data = []
