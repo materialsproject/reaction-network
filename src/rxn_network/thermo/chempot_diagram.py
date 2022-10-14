@@ -86,7 +86,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         self._border_hyperplane_indices = list(
             range(num_hyperplanes, num_hyperplanes + num_border_hyperplanes)
         )
-        self._metastable_domains = {}  # for caching
+        self._metastable_domains: Dict[str, List] = {}  # for caching
 
     def shortest_domain_distance(self, f1: str, f2: str, offset=0.0) -> float:
         """
