@@ -5,8 +5,8 @@ from itertools import combinations
 from typing import List, Tuple
 
 import numpy as np
+import plotly.express as px
 from monty.json import MSONable
-from plotly.express import plotly_line, scatter
 from plotly.graph_objs import Figure
 from pymatgen.core.units import kb
 from scipy.spatial import ConvexHull
@@ -467,7 +467,7 @@ class InterfaceReactionHull(MSONable):
     def _get_scatter(self):
         marker_size = 10
 
-        pts = scatter(
+        pts = px.scatter(
             x=self.coords[:, 0],
             y=self.coords[:, 1],
             hover_name=[str(r) for r in self.reactions],
@@ -490,7 +490,7 @@ class InterfaceReactionHull(MSONable):
         coords = coords[~(coords[:, :, 1] == 0).all(axis=1)]
 
         lines = [
-            plotly_line(x=c[:, 0], y=c[:, 1])
+            px.line(x=c[:, 0], y=c[:, 1])
             for c in coords
             if not (c[:, 1] == 0).all()
         ]
