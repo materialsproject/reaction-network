@@ -77,6 +77,8 @@ jobs:
           pip install -e .[strict,tests]
 
       - name: Test with pytest
+        env:
+          MP_API_KEY: ${{ secrets.MP_API_KEY }}
         run: |
           pytest --cov=src/rxn_network --cov-report=xml
 
