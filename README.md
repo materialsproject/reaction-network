@@ -1,7 +1,12 @@
 # ![Reaction Network](docs/images/logo.png)
 
-[![Pytest Status](https://github.com/GENESIS-EFRC/reaction-network/workflows/testing/badge.svg)](https://github.com/GENESIS-EFRC/reaction-network/actions?query=workflow%3Atesting)
-[![Code Coverage](https://codecov.io/gh/GENESIS-EFRC/reaction-network/branch/main/graph/badge.svg)](https://codecov.io/gh/GENESIS-EFRC/reaction-network)
+[![Pytest Status](https://github.com/GENESIS-EFRC/reaction-network/workflows/testing/badge.svg)](https://github.com/GENESIS-EFRC/reaction-network/actions?query=workflow%3Atesting?)
+![Codecov](https://img.shields.io/codecov/c/github/GENESIS-EFRC/reaction-network?)
+
+![PyPI - Python
+Version](https://img.shields.io/pypi/pyversions/reaction-network?style=for-the-badge)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/reaction-network?style=for-the-badge)
+ ![PyPI - License](https://img.shields.io/pypi/l/reaction-network?style=for-the-badge)
 
 Reaction network (rxn-network) is a Python package for predicting chemical reaction
 pathways in solid-state materials synthesis using combinatorial and graph-theorteical methods.
