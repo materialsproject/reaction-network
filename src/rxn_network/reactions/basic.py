@@ -466,6 +466,7 @@ class BasicReaction(Reaction):
 
             coeffs = np.matmul(np.linalg.pinv(comp_and_constraints), b)
 
+            num_errors = 0
             if np.allclose(np.matmul(comp_matrix, coeffs), np.zeros((num_elems, 1))):
                 expected_signs = np.array([-1] * len(reactants) + [+1] * len(products))
                 num_errors = np.sum(np.multiply(expected_signs, coeffs.T) < TOLERANCE)

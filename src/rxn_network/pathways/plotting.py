@@ -174,6 +174,6 @@ class PathwayPlotter(MSONable):
         """
         comps = [
             Composition(i).fractional_composition
-            for i in self.num_atoms_df.to_dict("records")
+            for i in self.num_atoms_df.to_dict("records")  # pylint: disable=not-an-iterable
         ]
         return pandas.Series(comps, index=self.num_atoms_df.index)
