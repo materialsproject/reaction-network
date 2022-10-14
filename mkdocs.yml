@@ -1,19 +1,21 @@
 site_name: Reaction-network documentation
 site_description: Documentation for the reaction-network package
-copyright: Built by Matthew McDermott (GENESIS-EFRC)
+copyright: Built by Matthew McDermott
 
 nav:
   - Home: index.md
   - Notebooks:
-        - Enumerators: 
-            - Enumerators: enumerators.ipynb
-        - Network: 
-            - Network: network.ipynb
+      - Enumerators:
+          - Enumerators: ../notebooks/enumerators.ipynb
+      - Network:
+          - Network: ../notebooks/network.ipynb
   - Reference:
       - Builders:
           Retrosynthesis: reference/builders/retrosynthesis.md
+          Schema: reference/builders/schema.md
       - Core:
           Calculator: reference/core/calculator.md
+          Composition: reference/core/composition.md
           Cost Function: reference/core/cost_function.md
           Enumerator: reference/core/enumerator.md
           Network: reference/core/network.md
@@ -22,7 +24,6 @@ nav:
           Solver: reference/core/solver.md
       - Costs:
           Calculators: reference/costs/calculators.md
-          Competition: reference/costs/competition.md
           Softplus: reference/costs/softplus.md
       - Data: reference/data/data.md
       - Entries:
@@ -32,23 +33,21 @@ nav:
           Experimental: reference/entries/experimental.md
           Freed: reference/entries/freed.md
           Gibbs: reference/entries/gibbs.md
+          Interpolated: reference/entries/interpolated.md
           Nist: reference/entries/nist.md
+          Utils: reference/entries/utils.md
       - Enumerators:
           Basic: reference/enumerators/basic.md
           Minimize: reference/enumerators/minimize.md
           Utils: reference/enumerators/utils.md
-      - Firetasks:
-          Build Inputs: reference/firetasks/build_inputs.md
-          Parse Outputs: reference/firetasks/parse_outputs.md
-          Run Calc: reference/firetasks/run_calc.md
-          Utils: reference/firetasks/utils.md
-      - Fireworks:
-          Core: reference/fireworks/core.md
+      - Flows:
+          Core: reference/flows/core.md
+      - Jobs:
+          Core: reference/jobs/core.md
       - Network:
           Entry: reference/network/entry.md
           Graph-tool: reference/network/gt.md
           Network: reference/network/network.md
-          Utils: reference/network/utils.md
           Visualize: reference/network/visualize.md
       - Pathways:
           Balanced: reference/pathways/balanced.md
@@ -59,6 +58,7 @@ nav:
       - Reactions:
           Basic: reference/reactions/basic.md
           Computed: reference/reactions/computed.md
+          Hull: reference/reactions/hull.md
           Open: reference/reactions/open.md
           Plotting: reference/reactions/plotting.md
           Reaction Set: reference/reactions/reaction_set.md
@@ -66,7 +66,6 @@ nav:
           Chempot Diagram: reference/thermo/chempot_diagram.md
           Utils: reference/thermo/utils.md
       - Utils:
-          Database: reference/utils/database.md
           Funcs: reference/utils/funcs.md
           Ray: reference/utils/ray.md
   - CHANGELOG: CHANGELOG.md
@@ -80,39 +79,39 @@ theme:
   icon:
     logo: material/currency-sign
   features:
-  - navigation.tabs
-  - navigation.top
+    - navigation.tabs
+    - navigation.top
   palette:
-  - media: "(prefers-color-scheme: light)"
-    scheme: default
-    primary: teal
-    accent: purple
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: purple
 
 extra_css:
-- css/mkdocstrings.css
+  - css/mkdocstrings.css
 
 markdown_extensions:
-- admonition
-- pymdownx.details
-- pymdownx.emoji
-- pymdownx.magiclink
-- pymdownx.snippets:
-    check_paths: true
-- pymdownx.superfences
-- pymdownx.tabbed
-- pymdownx.tasklist
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji
+  - pymdownx.magiclink
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist
 
 plugins:
-- search
-- section-index
-- mkdocs-jupyter
-- mkdocstrings:
-    handlers:
-      python:
-        setup_commands:
-        - import sys
-        - sys.path.append("docs")
-        selection:
-          new_path_syntax: yes
-    watch:
-    - src/rxn_network
+  - search
+  - section-index
+  - mkdocs-jupyter
+  - mkdocstrings:
+      handlers:
+        python:
+          setup_commands:
+            - import sys
+            - sys.path.append("docs")
+          selection:
+            new_path_syntax: yes
+      watch:
+        - src/rxn_network
