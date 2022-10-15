@@ -314,9 +314,7 @@ class CalculateSelectivitiesMaker(Maker):
     def _get_chempot_decorated_rxns(self, target_rxns, entries):
         initialize_ray()
 
-        batch_size = self.batch_size or int(
-            ray.cluster_resources()["CPU"] - 1
-        )  # arbitrary default
+        batch_size = self.batch_size or int(ray.cluster_resources()["CPU"] - 1)
 
         chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
         rxn_chunk_refs = []
