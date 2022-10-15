@@ -182,7 +182,7 @@ class CalculateSelectivitiesMaker(Maker):
     calculate_selectivities: bool = True
     calculate_chempot_distances: bool = True
     temp: float = 300.0
-    chunk_size: int = 150
+    chunk_size: Optional[int] = None
     batch_size: Optional[int] = None
     cpd_kwargs: dict = field(default_factory=dict)
 
@@ -201,6 +201,7 @@ class CalculateSelectivitiesMaker(Maker):
         all_rxns = rxn_sets[0]
         for rxn_set in rxn_sets[1:]:
             all_rxns = all_rxns.add_rxn_set(rxn_set)
+        size = len(all_rxns)
 
         logger.info("Identifying target reactions...")
 
@@ -209,7 +210,7 @@ class CalculateSelectivitiesMaker(Maker):
         )
         logger.info(
             f"Identified {len(target_rxns)} target reactions out of"
-            f" {len(all_rxns)} total reactions."
+            f" {size} total reactions."
         )
         logger.info("Placing reactions in ray object store...")
 
@@ -219,7 +220,9 @@ class CalculateSelectivitiesMaker(Maker):
         decorated_rxns = target_rxns
 
         if self.calculate_selectivities:
-            decorated_rxns = self._get_selectivity_decorated_rxns(target_rxns, all_rxns)
+            decorated_rxns = self._get_selectivity_decorated_rxns(
+                target_rxns, all_rxns, size
+            )
 
         logger.info("Calculating chemical potential distances...")
 
@@ -247,20 +250,32 @@ class CalculateSelectivitiesMaker(Maker):
         doc.task_label = self.name
         return doc
 
-    def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns):
+    def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns, size):
         initialize_ray()
 
-        batch_size = self.batch_size or int(
-            ray.cluster_resources()["CPU"] / 2
-        )  # arbitrary default
+        size_per_rxn = 1000  # generous estimate of 1kb memory per reaction
+
+        memory_size = int(ray.cluster_resources()["memory"])
+        num_cpus = int(ray.cluster_resources()["CPU"]) - 1
+
+        batch_size = self.batch_size
+        if batch_size is None:
+            batch_size = num_cpus
+            if memory_size / num_cpus / size_per_rxn < size:
+                # load fewer chunks into memory at a time for big jobs
+                batch_size = int(memory_size / size_per_rxn / size)
+
+        chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
+
+        logger.info(f"Using batch size of {batch_size} and chunk size of {chunk_size}")
 
         rxn_chunk_refs = []
         results = []
 
-        with tqdm(total=len(target_rxns) // self.chunk_size + 1) as pbar:
+        with tqdm(total=len(target_rxns) // chunk_size + 1) as pbar:
             for chunk in grouper(
                 target_rxns,
-                self.chunk_size,
+                chunk_size,
                 fillvalue=None,
             ):
                 chunk = [c for c in chunk if c is not None]
@@ -300,9 +315,10 @@ class CalculateSelectivitiesMaker(Maker):
         initialize_ray()
 
         batch_size = self.batch_size or int(
-            ray.cluster_resources()["CPU"] / 2
+            ray.cluster_resources()["CPU"] - 1
         )  # arbitrary default
 
+        chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
         rxn_chunk_refs = []
         results = []
 
@@ -312,10 +328,10 @@ class CalculateSelectivitiesMaker(Maker):
         entries = ray.put(entries)
         cpd_kwargs = ray.put(self.cpd_kwargs)
 
-        with tqdm(total=len(target_rxns) // self.chunk_size + 1) as pbar:
+        with tqdm(total=len(target_rxns) // chunk_size + 1) as pbar:
             for chunk in grouper(
                 sorted(target_rxns, key=lambda r: r.chemical_system),
-                self.chunk_size,
+                chunk_size,
                 fillvalue=None,
             ):
                 chunk = [c for c in chunk if c is not None]
@@ -525,8 +541,8 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         secondary_selectivity = (
             secondary_rxn_energies.max() if secondary_rxn_energies.any() else 0.0
         )
-        rxn.data["primary_selectivity"] = primary_selectivity
-        rxn.data["secondary_selectivity"] = secondary_selectivity
+        rxn.data["primary_selectivity"] = round(primary_selectivity, 4)
+        rxn.data["secondary_selectivity"] = round(secondary_selectivity, 4)
         decorated_rxn = rxn
     else:
         irh = InterfaceReactionHull(

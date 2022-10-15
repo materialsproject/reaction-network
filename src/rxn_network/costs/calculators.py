@@ -97,7 +97,7 @@ class ChempotDistanceCalculator(Calculator):
             for combo in combos
         ]
 
-        distance = float(self._mu_func(distances))
+        distance = round(float(self._mu_func(distances)), 5)
         return distance
 
     @classmethod
