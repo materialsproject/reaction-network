@@ -15,7 +15,9 @@ from rxn_network.core.cost_function import CostFunction
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
     PrimarySelectivityCalculator,
+    SecondarySelectivityAreaCalculator,
     SecondarySelectivityCalculator,
+    SecondarySelectivityMaxCalculator,
 )
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
@@ -541,6 +543,8 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         )
         rxn.data["primary_selectivity"] = round(primary_selectivity, 4)
         rxn.data["secondary_selectivity"] = round(secondary_selectivity, 4)
+        rxn.data["secondary_selectivity_max"] = round(secondary_selectivity, 4)
+        rxn.data["secondary_selectivity_area"] = round(secondary_selectivity, 4)
         decorated_rxn = rxn
     else:
         irh = InterfaceReactionHull(
@@ -551,9 +555,13 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
 
         calc_1 = PrimarySelectivityCalculator(irh=irh, temp=temp)
         calc_2 = SecondarySelectivityCalculator(irh=irh)
+        calc_3 = SecondarySelectivityMaxCalculator(irh=irh)
+        calc_4 = SecondarySelectivityAreaCalculator(irh=irh)
 
         decorated_rxn = calc_1.decorate(rxn)
         decorated_rxn = calc_2.decorate(decorated_rxn)
+        decorated_rxn = calc_3.decorate(decorated_rxn)
+        decorated_rxn = calc_4.decorate(decorated_rxn)
 
     return decorated_rxn
 

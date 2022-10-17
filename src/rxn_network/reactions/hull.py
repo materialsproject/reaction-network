@@ -230,6 +230,55 @@ class InterfaceReactionHull(MSONable):
 
         return -1 * energy
 
+    def get_secondary_selectivity_max_energy(self, reaction: ComputedReaction):
+        """
+        Calculates the score for a given reaction. This formula is based on a
+        methodology presented in the following paper: (TBD)
+
+        Args:
+            reaction: Reaction to calculate the selectivity score for.
+
+        Returns:
+            The selectivity score for the reaction
+        """
+        x = self.get_coordinate(reaction)
+        left_energy = self.get_max_decomposition_energy(0, x)
+        right_energy = self.get_max_decomposition_energy(x, 1)
+
+        return -1 * (left_energy + right_energy - self.get_energy_above_hull(reaction))
+
+    def get_secondary_selectivity_area(self, reaction: ComputedReaction):
+        """
+        Calculates the score for a given reaction. This formula is based on a
+        methodology presented in the following paper: (TBD)
+
+        Args:
+            reaction: Reaction to calculate the selectivity score for.
+
+        Returns:
+            The selectivity score for the reaction
+        """
+        x = self.get_coordinate(reaction)
+        left_area = self.get_decomposition_area(0, x)
+        right_area = self.get_decomposition_area(x, 1)
+
+        return left_area + right_area
+
+    def get_max_decomposition_energy(self, x1: float, x2: float):
+        coords = self.get_coords_in_range(x1, x2)
+
+        max_energy = 0
+
+        for c in combinations(range(len(coords)), 3):
+            i_left, i_mid, i_right = sorted(c)
+            c_left, c_mid, c_right = coords[[i_left, i_mid, i_right]]
+
+            energy = self._calculate_altitude(c_left, c_mid, c_right)
+            if energy < max_energy:
+                max_energy = energy
+
+        return max_energy
+
     def get_decomposition_energy(self, x1: float, x2: float):
         """
         Calculates the energy of the reaction decomposition between two points.
@@ -257,6 +306,13 @@ class InterfaceReactionHull(MSONable):
             energy += count * self._calculate_altitude(c_left, c_mid, c_right)
 
         return energy
+
+    def get_decomposition_area(self, x1: float, x2: float):
+        coords = self.get_coords_in_range(x1, x2)
+        if len(coords) == 2:
+            return 0
+
+        return ConvexHull(coords).volume  # this is how area is defined in scipy
 
     def get_coords_in_range(self, x1, x2):
         """
