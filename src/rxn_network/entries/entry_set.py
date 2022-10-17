@@ -561,7 +561,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             try:
                 entry = cl(composition=Composition(formula), temperature=temperature)
             except ValueError as error:
-                logger.info(
+                logger.debug(
                     f"Compound {formula} is in {cl} tables but at different"
                     f" temperatures!: {error}"
                 )
