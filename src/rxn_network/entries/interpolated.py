@@ -86,3 +86,12 @@ class InterpolatedEntry(ComputedEntry):
             return False
 
         return True
+
+    def __hash__(self):
+        return hash(
+            (
+                self.composition,
+                self.energy,
+                self.entry_id,
+            )
+        )
