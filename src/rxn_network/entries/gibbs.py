@@ -329,15 +329,11 @@ class GibbsComputedEntry(ComputedEntry):
         if not type(other) is type(self):
             return False
 
-        if getattr(self, "entry_id", None) and getattr(other, "entry_id", None):
-            if self.entry_id == other.entry_id and np.allclose(
-                self.energy, other.energy
-            ):
-                return True  # assumes diff temps --> different energies
-            return False
-
         if not np.isclose(self.energy, other.energy):
             return False
+
+        if getattr(self, "entry_id", None) and getattr(other, "entry_id", None):
+            return self.entry_id == other.entry_id
 
         if self.composition != other.composition:
             return False

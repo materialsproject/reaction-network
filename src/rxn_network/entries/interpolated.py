@@ -1,5 +1,6 @@
 """Class for intepolated entries"""
 
+import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import ComputedEntry
 
@@ -70,3 +71,18 @@ class InterpolatedEntry(ComputedEntry):
     def is_experimental(self) -> bool:
         """Returns True by default."""
         return False
+
+    def __eq__(self, other):
+        if not type(other) is type(self):
+            return False
+
+        if not np.isclose(self.energy, other.energy):
+            return False
+
+        if getattr(self, "entry_id", None) and getattr(other, "entry_id", None):
+            return self.entry_id == other.entry_id
+
+        if self.composition != other.composition:
+            return False
+
+        return True
