@@ -72,6 +72,16 @@ class InterpolatedEntry(ComputedEntry):
         """Returns True by default."""
         return False
 
+    def __repr__(self):
+        output = [
+            (
+                f"InterpolatedEntry | {self.composition.formula} "
+                f"({self.composition.reduced_formula})"
+            ),
+            f"Energy  = {self.energy:.4f}",
+        ]
+        return "\n".join(output)
+
     def __eq__(self, other):
         if not type(other) is type(self):
             return False

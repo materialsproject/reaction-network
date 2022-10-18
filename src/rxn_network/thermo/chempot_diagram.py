@@ -211,7 +211,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         """Mapping of formulas to array of domain boundary points"""
         return self._get_domains()
 
-    @cached_property
+    @property
     def metastable_domains(self) -> Dict[str, np.ndarray]:
         """
         Gets a dictionary of the chemical potential domains for metastable chemical
