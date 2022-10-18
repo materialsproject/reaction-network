@@ -105,7 +105,7 @@ def test_get_stabilized_entry(gibbs_entries):
         assert e_stable in PhaseDiagram(entries).stable_entries
 
 
-def test_get_adjusted_entry(gibbs_entries, interpolated_entry):
+def test_get_adjusted_entry(interpolated_entry):
 
     entry_copy = deepcopy(interpolated_entry)
     entry_copy.energy_adjustments.append(ConstantEnergyAdjustment(0.1))
