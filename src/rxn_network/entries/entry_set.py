@@ -294,7 +294,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return GibbsEntrySet(new_entries)
 
-    def get_interpolated_entry(self, formula: str, tol=1e-6) -> ComputedEntry:
+    def get_interpolated_entry(self, formula: str, tol=1e-1) -> ComputedEntry:
         """
         Helper method for interpolating an entry from the entry set.
 
