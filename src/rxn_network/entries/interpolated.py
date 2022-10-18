@@ -44,7 +44,15 @@ class InterpolatedEntry(ComputedEntry):
                 with the entry. Defaults to None.
             entry_id: An optional id to uniquely identify the entry.
         """
-        super().__init__(composition, energy)
+        super().__init__(
+            composition,
+            energy,
+            correction=correction,
+            energy_adjustments=energy_adjustments,
+            parameters=parameters,
+            data=data,
+            entry_id=entry_id,
+        )
 
     def to_grand_entry(self, chempots):
         """

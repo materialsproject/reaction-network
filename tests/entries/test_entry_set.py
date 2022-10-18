@@ -1,4 +1,6 @@
 """ Tests for GibbsEntrySet. """
+from copy import deepcopy
+
 import pytest
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
@@ -101,6 +103,16 @@ def test_get_stabilized_entry(gibbs_entries):
         entries.add(e_stable)
 
         assert e_stable in PhaseDiagram(entries).stable_entries
+
+
+def test_get_adjusted_entry(gibbs_entries, interpolated_entry):
+
+    entry_copy = deepcopy(interpolated_entry)
+    entry_copy.energy_adjustments.append(ConstantEnergyAdjustment(0.1))
+
+    assert entry_copy == GibbsEntrySet.get_adjusted_entry(
+        interpolated_entry, ConstantEnergyAdjustment(0.1)
+    )
 
 
 def test_from_pd(mp_entries):

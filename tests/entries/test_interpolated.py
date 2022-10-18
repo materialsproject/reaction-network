@@ -6,17 +6,7 @@ from pymatgen.core.composition import Element
 from rxn_network.entries.interpolated import InterpolatedEntry
 
 
-@pytest.fixture
-def entry():
-    """Create entry"""
-    entry = InterpolatedEntry(
-        composition="H3O",
-        energy=-1.0,
-    )
-    return entry
-
-
-def test_to_grand_entry(entry):
+def test_to_grand_entry(interpolated_entry):
     """Test to_grand_entry"""
     grand_entry = entry.to_grand_entry({Element("O"): 0.0})
     assert grand_entry.__class__.__name__ == "GrandPotPDEntry"
@@ -25,6 +15,6 @@ def test_to_grand_entry(entry):
     assert grand_entry.composition != entry.composition
 
 
-def test_is_experimental(entry):
+def test_is_experimental(interpolated_entry):
     """Test is_experimental"""
     assert entry.is_experimental is False

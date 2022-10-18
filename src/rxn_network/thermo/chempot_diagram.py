@@ -220,7 +220,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         just barely stable
         """
         return {
-            e.composition.reduced_formula: self._get_metastable_domain(e)
+            e.composition.reduced_formula: self._get_metastable_domain(
+                e.composition.reduced_formula
+            )
             for e in self._min_entries
             if e.composition.reduced_formula not in self.domains
         }

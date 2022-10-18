@@ -7,6 +7,7 @@ from monty.serialization import loadfn
 
 from rxn_network.core.composition import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.entries.interpolated import InterpolatedEntry
 from rxn_network.reactions.hull import InterfaceReactionHull
 
 # load files
@@ -46,6 +47,16 @@ def filtered_entries():
         MN_O_Y_ENTRIES, temperature=1000, include_barin_data=False
     ).filter_by_stability(0.0)
     return filtered_entries
+
+
+@pytest.fixture
+def interpolated_entry():
+    """Create entry"""
+    entry = InterpolatedEntry(
+        composition="Y3O8",
+        energy=-1.0,
+    )
+    return entry
 
 
 @pytest.fixture(scope="session")
