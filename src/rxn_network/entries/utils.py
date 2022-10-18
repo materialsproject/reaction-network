@@ -89,7 +89,7 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = F
         )
 
     if stabilize:
-        entry = entry_set.get_stabilized_entry(entry, tol=1e-3)
+        entry = entry_set.get_stabilized_entry(entry)
 
     return entry
 

@@ -294,7 +294,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return GibbsEntrySet(new_entries)
 
-    def get_interpolated_entry(self, formula: str, tol=1e-1) -> ComputedEntry:
+    def get_interpolated_entry(self, formula: str, tol_per_atom=1e-3) -> ComputedEntry:
         """
         Helper method for interpolating an entry from the entry set.
 
@@ -307,7 +307,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         comp = Composition(formula).reduced_composition
         pd_entries = self.get_subset_in_chemsys([str(e) for e in comp.elements])
 
-        energy = PhaseDiagram(pd_entries).get_hull_energy(comp) - tol
+        energy = (
+            PhaseDiagram(pd_entries).get_hull_energy(comp)
+            - tol_per_atom * comp.num_atoms
+        )
 
         adj = ConstantEnergyAdjustment(  # for keeping track of uncertainty
             value=0.0,
