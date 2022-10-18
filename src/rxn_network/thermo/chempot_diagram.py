@@ -192,10 +192,10 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         try:
             metastable_domain = cpd.domains[formula]
-        except KeyError:
-            logging.warning(
+        except KeyError as exc:
+            raise ValueError(
                 f"Metastable domain for {formula} not found! Please investigate."
-            )
+            ) from exc
 
         self._metastable_domains[formula] = metastable_domain
         self._entry_set.remove(new_entry)
