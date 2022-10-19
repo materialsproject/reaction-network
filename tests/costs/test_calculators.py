@@ -1,31 +1,24 @@
 """ Tests for ChempotDistanceCalculator """
 from pathlib import Path
 
-import numpy as np
 import pytest
-from monty.serialization import loadfn
 
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
     PrimarySelectivityCalculator,
     SecondarySelectivityCalculator,
 )
-from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 
 cpd_expected_values = {
-    "0.5 Y2O3 + 0.5 Mn2O3 -> YMnO3": {
-        "sum": 0.480008216,
-        "max": 0.480008216,
-        "mean": 0.240004108,
-    },
+    "0.5 Y2O3 + 0.5 Mn2O3 -> YMnO3": {"sum": 0.48001, "max": 0.48001, "mean": 0.24},
     "2 YClO + 2 NaMnO2 + 0.5 O2 -> Y2Mn2O7 + 2 NaCl": {
-        "sum": 1.369790046,
-        "max": 1.369790045,
-        "mean": 0.195684292,
+        "sum": 1.36979,
+        "max": 1.36979,
+        "mean": 0.19568,
     },
 }
 
