@@ -441,7 +441,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return cls(gibbs_entries, minimize_obj_size=minimize_obj_size)
 
     @classmethod
-    def from_entries(
+    def from_computed_entries(
         cls,
         entries: Iterable[ComputedStructureEntry],
         temperature: float,
@@ -497,6 +497,34 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             new_entries.update(gibbs_set)
 
         return cls(list(new_entries))
+
+    @classmethod
+    def from_entries(
+        cls,
+        entries: Iterable[ComputedStructureEntry],
+        temperature: float,
+        include_nist_data=True,
+        include_barin_data=False,
+        include_freed_data=False,
+        apply_carbonate_correction=True,
+        minimize_obj_size=False,
+    ) -> "GibbsEntrySet":
+        """
+        This method is deprecated. Use from_computed_entries instead.
+        """
+        warnings.warn(
+            "This method is deprecated. Use from_computed_entries instead.", category=FutureWarning
+        )
+
+        return cls.from_computed_entries(
+            entries,
+            temperature,
+            include_nist_data,
+            include_barin_data,
+            include_freed_data,
+            apply_carbonate_correction,
+            minimize_obj_size,
+        )
 
     @cached_property
     def entries_list(self) -> List[ComputedEntry]:
