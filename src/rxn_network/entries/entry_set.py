@@ -513,7 +513,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         This method is deprecated. Use from_computed_entries instead.
         """
         warnings.warn(
-            "This method is deprecated. Use from_computed_entries instead.", category=FutureWarning
+            "This method is deprecated. Use from_computed_entries instead.",
+            category=FutureWarning,
         )
 
         return cls.from_computed_entries(
