@@ -5,6 +5,7 @@ equations using matrix operations.
 
 from copy import deepcopy
 from itertools import combinations
+from math import comb
 from typing import Union
 
 import numpy as np
@@ -41,6 +42,7 @@ class PathwaySolver(Solver):
     def __init__(
         self,
         pathways: PathwaySet,
+        entries: GibbsEntrySet,
         cost_function: CostFunction,
         open_elem: str = None,
         chempot: float = None,
@@ -56,7 +58,7 @@ class PathwaySolver(Solver):
             chempot: Chemical potential to use for pathways with an open element.
         """
         super().__init__(pathways=deepcopy(pathways))
-        self._entries = GibbsEntrySet(pathways.reaction_set.entries)
+        self._entries = entries
         self.cost_function = cost_function
         self.open_elem = Element(open_elem) if open_elem else None
         self.chempot = chempot
@@ -79,7 +81,7 @@ class PathwaySolver(Solver):
             net_rxn: The reaction representing the total reaction from precursors to
                 final targets.
             max_num_combos: The maximum allowable size of the balanced reaction pathway.
-                At 5 or more, the solver will start to take a significant amount of time
+                At values <=5, the solver will start to take a significant amount of time
                 to run.
             find_intermediate_rxns: Whether to find intermediate reactions; crucial for
                 finding pathways where intermediates react together, as these reactions
@@ -148,10 +150,13 @@ class PathwaySolver(Solver):
         chempot = ray.put(self.chempot)
 
         num_rxns = len(reactions)
+        batch_size = self.batch_size or ray.cluster_resources()["CPU"] - 1
+
+        num_combos = sum(comb(num_rxns, k) for k in range(1, max_num_combos + 1))
+        num_batches = int((num_combos // self.chunk_size + 1) // batch_size + 1)
 
         paths = []
         paths_refs = []
-        batch_size = self.batch_size or ray.cluster_resources()["CPU"]
         batch_count = 1
         for n in range(1, max_num_combos + 1):
             for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
@@ -171,7 +176,10 @@ class PathwaySolver(Solver):
                     for paths_ref in tqdm(
                         to_iterator(paths_refs),
                         total=len(paths_refs),
-                        desc=f"{self.__class__.__name__} (Batch {batch_count})",
+                        desc=(
+                            f"{self.__class__.__name__} (Batch"
+                            f" {batch_count}/{num_batches})"
+                        ),
                     ):
                         paths.extend(paths_ref)
 
@@ -182,7 +190,7 @@ class PathwaySolver(Solver):
         for paths_ref in tqdm(
             to_iterator(paths_refs),
             total=len(paths_refs),
-            desc=f"{self.__class__.__name__} (Batch {batch_count})",
+            desc=f"{self.__class__.__name__} (Batch {batch_count}/{num_batches})",
         ):
             paths.extend(paths_ref)
 

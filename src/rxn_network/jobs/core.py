@@ -452,19 +452,20 @@ class PathwaySolverMaker(Maker):
         self.net_rxn = net_rxn
 
     @job(paths="paths", output_schema=PathwaySolverTaskDocument)
-    def make(self, pathways):
+    def make(self, pathways, entries):
         chempots = None
         if self.open_elem:
             chempots = {Element(self.open_elem): self.chempot}
 
         ps = PathwaySolver(
             pathways=pathways,
+            entries=entries,
             cost_function=self.cost_function,
             open_elem=self.open_elem,
             chempot=self.chempot,
         )
 
-        net_rxn = get_computed_rxn(self.net_rxn, ps.entries, chempots)
+        net_rxn = get_computed_rxn(self.net_rxn, entries, chempots)
 
         balanced_paths = ps.solve(
             net_rxn=net_rxn,
