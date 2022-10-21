@@ -378,7 +378,7 @@ class NetworkMaker(Maker):
     chempot: float = 0.0
     graph_fn: Optional[str] = None
 
-    @job(output_schema=NetworkTaskDocument)
+    @job(network="network", output_schema=NetworkTaskDocument)
     def make(
         self,
         rxn_sets: Iterable[ReactionSet],

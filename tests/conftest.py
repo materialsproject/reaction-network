@@ -101,5 +101,10 @@ def ymno_rn():
 
 @pytest.fixture(scope="session")
 def job_store():
-    additional_stores = {"rxns": MemoryStore(), "entries": MemoryStore()}
+    additional_stores = {
+        "rxns": MemoryStore(),
+        "entries": MemoryStore(),
+        "network": MemoryStore(),
+        "paths": MemoryStore(),
+    }
     return JobStore(MemoryStore(), additional_stores=additional_stores)
