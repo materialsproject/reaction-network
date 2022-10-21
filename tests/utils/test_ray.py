@@ -1,13 +1,11 @@
 """Tests for ray utils"""
 import logging
 import os
-import sys
-from pathlib import Path
 
 import pytest
 import ray
 
-from rxn_network.utils.ray import initialize_ray, to_iterator
+from rxn_network.utils.ray import initialize_ray
 
 LOGGER = logging.getLogger(__name__)
 

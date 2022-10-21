@@ -77,8 +77,8 @@ def pathway_solver_maker():
 
 
 @pytest.fixture
-def pathway_solver_job(pathway_solver_maker, ymn2o5_mn3o4_paths):
-    job = pathway_solver_maker.make(ymn2o5_mn3o4_paths)
+def pathway_solver_job(pathway_solver_maker, ymn2o5_mn3o4_paths, filtered_entries):
+    job = pathway_solver_maker.make(ymn2o5_mn3o4_paths, filtered_entries)
     return job
 
 

@@ -81,8 +81,8 @@ class PathwaySolver(Solver):
             net_rxn: The reaction representing the total reaction from precursors to
                 final targets.
             max_num_combos: The maximum allowable size of the balanced reaction pathway.
-                At values <=5, the solver will start to take a significant amount of time
-                to run.
+                At values <=5, the solver will start to take a significant amount of
+                time to run.
             find_intermediate_rxns: Whether to find intermediate reactions; crucial for
                 finding pathways where intermediates react together, as these reactions
                 may not occur in the graph-derived pathways. Defaults to True.
