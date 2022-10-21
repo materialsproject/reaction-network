@@ -225,7 +225,14 @@ class NetworkFlowMaker(Maker):
                 {
                     "name": self.get_entry_set_maker.name
                     + f" ({chemsys}, T={self.get_entry_set_maker.temperature} K,"
-                    f" +{round(self.get_entry_set_maker.e_above_hull, 3)} eV)"
+                    f" +{round(self.get_entry_set_maker.e_above_hull, 3)} eV)",
+                    "formulas_to_include": list(
+                        set(
+                            self.get_entry_set_maker.formulas_to_include
+                            + precursor_formulas
+                            + target_formulas
+                        )
+                    ),
                 }
             )
             get_entry_set_job = get_entry_set_maker.make(chemsys)
