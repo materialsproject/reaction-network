@@ -2,17 +2,17 @@
 This module contains functions for plotting experimental reaction pathway data.
 """
 
-from typing import List, Dict
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import pandas
 from monty.json import MSONable
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-from pymatgen.core.composition import Composition
 from scipy.ndimage.filters import median_filter
 from tqdm import tqdm
 
-from rxn_network.entries import GibbsEntrySet
+from rxn_network.core.composition import Composition
+from rxn_network.entries.entry_set import GibbsEntrySet
 
 
 class PathwayPlotter(MSONable):
@@ -73,7 +73,7 @@ class PathwayPlotter(MSONable):
         total_g = g_df.sum(axis=1)
         total_g = total_g - ground_state_energies
 
-        plot = total_g.plot(style="o")
+        plot = total_g.plot(backend="matplotlib", style="o")
         plt.xlabel("Temperature (K)", {"size": 11})
         plt.ylabel(r"Gibbs Free Energy, $G$ (eV/atom)", {"size": 11})
 
@@ -115,7 +115,7 @@ class PathwayPlotter(MSONable):
         """
         phase_df = pandas.DataFrame(self._phase_amounts, index=self._temps)
         if self._apply_smoothing:
-            phase_df = phase_df.apply(median_filter, axis=0, size=15)
+            phase_df = phase_df.apply(median_filter, axis=0, size=3)
 
         return phase_df
 
@@ -174,6 +174,8 @@ class PathwayPlotter(MSONable):
         """
         comps = [
             Composition(i).fractional_composition
-            for i in self.num_atoms_df.to_dict("records")
+            for i in self.num_atoms_df.to_dict(  # pylint: disable=not-an-iterable
+                "records"
+            )
         ]
         return pandas.Series(comps, index=self.num_atoms_df.index)

@@ -1,0 +1,44 @@
+max-line-length: 88
+test-warnings: false
+doc-warnings: false
+ignore-paths:
+  - docs
+  - tests
+  - data/nist/generate_janaf_data.py
+
+bandit:
+  run: false
+
+mccabe:
+  run: false
+
+pycodestyle:
+  disable:
+    - E501
+
+pylint:
+  disable:
+    - unsubscriptable-object
+    - invalid-name
+    - arguments-differ # to account for jobflow
+    - logging-fstring-interpolation
+    - arguments-renamed
+    - assignment-from-none
+    - unsupported-membership-test
+    - cell-var-from-loop
+    - broad-except
+    - import-outside-toplevel
+    - arguments_differ
+    - duplicate-code
+    - too-many-branches
+    - too-many-statements
+    - too-many-boolean-expressions
+    - R0902
+    - R0903
+    - R0913
+    - R0914
+mypy:
+  run: true
+  options:
+    ignore-missing-imports: true
+    follow-imports: skip

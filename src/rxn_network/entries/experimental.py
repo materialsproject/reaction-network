@@ -4,17 +4,19 @@ Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 import hashlib
 from typing import Dict, List, Optional
 
-from pymatgen.core.composition import Composition
-from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
 from monty.json import MontyDecoder
+from pymatgen.analysis.phase_diagram import GrandPotPDEntry
+from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
 from scipy.interpolate import interp1d
+
+from rxn_network.core.composition import Composition
 
 
 class ExperimentalReferenceEntry(ComputedEntry):
     """
     An Entry class for experimental reference data, to be sub-classed for specific data
-    sources.  Given a composition, automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
-    reference values.
+    sources.  Given a composition, automatically finds the Gibbs free energy of
+    formation, dGf(T) from tabulated reference values.
     """
 
     REFERENCES: Dict = {}
@@ -28,13 +30,14 @@ class ExperimentalReferenceEntry(ComputedEntry):
     ):
         """
         Args:
-            composition: Composition object (pymatgen).
-            temperature: Temperature in Kelvin. If temperature is not selected from
-                one of [300, 400, 500, ... 2000 K], then free energies will be
-                interpolated. Defaults to 300 K.
-            data: Optional dictionary containing entry data
+            composition: Composition object (pymatgen). temperature: Temperature in
+            Kelvin. If temperature is not selected within
+                the range of the reference data (see self._validate_temperature), then
+                this will raise an error.
+            energy_adjustments: A list of EnergyAdjustments to apply to the entry. data:
+            Optional dictionary containing entry data
         """
-        formula = Composition(composition).reduced_formula
+        formula = composition.reduced_formula
         entry_id = self.__class__.__name__
 
         self._temperature = temperature
@@ -49,6 +52,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
             data=data,
             entry_id=entry_id,
         )
+        self._composition = composition
 
         self.name = formula
 
@@ -69,6 +73,18 @@ class ExperimentalReferenceEntry(ComputedEntry):
 
         new_entry = self.from_dict(new_entry_dict)
         return new_entry
+
+    def to_grand_entry(self, chempots):
+        """
+        Convert an ExperimentalReferenceEntry to a GrandComputedEntry.
+
+        Args:
+            chempots: A dictionary of {element: chempot} pairs.
+
+        Returns:
+            A GrandComputedEntry.
+        """
+        return GrandPotPDEntry(self, chempots)
 
     @classmethod
     def _validate_temperature(cls, formula: str, temperature: float) -> None:
@@ -96,6 +112,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
             Gibbs free energy of formation of formula at specified temperature [eV]
         """
         data = cls.REFERENCES[formula]
+
         if temperature % 100 > 0:
             g_interp = interp1d(list(data.keys()), list(data.values()))
             return g_interp(temperature)[()]
@@ -137,7 +154,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
     def from_dict(cls, d):
         dec = MontyDecoder()
         entry = cls(
-            composition=d["composition"],
+            composition=Composition(d["composition"]),
             temperature=d["temperature"],
             energy_adjustments=dec.process_decoded(d["energy_adjustments"]),
             data=d["data"],
@@ -161,9 +178,9 @@ class ExperimentalReferenceEntry(ComputedEntry):
         return False
 
     def __hash__(self):
-        data_md5 = hashlib.md5(
-            f"{self.__class__.__name__}"
-            f"{self.composition}_"
-            f"{self.temperature}".encode("utf-8")
+        data_md5 = hashlib.md5(  # nosec
+            f"{self.__class__.__name__}{self.composition}_{self.temperature}".encode(
+                "utf-8"
+            )
         ).hexdigest()
         return int(data_md5, 16)

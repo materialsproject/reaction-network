@@ -1,74 +1,16 @@
 """
 Utility functions used by the enumerator classes.
 """
-import warnings
 from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry
 
-import rxn_network.costs.calculators as calcs
-from rxn_network.core import Reaction
+from rxn_network.core.reaction import Reaction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
-
-
-def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = False):
-    """
-    Acquire a (stabilized) entry by user-specified formula.
-
-    Args:
-        formula: Chemical formula
-        entry_set: GibbsEntrySet containing 1 or more entries corresponding to
-            given formula
-        stabilize: Whether or not to stabilize the entry by decreasing its energy
-            such that it is 'on the hull'
-    """
-    try:
-        entry = entry_set.get_min_entry_by_formula(formula)
-    except KeyError:
-        entry = entry_set.get_interpolated_entry(formula)
-        warnings.warn(
-            f"Using interpolated entry for {entry.composition.reduced_formula}"
-        )
-
-    if stabilize:
-        entry = entry_set.get_stabilized_entry(entry, tol=1e-3)
-
-    return entry
-
-
-def initialize_calculators(
-    calculators: Union[List[calcs.Calculator], List[str]], entries: GibbsEntrySet
-):
-    """
-    Initialize a list of Calculators given a list of their names (strings) or
-    uninitialized objects, and a provided list of entries.
-
-    Args:
-        calculators: List of names of calculators
-        entries: List of entries or EntrySet-type object
-    """
-    calculators = [getattr(calcs, c) if isinstance(c, str) else c for c in calculators]
-    return [c.from_entries(entries) for c in calculators]  # type: ignore
-
-
-def apply_calculators(
-    rxn: ComputedReaction, calculators: List[calcs.Calculator]
-) -> ComputedReaction:
-    """
-    Decorates a reaction by applying decorate() from a list of calculators.
-
-    Args:
-        rxn: ComputedReaction object
-        calculators: List of (initialized) calculators
-
-    """
-    for calc in calculators:
-        rxn = calc.decorate(rxn)
-    return rxn
 
 
 def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
@@ -85,7 +27,7 @@ def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
 
 
 def get_total_chemsys_str(
-    entries: Iterable[Entry], open_elem: Optional[Element] = None
+    entries: Iterable[Entry], open_elems: Optional[Iterable[Union[Element]]] = None
 ) -> str:
     """
     Returns chemical system string for set of entries, with optional open element.
@@ -95,13 +37,13 @@ def get_total_chemsys_str(
         open_elem: optional open element to include in chemical system
     """
     elements = {elem for entry in entries for elem in entry.composition.elements}
-    if open_elem:
-        elements.add(open_elem)
+    if open_elems:
+        elements.update(list(open_elems))
     return "-".join(sorted([str(e) for e in elements]))
 
 
 def group_by_chemsys(
-    combos: Iterable[Tuple[Entry]], open_elem: Optional[Element] = None
+    combos: Iterable[Tuple[Entry]], open_elems: Optional[Iterable[Element]] = None
 ) -> dict:
     """
     Groups entry combinations by chemical system, with optional open element.
@@ -115,7 +57,7 @@ def group_by_chemsys(
     """
     combo_dict: Dict[str, List[Tuple[Entry]]] = {}
     for combo in combos:
-        key = get_total_chemsys_str(combo, open_elem)
+        key = get_total_chemsys_str(combo, open_elems)
         if key in combo_dict:
             combo_dict[key].append(combo)
         else:
@@ -137,7 +79,8 @@ def stabilize_entries(
     Args:
         pd: PhaseDiagram object
         entries_to_adjust: Iterable of entries requiring energies to be adjusted
-        tol: Numerical tolerance to ensure that the energy of the entry is below the hull
+        tol: Numerical tolerance to ensure that the energy of the entry is below the
+            hull
 
     Returns:
         A list of new entries with energies adjusted to be on the hull
@@ -184,3 +127,17 @@ def get_computed_rxn(
         rxn = ComputedReaction.balance(reactant_entries, product_entries)
 
     return rxn
+
+
+def get_rxn_info(rxn: ComputedReaction):
+    """
+    Utility function to get basic reaction information from a ComputedReaction object.
+    Used in enumerators.
+
+    Args:
+        rxn: ComputedReaction object
+
+    Returns:
+        Tuple of reaction information (entry indices, coefficients, data)
+    """
+    return [e.data["idx"] for e in rxn.entries], list(rxn.coefficients), rxn.data

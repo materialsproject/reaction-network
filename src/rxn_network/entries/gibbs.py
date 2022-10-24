@@ -3,14 +3,13 @@ A computed entry object for estimating the Gibbs free energy of formation. Note 
 this is similar to the implementation within pymatgen, but has been refactored here to
 add extra functionality.
 """
-import hashlib
+from copy import deepcopy
 from itertools import combinations
 from typing import List, Optional
-from functools import cached_property
 
 import numpy as np
 from monty.json import MontyDecoder
-from pymatgen.core.composition import Composition
+from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.core.structure import Structure
 from pymatgen.entries.computed_entries import (
     ComputedEntry,
@@ -19,21 +18,8 @@ from pymatgen.entries.computed_entries import (
 )
 from scipy.interpolate import interp1d
 
+from rxn_network.core.composition import Composition
 from rxn_network.data import G_ELEMS
-
-
-# TO-DO: Find better method for caching formula than monkey patching a class from pymatgen.
-@cached_property  # type: ignore
-def cached_reduced_formula(self):
-    """
-    Simple caching for Composition's reduced formula. Due to repetitive calls to this
-    property, this can offer a significant speedup.
-    """
-    return self.get_reduced_formula_and_factor()[0]
-
-
-Composition.reduced_formula = cached_reduced_formula  # type: ignore # noqa
-Composition.reduced_formula.__set_name__(Composition, "reduced_formula")  # type: ignore # noqa
 
 
 class GibbsComputedEntry(ComputedEntry):
@@ -73,26 +59,23 @@ class GibbsComputedEntry(ComputedEntry):
         Args:
             composition: The composition object (pymatgen)
             formation_energy_per_atom: Calculated formation enthalpy, dH, at T = 298 K,
-                normalized to the total number of atoms in the composition. NOTE: since this
-                is a _formation_ energy, it must be calculated using a phase diagram construction.
+                normalized to the total number of atoms in the composition. NOTE: since
+                this is a _formation_ energy, it must be calculated using a phase
+                diagram construction.
             volume_per_atom: The total volume of the associated structure divided by its
                 number of atoms.
             temperature: Temperature [K] by which to acquire dGf(T); must be selected
-                from a range of [300, 2000] K. If temperature is not selected from
-                one of [300, 400, 500, ... 2000 K], then free energies will be
-                interpolated.
+                from a range of [300, 2000] K. If temperature is not selected from one
+                of [300, 400, 500, ... 2000 K], then free energies will be interpolated.
             energy_adjustments: Optional list of energy adjustments
             parameters: Optional list of calculation parameters
             data: Optional dictionary containing entry data
             entry_id: Optional entry-id, such as the entry's mp-id
         """
-        self._composition = Composition(composition)
-        self.formation_energy_per_atom = formation_energy_per_atom
+        composition = Composition(composition)
+        self._composition = composition
         self.volume_per_atom = volume_per_atom
-        self.temperature = temperature
-
-        num_atoms = self._composition.num_atoms
-
+        num_atoms = composition.num_atoms
         if temperature < 300 or temperature > 2000:
             raise ValueError("Temperature must be selected from range: [300, 2000] K.")
 
@@ -110,9 +93,7 @@ class GibbsComputedEntry(ComputedEntry):
                 self.gibbs_adjustment(temperature),
                 uncertainty=0.05 * num_atoms,  # descriptor has ~50 meV/atom MAD
                 name="Gibbs SISSO Correction",
-                description=(
-                    f"Gibbs correction: dGf({self.temperature} K) - dHf (298 K)"
-                ),
+                description=f"Gibbs correction: dGf({temperature} K) - dHf (298 K)",
             )
         )
 
@@ -126,6 +107,9 @@ class GibbsComputedEntry(ComputedEntry):
             data=data,
             entry_id=entry_id,
         )
+        self._composition = composition
+        self.formation_energy_per_atom = formation_energy_per_atom
+        self.temperature = temperature
 
     def get_new_temperature(self, new_temperature: float) -> "GibbsComputedEntry":
         """
@@ -135,7 +119,8 @@ class GibbsComputedEntry(ComputedEntry):
             new_temperature: The new temperature to use [K]
 
         Returns:
-            A copy of the GibbsComputedEntry, initialized at the new specified temperature.
+            A copy of the GibbsComputedEntry, initialized at the new specified
+            temperature.
         """
         new_entry_dict = self.as_dict()
         new_entry_dict["temperature"] = new_temperature
@@ -166,6 +151,21 @@ class GibbsComputedEntry(ComputedEntry):
         return num_atoms * self._g_delta_sisso(
             self.volume_per_atom, reduced_mass, temperature
         ) - self._sum_g_i(self._composition, temperature)
+
+    def to_grand_entry(self, chempots):
+        """
+        Convert a GibbsComputedEntry to a GrandComputedEntry.
+
+        Args:
+            chempots: A dictionary of {element: chempot} pairs.
+
+        Returns:
+            A GrandComputedEntry.
+        """
+        return GrandPotPDEntry(self, chempots)
+
+    def copy(self):
+        return deepcopy(self)
 
     @staticmethod
     def _g_delta_sisso(
@@ -212,7 +212,7 @@ class GibbsComputedEntry(ComputedEntry):
                 sum_g_i += amt * g_interp(temperature)
         else:
             sum_g_i = sum(
-                [amt * G_ELEMS[str(temperature)][elem] for elem, amt in elems.items()]
+                amt * G_ELEMS[str(temperature)][elem] for elem, amt in elems.items()
             )
 
         return sum_g_i
@@ -266,7 +266,7 @@ class GibbsComputedEntry(ComputedEntry):
         Returns:
             A new GibbsComputedEntry object
         """
-        composition = structure.composition
+        composition = Composition(structure.composition)
         volume_per_atom = structure.volume / structure.num_sites
         entry = cls(
             composition=composition,
@@ -279,8 +279,17 @@ class GibbsComputedEntry(ComputedEntry):
 
     @property
     def is_experimental(self) -> bool:
-        """Returns True if the entry contains at least one ICSD id stored in the data dictionary"""
-        return bool(self.data.get("icsd_ids"))
+        """
+        Returns True if self.data contains {"theoretical": False}. If
+        theoretical is not specified but there is greater than 1 icsd_id provided,
+        assumes that the presence of an icsd_id means the entry is experimental.
+        """
+        if "theoretical" in self.data:
+            return not self.data["theoretical"]
+        if "icsd_ids" in self.data:
+            return len(self.data["icsd_ids"]) >= 1
+
+        return False
 
     def as_dict(self) -> dict:
         """Returns an MSONable dict."""
@@ -308,27 +317,35 @@ class GibbsComputedEntry(ComputedEntry):
 
     def __repr__(self):
         output = [
-            f"GibbsComputedEntry | {self.entry_id} | {self.composition.formula} "
-            f"({self.composition.reduced_formula})",
+            (
+                f"GibbsComputedEntry | {self.entry_id} | {self.composition.formula} "
+                f"({self.composition.reduced_formula})"
+            ),
             f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
         ]
         return "\n".join(output)
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return (
-                (self.entry_id == other.entry_id)
-                and (self.temperature == other.temperature)
-                and (self.composition == other.composition)
-                and (self.energy == other.energy)
-            )
-        return False
+        if not type(other) is type(self):
+            return False
+
+        if not np.isclose(self.energy, other.energy):
+            return False
+
+        if getattr(self, "entry_id", None) and getattr(other, "entry_id", None):
+            return self.entry_id == other.entry_id
+
+        if self.composition != other.composition:
+            return False
+
+        return True
 
     def __hash__(self):
-        data_md5 = hashlib.md5(
-            "GibbsComputedEntry"
-            f"{self.composition}_"
-            f"{self.energy}_{self.entry_id}_"
-            f"{self.temperature}".encode("utf-8")
-        ).hexdigest()
-        return int(data_md5, 16)
+        return hash(
+            (
+                self.composition,
+                self.energy,
+                self.entry_id,
+                self.temperature,
+            )
+        )

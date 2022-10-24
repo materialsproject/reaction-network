@@ -5,7 +5,7 @@ from typing import List, Optional
 
 import numpy as np
 
-from rxn_network.core import CostFunction
+from rxn_network.core.cost_function import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 
 
@@ -74,6 +74,6 @@ class Softplus(CostFunction):
 
     def __repr__(self):
         return (
-            f"Softplus with parameters: "
+            "Softplus with parameters: "
             f"{' '.join([f'{k} ({v})' for k, v in zip(self.params, self.weights)])}"
         )

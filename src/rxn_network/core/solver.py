@@ -6,7 +6,6 @@ from abc import ABCMeta
 from typing import List
 
 from monty.json import MSONable
-from pymatgen.entries.entry_tools import EntrySet
 
 from rxn_network.core.pathway import Pathway
 from rxn_network.core.reaction import Reaction
@@ -17,17 +16,16 @@ class Solver(MSONable, metaclass=ABCMeta):
     Base definition for a pathway solver class.
     """
 
-    def __init__(self, entries, pathways):
+    def __init__(self, pathways):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
 
-        self._entries = entries
         self._pathways = pathways
 
         rxns = []
         costs = []
 
-        for path in self._pathways:
+        for path in self._pathways.get_paths():
             for rxn, cost in zip(path.reactions, path.costs):
                 if rxn not in rxns:
                     rxns.append(rxn)
@@ -35,11 +33,6 @@ class Solver(MSONable, metaclass=ABCMeta):
 
         self._reactions = rxns
         self._costs = costs
-
-    @property
-    def entries(self) -> EntrySet:
-        """Entry set used in solver"""
-        return self._entries
 
     @property
     def pathways(self) -> List[Pathway]:

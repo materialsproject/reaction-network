@@ -5,14 +5,18 @@ pymatgen and streamlined for the reaction-network code.
 
 import re
 from copy import deepcopy
+from functools import cached_property
 from itertools import chain, combinations
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from monty.fractions import gcd_float
-from pymatgen.core.composition import Composition, Element
+from pymatgen.core.composition import Element
 
-from rxn_network.core import Reaction
+from rxn_network.core.composition import Composition
+from rxn_network.core.reaction import Reaction
+
+TOLERANCE = 1e-6  # Tolerance for determining if a particular component fraction is > 0.
 
 
 class BasicReaction(Reaction):
@@ -20,9 +24,6 @@ class BasicReaction(Reaction):
     An object representing a basic chemical reaction: compositions and their
     coefficients.
     """
-
-    # Tolerance for determining if a particular component fraction is > 0.
-    TOLERANCE = 1e-6
 
     def __init__(
         self,
@@ -74,9 +75,7 @@ class BasicReaction(Reaction):
                 [k * abs(v) for k, v in self.product_coeffs.items()], Composition({})
             )
 
-            if not sum_reactants.almost_equals(
-                sum_products, rtol=0, atol=self.TOLERANCE
-            ):
+            if not sum_reactants.almost_equals(sum_products, rtol=0, atol=TOLERANCE):
                 self.balanced = False
             else:
                 self.balanced = True
@@ -101,7 +100,12 @@ class BasicReaction(Reaction):
             data: Optional dictionary containing extra data about the reaction.
         """
         compositions = list(reactants + products)
-        coeffs, lowest_num_errors = cls._balance_coeffs(reactants, products)
+        coeffs, lowest_num_errors, num_constraints = cls._balance_coeffs(
+            reactants, products
+        )
+        if not data:
+            data = {}
+        data["num_constraints"] = num_constraints
 
         balanced = True
         if coeffs is None or lowest_num_errors == np.inf:
@@ -128,7 +132,7 @@ class BasicReaction(Reaction):
             factor: factor to normalize to. Defaults to 1.
         """
         all_comp = self.compositions
-        coeffs = self.coefficients
+        coeffs = self.coefficients.copy()
         scale_factor = abs(1 / coeffs[self.compositions.index(comp)] * factor)
         coeffs *= scale_factor
         return BasicReaction(all_comp, coeffs)
@@ -146,10 +150,9 @@ class BasicReaction(Reaction):
             factor (float): Factor to normalize to. Defaults to 1.
         """
         all_comp = self.compositions
-        coeffs = self.coefficients
+        coeffs = self.coefficients.copy()
         current_el_amount = (
-            sum([all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))])
-            / 2
+            sum(all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))) / 2
         )
         scale_factor = factor / current_el_amount
         coeffs *= scale_factor
@@ -167,10 +170,8 @@ class BasicReaction(Reaction):
         """
         return (
             sum(
-                [
-                    self.compositions[i][element] * abs(self.coefficients[i])
-                    for i in range(len(self.compositions))
-                ]
+                self.compositions[i][element] * abs(self.coefficients[i])
+                for i in range(len(self.compositions))
             )
             / 2
         )
@@ -192,7 +193,7 @@ class BasicReaction(Reaction):
         """Returns a copy of the BasicReaction object"""
         return BasicReaction(
             compositions=self.compositions,
-            coefficients=self.coefficients,
+            coefficients=self.coefficients.copy(),
             balanced=self.balanced,
             data=self.data,
             lowest_num_errors=self.lowest_num_errors,
@@ -205,7 +206,7 @@ class BasicReaction(Reaction):
         """
         return BasicReaction(
             compositions=self.compositions,
-            coefficients=-1 * self.coefficients,
+            coefficients=-1 * self.coefficients.copy(),
             balanced=self.balanced,
             data=self.data,
             lowest_num_errors=self.lowest_num_errors,
@@ -214,7 +215,8 @@ class BasicReaction(Reaction):
     def is_separable(self, target: Composition) -> bool:
         """
         Checks if the reaction forms byproducts which are separable from the target
-        composition; i.e., byproducts do not contain any of the elements in the target phase.
+        composition; i.e., byproducts do not contain any of the elements in the target
+        phase.
 
         Args:
             target: Composition object of target; elements in this phase will be used to
@@ -242,6 +244,56 @@ class BasicReaction(Reaction):
         found = all(separable)
 
         return found
+
+    @cached_property
+    def reactant_atomic_fractions(self) -> dict:
+        """
+        Returns the atomic mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        return {
+            c.reduced_composition: -coeff * c.num_atoms / self.num_atoms
+            for c, coeff in self.reactant_coeffs.items()
+        }
+
+    @cached_property
+    def product_atomic_fractions(self) -> dict:
+        """
+        Returns the atomic mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        return {
+            c.reduced_composition: coeff * c.num_atoms / self.num_atoms
+            for c, coeff in self.product_coeffs.items()
+        }
+
+    @cached_property
+    def reactant_molar_fractions(self) -> dict:
+        """
+        Returns the molar mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        total = sum(self.reactant_coeffs.values())
+
+        return {c: coeff / total for c, coeff in self.reactant_coeffs.items()}
+
+    @cached_property
+    def product_molar_fractions(self) -> dict:
+        """
+        Returns the molar mixing ratio of products in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        total = sum(self.product_coeffs.values())
+
+        return {c: coeff / total for c, coeff in self.product_coeffs.items()}
 
     @classmethod
     def from_string(cls, rxn_string) -> "BasicReaction":
@@ -309,22 +361,34 @@ class BasicReaction(Reaction):
         return self._compositions
 
     @property
-    def coefficients(self) -> np.ndarray:  # pylint: disable = W0236
+    def coefficients(self) -> np.ndarray:
         """Array of reaction coefficients"""
         return self._coefficients
 
-    @property
+    @cached_property
+    def num_atoms(self) -> float:
+        """Total number of atoms in this reaction"""
+        return sum(
+            coeff * sum(c[el] for el in self.elements)
+            for c, coeff in self.product_coeffs.items()
+        )
+
+    @cached_property
     def energy(self) -> float:
         """The energy of this reaction"""
         raise ValueError("No energy for a basic reaction!")
 
-    @property
+    @cached_property
     def energy_per_atom(self) -> float:
         """The energy per atom of this reaction"""
         raise ValueError("No energy per atom for a basic reaction!")
 
-    @property
+    @cached_property
     def is_identity(self):
+        """Returns True if the reaction has identical reactants and products"""
+        return self._get_is_identity()
+
+    def _get_is_identity(self):
         """Returns True if the reaction has identical reactants and products"""
         if set(self.reactants) != set(self.products):
             return False
@@ -335,7 +399,7 @@ class BasicReaction(Reaction):
             for c in self.reactant_coeffs
         )
 
-    @property
+    @cached_property
     def chemical_system(self):
         """Returns the chemical system as string in the form of A-B-C-..."""
         return "-".join(sorted([str(el) for el in self.elements]))
@@ -351,7 +415,7 @@ class BasicReaction(Reaction):
     @classmethod
     def _balance_coeffs(
         cls, reactants: List[Composition], products: List[Composition]
-    ) -> Tuple[np.ndarray, Union[int, float]]:
+    ) -> Tuple[np.ndarray, Union[int, float], int]:
         """
         Balances the reaction and returns the new coefficient matrix
         """
@@ -402,11 +466,10 @@ class BasicReaction(Reaction):
 
             coeffs = np.matmul(np.linalg.pinv(comp_and_constraints), b)
 
+            num_errors = 0
             if np.allclose(np.matmul(comp_matrix, coeffs), np.zeros((num_elems, 1))):
                 expected_signs = np.array([-1] * len(reactants) + [+1] * len(products))
-                num_errors = np.sum(
-                    np.multiply(expected_signs, coeffs.T) < cls.TOLERANCE
-                )
+                num_errors = np.sum(np.multiply(expected_signs, coeffs.T) < TOLERANCE)
                 if num_errors == 0:
                     lowest_num_errors = 0
                     best_soln = coeffs
@@ -415,7 +478,7 @@ class BasicReaction(Reaction):
                     lowest_num_errors = num_errors
                     best_soln = coeffs
 
-        return np.squeeze(best_soln), lowest_num_errors
+        return np.squeeze(best_soln), lowest_num_errors, num_constraints
 
     @staticmethod
     def _from_coeff_dicts(reactant_coeffs, product_coeffs) -> "BasicReaction":
@@ -425,11 +488,10 @@ class BasicReaction(Reaction):
         product_comps, p_coefs = zip(*list(product_coeffs.items()))
         return BasicReaction(reactant_comps + product_comps, r_coefs + p_coefs)
 
-    @classmethod
-    def _str_from_formulas(cls, coeffs, formulas) -> str:
+    @staticmethod
+    def _str_from_formulas(coeffs, formulas, tol=TOLERANCE) -> str:
         reactant_str = []
         product_str = []
-        tol = cls.TOLERANCE
         for amt, formula in zip(coeffs, formulas):
             if abs(amt + 1) < tol:
                 reactant_str.append(formula)
@@ -461,21 +523,30 @@ class BasicReaction(Reaction):
         if self is other:
             return True
 
-        if str(self) == str(other):
-            is_equal = True
-        else:
-            is_equal = (set(self.reactants) == set(other.reactants)) & (
-                set(self.products) == set(other.products)
-            )
-        return is_equal
+        if not self.chemical_system == other.chemical_system:
+            return False
+
+        if not len(self.products) == len(other.products):
+            return False
+
+        if not len(self.reactants) == len(other.reactants):
+            return False
+
+        if not np.allclose(sorted(self.coefficients), sorted(other.coefficients)):
+            return False
+
+        if not set(self.reactants) == set(other.reactants):
+            return False
+
+        if not set(self.products) == set(other.products):
+            return False
+
+        return True
 
     def __hash__(self):
         return hash(
-            "-".join(
-                [e.reduced_formula for e in sorted(self.reactants)]
-                + [e.reduced_formula for e in sorted(self.products)]
-            )
-        )
+            (self.chemical_system, tuple(sorted(self.coefficients)))
+        )  # not checking here for reactions that are multiples (too expensive)
 
     def __str__(self):
         return self._str_from_comp(self.coefficients, self.compositions)[0]

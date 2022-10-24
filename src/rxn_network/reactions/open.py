@@ -3,13 +3,15 @@ A reaction class that builds reactions based on ComputedEntry objects under the
 presence of an open entry (e.g. O2), and provides information about reaction
 thermodynamics computed as changes in grand potential.
 """
+from functools import cached_property
 from typing import Dict, List, Optional, Union
 
 import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
-from pymatgen.core.composition import Composition, Element
+from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 
+from rxn_network.core.composition import Composition
 from rxn_network.reactions.computed import ComputedReaction
 
 
@@ -33,7 +35,8 @@ class OpenComputedReaction(ComputedReaction):
             coefficients: List of reaction coefficients.
             chempots: Dict of chemical potentials corresponding to open elements
             data: Optional dict of data
-            lowest_num_errors: number of "errors" encountered during reaction balancing
+            lowest_num_errors: number of "errors" encountered during reaction
+                balancing
         """
         super().__init__(
             entries=entries,
@@ -56,7 +59,7 @@ class OpenComputedReaction(ComputedReaction):
         self.grand_entries = grand_entries
 
     @classmethod
-    def balance(  # type: ignore # pylint: disable = W0221
+    def balance(  # type: ignore
         cls,
         reactant_entries: List[ComputedEntry],
         product_entries: List[ComputedEntry],
@@ -69,19 +72,25 @@ class OpenComputedReaction(ComputedReaction):
         Reactants and products to be specified as a collection (list, set, etc.) of
         ComputedEntry objects.
 
-        A dictionary of open elements and their corresponding chemical potentials must be supplied.
+        A dictionary of open elements and their corresponding chemical potentials must
+        be supplied.
 
         Args:
             reactant_entries: List of reactant entries
             product_entries: List of product entries
-            chempots: Dict of chemical potentials corresponding to open element(s)
+            chempots: Dict of chemical potentials corresponding to open
+                element(s)
             data: Optional dict of data
         """
         reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
         product_comps = [e.composition.reduced_composition for e in product_entries]
-        coefficients, lowest_num_errors = cls._balance_coeffs(
+        coefficients, lowest_num_errors, num_constraints = cls._balance_coeffs(
             reactant_comps, product_comps
         )
+
+        if not data:
+            data = {}
+        data["num_constraints"] = num_constraints
 
         entries = list(reactant_entries) + list(product_entries)
 
@@ -118,10 +127,8 @@ class OpenComputedReaction(ComputedReaction):
             )
 
         return sum(
-            [
-                amt * calc_energies[c]
-                for amt, c in zip(self.coefficients, self.compositions)
-            ]
+            amt * calc_energies[c]
+            for amt, c in zip(self.coefficients, self.compositions)
         )
 
     @property
@@ -166,6 +173,62 @@ class OpenComputedReaction(ComputedReaction):
             self.data,
             self.lowest_num_errors,
         )
+
+    @cached_property
+    def reactant_atomic_fractions(self) -> dict:
+        """
+        Returns the atomic mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        return {
+            c.reduced_composition: -coeff
+            * sum(c[el] for el in self.elements)
+            / self.num_atoms
+            for c, coeff in self.reactant_coeffs.items()
+        }
+
+    @cached_property
+    def product_atomic_fractions(self) -> dict:
+        """
+        Returns the atomic mixing ratio of reactants in the reaction
+        """
+        if not self.balanced:
+            raise ValueError("Reaction is not balanced")
+
+        return {
+            c.reduced_composition: sum(c[el] for el in self.elements) / self.num_atoms
+            for c, coeff in self.product_coeffs.items()
+        }
+
+    @classmethod
+    def from_computed_rxn(
+        cls, reaction: ComputedReaction, chempots: Dict[Element, float]
+    ):
+        return cls(
+            entries=reaction.entries.copy(),
+            coefficients=reaction.coefficients.copy(),
+            chempots=chempots,
+            data=reaction.data.copy(),
+            lowest_num_errors=reaction.lowest_num_errors,
+        )
+
+    def as_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the reaction.
+        """
+        d = super().as_dict()
+        d["chempots"] = {el.symbol: u for el, u in self.chempots.items()}
+        return d
+
+    @classmethod
+    def from_dict(cls, d):
+        """
+        Returns an OpenComputedReaction object from a dictionary representation.
+        """
+        d["chempots"] = {Element(symbol): u for symbol, u in d["chempots"].items()}
+        return super().from_dict(d)
 
     def __repr__(self):
         cp = f"({','.join([f'mu_{e}={m}' for e, m in self.chempots.items()])})"

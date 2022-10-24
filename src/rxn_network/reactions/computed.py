@@ -2,13 +2,15 @@
 A reaction class that builds reactions based on ComputedEntry objects and provides
 information about reaction thermodynamics.
 """
+from functools import cached_property
 from typing import Dict, List, Optional, Union
 
 import numpy as np
-from pymatgen.core.composition import Composition
+from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 from uncertainties import ufloat
 
+from rxn_network.core.composition import Composition
 from rxn_network.reactions.basic import BasicReaction
 
 
@@ -52,7 +54,7 @@ class ComputedReaction(BasicReaction):
         reactant_entries: List[ComputedEntry],
         product_entries: List[ComputedEntry],
         data: Optional[Dict] = None,
-    ) -> "ComputedReaction":  # pylint: disable = W0221
+    ) -> "ComputedReaction":
         """
         Balances and returns a new ComputedReaction.
 
@@ -66,9 +68,13 @@ class ComputedReaction(BasicReaction):
         """
         reactant_comps = [e.composition.reduced_composition for e in reactant_entries]
         product_comps = [e.composition.reduced_composition for e in product_entries]
-        coefficients, lowest_num_errors = cls._balance_coeffs(
+        coefficients, lowest_num_errors, num_constraints = cls._balance_coeffs(
             reactant_comps, product_comps
         )
+
+        if not data:
+            data = {}
+        data["num_constraints"] = num_constraints
 
         return cls(
             entries=list(reactant_entries) + list(product_entries),
@@ -100,7 +106,22 @@ class ComputedReaction(BasicReaction):
             lowest_num_errors=self.lowest_num_errors,
         )
 
-    @property
+    def get_energy(self):
+        """ """
+        calc_energies: Dict[Composition, float] = {}
+
+        for entry in self._entries:
+            (comp, factor) = entry.composition.get_reduced_composition_and_factor()
+            calc_energies[comp] = min(
+                calc_energies.get(comp, float("inf")), entry.energy / factor
+            )
+
+        return sum(
+            amt * calc_energies[c]
+            for amt, c in zip(self.coefficients, self.compositions)
+        )
+
+    @cached_property
     def energy(self) -> float:
         """
         Returns (float):
@@ -115,26 +136,24 @@ class ComputedReaction(BasicReaction):
             )
 
         return sum(
-            [
-                amt * calc_energies[c]
-                for amt, c in zip(self.coefficients, self.compositions)
-            ]
+            amt * calc_energies[c]
+            for amt, c in zip(self.coefficients, self.compositions)
         )
 
-    @property
+    @cached_property
     def energy_per_atom(self) -> float:
         """
         Returns (float):
-            The calculated reaction energy in eV, divided by the total number of
-            atoms in the reaction.
+            The calculated reaction energy in eV, divided by the total number of atoms
+            in the reaction.
         """
         return self.energy / self.num_atoms
 
-    @property
+    @cached_property
     def energy_uncertainty(self) -> float:
         """
-        Calculates the uncertainty in the reaction energy based on the uncertainty in the
-        energies of the reactants/products
+        Calculates the uncertainty in the reaction energy based on the uncertainty in
+        the energies of the reactants/products.
         """
 
         calc_energies: Dict[Composition, ufloat] = {}
@@ -147,19 +166,17 @@ class ComputedReaction(BasicReaction):
             )
 
         energy_with_uncertainty = sum(
-            [
-                amt * calc_energies[c]
-                for amt, c in zip(self.coefficients, self.compositions)
-            ]
+            amt * calc_energies[c]
+            for amt, c in zip(self.coefficients, self.compositions)
         )
 
         return energy_with_uncertainty.s  # type: ignore
 
-    @property
+    @cached_property
     def energy_uncertainty_per_atom(self) -> float:
         """
-        Returns the energy_uncertainty divided by the total number of atoms in
-        the reaction.
+        Returns the energy_uncertainty divided by the total number of atoms in the
+        reaction.
         """
         return self.energy_uncertainty / self.num_atoms
 
@@ -186,6 +203,54 @@ class ComputedReaction(BasicReaction):
         return ComputedReaction(
             self.entries, -1 * self.coefficients, self.data, self.lowest_num_errors
         )
+
+    def normalize_to(self, comp: Composition, factor: float = 1) -> "ComputedReaction":
+        """
+        Normalizes the reaction to one of the compositions via the provided factor.
+
+        By default, normalizes such that the composition given has a coefficient of
+        1.
+
+        Args:
+            comp: Composition object to normalize to
+            factor: factor to normalize to. Defaults to 1.
+        """
+        coeffs = self.coefficients.copy()
+        scale_factor = abs(1 / coeffs[self.compositions.index(comp)] * factor)
+        coeffs *= scale_factor
+        return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
+
+    def normalize_to_element(
+        self, element: Element, factor: float = 1
+    ) -> "ComputedReaction":
+        """
+        Normalizes the reaction to one of the elements.
+        By default, normalizes such that the amount of the element is 1.
+        Another factor can be specified.
+
+        Args:
+            element (Element/Species): Element to normalize to.
+            factor (float): Factor to normalize to. Defaults to 1.
+        """
+        all_comp = self.compositions
+        coeffs = self.coefficients.copy()
+        current_el_amount = (
+            sum(all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))) / 2
+        )
+        scale_factor = factor / current_el_amount
+        coeffs *= scale_factor
+        return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
+
+    def get_entry_idx_vector(self, n):
+        indices = [e.data.get("idx") for e in self.entries]
+        if None in indices:
+            raise ValueError(
+                f"Could not find index for one or more entries in reaction: {self}"
+            )
+
+        v = np.zeros(n)
+        v[indices] = self.coefficients
+        return v
 
     def __hash__(self):
         return BasicReaction.__hash__(self)

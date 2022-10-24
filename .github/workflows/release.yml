@@ -9,26 +9,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v2.4.0
 
-    - uses: actions/setup-python@v1
-      with:
-        python-version: 3.9
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools setuptools_scm wheel
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools setuptools_scm wheel
 
-    - name: Build packages
-      run: |
-        python setup.py sdist
+      - name: Build packages
+        run: |
+          python setup.py sdist
 
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPY_API_TOKEN }}
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.PYPY_API_TOKEN }}
 
   docs:
     runs-on: ubuntu-latest
@@ -36,48 +36,54 @@ jobs:
       run:
         shell: bash -l {0}
     needs:
-    - deploy
+      - deploy
     steps:
-    - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
 
-    - uses: conda-incubator/setup-miniconda@v2
-      with:
-        miniconda-version: "latest"
-        python-version: 3.9
-        activate-environment: foo
-    - run: |
-        python -m pip install --upgrade pip
-        conda install -c conda-forge graph-tool
-        pip install -r requirements.txt
-        pip install -r requirements-optional.txt
-        pip install -r requirements-docs.txt
-        pip install -e .
+      - name: Cache conda
+        uses: actions/cache@v2
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+            hashFiles('environment.yaml') }}
+      - uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          activate-environment: graph-tool
+          environment-file: environment.yaml
+          use-only-tar-bz2: true
 
-    - name: Generate changelog
-      uses: charmixer/auto-changelog-action@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        exclude_labels: dependencies
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[strict]
 
-    - name: Commit files
-      run: |
-        git config --local user.email "mcdermott@lbl.gov"
-        git config --local user.name "GENESIS-EFRC"
-        git stash
-        git pull origin main
-        mv CHANGELOG.md docs/
-        git add docs/CHANGELOG.md && git commit -m 'Updated CHANGELOG.md'
-        
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate changelog
+        uses: charmixer/auto-changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          exclude_labels: dependencies
 
-    - name: Build
-      run: mkdocs build
+      - name: Commit files
+        run: |
+          git config --local user.email "mcdermott@lbl.gov"
+          git config --local user.name "GENESIS-EFRC"
+          git stash
+          git pull origin main
+          mv CHANGELOG.md docs/
+          git add docs/CHANGELOG.md && git commit -m 'Updated CHANGELOG.md'
 
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3.8.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./site
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        run: mkdocs build
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

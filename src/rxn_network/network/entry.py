@@ -29,7 +29,8 @@ class NetworkEntry(MSONable):
         """
         Args:
             entries: list of Entry-like objects
-            description: Node type (e.g., Precursors, Target... see NetworkEntryType class)
+            description: Node type (e.g., Precursors, Target... see NetworkEntryType
+                class)
         """
         self.entries = set(entries)
         self.elements = sorted(
@@ -61,7 +62,7 @@ class DummyEntry(NetworkEntry):
     node to facilitate pathfinding to all nodes, etc.
     """
 
-    def __init__(self):  # pylint: disable=W0231
+    def __init__(self):  # pylint: disable=super-init-not-called
         """Dummy node doesn't need any parameters"""
 
     @property

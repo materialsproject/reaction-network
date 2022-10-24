@@ -4,11 +4,12 @@ Implements a class for storing balanced reaction pathways.
 from typing import List, Union
 
 import numpy as np
-from pymatgen.core.composition import Composition
 
-from rxn_network.core import Pathway, Reaction
+from rxn_network.core.composition import Composition
+from rxn_network.core.pathway import Pathway
+from rxn_network.core.reaction import Reaction
 from rxn_network.pathways.basic import BasicPathway
-from rxn_network.utils import limited_powerset
+from rxn_network.utils.funcs import limited_powerset
 
 
 class BalancedPathway(BasicPathway):
@@ -28,9 +29,11 @@ class BalancedPathway(BasicPathway):
         """
         Args:
             reactions: list of ComputedReaction objects which occur along path.
-            coefficients: list of coefficients to balance each of these reactions, respectively
+            coefficients: list of coefficients to balance each of these reactions,
+                respectively
             costs: list of corresponding costs for each reaction.
-                balanced: whether or not the reaction pathway is balanced. Defaults to False.
+            balanced: whether or not the reaction pathway is balanced.
+                Defaults to False.
         """
         self.coefficients = coefficients
         super().__init__(reactions=reactions, costs=costs)

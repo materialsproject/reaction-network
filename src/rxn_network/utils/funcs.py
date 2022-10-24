@@ -1,8 +1,11 @@
 """ Utility functions used throughout the reaction-network package."""
 
-from typing import Iterable, Any
+import logging
+import sys
+from datetime import datetime
 from itertools import chain, combinations, zip_longest
 from pathlib import Path
+from typing import Any, Iterable
 
 
 def limited_powerset(iterable, max_size) -> Iterable:
@@ -47,3 +50,38 @@ def get_project_root() -> Path:
         Path object for the project root directory.
     """
     return Path(__file__).parent.parent.parent
+
+
+def get_logger(
+    name: str,
+    level=logging.DEBUG,
+    log_format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    stream=sys.stdout,
+):
+    """
+    Code borrowed from the atomate package.
+
+    Helper method for acquiring logger.
+    """
+
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+
+    formatter = logging.Formatter(log_format)
+
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
+    sh = logging.StreamHandler(stream=stream)
+    sh.setFormatter(formatter)
+
+    logger.addHandler(sh)
+
+    return logger
+
+
+def datetime_str() -> str:
+    """
+    Get a string representation of the current time. Borrowed from atomate2.
+    """
+    return str(datetime.utcnow())

@@ -1,5 +1,6 @@
 """ Tests for Softplus """
 import pytest
+
 from rxn_network.costs.softplus import Softplus
 
 
@@ -30,3 +31,14 @@ def test_missing_parameter(softplus_with_attr_and_param, computed_rxn):
     with pytest.raises(ValueError) as error:
         assert softplus_with_attr_and_param.evaluate(computed_rxn)
     assert str(error.value) == "Reaction is missing parameter test_param!"
+
+
+def test_repr(softplus_with_attr, softplus_with_attr_and_param):
+    assert (
+        repr(softplus_with_attr)
+        == "Softplus with parameters: energy_per_atom (1.0)"
+    )
+    assert (
+        repr(softplus_with_attr_and_param)
+        == "Softplus with parameters: energy_per_atom (0.3) test_param (0.7)"
+    )

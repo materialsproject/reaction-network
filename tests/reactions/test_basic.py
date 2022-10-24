@@ -3,12 +3,13 @@ Test for BasicReaction. Several tests adapted from
 test module for pymatgen.analysis.reaction_calculator
 """
 import pytest
-from pymatgen.core.composition import Composition, Element
+from pymatgen.core.composition import Element
 
+from rxn_network.core.composition import Composition
 from rxn_network.reactions.basic import BasicReaction
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def pre_balanced_rxn():
     """Returns a simple, pre-balanced iron oxidation reaction."""
     reactants = [Composition("Fe"), Composition("O2")]
@@ -21,7 +22,7 @@ def pre_balanced_rxn():
     return rxn
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def auto_balanced_rxn():
     """Returns the same iron oxidation reaction, after automatically balancing"""
     reactants = ["Fe", "O2"]
@@ -105,6 +106,14 @@ def test_balance(reactants, products, expected_rxn, expected_lowest_num_errors):
     assert rxn.lowest_num_errors == expected_lowest_num_errors
 
 
+def test_compositions(pre_balanced_rxn):
+    assert pre_balanced_rxn.compositions == [
+        Composition("Fe"),
+        Composition("O2"),
+        Composition("Fe2O3"),
+    ]
+
+
 def test_equality(pre_balanced_rxn, auto_balanced_rxn):
     assert pre_balanced_rxn == auto_balanced_rxn
 
@@ -149,7 +158,7 @@ def test_reverse():
     rxn_reverse = rxn.reverse()
 
     assert (
-        rxn_reverse
+        str(rxn_reverse)
         == "Li2O + La2Zr2O7 + 0.6667 Li3CoO3 -> La2O3 + 0.3333 Co2O3 + 2 Li2ZrO3"
     )
     assert rxn_reverse.reverse() == rxn
@@ -160,10 +169,10 @@ def test_normalize(pre_balanced_rxn):
     rxn_o2_norm = pre_balanced_rxn.normalize_to(Composition("O2"))
     rxn_o2_norm_5 = pre_balanced_rxn.normalize_to(Composition("O2"), 5)
 
-    assert rxn == "4 Fe + 3 O2 -> 2 Fe2O3"
+    assert str(rxn) == "4 Fe + 3 O2 -> 2 Fe2O3"
     assert factor == 2
-    assert rxn_o2_norm == "1.333 Fe + O2 -> 0.6667 Fe2O3"
-    assert rxn_o2_norm_5 == "6.667 Fe + 5 O2 -> 3.333 Fe2O3"
+    assert str(rxn_o2_norm) == "1.333 Fe + O2 -> 0.6667 Fe2O3"
+    assert str(rxn_o2_norm_5) == "6.667 Fe + 5 O2 -> 3.333 Fe2O3"
 
 
 def test_from_string(pre_balanced_rxn):

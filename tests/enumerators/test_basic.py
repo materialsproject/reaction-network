@@ -9,72 +9,76 @@ TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 RXNS_FILE = "ymno3_rxns.json.gz"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def ymno3_rxns():
     return loadfn(TEST_FILES_PATH / RXNS_FILE)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_enumerator_default():
-    return BasicEnumerator()
+    return BasicEnumerator(quiet=True)
 
 
-@pytest.fixture
-def basic_enumerator_with_calculator():
-    return BasicEnumerator(calculators=["ChempotDistanceCalculator"])
+@pytest.fixture(scope="module")
+def basic_enumerator_more_constraints():
+    return BasicEnumerator(quiet=True, max_num_constraints=2)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_enumerator_with_precursors():
-    return BasicEnumerator(precursors=["Y2O3", "Mn2O3"])
+    return BasicEnumerator(precursors=["Y2O3", "Mn2O3"], quiet=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_enumerator_with_target():
-    return BasicEnumerator(targets=["YMnO3"])
+    return BasicEnumerator(targets=["YMnO3"], quiet=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_enumerator_with_precursors_and_target():
-    return BasicEnumerator(precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"])
+    return BasicEnumerator(precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"], quiet=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_open_enumerator():
-    return BasicOpenEnumerator(["O2"])
+    return BasicOpenEnumerator(["O2"], quiet=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_open_enumerator_with_precursors():
-    return BasicOpenEnumerator(["O2"], precursors=["Y2O3", "Mn2O3"])
+    return BasicOpenEnumerator(["O2"], precursors=["Y2O3", "Mn2O3"], quiet=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_open_enumerator_with_target():
-    return BasicOpenEnumerator(["O2"], targets=["Y2Mn2O7"])
+    return BasicOpenEnumerator(["O2"], targets=["Y2Mn2O7"], quiet=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def basic_open_enumerator_with_precursors_and_target():
     return BasicOpenEnumerator(
-        ["O2"], precursors=["Y2O3", "Mn2O3"], targets=["Y2Mn2O7"]
+        ["O2"],
+        precursors=["Y2O3", "Mn2O3"],
+        targets=["Y2Mn2O7"],
+        quiet=True,
     )
 
 
 def test_enumerate(
-    filtered_entries, basic_enumerator_default, basic_enumerator_with_calculator
+    filtered_entries, basic_enumerator_default, basic_enumerator_more_constraints
 ):
-    expected_num_rxns = 538
+    expected_num_rxns_1 = 496
+    expected_num_rxns_2 = 538
 
-    for enumerator in [basic_enumerator_default, basic_enumerator_with_calculator]:
+    for enumerator, expected_num_rxns in zip(
+        [basic_enumerator_default, basic_enumerator_more_constraints],
+        [expected_num_rxns_1, expected_num_rxns_2],
+    ):
         rxns = enumerator.enumerate(filtered_entries)
 
         assert expected_num_rxns == len(rxns)
         assert len(rxns) == len(set(rxns))
         assert all([not r.is_identity for r in rxns])
-
-        if enumerator.calculators:
-            assert all([r.data["chempot_distance"] is not None for r in rxns])
 
 
 def test_enumerate_with_precursors(
@@ -88,16 +92,12 @@ def test_enumerate_with_precursors(
         basic_open_enumerator_with_precursors,
     ]:
 
+        precursors = set(enumerator.precursors)
         rxns = enumerator.enumerate(filtered_entries)
-        precursors = enumerator.precursors
 
         for r in rxns:
-            reactants = [i.reduced_formula for i in r.reactants]
-            products = [i.reduced_formula for i in r.products]
-
-            for precursor in precursors:
-                assert precursor in reactants
-                assert precursor not in products
+            reactants = {i.reduced_formula for i in r.reactants}
+            assert precursors & reactants
 
 
 def test_enumerate_with_target(
@@ -120,31 +120,35 @@ def test_enumerate_with_target(
 def test_enumerate_with_precursors_and_target(
     filtered_entries, basic_enumerator_with_precursors_and_target
 ):
-    rxns = basic_enumerator_with_precursors_and_target.enumerate(filtered_entries)
+    rxns = list(
+        basic_enumerator_with_precursors_and_target.enumerate(
+            filtered_entries
+        ).get_rxns()
+    )
 
     assert len(rxns) == 1
-    assert str(rxns[0]) == "Mn2O3 + Y2O3 -> 2 YMnO3"
+    rxn_str = str(rxns[0])
+    assert rxn_str == "Mn2O3 + Y2O3 -> 2 YMnO3" or rxn_str == "Y2O3 + Mn2O3 -> 2 YMnO3"
 
 
 def test_open_enumerate_with_precursors_and_target(
     filtered_entries, basic_open_enumerator_with_precursors_and_target
 ):
-    rxns = basic_open_enumerator_with_precursors_and_target.enumerate(filtered_entries)
+    rxns = list(
+        basic_open_enumerator_with_precursors_and_target.enumerate(
+            filtered_entries
+        ).get_rxns()
+    )
 
-    assert len(rxns) == 11
-
-    for r in rxns:
-        reactants = [i.reduced_formula for i in r.reactants]
-        products = [i.reduced_formula for i in r.products]
-        assert "O2" in reactants or "O2" in products
-        assert "Y2Mn2O7" in products
+    assert len(rxns) == 1
+    assert {c.reduced_formula for c in rxns[0].reactants} == {"Y2O3", "Mn2O3", "O2"}
+    assert {c.reduced_formula for c in rxns[0].products} == {"Y2Mn2O7"}
 
 
 def test_open_enumerate(filtered_entries, basic_open_enumerator):
-    expected_num_rxns = 1358
+    expected_num_rxns = 168
 
-    rxns = basic_open_enumerator.enumerate(filtered_entries)
-    print(rxns)
+    rxns = list(basic_open_enumerator.enumerate(filtered_entries).get_rxns())
 
     assert expected_num_rxns == len(rxns)
     assert len(rxns) == len(set(rxns))

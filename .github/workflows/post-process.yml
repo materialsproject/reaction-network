@@ -6,7 +6,7 @@ on:
       - completed
     workflows:
       # List all required workflow names here.
-      - 'testing'
+      - "testing"
 
 jobs:
   merge-me:
@@ -20,7 +20,7 @@ jobs:
         uses: ridedott/merge-me-action@v2
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
   auto-gen-release:
     runs-on: ubuntu-latest
     env:

@@ -4,47 +4,45 @@ minimization technique, with or without the option of an open entry.
 """
 
 from itertools import product
-from math import comb
 from typing import List, Optional
 
 from pymatgen.analysis.interface_reactions import (
     GrandPotentialInterfacialReactivity,
     InterfacialReactivity,
 )
-from pymatgen.core.composition import Composition, Element
-from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.core.composition import Element
 
+from rxn_network.core.composition import Composition
 from rxn_network.enumerators.basic import BasicEnumerator
-from rxn_network.enumerators.utils import (
-    apply_calculators,
-    get_computed_rxn,
-)
+from rxn_network.enumerators.utils import get_computed_rxn
 
 
 class MinimizeGibbsEnumerator(BasicEnumerator):
     """
     Enumerator for finding all reactions between two reactants that are predicted by
-    thermodynamics; i.e., they appear when taking the convex hull along a straight
-    line connecting any two phases in G-x phase space. Identity reactions are
-    automatically excluded.
+    thermodynamics; i.e., they appear when taking the convex hull along a straight line
+    connecting any two phases in G-x phase space. Identity reactions are automatically
+    excluded.
     """
+
+    CHUNK_SIZE = 10000
 
     def __init__(
         self,
         precursors: Optional[List[str]] = None,
         targets: Optional[List[str]] = None,
-        calculators: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        filter_by_chemsys: Optional[str] = None,
+        max_num_constraints: int = 1,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
-        parallel: bool = True,
     ):
         """
         Args:
             precursors: Optional formulas of precursors.
-            targets: Optional formulas of targets; only reactions which make these targets
-                will be enumerated.
+            targets: Optional formulas of targets; only reactions which make
+                these targets will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator"])
             exclusive_precursors: Whether to consider only reactions that have
@@ -57,38 +55,20 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         super().__init__(
             precursors=precursors,
             targets=targets,
-            calculators=calculators,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
-            calculate_e_above_hulls=calculate_e_above_hulls,
+            filter_by_chemsys=filter_by_chemsys,
             quiet=quiet,
-            parallel=parallel,
         )
         self._build_pd = True
 
-    def estimate_max_num_reactions(self, entries: List[ComputedEntry]) -> int:
-        """
-        Estimate the upper bound of the number of possible reactions. This will
-        correlate with the amount of time it takes to enumerate reactions.
-
-        Args:
-            entries: A list of all entries to consider
-
-        Returns: The upper bound on the number of possible reactions
-        """
-        return comb(len(entries), 2) * 2
-
-    def _react(
-        self,
-        reactants,
-        products,
-        calculators,
-        filtered_entries=None,
-        pd=None,
-        grand_pd=None,
+    @staticmethod
+    def _react_function(
+        reactants, products, filtered_entries=None, pd=None, grand_pd=None, **kwargs
     ):
         """React method for MinimizeGibbsEnumerator, which uses the interfacial reaction
         approach (see _react_interface())"""
+
         r = list(reactants)
         r0 = r[0]
 
@@ -97,13 +77,12 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         else:
             r1 = r[1]
 
-        return self._react_interface(
+        return react_interface(
             r0.composition,
             r1.composition,
             filtered_entries,
             pd,
             grand_pd,
-            calculators=calculators,
         )
 
     @staticmethod
@@ -114,37 +93,9 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         return product(combos, [None])
 
     @staticmethod
-    def _react_interface(r1, r2, filtered_entries, pd, grand_pd=None, calculators=None):
-        """Simple API for InterfacialReactivity module from pymatgen."""
-        chempots = None
-
-        if grand_pd:
-            interface = GrandPotentialInterfacialReactivity(
-                r1,
-                r2,
-                grand_pd,
-                pd_non_grand=pd,
-                norm=True,
-                include_no_mixing_energy=True,
-                use_hull_energy=True,
-            )
-            chempots = grand_pd.chempots
-
-        else:
-            interface = InterfacialReactivity(
-                r1,
-                r2,
-                pd,
-                use_hull_energy=True,
-            )
-
-        rxns = []
-        for _, _, _, rxn, _ in interface.get_kinks():
-            rxn = get_computed_rxn(rxn, filtered_entries, chempots)
-            rxn = apply_calculators(rxn, calculators)
-            rxns.append(rxn)
-
-        return rxns
+    def _rxn_iter_length(combos, open_combos):
+        _ = open_combos
+        return len(combos)
 
 
 class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
@@ -155,26 +106,27 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     phase space. Identity reactions are excluded.
     """
 
+    CHUNK_SIZE = 10000
+
     def __init__(
         self,
         open_elem: Element,
         mu: float,
         precursors: Optional[List[str]] = None,
         targets: Optional[List[str]] = None,
-        calculators: Optional[List[str]] = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
-        calculate_e_above_hulls: bool = False,
+        filter_by_chemsys: Optional[str] = None,
+        max_num_constraints=1,
         quiet: bool = False,
-        parallel: bool = True,
     ):
         """
         Args:
             open_elem: The element to be considered as open
             mu: The chemical potential of the open element
             precursors: Optional formulas of precursors.
-            targets: Optional formulas of targets; only reactions which make these targets
-                will be enumerated.
+            targets: Optional formulas of targets; only reactions which make
+                these targets will be enumerated.
             calculators: Optional list of Calculator object names; see calculators
                 module for options (e.g., ["ChempotDistanceCalculator])
             exclusive_precursors: Whether to consider only reactions that have
@@ -188,27 +140,20 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         super().__init__(
             precursors=precursors,
             targets=targets,
-            calculators=calculators,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
-            calculate_e_above_hulls=calculate_e_above_hulls,
+            filter_by_chemsys=filter_by_chemsys,
             quiet=quiet,
-            parallel=parallel,
         )
-        self.open_elem = Element(open_elem)  # type: ignore
-        self.open_phases = [Composition(str(self.open_elem)).reduced_formula]  # type: ignore
+        self.open_elem = Element(open_elem)
+        self.open_phases = [Composition(str(self.open_elem)).reduced_formula]
         self.mu = mu
         self.chempots = {self.open_elem: self.mu}
         self._build_grand_pd = True
 
-    def _react(
-        self,
-        reactants,
-        products,
-        calculators,
-        filtered_entries=None,
-        pd=None,
-        grand_pd=None,
+    @staticmethod
+    def _react_function(
+        reactants, products, filtered_entries=None, pd=None, grand_pd=None, **kwargs
     ):
         """Same as the MinimizeGibbsEnumerator react function, but with ability to
         specify open element and grand potential phase diagram"""
@@ -227,11 +172,42 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             if len(elems) == 1 and elems[0] == open_elem:  # skip if reactant = open_e
                 return []
 
-        return self._react_interface(
+        return react_interface(
             r0.composition,
             r1.composition,
             filtered_entries,
             pd,
             grand_pd=grand_pd,
-            calculators=calculators,
         )
+
+
+def react_interface(r1, r2, filtered_entries, pd, grand_pd=None):
+    """Simple API for InterfacialReactivity module from pymatgen."""
+    chempots = None
+
+    if grand_pd:
+        interface = GrandPotentialInterfacialReactivity(
+            r1,
+            r2,
+            grand_pd,
+            pd_non_grand=pd,
+            norm=True,
+            include_no_mixing_energy=True,
+            use_hull_energy=True,
+        )
+        chempots = grand_pd.chempots
+
+    else:
+        interface = InterfacialReactivity(
+            r1,
+            r2,
+            pd,
+            use_hull_energy=True,
+        )
+
+    rxns = []
+    for _, _, _, rxn, _ in interface.get_kinks():
+        rxn = get_computed_rxn(rxn, filtered_entries, chempots)
+        rxns.append(rxn)
+
+    return rxns

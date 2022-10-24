@@ -1,8 +1,27 @@
 """ Tests for GibbsEntrySet. """
+from copy import deepcopy
+
 import pytest
 from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
 
 from rxn_network.entries.entry_set import GibbsEntrySet
+
+
+@pytest.mark.parametrize(
+    "chemsys", [["Mn", "O", "Y"], ["Mn", "O"], ["Y", "O"], ["O"], ["Mn", "Y"]]
+)
+def test_get_subset_in_chemsys(chemsys, gibbs_entries):
+    subset = gibbs_entries.get_subset_in_chemsys(chemsys)
+    desired_chemsys = set(sorted(chemsys))
+    assert subset.chemsys == desired_chemsys
+
+    for e in gibbs_entries:
+        chemsys = set(sorted([str(e) for e in e.composition.elements]))
+        if chemsys.issubset(desired_chemsys):
+            assert e in subset
+        else:
+            assert e not in subset
 
 
 @pytest.mark.parametrize(
@@ -86,6 +105,57 @@ def test_get_stabilized_entry(gibbs_entries):
         assert e_stable in PhaseDiagram(entries).stable_entries
 
 
+def test_get_adjusted_entry(interpolated_entry):
+
+    entry_copy = deepcopy(interpolated_entry)
+    entry_copy.energy_adjustments.append(ConstantEnergyAdjustment(0.1))
+
+    assert entry_copy == GibbsEntrySet.get_adjusted_entry(
+        interpolated_entry, ConstantEnergyAdjustment(0.1)
+    )
+
+
 def test_from_pd(mp_entries):
     entries = GibbsEntrySet.from_pd(PhaseDiagram(mp_entries), temperature=1000)
     assert entries is not None
+
+
+def test_add(gibbs_entries):
+    original_len = len(gibbs_entries)
+
+    new_entry = gibbs_entries.get_min_entry_by_formula("YMnO3").copy()
+    new_entry.energy_adjustments.append(ConstantEnergyAdjustment(0.1))
+    gibbs_entries.add(new_entry)
+
+    assert len(gibbs_entries) == original_len + 1
+    assert new_entry in gibbs_entries
+
+    gibbs_entries.add(gibbs_entries.entries_list[0])
+    assert len(gibbs_entries) == original_len + 1  # no change
+
+
+def test_discard(gibbs_entries):
+    original_len = len(gibbs_entries)
+    ymno3 = gibbs_entries.get_min_entry_by_formula("YMnO3")
+    gibbs_entries.discard(ymno3)
+    assert len(gibbs_entries) == original_len - 1
+    assert ymno3 not in gibbs_entries
+
+
+def test_update(gibbs_entries):
+    original_len = len(gibbs_entries)
+
+    entry_copies = {
+        gibbs_entries.get_min_entry_by_formula("YMnO3").copy(),
+        gibbs_entries.get_min_entry_by_formula("YMn2O5").copy(),
+    }
+    new_entries = set()
+    for e in entry_copies:
+        new_entries.add(
+            GibbsEntrySet.get_adjusted_entry(e, ConstantEnergyAdjustment(0.1))
+        )
+
+    gibbs_entries.update(new_entries)
+
+    assert len(gibbs_entries) == original_len + 2
+    assert new_entries.issubset(gibbs_entries)

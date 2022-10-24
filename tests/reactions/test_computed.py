@@ -1,31 +1,32 @@
 """ Tests for ComputedReaction. Some tests adapted from pymatgen. """
-import pytest
 from pathlib import Path
+
+import pytest
 from monty.serialization import loadfn
 
-from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.entries.gibbs import GibbsComputedEntry
+from rxn_network.reactions.computed import ComputedReaction
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 ENTRIES_FILE = "yocl_namno2_rxn_entries.json.gz"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def entries():
     return loadfn(TEST_FILES_PATH / ENTRIES_FILE)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def reactants(entries):
     return [entries["YOCl"], entries["NaMnO2"], entries["O2"]]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def products(entries):
     return [entries["Y2Mn2O7"], entries["NaCl"]]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def pre_balanced_rxn(reactants, products):
     """Returns a simple, pre-balanced computed reaction."""
     coefficients = [-2, -2, -0.5, 1, 2]
@@ -36,7 +37,7 @@ def pre_balanced_rxn(reactants, products):
     return rxn
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def auto_balanced_rxn(reactants, products):
     """Returns the same iron oxidation reaction, after automatically balancing"""
     return ComputedReaction.balance(
@@ -44,7 +45,7 @@ def auto_balanced_rxn(reactants, products):
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def gibbs_balanced_rxn(gibbs_entries):
     """Returns a simple, pre-balanced computed reaction using GibbsComputedentry objects."""
     return ComputedReaction.balance(

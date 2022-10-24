@@ -74,7 +74,7 @@ def plot_network(
     )
 
 
-def plot_network_on_graphistry(graph: gt.Graph):
+def plot_network_on_graphistry(graph: gt.Graph):  # pragma: no cover
     """
     Plots a reaction network using Graphistry Hub (https://graphistry.org/). This uses
     optional dependencies networkx and pyintergraph to facilitate mapping to a format
@@ -94,7 +94,8 @@ def plot_network_on_graphistry(graph: gt.Graph):
         import pyintergraph
     except ImportError as e:
         raise ImportError(
-            "Must install optional dependencies: pygraphistry, networkx, and pyintergraph!"
+            "Must install optional dependencies: pygraphistry, networkx, and"
+            " pyintergraph!"
         ) from e
 
     nx_graph = pyintergraph.gt2nx(graph)
@@ -120,7 +121,8 @@ def plot_network_on_graphistry(graph: gt.Graph):
 
 def _get_cmap_string(palette, domain):
     """
-    Utility function for getting a matplotlib colormap string for a given palette and domain.
+    Utility function for getting a matplotlib colormap string for a given palette and
+    domain.
     """
     domain_unique = np.unique(domain)
     hash_table = {key: i_str for i_str, key in enumerate(domain_unique)}

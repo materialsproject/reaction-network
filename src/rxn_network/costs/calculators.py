@@ -53,11 +53,15 @@ class ChempotDistanceCalculator(Calculator):
         elif mu_func == "sum":
             self._mu_func = sum  # type: ignore
 
+        self._open_elems = set()
+        if cpd.entries[0].__class__.__name__ == "GrandPotPDEntry":
+            self._open_elems = set(cpd.entries[0].chempots.keys())
+
     def calculate(self, rxn: ComputedReaction) -> float:
         """
-        Calculates the (aggregate) chemical potential distance in eV/atom. The mu_func parameter
-        determines how the individual pairwise interface distances are aggregated into a
-        single value describing the overall reaction.
+        Calculates the (aggregate) chemical potential distance in eV/atom. The mu_func
+        parameter determines how the individual pairwise interface distances are
+        aggregated into a single value describing the overall reaction.
 
         Args:
             rxn: the ComputedReaction object
@@ -65,19 +69,34 @@ class ChempotDistanceCalculator(Calculator):
         Returns:
             The chemical potential distance of the reaction.
         """
+        reactant_entries = rxn.reactant_entries
+        product_entries = rxn.product_entries
+
+        if hasattr(rxn, "grand_entries"):
+            reactant_entries = [
+                e
+                for e, c in zip(rxn.grand_entries, rxn.coefficients)
+                if c < 0 and e.__class__.__name__ == "GrandPotPDEntry"
+            ]
+            product_entries = [
+                e
+                for e, c in zip(rxn.grand_entries, rxn.coefficients)
+                if c > 0 and e.__class__.__name__ == "GrandPotPDEntry"
+            ]
         combos = chain(
-            product(rxn.reactant_entries, rxn.product_entries),
-            combinations(rxn.product_entries, 2),
+            product(reactant_entries, product_entries),
+            combinations(product_entries, 2),
         )
         distances = [
             self.cpd.shortest_domain_distance(
                 combo[0].composition.reduced_formula,
                 combo[1].composition.reduced_formula,
+                offset=self.cpd.get_offset(combo[0]) + self.cpd.get_offset(combo[1]),
             )
             for combo in combos
         ]
 
-        distance = float(self._mu_func(distances))
+        distance = round(float(self._mu_func(distances)), 5)
         return distance
 
     @classmethod
@@ -99,14 +118,11 @@ class ChempotDistanceCalculator(Calculator):
                 reaction.
             name: the data dictionary key by which to store the calculated value,
                 defaults to "chempot_distance"
-            **kwargs: optional kwargs passed to ChemicalPotentialDiagram. By default, passes
-                {"default_min_limit": -100}.
+            **kwargs: optional kwargs passed to ChemicalPotentialDiagram.
 
         Returns:
             A ChempotDistanceCalculator object
         """
-        if not kwargs.get("default_min_limit"):
-            kwargs["default_min_limit"] = -100
 
         cpd = ChemicalPotentialDiagram(entries=entries, **kwargs)
         return cls(cpd, mu_func, name)

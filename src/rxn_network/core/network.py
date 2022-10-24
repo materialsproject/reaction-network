@@ -3,14 +3,14 @@ Basic interface for a reaction network.
 """
 import logging
 from abc import ABCMeta, abstractmethod
-from typing import Iterable, List
+from typing import List
 
 from monty.json import MSONable
 
 from rxn_network.core.cost_function import CostFunction
-from rxn_network.core.enumerator import Enumerator
 from rxn_network.core.pathway import Pathway
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.reactions.reaction_set import ReactionSet
 
 
 class Network(MSONable, metaclass=ABCMeta):
@@ -20,20 +20,20 @@ class Network(MSONable, metaclass=ABCMeta):
 
     def __init__(
         self,
-        entries: GibbsEntrySet,
-        enumerators: Iterable[Enumerator],
+        rxns: ReactionSet,
         cost_function: CostFunction,
     ):
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
-        self.entries = entries
-        self.enumerators = enumerators
+        self.rxns = rxns
         self.cost_function = cost_function
+
+        self.entries = GibbsEntrySet(rxns.entries)
+        self.entries.build_indices()
+
         self._g = None
         self._precursors = None
         self._target = None
-
-        self.entries.build_indices()
 
     @abstractmethod
     def build(self):

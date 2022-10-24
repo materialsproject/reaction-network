@@ -1,80 +1,74 @@
 """ Tests for MinimizeGibbsEnumerator and MinimizeGrandPotentialEnumerator """
 import pytest
 from pymatgen.core.composition import Element
+
 from rxn_network.enumerators.minimize import (
     MinimizeGibbsEnumerator,
     MinimizeGrandPotentialEnumerator,
 )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def gibbs_enumerator_default():
-    return MinimizeGibbsEnumerator()
+    return MinimizeGibbsEnumerator(quiet=True)
 
 
-@pytest.fixture
-def gibbs_enumerator_with_calculator():
-    return MinimizeGibbsEnumerator(calculators=["ChempotDistanceCalculator"])
-
-
-@pytest.fixture
+@pytest.fixture(scope="module")
 def gibbs_enumerator_with_precursors():
-    return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"])
+    return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"], quiet=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def gibbs_enumerator_with_target():
-    return MinimizeGibbsEnumerator(targets=["YMnO3"])
+    return MinimizeGibbsEnumerator(targets=["YMnO3"], quiet=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def gibbs_enumerator_with_precursors_and_target():
-    return MinimizeGibbsEnumerator(precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"])
+    return MinimizeGibbsEnumerator(
+        precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"], quiet=True
+    )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def grand_potential_enumerator():
-    return MinimizeGrandPotentialEnumerator(open_elem=Element("O"), mu=0.0)
+    return MinimizeGrandPotentialEnumerator(open_elem=Element("O"), mu=0.0, quiet=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def grand_potential_enumerator_with_precursors():
     return MinimizeGrandPotentialEnumerator(
-        open_elem=Element("O"), mu=0.0, precursors=["Y2O3", "Mn2O3"]
+        open_elem=Element("O"), mu=0.0, precursors=["Y2O3", "Mn2O3"], quiet=True
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def grand_potential_enumerator_with_target():
     return MinimizeGrandPotentialEnumerator(
-        open_elem=Element("O"), mu=0.0, targets=["Y2Mn2O7"]
+        open_elem=Element("O"), mu=0.0, targets=["Y2Mn2O7"], quiet=True
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def grand_potential_enumerator_with_precursors_and_target():
     return MinimizeGrandPotentialEnumerator(
         open_elem=Element("O"),
         mu=0.0,
         precursors=["Y2O3", "Mn2O3"],
         targets=["Y2Mn2O7"],
+        quiet=True,
     )
 
 
-def test_enumerate_gibbs(
-    filtered_entries, gibbs_enumerator_default, gibbs_enumerator_with_calculator
-):
+def test_enumerate_gibbs(filtered_entries, gibbs_enumerator_default):
     expected_num_rxns = 109
 
-    for enumerator in [gibbs_enumerator_default, gibbs_enumerator_with_calculator]:
+    for enumerator in [gibbs_enumerator_default]:
         rxns = enumerator.enumerate(filtered_entries)
 
         assert len(rxns) == expected_num_rxns
         assert len(rxns) == len(set(rxns))
         assert all([not r.is_identity for r in rxns])
-
-        if enumerator.calculators:
-            assert all([r.data["chempot_distance"] is not None for r in rxns])
 
 
 def test_enumerate_gibbs_with_precursors(
@@ -121,12 +115,11 @@ def test_enumerate_gibbs_with_precursors_and_target(
 
 
 def test_enumerate_grand_potential(filtered_entries, grand_potential_enumerator):
-    expected_num_rxns = 38
+    expected_num_rxns = 42
 
     rxns = grand_potential_enumerator.enumerate(filtered_entries)
 
     assert len(rxns) == expected_num_rxns
-    assert len(rxns) == len(set(rxns))
     assert all([not r.is_identity for r in rxns])
 
 
@@ -146,7 +139,7 @@ def test_enumerate_grand_potential_precursors(
 def test_enumerate_grand_potential_target(
     filtered_entries, grand_potential_enumerator_with_target
 ):
-    expected_num_rxns = 12
+    expected_num_rxns = 14
 
     rxns = grand_potential_enumerator_with_target.enumerate(filtered_entries)
     targets = grand_potential_enumerator_with_target.targets
@@ -164,8 +157,10 @@ def test_enumerate_grand_potential_target(
 def test_enumerate_grand_potential_precursors_target(
     filtered_entries, grand_potential_enumerator_with_precursors_and_target
 ):
-    rxns = grand_potential_enumerator_with_precursors_and_target.enumerate(
-        filtered_entries
+    rxns = list(
+        grand_potential_enumerator_with_precursors_and_target.enumerate(
+            filtered_entries
+        ).get_rxns()
     )
 
     assert len(rxns) == 1

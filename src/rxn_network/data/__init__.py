@@ -3,7 +3,7 @@ Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), Barin ta
 (all compounds), and FactSage (elements)
 """
 from pathlib import Path
-from typing import Dict, Any, Union
+from typing import Any, Dict, Union
 
 from monty.serialization import loadfn
 

@@ -9,7 +9,8 @@ from typing import List, Union
 import numpy as np
 from monty.json import MSONable
 
-from rxn_network.pathways import BalancedPathway, BasicPathway
+from rxn_network.pathways.balanced import BalancedPathway
+from rxn_network.pathways.basic import BasicPathway
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
@@ -44,8 +45,6 @@ class PathwaySet(MSONable):
         self.coefficients = coefficients
         self.costs = costs
 
-        self._rxns = self.reaction_set.get_rxns()
-
     @lru_cache(1)
     def get_paths(
         self,
@@ -55,12 +54,15 @@ class PathwaySet(MSONable):
         for efficiency.
         """
         paths = []
+
+        rxns = list(self.reaction_set.get_rxns())
+
         for indices, coefficients, costs in zip(
             self.indices,
             self.coefficients,
             self.costs,
         ):
-            reactions = [self._rxns[i] for i in indices]
+            reactions = [rxns[i] for i in indices]
             if coefficients is not None:
                 path = BalancedPathway(
                     reactions=reactions, coefficients=coefficients, costs=costs
@@ -88,7 +90,7 @@ class PathwaySet(MSONable):
         indices, coefficients, costs = [], [], []
 
         reaction_set = cls._get_reaction_set(paths)
-        rxns = reaction_set.get_rxns()
+        rxns = list(reaction_set.get_rxns())
 
         for path in paths:
             indices.append([rxns.index(r) for r in path.reactions])
@@ -119,3 +121,9 @@ class PathwaySet(MSONable):
         Iterates over the PathwaySet.
         """
         return iter(self.get_paths())
+
+    def __len__(self):
+        """
+        Returns the number of pathways in the PathwaySet.
+        """
+        return len(self.indices)
