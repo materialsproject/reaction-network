@@ -19,7 +19,8 @@ YMNO3_RXNS = loadfn(TEST_FILES_PATH / "ymno3_rxns.json.gz")
 BAO_TIO2_RXNS = loadfn(TEST_FILES_PATH / "bao_tio2_rxns.json.gz")
 COMPUTED_RXN = loadfn(TEST_FILES_PATH / "computed_rxn.json.gz")
 ALL_YMNO_RXNS = loadfn(TEST_FILES_PATH / "all_ymno_rxns.json.gz")
-YMN2O5_MN3O4_PATHS = loadfn(TEST_FILES_PATH / "ymn2o5_mn3o4_paths.json.gz")
+MN_O_Y_NETWORK_ENTRIES = loadfn(TEST_FILES_PATH / "Mn_O_Y_network_entries.json.gz")
+YMN2O5_MN3O4_PATHS = loadfn(TEST_FILES_PATH / "ymn2o5_mn3o4_network_paths.json.gz")
 YMNO_RN = loadfn(TEST_FILES_PATH / "ymno_rn.json.gz")
 
 
@@ -43,7 +44,7 @@ def entries():
 
 @pytest.fixture(scope="session")
 def filtered_entries():
-    filtered_entries = GibbsEntrySet.from_entries(
+    filtered_entries = GibbsEntrySet.from_computed_entries(
         MN_O_Y_ENTRIES, temperature=1000, include_barin_data=False
     ).filter_by_stability(0.0)
     return filtered_entries
@@ -90,6 +91,11 @@ def irh_batio(bao_tio2_rxns):
 @pytest.fixture(scope="session")
 def ymn2o5_mn3o4_paths():
     return YMN2O5_MN3O4_PATHS
+
+
+@pytest.fixture(scope="session")
+def mn_o_y_network_entries():
+    return MN_O_Y_NETWORK_ENTRIES
 
 
 @pytest.fixture(scope="session")

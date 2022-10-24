@@ -4,6 +4,7 @@ doc-warnings: false
 ignore-paths:
   - docs
   - tests
+  - data/nist/generate_janaf_data.py
 
 bandit:
   run: false

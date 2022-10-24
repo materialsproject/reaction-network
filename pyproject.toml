@@ -86,6 +86,7 @@ exclude_lines = [
     'if typing.TYPE_CHECKING:',
     '^\s*@overload( |$)',
 ]
+omit = ["data/nist/generate_janaf_data.py"]
 
 [tool.flake8]
 exclude = ".git,__pycache__,tests"
