@@ -10,9 +10,6 @@ nav:
       - Network:
           - Network: ../notebooks/network.ipynb
   - Reference:
-      - Builders:
-          Retrosynthesis: reference/builders/retrosynthesis.md
-          Schema: reference/builders/schema.md
       - Core:
           Calculator: reference/core/calculator.md
           Composition: reference/core/composition.md

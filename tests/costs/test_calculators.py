@@ -3,11 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from rxn_network.costs.calculators import (
-    ChempotDistanceCalculator,
-    PrimarySelectivityCalculator,
-    SecondarySelectivityCalculator,
-)
+from rxn_network.costs.calculators import ChempotDistanceCalculator
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
@@ -65,16 +61,6 @@ def cpd(entries):
 @pytest.fixture
 def cpd_calculator(cpd, mu_func):
     return ChempotDistanceCalculator(cpd=cpd, mu_func=mu_func)
-
-
-@pytest.fixture
-def primary_selectivity_calculator(irh_batio):
-    return PrimarySelectivityCalculator(irh_batio)
-
-
-@pytest.fixture
-def secondary_selectivity_calculator(irh_batio):
-    return SecondarySelectivityCalculator(irh_batio)
 
 
 @pytest.fixture
@@ -144,26 +130,3 @@ def test_cpd_calculator_from_entries(entries, mu_func, rxn):
 
     assert type(calc) == ChempotDistanceCalculator
     assert actual_cost == pytest.approx(expected_cost)
-
-
-def test_primary_selectivity_calculate(
-    primary_selectivity_calculator, stable_rxn, unstable_rxn, irh_batio
-):
-
-    assert primary_selectivity_calculator.calculate(stable_rxn) == pytest.approx(
-        irh_batio.get_primary_selectivity(stable_rxn)
-    )
-    assert primary_selectivity_calculator.calculate(unstable_rxn) == pytest.approx(
-        irh_batio.get_primary_selectivity(unstable_rxn)
-    )
-
-
-def test_secondary_selectivity_calculate(
-    secondary_selectivity_calculator, stable_rxn, unstable_rxn, irh_batio
-):
-    assert secondary_selectivity_calculator.calculate(stable_rxn) == pytest.approx(
-        irh_batio.get_secondary_selectivity(stable_rxn)
-    )
-    assert secondary_selectivity_calculator.calculate(unstable_rxn) == pytest.approx(
-        irh_batio.get_secondary_selectivity(unstable_rxn)
-    )
