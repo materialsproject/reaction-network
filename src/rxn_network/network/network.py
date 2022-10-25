@@ -4,7 +4,7 @@ Implementation of reaction network interface.
 from dataclasses import field
 from typing import Iterable, List, Optional, Union
 
-from graph_tool.all import Graph, Vertex, find_edge, find_vertex
+import rustworkx as rx
 from pymatgen.entries import Entry
 from tqdm import tqdm
 
@@ -61,27 +61,15 @@ class ReactionNetwork(Network):
         Returns:
             None
         """
-        costs = self.rxns.calculate_costs(self.cost_function)
         self.logger.info("Building graph from reactions...")
 
-        nodes, rxn_edges = get_rxn_nodes_and_edges(self.rxns)
+        g = rx.PyDiGraph()
 
-        g = initialize_graph()
-        g.add_vertex(len(nodes))
+        nodes, edges = get_rxn_nodes_and_edges(self.rxns)
+        edges.extend(get_loopback_edges(g, nodes))
 
-        for i, network_entry in enumerate(nodes):
-            props = {"entry": network_entry, "type": network_entry.description.value}
-            update_vertex_props(g, g.vertex(i), props)
-
-        edge_list = []
-        for edge, cost, rxn in zip(rxn_edges, costs, self.rxns):
-            v1 = g.vertex(edge[0])
-            v2 = g.vertex(edge[1])
-            edge_list.append((v1, v2, cost, rxn, "reaction"))
-
-        edge_list.extend(get_loopback_edges(g, nodes))
-
-        g.add_edge_list(edge_list, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
+        g.add_nodes_from(nodes)
+        g.add_edges_from(edges)
 
         self._g = g
 
@@ -139,43 +127,41 @@ class ReactionNetwork(Network):
 
         if precursors == self.precursors:
             return
-
-        if self.precursors:
-            precursors_v = find_vertex(
-                g, g.vp["type"], NetworkEntryType.Precursors.value
-            )[0]
-            g.remove_vertex(precursors_v)
-            loopback_edges = find_edge(g, g.ep["type"], "loopback_precursors")
-            for e in loopback_edges:
-                g.remove_edge(e)
-        elif not all(p in self.entries for p in precursors):
+        if not all(p in self.entries for p in precursors):
             raise ValueError("One or more precursors are not included in network!")
 
-        precursors_v = g.add_vertex()
         precursors_entry = NetworkEntry(precursors, NetworkEntryType.Precursors)
+        if self.precursors:  # remove old precursors
+            for node in g.node_indices():
+                if (
+                    g.get_node_data(node).description.value
+                    == NetworkEntryType.Precursors.value
+                ):
+                    g.remove_node(node)
+                    break
+            else:
+                raise ValueError("Old precursors node not found in graph!")
 
-        props = {"entry": precursors_entry, "type": precursors_entry.description.value}
-        update_vertex_props(g, precursors_v, props)
+        precursors_node = g.add_node(precursors_entry)
 
-        add_edges = []
-        for v in g.vertices():
-            entry = g.vp["entry"][v]
-            if not entry:
-                continue
-            if entry.description.value == NetworkEntryType.Reactants.value:
-                if entry.entries.issubset(precursors):
-                    add_edges.append((precursors_v, v, 0.0, None, "precursors"))
+        edges_to_add = []
+        for node in g.node_indices():
+            entry = g.get_node_data(node)
+            entry_type = node.description.value
+
+            if entry_type == NetworkEntryType.Reactants.value:
+                if node.entries.issubset(precursors):
+                    edges_to_add.append((precursors_node, node, "precursor_edge"))
             elif entry.description.value == NetworkEntryType.Products.value:
-                for v2 in g.vertices():
-                    entry2 = g.vp["entry"][v2]
+                for node2 in g.node_indices():
+                    entry2 = g.get_node_data(node2)
                     if entry2.description.value == NetworkEntryType.Reactants.value:
                         if precursors.issuperset(entry2.entries):
                             continue
                         if precursors.union(entry.entries).issuperset(entry2.entries):
-                            add_edges.append((v, v2, 0.0, None, "loopback_precursors"))
+                            edges_to_add.append((node, node2, "loopback_edge"))
 
-        g.add_edge_list(add_edges, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
-
+        g.add_edges_from(edges_to_add)
         self._precursors = precursors
 
     def set_target(self, target: Union[Entry, str]):
@@ -207,25 +193,30 @@ class ReactionNetwork(Network):
             raise ValueError("Target is not included in network!")
 
         if self.target:
-            target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
-            g.remove_vertex(target_v)
+            for node in g.node_indices():
+                if (
+                    g.get_node_data(node).description.value
+                    == NetworkEntryType.Target.value
+                ):
+                    g.remove_node(node)
+                    break
+            else:
+                raise ValueError("Old target node not found in graph!")
 
-        target_v = g.add_vertex()
         target_entry = NetworkEntry([target], NetworkEntryType.Target)
-        props = {"entry": target_entry, "type": target_entry.description.value}
-        update_vertex_props(g, target_v, props)
 
-        add_edges = []
-        for v in g.vertices():
-            entry = g.vp["entry"][v]
-            if not entry:
-                continue
+        target_node = g.add_node(target_entry)
+
+        edges_to_add = []
+        for v in g.node_indices():
+            entry = g.get_node_data(v)
+
             if entry.description.value != NetworkEntryType.Products.value:
                 continue
             if target in entry.entries:
-                add_edges.append([v, target_v, 0.0, None, "target"])
+                edges_to_add.append((v, target_v, "target_edge"))
 
-        g.add_edge_list(add_edges, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
+        g.add_edges_from(edges_to_add)
 
         self._target = target
 
@@ -376,12 +367,12 @@ def get_rxn_nodes_and_edges(rxns: ReactionSet):
         else:
             product_idx = nodes.index(product_node)
 
-        edges.append((reactant_idx, product_idx))
+        edges.append((reactant_idx, product_idx, rxn))
 
     return nodes, edges
 
 
-def get_loopback_edges(g: Graph, nodes: List[Vertex]):
+def get_loopback_edges(g, nodes):
     """
     Given a graph and a list of nodes to check, this function finds and returns loopback
     edges (i.e., edges that connect a product node to its equivalent reactant node)
@@ -402,6 +393,16 @@ def get_loopback_edges(g: Graph, nodes: List[Vertex]):
             if r.description.value != NetworkEntryType.Reactants.value:
                 continue
             if p.entries == r.entries:
-                edges.append((g.vertex(idx1), g.vertex(idx2), 0.0, None, "loopback"))
+                edges.append((idx1, idx2, "loopback_edge"))
 
     return edges
+
+
+def get_edge_weight(edge_obj, cf):
+    name = edge_obj.__clas__.__name__
+    if name in ["ComputedReaction", "OpenComputedReaction"]:
+        return cf.calculate(edge_obj)
+    if name in ["loopback_edge", "precursor_edge", "target_edge"]:
+        return 0.0
+
+    raise ValueError(f"Unknown edge type: {name}")
