@@ -1,5 +1,13 @@
 # Changelog
 
+## [v6.1.1](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.1.1) (2022-10-25)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.1.0...v6.1.1)
+
+**Merged pull requests:**
+
+- fix broken docs github workflow [\#174](https://github.com/GENESIS-EFRC/reaction-network/pull/174) ([mattmcdermott](https://github.com/mattmcdermott))
+
 ## [v6.1.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.1.0) (2022-10-25)
 
 [Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.2...v6.1.0)
