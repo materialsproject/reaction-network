@@ -25,7 +25,7 @@ jobs:
           python -m build --sdist --wheel --outdir dist/ .
 
       - name: Publish package
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@v1.5.1
         with:
           user: __token__
           password: ${{ secrets.PYPY_API_TOKEN }}
