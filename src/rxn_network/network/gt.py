@@ -22,7 +22,7 @@ def yens_ksp(
 ):
     """
     Yen's Algorithm for k-shortest paths, adopted for graph-tool. Utilizes GraphView
-    objects to speed up filtering. I
+    objects to speed up filtering.
 
     This implementation was inspired by the igraph implementation by Antonin Lenfant.
 
