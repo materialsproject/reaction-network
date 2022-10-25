@@ -70,3 +70,19 @@ class Network(MSONable, metaclass=ABCMeta):
     def chemsys(self):
         """A string representing the chemical system (elements) of the network"""
         return "-".join(sorted(self.entries.chemsys))
+
+
+class GraphAdaptor(metaclass=ABCMeta):
+
+    @abstractmethod
+    def build(self):
+
+    def add_node(self):
+
+    def add_edges(self):
+
+    def shortest_path(self):
+
+    def get_basic_pathway(self, path)
+
+    def k_shortest_paths(self):
