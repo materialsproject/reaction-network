@@ -5,7 +5,6 @@ on:
     types:
       - completed
     workflows:
-      # List all required workflow names here.
       - "testing"
 
 jobs:
