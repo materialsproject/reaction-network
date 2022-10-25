@@ -1,4 +1,4 @@
-name: Post-process
+name: post-process
 
 on:
   workflow_run:
