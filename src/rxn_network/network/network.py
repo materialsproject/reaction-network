@@ -2,6 +2,7 @@
 Implementation of reaction network interface.
 """
 from dataclasses import field
+from queue import Empty, PriorityQueue
 from typing import Iterable, List, Optional, Union
 
 import rustworkx as rx
@@ -13,13 +14,6 @@ from rxn_network.core.network import Network
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
-from rxn_network.network.gt import (
-    initialize_graph,
-    load_graph,
-    save_graph,
-    update_vertex_props,
-    yens_ksp,
-)
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.reaction_set import ReactionSet
@@ -66,7 +60,7 @@ class ReactionNetwork(Network):
         g = rx.PyDiGraph()
 
         nodes, edges = get_rxn_nodes_and_edges(self.rxns)
-        edges.extend(get_loopback_edges(g, nodes))
+        edges.extend(get_loopback_edges(nodes))
 
         g.add_nodes_from(nodes)
         g.add_edges_from(edges)
@@ -92,7 +86,7 @@ class ReactionNetwork(Network):
             self.set_target(target)
             print(f"PATHS to {self.target.composition.reduced_formula} \n")
             print("--------------------------------------- \n")
-            pathways = self._shortest_paths(k=k)
+            pathways = self._k_shortest_paths(k=k)
             paths.extend(pathways)
 
         paths = PathwaySet.from_paths(paths)
@@ -147,10 +141,10 @@ class ReactionNetwork(Network):
         edges_to_add = []
         for node in g.node_indices():
             entry = g.get_node_data(node)
-            entry_type = node.description.value
+            entry_type = entry.description.value
 
             if entry_type == NetworkEntryType.Reactants.value:
-                if node.entries.issubset(precursors):
+                if entry.entries.issubset(precursors):
                     edges_to_add.append((precursors_node, node, "precursor_edge"))
             elif entry.description.value == NetworkEntryType.Products.value:
                 for node2 in g.node_indices():
@@ -204,17 +198,17 @@ class ReactionNetwork(Network):
                 raise ValueError("Old target node not found in graph!")
 
         target_entry = NetworkEntry([target], NetworkEntryType.Target)
-
         target_node = g.add_node(target_entry)
 
         edges_to_add = []
-        for v in g.node_indices():
-            entry = g.get_node_data(v)
+        for node in g.node_indices():
+            entry = g.get_node_data(node)
+            entry_type = entry.description.value
 
-            if entry.description.value != NetworkEntryType.Products.value:
+            if entry_type != NetworkEntryType.Products.value:
                 continue
             if target in entry.entries:
-                edges_to_add.append((v, target_v, "target_edge"))
+                edges_to_add.append((node, target_node, "target_edge"))
 
         g.add_edges_from(edges_to_add)
 
@@ -247,18 +241,20 @@ class ReactionNetwork(Network):
 
         save_graph(self._g, filename)
 
-    def _shortest_paths(self, k):
-        """Finds the k shortest paths using Yen's algorithm and returns BasicPathways"""
+    def _k_shortest_paths(self, k):
+        """Wrapper for finding the k shortest paths using Yen's algorithm. Returns
+        BasicPathway objects"""
         g = self._g
         paths = []
 
-        precursors_v = find_vertex(g, g.vp["type"], NetworkEntryType.Precursors.value)[
-            0
-        ]
-        target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
-
-        for path in yens_ksp(g, k, precursors_v, target_v):
-            paths.append(self._path_from_graph(g, path))
+        precursors_node = g.find_node_by_weight(
+            NetworkEntry(self.precursors, NetworkEntryType.Precursors)
+        )
+        target_node = g.find_node_by_weight(
+            NetworkEntry([self.target], NetworkEntryType.Target)
+        )
+        for path in yens_ksp(g, self.cost_function, k, precursors_node, target_node):
+            paths.append(self._path_from_graph(g, path, self.cost_function))
 
         for path in paths:
             print(path, "\n")
@@ -266,17 +262,20 @@ class ReactionNetwork(Network):
         return paths
 
     @staticmethod
-    def _path_from_graph(g, path):
+    def _path_from_graph(g, path, cf):
         """Gets a BasicPathway object from a shortest path found in the network"""
         rxns = []
         costs = []
 
-        for step, v in enumerate(path):
-            if g.vp["type"][v] == NetworkEntryType.Products.value:
-                e = g.edge(path[step - 1], v)
+        for step, node in enumerate(path):
+            if (
+                g.get_node_data(node).description.value
+                == NetworkEntryType.Products.value
+            ):
+                e = g.get_edge_data(path[step - 1], node)
 
-                rxns.append(g.ep["rxn"][e])
-                costs.append(g.ep["cost"][e])
+                rxns.append(e)
+                costs.append(get_edge_weight(e, cf))
 
         return BasicPathway(reactions=rxns, costs=costs)
 
@@ -372,7 +371,7 @@ def get_rxn_nodes_and_edges(rxns: ReactionSet):
     return nodes, edges
 
 
-def get_loopback_edges(g, nodes):
+def get_loopback_edges(nodes):
     """
     Given a graph and a list of nodes to check, this function finds and returns loopback
     edges (i.e., edges that connect a product node to its equivalent reactant node)
@@ -399,10 +398,113 @@ def get_loopback_edges(g, nodes):
 
 
 def get_edge_weight(edge_obj, cf):
-    name = edge_obj.__clas__.__name__
-    if name in ["ComputedReaction", "OpenComputedReaction"]:
-        return cf.calculate(edge_obj)
-    if name in ["loopback_edge", "precursor_edge", "target_edge"]:
+    if isinstance(edge_obj, str) and edge_obj in [
+        "loopback_edge",
+        "precursor_edge",
+        "target_edge",
+    ]:
         return 0.0
+    if edge_obj.__class__.__name__ in ["ComputedReaction", "OpenComputedReaction"]:
+        return cf.evaluate(edge_obj)
 
-    raise ValueError(f"Unknown edge type: {name}")
+    raise ValueError("Unknown edge type")
+
+
+def yens_ksp(
+    g: rx.PyGraph,
+    cf: CostFunction,
+    num_k: int,
+    precursors_node: int,
+    target_node: int,
+):
+    """
+    Yen's Algorithm for k-shortest paths, adopted for graph-tool. Utilizes GraphView
+    objects to speed up filtering. I
+
+    This implementation was inspired by the igraph implementation by Antonin Lenfant.
+
+    Reference:
+        Jin Y. Yen, "Finding the K Shortest Loopless Paths n a Network", Management
+        Science, Vol. 17, No. 11, Theory Series (Jul., 1971), pp. 712-716.
+
+    Args:
+        g: the graph-tool graph object.
+        num_k: number of k shortest paths that should be found.
+        precursors_v: graph-tool vertex object containing precursors.
+        target_v: graph-tool vertex object containing target.
+        edge_prop: name of edge property map which allows for filtering edges.
+            Defaults to the word "bool".
+        cost_prop: name of edge property map that stores edge weights/costs.
+            Defaults to the word "weight".
+    Returns:
+        List of lists of graph vertices corresponding to each shortest path
+            (sorted in increasing order by cost).
+    """
+
+    def path_cost(nodes):
+        """Calculates path cost given a list of nodes"""
+        cost = 0
+        for j in range(len(nodes) - 1):
+            cost += get_edge_weight(g.get_edge_data(nodes[j], nodes[j + 1]), cf)
+        return cost
+
+    def get_edge_weight_with_cf(edge_obj):
+        return get_edge_weight(edge_obj, cf)
+
+    path = rx.dijkstra_shortest_paths(
+        g, precursors_node, target_node, weight_fn=get_edge_weight_with_cf
+    )[target_node]
+
+    if not path:
+        return []
+
+    a = [path]
+    a_costs = [path_cost(path)]
+
+    b = PriorityQueue()  # type: ignore
+
+    for k in range(1, num_k):
+        try:
+            prev_path = a[k - 1]
+        except IndexError:
+            print(f"Identified only k={k-1} paths before exiting. \n")
+            break
+
+        for i in range(len(prev_path) - 1):
+            spur_node = prev_path[i]
+            root_path = prev_path[:i]
+
+            removed_edges = []
+
+            for path in a:
+                if len(path) - 1 > i and root_path == path[:i]:
+                    try:
+                        e = g.get_edge_data(path[i], path[i + 1])
+                    except rx.NoEdgeBetweenNodes:
+                        continue
+
+                    g.remove_edge(path[i], path[i + 1])
+                    removed_edges.append((path[i], path[i + 1], e))
+
+            spur_path = rx.dijkstra_shortest_paths(
+                g, spur_node, target_node, weight_fn=get_edge_weight_with_cf
+            )
+
+            if spur_path:
+                total_path = list(root_path) + list(spur_path[target_node])
+                total_path_cost = path_cost(total_path)
+                b.put((total_path_cost, total_path))
+
+            g.add_edges_from(removed_edges)
+
+        while True:
+            try:
+                cost_, path_ = b.get(block=False)
+            except Empty:
+                break
+            if path_ not in a:
+                a.append(path_)
+                a_costs.append(cost_)
+                break
+
+    return a
