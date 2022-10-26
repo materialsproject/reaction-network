@@ -451,12 +451,16 @@ def yens_ksp(
     def get_edge_weight_with_cf(edge_obj):
         return get_edge_weight(edge_obj, cf)
 
+    g = g.copy()
+
     path = rx.dijkstra_shortest_paths(
         g, precursors_node, target_node, weight_fn=get_edge_weight_with_cf
-    )[target_node]
+    )
 
     if not path:
         return []
+
+    path = list(path[target_node])
 
     a = [path]
     a_costs = [path_cost(path)]
@@ -490,12 +494,12 @@ def yens_ksp(
                 g, spur_node, target_node, weight_fn=get_edge_weight_with_cf
             )
 
+            g.add_edges_from(removed_edges)
+
             if spur_path:
                 total_path = list(root_path) + list(spur_path[target_node])
                 total_path_cost = path_cost(total_path)
                 b.put((total_path_cost, total_path))
-
-            g.add_edges_from(removed_edges)
 
         while True:
             try:
