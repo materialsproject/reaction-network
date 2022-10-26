@@ -418,8 +418,7 @@ def yens_ksp(
     target_node: int,
 ):
     """
-    Yen's Algorithm for k-shortest paths, adopted for graph-tool. Utilizes GraphView
-    objects to speed up filtering. I
+    Yen's Algorithm for k-shortest paths, adopted for rustworkx.
 
     This implementation was inspired by the igraph implementation by Antonin Lenfant.
 
@@ -428,14 +427,10 @@ def yens_ksp(
         Science, Vol. 17, No. 11, Theory Series (Jul., 1971), pp. 712-716.
 
     Args:
-        g: the graph-tool graph object.
+        g: the rustworkx PyGraph object
         num_k: number of k shortest paths that should be found.
-        precursors_v: graph-tool vertex object containing precursors.
-        target_v: graph-tool vertex object containing target.
-        edge_prop: name of edge property map which allows for filtering edges.
-            Defaults to the word "bool".
-        cost_prop: name of edge property map that stores edge weights/costs.
-            Defaults to the word "weight".
+        precursors_node: the index of the node representing the precursors.
+        target_node: the index of the node representing the targets.
     Returns:
         List of lists of graph vertices corresponding to each shortest path
             (sorted in increasing order by cost).
