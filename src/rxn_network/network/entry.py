@@ -33,7 +33,7 @@ class NetworkEntry(MSONable):
             description: Node type (e.g., Precursors, Target... see NetworkEntryType
                 class)
         """
-        self.entries = entries
+        self.entries = set(entries)
         self.elements = sorted(
             list({elem for entry in entries for elem in entry.composition.elements})
         )
@@ -46,7 +46,7 @@ class NetworkEntry(MSONable):
         return {
             "@module": self.__class__.__module__,
             "@class": self.__class__.__name__,
-            "entries": self.entries,
+            "entries": list(self.entries),
             "description": self.description.value,
         }
 

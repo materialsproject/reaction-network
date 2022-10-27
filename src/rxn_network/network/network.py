@@ -6,7 +6,7 @@ from queue import Empty, PriorityQueue
 from typing import Iterable, List, Union
 
 import rustworkx as rx
-from monty.json import MontyDecoder, MontyEncoder
+from monty.json import MontyDecoder
 from pymatgen.entries import Entry
 from rustworkx import PyDiGraph
 from tqdm import tqdm
@@ -31,10 +31,13 @@ class Graph(PyDiGraph):
         MSONable, for more information"""
         d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
 
-        d["nodes"] = MontyEncoder().encode(dict(zip(self.node_indices(), self.nodes())))
-        d["edges"] = MontyEncoder().encode(
-            [(*e, obj) for e, obj in zip(self.edge_list(), self.edges())]
-        )
+        d["nodes"] = [n.as_dict() for n in self.nodes()]
+        d["node_indices"] = list(self.node_indices())
+        d["edges"] = [
+            (*e, obj.as_dict() if hasattr(obj, "as_dict") else obj)
+            for e, obj in zip(self.edge_list(), self.edges())
+        ]
+
         return d
 
     @classmethod
@@ -42,9 +45,10 @@ class Graph(PyDiGraph):
         """Instantiates a Graph object from a dictionary (see monty package, MSONable,
         for more information)"""
         nodes = MontyDecoder().process_decoded(d["nodes"])
-        edges = MontyDecoder().process_decoded(d["edges"])
+        node_indices = MontyDecoder().process_decoded(d["node_indices"])
+        edges = [(e[0], e[1], MontyDecoder().process_decoded(e[2])) for e in d["edges"]]
 
-        nodes = {v: k for k, v in nodes.items()}
+        nodes = dict(zip(nodes, node_indices))
 
         graph = cls()
         new_indices = graph.add_nodes_from(list(nodes.keys()))
