@@ -3,21 +3,11 @@
 from dataclasses import dataclass, field
 from typing import Iterable, List, Optional
 
-import numpy as np
-import ray
 from jobflow import SETTINGS, Maker, job
 from pymatgen.core.composition import Element
-from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
-from rxn_network.costs.calculators import (
-    ChempotDistanceCalculator,
-    PrimarySelectivityCalculator,
-    SecondarySelectivityAreaCalculator,
-    SecondarySelectivityCalculator,
-    SecondarySelectivityMaxCalculator,
-)
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
 from rxn_network.enumerators.utils import get_computed_rxn
@@ -26,16 +16,13 @@ from rxn_network.jobs.schema import (
     EnumeratorTaskDocument,
     NetworkTaskDocument,
     PathwaySolverTaskDocument,
-    SelectivitiesTaskDocument,
 )
 from rxn_network.jobs.utils import get_added_elem_data, run_enumerators
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.basic import BasicReaction
-from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils.funcs import get_logger, grouper
-from rxn_network.utils.ray import initialize_ray
+from rxn_network.utils.funcs import get_logger
 
 logger = get_logger(__name__)
 
@@ -173,195 +160,6 @@ class ReactionEnumerationMaker(Maker):
 
 
 @dataclass
-class CalculateSelectivitiesMaker(Maker):
-    """Maker to create job for calculating selectivities of a set of reactions and
-    target formula."""
-
-    name: str = "calculate_selectivities"
-    open_elem: Optional[Element] = None
-    chempot: Optional[float] = 0.0
-    calculate_selectivities: bool = True
-    calculate_chempot_distances: bool = True
-    temp: float = 300.0
-    chunk_size: Optional[int] = None
-    batch_size: Optional[int] = None
-    cpd_kwargs: dict = field(default_factory=dict)
-
-    def __post_init__(self):
-        self.open_elem = Element(self.open_elem) if self.open_elem else None
-        self.open_formula = (
-            Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
-        )
-
-    @job(rxns="rxns", output_schema=SelectivitiesTaskDocument)
-    def make(self, rxn_sets, entries, target_formula):
-        target_formula = Composition(target_formula).reduced_formula
-        added_elements, added_chemsys = get_added_elem_data(entries, [target_formula])
-
-        logger.info("Loading reactions..")
-        all_rxns = rxn_sets[0]
-        for rxn_set in rxn_sets[1:]:
-            all_rxns = all_rxns.add_rxn_set(rxn_set)
-        size = len(all_rxns)
-
-        logger.info("Identifying target reactions...")
-
-        target_rxns = ReactionSet.from_rxns(
-            list(all_rxns.get_rxns_by_product(target_formula))
-        )
-        logger.info(
-            f"Identified {len(target_rxns)} target reactions out of"
-            f" {size} total reactions."
-        )
-        logger.info("Placing reactions in ray object store...")
-
-        all_rxns = ray.put(all_rxns)
-        logger.info("Beginning selectivity calculations...")
-
-        decorated_rxns = target_rxns
-
-        if self.calculate_selectivities:
-            decorated_rxns = self._get_selectivity_decorated_rxns(
-                target_rxns, all_rxns, size
-            )
-
-        logger.info("Calculating chemical potential distances...")
-
-        if self.calculate_chempot_distances:
-            decorated_rxns = self._get_chempot_decorated_rxns(decorated_rxns, entries)
-
-        logger.info("Saving decorated reactions.")
-        results = ReactionSet.from_rxns(decorated_rxns, entries=entries)
-
-        data = {
-            "rxns": results,
-            "target_formula": target_formula,
-            "open_elem": self.open_elem,
-            "chempot": self.chempot,
-            "added_elements": added_elements,
-            "added_chemsys": added_chemsys,
-            "calculate_selectivities": self.calculate_selectivities,
-            "calculate_chempot_distances": self.calculate_chempot_distances,
-            "temp": self.temp,
-            "batch_size": self.batch_size,
-            "cpd_kwargs": self.cpd_kwargs,
-        }
-
-        doc = SelectivitiesTaskDocument(**data)
-        doc.task_label = self.name
-        return doc
-
-    def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns, size):
-        initialize_ray()
-
-        size_per_rxn = 1000  # generous estimate of 1kb memory per reaction
-
-        memory_size = int(ray.cluster_resources()["memory"])
-        num_cpus = int(ray.cluster_resources()["CPU"]) - 1
-
-        batch_size = self.batch_size
-        if batch_size is None:
-            batch_size = num_cpus
-            if memory_size / num_cpus / size_per_rxn < size:
-                # load fewer chunks into memory at a time for big jobs
-                batch_size = int(memory_size / size_per_rxn / size)
-
-        chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
-
-        logger.info(f"Using batch size of {batch_size} and chunk size of {chunk_size}")
-
-        rxn_chunk_refs = []
-        results = []
-
-        with tqdm(total=len(target_rxns) // chunk_size + 1) as pbar:
-            for chunk in grouper(
-                target_rxns,
-                chunk_size,
-                fillvalue=None,
-            ):
-                chunk = [c for c in chunk if c is not None]
-                if len(rxn_chunk_refs) > batch_size:
-                    num_ready = len(rxn_chunk_refs) - batch_size
-                    newly_completed, rxn_chunk_refs = ray.wait(
-                        rxn_chunk_refs, num_returns=num_ready
-                    )
-                    for completed_ref in newly_completed:
-                        results.append(ray.get(completed_ref))
-                        pbar.update(1)
-
-                reactant_formulas = [
-                    c.reduced_formula for rxn in chunk for c in rxn.reactants
-                ]
-                if self.open_formula:
-                    reactant_formulas.append(self.open_formula)
-
-                rxn_chunk_refs.append(
-                    _get_selectivity_decorated_rxns_by_chunk.remote(
-                        chunk, all_rxns, self.open_formula, self.temp
-                    )
-                )
-
-            newly_completed, rxn_chunk_refs = ray.wait(
-                rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
-            )
-            for completed_ref in newly_completed:
-                results.append(ray.get(completed_ref))
-                pbar.update(1)
-
-        decorated_rxns = [rxn for r_set in results for rxn in r_set]
-
-        return ReactionSet.from_rxns(decorated_rxns)
-
-    def _get_chempot_decorated_rxns(self, target_rxns, entries):
-        initialize_ray()
-
-        batch_size = self.batch_size or int(ray.cluster_resources()["CPU"] - 1)
-
-        chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
-        rxn_chunk_refs = []
-        results = []
-
-        open_elem = target_rxns.open_elem
-        chempot = target_rxns.chempot
-
-        entries = ray.put(entries)
-        cpd_kwargs = ray.put(self.cpd_kwargs)
-
-        with tqdm(total=len(target_rxns) // chunk_size + 1) as pbar:
-            for chunk in grouper(
-                sorted(target_rxns, key=lambda r: r.chemical_system),
-                chunk_size,
-                fillvalue=None,
-            ):
-                chunk = [c for c in chunk if c is not None]
-                if len(rxn_chunk_refs) > batch_size:
-                    num_ready = len(rxn_chunk_refs) - batch_size
-                    newly_completed, rxn_chunk_refs = ray.wait(
-                        rxn_chunk_refs, num_returns=num_ready
-                    )
-                    for completed_ref in newly_completed:
-                        results.append(ray.get(completed_ref))
-                        pbar.update(1)
-
-                rxn_chunk_refs.append(
-                    _get_chempot_decorated_rxns_by_chunk.remote(
-                        chunk, entries, cpd_kwargs, open_elem, chempot
-                    )
-                )
-
-            newly_completed, rxn_chunk_refs = ray.wait(
-                rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
-            )
-            for completed_ref in newly_completed:
-                results.append(ray.get(completed_ref))
-                pbar.update(1)
-
-        decorated_rxns = [rxn for r_set in results for rxn in r_set]
-
-        return ReactionSet.from_rxns(decorated_rxns)
-
-
-@dataclass
 class NetworkMaker(Maker):
     """
     Maker for generating reaction networks and performing pathfinding from a set of
@@ -487,116 +285,3 @@ class PathwaySolverMaker(Maker):
         doc.task_label = self.name
 
         return doc
-
-
-@ray.remote
-def _get_selectivity_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
-    decorated_rxns = []
-
-    for rxn in rxn_chunk:
-        if not rxn:
-            continue
-
-        reactant_formulas = [r.reduced_formula for r in rxn.reactants]
-        reactants_with_open = reactant_formulas.copy()
-
-        if open_formula:
-            reactants_with_open.append(open_formula)
-
-        competing_rxns = all_rxns.get_rxns_by_reactants(reactants_with_open)
-
-        if len(reactant_formulas) >= 3:
-            if open_formula:
-                reactant_formulas = list(set(reactant_formulas) - {open_formula})
-            else:
-                raise ValueError("Can only have 2 precursors, excluding open element!")
-
-        decorated_rxns.append(
-            _get_selectivity_decorated_rxn(rxn, competing_rxns, reactant_formulas, temp)
-        )
-
-    return decorated_rxns
-
-
-def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
-    """ """
-    if len(precursors_list) == 1:
-        other_energies = np.array(
-            [r.energy_per_atom for r in competing_rxns if r != rxn]
-        )
-        primary_selectivity = InterfaceReactionHull._primary_selectivity_from_energies(  # pylint: disable=protected-access, line-too-long # noqa: E501
-            rxn.energy_per_atom, other_energies, temp=temp
-        )
-        energy_diffs = rxn.energy_per_atom - np.append(
-            other_energies, 0.0
-        )  # consider identity reaction as well
-
-        secondary_rxn_energies = energy_diffs[energy_diffs > 0]
-        secondary_selectivity = (
-            secondary_rxn_energies.max() if secondary_rxn_energies.any() else 0.0
-        )
-        rxn.data["primary_selectivity"] = round(primary_selectivity, 4)
-        rxn.data["secondary_selectivity"] = round(secondary_selectivity, 4)
-        rxn.data["secondary_selectivity_max"] = round(secondary_selectivity, 4)
-        rxn.data["secondary_selectivity_area"] = round(secondary_selectivity, 4)
-        decorated_rxn = rxn
-    else:
-        irh = InterfaceReactionHull(
-            precursors_list[0],
-            precursors_list[1],
-            list(competing_rxns),
-        )
-
-        calc_1 = PrimarySelectivityCalculator(irh=irh, temp=temp)
-        calc_2 = SecondarySelectivityCalculator(irh=irh)
-        calc_3 = SecondarySelectivityMaxCalculator(irh=irh)
-        calc_4 = SecondarySelectivityAreaCalculator(irh=irh)
-
-        decorated_rxn = calc_1.decorate(rxn)
-        decorated_rxn = calc_2.decorate(decorated_rxn)
-        decorated_rxn = calc_3.decorate(decorated_rxn)
-        decorated_rxn = calc_4.decorate(decorated_rxn)
-
-    return decorated_rxn
-
-
-@ray.remote
-def _get_chempot_decorated_rxns_by_chunk(
-    rxn_chunk, entries, cpd_kwargs, open_elem, chempot
-):
-    cpd_calc_dict = {}
-    new_rxns = []
-
-    if open_elem:
-        open_elem_set = {open_elem}
-
-    for rxn in sorted(rxn_chunk, key=lambda rxn: len(rxn.elements), reverse=True):
-        chemsys = rxn.chemical_system
-        elems = chemsys.split("-")
-
-        for c, cpd_calc in cpd_calc_dict.items():
-            if set(c.split("-")).issuperset(elems):
-                break
-        else:
-            if open_elem:
-                filtered_entries = entries.get_subset_in_chemsys(
-                    elems + [str(open_elem)]
-                )
-                filtered_entries = [
-                    e.to_grand_entry({Element(open_elem): chempot})
-                    for e in filtered_entries
-                    if set(e.composition.elements) != open_elem_set
-                ]
-            else:
-                filtered_entries = entries.get_subset_in_chemsys(elems)
-
-            cpd_calc = ChempotDistanceCalculator.from_entries(
-                filtered_entries, **cpd_kwargs
-            )
-            cpd_calc_dict[chemsys] = cpd_calc
-
-        new_rxn = cpd_calc.decorate(rxn)
-        new_rxns.append(new_rxn)
-
-    results = ReactionSet.from_rxns(new_rxns, entries=entries)
-    return results

@@ -1,6 +1,6 @@
 """Core definition for various task and synthesis recipe documents"""
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element
@@ -59,49 +59,6 @@ class EnumeratorTaskDocument(BaseModel):
     enumerators: List[Enumerator] = Field(
         None,
         description="A list of the enumerator objects used to calculate the reactions.",
-    )
-
-
-class SelectivitiesTaskDocument(BaseModel):
-    task_label: str = Field(None, description="The name of the task.")
-    last_updated: datetime = Field(
-        default_factory=datetime_str,
-        description="Timestamp of when the document was last updated.",
-    )
-    rxns: ReactionSet = Field(
-        description=(
-            "The reaction set (reactions have calculated selectivities stored in data"
-            " attribute"
-        )
-    )
-    target_formula: str = Field(
-        description="The reduced chemical formula of the target material."
-    )
-    open_elem: Element = Field(None, description="The open element")
-    chempot: float = Field(
-        None, description="The chemical potential of the open element"
-    )
-    added_elements: List[Element] = Field(
-        None, description="The elements added beyond the elements of the target(s)."
-    )
-    added_chemsys: str = Field(
-        None, description="The chemical system of the added elements"
-    )
-    calculate_selectivities: bool = Field(
-        None, description="Whether to calculate selectivities"
-    )
-    calculate_chempot_distances: bool = Field(
-        None, description="Whether to calculate chempot distances"
-    )
-    temp: float = Field(
-        None,
-        description=(
-            "The temperature in K used to determine the primary selectivity weightings."
-        ),
-    )
-    batch_size: int = Field(None, description="The batch size for the reaction set")
-    cpd_kwargs: Dict[str, Any] = Field(
-        None, description="The kwargs for ChempotDistanceCalculator"
     )
 
 

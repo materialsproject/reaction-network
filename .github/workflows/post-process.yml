@@ -1,4 +1,4 @@
-name: Post-process
+name: post-process
 
 on:
   workflow_run:
@@ -12,9 +12,7 @@ jobs:
     name: Merge me!
     runs-on: ubuntu-latest
     steps:
-      - # It is often a desired behavior to merge only when a workflow execution
-        # succeeds. This can be changed as needed.
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+      - if: ${{ github.event.workflow_run.conclusion == 'success' }}
         name: Merge me!
         uses: ridedott/merge-me-action@v2
         with:
@@ -25,9 +23,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.SEMVER_BUMP_TOKEN }}
     steps:
-      - # It is often a desired behavior to merge only when a workflow execution
-        # succeeds. This can be changed as needed.
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        uses: rymndhng/release-on-push-action@v0.25.0
+      - if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        uses: rymndhng/release-on-push-action@v0.27.0
         with:
           bump_version_scheme: norelease
