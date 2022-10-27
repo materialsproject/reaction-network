@@ -6,9 +6,9 @@ nav:
   - Home: index.md
   - Notebooks:
       - Enumerators:
-          - Enumerators: ../notebooks/enumerators.ipynb
+          - Enumerators: ../examples/1_enumerators.ipynb
       - Network:
-          - Network: ../notebooks/network.ipynb
+          - Network: ../examples/2_network.ipynb
   - Reference:
       - Core:
           Calculator: reference/core/calculator.md
@@ -43,7 +43,6 @@ nav:
           Core: reference/jobs/core.md
       - Network:
           Entry: reference/network/entry.md
-          Graph-tool: reference/network/gt.md
           Network: reference/network/network.md
           Visualize: reference/network/visualize.md
       - Pathways:
