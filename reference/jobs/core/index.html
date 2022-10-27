@@ -211,7 +211,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../notebooks/enumerators.ipynb" class="md-tabs__link">
+      <a href="../../../examples/1_enumerators.ipynb" class="md-tabs__link">
         Notebooks
       </a>
     </li>
@@ -376,7 +376,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../notebooks/enumerators.ipynb" class="md-nav__link">
+      <a href="../../../examples/1_enumerators.ipynb" class="md-nav__link">
         Enumerators
       </a>
     </li>
@@ -423,7 +423,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../notebooks/network.ipynb" class="md-nav__link">
+      <a href="../../../examples/2_network.ipynb" class="md-nav__link">
         Network
       </a>
     </li>
@@ -1135,20 +1135,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../network/gt/" class="md-nav__link">
-        Graph-tool
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../network/network/" class="md-nav__link">
         Network
       </a>
@@ -1682,7 +1668,8 @@ enumeration or network building.</p>
 
         <details class="quote">
           <summary>Source code in <code>rxn_network/jobs/core.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 31</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 30</span>
+<span class="normal"> 31</span>
 <span class="normal"> 32</span>
 <span class="normal"> 33</span>
 <span class="normal"> 34</span>
@@ -1766,8 +1753,7 @@ enumeration or network building.</p>
 <span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
+<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">GetEntrySetMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maker to create job for acquiring and processing entries to be used in reaction</span>
@@ -1902,7 +1888,8 @@ previously enumerated reactions.</p>
 
         <details class="quote">
           <summary>Source code in <code>rxn_network/jobs/core.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">163</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">162</span>
+<span class="normal">163</span>
 <span class="normal">164</span>
 <span class="normal">165</span>
 <span class="normal">166</span>
@@ -1948,14 +1935,7 @@ previously enumerated reactions.</p>
 <span class="normal">206</span>
 <span class="normal">207</span>
 <span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
+<span class="normal">209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">NetworkMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maker for generating reaction networks and performing pathfinding from a set of</span>
@@ -1969,7 +1949,6 @@ previously enumerated reactions.</p>
     <span class="n">calculate_pathways</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="n">open_elem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">chempot</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
-    <span class="n">graph_fn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@job</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="n">output_schema</span><span class="o">=</span><span class="n">NetworkTaskDocument</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">make</span><span class="p">(</span>
@@ -1994,13 +1973,8 @@ previously enumerated reactions.</p>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_pathways</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">:</span>
             <span class="n">paths</span> <span class="o">=</span> <span class="n">rn</span><span class="o">.</span><span class="n">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">calculate_pathways</span><span class="p">)</span>
 
-        <span class="n">graph_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_fn</span> <span class="ow">or</span> <span class="s2">&quot;network.gt.gz&quot;</span>
-        <span class="n">graph_fn</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">graph_fn</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
-        <span class="n">rn</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">graph_fn</span><span class="p">)</span>
-
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="n">rn</span><span class="p">,</span>
-            <span class="s2">&quot;graph_fn&quot;</span><span class="p">:</span> <span class="n">graph_fn</span><span class="p">,</span>
             <span class="s2">&quot;paths&quot;</span><span class="p">:</span> <span class="n">paths</span><span class="p">,</span>
             <span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_pathways</span><span class="p">,</span>
             <span class="s2">&quot;precursors&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">,</span>
@@ -2058,7 +2032,14 @@ returned as part of reaction network analysis.</p>
 
         <details class="quote">
           <summary>Source code in <code>rxn_network/jobs/core.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">219</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
 <span class="normal">222</span>
@@ -2126,14 +2107,7 @@ returned as part of reaction network analysis.</p>
 <span class="normal">284</span>
 <span class="normal">285</span>
 <span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
+<span class="normal">287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">PathwaySolverMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maker for solving balanced reaction pathways from a set of (unbalanced) pathways</span>
@@ -2142,8 +2116,8 @@ returned as part of reaction network analysis.</p>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;solve pathways&quot;</span>
     <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Softplus</span><span class="p">)</span>
-    <span class="n">precursors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-    <span class="n">targets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">precursors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="n">open_elem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">chempot</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">max_num_combos</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
@@ -2257,7 +2231,8 @@ returned as part of reaction network analysis.</p>
 
         <details class="quote">
           <summary>Source code in <code>rxn_network/jobs/core.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">119</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">118</span>
+<span class="normal">119</span>
 <span class="normal">120</span>
 <span class="normal">121</span>
 <span class="normal">122</span>
@@ -2297,8 +2272,7 @@ returned as part of reaction network analysis.</p>
 <span class="normal">156</span>
 <span class="normal">157</span>
 <span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
+<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ReactionEnumerationMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maker to create job for enumerating reactions from a set of entries.</span>

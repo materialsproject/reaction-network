@@ -213,7 +213,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="notebooks/enumerators.ipynb" class="md-tabs__link">
+      <a href="examples/1_enumerators.ipynb" class="md-tabs__link">
         Notebooks
       </a>
     </li>
@@ -386,7 +386,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/enumerators.ipynb" class="md-nav__link">
+      <a href="examples/1_enumerators.ipynb" class="md-nav__link">
         Enumerators
       </a>
     </li>
@@ -433,7 +433,7 @@
   
   
     <li class="md-nav__item">
-      <a href="notebooks/network.ipynb" class="md-nav__link">
+      <a href="examples/2_network.ipynb" class="md-nav__link">
         Network
       </a>
     </li>
@@ -1076,20 +1076,6 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/network/gt/" class="md-nav__link">
-        Graph-tool
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="reference/network/network/" class="md-nav__link">
         Network
       </a>
@@ -1527,17 +1513,16 @@
 Version" src="https://img.shields.io/pypi/pyversions/reaction-network?style=for-the-badge" />
 <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/reaction-network?style=for-the-badge" />
 <img alt="PyPI - License" src="https://img.shields.io/pypi/l/reaction-network?style=for-the-badge" /></p>
-<p>Reaction Network (<code>rxn_network</code>) is a Python package for predicting likely inorganic chemical reaction pathways using graph theoretical methods.</p>
+<p>Reaction Network (<code>rxn_network</code>) is a Python package for predicting likely inorganic
+chemical reaction pathways using combinatorial and graph theoretical methods.</p>
 <h1 id="installation-directions">Installation directions</h1>
-<p>This package can be easily installed using pip:</p>
+<p>We recommend installing using pip:</p>
 <div class="highlight"><pre><span></span><code><span class="err">pip</span><span class="w"> </span><span class="err">install</span><span class="w"> </span><span class="err">reaction-network</span><span class="w"></span>
 </code></pre></div>
-<p>The package will then be installed under the name <code>rxn_network</code>. </p>
-<h3 id="warning">Warning <img alt="⚠️" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/26a0.png" title=":warning:" /></h3>
-<p>While this will take care of most dependencies, if you are using any of the network-based features, then the <code>graph-tool</code> package must be installed. Unfortunately, this cannotbe installed through pip. Please see <a href="https://graph-tool.skewed.de/">https://graph-tool.skewed.de/</a> for more details. <img alt="⚠️" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/26a0.png" title=":warning:" /></p>
-<p>We recommend the following installation procedure which installs graph-tool through conda-forge.</p>
-<div class="highlight"><pre><span></span><code><span class="err">conda</span><span class="w"> </span><span class="err">install</span><span class="w"> </span><span class="err">-c</span><span class="w"> </span><span class="err">conda-forge</span><span class="w"> </span><span class="err">graph-tool</span><span class="w"></span>
-</code></pre></div>
+<p>The package will then be installed under the name <code>rxn_network</code>.</p>
+<p><em>As of version 7.0, the <code>reaction-network</code> package no longer uses <code>graph-tool</code>. All
+network functionality is now implemented using <code>rustworkx</code>. This means it is no longer
+required to complete any extra installations.</em></p>
 <h1 id="tutorial-notebooks">Tutorial notebooks</h1>
 <p>The <code>examples</code> folder contains two (2) demonstration notebooks:</p>
 <ul>

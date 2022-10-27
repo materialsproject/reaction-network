@@ -211,7 +211,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../notebooks/enumerators.ipynb" class="md-tabs__link">
+      <a href="../../../examples/1_enumerators.ipynb" class="md-tabs__link">
         Notebooks
       </a>
     </li>
@@ -376,7 +376,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../notebooks/enumerators.ipynb" class="md-nav__link">
+      <a href="../../../examples/1_enumerators.ipynb" class="md-nav__link">
         Enumerators
       </a>
     </li>
@@ -423,7 +423,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../notebooks/network.ipynb" class="md-nav__link">
+      <a href="../../../examples/2_network.ipynb" class="md-nav__link">
         Network
       </a>
     </li>
@@ -1056,20 +1056,6 @@
     <li class="md-nav__item">
       <a href="../../network/entry/" class="md-nav__link">
         Entry
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../network/gt/" class="md-nav__link">
-        Graph-tool
       </a>
     </li>
   
@@ -1987,7 +1973,7 @@
         <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
             <span class="n">all_energies</span><span class="p">[</span><span class="n">temp</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-            <span class="n">gibbs_entries</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="o">.</span><span class="n">from_entries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
+            <span class="n">gibbs_entries</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="o">.</span><span class="n">from_computed_entries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
             <span class="n">pd</span> <span class="o">=</span> <span class="n">PhaseDiagram</span><span class="p">(</span><span class="n">gibbs_entries</span><span class="p">)</span>
 
             <span class="n">ground_state_energy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_hull_energy</span><span class="p">(</span><span class="n">compositions</span><span class="p">[</span><span class="n">temp</span><span class="p">])</span>

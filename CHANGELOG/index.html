@@ -211,7 +211,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../notebooks/enumerators.ipynb" class="md-tabs__link">
+      <a href="../examples/1_enumerators.ipynb" class="md-tabs__link">
         Notebooks
       </a>
     </li>
@@ -376,7 +376,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../notebooks/enumerators.ipynb" class="md-nav__link">
+      <a href="../examples/1_enumerators.ipynb" class="md-nav__link">
         Enumerators
       </a>
     </li>
@@ -423,7 +423,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../notebooks/network.ipynb" class="md-nav__link">
+      <a href="../examples/2_network.ipynb" class="md-nav__link">
         Network
       </a>
     </li>
@@ -1066,20 +1066,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/network/gt/" class="md-nav__link">
-        Graph-tool
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../reference/network/network/" class="md-nav__link">
         Network
       </a>
@@ -1499,6 +1485,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v700-2022-10-27" class="md-nav__link">
+    v7.0.0 (2022-10-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v611-2022-10-25" class="md-nav__link">
     v6.1.1 (2022-10-25)
   </a>
@@ -1513,15 +1506,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v602-2022-10-25" class="md-nav__link">
-    v6.0.2 (2022-10-25)
+  <a href="#v601-2022-10-25" class="md-nav__link">
+    v6.0.1 (2022-10-25)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#v601-2022-10-25" class="md-nav__link">
-    v6.0.1 (2022-10-25)
+  <a href="#v602-2022-10-25" class="md-nav__link">
+    v6.0.2 (2022-10-25)
   </a>
   
 </li>
@@ -1673,6 +1666,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v700-2022-10-27" class="md-nav__link">
+    v7.0.0 (2022-10-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v611-2022-10-25" class="md-nav__link">
     v6.1.1 (2022-10-25)
   </a>
@@ -1687,15 +1687,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v602-2022-10-25" class="md-nav__link">
-    v6.0.2 (2022-10-25)
+  <a href="#v601-2022-10-25" class="md-nav__link">
+    v6.0.1 (2022-10-25)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#v601-2022-10-25" class="md-nav__link">
-    v6.0.1 (2022-10-25)
+  <a href="#v602-2022-10-25" class="md-nav__link">
+    v6.0.2 (2022-10-25)
   </a>
   
 </li>
@@ -1833,6 +1833,21 @@
 
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="v700-2022-10-27"><a href="https://github.com/GENESIS-EFRC/reaction-network/tree/v7.0.0">v7.0.0</a> (2022-10-27)</h2>
+<p><a href="https://github.com/GENESIS-EFRC/reaction-network/compare/v6.1.1...v7.0.0">Full Changelog</a></p>
+<p><strong>Implemented enhancements:</strong></p>
+<ul>
+<li><code>graph-tool</code> is a slow/cumbersome to install dependency <a href="https://github.com/GENESIS-EFRC/reaction-network/issues/84">#84</a></li>
+</ul>
+<p><strong>Closed issues:</strong></p>
+<ul>
+<li>ray cannot parallelise the job among mutiple CPUs on HPC cluster <a href="https://github.com/GENESIS-EFRC/reaction-network/issues/132">#132</a></li>
+</ul>
+<p><strong>Merged pull requests:</strong></p>
+<ul>
+<li>Test github actions <a href="https://github.com/GENESIS-EFRC/reaction-network/pull/176">#176</a> (<a href="https://github.com/mattmcdermott">mattmcdermott</a>)</li>
+<li>Swap graph-tool for rustworkx  <a href="https://github.com/GENESIS-EFRC/reaction-network/pull/175">#175</a> (<a href="https://github.com/mattmcdermott">mattmcdermott</a>)</li>
+</ul>
 <h2 id="v611-2022-10-25"><a href="https://github.com/GENESIS-EFRC/reaction-network/tree/v6.1.1">v6.1.1</a> (2022-10-25)</h2>
 <p><a href="https://github.com/GENESIS-EFRC/reaction-network/compare/v6.1.0...v6.1.1">Full Changelog</a></p>
 <p><strong>Merged pull requests:</strong></p>
@@ -1840,15 +1855,15 @@
 <li>fix broken docs github workflow <a href="https://github.com/GENESIS-EFRC/reaction-network/pull/174">#174</a> (<a href="https://github.com/mattmcdermott">mattmcdermott</a>)</li>
 </ul>
 <h2 id="v610-2022-10-25"><a href="https://github.com/GENESIS-EFRC/reaction-network/tree/v6.1.0">v6.1.0</a> (2022-10-25)</h2>
-<p><a href="https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.2...v6.1.0">Full Changelog</a></p>
+<p><a href="https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.1...v6.1.0">Full Changelog</a></p>
 <p><strong>Merged pull requests:</strong></p>
 <ul>
 <li>hopefully fix broken release workflow <a href="https://github.com/GENESIS-EFRC/reaction-network/pull/173">#173</a> (<a href="https://github.com/mattmcdermott">mattmcdermott</a>)</li>
 </ul>
-<h2 id="v602-2022-10-25"><a href="https://github.com/GENESIS-EFRC/reaction-network/tree/v6.0.2">v6.0.2</a> (2022-10-25)</h2>
-<p><a href="https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.1...v6.0.2">Full Changelog</a></p>
 <h2 id="v601-2022-10-25"><a href="https://github.com/GENESIS-EFRC/reaction-network/tree/v6.0.1">v6.0.1</a> (2022-10-25)</h2>
-<p><a href="https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.0...v6.0.1">Full Changelog</a></p>
+<p><a href="https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.2...v6.0.1">Full Changelog</a></p>
+<h2 id="v602-2022-10-25"><a href="https://github.com/GENESIS-EFRC/reaction-network/tree/v6.0.2">v6.0.2</a> (2022-10-25)</h2>
+<p><a href="https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.0...v6.0.2">Full Changelog</a></p>
 <p><strong>Merged pull requests:</strong></p>
 <ul>
 <li>trigger new version release <a href="https://github.com/GENESIS-EFRC/reaction-network/pull/172">#172</a> (<a href="https://github.com/mattmcdermott">mattmcdermott</a>)</li>
