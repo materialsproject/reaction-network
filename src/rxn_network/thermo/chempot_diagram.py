@@ -207,7 +207,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         return self._hs_int
 
     @cached_property
-    def domains(self) -> dict[str, np.ndarray]:
+    def domains(self) -> Dict[str, np.ndarray]:
         """Mapping of formulas to array of domain boundary points"""
         return self._get_domains()
 
