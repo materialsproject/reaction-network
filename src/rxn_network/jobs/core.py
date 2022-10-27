@@ -218,8 +218,8 @@ class PathwaySolverMaker(Maker):
 
     name: str = "solve pathways"
     cost_function: CostFunction = field(default_factory=Softplus)
-    precursors: list[str] = field(default_factory=list)
-    targets: list[str] = field(default_factory=list)
+    precursors: List[str] = field(default_factory=list)
+    targets: List[str] = field(default_factory=list)
     open_elem: Optional[Element] = None
     chempot: Optional[float] = None
     max_num_combos: int = 4
