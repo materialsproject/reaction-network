@@ -6,7 +6,9 @@ from queue import Empty, PriorityQueue
 from typing import Iterable, List, Optional, Union
 
 import rustworkx as rx
+from monty.json import MontyDecoder
 from pymatgen.entries import Entry
+from rustworkx import PyDiGraph
 from tqdm import tqdm
 
 from rxn_network.core.cost_function import CostFunction
@@ -17,6 +19,35 @@ from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.reaction_set import ReactionSet
+
+
+class Graph(PyDiGraph):
+    """
+    Thin wrapper around rx.PyDiGraph to allow for serialization.
+    """
+
+    def as_dict(self):
+        d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
+
+        d["nodes"] = {node: idx for idx, node in zip(self.node_indices(), self.nodes())}
+        d["edges"] = [(*e, obj) for e, obj in zip(self.edge_list(), self.edges())]
+        return d
+
+    @classmethod
+    def from_dict(cls, d):
+        nodes = d["nodes"]
+
+        graph = cls()
+        new_indices = graph.add_nodes_from(list(nodes.keys()))
+        mapping = {nodes[node]: idx for idx, node in zip(new_indices, nodes.keys())}
+
+        new_mapping = []
+        for edge in d["edges"]:
+            new_mapping.append((mapping[edge[0]], mapping[edge[1]], edge[2]))
+
+        graph.add_edges_from(new_mapping)
+
+        return graph
 
 
 class ReactionNetwork(Network):
@@ -57,7 +88,7 @@ class ReactionNetwork(Network):
         """
         self.logger.info("Building graph from reactions...")
 
-        g = rx.PyDiGraph()
+        g = Graph()
 
         nodes, edges = get_rxn_nodes_and_edges(self.rxns)
         edges.extend(get_loopback_edges(nodes))
@@ -214,33 +245,6 @@ class ReactionNetwork(Network):
 
         self._target = target
 
-    def load_graph(self, filename: str):
-        """
-        Loads graph-tool graph from file.
-
-        Args:
-            filename: Filename of graph object to load (for example, .gt or .gt.gz
-                format)
-
-        Returns: None
-        """
-        self._g = load_graph(filename)
-
-    def write_graph(self, filename: Optional[str] = None):
-        """
-        Writes graph to file. If filename is not provided, will write to CHEMSYS.gt.gz
-        (where CHEMSYS is the chemical system of the network)
-
-        Args:
-            filename: Filename to write to. If None, writes to default filename.
-
-        Returns: None
-        """
-        if not filename:
-            filename = f"{self.chemsys}.gt.gz"
-
-        save_graph(self._g, filename)
-
     def _k_shortest_paths(self, k):
         """Wrapper for finding the k shortest paths using Yen's algorithm. Returns
         BasicPathway objects"""
@@ -279,26 +283,6 @@ class ReactionNetwork(Network):
 
         return BasicPathway(reactions=rxns, costs=costs)
 
-    @classmethod
-    def from_dict_and_file(cls, d: dict, filename: str):
-        """
-        Convenience constructor method that loads a ReactionNetwork object from a
-        dictionary (MSONable version) and a filename (to load graph object in
-        graph-tool).
-
-        Args:
-            d: Dictionary containing the ReactionNetwork object
-            filename: Filename of graph object to load (for example, .gt or .gt.gz
-                format)
-
-        Returns:
-            ReactionNetwork object with loaded graph
-        """
-        rn = cls.from_dict(d)
-        rn.load_graph(filename)  # pylint: disable=no-member
-
-        return rn
-
     @property
     def graph(self):
         """Returns the network object in graph-tool"""
@@ -314,6 +298,7 @@ class ReactionNetwork(Network):
         d = super().as_dict()
         d["precursors"] = list(self.precursors) if self.precursors else None
         d["target"] = self.target
+        d["graph"] = self.graph.as_dict()
         return d
 
     @classmethod
@@ -321,10 +306,14 @@ class ReactionNetwork(Network):
         """Instantiate object from MSONable dict"""
         precursors = d.pop("precursors", None)
         target = d.pop("target", None)
+        graph = d.pop("graph", None)
 
         rn = super().from_dict(d)
         rn._precursors = precursors  # pylint: disable=protected-access
         rn._target = target  # pylint: disable=protected-access
+        rn._g = MontyDecoder().process_decoded(
+            graph
+        )  # pylint: disable=protected-access
 
         return rn
 

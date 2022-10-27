@@ -1,9 +1,6 @@
 """
 Functions for visualizing/plotting reaction networks.
 """
-import warnings
-from typing import Optional
-
 import matplotlib.cm
 import numpy as np
 import rustworkx as rx
