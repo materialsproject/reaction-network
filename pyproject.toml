@@ -61,7 +61,7 @@ strict = [
     "pymatgen==2022.09.21",
     "jobflow==0.1.9",
     "ray==2.0.0",
-    "mp-api==0.27.5",
+    "mp-api==0.29.3",
     "rustworkx==0.12.0",
 ]
 
