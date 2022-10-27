@@ -100,9 +100,7 @@ def mn_o_y_network_entries():
 
 @pytest.fixture(scope="session")
 def ymno_rn():
-    rn = YMNO_RN
-    rn.load_graph(str(TEST_FILES_PATH / "ymno_rn_graph.gt.gz"))
-    return rn
+    return YMNO_RN
 
 
 @pytest.fixture(scope="session")
