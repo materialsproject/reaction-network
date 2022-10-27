@@ -115,7 +115,7 @@ class ReactionNetwork(Network):
         paths = []
         for target in targets:
             self.set_target(target)
-            print(f"PATHS to {self.target.composition.reduced_formula} \n")
+            print(f"Paths to {self.target.composition.reduced_formula} \n")
             print("--------------------------------------- \n")
             pathways = self._k_shortest_paths(k=k)
             paths.extend(pathways)
