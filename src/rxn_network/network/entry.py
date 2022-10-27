@@ -6,6 +6,7 @@ from enum import Enum, auto
 from typing import List
 
 from monty.json import MSONable
+from monty.serialization import MontyDecoder
 from pymatgen.entries import Entry
 
 
@@ -39,6 +40,23 @@ class NetworkEntry(MSONable):
         self.chemsys = "-".join([str(e) for e in self.elements])
         self.dim = len(self.chemsys)
         self.description = description
+
+    def as_dict(self):
+        """MSONable dict representation"""
+        return {
+            "@module": self.__class__.__module__,
+            "@class": self.__class__.__name__,
+            "entries": list(self.entries),
+            "description": self.description.value,
+        }
+
+    @classmethod
+    def from_dict(cls, d):
+        """Load from MSONable dict"""
+        return cls(
+            MontyDecoder().process_decoded(d["entries"]),
+            NetworkEntryType(d["description"]),
+        )
 
     def __repr__(self):
         formulas = [entry.composition.reduced_formula for entry in self.entries]

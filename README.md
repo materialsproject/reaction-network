@@ -8,26 +8,22 @@ Version](https://img.shields.io/pypi/pyversions/reaction-network?style=for-the-b
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/reaction-network?style=for-the-badge)
 ![PyPI - License](https://img.shields.io/pypi/l/reaction-network?style=for-the-badge)
 
-Reaction Network (`rxn_network`) is a Python package for predicting likely inorganic chemical reaction pathways using graph theoretical methods.
+Reaction Network (`rxn_network`) is a Python package for predicting likely inorganic
+chemical reaction pathways using combinatorial and graph theoretical methods.
 
 # Installation directions
 
-This package can be easily installed using pip:
+We recommend installing using pip:
 
 ```properties
 pip install reaction-network
 ```
 
-The package will then be installed under the name `rxn_network`. 
+The package will then be installed under the name `rxn_network`.
 
-### Warning :warning:
-While this will take care of most dependencies, if you are using any of the network-based features, then the `graph-tool` package must be installed. Unfortunately, this cannotbe installed through pip. Please see <https://graph-tool.skewed.de/> for more details. :warning:
-
-We recommend the following installation procedure which installs graph-tool through conda-forge.
-
-```properties
-conda install -c conda-forge graph-tool
-```
+*As of version 7.0, the `reaction-network` package no longer uses `graph-tool`. All
+network functionality is now implemented using `rustworkx`. This means it is no longer
+required to complete any extra installations.*
 
 # Tutorial notebooks
 

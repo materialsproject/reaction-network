@@ -91,7 +91,7 @@ class PathwayPlotter(MSONable):
         for temp in tqdm(self.df.index):
             all_energies[temp] = {}
 
-            gibbs_entries = GibbsEntrySet.from_entries(entries, temp)
+            gibbs_entries = GibbsEntrySet.from_computed_entries(entries, temp)
             pd = PhaseDiagram(gibbs_entries)
 
             ground_state_energy = pd.get_hull_energy(compositions[temp])

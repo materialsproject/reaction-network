@@ -2,10 +2,13 @@
 Implementation of reaction network interface.
 """
 from dataclasses import field
-from typing import Iterable, List, Optional, Union
+from queue import Empty, PriorityQueue
+from typing import Iterable, List, Union
 
-from graph_tool.all import Graph, Vertex, find_edge, find_vertex
+import rustworkx as rx
+from monty.json import MontyDecoder
 from pymatgen.entries import Entry
+from rustworkx import PyDiGraph
 from tqdm import tqdm
 
 from rxn_network.core.cost_function import CostFunction
@@ -13,22 +16,57 @@ from rxn_network.core.network import Network
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
-from rxn_network.network.gt import (
-    initialize_graph,
-    load_graph,
-    save_graph,
-    update_vertex_props,
-    yens_ksp,
-)
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.reaction_set import ReactionSet
 
 
+class Graph(PyDiGraph):
+    """
+    Thin wrapper around rx.PyDiGraph to allow for serialization.
+    """
+
+    def as_dict(self):
+        """Represents the PyDiGraph object as a serializable dictionary (see monty
+        package, MSONable, for more information"""
+        d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
+
+        d["nodes"] = [n.as_dict() for n in self.nodes()]
+        d["node_indices"] = list(self.node_indices())
+        d["edges"] = [
+            (*e, obj.as_dict() if hasattr(obj, "as_dict") else obj)
+            for e, obj in zip(self.edge_list(), self.edges())
+        ]
+
+        return d
+
+    @classmethod
+    def from_dict(cls, d):
+        """Instantiates a Graph object from a dictionary (see monty package, MSONable,
+        for more information)"""
+        nodes = MontyDecoder().process_decoded(d["nodes"])
+        node_indices = MontyDecoder().process_decoded(d["node_indices"])
+        edges = [(e[0], e[1], MontyDecoder().process_decoded(e[2])) for e in d["edges"]]
+
+        nodes = dict(zip(nodes, node_indices))
+
+        graph = cls()
+        new_indices = graph.add_nodes_from(list(nodes.keys()))
+        mapping = {nodes[node]: idx for idx, node in zip(new_indices, nodes.keys())}
+
+        new_mapping = []
+        for edge in edges:
+            new_mapping.append((mapping[edge[0]], mapping[edge[1]], edge[2]))
+
+        graph.add_edges_from(new_mapping)
+
+        return graph
+
+
 class ReactionNetwork(Network):
     """
-    Main reaction network class for building graphs of reactions and performing
-    pathfinding.
+    Main reaction network class for building graph networks and performing
+    pathfinding. Graphs are built using rustworkx.
     """
 
     def __init__(
@@ -39,8 +77,8 @@ class ReactionNetwork(Network):
         """
         Initialize a ReactionNetwork object for a set of reactions.
 
-        Note: the precursors and target must be set by calling set_precursors() and
-        set_target() respectively.
+        Note: the precursors and target are not set by default. You must call
+        set_precursors() and set_target() in place.
 
         Args:
             rxns: Reaction set of reactions
@@ -54,34 +92,22 @@ class ReactionNetwork(Network):
 
     def build(self):
         """
-        Construct the reaction network graph object and store under the "graph"
-        attribute. Does NOT initialize precursors or target; you must call
+        In-place method. Construct the reaction network graph object and store under the
+        "graph" attribute. Does NOT initialize precursors or target; you must call
         set_precursors() or set_target() to do so.
 
         Returns:
             None
         """
-        costs = self.rxns.calculate_costs(self.cost_function)
         self.logger.info("Building graph from reactions...")
 
-        nodes, rxn_edges = get_rxn_nodes_and_edges(self.rxns)
+        g = Graph()
 
-        g = initialize_graph()
-        g.add_vertex(len(nodes))
+        nodes, edges = get_rxn_nodes_and_edges(self.rxns)
+        edges.extend(get_loopback_edges(nodes))
 
-        for i, network_entry in enumerate(nodes):
-            props = {"entry": network_entry, "type": network_entry.description.value}
-            update_vertex_props(g, g.vertex(i), props)
-
-        edge_list = []
-        for edge, cost, rxn in zip(rxn_edges, costs, self.rxns):
-            v1 = g.vertex(edge[0])
-            v2 = g.vertex(edge[1])
-            edge_list.append((v1, v2, cost, rxn, "reaction"))
-
-        edge_list.extend(get_loopback_edges(g, nodes))
-
-        g.add_edge_list(edge_list, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
+        g.add_nodes_from(nodes)
+        g.add_edges_from(edges)
 
         self._g = g
 
@@ -102,9 +128,9 @@ class ReactionNetwork(Network):
         paths = []
         for target in targets:
             self.set_target(target)
-            print(f"PATHS to {self.target.composition.reduced_formula} \n")
+            print(f"Paths to {self.target.composition.reduced_formula} \n")
             print("--------------------------------------- \n")
-            pathways = self._shortest_paths(k=k)
+            pathways = self._k_shortest_paths(k=k)
             paths.extend(pathways)
 
         paths = PathwaySet.from_paths(paths)
@@ -113,15 +139,15 @@ class ReactionNetwork(Network):
 
     def set_precursors(self, precursors: Iterable[Union[Entry, str]]):
         """
-        Sets the precursors of the network. Removes all references to previous
-        precursors.
+        In-place method. Sets the precursors of the network. Removes all references to
+        previous precursors.
 
         If entries are provided, will use the entries to set the precursors. If strings
         are provided, will automatically find minimum-energy entries with matching
         reduced_formula.
 
         Args:
-            precursors: iterable of
+            precursors: iterable of Entries (or reduced formulas) of precursors
 
         Returns:
             None
@@ -139,50 +165,48 @@ class ReactionNetwork(Network):
 
         if precursors == self.precursors:
             return
-
-        if self.precursors:
-            precursors_v = find_vertex(
-                g, g.vp["type"], NetworkEntryType.Precursors.value
-            )[0]
-            g.remove_vertex(precursors_v)
-            loopback_edges = find_edge(g, g.ep["type"], "loopback_precursors")
-            for e in loopback_edges:
-                g.remove_edge(e)
-        elif not all(p in self.entries for p in precursors):
+        if not all(p in self.entries for p in precursors):
             raise ValueError("One or more precursors are not included in network!")
 
-        precursors_v = g.add_vertex()
         precursors_entry = NetworkEntry(precursors, NetworkEntryType.Precursors)
+        if self.precursors:  # remove old precursors
+            for node in g.node_indices():
+                if (
+                    g.get_node_data(node).description.value
+                    == NetworkEntryType.Precursors.value
+                ):
+                    g.remove_node(node)
+                    break
+            else:
+                raise ValueError("Old precursors node not found in graph!")
 
-        props = {"entry": precursors_entry, "type": precursors_entry.description.value}
-        update_vertex_props(g, precursors_v, props)
+        precursors_node = g.add_node(precursors_entry)
 
-        add_edges = []
-        for v in g.vertices():
-            entry = g.vp["entry"][v]
-            if not entry:
-                continue
-            if entry.description.value == NetworkEntryType.Reactants.value:
+        edges_to_add = []
+        for node in g.node_indices():
+            entry = g.get_node_data(node)
+            entry_type = entry.description.value
+
+            if entry_type == NetworkEntryType.Reactants.value:
                 if entry.entries.issubset(precursors):
-                    add_edges.append((precursors_v, v, 0.0, None, "precursors"))
+                    edges_to_add.append((precursors_node, node, "precursor_edge"))
             elif entry.description.value == NetworkEntryType.Products.value:
-                for v2 in g.vertices():
-                    entry2 = g.vp["entry"][v2]
+                for node2 in g.node_indices():
+                    entry2 = g.get_node_data(node2)
                     if entry2.description.value == NetworkEntryType.Reactants.value:
                         if precursors.issuperset(entry2.entries):
                             continue
                         if precursors.union(entry.entries).issuperset(entry2.entries):
-                            add_edges.append((v, v2, 0.0, None, "loopback_precursors"))
+                            edges_to_add.append((node, node2, "loopback_edge"))
 
-        g.add_edge_list(add_edges, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
-
+        g.add_edges_from(edges_to_add)
         self._precursors = precursors
 
     def set_target(self, target: Union[Entry, str]):
         """
-        If entry is provided, will use that entry to set the target. If string is
-        provided, will automatically find minimum-energy entry with matching
-        reduced_formula.
+        In-place method. If entry is provided, will use that entry to set the
+        target. If string is provided, will automatically find minimum-energy entry with
+        matching reduced_formula.
 
         Args:
             target: Entry, or string of reduced formula, of target
@@ -207,67 +231,47 @@ class ReactionNetwork(Network):
             raise ValueError("Target is not included in network!")
 
         if self.target:
-            target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
-            g.remove_vertex(target_v)
+            for node in g.node_indices():
+                if (
+                    g.get_node_data(node).description.value
+                    == NetworkEntryType.Target.value
+                ):
+                    g.remove_node(node)
+                    break
+            else:
+                raise ValueError("Old target node not found in graph!")
 
-        target_v = g.add_vertex()
         target_entry = NetworkEntry([target], NetworkEntryType.Target)
-        props = {"entry": target_entry, "type": target_entry.description.value}
-        update_vertex_props(g, target_v, props)
+        target_node = g.add_node(target_entry)
 
-        add_edges = []
-        for v in g.vertices():
-            entry = g.vp["entry"][v]
-            if not entry:
-                continue
-            if entry.description.value != NetworkEntryType.Products.value:
+        edges_to_add = []
+        for node in g.node_indices():
+            entry = g.get_node_data(node)
+            entry_type = entry.description.value
+
+            if entry_type != NetworkEntryType.Products.value:
                 continue
             if target in entry.entries:
-                add_edges.append([v, target_v, 0.0, None, "target"])
+                edges_to_add.append((node, target_node, "target_edge"))
 
-        g.add_edge_list(add_edges, eprops=[g.ep["cost"], g.ep["rxn"], g.ep["type"]])
+        g.add_edges_from(edges_to_add)
 
         self._target = target
 
-    def load_graph(self, filename: str):
-        """
-        Loads graph-tool graph from file.
-
-        Args:
-            filename: Filename of graph object to load (for example, .gt or .gt.gz
-                format)
-
-        Returns: None
-        """
-        self._g = load_graph(filename)
-
-    def write_graph(self, filename: Optional[str] = None):
-        """
-        Writes graph to file. If filename is not provided, will write to CHEMSYS.gt.gz
-        (where CHEMSYS is the chemical system of the network)
-
-        Args:
-            filename: Filename to write to. If None, writes to default filename.
-
-        Returns: None
-        """
-        if not filename:
-            filename = f"{self.chemsys}.gt.gz"
-
-        save_graph(self._g, filename)
-
-    def _shortest_paths(self, k):
-        """Finds the k shortest paths using Yen's algorithm and returns BasicPathways"""
+    def _k_shortest_paths(self, k):
+        """Wrapper for finding the k shortest paths using Yen's algorithm. Returns
+        BasicPathway objects"""
         g = self._g
         paths = []
 
-        precursors_v = find_vertex(g, g.vp["type"], NetworkEntryType.Precursors.value)[
-            0
-        ]
-        target_v = find_vertex(g, g.vp["type"], NetworkEntryType.Target.value)[0]
-
-        for path in yens_ksp(g, k, precursors_v, target_v):
-            paths.append(self._path_from_graph(g, path))
+        precursors_node = g.find_node_by_weight(
+            NetworkEntry(self.precursors, NetworkEntryType.Precursors)
+        )
+        target_node = g.find_node_by_weight(
+            NetworkEntry([self.target], NetworkEntryType.Target)
+        )
+        for path in yens_ksp(g, self.cost_function, k, precursors_node, target_node):
+            paths.append(self._path_from_graph(g, path, self.cost_function))
 
         for path in paths:
             print(path, "\n")
@@ -275,43 +279,26 @@ class ReactionNetwork(Network):
         return paths
 
     @staticmethod
-    def _path_from_graph(g, path):
+    def _path_from_graph(g, path, cf):
         """Gets a BasicPathway object from a shortest path found in the network"""
         rxns = []
         costs = []
 
-        for step, v in enumerate(path):
-            if g.vp["type"][v] == NetworkEntryType.Products.value:
-                e = g.edge(path[step - 1], v)
+        for step, node in enumerate(path):
+            if (
+                g.get_node_data(node).description.value
+                == NetworkEntryType.Products.value
+            ):
+                e = g.get_edge_data(path[step - 1], node)
 
-                rxns.append(g.ep["rxn"][e])
-                costs.append(g.ep["cost"][e])
+                rxns.append(e)
+                costs.append(get_edge_weight(e, cf))
 
         return BasicPathway(reactions=rxns, costs=costs)
 
-    @classmethod
-    def from_dict_and_file(cls, d: dict, filename: str):
-        """
-        Convenience constructor method that loads a ReactionNetwork object from a
-        dictionary (MSONable version) and a filename (to load graph object in
-        graph-tool).
-
-        Args:
-            d: Dictionary containing the ReactionNetwork object
-            filename: Filename of graph object to load (for example, .gt or .gt.gz
-                format)
-
-        Returns:
-            ReactionNetwork object with loaded graph
-        """
-        rn = cls.from_dict(d)
-        rn.load_graph(filename)  # pylint: disable=no-member
-
-        return rn
-
     @property
     def graph(self):
-        """Returns the network object in graph-tool"""
+        """Returns the Graph object"""
         return self._g
 
     @property
@@ -324,6 +311,7 @@ class ReactionNetwork(Network):
         d = super().as_dict()
         d["precursors"] = list(self.precursors) if self.precursors else None
         d["target"] = self.target
+        d["graph"] = self.graph.as_dict()
         return d
 
     @classmethod
@@ -331,10 +319,14 @@ class ReactionNetwork(Network):
         """Instantiate object from MSONable dict"""
         precursors = d.pop("precursors", None)
         target = d.pop("target", None)
+        graph = d.pop("graph", None)
 
         rn = super().from_dict(d)
         rn._precursors = precursors  # pylint: disable=protected-access
         rn._target = target  # pylint: disable=protected-access
+        rn._g = MontyDecoder().process_decoded(  # pylint: disable=protected-access
+            graph
+        )
 
         return rn
 
@@ -376,18 +368,17 @@ def get_rxn_nodes_and_edges(rxns: ReactionSet):
         else:
             product_idx = nodes.index(product_node)
 
-        edges.append((reactant_idx, product_idx))
+        edges.append((reactant_idx, product_idx, rxn))
 
     return nodes, edges
 
 
-def get_loopback_edges(g: Graph, nodes: List[Vertex]):
+def get_loopback_edges(nodes):
     """
-    Given a graph and a list of nodes to check, this function finds and returns loopback
+    Given a list of nodes to check, this function finds and returns loopback
     edges (i.e., edges that connect a product node to its equivalent reactant node)
 
     Args:
-        g: graph-tool Graph object
         nodes: List of vertices from which to find loopback edges
 
     Returns:
@@ -402,6 +393,118 @@ def get_loopback_edges(g: Graph, nodes: List[Vertex]):
             if r.description.value != NetworkEntryType.Reactants.value:
                 continue
             if p.entries == r.entries:
-                edges.append((g.vertex(idx1), g.vertex(idx2), 0.0, None, "loopback"))
+                edges.append((idx1, idx2, "loopback_edge"))
 
     return edges
+
+
+def get_edge_weight(edge_obj, cf):
+    if isinstance(edge_obj, str) and edge_obj in [
+        "loopback_edge",
+        "precursor_edge",
+        "target_edge",
+    ]:
+        return 0.0
+    if edge_obj.__class__.__name__ in ["ComputedReaction", "OpenComputedReaction"]:
+        return cf.evaluate(edge_obj)
+
+    raise ValueError("Unknown edge type")
+
+
+def yens_ksp(
+    g: rx.PyGraph,
+    cf: CostFunction,
+    num_k: int,
+    precursors_node: int,
+    target_node: int,
+):
+    """
+    Yen's Algorithm for k-shortest paths, adopted for rustworkx.
+
+    This implementation was inspired by the igraph implementation by Antonin Lenfant.
+
+    Reference:
+        Jin Y. Yen, "Finding the K Shortest Loopless Paths n a Network", Management
+        Science, Vol. 17, No. 11, Theory Series (Jul., 1971), pp. 712-716.
+
+    Args:
+        g: the rustworkx PyGraph object
+        num_k: number of k shortest paths that should be found.
+        precursors_node: the index of the node representing the precursors.
+        target_node: the index of the node representing the targets.
+    Returns:
+        List of lists of graph vertices corresponding to each shortest path
+            (sorted in increasing order by cost).
+    """
+
+    def path_cost(nodes):
+        """Calculates path cost given a list of nodes"""
+        cost = 0
+        for j in range(len(nodes) - 1):
+            cost += get_edge_weight(g.get_edge_data(nodes[j], nodes[j + 1]), cf)
+        return cost
+
+    def get_edge_weight_with_cf(edge_obj):
+        return get_edge_weight(edge_obj, cf)
+
+    g = g.copy()
+
+    path = rx.dijkstra_shortest_paths(
+        g, precursors_node, target_node, weight_fn=get_edge_weight_with_cf
+    )
+
+    if not path:
+        return []
+
+    path = list(path[target_node])
+
+    a = [path]
+    a_costs = [path_cost(path)]
+
+    b = PriorityQueue()  # type: ignore
+
+    for k in range(1, num_k):
+        try:
+            prev_path = a[k - 1]
+        except IndexError:
+            print(f"Identified only k={k-1} paths before exiting. \n")
+            break
+
+        for i in range(len(prev_path) - 1):
+            spur_node = prev_path[i]
+            root_path = prev_path[:i]
+
+            removed_edges = []
+
+            for path in a:
+                if len(path) - 1 > i and root_path == path[:i]:
+                    try:
+                        e = g.get_edge_data(path[i], path[i + 1])
+                    except rx.NoEdgeBetweenNodes:
+                        continue
+
+                    g.remove_edge(path[i], path[i + 1])
+                    removed_edges.append((path[i], path[i + 1], e))
+
+            spur_path = rx.dijkstra_shortest_paths(
+                g, spur_node, target_node, weight_fn=get_edge_weight_with_cf
+            )
+
+            g.add_edges_from(removed_edges)
+
+            if spur_path:
+                total_path = list(root_path) + list(spur_path[target_node])
+                total_path_cost = path_cost(total_path)
+                b.put((total_path_cost, total_path))
+
+        while True:
+            try:
+                cost_, path_ = b.get(block=False)
+            except Empty:
+                break
+            if path_ not in a:
+                a.append(path_)
+                a_costs.append(cost_)
+                break
+
+    return a

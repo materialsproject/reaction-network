@@ -38,6 +38,7 @@ dependencies = [
     "jobflow>=0.1.8",
     "ray>=2.0.0",
     "mp-api>=0.27.1",
+    "rustworkx>=0.12.0",
 ]
 
 [project.optional-dependencies]
@@ -54,13 +55,14 @@ docs = [
 
 ]
 plotting = ["graphistry==0.28.0"]
-tests = ["pytest==7.1.3", "pytest-cov==4.0.0", "pytest-xvfb==2.0.0"]
+tests = ["pytest==7.1.3", "pytest-cov==4.0.0"]
 strict = [
     "numba==0.56.2",
     "pymatgen==2022.09.21",
     "jobflow==0.1.9",
     "ray==2.0.0",
     "mp-api==0.27.5",
+    "rustworkx==0.12.0",
 ]
 
 [project.urls]

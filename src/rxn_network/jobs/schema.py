@@ -75,7 +75,6 @@ class NetworkTaskDocument(BaseModel):
         description="Timestamp of when the document was last updated.",
     )
     network: Network = Field(description="The reaction network")
-    graph_fn: str = Field(description="The file path of the network graph")
     paths: PathwaySet = Field(None, description="The (simple) reaction pathways")
     k: int = Field(None, description="The number of paths solved for")
     precursors: List[str] = Field(None, description="The precursor compositions")
@@ -95,8 +94,8 @@ class PathwaySolverTaskDocument(BaseModel):
     )
     solver: Solver = Field(description="The pathway solver used to calculate pathways")
     balanced_paths: PathwaySet = Field(description="The balanced reaction pathways")
-    precursors: list[str] = Field(description="The precursor compositions")
-    targets: list[str] = Field(description="The target compositions")
+    precursors: List[str] = Field(description="The precursor compositions")
+    targets: List[str] = Field(description="The target compositions")
     net_rxn: ComputedReaction = Field(
         description="The net reaction used for pathway solving"
     )
