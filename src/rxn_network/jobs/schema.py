@@ -118,7 +118,6 @@ class NetworkTaskDocument(BaseModel):
         description="Timestamp of when the document was last updated.",
     )
     network: Network = Field(description="The reaction network")
-    graph_fn: str = Field(description="The file path of the network graph")
     paths: PathwaySet = Field(None, description="The (simple) reaction pathways")
     k: int = Field(None, description="The number of paths solved for")
     precursors: List[str] = Field(None, description="The precursor compositions")

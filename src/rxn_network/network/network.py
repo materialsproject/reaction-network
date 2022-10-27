@@ -3,7 +3,7 @@ Implementation of reaction network interface.
 """
 from dataclasses import field
 from queue import Empty, PriorityQueue
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Union
 
 import rustworkx as rx
 from monty.json import MontyDecoder
@@ -27,6 +27,8 @@ class Graph(PyDiGraph):
     """
 
     def as_dict(self):
+        """Represents the graph object as a serializable dictionar (see monty package,
+        MSONable, for more information"""
         d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
 
         d["nodes"] = {node: idx for idx, node in zip(self.node_indices(), self.nodes())}
@@ -35,6 +37,8 @@ class Graph(PyDiGraph):
 
     @classmethod
     def from_dict(cls, d):
+        """Instantiates a Graph object from a dictionary (see monty package, MSONable,
+        for more information)"""
         nodes = d["nodes"]
 
         graph = cls()
@@ -52,8 +56,8 @@ class Graph(PyDiGraph):
 
 class ReactionNetwork(Network):
     """
-    Main reaction network class for building graphs of reactions and performing
-    pathfinding.
+    Main reaction network class for building graph networks and performing
+    pathfinding. Graphs are built using rustworkx.
     """
 
     def __init__(
@@ -285,7 +289,7 @@ class ReactionNetwork(Network):
 
     @property
     def graph(self):
-        """Returns the network object in graph-tool"""
+        """Returns the Graph object"""
         return self._g
 
     @property
@@ -311,9 +315,9 @@ class ReactionNetwork(Network):
         rn = super().from_dict(d)
         rn._precursors = precursors  # pylint: disable=protected-access
         rn._target = target  # pylint: disable=protected-access
-        rn._g = MontyDecoder().process_decoded(
+        rn._g = MontyDecoder().process_decoded(  # pylint: disable=protected-access
             graph
-        )  # pylint: disable=protected-access
+        )
 
         return rn
 
@@ -362,11 +366,10 @@ def get_rxn_nodes_and_edges(rxns: ReactionSet):
 
 def get_loopback_edges(nodes):
     """
-    Given a graph and a list of nodes to check, this function finds and returns loopback
+    Given a list of nodes to check, this function finds and returns loopback
     edges (i.e., edges that connect a product node to its equivalent reactant node)
 
     Args:
-        g: graph-tool Graph object
         nodes: List of vertices from which to find loopback edges
 
     Returns:
