@@ -27,8 +27,8 @@ class Graph(PyDiGraph):
     """
 
     def as_dict(self):
-        """Represents the graph object as a serializable dictionar (see monty package,
-        MSONable, for more information"""
+        """Represents the PyDiGraph object as a serializable dictionary (see monty
+        package, MSONable, for more information"""
         d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
 
         d["nodes"] = [n.as_dict() for n in self.nodes()]
@@ -77,8 +77,8 @@ class ReactionNetwork(Network):
         """
         Initialize a ReactionNetwork object for a set of reactions.
 
-        Note: the precursors and target must be set by calling set_precursors() and
-        set_target() respectively.
+        Note: the precursors and target are not set by default. You must call
+        set_precursors() and set_target() in place.
 
         Args:
             rxns: Reaction set of reactions
@@ -92,8 +92,8 @@ class ReactionNetwork(Network):
 
     def build(self):
         """
-        Construct the reaction network graph object and store under the "graph"
-        attribute. Does NOT initialize precursors or target; you must call
+        In-place method. Construct the reaction network graph object and store under the
+        "graph" attribute. Does NOT initialize precursors or target; you must call
         set_precursors() or set_target() to do so.
 
         Returns:
@@ -139,15 +139,15 @@ class ReactionNetwork(Network):
 
     def set_precursors(self, precursors: Iterable[Union[Entry, str]]):
         """
-        Sets the precursors of the network. Removes all references to previous
-        precursors.
+        In-place method. Sets the precursors of the network. Removes all references to
+        previous precursors.
 
         If entries are provided, will use the entries to set the precursors. If strings
         are provided, will automatically find minimum-energy entries with matching
         reduced_formula.
 
         Args:
-            precursors: iterable of
+            precursors: iterable of Entries (or reduced formulas) of precursors
 
         Returns:
             None
@@ -204,9 +204,9 @@ class ReactionNetwork(Network):
 
     def set_target(self, target: Union[Entry, str]):
         """
-        If entry is provided, will use that entry to set the target. If string is
-        provided, will automatically find minimum-energy entry with matching
-        reduced_formula.
+        In-place method. If entry is provided, will use that entry to set the
+        target. If string is provided, will automatically find minimum-energy entry with
+        matching reduced_formula.
 
         Args:
             target: Entry, or string of reduced formula, of target

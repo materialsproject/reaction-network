@@ -9,14 +9,12 @@ from rustworkx.visualization import mpl_draw
 
 def plot_network(graph: rx.PyGraph, vertex_cmap_name: str = "jet", **kwargs):
     """
-    Plots a reaction network using graph-tool visualization tools (i.e., graph_draw())
+    Plots a reaction network using rustworkx visualization tools (i.e., mpl_draw)
 
     Args:
-        graph: a graph-tool Graph object
+        graph: a rustworkx PyGraph object
         vertex_cmap_name: the name of . Defaults to "jet".
-        edge_cmap_name: Defaults to "PuBuGn_r".
-        output: Optional output filename
-        cost_pos_scale_factor
+        **kwargs: keyword arguments to pass to mpl_draw
 
     """
     g = graph.copy()
