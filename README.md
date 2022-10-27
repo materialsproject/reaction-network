@@ -1,15 +1,14 @@
 # ![Reaction Network](docs/images/logo.png)
 
-[![Pytest Status](https://github.com/GENESIS-EFRC/reaction-network/workflows/testing/badge.svg)](https://github.com/GENESIS-EFRC/reaction-network/actions?query=workflow%3Atesting?)
-![Codecov](https://img.shields.io/codecov/c/github/GENESIS-EFRC/reaction-network?)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/GENESIS-EFRC/reaction-network/testing?style=for-the-badge)
+![Codecov](https://img.shields.io/codecov/c/github/GENESIS-EFRC/reaction-network?style=for-the-badge)
 
 ![PyPI - Python
 Version](https://img.shields.io/pypi/pyversions/reaction-network?style=for-the-badge)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/reaction-network?style=for-the-badge)
- ![PyPI - License](https://img.shields.io/pypi/l/reaction-network?style=for-the-badge)
+![PyPI - License](https://img.shields.io/pypi/l/reaction-network?style=for-the-badge)
 
-Reaction network (rxn-network) is a Python package for predicting chemical reaction
-pathways in solid-state materials synthesis using combinatorial and graph-theorteical methods.
+Reaction Network (`rxn_network`) is a Python package for predicting likely inorganic chemical reaction pathways using graph theoretical methods.
 
 # Installation directions
 
@@ -19,8 +18,10 @@ This package can be easily installed using pip:
 pip install reaction-network
 ```
 
-:warning: While this will take care of most dependencies, if you are using any of the network-based features (i.e. within `rxn_network.network`), then `graph-tool` must be installed. Unfortunately, this cannot
-be installed through pip. Please see <https://graph-tool.skewed.de/> for more details. :warning:
+The package will then be installed under the name `rxn_network`. 
+
+### Warning :warning:
+While this will take care of most dependencies, if you are using any of the network-based features, then the `graph-tool` package must be installed. Unfortunately, this cannotbe installed through pip. Please see <https://graph-tool.skewed.de/> for more details. :warning:
 
 We recommend the following installation procedure which installs graph-tool through conda-forge.
 
@@ -28,29 +29,15 @@ We recommend the following installation procedure which installs graph-tool thro
 conda install -c conda-forge graph-tool
 ```
 
-## For developers
-
-To install an editable version of the rxn-network code, simply clone the
-code from this repository, navigate to its directory, and then run the
-following command to install the requirements:
-
-```properties
-pip install -r requirements.txt
-pip install -e .
-```
-
-Note that this only works if the repository is cloned from GitHub, such that it contains
-the proper metadata.
-
 # Tutorial notebooks
 
-The `notebooks` folder contains two (2) demonstration notebooks:
+The `examples` folder contains two (2) demonstration notebooks:
 
-- **enumerators.ipynb**: how to enumerate reactions from a set of entries; running
-  enumerators using Fireworks
-- **network.ipynb**: how to build reaction networks from a list of enumerators and
+- **1_enumerators.ipynb**: how to enumerate reactions from a set of entries; running
+  enumerators using jobflow
+- **2_network.ipynb**: how to build reaction networks from a list of enumerators and
   entries; how to perform pathfinding to recommend balanced reaction pathways; running
-  reaction network analysis using Fireworks
+  reaction network analysis using jobflow
 
 # Citation
 

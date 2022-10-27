@@ -129,5 +129,15 @@ def get_computed_rxn(
     return rxn
 
 
-def get_rxn_info(rxn):
+def get_rxn_info(rxn: ComputedReaction):
+    """
+    Utility function to get basic reaction information from a ComputedReaction object.
+    Used in enumerators.
+
+    Args:
+        rxn: ComputedReaction object
+
+    Returns:
+        Tuple of reaction information (entry indices, coefficients, data)
+    """
     return [e.data["idx"] for e in rxn.entries], list(rxn.coefficients), rxn.data

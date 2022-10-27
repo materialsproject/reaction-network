@@ -2,6 +2,8 @@ name: testing
 
 on:
   push:
+    branches:
+      - main
 
   pull_request:
     branches:
@@ -10,25 +12,13 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Cache conda
-        uses: actions/cache@v2
-        env:
-          CACHE_NUMBER: 0
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
         with:
-          path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
-            hashFiles('environment.yaml') }}
-      - uses: conda-incubator/setup-miniconda@v2.1.1
-        with:
-          activate-environment: graph-tool
-          environment-file: environment.yaml
-          use-only-tar-bz2: true
+          python-version: "3.10"
 
       - name: Install python dependencies
         run: |
@@ -51,25 +41,13 @@ jobs:
         os: [ubuntu-latest]
         python-version: ["3.8", "3.9", "3.10"]
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Cache conda
-        uses: actions/cache@v2
-        env:
-          CACHE_NUMBER: 0
+      - name: Set up Python ${{ matrix.python_version }}
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
-            hashFiles('environment.yaml') }}
-      - uses: conda-incubator/setup-miniconda@v2.1.1
-        with:
-          activate-environment: graph-tool
-          environment-file: environment.yaml
-          use-only-tar-bz2: true
+          python-version: ${{ matrix.python_version }}
 
       - name: Install python dependencies
         run: |
@@ -82,7 +60,7 @@ jobs:
         run: |
           pytest --cov=src/rxn_network --cov-report=xml
 
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v3.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
@@ -95,19 +73,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Cache conda
-        uses: actions/cache@v2
-        env:
-          CACHE_NUMBER: 0
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
         with:
-          path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
-            hashFiles('environment.yaml') }}
-      - uses: conda-incubator/setup-miniconda@v2.1.1
-        with:
-          activate-environment: graph-tool
-          environment-file: environment.yaml
-          use-only-tar-bz2: true
+          python-version: "3.10"
 
       - name: Install python dependencies
         run: |
