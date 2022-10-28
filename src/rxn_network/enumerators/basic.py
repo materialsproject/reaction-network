@@ -60,12 +60,10 @@ class BasicEnumerator(Enumerator):
             targets: Optional list of target formulas; only reactions which include
                 formation of at least one of these targets will be enumerated. See the
                 "exclusive_targets" parameter for more details.
-            calculators: Optional list of Calculator object names to be initialized; see
-                calculators module for options (e.g., ["ChempotDistanceCalculator"])
             n: Maximum reactant/product cardinality; i.e., largest possible number of
                 entries on either side of the reaction. Defaults to 2.
             exclusive_precursors: Whether to consider only reactions that have reactants
-            which are a subset of the provided list of precursors. In other
+                which are a subset of the provided list of precursors. In other
                 words, if True, this only identifies reactions with reactants selected
                 from the precursors argument. Defaults to True.
             exclusive_targets: Whether to consider only reactions that make the

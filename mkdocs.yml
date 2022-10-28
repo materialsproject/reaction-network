@@ -6,13 +6,10 @@ nav:
   - Home: index.md
   - Notebooks:
       - Enumerators:
-          - Enumerators: ../notebooks/enumerators.ipynb
+          - Enumerators: ../examples/1_enumerators.ipynb
       - Network:
-          - Network: ../notebooks/network.ipynb
+          - Network: ../examples/2_network.ipynb
   - Reference:
-      - Builders:
-          Retrosynthesis: reference/builders/retrosynthesis.md
-          Schema: reference/builders/schema.md
       - Core:
           Calculator: reference/core/calculator.md
           Composition: reference/core/composition.md
@@ -46,7 +43,6 @@ nav:
           Core: reference/jobs/core.md
       - Network:
           Entry: reference/network/entry.md
-          Graph-tool: reference/network/gt.md
           Network: reference/network/network.md
           Visualize: reference/network/visualize.md
       - Pathways:

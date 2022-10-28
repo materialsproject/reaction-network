@@ -20,6 +20,15 @@ class ChemicalPotentialDiagram(ChempotDiagram):
     Several features have been added to the original class for the purpose of
     efficiently calculating the shortest distance between two chemical potential
     domains.
+
+    For more information on this specific implementation of the algorithm,
+    please cite/reference the paper below:
+
+        Todd, P. K., McDermott, M. J., Rom, C. L., Corrao, A. A., Denney, J. J.,
+        Dwaraknath, S. S.,  Khalifah, P. G., Persson, K. A., & Neilson, J. R. (2021).
+        Selectivity in Yttrium Manganese Oxide Synthesis via Local Chemical Potentials
+        in Hyperdimensional Phase Space. Journal of the American Chemical Society,
+        143(37), 15185-15194. https://doi.org/10.1021/jacs.1c06229
     """
 
     def __init__(  # pylint: disable=super-init-not-called
@@ -207,7 +216,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         return self._hs_int
 
     @cached_property
-    def domains(self) -> dict[str, np.ndarray]:
+    def domains(self) -> Dict[str, np.ndarray]:
         """Mapping of formulas to array of domain boundary points"""
         return self._get_domains()
 

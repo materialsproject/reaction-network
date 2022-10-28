@@ -376,7 +376,6 @@ class NetworkMaker(Maker):
     calculate_pathways: Optional[int] = 10
     open_elem: Optional[Element] = None
     chempot: float = 0.0
-    graph_fn: Optional[str] = None
 
     @job(network="network", output_schema=NetworkTaskDocument)
     def make(
@@ -401,13 +400,8 @@ class NetworkMaker(Maker):
         if self.calculate_pathways and self.targets:
             paths = rn.find_pathways(self.targets, k=self.calculate_pathways)
 
-        graph_fn = self.graph_fn or "network.gt.gz"
-        graph_fn = str(Path(graph_fn).absolute())
-        rn.graph.save(graph_fn)
-
         data = {
             "network": rn,
-            "graph_fn": graph_fn,
             "paths": paths,
             "k": self.calculate_pathways,
             "precursors": self.precursors,
@@ -427,8 +421,8 @@ class PathwaySolverMaker(Maker):
 
     name: str = "solve pathways"
     cost_function: CostFunction = field(default_factory=Softplus)
-    precursors: list[str] = field(default_factory=list)
-    targets: list[str] = field(default_factory=list)
+    precursors: List[str] = field(default_factory=list)
+    targets: List[str] = field(default_factory=list)
     open_elem: Optional[Element] = None
     chempot: Optional[float] = None
     max_num_combos: int = 4
