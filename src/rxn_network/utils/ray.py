@@ -4,6 +4,10 @@ import os
 
 import ray
 
+from rxn_network.utils.funcs import get_logger
+
+logger = get_logger(__name__)
+
 
 def initialize_ray(quiet=False):
     """
@@ -18,7 +22,6 @@ def initialize_ray(quiet=False):
         Checks environment for PBS_NNODES > 1.
 
     """
-    logger = logging.getLogger("enumerator")
     if not quiet:
         logger.setLevel("INFO")
     if not ray.is_initialized():
