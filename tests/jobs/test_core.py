@@ -5,11 +5,13 @@ from jobflow.managers.local import run_locally
 
 from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.jobs.core import (
+    CalculateSelectivitiesMaker,
     GetEntrySetMaker,
     NetworkMaker,
     PathwaySolverMaker,
     ReactionEnumerationMaker,
 )
+from rxn_network.reactions.reaction_set import ReactionSet
 
 
 @pytest.fixture
@@ -34,6 +36,21 @@ def reaction_enumeration_maker():
 def enumeration_job(reaction_enumeration_maker, filtered_entries):
     enumerators = [BasicEnumerator(precursors=["Y2O3", "MnO2"])]
     job = reaction_enumeration_maker.make(enumerators, filtered_entries)
+    return job
+
+
+@pytest.fixture
+def calculate_selectivities_maker():
+    calculate_selectivities_maker = CalculateSelectivitiesMaker()
+    return calculate_selectivities_maker
+
+
+@pytest.fixture
+def selectivities_job(calculate_selectivities_maker, all_ymno_rxns, filtered_entries):
+    target_formula = "YMnO3"
+    job = calculate_selectivities_maker.make(
+        [ReactionSet.from_rxns(all_ymno_rxns)], filtered_entries, target_formula
+    )
     return job
 
 
@@ -84,6 +101,16 @@ def test_enumeration_job(enumeration_job, job_store):
     output = run_locally(enumeration_job, store=job_store, ensure_success=True)
     doc = output[enumeration_job.uuid][1].output
     assert doc.__class__.__name__ == "EnumeratorTaskDocument"
+
+
+def test_calculate_selectivities_job(selectivities_job, job_store):
+    output = run_locally(selectivities_job, store=job_store, ensure_success=True)
+    doc = output[selectivities_job.uuid][1].output
+    assert doc.__class__.__name__ == "SelectivitiesTaskDocument"
+    for r in doc.rxns:
+        assert r.data["primary_selectivity"] is not None
+        assert r.data["secondary_selectivity"] is not None
+        assert r.data["chempot_distance"] is not None
 
 
 def test_network_job(network_job, job_store):

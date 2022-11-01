@@ -1,6 +1,6 @@
 """Core definition for various task and synthesis recipe documents"""
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element
@@ -62,6 +62,49 @@ class EnumeratorTaskDocument(BaseModel):
     )
 
 
+class SelectivitiesTaskDocument(BaseModel):
+    task_label: str = Field(None, description="The name of the task.")
+    last_updated: datetime = Field(
+        default_factory=datetime_str,
+        description="Timestamp of when the document was last updated.",
+    )
+    rxns: ReactionSet = Field(
+        description=(
+            "The reaction set (reactions have calculated selectivities stored in data"
+            " attribute"
+        )
+    )
+    target_formula: str = Field(
+        description="The reduced chemical formula of the target material."
+    )
+    open_elem: Element = Field(None, description="The open element")
+    chempot: float = Field(
+        None, description="The chemical potential of the open element"
+    )
+    added_elements: List[Element] = Field(
+        None, description="The elements added beyond the elements of the target(s)."
+    )
+    added_chemsys: str = Field(
+        None, description="The chemical system of the added elements"
+    )
+    calculate_selectivities: bool = Field(
+        None, description="Whether to calculate selectivities"
+    )
+    calculate_chempot_distances: bool = Field(
+        None, description="Whether to calculate chempot distances"
+    )
+    temp: float = Field(
+        None,
+        description=(
+            "The temperature in K used to determine the primary selectivity weightings."
+        ),
+    )
+    batch_size: int = Field(None, description="The batch size for the reaction set")
+    cpd_kwargs: Dict[str, Any] = Field(
+        None, description="The kwargs for ChempotDistanceCalculator"
+    )
+
+
 class NetworkTaskDocument(BaseModel):
     """
     The calculation output from the NetworkMaker workflow. Contains the ReactionNetwork
@@ -75,6 +118,7 @@ class NetworkTaskDocument(BaseModel):
         description="Timestamp of when the document was last updated.",
     )
     network: Network = Field(description="The reaction network")
+    graph_fn: str = Field(description="The file path of the network graph")
     paths: PathwaySet = Field(None, description="The (simple) reaction pathways")
     k: int = Field(None, description="The number of paths solved for")
     precursors: List[str] = Field(None, description="The precursor compositions")
@@ -94,8 +138,8 @@ class PathwaySolverTaskDocument(BaseModel):
     )
     solver: Solver = Field(description="The pathway solver used to calculate pathways")
     balanced_paths: PathwaySet = Field(description="The balanced reaction pathways")
-    precursors: List[str] = Field(description="The precursor compositions")
-    targets: List[str] = Field(description="The target compositions")
+    precursors: list[str] = Field(description="The precursor compositions")
+    targets: list[str] = Field(description="The target compositions")
     net_rxn: ComputedReaction = Field(
         description="The net reaction used for pathway solving"
     )

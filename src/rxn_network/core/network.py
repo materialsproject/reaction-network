@@ -70,3 +70,36 @@ class Network(MSONable, metaclass=ABCMeta):
     def chemsys(self):
         """A string representing the chemical system (elements) of the network"""
         return "-".join(sorted(self.entries.chemsys))
+
+
+
+
+class GraphAdaptor(metaclass=ABCMeta):
+
+    @abstractmethod
+    def create(self):
+        """Create the graph"""
+
+    @abstractmethod
+    def add_node(self):
+        """Add a node/vertex to the graph"""
+
+    @abstractmethod
+    def add_edges(self):
+        """Add edges to the graph"""
+
+    @abstractmethod
+    def find_node(self):
+        """Find a node in the graph"""
+
+    @abstractmethod
+    def shortest_path(self):
+        """Find the shortest path between two nodes"""
+
+    @abstractmethod
+    def get_basic_pathway(self, path):
+        """Get a BasicPathway from a graph path"""
+
+    @abstractmethod
+    def k_shortest_paths(self, start_node, end_node):
+        """Find the k shortest paths between two nodes using Yen's algorithm"""

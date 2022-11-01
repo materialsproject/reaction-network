@@ -47,6 +47,20 @@ def test_unstable_reactions(irh_batio):
 
 
 @pytest.mark.parametrize(
+    "c1, c2, c3, expected_altitude",
+    [
+        ((0.0, 0.0), (0.5, -1.0), (1.0, 0.0), -1.0),
+        ((0.25, -0.5), (0.4, -0.8), (0.9, -0.63), -0.27),
+        ((0.33333, -0.23), (0.67777, 5.50), (0.8, 1.0), 4.822161),
+    ],
+)
+def test_calculate_altitude(c1, c2, c3, expected_altitude):
+    assert InterfaceReactionHull._calculate_altitude(c1, c2, c3) == pytest.approx(
+        expected_altitude
+    )
+
+
+@pytest.mark.parametrize(
     "x1, x2, expected_length",
     [(0, 1, 9), (0.3, 1, 9), (0.8, 0.9, 4), (0.9, 1, 3), (0.3, 0.4, 2)],
 )
@@ -55,6 +69,24 @@ def test_get_coords_in_range(x1, x2, expected_length, irh_batio):
     assert len(coords) == expected_length
     assert coords[0, 0] == pytest.approx(x1)
     assert coords[-1, 0] == pytest.approx(x2)
+
+
+def test_get_primary_selectivity(irh_batio, stable_rxn, unstable_rxn):
+    assert irh_batio.get_primary_selectivity(stable_rxn, temp=300) == pytest.approx(
+        1.7824197647022084
+    )
+    assert irh_batio.get_primary_selectivity(unstable_rxn, temp=300) == pytest.approx(
+        41.321218932490815
+    )
+
+
+def test_get_secondary_selectivity(irh_batio, stable_rxn, unstable_rxn):
+    assert irh_batio.get_secondary_selectivity(stable_rxn) == pytest.approx(
+        0.41705577943708827
+    )
+    assert irh_batio.get_secondary_selectivity(unstable_rxn) == pytest.approx(
+        1.4664328079494886
+    )
 
 
 def test_get_energy_above_hull(irh_batio, stable_rxn, unstable_rxn):
@@ -70,6 +102,41 @@ def test_get_energy_above_hull(irh_batio, stable_rxn, unstable_rxn):
 
     for r in irh_batio.stable_reactions:
         assert irh_batio.get_energy_above_hull(r) == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize(
+    "x1, x2, expected",
+    [
+        (0, 1, -322.0267006467209),
+        (0, 0.0001, 0.0),
+        (0, 0.428, 0.0),
+        (0, 0.430, -0.0011368030287497444),
+        (0, 0.500, -0.0488825302218695),
+        (0.5, 0.8, -0.06433079481994658),
+    ],
+)
+def test_get_decomposition_energy(x1, x2, expected, irh_batio):
+    assert irh_batio.get_decomposition_energy(x1, x2) == pytest.approx(expected)
+
+
+def test_get_decomposition_energy_and_num_paths_recursive(irh_batio):
+    (
+        decomp_energy,
+        num_paths,
+    ) = irh_batio.get_decomposition_energy_and_num_paths_recursive(0, 1)
+
+    assert decomp_energy == pytest.approx(irh_batio.get_decomposition_energy(0, 1))
+    assert num_paths == pytest.approx(
+        irh_batio.count(len(irh_batio.get_coords_in_range(0, 1)) - 2)
+    )
+
+
+@pytest.mark.parametrize(
+    "num, answer",
+    [(0, 1), (1, 1), (2, 2), (3, 5), (6, 132), (12, 208012), (18, 477638700)],
+)
+def test_count(num, answer, irh_batio):
+    assert irh_batio.count(num) == irh_batio._count_recursive(num)[0] == answer
 
 
 def test_hull_vertices(irh_batio):

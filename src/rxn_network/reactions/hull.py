@@ -1,12 +1,14 @@
 """Code for analyzing sets of reactions between two phases."""
 
-from functools import cached_property
-from typing import List
+from functools import cached_property, lru_cache
+from itertools import combinations
+from typing import List, Tuple
 
 import numpy as np
 import plotly.express as px
 from monty.json import MSONable
 from plotly.graph_objs import Figure
+from pymatgen.core.units import kb
 from scipy.spatial import ConvexHull
 
 from rxn_network.core.composition import Composition
@@ -163,6 +165,155 @@ class InterfaceReactionHull(MSONable):
 
         raise ValueError("No reactions found!")
 
+    def get_primary_selectivity(self, reaction: ComputedReaction, temp=300):
+        """
+        Calculates the competition score (c-score) for a given reaction. This formula is
+        based on a methodology presented in the following paper: (TBD)
+
+        Args:
+            reaction: Reaction to calculate the competition score for.
+
+        Returns:
+            The c-score for the reaction
+        """
+        energy = reaction.energy_per_atom
+        idx = self.reactions.index(reaction)
+        competing_rxns = self.reactions[:idx] + self.reactions[idx + 1 :]
+        primary = self._primary_selectivity_from_energies(
+            energy, [r.energy_per_atom for r in competing_rxns], temp
+        )
+
+        return primary
+
+    def get_secondary_selectivity(
+        self, reaction: ComputedReaction, normalize=True, recursive=False
+    ):
+        """
+        Calculates the score for a given reaction. This formula is based on a
+        methodology presented in the following paper: (TBD)
+
+        Args:
+            reaction: Reaction to calculate the selectivity score for.
+
+        Returns:
+            The selectivity score for the reaction
+        """
+        x = self.get_coordinate(reaction)
+        if recursive:
+            (
+                left_energy,
+                left_num_paths,
+            ) = self.get_decomposition_energy_and_num_paths_recursive(0, x)
+            (
+                right_energy,
+                right_num_paths,
+            ) = self.get_decomposition_energy_and_num_paths_recursive(x, 1)
+        else:
+            left_energy = self.get_decomposition_energy(0, x)
+            left_num_paths = self.count(len(self.get_coords_in_range(0, x)) - 2)
+            right_energy = self.get_decomposition_energy(x, 1)
+            right_num_paths = self.count(len(self.get_coords_in_range(x, 1)) - 2)
+
+        if left_num_paths == 0:
+            left_num_paths = 1
+        if right_num_paths == 0:
+            right_num_paths = 1
+
+        energy = left_energy * right_num_paths + right_energy * left_num_paths
+        total = left_num_paths * right_num_paths
+
+        if normalize:
+            energy = energy / total
+
+        e_above_hull = self.get_energy_above_hull(reaction)
+        energy -= e_above_hull
+
+        return -1 * energy
+
+    def get_secondary_selectivity_max_energy(self, reaction: ComputedReaction):
+        """
+        Calculates the score for a given reaction. This formula is based on a
+        methodology presented in the following paper: (TBD)
+
+        Args:
+            reaction: Reaction to calculate the selectivity score for.
+
+        Returns:
+            The selectivity score for the reaction
+        """
+        x = self.get_coordinate(reaction)
+        left_energy = self.get_max_decomposition_energy(0, x)
+        right_energy = self.get_max_decomposition_energy(x, 1)
+
+        return -1 * (left_energy + right_energy - self.get_energy_above_hull(reaction))
+
+    def get_secondary_selectivity_area(self, reaction: ComputedReaction):
+        """
+        Calculates the score for a given reaction. This formula is based on a
+        methodology presented in the following paper: (TBD)
+
+        Args:
+            reaction: Reaction to calculate the selectivity score for.
+
+        Returns:
+            The selectivity score for the reaction
+        """
+        x = self.get_coordinate(reaction)
+        left_area = self.get_decomposition_area(0, x)
+        right_area = self.get_decomposition_area(x, 1)
+
+        return left_area + right_area
+
+    def get_max_decomposition_energy(self, x1: float, x2: float):
+        coords = self.get_coords_in_range(x1, x2)
+
+        max_energy = 0
+
+        for c in combinations(range(len(coords)), 3):
+            i_left, i_mid, i_right = sorted(c)
+            c_left, c_mid, c_right = coords[[i_left, i_mid, i_right]]
+
+            energy = self._calculate_altitude(c_left, c_mid, c_right)
+            if energy < max_energy:
+                max_energy = energy
+
+        return max_energy
+
+    def get_decomposition_energy(self, x1: float, x2: float):
+        """
+        Calculates the energy of the reaction decomposition between two points.
+
+        Args:
+            x1: Coordinate of first point.
+            x2: Coordinate of second point.
+
+        Returns:
+            The energy of the reaction decomposition between the two points.
+        """
+        coords = self.get_coords_in_range(x1, x2)
+        n = len(coords) - 2
+
+        energy = 0
+        for c in combinations(range(len(coords)), 3):
+            i_left, i_mid, i_right = sorted(c)
+
+            c_left, c_mid, c_right = coords[[i_left, i_mid, i_right]]
+
+            n_left = (i_mid - i_left) - 1
+            n_right = (i_right - i_mid) - 1
+
+            count = self._altitude_multiplicity(n_left, n_right, n)
+            energy += count * self._calculate_altitude(c_left, c_mid, c_right)
+
+        return energy
+
+    def get_decomposition_area(self, x1: float, x2: float):
+        coords = self.get_coords_in_range(x1, x2)
+        if len(coords) == 2:
+            return 0
+
+        return ConvexHull(coords).volume  # this is how area is defined in scipy
+
     def get_coords_in_range(self, x1, x2):
         """
         Get the coordinates in the range [x1, x2].
@@ -203,6 +354,171 @@ class InterfaceReactionHull(MSONable):
         coords = np.array(coords)
 
         return coords[coords[:, 0].argsort()]
+
+    def count(self, num):
+        """
+        Reurns the number of decomposition pathways for the interface reaction hull
+        based on the number of **product** vertices (i.e., total # of vertices
+        considered - 2 reactant vertices).
+
+        Precomputed for hulls up to size 15. Otherwise, calls recursive implementation
+        of counting function.
+
+        Args:
+            num: Number of product vertices.
+        """
+        counts = [
+            1,
+            1,
+            2,
+            5,
+            14,
+            42,
+            132,
+            429,
+            1430,
+            4862,
+            16796,
+            58786,
+            208012,
+            742900,
+            2674440,
+        ]
+        if num < 15:
+            count = counts[num]
+        else:
+            count = self._count_recursive(num)[0]
+
+        return count
+
+    @lru_cache(maxsize=128)
+    def get_decomposition_energy_and_num_paths_recursive(
+        self, x1: float, x2: float, use_x_min_ref=True, use_x_max_ref=True
+    ) -> Tuple[float, int]:
+        """
+        This is a recursive implementation of the get_decomposition_energy function. It
+        significantly slower than the non-recursive implementation but is more
+        straightforward to understand. Both should return the same answer, however the
+        refcursive implementation also includes "free" computation of the total number
+        of paths. The function has been cached for speed.
+
+        Args:
+            x1: Coordinate of first point.
+            x2: Coordinate of second point.
+            use_x_min_ref: Useful for recursive calls. If true, uses the reactant at x=0
+                as the reference (sometimes there is a decomposition reaction of the
+                reactant that is lower in energy than the reactant).
+            use_x_max_ref: Useful for recursive calls. If true, uses the reactant at
+                x=1.0 as the reference (sometimes there is a decomposition reaction of
+                the reactant that is lower in energy than the reactant).
+
+        Returns:
+            Tuple of decomposition energy and the number of decomposition pathways.
+        """
+        all_coords = self.get_coords_in_range(x1, x2)
+
+        if not use_x_min_ref and all_coords[1, 0] == 0.0:
+            all_coords = all_coords[1:]
+        if not use_x_max_ref and all_coords[-1, 0] == 1.0:
+            all_coords = all_coords[:-1]
+
+        x_min, y_min = all_coords[0]
+        x_max, y_max = all_coords[-1]
+
+        coords = all_coords[1:-1, :]
+
+        if len(coords) == 0:
+            val, total = 0, 1
+            return val, total
+        if len(coords) == 1:
+            val = self._calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])
+            total = 1
+            return val, total
+
+        val = 0
+        total = 0
+        for c in coords:
+            if c[0] == 0.0 and not np.isclose(c[1], 0.0):
+                use_x_min_ref = False
+            elif c[0] == 1.0 and not np.isclose(c[1], 0.0):
+                use_x_max_ref = False
+
+            height = self._calculate_altitude([x_min, y_min], c, [x_max, y_max])
+            (
+                left_decomp,
+                left_total,
+            ) = self.get_decomposition_energy_and_num_paths_recursive(
+                x_min, c[0], use_x_min_ref, use_x_max_ref
+            )
+            (
+                right_decomp,
+                right_total,
+            ) = self.get_decomposition_energy_and_num_paths_recursive(
+                c[0], x_max, use_x_min_ref, use_x_max_ref
+            )
+
+            val += (
+                height * (left_total * right_total)
+                + left_decomp * right_total
+                + right_decomp * left_total
+            )
+            total += left_total * right_total
+
+        return val, total
+
+    @lru_cache(maxsize=128)
+    def _altitude_multiplicity(self, n_left, n_right, n):
+        """
+        This function is used in the non-recursive implementation of the
+        get_decomposition_energy function. It allows for rapid computation of the number
+        times (multiplicitly) that a particular altitude appears in the decomposition.
+
+        Args:
+            n_left: number of vertices occurring in between the leftmost and middle
+                vertices.
+            n_right: number of vertices occurring in between the middle and
+                rightmost vertices.
+            n: total number of product vertices in the full interface reaction hull
+                (i.e., not including the 2 reactant reference vertices )
+        """
+        remainder = n - n_left - n_right - 1
+        if remainder < 0:
+            return 0
+
+        return self.count(n_left) * self.count(n_right) * self.count(remainder)
+
+    def _count_recursive(self, n, cache=None):
+        """
+        A recursive implementation of the counting function.
+
+        This implementation is courtesy of @mcgalcode.
+        """
+        if cache is None:
+            cache = []
+        if n == 0:
+            return 1, [1]
+        if n == 1:
+            return 1, [1, 1]
+        if len(cache) >= n:
+            return cache[n], cache
+
+        total = 0
+        biggest_cache = []
+        for i in range(n):
+            left = i
+            right = n - i - 1
+            left_divs, c1 = self._count_recursive(left, biggest_cache)
+
+            right_divs, c2 = self._count_recursive(right, biggest_cache)
+
+            if len(c1) > len(biggest_cache):
+                biggest_cache = c1
+
+            if len(c2) > len(biggest_cache):
+                biggest_cache = c2
+
+            total += left_divs * right_divs
+        return total, biggest_cache + [total]
 
     def _get_scatter(self):
         marker_size = 10
@@ -269,3 +585,38 @@ class InterfaceReactionHull(MSONable):
         interface reaction hull.
         """
         return [r for i, r in enumerate(self.reactions) if i not in self.hull_vertices]
+
+    @staticmethod
+    def _calculate_altitude(c_left, c_mid, c_right):
+        """
+        Helper geometry method: calculates the altitude of a point on a line defined by
+        three points.
+
+        Args:
+            x1: point 1
+            x2: point 2
+            x3: point 3
+
+        Returns:
+            The altitude of the point
+        """
+        x1, y1 = c_left
+        x2, y2 = c_mid
+        x3, y3 = c_right
+
+        xd = (x2 - x1) / (x3 - x1)
+        yd = y1 + xd * (y3 - y1)
+
+        return y2 - yd
+
+    @staticmethod
+    def _primary_selectivity_from_energies(rxn_energy, other_rxn_energies, temp):
+        """
+        Calculates the primary selectivity given a list of reaction energy differences.
+        """
+        all_rxn_energies = np.append(other_rxn_energies, rxn_energy)
+        Q = np.sum(np.exp(-all_rxn_energies / (kb * temp)))
+
+        probability = np.exp(-rxn_energy / (kb * temp)) / Q
+
+        return -np.log(probability)

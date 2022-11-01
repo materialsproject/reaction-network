@@ -100,10 +100,10 @@ class ReactionSet(MSONable):
         for rxn in rxns:
             rxn_indices = []
             for e in rxn.entries:
-                idx = all_entry_indices.get(e.composition.reduced_formula)
+                idx = all_entry_indices.get(e)
                 if idx is None:
                     idx = entries.index(e)
-                    all_entry_indices[e.composition.reduced_formula] = idx
+                    all_entry_indices[e] = idx
                 rxn_indices.append(idx)
 
             indices.append(rxn_indices)
@@ -461,6 +461,18 @@ class ReactionSet(MSONable):
         added_elems_str = "-".join(sorted(list(added_elems)))
 
         return added_elems_str
+
+    @staticmethod
+    def _get_entry_key(entry: ComputedEntry) -> str:
+        """
+        Get a unique key for an entry. Assumes that a formula and energy alone should be
+        able to define a unique entry.
+
+        Args:
+            entry: Entry object
+
+        """
+        return f"{entry.composition.reduced_formula}_{round(entry.energy_per_atom, 4)}"
 
     @staticmethod
     def _get_unique_entries(rxns: Collection[ComputedReaction]) -> Set[ComputedEntry]:

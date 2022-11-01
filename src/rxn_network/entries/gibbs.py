@@ -329,6 +329,9 @@ class GibbsComputedEntry(ComputedEntry):
         if not type(other) is type(self):
             return False
 
+        if not np.isclose(self.temperature, other.temperature):
+            return False
+
         if not np.isclose(self.energy, other.energy):
             return False
 

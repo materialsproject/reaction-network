@@ -1,5 +1,22 @@
 # Changelog
 
+## [v7.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v7.0.0) (2022-10-27)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.1.1...v7.0.0)
+
+**Implemented enhancements:**
+
+- `graph-tool` is a slow/cumbersome to install dependency [\#84](https://github.com/GENESIS-EFRC/reaction-network/issues/84)
+
+**Closed issues:**
+
+- ray cannot parallelise the job among mutiple CPUs on HPC cluster [\#132](https://github.com/GENESIS-EFRC/reaction-network/issues/132)
+
+**Merged pull requests:**
+
+- Test github actions [\#176](https://github.com/GENESIS-EFRC/reaction-network/pull/176) ([mattmcdermott](https://github.com/mattmcdermott))
+- Swap graph-tool for rustworkx  [\#175](https://github.com/GENESIS-EFRC/reaction-network/pull/175) ([mattmcdermott](https://github.com/mattmcdermott))
+
 ## [v6.1.1](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.1.1) (2022-10-25)
 
 [Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.1.0...v6.1.1)
@@ -10,19 +27,19 @@
 
 ## [v6.1.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.1.0) (2022-10-25)
 
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.2...v6.1.0)
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.1...v6.1.0)
 
 **Merged pull requests:**
 
 - hopefully fix broken release workflow [\#173](https://github.com/GENESIS-EFRC/reaction-network/pull/173) ([mattmcdermott](https://github.com/mattmcdermott))
 
-## [v6.0.2](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.0.2) (2022-10-25)
-
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.1...v6.0.2)
-
 ## [v6.0.1](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.0.1) (2022-10-25)
 
-[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.0...v6.0.1)
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.2...v6.0.1)
+
+## [v6.0.2](https://github.com/GENESIS-EFRC/reaction-network/tree/v6.0.2) (2022-10-25)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.0.0...v6.0.2)
 
 **Merged pull requests:**
 
