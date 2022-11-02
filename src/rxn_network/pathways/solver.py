@@ -74,6 +74,7 @@ class PathwaySolver(Solver):
         use_basic_enumerator: bool = True,
         use_minimize_enumerator: bool = False,
         filter_interdependent: bool = True,
+        use_gpu: bool = False,
     ) -> PathwaySet:
         """
 
@@ -160,8 +161,13 @@ class PathwaySolver(Solver):
         batch_count = 1
         for n in range(1, max_num_combos + 1):
             for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
+                if use_gpu:
+                    path_balancer = _get_balanced_paths_ray_gpu
+                else:
+                    path_balancer = _get_balanced_paths_ray_cpu
+
                 paths_refs.append(
-                    _get_balanced_paths_ray.remote(
+                    path_balancer.remote(
                         group,
                         reaction_set,
                         costs,
