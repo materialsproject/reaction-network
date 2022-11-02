@@ -280,8 +280,86 @@ class PathwaySolver(Solver):
         return self._entries
 
 
-@njit(parallel=True, fastmath=True)
 def _balance_path_arrays(
+    comp_matrices: np.ndarray,
+    net_coeffs: np.ndarray,
+    use_gpu: bool,
+    tol: float = 1e-6,
+):
+    if use_gpu:
+        return _balance_path_arrays_gpu(comp_matrices, net_coeffs, tol)
+
+    return _balance_path_arrays_cpu(comp_matrices, net_coeffs, tol)
+
+
+def _balance_path_arrays_gpu(
+    comp_matrices: np.ndarray,
+    net_coeffs: np.ndarray,
+    tol: float = 1e-6,
+):
+    """
+    Fast solution for reaction multiplicities via mass balance stochiometric
+    constraints. Parallelized using Numba. Can be applied to large batches (100K-1M
+    sets of reactions at a time.)
+
+    Args:
+        comp_matrices: Array containing stoichiometric coefficients of all
+            compositions in all reactions, for each trial combination.
+        net_coeffs: Array containing stoichiometric coefficients of net reaction.
+        tol: numerical tolerance for determining if a multiplicity is zero
+            (reaction was removed).
+    """
+    import cupy as cp
+
+    comp_matrices = cp.asarray(comp_matrices)
+    net_coeffs = cp.asarray(net_coeffs)
+
+    shape = comp_matrices.shape
+    net_coeff_filter = cp.argwhere(net_coeffs != 0).flatten()
+    len_net_coeff_filter = len(net_coeff_filter)
+    all_multiplicities = cp.zeros((shape[0], shape[1]), cp.float64)
+    indices = cp.full(shape[0], False)
+
+    for i in prange(shape[0]):  # pylint: disable=not-an-iterable
+        correct = True
+        for j in range(len_net_coeff_filter):
+            idx = net_coeff_filter[j]
+            if not comp_matrices[i][:, idx].any():
+                correct = False
+                break
+        if not correct:
+            continue
+
+        comp_pinv = cp.linalg.pinv(comp_matrices[i]).T
+        multiplicities = comp_pinv @ net_coeffs
+        solved_coeffs = comp_matrices[i].T @ multiplicities
+
+        if (multiplicities < tol).any():
+            continue
+
+        if not (
+            cp.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * cp.abs(net_coeffs))
+        ).all():
+            continue
+
+        all_multiplicities[i] = multiplicities
+        indices[i] = True
+
+    filtered_indices = cp.argwhere(indices != 0).flatten()
+    length = filtered_indices.shape[0]
+    filtered_comp_matrices = cp.empty((length, shape[1], shape[2]), cp.float64)
+    filtered_multiplicities = cp.empty((length, shape[1]), np.float64)
+
+    for i in range(length):
+        idx = filtered_indices[i]
+        filtered_comp_matrices[i] = comp_matrices[idx]
+        filtered_multiplicities[i] = all_multiplicities[idx]
+
+    return filtered_comp_matrices, filtered_multiplicities
+
+
+@njit(parallel=True, fastmath=True)
+def _balance_path_arrays_cpu(
     comp_matrices: np.ndarray,
     net_coeffs: np.ndarray,
     tol: float = 1e-6,
@@ -355,7 +433,7 @@ def _create_comp_matrices(combos, rxns, num_entries):
 
 
 @ray.remote
-def _get_balanced_paths_ray(
+def _get_balanced_paths_ray_cpu(
     combos,
     reaction_set,
     costs,
@@ -365,12 +443,62 @@ def _get_balanced_paths_ray(
     open_elem,
     chempot,
 ):
+
+    return _get_balanced_paths_ray(
+        combos,
+        reaction_set,
+        costs,
+        entries,
+        num_entries,
+        net_rxn_vector,
+        open_elem,
+        chempot,
+        use_gpu=False,
+    )
+
+
+@ray.remote(num_gpus=1)
+def _get_balanced_paths_ray_gpu(
+    combos,
+    reaction_set,
+    costs,
+    entries,
+    num_entries,
+    net_rxn_vector,
+    open_elem,
+    chempot,
+):
+
+    return _get_balanced_paths_ray(
+        combos,
+        reaction_set,
+        costs,
+        entries,
+        num_entries,
+        net_rxn_vector,
+        open_elem,
+        chempot,
+        use_gpu=True,
+    )
+
+
+def _get_balanced_paths_ray(
+    combos,
+    reaction_set,
+    costs,
+    entries,
+    num_entries,
+    net_rxn_vector,
+    open_elem,
+    chempot,
+    use_gpu,
+):
     reactions = list(reaction_set.get_rxns())
     comp_matrices = _create_comp_matrices(combos, reactions, num_entries)
 
     paths = []
 
-    c_mats, m_mats = _balance_path_arrays(comp_matrices, net_rxn_vector)
+    c_mats, m_mats = _balance_path_arrays(comp_matrices, net_rxn_vector, use_gpu)
 
     for c_mat, m_mat in zip(c_mats, m_mats):
         path_rxns = []
