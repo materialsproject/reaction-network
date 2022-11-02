@@ -4,6 +4,7 @@ equations using matrix operations.
 """
 
 from copy import deepcopy
+from datetime import datetime
 from itertools import combinations
 from math import comb
 from typing import Union
@@ -152,7 +153,10 @@ class PathwaySolver(Solver):
         chempot = ray.put(self.chempot)
 
         num_rxns = len(reactions)
-        batch_size = self.batch_size or ray.cluster_resources()["CPU"] - 1
+        num_cpus = ray.cluster_resources()["CPU"]
+        batch_size = self.batch_size or num_cpus - 1
+        if use_gpu:
+            num_gpus = ray.cluster_resources()["GPU"]
 
         num_combos = sum(comb(num_rxns, k) for k in range(1, max_num_combos + 1))
         num_batches = int((num_combos // self.chunk_size + 1) // batch_size + 1)
@@ -160,15 +164,14 @@ class PathwaySolver(Solver):
         paths = []
         paths_refs = []
         batch_count = 1
+
+        gpus_in_use = 0
+
         for n in range(1, max_num_combos + 1):
             for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
-                if use_gpu:
+                if use_gpu and gpus_in_use <= num_gpus and n >= 4:
                     path_balancer = _get_balanced_paths_ray_gpu
-                else:
-                    path_balancer = _get_balanced_paths_ray_cpu
-
-                paths_refs.append(
-                    path_balancer.remote(
+                    gpu_ref = path_balancer.remote(
                         group,
                         reaction_set,
                         costs,
@@ -178,7 +181,23 @@ class PathwaySolver(Solver):
                         open_elem,
                         chempot,
                     )
-                )
+                    gpus_in_use += 1
+                    paths_refs.append(gpu_ref)
+                else:
+                    path_balancer = _get_balanced_paths_ray_cpu
+                    paths_refs.append(
+                        path_balancer.remote(
+                            group,
+                            reaction_set,
+                            costs,
+                            entries,
+                            num_entries,
+                            net_rxn_vector,
+                            open_elem,
+                            chempot,
+                        )
+                    )
+
                 if len(paths_refs) >= batch_size:
                     for paths_ref in tqdm(
                         to_iterator(paths_refs),
@@ -191,6 +210,7 @@ class PathwaySolver(Solver):
                         paths.extend(paths_ref)
 
                     batch_count += 1
+                    gpus_in_use = 0
 
                     paths_refs = []
 
@@ -305,9 +325,6 @@ def _balance_path_arrays_gpu(
     tol: float = 1e-6,
 ):
     """
-    Fast solution for reaction multiplicities via mass balance stochiometric
-    constraints. Parallelized using Numba. Can be applied to large batches (100K-1M
-    sets of reactions at a time.)
 
     Args:
         comp_matrices: Array containing stoichiometric coefficients of all
@@ -316,17 +333,23 @@ def _balance_path_arrays_gpu(
         tol: numerical tolerance for determining if a multiplicity is zero
             (reaction was removed).
     """
+    # start_time = datetime.now()
+
     comp_matrices = cp.asarray(comp_matrices)
     net_coeffs = cp.asarray(net_coeffs)
 
+    # checkpoint1 = datetime.now()
+    # print(f"Loading from CPU took: {checkpoint1 - start_time}")
+
     shape = comp_matrices.shape
     print(shape)
+
     net_coeff_filter = cp.argwhere(net_coeffs != 0).flatten()
     len_net_coeff_filter = len(net_coeff_filter)
     all_multiplicities = cp.zeros((shape[0], shape[1]), cp.float64)
     indices = cp.full(shape[0], False)
 
-    for i in range(shape[0]):  # pylint: disable=not-an-iterable
+    for i in range(shape[0]):
         correct = True
         for j in range(len_net_coeff_filter):
             idx = net_coeff_filter[j]
@@ -359,7 +382,16 @@ def _balance_path_arrays_gpu(
         filtered_comp_matrices[i] = comp_matrices[idx]
         filtered_multiplicities[i] = all_multiplicities[idx]
 
-    return cp.asnumpy(filtered_comp_matrices), cp.asnumpy(filtered_multiplicities)
+    # checkpoint2 = datetime.now()
+    # print(f"Operations took: {checkpoint2-checkpoint1}")
+
+    filtered_comp_matrices = cp.asnumpy(filtered_comp_matrices)
+    filtered_multiplicities = cp.asnumpy(filtered_multiplicities)
+
+    # checkpoint3 = datetime.now()
+    # print(f"Converting back to CPU took: {checkpoint3-checkpoint2}")
+
+    return filtered_comp_matrices, filtered_multiplicities
 
 
 @njit
