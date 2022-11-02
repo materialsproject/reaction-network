@@ -8,9 +8,10 @@ from itertools import combinations
 from math import comb
 from typing import Union
 
+import cupy as cp
 import numpy as np
 import ray
-from numba import njit, prange
+from numba import njit
 from pymatgen.core.composition import Element
 from tqdm import tqdm
 
@@ -315,18 +316,17 @@ def _balance_path_arrays_gpu(
         tol: numerical tolerance for determining if a multiplicity is zero
             (reaction was removed).
     """
-    import cupy as cp
-
     comp_matrices = cp.asarray(comp_matrices)
     net_coeffs = cp.asarray(net_coeffs)
 
     shape = comp_matrices.shape
+    print(shape)
     net_coeff_filter = cp.argwhere(net_coeffs != 0).flatten()
     len_net_coeff_filter = len(net_coeff_filter)
     all_multiplicities = cp.zeros((shape[0], shape[1]), cp.float64)
     indices = cp.full(shape[0], False)
 
-    for i in prange(shape[0]):  # pylint: disable=not-an-iterable
+    for i in range(shape[0]):  # pylint: disable=not-an-iterable
         correct = True
         for j in range(len_net_coeff_filter):
             idx = net_coeff_filter[j]
@@ -343,9 +343,7 @@ def _balance_path_arrays_gpu(
         if (multiplicities < tol).any():
             continue
 
-        if not (
-            cp.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * cp.abs(net_coeffs))
-        ).all():
+        if not (cp.allclose(net_coeffs, solved_coeffs)):
             continue
 
         all_multiplicities[i] = multiplicities
@@ -361,10 +359,10 @@ def _balance_path_arrays_gpu(
         filtered_comp_matrices[i] = comp_matrices[idx]
         filtered_multiplicities[i] = all_multiplicities[idx]
 
-    return filtered_comp_matrices, filtered_multiplicities
+    return cp.asnumpy(filtered_comp_matrices), cp.asnumpy(filtered_multiplicities)
 
 
-@njit(parallel=True, fastmath=True)
+@njit
 def _balance_path_arrays_cpu(
     comp_matrices: np.ndarray,
     net_coeffs: np.ndarray,
@@ -388,7 +386,7 @@ def _balance_path_arrays_cpu(
     all_multiplicities = np.zeros((shape[0], shape[1]), np.float64)
     indices = np.full(shape[0], False)
 
-    for i in prange(shape[0]):  # pylint: disable=not-an-iterable
+    for i in range(shape[0]):  # pylint: disable=not-an-iterable
         correct = True
         for j in range(len_net_coeff_filter):
             idx = net_coeff_filter[j]
@@ -474,7 +472,6 @@ def _get_balanced_paths_ray_gpu(
     open_elem,
     chempot,
 ):
-
     return _get_balanced_paths_ray(
         combos,
         reaction_set,
