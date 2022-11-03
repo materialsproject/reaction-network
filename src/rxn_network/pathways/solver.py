@@ -12,7 +12,7 @@ from typing import Union
 import cupy as cp
 import numpy as np
 import ray
-from numba import njit
+from numba import jit
 from pymatgen.core.composition import Element
 from tqdm import tqdm
 
@@ -77,6 +77,7 @@ class PathwaySolver(Solver):
         use_minimize_enumerator: bool = False,
         filter_interdependent: bool = True,
         use_gpu: bool = False,
+        cpu_gpu_ratio: Optional[int] = None,
     ) -> PathwaySet:
         """
 
@@ -110,11 +111,6 @@ class PathwaySolver(Solver):
 
         initialize_ray()
 
-        num_cpus = ray.cluster_resources()["CPU"]
-        batch_size = self.batch_size or num_cpus - 1
-        if use_gpu:
-            num_gpus = ray.cluster_resources()["GPU"]
-
         entries_copy = deepcopy(self.entries)
         entries = entries_copy.entries_list
         num_entries = len(entries)
@@ -135,7 +131,6 @@ class PathwaySolver(Solver):
                 intermediate_rxn_energy_cutoff,
                 use_basic_enumerator,
                 use_minimize_enumerator,
-                batch_size=batch_size,
             )
             intermediate_costs = [
                 self.cost_function.evaluate(r) for r in intermediate_rxns.get_rxns()
@@ -156,78 +151,111 @@ class PathwaySolver(Solver):
 
         net_rxn_vector = net_rxn.get_entry_idx_vector(num_entries)
 
-        reaction_set = ray.put(ReactionSet.from_rxns(cleaned_reactions))
-        entries = ray.put(entries)
-        costs = ray.put(cleaned_costs)
-        num_entries = ray.put(num_entries)
         net_rxn_vector = ray.put(net_rxn_vector)
-        open_elem = ray.put(self.open_elem)
-        chempot = ray.put(self.chempot)
 
         num_rxns = len(cleaned_reactions)
+        num_cpus = ray.cluster_resources()["CPU"]
+        batch_size = self.batch_size or num_cpus - 1
+        if use_gpu:
+            num_gpus = ray.cluster_resources()["GPU"]
+            cpu_gpu_ratio = cpu_gpu_ratio or num_cpus // num_gpus
 
         num_combos = sum(comb(num_rxns, k) for k in range(1, max_num_combos + 1))
         num_batches = int((num_combos // self.chunk_size + 1) // batch_size + 1)
 
-        paths = []
-        paths_refs = []
         batch_count = 1
 
-        gpus_in_use = 0
+        num_cpu_jobs = 0
+        num_gpu_jobs = 0
+
+        c_m_mats = []
+        c_m_mats_refs = []
 
         for n in range(1, max_num_combos + 1):
             for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
-                if use_gpu and gpus_in_use <= num_gpus and n >= 4:
-                    path_balancer = _get_balanced_paths_ray_gpu
-                    gpu_ref = path_balancer.remote(
-                        group,
-                        reaction_set,
-                        costs,
-                        entries,
-                        num_entries,
-                        net_rxn_vector,
-                        open_elem,
-                        chempot,
-                    )
-                    gpus_in_use += 1
-                    paths_refs.append(gpu_ref)
-                else:
-                    path_balancer = _get_balanced_paths_ray_cpu
-                    paths_refs.append(
-                        path_balancer.remote(
-                            group,
-                            reaction_set,
-                            costs,
-                            entries,
-                            num_entries,
-                            net_rxn_vector,
-                            open_elem,
-                            chempot,
-                        )
-                    )
+                comp_matrices = _create_comp_matrices(
+                    group, cleaned_reactions, num_entries
+                )
 
-                if len(paths_refs) >= batch_size:
-                    for paths_ref in tqdm(
-                        to_iterator(paths_refs),
-                        total=len(paths_refs),
+                if use_gpu and (
+                    num_gpu_jobs <= num_gpus
+                    or num_cpu_jobs / num_gpu_jobs > cpu_gpu_ratio
+                ):
+                    path_balancer = _balance_path_arrays_gpu
+                    num_gpu_jobs += 1
+                else:
+                    path_balancer = _balance_path_arrays_cpu_wrapper
+                    num_cpu_jobs += 1
+
+                c_m_mats_refs.append(
+                    path_balancer.remote(
+                        comp_matrices,
+                        net_rxn_vector,
+                    )
+                )
+
+                if len(c_m_mats_refs) >= batch_size:
+                    for c_m_mats_ref in tqdm(
+                        to_iterator(c_m_mats_refs),
+                        total=len(c_m_mats_refs),
                         desc=(
                             f"{self.__class__.__name__} (Batch"
                             f" {batch_count}/{num_batches})"
                         ),
                     ):
-                        paths.extend(paths_ref)
+                        c_m_mats.append(c_m_mats_ref)
 
                     batch_count += 1
-                    gpus_in_use = 0
 
-                    paths_refs = []
+                    num_cpu_jobs = 0
+                    num_gpu_jobs = 0
 
-        for paths_ref in tqdm(
-            to_iterator(paths_refs),
-            total=len(paths_refs),
+                    c_m_mats_refs = []
+
+        for c_m_mats_ref in tqdm(
+            to_iterator(c_m_mats_refs),
+            total=len(c_m_mats_refs),
             desc=f"{self.__class__.__name__} (Batch {batch_count}/{num_batches})",
         ):
-            paths.extend(paths_ref)
+            c_m_mats.append(c_m_mats_ref)
+
+        c_mats, m_mats = zip(*c_m_mats)
+        c_mats = [mat for mats in c_mats for mat in mats]
+        m_mats = [mat for mats in m_mats for mat in mats]
+
+        paths = []
+        for c_mat, m_mat in zip(c_mats, m_mats):
+            path_rxns = []
+            path_costs = []
+
+            for rxn_mat in c_mat:
+                ents, coeffs = zip(
+                    *[
+                        (entries[idx], c)
+                        for idx, c in enumerate(rxn_mat)
+                        if not np.isclose(c, 0.0)
+                    ]
+                )
+
+                if self.open_elem is not None:
+                    rxn = OpenComputedReaction(
+                        entries=ents,
+                        coefficients=coeffs,
+                        chempots={self.open_elem: self.chempot},
+                    )
+
+                else:
+                    rxn = ComputedReaction(entries=ents, coefficients=coeffs)
+
+                try:
+                    path_rxns.append(rxn)
+                    path_costs.append(costs[reactions.index(rxn)])
+                except Exception as e:
+                    print(e)
+                    continue
+
+            p = BalancedPathway(path_rxns, m_mat.flatten(), path_costs, balanced=True)
+            paths.append(p)
 
         filtered_paths = []
         if filter_interdependent:
@@ -249,7 +277,6 @@ class PathwaySolver(Solver):
         energy_cutoff,
         use_basic_enumerator,
         use_minimize_enumerator,
-        batch_size=None,
     ):
         """
         Method for finding intermediate reactions using enumerators and
@@ -276,9 +303,7 @@ class PathwaySolver(Solver):
 
         if use_basic_enumerator:
             be = BasicEnumerator(targets=target_formulas, calculate_e_above_hulls=False)
-            rxn_set = rxn_set.add_rxn_set(
-                be.enumerate(intermediates, batch_size=batch_size)
-            )
+            rxn_set = rxn_set.add_rxn_set(be.enumerate(intermediates))
 
             if self.open_elem:
                 boe = BasicOpenEnumerator(
@@ -287,17 +312,13 @@ class PathwaySolver(Solver):
                     calculate_e_above_hulls=False,
                 )
 
-                rxn_set = rxn_set.add_rxn_set(
-                    boe.enumerate(intermediates, batch_size=batch_size)
-                )
+                rxn_set = rxn_set.add_rxn_set(boe.enumerate(intermediates))
 
         if use_minimize_enumerator:
             mge = MinimizeGibbsEnumerator(
                 targets=target_formulas, calculate_e_above_hulls=False
             )
-            rxn_set = rxn_set.add_rxn_set(
-                mge.enumerate(intermediates, batch_size=batch_size)
-            )
+            rxn_set = rxn_set.add_rxn_set(mge.enumerate(intermediates))
 
             if self.open_elem:
                 mgpe = MinimizeGrandPotentialEnumerator(
@@ -305,9 +326,7 @@ class PathwaySolver(Solver):
                     mu=self.chempot,
                     targets=target_formulas,
                 )
-                rxn_set.add_rxn_set(
-                    mgpe.enumerate(intermediates, batch_size=batch_size)
-                )
+                rxn_set.add_rxn_set(mgpe.enumerate(intermediates))
 
         rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxn_set))
         rxns = [r for r in rxns if all(e in intermediates for e in r.entries)]
@@ -324,18 +343,7 @@ class PathwaySolver(Solver):
         return self._entries
 
 
-def _balance_path_arrays(
-    comp_matrices: np.ndarray,
-    net_coeffs: np.ndarray,
-    use_gpu: bool,
-    tol: float = 1e-6,
-):
-    if use_gpu:
-        return _balance_path_arrays_gpu(comp_matrices, net_coeffs, tol)
-
-    return _balance_path_arrays_cpu(comp_matrices, net_coeffs, tol)
-
-
+@ray.remote(num_gpus=1)
 def _balance_path_arrays_gpu(
     comp_matrices: np.ndarray,
     net_coeffs: np.ndarray,
@@ -402,7 +410,7 @@ def _balance_path_arrays_gpu(
     return filtered_comp_matrices, filtered_multiplicities
 
 
-@njit
+@jit(nopython=True)
 def _balance_path_arrays_cpu(
     comp_matrices: np.ndarray,
     net_coeffs: np.ndarray,
@@ -426,7 +434,6 @@ def _balance_path_arrays_cpu(
     all_multiplicities = np.zeros((shape[0], shape[1]), np.float64)
     indices = np.full(shape[0], False)
 
-    bad_count = 0
     for i in range(shape[0]):  # pylint: disable=not-an-iterable
         correct = True
         for j in range(len_net_coeff_filter):
@@ -442,7 +449,6 @@ def _balance_path_arrays_cpu(
         solved_coeffs = comp_matrices[i].T @ multiplicities
 
         if (multiplicities < tol).any():
-            bad_count += 1
             continue
 
         if not (
@@ -480,106 +486,9 @@ def _create_comp_matrices(combos, rxns, num_entries):
 
 
 @ray.remote
-def _get_balanced_paths_ray_cpu(
-    combos,
-    reaction_set,
-    costs,
-    entries,
-    num_entries,
+def _balance_path_arrays_cpu_wrapper(
+    comp_matrices,
     net_rxn_vector,
-    open_elem,
-    chempot,
 ):
 
-    return _get_balanced_paths_ray(
-        combos,
-        reaction_set,
-        costs,
-        entries,
-        num_entries,
-        net_rxn_vector,
-        open_elem,
-        chempot,
-        use_gpu=False,
-    )
-
-
-@ray.remote(num_gpus=1)
-def _get_balanced_paths_ray_gpu(
-    combos,
-    reaction_set,
-    costs,
-    entries,
-    num_entries,
-    net_rxn_vector,
-    open_elem,
-    chempot,
-):
-    return _get_balanced_paths_ray(
-        combos,
-        reaction_set,
-        costs,
-        entries,
-        num_entries,
-        net_rxn_vector,
-        open_elem,
-        chempot,
-        use_gpu=True,
-    )
-
-
-def _get_balanced_paths_ray(
-    combos,
-    reaction_set,
-    costs,
-    entries,
-    num_entries,
-    net_rxn_vector,
-    open_elem,
-    chempot,
-    use_gpu,
-):
-    reactions = list(reaction_set.get_rxns())
-    # start_time = datetime.now()
-    # print("Starting comp matrices...")
-    comp_matrices = _create_comp_matrices(combos, reactions, num_entries)
-    # print(f"Finished comp matrices at {datetime.now() - start_time}")
-
-    paths = []
-
-    c_mats, m_mats = _balance_path_arrays(comp_matrices, net_rxn_vector, use_gpu)
-
-    for c_mat, m_mat in zip(c_mats, m_mats):
-        path_rxns = []
-        path_costs = []
-
-        for rxn_mat in c_mat:
-            ents, coeffs = zip(
-                *[
-                    (entries[idx], c)
-                    for idx, c in enumerate(rxn_mat)
-                    if not np.isclose(c, 0.0)
-                ]
-            )
-
-            if open_elem is not None:
-                rxn = OpenComputedReaction(
-                    entries=ents,
-                    coefficients=coeffs,
-                    chempots={open_elem: chempot},
-                )
-
-            else:
-                rxn = ComputedReaction(entries=ents, coefficients=coeffs)
-
-            try:
-                path_rxns.append(rxn)
-                path_costs.append(costs[reactions.index(rxn)])
-            except Exception as e:
-                print(e)
-                continue
-
-        p = BalancedPathway(path_rxns, m_mat.flatten(), path_costs, balanced=True)
-        paths.append(p)
-
-    return paths
+    return _balance_path_arrays_cpu(comp_matrices, net_rxn_vector)
