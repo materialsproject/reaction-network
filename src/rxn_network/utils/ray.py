@@ -41,11 +41,14 @@ def initialize_ray(quiet=False):
             )
 
 
-def to_iterator(obj_ids):
+def to_iterator(obj_ids, get_obj_ids=False):
     """
     Method to convert a list of ray object ids to an iterator that can be used in a for
     loop.
     """
     while obj_ids:
         done, obj_ids = ray.wait(obj_ids)
-        yield ray.get(done[0])
+        if get_obj_ids:
+            yield done[0], ray.get(done[0])
+        else:
+            yield ray.get(done[0])

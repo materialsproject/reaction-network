@@ -8,6 +8,8 @@ from itertools import combinations
 from math import comb
 from typing import Union
 
+from datetime import datetime
+
 import cupy as cp
 import numpy as np
 import ray
@@ -137,22 +139,25 @@ class PathwaySolver(Solver):
                 if r not in reactions:
                     reactions.append(r)
                     costs.append(c)
-
+                
+        clean_r_set = ReactionSet.from_rxns(reactions, filter_duplicates=True)
+        cleaned_reactions, cleaned_costs = zip(*[(r, c) for r,c in zip(reactions,costs) if r in clean_r_set and r != net_rxn])
+        
         net_rxn_vector = net_rxn.get_entry_idx_vector(num_entries)
 
-        if net_rxn in reactions:
-            reactions.remove(net_rxn)
-
-        reaction_set = ray.put(ReactionSet.from_rxns(reactions))
+        reaction_set = ray.put(ReactionSet.from_rxns(cleaned_reactions))
         entries = ray.put(entries)
-        costs = ray.put(costs)
+        costs = ray.put(cleaned_costs)
         num_entries = ray.put(num_entries)
         net_rxn_vector = ray.put(net_rxn_vector)
         open_elem = ray.put(self.open_elem)
         chempot = ray.put(self.chempot)
 
-        num_rxns = len(reactions)
-        batch_size = self.batch_size or ray.cluster_resources()["CPU"] - 1
+        num_rxns = len(cleaned_reactions)
+        num_cpus = ray.cluster_resources()["CPU"]
+        batch_size = self.batch_size or num_cpus - 1
+        if use_gpu:
+            num_gpus = ray.cluster_resources()["GPU"]
 
         num_combos = sum(comb(num_rxns, k) for k in range(1, max_num_combos + 1))
         num_batches = int((num_combos // self.chunk_size + 1) // batch_size + 1)
@@ -160,25 +165,40 @@ class PathwaySolver(Solver):
         paths = []
         paths_refs = []
         batch_count = 1
+
+        gpus_in_use = 0
+
         for n in range(1, max_num_combos + 1):
             for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
-                if use_gpu:
+                if use_gpu and gpus_in_use <= num_gpus and n>=4:
                     path_balancer = _get_balanced_paths_ray_gpu
+                    gpu_ref = path_balancer.remote(
+                            group,
+                            reaction_set,
+                            costs,
+                            entries,
+                            num_entries,
+                            net_rxn_vector,
+                            open_elem,
+                            chempot,
+                        )
+                    gpus_in_use += 1
+                    paths_refs.append(gpu_ref)
                 else:
                     path_balancer = _get_balanced_paths_ray_cpu
-
-                paths_refs.append(
-                    path_balancer.remote(
-                        group,
-                        reaction_set,
-                        costs,
-                        entries,
-                        num_entries,
-                        net_rxn_vector,
-                        open_elem,
-                        chempot,
+                    paths_refs.append(
+                        path_balancer.remote(
+                            group,
+                            reaction_set,
+                            costs,
+                            entries,
+                            num_entries,
+                            net_rxn_vector,
+                            open_elem,
+                            chempot,
+                        )
                     )
-                )
+
                 if len(paths_refs) >= batch_size:
                     for paths_ref in tqdm(
                         to_iterator(paths_refs),
@@ -191,6 +211,7 @@ class PathwaySolver(Solver):
                         paths.extend(paths_ref)
 
                     batch_count += 1
+                    gpus_in_use = 0
 
                     paths_refs = []
 
@@ -305,9 +326,6 @@ def _balance_path_arrays_gpu(
     tol: float = 1e-6,
 ):
     """
-    Fast solution for reaction multiplicities via mass balance stochiometric
-    constraints. Parallelized using Numba. Can be applied to large batches (100K-1M
-    sets of reactions at a time.)
 
     Args:
         comp_matrices: Array containing stoichiometric coefficients of all
@@ -316,50 +334,50 @@ def _balance_path_arrays_gpu(
         tol: numerical tolerance for determining if a multiplicity is zero
             (reaction was removed).
     """
+    start_time = datetime.now()
+
     comp_matrices = cp.asarray(comp_matrices)
     net_coeffs = cp.asarray(net_coeffs)
 
+    checkpoint1 = datetime.now()
+    # print(f"Loading from CPU took: {checkpoint1 - start_time}")
+
     shape = comp_matrices.shape
-    print(shape)
+    print("original shape", shape)
+
     net_coeff_filter = cp.argwhere(net_coeffs != 0).flatten()
-    len_net_coeff_filter = len(net_coeff_filter)
-    all_multiplicities = cp.zeros((shape[0], shape[1]), cp.float64)
-    indices = cp.full(shape[0], False)
 
-    for i in range(shape[0]):  # pylint: disable=not-an-iterable
-        correct = True
-        for j in range(len_net_coeff_filter):
-            idx = net_coeff_filter[j]
-            if not comp_matrices[i][:, idx].any():
-                correct = False
-                break
-        if not correct:
-            continue
+    # filter bad matrices
+    comp_matrices_filtered = comp_matrices[comp_matrices[:,:,net_coeff_filter].any(axis=1).all(axis=1)]
+    print("new shape", comp_matrices_filtered.shape)
 
-        comp_pinv = cp.linalg.pinv(comp_matrices[i]).T
-        multiplicities = comp_pinv @ net_coeffs
-        solved_coeffs = comp_matrices[i].T @ multiplicities
+    comp_pinv = cp.linalg.pinv(comp_matrices_filtered).transpose(0,2,1)
+    multiplicities = comp_pinv @ net_coeffs
+    multiplicities_filter = (multiplicities < tol).any(axis=1)
 
-        if (multiplicities < tol).any():
-            continue
+    multiplicities = multiplicities[~multiplicities_filter]
+    comp_matrices_filtered = comp_matrices_filtered[~multiplicities_filter]
 
-        if not (cp.allclose(net_coeffs, solved_coeffs)):
-            continue
+    stack_size = len(comp_matrices_filtered)
+    solved_coeffs = (comp_matrices_filtered.transpose(0,2,1) @ multiplicities.reshape(stack_size,-1,1)).reshape(stack_size,-1)
 
-        all_multiplicities[i] = multiplicities
-        indices[i] = True
+    correct_filter = cp.isclose(solved_coeffs, cp.repeat(net_coeffs.reshape(1,-1), stack_size, axis=0)).all(axis=1)
 
-    filtered_indices = cp.argwhere(indices != 0).flatten()
-    length = filtered_indices.shape[0]
-    filtered_comp_matrices = cp.empty((length, shape[1], shape[2]), cp.float64)
-    filtered_multiplicities = cp.empty((length, shape[1]), np.float64)
+    filtered_comp_matrices = comp_matrices_filtered[correct_filter]
+    filtered_multiplicities = multiplicities[correct_filter]
 
-    for i in range(length):
-        idx = filtered_indices[i]
-        filtered_comp_matrices[i] = comp_matrices[idx]
-        filtered_multiplicities[i] = all_multiplicities[idx]
+    checkpoint2 = datetime.now()
+    print(f"GPU main operations took: {checkpoint2-checkpoint1}")
 
-    return cp.asnumpy(filtered_comp_matrices), cp.asnumpy(filtered_multiplicities)
+    filtered_comp_matrices = cp.asnumpy(filtered_comp_matrices)
+    filtered_multiplicities = cp.asnumpy(filtered_multiplicities)
+
+    # checkpoint3 = datetime.now()
+    # print(f"Converting back to CPU took: {checkpoint3-checkpoint2}")
+    print("I'm done - GPU!")
+
+    return filtered_comp_matrices, filtered_multiplicities
+
 
 
 @njit
@@ -421,6 +439,7 @@ def _balance_path_arrays_cpu(
         filtered_comp_matrices[i] = comp_matrices[idx]
         filtered_multiplicities[i] = all_multiplicities[idx]
 
+    print("I'm done - CPU!")
     return filtered_comp_matrices, filtered_multiplicities
 
 
@@ -497,7 +516,10 @@ def _get_balanced_paths_ray(
     use_gpu,
 ):
     reactions = list(reaction_set.get_rxns())
+    # start_time = datetime.now()
+    # print("Starting comp matrices...")
     comp_matrices = _create_comp_matrices(combos, reactions, num_entries)
+    # print(f"Finished comp matrices at {datetime.now() - start_time}")
 
     paths = []
 
