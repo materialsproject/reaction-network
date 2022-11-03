@@ -1,9 +1,10 @@
 """ Tests for PathwaySolver"""
 from pathlib import Path
-import pytest
-import numpy as np
-from rxn_network.pathways.solver import _balance_path_arrays
 
+import numpy as np
+import pytest
+
+from rxn_network.pathways.solver import _balance_path_arrays
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 ARRAY_FILE = "comp_matrices.npy"
