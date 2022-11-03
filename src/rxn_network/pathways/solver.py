@@ -9,8 +9,6 @@ from itertools import combinations
 from math import comb
 from typing import Union
 
-from datetime import datetime
-
 import cupy as cp
 import numpy as np
 import ray
@@ -112,6 +110,11 @@ class PathwaySolver(Solver):
 
         initialize_ray()
 
+        num_cpus = ray.cluster_resources()["CPU"]
+        batch_size = self.batch_size or num_cpus - 1
+        if use_gpu:
+            num_gpus = ray.cluster_resources()["GPU"]
+
         entries_copy = deepcopy(self.entries)
         entries = entries_copy.entries_list
         num_entries = len(entries)
@@ -141,10 +144,16 @@ class PathwaySolver(Solver):
                 if r not in reactions:
                     reactions.append(r)
                     costs.append(c)
-                
+
         clean_r_set = ReactionSet.from_rxns(reactions, filter_duplicates=True)
-        cleaned_reactions, cleaned_costs = zip(*[(r, c) for r,c in zip(reactions,costs) if r in clean_r_set and r != net_rxn])
-        
+        cleaned_reactions, cleaned_costs = zip(
+            *[
+                (r, c)
+                for r, c in zip(reactions, costs)
+                if r in clean_r_set and r != net_rxn
+            ]
+        )
+
         net_rxn_vector = net_rxn.get_entry_idx_vector(num_entries)
 
         reaction_set = ray.put(ReactionSet.from_rxns(cleaned_reactions))
@@ -156,10 +165,6 @@ class PathwaySolver(Solver):
         chempot = ray.put(self.chempot)
 
         num_rxns = len(cleaned_reactions)
-        num_cpus = ray.cluster_resources()["CPU"]
-        batch_size = self.batch_size or num_cpus - 1
-        if use_gpu:
-            num_gpus = ray.cluster_resources()["GPU"]
 
         num_combos = sum(comb(num_rxns, k) for k in range(1, max_num_combos + 1))
         num_batches = int((num_combos // self.chunk_size + 1) // batch_size + 1)
@@ -172,18 +177,18 @@ class PathwaySolver(Solver):
 
         for n in range(1, max_num_combos + 1):
             for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
-                if use_gpu and gpus_in_use <= num_gpus and n>=4:
+                if use_gpu and gpus_in_use <= num_gpus and n >= 4:
                     path_balancer = _get_balanced_paths_ray_gpu
                     gpu_ref = path_balancer.remote(
-                            group,
-                            reaction_set,
-                            costs,
-                            entries,
-                            num_entries,
-                            net_rxn_vector,
-                            open_elem,
-                            chempot,
-                        )
+                        group,
+                        reaction_set,
+                        costs,
+                        entries,
+                        num_entries,
+                        net_rxn_vector,
+                        open_elem,
+                        chempot,
+                    )
                     gpus_in_use += 1
                     paths_refs.append(gpu_ref)
                 else:
@@ -359,10 +364,12 @@ def _balance_path_arrays_gpu(
     net_coeff_filter = cp.argwhere(net_coeffs != 0).flatten()
 
     # filter bad matrices
-    comp_matrices_filtered = comp_matrices[comp_matrices[:,:,net_coeff_filter].any(axis=1).all(axis=1)]
+    comp_matrices_filtered = comp_matrices[
+        comp_matrices[:, :, net_coeff_filter].any(axis=1).all(axis=1)
+    ]
     print("new shape", comp_matrices_filtered.shape)
 
-    comp_pinv = cp.linalg.pinv(comp_matrices_filtered).transpose(0,2,1)
+    comp_pinv = cp.linalg.pinv(comp_matrices_filtered).transpose(0, 2, 1)
     multiplicities = comp_pinv @ net_coeffs
     multiplicities_filter = (multiplicities < tol).any(axis=1)
 
@@ -370,9 +377,14 @@ def _balance_path_arrays_gpu(
     comp_matrices_filtered = comp_matrices_filtered[~multiplicities_filter]
 
     stack_size = len(comp_matrices_filtered)
-    solved_coeffs = (comp_matrices_filtered.transpose(0,2,1) @ multiplicities.reshape(stack_size,-1,1)).reshape(stack_size,-1)
+    solved_coeffs = (
+        comp_matrices_filtered.transpose(0, 2, 1)
+        @ multiplicities.reshape(stack_size, -1, 1)
+    ).reshape(stack_size, -1)
 
-    correct_filter = cp.isclose(solved_coeffs, cp.repeat(net_coeffs.reshape(1,-1), stack_size, axis=0)).all(axis=1)
+    correct_filter = cp.isclose(
+        solved_coeffs, cp.repeat(net_coeffs.reshape(1, -1), stack_size, axis=0)
+    ).all(axis=1)
 
     filtered_comp_matrices = comp_matrices_filtered[correct_filter]
     filtered_multiplicities = multiplicities[correct_filter]
@@ -388,7 +400,6 @@ def _balance_path_arrays_gpu(
     print("I'm done - GPU!")
 
     return filtered_comp_matrices, filtered_multiplicities
-
 
 
 @njit
