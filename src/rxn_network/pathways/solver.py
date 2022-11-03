@@ -132,6 +132,7 @@ class PathwaySolver(Solver):
                 intermediate_rxn_energy_cutoff,
                 use_basic_enumerator,
                 use_minimize_enumerator,
+                batch_size=batch_size,
             )
             intermediate_costs = [
                 self.cost_function.evaluate(r) for r in intermediate_rxns.get_rxns()
@@ -243,6 +244,7 @@ class PathwaySolver(Solver):
         energy_cutoff,
         use_basic_enumerator,
         use_minimize_enumerator,
+        batch_size=None,
     ):
         """
         Method for finding intermediate reactions using enumerators and
@@ -269,7 +271,9 @@ class PathwaySolver(Solver):
 
         if use_basic_enumerator:
             be = BasicEnumerator(targets=target_formulas, calculate_e_above_hulls=False)
-            rxn_set = rxn_set.add_rxn_set(be.enumerate(intermediates))
+            rxn_set = rxn_set.add_rxn_set(
+                be.enumerate(intermediates, batch_size=batch_size)
+            )
 
             if self.open_elem:
                 boe = BasicOpenEnumerator(
@@ -278,13 +282,17 @@ class PathwaySolver(Solver):
                     calculate_e_above_hulls=False,
                 )
 
-                rxn_set = rxn_set.add_rxn_set(boe.enumerate(intermediates))
+                rxn_set = rxn_set.add_rxn_set(
+                    boe.enumerate(intermediates, batch_size=batch_size)
+                )
 
         if use_minimize_enumerator:
             mge = MinimizeGibbsEnumerator(
                 targets=target_formulas, calculate_e_above_hulls=False
             )
-            rxn_set = rxn_set.add_rxn_set(mge.enumerate(intermediates))
+            rxn_set = rxn_set.add_rxn_set(
+                mge.enumerate(intermediates, batch_size=batch_size)
+            )
 
             if self.open_elem:
                 mgpe = MinimizeGrandPotentialEnumerator(
@@ -292,7 +300,9 @@ class PathwaySolver(Solver):
                     mu=self.chempot,
                     targets=target_formulas,
                 )
-                rxn_set.add_rxn_set(mgpe.enumerate(intermediates))
+                rxn_set.add_rxn_set(
+                    mgpe.enumerate(intermediates, batch_size=batch_size)
+                )
 
         rxns = list(filter(lambda x: x.energy_per_atom < energy_cutoff, rxn_set))
         rxns = [r for r in rxns if all(e in intermediates for e in r.entries)]
@@ -405,6 +415,7 @@ def _balance_path_arrays_cpu(
     all_multiplicities = np.zeros((shape[0], shape[1]), np.float64)
     indices = np.full(shape[0], False)
 
+    bad_count = 0
     for i in range(shape[0]):  # pylint: disable=not-an-iterable
         correct = True
         for j in range(len_net_coeff_filter):
@@ -420,6 +431,7 @@ def _balance_path_arrays_cpu(
         solved_coeffs = comp_matrices[i].T @ multiplicities
 
         if (multiplicities < tol).any():
+            bad_count += 1
             continue
 
         if not (
