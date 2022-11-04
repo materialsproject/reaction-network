@@ -7,7 +7,9 @@ from copy import deepcopy
 from datetime import datetime
 from itertools import combinations
 from math import comb
-from typing import Union
+from typing import Union, Optional
+
+from datetime import datetime
 
 import cupy as cp
 import numpy as np
@@ -30,9 +32,11 @@ from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils.funcs import grouper
+from rxn_network.utils.funcs import grouper, get_logger
 from rxn_network.utils.ray import initialize_ray, to_iterator
 
+
+logger = get_logger(__name__)
 
 class PathwaySolver(Solver):
     """
@@ -77,7 +81,7 @@ class PathwaySolver(Solver):
         use_minimize_enumerator: bool = False,
         filter_interdependent: bool = True,
         use_gpu: bool = False,
-        cpu_gpu_ratio: Optional[int] = None,
+        cpu_gpu_ratio: Optional[int] = None
     ) -> PathwaySet:
         """
 
@@ -121,10 +125,10 @@ class PathwaySolver(Solver):
         precursors = deepcopy(net_rxn.reactant_entries)
         targets = deepcopy(net_rxn.product_entries)
 
-        self.logger.info(f"Net reaction: {net_rxn} \n")
+        logger.info(f"Net reaction: {net_rxn} \n")
 
         if find_intermediate_rxns:
-            self.logger.info("Identifying reactions between intermediates...")
+            logger.info("Identifying reactions between intermediates...")
 
             intermediate_rxns = self._find_intermediate_rxns(
                 targets,
@@ -139,19 +143,11 @@ class PathwaySolver(Solver):
                 if r not in reactions:
                     reactions.append(r)
                     costs.append(c)
-
+                
         clean_r_set = ReactionSet.from_rxns(reactions, filter_duplicates=True)
-        cleaned_reactions, cleaned_costs = zip(
-            *[
-                (r, c)
-                for r, c in zip(reactions, costs)
-                if r in clean_r_set and r != net_rxn
-            ]
-        )
-
+        cleaned_reactions, cleaned_costs = zip(*[(r, c) for r,c in zip(reactions,costs) if r in clean_r_set and r != net_rxn])
+        
         net_rxn_vector = net_rxn.get_entry_idx_vector(num_entries)
-
-        net_rxn_vector = ray.put(net_rxn_vector)
 
         num_rxns = len(cleaned_reactions)
         num_cpus = ray.cluster_resources()["CPU"]
@@ -160,10 +156,34 @@ class PathwaySolver(Solver):
             num_gpus = ray.cluster_resources()["GPU"]
             cpu_gpu_ratio = cpu_gpu_ratio or num_cpus // num_gpus
 
-        num_combos = sum(comb(num_rxns, k) for k in range(1, max_num_combos + 1))
-        num_batches = int((num_combos // self.chunk_size + 1) // batch_size + 1)
+        net_coeff_filter = np.argwhere(net_rxn_vector != 0).flatten()
+        net_coeff_filter = ray.put(net_coeff_filter)
+        cleaned_reactions = ray.put(cleaned_reactions)
 
-        batch_count = 1
+        comp_matrices = {n: [] for n in range(1, max_num_combos + 1)}
+        comp_matrices_refs_dict = {}
+
+        for n in range(1, max_num_combos + 1):
+            comp_matrices_refs_dict[n] = []
+            for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
+                    comp_matrices_refs_dict[n].append(_create_comp_matrices.remote(group, cleaned_reactions, num_entries, net_coeff_filter))
+
+        logger.info("Building comp matrices...")
+
+        num_objs = sum(len(i) for i in comp_matrices_refs_dict.values())
+
+        with tqdm(total=num_objs) as pbar:
+            for n, comp_matrices_refs in comp_matrices_refs_dict.items():
+                for comp_matrices_ref in to_iterator(comp_matrices_refs):
+                    pbar.update(1)
+                    comp_matrices[n].append(comp_matrices_ref)
+
+                comp_matrices[n] = np.concatenate(comp_matrices[n])  
+
+                if not comp_matrices[n].any():
+                    del comp_matrices[n]
+
+        logger.info("Comp matrices done...")
 
         num_cpu_jobs = 0
         num_gpu_jobs = 0
@@ -171,16 +191,23 @@ class PathwaySolver(Solver):
         c_m_mats = []
         c_m_mats_refs = []
 
-        for n in range(1, max_num_combos + 1):
-            for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
-                comp_matrices = _create_comp_matrices(
-                    group, cleaned_reactions, num_entries
-                )
+        num_jobs = sum(len(val) // self.chunk_size + 1 for val in comp_matrices.values())
+        num_batches = int(num_jobs // batch_size + 1)
 
-                if use_gpu and (
-                    num_gpu_jobs <= num_gpus
-                    or num_cpu_jobs / num_gpu_jobs > cpu_gpu_ratio
-                ):
+        batch_count = 1
+
+        for n, comp_matrix in comp_matrices.items():
+            if n>=4:
+                num_splits = len(comp_matrix) // self.chunk_size + 1
+                splits = np.array_split(comp_matrix, num_splits)
+            else:
+                splits = [comp_matrix]  # only submit one job for small n
+
+            for group in splits:
+                print(group.shape)
+                if len(group)==0:  # catch empty matrices
+                    continue
+                if use_gpu and (num_gpu_jobs <= num_gpus or num_cpu_jobs / num_gpu_jobs > cpu_gpu_ratio):
                     path_balancer = _balance_path_arrays_gpu
                     num_gpu_jobs += 1
                 else:
@@ -189,7 +216,7 @@ class PathwaySolver(Solver):
 
                 c_m_mats_refs.append(
                     path_balancer.remote(
-                        comp_matrices,
+                        group,
                         net_rxn_vector,
                     )
                 )
@@ -206,10 +233,10 @@ class PathwaySolver(Solver):
                         c_m_mats.append(c_m_mats_ref)
 
                     batch_count += 1
-
+                    
                     num_cpu_jobs = 0
                     num_gpu_jobs = 0
-
+        
                     c_m_mats_refs = []
 
         for c_m_mats_ref in tqdm(
@@ -220,8 +247,8 @@ class PathwaySolver(Solver):
             c_m_mats.append(c_m_mats_ref)
 
         c_mats, m_mats = zip(*c_m_mats)
-        c_mats = [mat for mats in c_mats for mat in mats]
-        m_mats = [mat for mats in m_mats for mat in mats]
+        c_mats = [mat for mats in c_mats for mat in mats if mat is not None]
+        m_mats = [mat for mats in m_mats for mat in mats if mat is not None]
 
         paths = []
         for c_mat, m_mat in zip(c_mats, m_mats):
@@ -333,7 +360,7 @@ class PathwaySolver(Solver):
         num_rxns = len(rxns)
         rxns = ReactionSet.from_rxns(rxns, filter_duplicates=True)
 
-        self.logger.info(f"Found {num_rxns} intermediate reactions! \n")
+        logger.info(f"Found {num_rxns} intermediate reactions! \n")
 
         return rxns
 
@@ -341,7 +368,6 @@ class PathwaySolver(Solver):
     def entries(self) -> GibbsEntrySet:
         """Entry set used in solver"""
         return self._entries
-
 
 @ray.remote(num_gpus=1)
 def _balance_path_arrays_gpu(
@@ -364,41 +390,65 @@ def _balance_path_arrays_gpu(
     net_coeffs = cp.asarray(net_coeffs)
 
     checkpoint1 = datetime.now()
-    # print(f"Loading from CPU took: {checkpoint1 - start_time}")
 
-    shape = comp_matrices.shape
-    print("original shape", shape)
-
-    net_coeff_filter = cp.argwhere(net_coeffs != 0).flatten()
-
-    # filter bad matrices
-    comp_matrices_filtered = comp_matrices[
-        comp_matrices[:, :, net_coeff_filter].any(axis=1).all(axis=1)
-    ]
-    print("new shape", comp_matrices_filtered.shape)
-
-    comp_pinv = cp.linalg.pinv(comp_matrices_filtered).transpose(0, 2, 1)
-    multiplicities = comp_pinv @ net_coeffs
-    multiplicities_filter = (multiplicities < tol).any(axis=1)
-
-    multiplicities = multiplicities[~multiplicities_filter]
-    comp_matrices_filtered = comp_matrices_filtered[~multiplicities_filter]
-
-    stack_size = len(comp_matrices_filtered)
-    solved_coeffs = (
-        comp_matrices_filtered.transpose(0, 2, 1)
-        @ multiplicities.reshape(stack_size, -1, 1)
-    ).reshape(stack_size, -1)
-
-    correct_filter = cp.isclose(
-        solved_coeffs, cp.repeat(net_coeffs.reshape(1, -1), stack_size, axis=0)
-    ).all(axis=1)
-
-    filtered_comp_matrices = comp_matrices_filtered[correct_filter]
-    filtered_multiplicities = multiplicities[correct_filter]
+    comp_pinv = cp.linalg.pinv(comp_matrices)
 
     checkpoint2 = datetime.now()
-    print(f"GPU main operations took: {checkpoint2-checkpoint1}")
+    print(f"performing pseudoinverse: {checkpoint2 - checkpoint1}")
+
+    comp_pinv = comp_pinv.transpose(0,2,1)
+
+    checkpoint2_5 = datetime.now()
+    print(f"transposing pseudoinverse result: {checkpoint2_5 - checkpoint2}")
+
+    multiplicities = comp_pinv @ net_coeffs
+
+    checkpoint3 = datetime.now()
+    print(f"get multiplicities: {checkpoint3 - checkpoint2_5}")
+
+    multiplicities_filter = (multiplicities < tol).any(axis=1)
+
+    checkpoint4 = datetime.now()
+    print(f"create multiplicities filter: {checkpoint4 - checkpoint3}")
+
+    multiplicities = multiplicities[~multiplicities_filter]
+
+    checkpoint5 = datetime.now()
+    print(f"filter multiplicities: {checkpoint5 - checkpoint4}")
+    comp_matrices = comp_matrices[~multiplicities_filter]
+
+    checkpoint6 = datetime.now()
+    print(f"filter comp_matrices: {checkpoint6 - checkpoint5}")
+
+    stack_size = len(comp_matrices)
+    if stack_size == 0:
+        return [None], [None]
+
+    checkpoint7 = datetime.now()
+    print(f"check stack size: {checkpoint7 - checkpoint6}")
+
+    solved_coeffs = (comp_matrices.transpose(0,2,1) @ multiplicities.reshape(stack_size,-1,1)).reshape(stack_size,-1)
+
+    checkpoint8 = datetime.now()
+    print(f"solving for coeffs: {checkpoint8 - checkpoint7}")
+
+    correct_filter = cp.isclose(solved_coeffs, cp.repeat(net_coeffs.reshape(1,-1), stack_size, axis=0)).all(axis=1)
+
+    checkpoint9 = datetime.now()
+    print(f"finding correct filter: {checkpoint9 - checkpoint8}")
+
+    filtered_comp_matrices = comp_matrices[correct_filter]
+
+    checkpoint10 = datetime.now()
+    print(f"filtering comp matrices: {checkpoint10 - checkpoint9}")
+
+    filtered_multiplicities = multiplicities[correct_filter]
+
+    checkpoint11 = datetime.now()
+    print(f"filtering multiplicities: {checkpoint11 - checkpoint10}")
+
+    # checkpoint2 = datetime.now()
+    # print(f"GPU main operations took: {checkpoint2-checkpoint1}")
 
     filtered_comp_matrices = cp.asnumpy(filtered_comp_matrices)
     filtered_multiplicities = cp.asnumpy(filtered_multiplicities)
@@ -473,7 +523,8 @@ def _balance_path_arrays_cpu(
     return filtered_comp_matrices, filtered_multiplicities
 
 
-def _create_comp_matrices(combos, rxns, num_entries):
+@ray.remote
+def _create_comp_matrices(combos, rxns, num_entries, net_coeff_filter):
     """Create array of stoichiometric coefficients for each reaction."""
     comp_matrices = np.stack(
         [
@@ -482,7 +533,10 @@ def _create_comp_matrices(combos, rxns, num_entries):
             if combo
         ]
     )
-    return comp_matrices
+    # filter bad matrices
+    comp_matrices_filtered = comp_matrices[comp_matrices[:,:,net_coeff_filter].any(axis=1).all(axis=1)]
+
+    return comp_matrices_filtered
 
 
 @ray.remote
