@@ -1,7 +1,6 @@
 """
 Basic interface for a reaction pathway solver.
 """
-import logging
 from abc import ABCMeta
 from typing import List
 
