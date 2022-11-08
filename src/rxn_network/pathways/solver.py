@@ -9,7 +9,6 @@ from itertools import combinations
 from math import comb
 from typing import Optional, Union
 
-import cupy as cp
 import numpy as np
 import ray
 from numba import jit
@@ -221,6 +220,12 @@ class PathwaySolver(Solver):
                     num_gpu_jobs <= num_gpus
                     or num_cpu_jobs / num_gpu_jobs > cpu_gpu_ratio
                 ):
+                    try:
+                        import cupy as cp
+                    except ImportError as e:
+                        raise ImportError(
+                            "GPU acceleration requires cupy to be installed."
+                        ) from e
                     path_balancer = _balance_path_arrays_gpu
                     num_gpu_jobs += 1
                 else:
@@ -390,6 +395,7 @@ def _balance_path_arrays_gpu(
     tol: float = 1e-6,
 ):
     """
+    WARNING: this GPU-based method is experimental. Use at your own risk.
 
     Args:
         comp_matrices: Array containing stoichiometric coefficients of all
@@ -405,9 +411,7 @@ def _balance_path_arrays_gpu(
 
     checkpoint1 = datetime.now()
 
-    q, r = cupy.linalg.qr(comp_matrices)
-    comp_pinv = cupy.linalg.inv(r) @ q.transpose(0, 2, 1)
-    # comp_pinv = cp.linalg.pinv(comp_matrices)
+    comp_pinv = cp.linalg.pinv(comp_matrices)
 
     checkpoint2 = datetime.now()
     print(f"performing pseudoinverse: {checkpoint2 - checkpoint1}")
