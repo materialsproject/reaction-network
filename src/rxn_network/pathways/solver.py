@@ -5,12 +5,11 @@ equations using matrix operations.
 
 from copy import deepcopy
 from itertools import combinations
-from math import comb
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 import ray
-from numba import njit, prange
+from numba import jit
 from pymatgen.core.composition import Element
 from tqdm import tqdm
 
@@ -28,8 +27,10 @@ from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils.funcs import grouper
+from rxn_network.utils.funcs import get_logger, grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
+
+logger = get_logger(__name__)
 
 
 class PathwaySolver(Solver):
@@ -74,6 +75,8 @@ class PathwaySolver(Solver):
         use_basic_enumerator: bool = True,
         use_minimize_enumerator: bool = False,
         filter_interdependent: bool = True,
+        use_gpu: bool = False,
+        cpu_gpu_ratio: Optional[int] = None,
     ) -> PathwaySet:
         """
 
@@ -104,6 +107,13 @@ class PathwaySolver(Solver):
             raise ValueError(
                 "Net reaction must be balanceable to find all reaction pathways."
             )
+        if use_gpu:
+            try:
+                from rxn_network.pathways.gpu import _balance_path_arrays_gpu
+            except ImportError as e:
+                raise ImportError(
+                    "GPU acceleration requires cupy to be installed."
+                ) from e
 
         initialize_ray()
 
@@ -117,10 +127,10 @@ class PathwaySolver(Solver):
         precursors = deepcopy(net_rxn.reactant_entries)
         targets = deepcopy(net_rxn.product_entries)
 
-        self.logger.info(f"Net reaction: {net_rxn} \n")
+        logger.info(f"Net reaction: {net_rxn} \n")
 
         if find_intermediate_rxns:
-            self.logger.info("Identifying reactions between intermediates...")
+            logger.info("Identifying reactions between intermediates...")
 
             intermediate_rxns = self._find_intermediate_rxns(
                 targets,
@@ -136,63 +146,161 @@ class PathwaySolver(Solver):
                     reactions.append(r)
                     costs.append(c)
 
+        clean_r_set = ReactionSet.from_rxns(reactions, filter_duplicates=True)
+        cleaned_reactions, cleaned_costs = zip(
+            *[
+                (r, c)
+                for r, c in zip(reactions, costs)
+                if r in clean_r_set and r != net_rxn
+            ]
+        )
+
         net_rxn_vector = net_rxn.get_entry_idx_vector(num_entries)
 
-        if net_rxn in reactions:
-            reactions.remove(net_rxn)
+        num_rxns = len(cleaned_reactions)
+        num_cpus = ray.cluster_resources()["CPU"]
+        batch_size = self.batch_size or num_cpus - 1
 
-        reaction_set = ray.put(ReactionSet.from_rxns(reactions))
-        entries = ray.put(entries)
-        costs = ray.put(costs)
-        num_entries = ray.put(num_entries)
-        net_rxn_vector = ray.put(net_rxn_vector)
-        open_elem = ray.put(self.open_elem)
-        chempot = ray.put(self.chempot)
+        if use_gpu:
+            num_gpus = ray.cluster_resources()["GPU"]
+            cpu_gpu_ratio = cpu_gpu_ratio or num_cpus // num_gpus
 
-        num_rxns = len(reactions)
-        batch_size = self.batch_size or ray.cluster_resources()["CPU"] - 1
+        net_coeff_filter = np.argwhere(net_rxn_vector != 0).flatten()
+        net_coeff_filter = ray.put(net_coeff_filter)
+        cleaned_reactions_ref = ray.put(cleaned_reactions)
 
-        num_combos = sum(comb(num_rxns, k) for k in range(1, max_num_combos + 1))
-        num_batches = int((num_combos // self.chunk_size + 1) // batch_size + 1)
+        comp_matrices = {n: [] for n in range(1, max_num_combos + 1)}
+        comp_matrices_refs_dict = {}
 
-        paths = []
-        paths_refs = []
-        batch_count = 1
         for n in range(1, max_num_combos + 1):
+            comp_matrices_refs_dict[n] = []
             for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
-                paths_refs.append(
-                    _get_balanced_paths_ray.remote(
-                        group,
-                        reaction_set,
-                        costs,
-                        entries,
-                        num_entries,
-                        net_rxn_vector,
-                        open_elem,
-                        chempot,
+                comp_matrices_refs_dict[n].append(
+                    _create_comp_matrices.remote(
+                        group, cleaned_reactions_ref, num_entries, net_coeff_filter
                     )
                 )
-                if len(paths_refs) >= batch_size:
-                    for paths_ref in tqdm(
-                        to_iterator(paths_refs),
-                        total=len(paths_refs),
+
+        logger.info("Building comp matrices...")
+
+        num_objs = sum(len(i) for i in comp_matrices_refs_dict.values())
+
+        with tqdm(total=num_objs) as pbar:
+            for n, comp_matrices_refs in comp_matrices_refs_dict.items():
+                for comp_matrices_ref in to_iterator(comp_matrices_refs):
+                    pbar.update(1)
+                    comp_matrices[n].append(comp_matrices_ref)
+
+                comp_matrices[n] = np.concatenate(comp_matrices[n])
+
+                if not comp_matrices[n].any():
+                    del comp_matrices[n]
+
+        logger.info("Comp matrices done...")
+
+        num_cpu_jobs = 0
+        num_gpu_jobs = 0
+
+        c_m_mats = []
+        c_m_mats_refs = []
+
+        num_jobs = sum(
+            len(val) // self.chunk_size + 1 for val in comp_matrices.values()
+        )
+        num_batches = int(num_jobs // batch_size + 1)
+
+        batch_count = 1
+
+        for n, comp_matrix in comp_matrices.items():
+            if n >= 4:
+                num_splits = len(comp_matrix) // self.chunk_size + 1
+                splits = np.array_split(comp_matrix, num_splits)
+            else:
+                splits = [comp_matrix]  # only submit one job for small n
+
+            for group in splits:
+                print(group.shape)
+                if len(group) == 0:  # catch empty matrices
+                    continue
+                if use_gpu and (
+                    num_gpu_jobs <= num_gpus
+                    or num_cpu_jobs / num_gpu_jobs > cpu_gpu_ratio
+                ):
+                    path_balancer = _balance_path_arrays_gpu
+                    num_gpu_jobs += 1
+                else:
+                    path_balancer = _balance_path_arrays_cpu_wrapper
+                    num_cpu_jobs += 1
+
+                c_m_mats_refs.append(
+                    path_balancer.remote(
+                        group,
+                        net_rxn_vector,
+                    )
+                )
+
+                if len(c_m_mats_refs) >= batch_size:
+                    for c_m_mats_ref in tqdm(
+                        to_iterator(c_m_mats_refs),
+                        total=len(c_m_mats_refs),
                         desc=(
                             f"{self.__class__.__name__} (Batch"
                             f" {batch_count}/{num_batches})"
                         ),
                     ):
-                        paths.extend(paths_ref)
+                        c_m_mats.append(c_m_mats_ref)
 
                     batch_count += 1
 
-                    paths_refs = []
+                    num_cpu_jobs = 0
+                    num_gpu_jobs = 0
 
-        for paths_ref in tqdm(
-            to_iterator(paths_refs),
-            total=len(paths_refs),
+                    c_m_mats_refs = []
+
+        for c_m_mats_ref in tqdm(
+            to_iterator(c_m_mats_refs),
+            total=len(c_m_mats_refs),
             desc=f"{self.__class__.__name__} (Batch {batch_count}/{num_batches})",
         ):
-            paths.extend(paths_ref)
+            c_m_mats.append(c_m_mats_ref)
+
+        c_mats, m_mats = zip(*c_m_mats)
+        c_mats = [mat for mats in c_mats for mat in mats if mat is not None]
+        m_mats = [mat for mats in m_mats for mat in mats if mat is not None]
+
+        paths = []
+        for c_mat, m_mat in zip(c_mats, m_mats):
+            path_rxns = []
+            path_costs = []
+
+            for rxn_mat in c_mat:
+                ents, coeffs = zip(
+                    *[
+                        (entries[idx], c)
+                        for idx, c in enumerate(rxn_mat)
+                        if not np.isclose(c, 0.0)
+                    ]
+                )
+
+                if self.open_elem is not None:
+                    rxn = OpenComputedReaction(
+                        entries=ents,
+                        coefficients=coeffs,
+                        chempots={self.open_elem: self.chempot},
+                    )
+
+                else:
+                    rxn = ComputedReaction(entries=ents, coefficients=coeffs)
+
+                try:
+                    path_rxns.append(rxn)
+                    path_costs.append(cleaned_costs[cleaned_reactions.index(rxn)])
+                except Exception as e:
+                    print(e)
+                    continue
+
+            p = BalancedPathway(path_rxns, m_mat.flatten(), path_costs, balanced=True)
+            paths.append(p)
 
         filtered_paths = []
         if filter_interdependent:
@@ -270,7 +378,7 @@ class PathwaySolver(Solver):
         num_rxns = len(rxns)
         rxns = ReactionSet.from_rxns(rxns, filter_duplicates=True)
 
-        self.logger.info(f"Found {num_rxns} intermediate reactions! \n")
+        logger.info(f"Found {num_rxns} intermediate reactions! \n")
 
         return rxns
 
@@ -280,8 +388,8 @@ class PathwaySolver(Solver):
         return self._entries
 
 
-@njit(parallel=True, fastmath=True)
-def _balance_path_arrays(
+@jit(nopython=True)
+def _balance_path_arrays_cpu(
     comp_matrices: np.ndarray,
     net_coeffs: np.ndarray,
     tol: float = 1e-6,
@@ -304,7 +412,7 @@ def _balance_path_arrays(
     all_multiplicities = np.zeros((shape[0], shape[1]), np.float64)
     indices = np.full(shape[0], False)
 
-    for i in prange(shape[0]):  # pylint: disable=not-an-iterable
+    for i in range(shape[0]):  # pylint: disable=not-an-iterable
         correct = True
         for j in range(len_net_coeff_filter):
             idx = net_coeff_filter[j]
@@ -339,10 +447,12 @@ def _balance_path_arrays(
         filtered_comp_matrices[i] = comp_matrices[idx]
         filtered_multiplicities[i] = all_multiplicities[idx]
 
+    print("I'm done - CPU!")
     return filtered_comp_matrices, filtered_multiplicities
 
 
-def _create_comp_matrices(combos, rxns, num_entries):
+@ray.remote
+def _create_comp_matrices(combos, rxns, num_entries, net_coeff_filter):
     """Create array of stoichiometric coefficients for each reaction."""
     comp_matrices = np.stack(
         [
@@ -351,58 +461,18 @@ def _create_comp_matrices(combos, rxns, num_entries):
             if combo
         ]
     )
-    return comp_matrices
+    # filter bad matrices
+    comp_matrices_filtered = comp_matrices[
+        comp_matrices[:, :, net_coeff_filter].any(axis=1).all(axis=1)
+    ]
+
+    return comp_matrices_filtered
 
 
 @ray.remote
-def _get_balanced_paths_ray(
-    combos,
-    reaction_set,
-    costs,
-    entries,
-    num_entries,
+def _balance_path_arrays_cpu_wrapper(
+    comp_matrices,
     net_rxn_vector,
-    open_elem,
-    chempot,
 ):
-    reactions = list(reaction_set.get_rxns())
-    comp_matrices = _create_comp_matrices(combos, reactions, num_entries)
 
-    paths = []
-
-    c_mats, m_mats = _balance_path_arrays(comp_matrices, net_rxn_vector)
-
-    for c_mat, m_mat in zip(c_mats, m_mats):
-        path_rxns = []
-        path_costs = []
-
-        for rxn_mat in c_mat:
-            ents, coeffs = zip(
-                *[
-                    (entries[idx], c)
-                    for idx, c in enumerate(rxn_mat)
-                    if not np.isclose(c, 0.0)
-                ]
-            )
-
-            if open_elem is not None:
-                rxn = OpenComputedReaction(
-                    entries=ents,
-                    coefficients=coeffs,
-                    chempots={open_elem: chempot},
-                )
-
-            else:
-                rxn = ComputedReaction(entries=ents, coefficients=coeffs)
-
-            try:
-                path_rxns.append(rxn)
-                path_costs.append(costs[reactions.index(rxn)])
-            except Exception as e:
-                print(e)
-                continue
-
-        p = BalancedPathway(path_rxns, m_mat.flatten(), path_costs, balanced=True)
-        paths.append(p)
-
-    return paths
+    return _balance_path_arrays_cpu(comp_matrices, net_rxn_vector)

@@ -1,7 +1,6 @@
 """
 Basic interface for a reaction pathway solver.
 """
-import logging
 from abc import ABCMeta
 from typing import List
 
@@ -17,9 +16,6 @@ class Solver(MSONable, metaclass=ABCMeta):
     """
 
     def __init__(self, pathways):
-        self.logger = logging.getLogger(str(self.__class__.__name__))
-        self.logger.setLevel("INFO")
-
         self._pathways = pathways
 
         rxns = []

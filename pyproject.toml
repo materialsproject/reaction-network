@@ -54,7 +54,6 @@ docs = [
     "pymdown-extensions==9.6",
 
 ]
-plotting = ["graphistry==0.28.0"]
 tests = ["pytest==7.1.3", "pytest-cov==4.0.0"]
 strict = [
     "numba==0.56.2",

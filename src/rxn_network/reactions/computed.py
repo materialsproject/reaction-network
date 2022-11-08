@@ -242,11 +242,11 @@ class ComputedReaction(BasicReaction):
         return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
 
     def get_entry_idx_vector(self, n):
-        indices = [e.data.get("idx") for e in self.entries]
-        if None in indices:
-            raise ValueError(
-                f"Could not find index for one or more entries in reaction: {self}"
-            )
+        indices = [e.data["idx"] for e in self.entries]
+        # if None in indices:
+        #     raise ValueError(
+        #         f"Could not find index for one or more entries in reaction: {self}"
+        #     )
 
         v = np.zeros(n)
         v[indices] = self.coefficients

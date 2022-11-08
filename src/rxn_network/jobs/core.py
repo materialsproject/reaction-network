@@ -81,13 +81,13 @@ class GetEntrySetMaker(Maker):
     def make(self, chemsys):
         entry_db = SETTINGS.JOB_STORE.additional_stores.get(self.entry_db_name)
 
-        property_data = self.property_data
-        if property_data is None:
-            property_data = ["theoretical"]
-        elif "theoretical" not in property_data:
-            property_data.append("theoretical")
-
         if entry_db:
+            property_data = self.property_data
+            if property_data is None:
+                property_data = ["theoretical"]
+            elif "theoretical" not in property_data:
+                property_data.append("theoretical")
+                
             entries = get_all_entries_in_chemsys(
                 entry_db,
                 chemsys,
