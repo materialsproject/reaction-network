@@ -4,9 +4,7 @@ equations using matrix operations.
 """
 
 from copy import deepcopy
-from datetime import datetime
 from itertools import combinations
-from math import comb
 from typing import Optional, Union
 
 import numpy as np
@@ -109,6 +107,13 @@ class PathwaySolver(Solver):
             raise ValueError(
                 "Net reaction must be balanceable to find all reaction pathways."
             )
+        if use_gpu:
+            try:
+                from rxn_network.pathways.gpu import _balance_path_arrays_gpu
+            except ImportError as e:
+                raise ImportError(
+                    "GPU acceleration requires cupy to be installed."
+                ) from e
 
         initialize_ray()
 
@@ -155,13 +160,14 @@ class PathwaySolver(Solver):
         num_rxns = len(cleaned_reactions)
         num_cpus = ray.cluster_resources()["CPU"]
         batch_size = self.batch_size or num_cpus - 1
+
         if use_gpu:
             num_gpus = ray.cluster_resources()["GPU"]
             cpu_gpu_ratio = cpu_gpu_ratio or num_cpus // num_gpus
 
         net_coeff_filter = np.argwhere(net_rxn_vector != 0).flatten()
         net_coeff_filter = ray.put(net_coeff_filter)
-        cleaned_reactions = ray.put(cleaned_reactions)
+        cleaned_reactions_ref = ray.put(cleaned_reactions)
 
         comp_matrices = {n: [] for n in range(1, max_num_combos + 1)}
         comp_matrices_refs_dict = {}
@@ -171,7 +177,7 @@ class PathwaySolver(Solver):
             for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
                 comp_matrices_refs_dict[n].append(
                     _create_comp_matrices.remote(
-                        group, cleaned_reactions, num_entries, net_coeff_filter
+                        group, cleaned_reactions_ref, num_entries, net_coeff_filter
                     )
                 )
 
@@ -220,12 +226,6 @@ class PathwaySolver(Solver):
                     num_gpu_jobs <= num_gpus
                     or num_cpu_jobs / num_gpu_jobs > cpu_gpu_ratio
                 ):
-                    try:
-                        import cupy as cp
-                    except ImportError as e:
-                        raise ImportError(
-                            "GPU acceleration requires cupy to be installed."
-                        ) from e
                     path_balancer = _balance_path_arrays_gpu
                     num_gpu_jobs += 1
                 else:
@@ -294,7 +294,7 @@ class PathwaySolver(Solver):
 
                 try:
                     path_rxns.append(rxn)
-                    path_costs.append(costs[reactions.index(rxn)])
+                    path_costs.append(cleaned_costs[cleaned_reactions.index(rxn)])
                 except Exception as e:
                     print(e)
                     continue
@@ -386,102 +386,6 @@ class PathwaySolver(Solver):
     def entries(self) -> GibbsEntrySet:
         """Entry set used in solver"""
         return self._entries
-
-
-@ray.remote(num_gpus=1)
-def _balance_path_arrays_gpu(
-    comp_matrices: np.ndarray,
-    net_coeffs: np.ndarray,
-    tol: float = 1e-6,
-):
-    """
-    WARNING: this GPU-based method is experimental. Use at your own risk.
-
-    Args:
-        comp_matrices: Array containing stoichiometric coefficients of all
-            compositions in all reactions, for each trial combination.
-        net_coeffs: Array containing stoichiometric coefficients of net reaction.
-        tol: numerical tolerance for determining if a multiplicity is zero
-            (reaction was removed).
-    """
-    start_time = datetime.now()
-
-    comp_matrices = cp.asarray(comp_matrices)
-    net_coeffs = cp.asarray(net_coeffs)
-
-    checkpoint1 = datetime.now()
-
-    comp_pinv = cp.linalg.pinv(comp_matrices)
-
-    checkpoint2 = datetime.now()
-    print(f"performing pseudoinverse: {checkpoint2 - checkpoint1}")
-
-    comp_pinv = comp_pinv.transpose(0, 2, 1)
-
-    checkpoint2_5 = datetime.now()
-    print(f"transposing pseudoinverse result: {checkpoint2_5 - checkpoint2}")
-
-    multiplicities = comp_pinv @ net_coeffs
-
-    checkpoint3 = datetime.now()
-    print(f"get multiplicities: {checkpoint3 - checkpoint2_5}")
-
-    multiplicities_filter = (multiplicities < tol).any(axis=1)
-
-    checkpoint4 = datetime.now()
-    print(f"create multiplicities filter: {checkpoint4 - checkpoint3}")
-
-    multiplicities = multiplicities[~multiplicities_filter]
-
-    checkpoint5 = datetime.now()
-    print(f"filter multiplicities: {checkpoint5 - checkpoint4}")
-    comp_matrices = comp_matrices[~multiplicities_filter]
-
-    checkpoint6 = datetime.now()
-    print(f"filter comp_matrices: {checkpoint6 - checkpoint5}")
-
-    stack_size = len(comp_matrices)
-    if stack_size == 0:
-        return [None], [None]
-
-    checkpoint7 = datetime.now()
-    print(f"check stack size: {checkpoint7 - checkpoint6}")
-
-    solved_coeffs = (
-        comp_matrices.transpose(0, 2, 1) @ multiplicities.reshape(stack_size, -1, 1)
-    ).reshape(stack_size, -1)
-
-    checkpoint8 = datetime.now()
-    print(f"solving for coeffs: {checkpoint8 - checkpoint7}")
-
-    correct_filter = cp.isclose(
-        solved_coeffs, cp.repeat(net_coeffs.reshape(1, -1), stack_size, axis=0)
-    ).all(axis=1)
-
-    checkpoint9 = datetime.now()
-    print(f"finding correct filter: {checkpoint9 - checkpoint8}")
-
-    filtered_comp_matrices = comp_matrices[correct_filter]
-
-    checkpoint10 = datetime.now()
-    print(f"filtering comp matrices: {checkpoint10 - checkpoint9}")
-
-    filtered_multiplicities = multiplicities[correct_filter]
-
-    checkpoint11 = datetime.now()
-    print(f"filtering multiplicities: {checkpoint11 - checkpoint10}")
-
-    # checkpoint2 = datetime.now()
-    # print(f"GPU main operations took: {checkpoint2-checkpoint1}")
-
-    filtered_comp_matrices = cp.asnumpy(filtered_comp_matrices)
-    filtered_multiplicities = cp.asnumpy(filtered_multiplicities)
-
-    # checkpoint3 = datetime.now()
-    # print(f"Converting back to CPU took: {checkpoint3-checkpoint2}")
-    print("I'm done - GPU!")
-
-    return filtered_comp_matrices, filtered_multiplicities
 
 
 @jit(nopython=True)
