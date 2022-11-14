@@ -60,7 +60,7 @@ strict = [
     "numba==0.56.2",
     "pymatgen==2022.11.1",
     "jobflow==0.1.9",
-    "ray==2.0.0",
+    "ray==2.1.0",
     "mp-api==0.27.5",
     "rustworkx==0.12.0",
 ]
