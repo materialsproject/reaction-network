@@ -62,7 +62,7 @@ strict = [
     "jobflow==0.1.9",
     "ray==2.0.0",
     "mp-api==0.27.5",
-    "rustworkx==0.12.0",
+    "rustworkx==0.12.1",
 ]
 
 [project.urls]
