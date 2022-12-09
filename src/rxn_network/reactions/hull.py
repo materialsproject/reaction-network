@@ -612,7 +612,7 @@ class InterfaceReactionHull(MSONable):
     @staticmethod
     def _primary_selectivity_from_energies(rxn_energy, other_rxn_energies, temp):
         """
-        Calculates the primary selectivity given a list of reaction energy differences.
+        Calculates the primary selectivity given a list of reaction energies.
         """
         all_rxn_energies = np.append(other_rxn_energies, rxn_energy)
         Q = np.sum(np.exp(-all_rxn_energies / (kb * temp)))

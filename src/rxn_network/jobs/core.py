@@ -87,7 +87,7 @@ class GetEntrySetMaker(Maker):
                 property_data = ["theoretical"]
             elif "theoretical" not in property_data:
                 property_data.append("theoretical")
-                
+
             entries = get_all_entries_in_chemsys(
                 entry_db,
                 chemsys,
