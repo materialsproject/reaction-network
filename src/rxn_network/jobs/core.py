@@ -216,6 +216,8 @@ class CalculateSelectivitiesMaker(Maker):
         )
         logger.info("Placing reactions in ray object store...")
 
+        initialize_ray()
+
         all_rxns = ray.put(all_rxns)
         logger.info("Beginning selectivity calculations...")
 
@@ -253,8 +255,6 @@ class CalculateSelectivitiesMaker(Maker):
         return doc
 
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns, size):
-        initialize_ray()
-
         size_per_rxn = 800  # generous estimate of 0.8kb memory per reaction
 
         memory_size = int(ray.cluster_resources()["memory"])
