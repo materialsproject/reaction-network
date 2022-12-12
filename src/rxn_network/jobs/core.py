@@ -1,7 +1,6 @@
 """Core jobs for reaction-network creation and analysis."""
 
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Iterable, List, Optional
 
 import numpy as np
@@ -213,7 +212,7 @@ class CalculateSelectivitiesMaker(Maker):
         )
         logger.info(
             f"Identified {len(target_rxns)} target reactions out of"
-            f" {size} total reactions."
+            f" {len(all_rxns)} total reactions."
         )
         logger.info("Placing reactions in ray object store...")
 
