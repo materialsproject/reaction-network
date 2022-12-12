@@ -263,7 +263,7 @@ class CalculateSelectivitiesMaker(Maker):
         batch_size = self.batch_size
         if batch_size is None:
             batch_size = num_cpus
-            if memory_size / num_cpus / size_per_rxn < size:
+            if memory_size < (size * size_per_rxn * num_cpus):
                 # load fewer chunks into memory at a time for big jobs
                 batch_size = int(memory_size / size_per_rxn / size)
 

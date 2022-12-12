@@ -35,10 +35,10 @@ def initialize_ray(quiet=False):
             )
             ray.init()
 
-            logger.info(
-                f"HOST: {ray.nodes()[0]['NodeManagerHostname']},"
-                f" {ray.nodes()[0]['Resources']}"
-            )
+    logger.info(
+        f"HOST: {ray.nodes()[0]['NodeManagerHostname']},"
+        f" {ray.nodes()[0]['Resources']}"
+    )
 
 
 def to_iterator(obj_ids, get_obj_ids=False):
