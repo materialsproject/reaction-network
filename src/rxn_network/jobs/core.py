@@ -255,7 +255,7 @@ class CalculateSelectivitiesMaker(Maker):
         return doc
 
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns, size):
-        size_per_rxn = 800  # generous estimate of 0.8kb memory per reaction
+        size_per_rxn = 1200  # estimate of 1.2kb memory per reaction
 
         memory_size = int(ray.cluster_resources()["memory"])
         logger.info(f"Available memory: {memory_size}")
@@ -268,6 +268,7 @@ class CalculateSelectivitiesMaker(Maker):
             batch_size = num_cpus
             if memory_size < (size * size_per_rxn * num_cpus):
                 # load fewer chunks into memory at a time for big jobs
+                logger.info("Taking batching approach due to large calculation size...")
                 batch_size = int(memory_size / size_per_rxn / size)
 
         chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
