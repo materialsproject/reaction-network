@@ -196,6 +196,8 @@ class CalculateSelectivitiesMaker(Maker):
 
     @job(rxns="rxns", output_schema=SelectivitiesTaskDocument)
     def make(self, rxn_sets, entries, target_formula):
+        initialize_ray()
+
         target_formula = Composition(target_formula).reduced_formula
         added_elements, added_chemsys = get_added_elem_data(entries, [target_formula])
 
@@ -215,8 +217,6 @@ class CalculateSelectivitiesMaker(Maker):
             f" {size} total reactions."
         )
         logger.info("Placing reactions in ray object store...")
-
-        initialize_ray()
 
         all_rxns = ray.put(all_rxns)
         logger.info("Beginning selectivity calculations...")
