@@ -37,7 +37,8 @@ def initialize_ray(quiet=False):
 
     logger.info(
         f"HOST: {ray.nodes()[0]['NodeManagerHostname']},"
-        f" {ray.nodes()[0]['Resources']}"
+        f"Num CPUs: {ray.cluster_resources()['CPU']}"
+        f"Total Memory: {ray.cluster_resources()['memory']}"
     )
 
 

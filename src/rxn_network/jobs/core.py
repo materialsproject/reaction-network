@@ -255,10 +255,13 @@ class CalculateSelectivitiesMaker(Maker):
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns, size):
         initialize_ray()
 
-        size_per_rxn = 1000  # generous estimate of 1kb memory per reaction
+        size_per_rxn = 800  # generous estimate of 0.8kb memory per reaction
 
         memory_size = int(ray.cluster_resources()["memory"])
+        logger.info(f"Available memory: {memory_size}")
+
         num_cpus = int(ray.cluster_resources()["CPU"]) - 1
+        logger.info(f"Available CPUs - 1: {num_cpus}")
 
         batch_size = self.batch_size
         if batch_size is None:
