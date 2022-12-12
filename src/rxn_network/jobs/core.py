@@ -205,7 +205,6 @@ class CalculateSelectivitiesMaker(Maker):
         all_rxns = rxn_sets[0]
         for rxn_set in rxn_sets[1:]:
             all_rxns = all_rxns.add_rxn_set(rxn_set)
-        size = len(all_rxns)
 
         logger.info("Identifying target reactions...")
 
@@ -224,9 +223,7 @@ class CalculateSelectivitiesMaker(Maker):
         decorated_rxns = target_rxns
 
         if self.calculate_selectivities:
-            decorated_rxns = self._get_selectivity_decorated_rxns(
-                target_rxns, all_rxns, size
-            )
+            decorated_rxns = self._get_selectivity_decorated_rxns(target_rxns, all_rxns)
 
         logger.info("Calculating chemical potential distances...")
 
@@ -254,8 +251,9 @@ class CalculateSelectivitiesMaker(Maker):
         doc.task_label = self.name
         return doc
 
-    def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns, size):
-        size_per_rxn = 1200  # estimate of 1.2kb memory per reaction
+    def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns):
+        size = len(all_rxns)
+        memory_per_rxn = 1500  # generous estimate of 1.5kb memory per reaction
 
         memory_size = int(ray.cluster_resources()["memory"])
         logger.info(f"Available memory: {memory_size}")
@@ -266,10 +264,6 @@ class CalculateSelectivitiesMaker(Maker):
         batch_size = self.batch_size
         if batch_size is None:
             batch_size = num_cpus
-            if memory_size < (size * size_per_rxn * num_cpus):
-                # load fewer chunks into memory at a time for big jobs
-                logger.info("Taking batching approach due to large calculation size...")
-                batch_size = int(memory_size / size_per_rxn / size)
 
         chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
 
@@ -300,10 +294,12 @@ class CalculateSelectivitiesMaker(Maker):
                 if self.open_formula:
                     reactant_formulas.append(self.open_formula)
 
+                task_memory = memory_per_rxn * (len(chunk) + size)
+
                 rxn_chunk_refs.append(
-                    _get_selectivity_decorated_rxns_by_chunk.remote(
-                        chunk, all_rxns, self.open_formula, self.temp
-                    )
+                    _get_selectivity_decorated_rxns_by_chunk.options(
+                        memory=task_memory
+                    )(chunk, all_rxns, self.open_formula, self.temp)
                 )
 
             newly_completed, rxn_chunk_refs = ray.wait(
