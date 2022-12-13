@@ -205,6 +205,8 @@ class CalculateSelectivitiesMaker(Maker):
         for rxn_set in rxn_sets[1:]:
             all_rxns = all_rxns.add_rxn_set(rxn_set)
 
+        size = len(all_rxns)  # need to get size before storing in ray
+
         logger.info("Identifying target reactions...")
 
         target_rxns = ReactionSet.from_rxns(
@@ -212,7 +214,7 @@ class CalculateSelectivitiesMaker(Maker):
         )
         logger.info(
             f"Identified {len(target_rxns)} target reactions out of"
-            f" {len(all_rxns)} total reactions."
+            f" {size} total reactions."
         )
         logger.info("Placing reactions in ray object store...")
 
@@ -222,7 +224,9 @@ class CalculateSelectivitiesMaker(Maker):
         decorated_rxns = target_rxns
 
         if self.calculate_selectivities:
-            decorated_rxns = self._get_selectivity_decorated_rxns(target_rxns, all_rxns)
+            decorated_rxns = self._get_selectivity_decorated_rxns(
+                target_rxns, all_rxns, size
+            )
 
         logger.info("Calculating chemical potential distances...")
 
@@ -250,8 +254,7 @@ class CalculateSelectivitiesMaker(Maker):
         doc.task_label = self.name
         return doc
 
-    def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns):
-        size = len(all_rxns)
+    def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns, size):
         memory_per_rxn = 1500  # generous estimate of 1.5kb memory per reaction
 
         memory_size = int(ray.cluster_resources()["memory"])
