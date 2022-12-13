@@ -301,7 +301,7 @@ class CalculateSelectivitiesMaker(Maker):
                 rxn_chunk_refs.append(
                     _get_selectivity_decorated_rxns_by_chunk.options(
                         memory=task_memory
-                    )(chunk, all_rxns, self.open_formula, self.temp)
+                    ).remote(chunk, all_rxns, self.open_formula, self.temp)
                 )
 
             newly_completed, rxn_chunk_refs = ray.wait(
