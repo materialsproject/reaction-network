@@ -255,7 +255,7 @@ class CalculateSelectivitiesMaker(Maker):
         return doc
 
     def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns, size):
-        memory_per_rxn = 1000  # generous estimate of 1.0kb memory per reaction
+        memory_per_rxn = 800  # estimate of 800 bytes memory per rxn
 
         memory_size = int(ray.cluster_resources()["memory"])
         logger.info(f"Available memory: {memory_size}")
@@ -302,7 +302,7 @@ class CalculateSelectivitiesMaker(Maker):
                 if self.open_formula:
                     reactant_formulas.append(self.open_formula)
 
-                task_memory = memory_per_rxn * (len(chunk) + size)
+                task_memory = memory_per_rxn * (size)
 
                 rxn_chunk_refs.append(
                     _get_selectivity_decorated_rxns_by_chunk.options(
