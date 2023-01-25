@@ -66,19 +66,31 @@ class GetEntrySetMaker(Maker):
     name: str = "get_and_process_entries"
     entry_db_name: str = "entries_db"
     temperature: int = 300
-    include_nist_data: bool = True
+    include_nist_data: bool = False
     include_barin_data: bool = False
     include_freed_data: bool = False
     e_above_hull: float = 0.0
     include_polymorphs: bool = False
     formulas_to_include: list = field(default_factory=list)
     calculate_e_above_hulls: bool = True
+    use_r2scan_data: bool = False
     MP_API_KEY: Optional[str] = None
     property_data: Optional[List[str]] = None
 
     @job(entries="entries", output_schema=EntrySetDocument)
     def make(self, chemsys):
         entry_db = SETTINGS.JOB_STORE.additional_stores.get(self.entry_db_name)
+
+        if self.use_r2scan_data:
+            try:
+                from emmet.core.thermo import ThermoType
+                from pymatgen.entries.mixing_scheme import (
+                    MaterialsProjectDFTMixingScheme,
+                )
+            except ImportError as e:
+                raise ImportError(
+                    "Could not import GGA/R2SCAN mixing scheme. Please update pymatgen."
+                ) from e
 
         if entry_db:
             property_data = self.property_data
@@ -98,11 +110,24 @@ class GetEntrySetMaker(Maker):
         else:
             from mp_api.client import MPRester
 
+            api_key = None  # defaults to ENV variable
             if self.MP_API_KEY:
-                with MPRester(self.MP_API_KEY) as mpr:
-                    entries = mpr.get_entries_in_chemsys(elements=chemsys)
+                api_key = self.MP_API_KEY
+
+            if self.use_r2scan_data:
+                with MPRester() as mpr:
+                    entries = mpr.get_entries_in_chemsys(
+                        elements=chemsys,
+                        compatible_only=False,
+                        additional_criteria={
+                            "thermo_types": [ThermoType.GGA_GGA_U, ThermoType.R2SCAN]
+                        },
+                    )
+                    # TODO: waiting for mp-api fix, then can remove this in-place mixing
+                    entries = MaterialsProjectDFTMixingScheme().process_entries(entries)
+
             else:
-                with MPRester() as mpr:  # let MPRester look for env variable
+                with MPRester(api_key=api_key) as mpr:
                     entries = mpr.get_entries_in_chemsys(elements=chemsys)
 
         entries = process_entries(

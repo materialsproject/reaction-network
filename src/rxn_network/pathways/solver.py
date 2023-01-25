@@ -2,7 +2,7 @@
 Implements a reaction pathway solver class which efficiently solves mass balance
 equations using matrix operations.
 """
-
+import math
 from copy import deepcopy
 from itertools import combinations
 from typing import Optional, Union
@@ -278,7 +278,7 @@ class PathwaySolver(Solver):
                     *[
                         (entries[idx], c)
                         for idx, c in enumerate(rxn_mat)
-                        if not np.isclose(c, 0.0)
+                        if not math.isclose(c, 0.0)
                     ]
                 )
 

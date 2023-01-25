@@ -1,5 +1,6 @@
 """Code for analyzing sets of reactions between two phases."""
 
+import math
 from functools import cached_property, lru_cache
 from itertools import combinations
 from typing import List, Tuple
@@ -151,9 +152,9 @@ class InterfaceReactionHull(MSONable):
             x1 = self.coords[v1, 0]
             x2 = self.coords[v2, 0]
 
-            if np.isclose(coordinate, x1):
+            if math.isclose(coordinate, x1):
                 return {self.reactions[v1]: 1.0}
-            if np.isclose(coordinate, x2):
+            if math.isclose(coordinate, x2):
                 return {self.reactions[v2]: 1.0}
             if x1 < coordinate < x2:
                 return {
@@ -331,7 +332,7 @@ class InterfaceReactionHull(MSONable):
 
         coords = []
 
-        if np.isclose(x_min, 0.0) and not np.isclose(y_min, 0.0):
+        if math.isclose(x_min, 0.0) and not math.isclose(y_min, 0.0):
             coords.append([0.0, 0.0])
 
         coords.append([x_min, y_min])
@@ -348,7 +349,7 @@ class InterfaceReactionHull(MSONable):
 
         if x_max != x_min:
             coords.append([x_max, y_max])
-        if np.isclose(x_max, 1.0) and not np.isclose(y_max, 0.0):
+        if math.isclose(x_max, 1.0) and not math.isclose(y_max, 0.0):
             coords.append([1.0, 0.0])
 
         coords = np.array(coords)
@@ -438,9 +439,9 @@ class InterfaceReactionHull(MSONable):
         val = 0
         total = 0
         for c in coords:
-            if c[0] == 0.0 and not np.isclose(c[1], 0.0):
+            if c[0] == 0.0 and not math.isclose(c[1], 0.0):
                 use_x_min_ref = False
-            elif c[0] == 1.0 and not np.isclose(c[1], 0.0):
+            elif c[0] == 1.0 and not math.isclose(c[1], 0.0):
                 use_x_max_ref = False
 
             height = self._calculate_altitude([x_min, y_min], c, [x_max, y_max])
@@ -562,7 +563,7 @@ class InterfaceReactionHull(MSONable):
             i
             for i in self.hull.vertices
             if self.coords[i, 1] <= 0
-            and np.isclose(
+            and math.isclose(
                 self.coords[self.coords[:, 0] == self.coords[i, 0]][:, 1].min(),
                 self.coords[i, 1],  # make sure point is lower than others on same x
             )

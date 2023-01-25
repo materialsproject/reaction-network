@@ -3,6 +3,7 @@ This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.
 """
 
+import math
 import re
 from copy import deepcopy
 from functools import cached_property
@@ -395,7 +396,7 @@ class BasicReaction(Reaction):
         if self.balanced is False:  # if not balanced, can not check coefficients
             return True
         return all(
-            np.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
+            math.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
             for c in self.reactant_coeffs
         )
 

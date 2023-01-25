@@ -3,6 +3,7 @@ A computed entry object for estimating the Gibbs free energy of formation. Note 
 this is similar to the implementation within pymatgen, but has been refactored here to
 add extra functionality.
 """
+import math
 from copy import deepcopy
 from itertools import combinations
 from typing import List, Optional
@@ -329,10 +330,10 @@ class GibbsComputedEntry(ComputedEntry):
         if not type(other) is type(self):
             return False
 
-        if not np.isclose(self.temperature, other.temperature):
+        if not math.isclose(self.temperature, other.temperature):
             return False
 
-        if not np.isclose(self.energy, other.energy):
+        if not math.isclose(self.energy, other.energy):
             return False
 
         if getattr(self, "entry_id", None) and getattr(other, "entry_id", None):
