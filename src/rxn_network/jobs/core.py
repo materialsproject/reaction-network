@@ -46,7 +46,7 @@ class GetEntrySetMaker(Maker):
     Maker to create job for acquiring and processing entries to be used in reaction
     enumeration or network building.
 
-    Args (A list of argumnets provided to the dataclass)
+    Args:
         name: Name of the job.
         entry_db_name: Name of the entry database store to use. If none is available,
             will automatically use MPRester to acquire entries.
@@ -124,7 +124,7 @@ class GetEntrySetMaker(Maker):
                         },
                     )
                     # TODO: waiting for mp-api fix, then can remove this in-place mixing
-                    entries = MaterialsProjectDFTMixingScheme().process_entries(entries)
+                entries = MaterialsProjectDFTMixingScheme().process_entries(entries)
 
             else:
                 with MPRester(api_key=api_key) as mpr:
