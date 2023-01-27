@@ -28,7 +28,11 @@ from rxn_network.jobs.schema import (
     PathwaySolverTaskDocument,
     SelectivitiesTaskDocument,
 )
-from rxn_network.jobs.utils import get_added_elem_data, run_enumerators
+from rxn_network.jobs.utils import (
+    get_added_elem_data,
+    process_entries_with_mixing_scheme,
+    run_enumerators,
+)
 from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.basic import BasicReaction
@@ -123,8 +127,9 @@ class GetEntrySetMaker(Maker):
                             "thermo_types": [ThermoType.GGA_GGA_U, ThermoType.R2SCAN]
                         },
                     )
-                    # TODO: waiting for mp-api fix, then can remove this in-place mixing
-                entries = MaterialsProjectDFTMixingScheme().process_entries(entries)
+
+                # TODO: waiting for mp-api fix, then can remove this local processing
+                entries = process_entries_with_mixing_scheme(entries)
 
             else:
                 with MPRester(api_key=api_key) as mpr:
