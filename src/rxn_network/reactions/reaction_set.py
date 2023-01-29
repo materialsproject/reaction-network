@@ -341,13 +341,19 @@ class ReactionSet(MSONable):
 
         return self._get_rxns_by_indices(idxs)
 
-    def filter_duplicates(self):
+    def filter_duplicates(self, ensure_rxns: Optional[List[ComputedReaction]] = None):
         """
         Return a new ReactionSet object with duplicate reactions removed
         """
         indices_to_remove = set()
         if len(self.coeffs) == 0:
             return self
+
+        rxns_list = list(self.get_rxns())
+
+        idxs_to_keep: List[int] = []
+        if ensure_rxns:
+            idxs_to_keep = [rxns_list.index(r) for r in ensure_rxns]
 
         # groupby only works with pre-sorted arrays
         sorted_coeffs, sorted_idxs, sorted_indices = zip(
@@ -365,7 +371,7 @@ class ReactionSet(MSONable):
         ):
             coeffs_group, idx_group, indices_group = zip(*group)
             if len(idx_group) > 1:
-                for (_, coeffs1, indices1), (
+                for (idx1, coeffs1, indices1), (
                     idx2,
                     coeffs2,
                     indices2,
@@ -382,7 +388,10 @@ class ReactionSet(MSONable):
                         continue
 
                     if np.isclose(ratios[0], ratios).all():
-                        indices_to_remove.add(idx2)
+                        if idx2 in idxs_to_keep:
+                            indices_to_remove.add(idx1)
+                        else:
+                            indices_to_remove.add(idx2)
 
         new_indices = []
         new_coeffs = []
