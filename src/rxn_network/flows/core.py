@@ -12,7 +12,7 @@ from rxn_network.enumerators.minimize import (
     MinimizeGrandPotentialEnumerator,
 )
 from rxn_network.jobs.core import (
-    CalculateSelectivitiesMaker,
+    CalculateCompetitionMaker,
     GetEntrySetMaker,
     NetworkMaker,
     PathwaySolverMaker,
@@ -30,8 +30,8 @@ class RetrosynthesisFlowMaker(Maker):
     enumeration_maker: ReactionEnumerationMaker = field(
         default_factory=ReactionEnumerationMaker
     )
-    calculate_selectivities_maker: CalculateSelectivitiesMaker = field(
-        default_factory=CalculateSelectivitiesMaker
+    calculate_competition_maker: CalculateCompetitionMaker = field(
+        default_factory=CalculateCompetitionMaker
     )
     open_elem: Optional[Element] = None
     chempots: Optional[List[float]] = None
@@ -120,12 +120,12 @@ class RetrosynthesisFlowMaker(Maker):
         jobs.append(enumeration_job)
 
         base_rxn_set = enumeration_job.output.rxns
-        base_calculate_selectivities_job = self.calculate_selectivities_maker.make(
+        base_calculate_competition_job = self.calculate_competition_maker.make(
             rxn_sets=[base_rxn_set],
             entries=entries,
             target_formula=target_formula,
         )
-        jobs.append(base_calculate_selectivities_job)
+        jobs.append(base_calculate_competition_job)
 
         if self.open_elem and self.chempots:
             for chempot in self.chempots:
@@ -134,12 +134,12 @@ class RetrosynthesisFlowMaker(Maker):
                     {"name": self.enumeration_maker.name + subname},
                     nested=False,
                 )
-                calculate_selectivities_maker = (
-                    self.calculate_selectivities_maker.update_kwargs(
+                calculate_competition_maker = (
+                    self.calculate_competition_maker.update_kwargs(
                         {
                             "chempot": chempot,
                             "open_elem": self.open_elem,
-                            "name": self.calculate_selectivities_maker.name + subname,
+                            "name": self.calculate_competition_maker.name + subname,
                         },
                         nested=False,
                     )
@@ -169,13 +169,13 @@ class RetrosynthesisFlowMaker(Maker):
                 )
                 jobs.append(enumeration_job)
 
-                calculate_selectivities_job = calculate_selectivities_maker.make(
+                calculate_competition_job = calculate_competition_maker.make(
                     rxn_sets=[base_rxn_set, enumeration_job.output.rxns],
                     entries=entries,
                     target_formula=target_formula,
                 )
 
-                jobs.append(calculate_selectivities_job)
+                jobs.append(calculate_competition_job)
 
         return Flow(jobs, name=flow_name)
 

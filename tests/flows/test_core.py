@@ -31,4 +31,4 @@ def test_retrosynthesis_flow_job(retrosynthesis_flow_job, job_store):
     assert len(retrosynthesis_flow_job.jobs) == 2
     output = run_locally(retrosynthesis_flow_job, store=job_store, ensure_success=True)
 
-    selectivities_doc = output[retrosynthesis_flow_job.job_uuids[-1]][1].output
+    competition_doc = output[retrosynthesis_flow_job.job_uuids[-1]][1].output

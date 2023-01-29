@@ -22,11 +22,11 @@ from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
 from rxn_network.enumerators.utils import get_computed_rxn
 from rxn_network.jobs.schema import (
+    CompetitionTaskDocument,
     EntrySetDocument,
     EnumeratorTaskDocument,
     NetworkTaskDocument,
     PathwaySolverTaskDocument,
-    SelectivitiesTaskDocument,
 )
 from rxn_network.jobs.utils import (
     get_added_elem_data,
@@ -203,14 +203,14 @@ class ReactionEnumerationMaker(Maker):
 
 
 @dataclass
-class CalculateSelectivitiesMaker(Maker):
-    """Maker to create job for calculating selectivities of a set of reactions and
+class CalculateCompetitionMaker(Maker):
+    """Maker to create job for calculating competition of a set of reactions and
     target formula."""
 
-    name: str = "calculate_selectivities"
+    name: str = "calculate_competition"
     open_elem: Optional[Element] = None
     chempot: Optional[float] = 0.0
-    calculate_selectivities: bool = True
+    calculate_competition: bool = True
     calculate_chempot_distances: bool = True
     temp: float = 300.0
     chunk_size: Optional[int] = None
@@ -223,7 +223,7 @@ class CalculateSelectivitiesMaker(Maker):
             Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
         )
 
-    @job(rxns="rxns", output_schema=SelectivitiesTaskDocument)
+    @job(rxns="rxns", output_schema=CompetitionTaskDocument)
     def make(self, rxn_sets, entries, target_formula):
         initialize_ray()
 
@@ -253,7 +253,7 @@ class CalculateSelectivitiesMaker(Maker):
 
         decorated_rxns = target_rxns
 
-        if self.calculate_selectivities:
+        if self.calculate_competition:
             decorated_rxns = self._get_competition_decorated_rxns(
                 target_rxns, all_rxns, size
             )
@@ -273,14 +273,14 @@ class CalculateSelectivitiesMaker(Maker):
             "chempot": self.chempot,
             "added_elements": added_elements,
             "added_chemsys": added_chemsys,
-            "calculate_selectivities": self.calculate_selectivities,
+            "calculate_competition": self.calculate_competition,
             "calculate_chempot_distances": self.calculate_chempot_distances,
             "temp": self.temp,
             "batch_size": self.batch_size,
             "cpd_kwargs": self.cpd_kwargs,
         }
 
-        doc = SelectivitiesTaskDocument(**data)
+        doc = CompetitionTaskDocument(**data)
         doc.task_label = self.name
         return doc
 

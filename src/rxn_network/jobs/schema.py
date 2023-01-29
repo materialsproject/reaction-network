@@ -62,7 +62,7 @@ class EnumeratorTaskDocument(BaseModel):
     )
 
 
-class SelectivitiesTaskDocument(BaseModel):
+class CompetitionTaskDocument(BaseModel):
     task_label: str = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
@@ -70,7 +70,7 @@ class SelectivitiesTaskDocument(BaseModel):
     )
     rxns: ReactionSet = Field(
         description=(
-            "The reaction set (reactions have calculated selectivities stored in data"
+            "The reaction set (reactions have calculated competition stored in data"
             " attribute"
         )
     )
@@ -87,8 +87,8 @@ class SelectivitiesTaskDocument(BaseModel):
     added_chemsys: str = Field(
         None, description="The chemical system of the added elements"
     )
-    calculate_selectivities: bool = Field(
-        None, description="Whether to calculate selectivities"
+    calculate_competition: bool = Field(
+        None, description="Whether to calculate competition"
     )
     calculate_chempot_distances: bool = Field(
         None, description="Whether to calculate chempot distances"
