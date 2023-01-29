@@ -166,13 +166,13 @@ class InterfaceReactionHull(MSONable):
 
         raise ValueError("No reactions found!")
 
-    def get_primary_selectivity(self, reaction: ComputedReaction, temp=300):
+    def get_primary_competition(self, reaction: ComputedReaction, temp=300):
         """
-        Calculates the competition score (c-score) for a given reaction. This formula is
+        Calculates the primary competition score for a given reaction. This formula is
         based on a methodology presented in the following paper: (TBD)
 
         Args:
-            reaction: Reaction to calculate the competition score for.
+            reaction: Reaction to calculate the primary competition score for.
 
         Returns:
             The c-score for the reaction
@@ -180,13 +180,13 @@ class InterfaceReactionHull(MSONable):
         energy = reaction.energy_per_atom
         idx = self.reactions.index(reaction)
         competing_rxns = self.reactions[:idx] + self.reactions[idx + 1 :]
-        primary = self._primary_selectivity_from_energies(
+        primary = self._primary_competition_from_energies(
             energy, [r.energy_per_atom for r in competing_rxns], temp
         )
 
         return primary
 
-    def get_secondary_selectivity(
+    def get_secondary_competition(
         self, reaction: ComputedReaction, normalize=True, recursive=False
     ):
         """
@@ -194,10 +194,10 @@ class InterfaceReactionHull(MSONable):
         methodology presented in the following paper: (TBD)
 
         Args:
-            reaction: Reaction to calculate the selectivity score for.
+            reaction: Reaction to calculate the competition score for.
 
         Returns:
-            The selectivity score for the reaction
+            The competition score for the reaction
         """
         x = self.get_coordinate(reaction)
         if recursive:
@@ -231,16 +231,16 @@ class InterfaceReactionHull(MSONable):
 
         return -1 * energy
 
-    def get_secondary_selectivity_max_energy(self, reaction: ComputedReaction):
+    def get_secondary_competition_max_energy(self, reaction: ComputedReaction):
         """
         Calculates the score for a given reaction. This formula is based on a
         methodology presented in the following paper: (TBD)
 
         Args:
-            reaction: Reaction to calculate the selectivity score for.
+            reaction: Reaction to calculate the competition score for.
 
         Returns:
-            The selectivity score for the reaction
+            The competition score for the reaction
         """
         x = self.get_coordinate(reaction)
         left_energy = self.get_max_decomposition_energy(0, x)
@@ -248,16 +248,16 @@ class InterfaceReactionHull(MSONable):
 
         return -1 * (left_energy + right_energy - self.get_energy_above_hull(reaction))
 
-    def get_secondary_selectivity_area(self, reaction: ComputedReaction):
+    def get_secondary_competition_area(self, reaction: ComputedReaction):
         """
         Calculates the score for a given reaction. This formula is based on a
         methodology presented in the following paper: (TBD)
 
         Args:
-            reaction: Reaction to calculate the selectivity score for.
+            reaction: Reaction to calculate the competition score for.
 
         Returns:
-            The selectivity score for the reaction
+            The competition score for the reaction
         """
         x = self.get_coordinate(reaction)
         left_area = self.get_decomposition_area(0, x)
@@ -611,9 +611,9 @@ class InterfaceReactionHull(MSONable):
         return y2 - yd
 
     @staticmethod
-    def _primary_selectivity_from_energies(rxn_energy, other_rxn_energies, temp):
+    def _primary_competition_from_energies(rxn_energy, other_rxn_energies, temp):
         """
-        Calculates the primary selectivity given a list of reaction energies.
+        Calculates the primary competition given a list of reaction energies.
         """
         all_rxn_energies = np.append(other_rxn_energies, rxn_energy)
         Q = np.sum(np.exp(-all_rxn_energies / (kb * temp)))

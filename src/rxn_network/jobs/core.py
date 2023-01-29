@@ -13,10 +13,10 @@ from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
-    PrimarySelectivityCalculator,
-    SecondarySelectivityAreaCalculator,
-    SecondarySelectivityCalculator,
-    SecondarySelectivityMaxCalculator,
+    PrimaryCompetitionCalculator,
+    SecondaryCompetitionAreaCalculator,
+    SecondaryCompetitionCalculator,
+    SecondaryCompetitionMaxCalculator,
 )
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
@@ -249,12 +249,12 @@ class CalculateSelectivitiesMaker(Maker):
         logger.info("Placing reactions in ray object store...")
 
         all_rxns = ray.put(all_rxns)
-        logger.info("Beginning selectivity calculations...")
+        logger.info("Beginning competition calculations...")
 
         decorated_rxns = target_rxns
 
         if self.calculate_selectivities:
-            decorated_rxns = self._get_selectivity_decorated_rxns(
+            decorated_rxns = self._get_competition_decorated_rxns(
                 target_rxns, all_rxns, size
             )
 
@@ -284,7 +284,7 @@ class CalculateSelectivitiesMaker(Maker):
         doc.task_label = self.name
         return doc
 
-    def _get_selectivity_decorated_rxns(self, target_rxns, all_rxns, size):
+    def _get_competition_decorated_rxns(self, target_rxns, all_rxns, size):
         memory_per_rxn = 800  # estimate of 800 bytes memory per rxn
 
         memory_size = int(ray.cluster_resources()["memory"])
@@ -335,7 +335,7 @@ class CalculateSelectivitiesMaker(Maker):
                 task_memory = memory_per_rxn * (size)
 
                 rxn_chunk_refs.append(
-                    _get_selectivity_decorated_rxns_by_chunk.options(
+                    _get_competition_decorated_rxns_by_chunk.options(
                         memory=task_memory
                     ).remote(chunk, all_rxns, self.open_formula, self.temp)
                 )
@@ -529,7 +529,7 @@ class PathwaySolverMaker(Maker):
 
 
 @ray.remote
-def _get_selectivity_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
+def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
     decorated_rxns = []
 
     for rxn in rxn_chunk:
@@ -551,19 +551,19 @@ def _get_selectivity_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, 
                 raise ValueError("Can only have 2 precursors, excluding open element!")
 
         decorated_rxns.append(
-            _get_selectivity_decorated_rxn(rxn, competing_rxns, reactant_formulas, temp)
+            _get_competition_decorated_rxn(rxn, competing_rxns, reactant_formulas, temp)
         )
 
     return decorated_rxns
 
 
-def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
+def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
     """ """
     if len(precursors_list) == 1:
         other_energies = np.array(
             [r.energy_per_atom for r in competing_rxns if r != rxn]
         )
-        primary_selectivity = InterfaceReactionHull._primary_selectivity_from_energies(  # pylint: disable=protected-access, line-too-long # noqa: E501
+        primary_competition = InterfaceReactionHull._primary_competition_from_energies(  # pylint: disable=protected-access, line-too-long # noqa: E501
             rxn.energy_per_atom, other_energies, temp=temp
         )
         energy_diffs = rxn.energy_per_atom - np.append(
@@ -571,13 +571,13 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         )  # consider identity reaction as well
 
         secondary_rxn_energies = energy_diffs[energy_diffs > 0]
-        secondary_selectivity = (
+        secondary_competition = (
             secondary_rxn_energies.max() if secondary_rxn_energies.any() else 0.0
         )
-        rxn.data["primary_selectivity"] = round(primary_selectivity, 4)
-        rxn.data["secondary_selectivity"] = round(secondary_selectivity, 4)
-        rxn.data["secondary_selectivity_max"] = round(secondary_selectivity, 4)
-        rxn.data["secondary_selectivity_area"] = round(secondary_selectivity, 4)
+        rxn.data["primary_competition"] = round(primary_competition, 4)
+        rxn.data["secondary_competition"] = round(secondary_competition, 4)
+        rxn.data["secondary_competition_max"] = round(secondary_competition, 4)
+        rxn.data["secondary_competition_area"] = round(secondary_competition, 4)
         decorated_rxn = rxn
     else:
         irh = InterfaceReactionHull(
@@ -586,10 +586,10 @@ def _get_selectivity_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
             list(competing_rxns),
         )
 
-        calc_1 = PrimarySelectivityCalculator(irh=irh, temp=temp)
-        calc_2 = SecondarySelectivityCalculator(irh=irh)
-        calc_3 = SecondarySelectivityMaxCalculator(irh=irh)
-        calc_4 = SecondarySelectivityAreaCalculator(irh=irh)
+        calc_1 = PrimaryCompetitionCalculator(irh=irh, temp=temp)
+        calc_2 = SecondaryCompetitionCalculator(irh=irh)
+        calc_3 = SecondaryCompetitionMaxCalculator(irh=irh)
+        calc_4 = SecondaryCompetitionAreaCalculator(irh=irh)
 
         decorated_rxn = calc_1.decorate(rxn)
         decorated_rxn = calc_2.decorate(decorated_rxn)

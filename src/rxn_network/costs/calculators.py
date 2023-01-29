@@ -140,9 +140,9 @@ class ChempotDistanceCalculator(Calculator):
         return self._name
 
 
-class PrimarySelectivityCalculator(Calculator):
+class PrimaryCompetitionCalculator(Calculator):
     """
-    Calculator for determining the primary selectivity for a reaction
+    Calculator for determining the level of primary competition for a reaction
     (in eV/atom).
 
     WARNING: This calculator is working but has not been sufficiently tested. Use at
@@ -154,12 +154,12 @@ class PrimarySelectivityCalculator(Calculator):
         self,
         irh: InterfaceReactionHull,
         temp=300,
-        name="primary_selectivity",
+        name="primary_competition",
     ):
         """
         Args:
             entries: Iterable of entries to be used for reaction enumeration in
-                determining c-score
+                determining primary competition score.
             cost_function: The cost function used to determine the c-score
             name: the data dictionary key with which to store the calculated value.
         """
@@ -180,7 +180,7 @@ class PrimarySelectivityCalculator(Calculator):
         Returns:
             The competitiveness score
         """
-        return self.irh.get_primary_selectivity(rxn, temp=self.temp)
+        return self.irh.get_primary_competition(rxn, temp=self.temp)
 
     @property
     def name(self):
@@ -188,9 +188,9 @@ class PrimarySelectivityCalculator(Calculator):
         return self._name
 
 
-class SecondarySelectivityCalculator(Calculator):
+class SecondaryCompetitionCalculator(Calculator):
     """
-    Calculator for determining the secondary selectivity for a reaction
+    Calculator for determining the secondary competition for a reaction
     (in eV/atom).
 
     WARNING: This calculator is working but has not been sufficiently tested. Use at
@@ -201,7 +201,7 @@ class SecondarySelectivityCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        name="secondary_selectivity",
+        name="secondary_competition",
     ):
         """
         Args:
@@ -226,7 +226,7 @@ class SecondarySelectivityCalculator(Calculator):
         Returns:
             The competitiveness score
         """
-        return self.irh.get_secondary_selectivity(rxn)
+        return self.irh.get_secondary_competition(rxn)
 
     @property
     def name(self):
@@ -234,9 +234,9 @@ class SecondarySelectivityCalculator(Calculator):
         return self._name
 
 
-class SecondarySelectivityMaxCalculator(Calculator):
+class SecondaryCompetitionMaxCalculator(Calculator):
     """
-    Calculator for determining the secondary selectivity for a reaction
+    Calculator for determining the secondary competition for a reaction
     (in eV/atom).
 
     WARNING: This calculator is working but has not been sufficiently tested. Use at
@@ -247,7 +247,7 @@ class SecondarySelectivityMaxCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        name="secondary_selectivity_max",
+        name="secondary_competition_max",
     ):
         """
         Args:
@@ -272,7 +272,7 @@ class SecondarySelectivityMaxCalculator(Calculator):
         Returns:
             The competitiveness score
         """
-        return self.irh.get_secondary_selectivity_max_energy(rxn)
+        return self.irh.get_secondary_competition_max_energy(rxn)
 
     @property
     def name(self):
@@ -280,9 +280,9 @@ class SecondarySelectivityMaxCalculator(Calculator):
         return self._name
 
 
-class SecondarySelectivityAreaCalculator(Calculator):
+class SecondaryCompetitionAreaCalculator(Calculator):
     """
-    Calculator for determining the secondary selectivity for a reaction
+    Calculator for determining the secondary competition for a reaction
     (in eV/atom).
 
     WARNING: This calculator is working but has not been sufficiently tested. Use at
@@ -293,7 +293,7 @@ class SecondarySelectivityAreaCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        name="secondary_selectivity_area",
+        name="secondary_competition_area",
     ):
         """
         Args:
@@ -318,7 +318,7 @@ class SecondarySelectivityAreaCalculator(Calculator):
         Returns:
             The competitiveness score
         """
-        return self.irh.get_secondary_selectivity_area(rxn)
+        return self.irh.get_secondary_competition_area(rxn)
 
     @property
     def name(self):

@@ -11,7 +11,7 @@ from pymatgen.analysis.chempot_diagram import plotly_layouts
 def plot_reaction_scatter(
     df: DataFrame,
     x="energy",
-    y="secondary_selectivity",
+    y="secondary_competition",
     z=None,
     color="has_added_elems",
     plot_pareto=True,
@@ -45,11 +45,11 @@ def plot_reaction_scatter(
             if z is not None:
                 label = "Total chemical potential distance"
             units = "eV/atom"
-        elif name == "primary_selectivity":
-            label = "Primary Selectivity"
+        elif name == "primary_competition":
+            label = "Primary Competition"
             units = "a.u."
-        elif name == "secondary_selectivity":
-            label = "Secondary Selectivity"
+        elif name == "secondary_competition":
+            label = "Secondary Competition"
             units = "eV/atom"
         elif name == "dE":
             label = "Uncertainty"
@@ -162,7 +162,7 @@ def plot_reaction_scatter(
 
 def get_pareto_front(
     df: DataFrame,
-    cols=("energy", "primary_selectivity", "secondary_selectivity"),
+    cols=("energy", "primary_competition", "secondary_competition"),
     maximize=False,
 ):
 

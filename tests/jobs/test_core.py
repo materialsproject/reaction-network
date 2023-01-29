@@ -108,8 +108,8 @@ def test_calculate_selectivities_job(selectivities_job, job_store):
     doc = output[selectivities_job.uuid][1].output
     assert doc.__class__.__name__ == "SelectivitiesTaskDocument"
     for r in doc.rxns:
-        assert r.data["primary_selectivity"] is not None
-        assert r.data["secondary_selectivity"] is not None
+        assert r.data["primary_competition"] is not None
+        assert r.data["secondary_competition"] is not None
         assert r.data["chempot_distance"] is not None
 
 

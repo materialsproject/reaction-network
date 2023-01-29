@@ -79,9 +79,9 @@ class ReactionThermo(BaseModel):
     )
 
 
-class ReactionSelectivity(BaseModel):
+class ReactionCompetition(BaseModel):
     """
-    A class for storing the reaction selectivity related parameters (e.g., chemical
+    A class for storing the reaction competition related parameters (e.g., chemical
     potential distance)
     """
 
@@ -140,8 +140,8 @@ class ComputedSynthesisRecipe(BaseModel):
 
     rxn: Reaction = Field(None, description="Balanced reaction")
     thermo: ReactionThermo = Field(None, description="Reaction thermodynamics data")
-    selectivity: ReactionSelectivity = Field(
-        None, description="Reaction selectivity data"
+    competition: ReactionCompetition = Field(
+        None, description="Reaction competition data"
     )
     heuristics: ReactionHeuristics = Field(None, description="Reaction heuristics data")
     cost: float = Field(None, description="Calculated cost of the reaction")
@@ -168,7 +168,7 @@ class ComputedSynthesisRecipe(BaseModel):
             energy_per_atom=round(rxn.energy_per_atom, 5),
             uncertainty_per_atom=round(rxn.energy_uncertainty_per_atom, 5),
         )
-        data["selectivity"] = ReactionSelectivity(
+        data["competition"] = ReactionCompetition(
             chempot_distance=round(chempot_distance, 5)
             if chempot_distance is not None
             else None,

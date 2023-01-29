@@ -71,20 +71,20 @@ def test_get_coords_in_range(x1, x2, expected_length, irh_batio):
     assert coords[-1, 0] == pytest.approx(x2)
 
 
-def test_get_primary_selectivity(irh_batio, stable_rxn, unstable_rxn):
-    assert irh_batio.get_primary_selectivity(stable_rxn, temp=300) == pytest.approx(
+def test_get_primary_competition(irh_batio, stable_rxn, unstable_rxn):
+    assert irh_batio.get_primary_competition(stable_rxn, temp=300) == pytest.approx(
         1.7824197647022084
     )
-    assert irh_batio.get_primary_selectivity(unstable_rxn, temp=300) == pytest.approx(
+    assert irh_batio.get_primary_competition(unstable_rxn, temp=300) == pytest.approx(
         41.321218932490815
     )
 
 
-def test_get_secondary_selectivity(irh_batio, stable_rxn, unstable_rxn):
-    assert irh_batio.get_secondary_selectivity(stable_rxn) == pytest.approx(
+def test_get_secondary_competition(irh_batio, stable_rxn, unstable_rxn):
+    assert irh_batio.get_secondary_competition(stable_rxn) == pytest.approx(
         0.41705577943708827
     )
-    assert irh_batio.get_secondary_selectivity(unstable_rxn) == pytest.approx(
+    assert irh_batio.get_secondary_competition(unstable_rxn) == pytest.approx(
         1.4664328079494886
     )
 

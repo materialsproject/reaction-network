@@ -7,8 +7,8 @@ from rxn_network.builders.schema import (
     ComputedSynthesisRecipesDoc,
     Phase,
     Reaction,
+    ReactionCompetition,
     ReactionHeuristics,
-    ReactionSelectivity,
     ReactionThermo,
 )
 from rxn_network.core.composition import Composition

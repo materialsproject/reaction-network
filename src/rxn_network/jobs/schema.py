@@ -96,7 +96,7 @@ class SelectivitiesTaskDocument(BaseModel):
     temp: float = Field(
         None,
         description=(
-            "The temperature in K used to determine the primary selectivity weightings."
+            "The temperature in K used to determine the primary competition weightings."
         ),
     )
     batch_size: int = Field(None, description="The batch size for the reaction set")
