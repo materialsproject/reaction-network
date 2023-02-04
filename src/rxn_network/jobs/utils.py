@@ -66,7 +66,9 @@ def process_entries_with_mixing_scheme(entries):
                 seen_chemsyses.append(chemsys_2)
                 ents.extend(entries_2)
 
-        new_ents = MaterialsProjectDFTMixingScheme().process_entries(ents)
+        new_ents = MaterialsProjectDFTMixingScheme().process_entries(
+            ents, verbose=False
+        )
 
         processed_entries.update(new_ents)
 
