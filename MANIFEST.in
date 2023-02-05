@@ -1,1 +1,1 @@
-graft reaction-network/src/rxn_network/data*
+graft src/rxn_network/data*
