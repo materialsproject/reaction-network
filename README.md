@@ -1,6 +1,6 @@
 # ![Reaction Network](docs/images/logo.png)
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/GENESIS-EFRC/reaction-network/testing?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/GENESIS-EFRC/reaction-network/testing.yml?style=for-the-badge)
 ![Codecov](https://img.shields.io/codecov/c/github/GENESIS-EFRC/reaction-network?style=for-the-badge)
 
 ![PyPI - Python
@@ -21,9 +21,8 @@ pip install reaction-network
 
 The package will then be installed under the name `rxn_network`.
 
-*As of version 7.0, the `reaction-network` package no longer uses `graph-tool`. All
-network functionality is now implemented using `rustworkx`. This means it is no longer
-required to complete any extra installations.*
+> **Note**
+> As of version 7.0 and beyond, the `reaction-network` package no longer uses `graph-tool`. All network functionality is now implemented using `rustworkx`. This means it is no longer required to complete any extra installations.
 
 # Tutorial notebooks
 
