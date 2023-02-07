@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 from pymatgen.core.composition import Element
 from pymatgen.entries.mixing_scheme import MaterialsProjectDFTMixingScheme
+from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
 from rxn_network.utils.funcs import get_logger
@@ -55,7 +56,7 @@ def process_entries_with_mixing_scheme(entries):
     processed_entries = set()
     seen_chemsyses = []
 
-    for chemsys, _ in reverse_entry_dict.items():
+    for chemsys, _ in tqdm(reverse_entry_dict.items()):
         if chemsys in seen_chemsyses:
             continue
         els = chemsys.split("-")
