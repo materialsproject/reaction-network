@@ -1,5 +1,22 @@
 # Changelog
 
+## [v7.0.1](https://github.com/GENESIS-EFRC/reaction-network/tree/v7.0.1) (2023-02-07)
+
+[Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v7.0.0...v7.0.1)
+
+**Fixed bugs:**
+
+- added data file in pip package [\#218](https://github.com/GENESIS-EFRC/reaction-network/pull/218) ([R1j1t](https://github.com/R1j1t))
+
+**Closed issues:**
+
+- \[BUG\] file not found error after pip install [\#217](https://github.com/GENESIS-EFRC/reaction-network/issues/217)
+
+**Merged pull requests:**
+
+- Patch release [\#221](https://github.com/GENESIS-EFRC/reaction-network/pull/221) ([mattmcdermott](https://github.com/mattmcdermott))
+- Fix broken testing for next patch release [\#220](https://github.com/GENESIS-EFRC/reaction-network/pull/220) ([mattmcdermott](https://github.com/mattmcdermott))
+
 ## [v7.0.0](https://github.com/GENESIS-EFRC/reaction-network/tree/v7.0.0) (2022-10-27)
 
 [Full Changelog](https://github.com/GENESIS-EFRC/reaction-network/compare/v6.1.1...v7.0.0)
