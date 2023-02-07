@@ -16,7 +16,6 @@ from rxn_network.utils.funcs import datetime_str
 
 
 class EntrySetDocument(BaseModel):
-
     task_label: str = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,

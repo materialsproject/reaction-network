@@ -5,7 +5,7 @@ import sys
 from datetime import datetime
 from itertools import chain, combinations, zip_longest
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Optional, Any, Iterable
 
 
 def limited_powerset(iterable, max_size) -> Iterable:
@@ -25,7 +25,7 @@ def limited_powerset(iterable, max_size) -> Iterable:
     )
 
 
-def grouper(iterable: Iterable, n: int, fillvalue: Any = None):
+def grouper(iterable: Iterable, n: int, fillvalue: Optional[Any] = None):
     """
     Collects data into fixed-length chunks or blocks.
 

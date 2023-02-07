@@ -4,7 +4,7 @@ doc-warnings: false
 ignore-paths:
   - docs
   - tests
-  - data/nist/generate_janaf_data.py
+  - examples
 
 bandit:
   run: false
@@ -37,6 +37,7 @@ pylint:
     - R0903
     - R0913
     - R0914
+    - use-dict-literal
 mypy:
   run: true
   options:

@@ -30,7 +30,7 @@ def plot_network(graph: rx.PyGraph, vertex_cmap_name: str = "jet", **kwargs):
         arrow_size=3,
         node_color=vertex_colors,
         alpha=0.8,
-        **kwargs
+        **kwargs,
     )
 
 

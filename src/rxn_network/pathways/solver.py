@@ -6,7 +6,7 @@ equations using matrix operations.
 from copy import deepcopy
 from itertools import combinations
 from math import comb
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 import ray
@@ -44,8 +44,8 @@ class PathwaySolver(Solver):
         pathways: PathwaySet,
         entries: GibbsEntrySet,
         cost_function: CostFunction,
-        open_elem: str = None,
-        chempot: float = None,
+        open_elem: Optional[str] = None,
+        chempot: Optional[float] = None,
         chunk_size=100000,
         batch_size=None,
     ):
