@@ -1,11 +1,13 @@
-"""Class for intepolated entries"""
+"""Class for intepolated entries, i.e. entries which are based on
+guessed energies (interpolated) from the phase diagram."""
+
+from typing import Optional
 
 import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core.composition import Composition
-from typing import Optional
 
 
 class InterpolatedEntry(ComputedEntry):
