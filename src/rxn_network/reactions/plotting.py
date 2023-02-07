@@ -165,7 +165,6 @@ def get_pareto_front(
     cols=("energy", "primary_selectivity", "secondary_selectivity"),
     maximize=False,
 ):
-
     df_original = df.copy()
     df = df_original[list(cols)]
     pts = df.to_numpy()
