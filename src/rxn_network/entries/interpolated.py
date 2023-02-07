@@ -5,6 +5,7 @@ from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core.composition import Composition
+from typing import Optional
 
 
 class InterpolatedEntry(ComputedEntry):
@@ -19,10 +20,10 @@ class InterpolatedEntry(ComputedEntry):
         composition: Composition,
         energy: float,
         correction: float = 0.0,
-        energy_adjustments: list = None,
-        parameters: dict = None,
-        data: dict = None,
-        entry_id: object = None,
+        energy_adjustments: Optional[list] = None,
+        parameters: Optional[dict] = None,
+        data: Optional[dict] = None,
+        entry_id: Optional[object] = None,
     ):
         """
         Initializes an InterpolatedEntry.

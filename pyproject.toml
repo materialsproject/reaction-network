@@ -88,10 +88,9 @@ exclude_lines = [
     'if typing.TYPE_CHECKING:',
     '^\s*@overload( |$)',
 ]
-omit = ["data/nist/generate_janaf_data.py", "data/freed/generate_freed_data.py"]
 
 [tool.flake8]
-exclude = ".git,__pycache__,tests,src/data"
+exclude = ".git,__pycache__,tests"
 max-line-length = 88
 max-doc-length = 88
 extend-ignore = "E741,W291,W293,E501,E231,E203,F401"
