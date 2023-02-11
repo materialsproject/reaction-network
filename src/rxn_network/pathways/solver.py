@@ -474,5 +474,4 @@ def _balance_path_arrays_cpu_wrapper(
     comp_matrices,
     net_rxn_vector,
 ):
-
     return _balance_path_arrays_cpu(comp_matrices, net_rxn_vector)

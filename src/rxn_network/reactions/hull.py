@@ -384,8 +384,16 @@ class InterfaceReactionHull(MSONable):
             208012,
             742900,
             2674440,
+            9694845,
+            35357670,
+            129644790,
+            477638700,
+            1767263190,
+            6564120420,
+            24466267020,
+            91482563640,
         ]
-        if num < 15:
+        if num <= 22:
             count = counts[num]
         else:
             count = self._count_recursive(num)[0]
