@@ -547,7 +547,12 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         rxn.data["primary_competition"] = round(primary_competition, 4)
         rxn.data["secondary_competition"] = round(secondary_competition, 4)
         rxn.data["secondary_competition_max"] = round(secondary_competition, 4)
-        rxn.data["secondary_competition_area"] = round(secondary_competition, 4)
+
+        try:  # this has been failing...
+            rxn.data["secondary_competition_area"] = round(secondary_competition, 4)
+        except Exception:
+            pass
+
         decorated_rxn = rxn
     else:
         irh = InterfaceReactionHull(
