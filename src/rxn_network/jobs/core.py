@@ -547,11 +547,7 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         rxn.data["primary_competition"] = round(primary_competition, 4)
         rxn.data["secondary_competition"] = round(secondary_competition, 4)
         rxn.data["secondary_competition_max"] = round(secondary_competition, 4)
-
-        try:  # this has been failing...
-            rxn.data["secondary_competition_area"] = round(secondary_competition, 4)
-        except Exception:
-            pass
+        rxn.data["secondary_competition_area"] = round(secondary_competition, 4)
 
         decorated_rxn = rxn
     else:
@@ -569,7 +565,11 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         decorated_rxn = calc_1.decorate(rxn)
         decorated_rxn = calc_2.decorate(decorated_rxn)
         decorated_rxn = calc_3.decorate(decorated_rxn)
-        decorated_rxn = calc_4.decorate(decorated_rxn)
+        try:  # this has been failing lately
+            decorated_rxn = calc_4.decorate(decorated_rxn)
+        except Exception:
+            print("Secondary competition area error with rxn: ", decorated_rxn)
+            decorated_rxn["secondary_competition_area"] = None
 
     return decorated_rxn
 
