@@ -569,7 +569,7 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
             decorated_rxn = calc_4.decorate(decorated_rxn)
         except Exception:
             print("Secondary competition area error with rxn: ", decorated_rxn)
-            decorated_rxn["secondary_competition_area"] = None
+            decorated_rxn.data["secondary_competition_area"] = None
 
     return decorated_rxn
 
