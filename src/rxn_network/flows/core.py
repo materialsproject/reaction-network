@@ -92,7 +92,7 @@ class RetrosynthesisFlowMaker(Maker):
         basic_enumerator_kwargs = self.basic_enumerator_kwargs.copy()
         minimize_enumerator_kwargs = self.minimize_enumerator_kwargs.copy()
 
-        kwarg_update = dict(targets=targets, filter_by_chemsys=filter_by_chemsys)
+        kwarg_update = {"targets": targets, "filter_by_chemsys": filter_by_chemsys}
 
         basic_enumerator_kwargs.update(kwarg_update)
         minimize_enumerator_kwargs.update(kwarg_update)
@@ -139,6 +139,7 @@ class RetrosynthesisFlowMaker(Maker):
                         {
                             "chempot": chempot,
                             "open_elem": self.open_elem,
+                            "temp": self.get_entry_set_maker.temperature,
                             "name": self.calculate_competition_maker.name + subname,
                         },
                         nested=False,
