@@ -265,6 +265,25 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         return self.get_stabilized_entry(entry, tol)
 
+    def get_entries_with_new_temperature(self, new_temperature) -> "GibbsEntrySet":
+        """
+        Returns a new GibbsEntrySet with entries that have had their energies
+        modified by using a new temperature.
+
+        Note: this will clear the "e_above_hull" data for each entry and re-calculate
+        them only if the original entry set had them calculated.
+        """
+        new_entries = []
+
+        for entry in self.entries_list:
+            new_entry = entry.get_new_temperature(new_temperature)
+            new_entry.data["e_above_hull"] = None
+            new_entries.append(new_entry)
+
+        return self.__class__(
+            new_entries, calculate_e_above_hulls=self.calculate_e_above_hulls
+        )
+
     def get_entries_with_jitter(self) -> "GibbsEntrySet":
         """
         Returns a new GibbsEntrySet with entries that have had their energies shifted by

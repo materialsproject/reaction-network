@@ -50,7 +50,7 @@ def process_entries(
         A GibbsEntrySet object containing GibbsComputedEntry objects with specified
         constraints.
     """
-    entry_set = GibbsEntrySet.from_entries(
+    entry_set = GibbsEntrySet.from_computed_entries(
         entries=entries,
         temperature=temperature,
         include_nist_data=include_nist_data,
@@ -60,8 +60,10 @@ def process_entries(
     entry_set = entry_set.filter_by_stability(
         e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
     )
+
     if calculate_e_above_hulls:
         entry_set = GibbsEntrySet(deepcopy(entry_set), calculate_e_above_hulls=True)
+
     included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include]
 
     entry_set.update(included_entries)

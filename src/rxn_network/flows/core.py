@@ -61,9 +61,13 @@ class RetrosynthesisFlowMaker(Maker):
         else:
             flow_name = flow_name + f" (+ {'-'.join(sorted(added_elems))})"
 
+        flow_name = flow_name + f", T={self.get_entry_set_maker.temperature} K"
+
         chemsys = "-".join(
-            {str(e) for e in Composition(target_formula).elements}
-            | {str(e) for e in added_elems}
+            sorted(
+                {str(e) for e in Composition(target_formula).elements}
+                | {str(e) for e in added_elems}
+            )
         )
 
         jobs = []
