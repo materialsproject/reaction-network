@@ -69,6 +69,7 @@ class GetEntrySetMaker(Maker):
     include_barin_data: bool = False
     include_freed_data: bool = False
     e_above_hull: float = 0.0
+    filter_at_temperature: Optional[int] = None
     include_polymorphs: bool = False
     formulas_to_include: list = field(default_factory=list)
     calculate_e_above_hulls: bool = True
@@ -98,11 +99,11 @@ class GetEntrySetMaker(Maker):
         else:
             from mp_api.client import MPRester
 
-            api_key = None  # default behavior: look for environment variable
+            kwargs = {}
             if self.MP_API_KEY:
-                api_key = self.MP_API_KEY
+                kwargs["api_key"] = self.MP_API_KEY
 
-            with MPRester(api_key=api_key) as mpr:
+            with MPRester(**kwargs) as mpr:
                 entries = mpr.get_entries_in_chemsys(elements=chemsys)
 
         entries = process_entries(
@@ -112,6 +113,7 @@ class GetEntrySetMaker(Maker):
             include_barin_data=self.include_barin_data,
             include_freed_data=self.include_freed_data,
             e_above_hull=self.e_above_hull,
+            filter_at_temperature=self.filter_at_temperature,
             include_polymorphs=self.include_polymorphs,
             formulas_to_include=self.formulas_to_include,
             calculate_e_above_hulls=self.calculate_e_above_hulls,

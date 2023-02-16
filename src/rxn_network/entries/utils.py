@@ -26,6 +26,7 @@ def process_entries(
     include_barin_data: bool,
     include_freed_data: bool,
     e_above_hull: float,
+    filter_at_temperature: Optional[int],
     include_polymorphs: bool,
     formulas_to_include: Iterable[str],
     calculate_e_above_hulls: bool = False,
@@ -50,23 +51,29 @@ def process_entries(
         A GibbsEntrySet object containing GibbsComputedEntry objects with specified
         constraints.
     """
+    temp = temperature
+    if filter_at_temperature:
+        temp = filter_at_temperature
+
     entry_set = GibbsEntrySet.from_computed_entries(
         entries=entries,
-        temperature=temperature,
+        temperature=temp,
         include_nist_data=include_nist_data,
         include_barin_data=include_barin_data,
         include_freed_data=include_freed_data,
     )
+    included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include]
+
     entry_set = entry_set.filter_by_stability(
         e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
     )
+    entry_set.update(included_entries)  # make sure these aren't filtered out
+
+    if filter_at_temperature and (filter_at_temperature != temperature):
+        entry_set = entry_set.get_entries_with_new_temperature(temperature)
 
     if calculate_e_above_hulls:
         entry_set = GibbsEntrySet(deepcopy(entry_set), calculate_e_above_hulls=True)
-
-    included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include]
-
-    entry_set.update(included_entries)
 
     return entry_set
 
