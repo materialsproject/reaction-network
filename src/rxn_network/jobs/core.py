@@ -257,7 +257,7 @@ class CalculateCompetitionMaker(Maker):
         return doc
 
     def _get_competition_decorated_rxns(self, target_rxns, all_rxns, size):
-        memory_per_rxn = 1000  # estimate of 1000 bytes memory per rxn (more or less...)
+        memory_per_rxn = 950  # estimate of 950 bytes memory per rxn (more or less...)
 
         memory_size = int(ray.cluster_resources()["memory"])
         logger.info(f"Available memory: {memory_size}")

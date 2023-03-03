@@ -54,7 +54,7 @@ class RetrosynthesisFlowMaker(Maker):
     ):
         target_formula = Composition(target_formula).reduced_formula
 
-        flow_name = f"Retrosynthesis: {target_formula}"
+        flow_name = f"Synthesis planning: {target_formula}"
 
         if added_elems is None:
             added_elems = []
