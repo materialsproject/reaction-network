@@ -204,8 +204,11 @@ class ReactionNetwork(Network):
 
     def set_target(self, target: Union[Entry, str]):
         """
-        In-place method. If entry is provided, will use that entry to set the
-        target. If string is provided, will automatically find minimum-energy entry with
+        In-place method. Can only provide one target entry or formula at a time.
+
+        If entry is provided, will use that entry to set the target.
+
+        If string is provided, will automatically find minimum-energy entry with
         matching reduced_formula.
 
         Args:

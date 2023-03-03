@@ -162,10 +162,13 @@ def plot_reaction_scatter(
 
 def get_pareto_front(
     df: DataFrame,
-    cols=("energy", "primary_competition", "secondary_competition"),
+    cols=(
+        "energy",
+        "secondary_competition",
+        "primary_competition",
+    ),
     maximize=False,
 ):
-
     df_original = df.copy()
     df = df_original[list(cols)]
     pts = df.to_numpy()
