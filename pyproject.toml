@@ -51,7 +51,7 @@ docs = [
     "mkdocs-section-index==0.3.4",
     "mkdocstrings==0.20.0",
     "mkdocstrings-python==0.8.3",
-    "pymdown-extensions==9.9.2",
+    "pymdown-extensions==9.10",
 
 ]
 plotting = ["graphistry==0.28.7"]
