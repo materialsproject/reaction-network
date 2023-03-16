@@ -23,7 +23,6 @@ def process_entries(
     entries: Iterable[Entry],
     temperature: float,
     include_nist_data: bool,
-    include_barin_data: bool,
     include_freed_data: bool,
     e_above_hull: float,
     filter_at_temperature: Optional[int],
@@ -39,8 +38,6 @@ def process_entries(
             objects
         include_nist_data (bool): Whether or not to include NIST data when constructing
             the GibbsComputedEntry objects. Defaults to True.
-        include_barin_data (bool): Whether or not to include Barin data when
-            constructing the GibbsComputedEntry objects. Defaults to False.
         e_above_hull (float): Only include entries with an energy above hull below this
             value (eV)
         include_polymorphs (bool): Whether or not to include metastable polymorphs.
@@ -59,7 +56,6 @@ def process_entries(
         entries=entries,
         temperature=temp,
         include_nist_data=include_nist_data,
-        include_barin_data=include_barin_data,
         include_freed_data=include_freed_data,
     )
     included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include]

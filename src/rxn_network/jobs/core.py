@@ -52,7 +52,6 @@ class GetEntrySetMaker(Maker):
             will automatically use MPRester to acquire entries.
         temperature: Temperature to use for computing thermodynamic properties.
         include_nist_data: Whether to include NIST data in the entry set.
-        include_barin_data: Whether to include Barin data in the entry set.
         include_freed_data: Whether to include FREED data in the entry set.
         e_above_hull: Energy above hull to use for filtering entries.
         include_polymorphs: Whether to include polymorphs in the entry set.
@@ -66,7 +65,6 @@ class GetEntrySetMaker(Maker):
     name: str = "get_and_process_entries"
     temperature: int = 300
     include_nist_data: bool = False
-    include_barin_data: bool = False
     include_freed_data: bool = False
     e_above_hull: float = 0.0
     filter_at_temperature: Optional[int] = None
@@ -110,7 +108,6 @@ class GetEntrySetMaker(Maker):
             entries,
             temperature=self.temperature,
             include_nist_data=self.include_nist_data,
-            include_barin_data=self.include_barin_data,
             include_freed_data=self.include_freed_data,
             e_above_hull=self.e_above_hull,
             filter_at_temperature=self.filter_at_temperature,

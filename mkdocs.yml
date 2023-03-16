@@ -24,7 +24,6 @@ nav:
           Softplus: reference/costs/softplus.md
       - Data: reference/data/data.md
       - Entries:
-          Barin: reference/entries/barin.md
           Corrections: reference/entries/corrections.md
           Entry Set: reference/entries/entry_set.md
           Experimental: reference/entries/experimental.md

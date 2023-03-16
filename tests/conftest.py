@@ -32,7 +32,8 @@ def mp_entries():
 @pytest.fixture(scope="session")
 def gibbs_entries():
     ents = GibbsEntrySet.from_entries(
-        MN_O_Y_ENTRIES, temperature=1000, include_barin_data=False
+        MN_O_Y_ENTRIES,
+        temperature=1000,
     )
     return ents
 
@@ -45,7 +46,8 @@ def entries():
 @pytest.fixture(scope="session")
 def filtered_entries():
     filtered_entries = GibbsEntrySet.from_computed_entries(
-        MN_O_Y_ENTRIES, temperature=1000, include_barin_data=False
+        MN_O_Y_ENTRIES,
+        temperature=1000,
     ).filter_by_stability(0.0)
     return filtered_entries
 

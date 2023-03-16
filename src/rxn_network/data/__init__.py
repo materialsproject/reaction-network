@@ -1,5 +1,5 @@
 """
-Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), Barin tables
+Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), FREED
 (all compounds), and FactSage (elements)
 """
 from pathlib import Path
@@ -9,7 +9,6 @@ from monty.serialization import loadfn
 
 cwd = Path(__file__).parent.resolve()
 
-PATH_TO_BARIN = cwd / "barin"
 PATH_TO_FREED = cwd / "freed"
 PATH_TO_NIST = cwd / "nist"
 

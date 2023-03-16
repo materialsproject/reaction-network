@@ -23,7 +23,6 @@ from pymatgen.entries.entry_tools import EntrySet
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
-from rxn_network.entries.barin import BarinReferenceEntry
 from rxn_network.entries.corrections import CarbonateCorrection
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.freed import FREEDReferenceEntry
@@ -372,7 +371,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         pd: PhaseDiagram,
         temperature: float,
         include_nist_data=True,
-        include_barin_data=False,
         include_freed_data=False,
         apply_carbonate_correction=True,
         minimize_obj_size=False,
@@ -385,8 +383,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             temperature: Temperature [K] for determining Gibbs Free Energy of
                 formation, dGf(T)
             include_nist_data: Whether to include NIST data in the entry set.
-            include_barin_data: Whether to include Barin data in the entry set. Defaults
-                to False. Warning: Barin data has not been verified. Use with caution.
 
         Returns:
             A GibbsEntrySet containing a collection of GibbsComputedEntry and
@@ -395,14 +391,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         gibbs_entries = []
         experimental_formulas = []
-
-        if include_barin_data:
-            warnings.warn(
-                "##### WARNING ##### \n\n"
-                "Barin experimental data was acquired through optical character"
-                "recognition and has not been verified. Use at your own risk! \n\n"
-                "##### WARNING #####"
-            )
 
         for entry in pd.all_entries:
             composition = entry.composition
@@ -420,10 +408,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             new_entry = None
             if include_nist_data:
                 new_entry = cls._check_for_experimental(formula, "nist", temperature)
-                if new_entry:
-                    new_entries.append(new_entry)
-            if include_barin_data:
-                new_entry = cls._check_for_experimental(formula, "barin", temperature)
                 if new_entry:
                     new_entries.append(new_entry)
             if include_freed_data:
@@ -465,7 +449,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         entries: Iterable[ComputedStructureEntry],
         temperature: float,
         include_nist_data=False,
-        include_barin_data=False,
         include_freed_data=False,
         apply_carbonate_correction=True,
         minimize_obj_size=False,
@@ -495,7 +478,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 pd,
                 temperature,
                 include_nist_data=include_nist_data,
-                include_barin_data=include_barin_data,
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
                 minimize_obj_size=minimize_obj_size,
@@ -508,7 +490,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 pd,
                 temperature,
                 include_nist_data=include_nist_data,
-                include_barin_data=include_barin_data,
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
                 minimize_obj_size=minimize_obj_size,
@@ -523,7 +504,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         entries: Iterable[ComputedStructureEntry],
         temperature: float,
         include_nist_data=True,
-        include_barin_data=False,
         include_freed_data=False,
         apply_carbonate_correction=True,
         minimize_obj_size=False,
@@ -540,7 +520,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entries,
             temperature,
             include_nist_data,
-            include_barin_data,
             include_freed_data,
             apply_carbonate_correction,
             minimize_obj_size,
@@ -600,8 +579,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         cls_name = cls_name.lower()
         if cls_name in ("nist", "nistreferenceentry"):
             cl = NISTReferenceEntry
-        elif cls_name in ("barin", "barinreferenceentry"):
-            cl = BarinReferenceEntry
         elif cls_name in ("freed", "freedreferenceentry"):
             cl = FREEDReferenceEntry
         else:

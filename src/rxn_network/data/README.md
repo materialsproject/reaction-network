@@ -3,16 +3,6 @@
 This folder contains a copy of the experimental thermochemistry data used in the 
 reaction-network code.
 
-## Barin _(data/barin/compounds.json.gz)_
-
-This is a copy of many of of the compounds contained in Ihsan Barin's thermochemical
-data tables. **Note: these data were captured via optical character recognition, and hence
-are prone to many mistakes. User discretion is advised.**
-
-Reference:
-
-    Barin, I. Thermochemical Data of Pure Substances; VCH: Weinheim; New York, 2008.
-
 
 ## FREED _(data/freed/compounds.json.gz)_
 
