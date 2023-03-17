@@ -25,7 +25,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     excluded.
     """
 
-    CHUNK_SIZE = 10000
+    CHUNK_SIZE = 100  # number of reactions to process in a single ray task
 
     def __init__(
         self,
@@ -106,7 +106,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     phase space. Identity reactions are excluded.
     """
 
-    CHUNK_SIZE = 10000
+    CHUNK_SIZE = 100
 
     def __init__(
         self,

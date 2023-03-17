@@ -29,6 +29,7 @@ def process_entries(
     include_polymorphs: bool,
     formulas_to_include: Iterable[str],
     calculate_e_above_hulls: bool = False,
+    ignore_nist_solids: bool = True,
 ) -> GibbsEntrySet:
     """
 
@@ -57,6 +58,7 @@ def process_entries(
         temperature=temp,
         include_nist_data=include_nist_data,
         include_freed_data=include_freed_data,
+        ignore_nist_solids=ignore_nist_solids,
     )
     included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include]
 

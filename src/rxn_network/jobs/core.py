@@ -71,6 +71,7 @@ class GetEntrySetMaker(Maker):
     include_polymorphs: bool = False
     formulas_to_include: list = field(default_factory=list)
     calculate_e_above_hulls: bool = True
+    ignore_nist_solids: bool = True
     MP_API_KEY: Optional[str] = None
     entry_db_name: Optional[str] = None
     property_data: Optional[List[str]] = None
@@ -114,6 +115,7 @@ class GetEntrySetMaker(Maker):
             include_polymorphs=self.include_polymorphs,
             formulas_to_include=self.formulas_to_include,
             calculate_e_above_hulls=self.calculate_e_above_hulls,
+            ignore_nist_solids=self.ignore_nist_solids,
         )
 
         doc = EntrySetDocument(
@@ -204,6 +206,16 @@ class CalculateCompetitionMaker(Maker):
         for rxn_set in rxn_sets[1:]:
             all_rxns = all_rxns.add_rxn_set(rxn_set)
 
+        if self.open_elem:
+            all_rxns = ReactionSet(
+                all_rxns.entries,
+                all_rxns.indices,
+                all_rxns.coeffs,
+                self.open_elem,
+                self.chempot,
+                all_rxns.all_data,
+            )
+
         size = len(all_rxns)  # need to get size before storing in ray
 
         logger.info("Identifying target reactions...")
@@ -254,7 +266,7 @@ class CalculateCompetitionMaker(Maker):
         return doc
 
     def _get_competition_decorated_rxns(self, target_rxns, all_rxns, size):
-        memory_per_rxn = 950  # estimate of 950 bytes memory per rxn (more or less...)
+        memory_per_rxn = 900  # estimate of 900 bytes memory per rxn (rough average)
 
         memory_size = int(ray.cluster_resources()["memory"])
         logger.info(f"Available memory: {memory_size}")
@@ -269,7 +281,7 @@ class CalculateCompetitionMaker(Maker):
                 batch_size = memory_size // (size * memory_per_rxn)
                 logger.info(
                     f"Memory size too small for {num_cpus} batches. "
-                    f"Using batch size of {batch_size}."
+                    f"Using batch size of {batch_size} instead."
                 )
 
         chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1

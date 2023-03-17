@@ -11,6 +11,7 @@ from typing import Dict, Iterable, List, Optional, Set, Union
 
 from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
+from monty.serialization import loadfn
 from numpy.random import normal
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
@@ -23,6 +24,7 @@ from pymatgen.entries.entry_tools import EntrySet
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
+from rxn_network.data import PATH_TO_NIST
 from rxn_network.entries.corrections import CarbonateCorrection
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.freed import FREEDReferenceEntry
@@ -33,6 +35,9 @@ from rxn_network.thermo.utils import expand_pd
 from rxn_network.utils.funcs import get_logger
 
 logger = get_logger(__name__)
+
+
+IGNORE_NIST_SOLIDS = loadfn(PATH_TO_NIST / "ignore_solids.json")
 
 
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):
@@ -373,6 +378,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_nist_data=True,
         include_freed_data=False,
         apply_carbonate_correction=True,
+        ignore_nist_solids=True,
         minimize_obj_size=False,
     ) -> "GibbsEntrySet":
         """
@@ -383,6 +389,13 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             temperature: Temperature [K] for determining Gibbs Free Energy of
                 formation, dGf(T)
             include_nist_data: Whether to include NIST data in the entry set.
+            include_freed_data: Whether to include Freed data in the entry set.
+            apply_carbonate_correction: Whether to apply the fit energy
+                correction for carbonates.
+            ignore_nist_solids: Whether to ignore NIST data for the solids specified in
+                the "data/nist/ignore_solids.json" file.
+            minimize_obj_size: Whether to minimize the size of the object by removing
+                unnecessary attributes from the entries.
 
         Returns:
             A GibbsEntrySet containing a collection of GibbsComputedEntry and
@@ -407,11 +420,15 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
             new_entry = None
             if include_nist_data:
-                new_entry = cls._check_for_experimental(formula, "nist", temperature)
+                new_entry = cls._check_for_experimental(
+                    formula, "nist", temperature, ignore_nist_solids
+                )
                 if new_entry:
                     new_entries.append(new_entry)
             if include_freed_data:
-                new_entry = cls._check_for_experimental(formula, "freed", temperature)
+                new_entry = cls._check_for_experimental(
+                    formula, "freed", temperature, ignore_nist_solids
+                )
                 if new_entry:
                     new_entries.append(new_entry)
 
@@ -451,6 +468,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_nist_data=False,
         include_freed_data=False,
         apply_carbonate_correction=True,
+        ignore_nist_solids=True,
         minimize_obj_size=False,
     ) -> "GibbsEntrySet":
         """
@@ -464,6 +482,14 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entries: List of ComputedStructureEntry objects, as downloaded from The
                 Materials Project API.
             temperature: Temperature for estimating Gibbs free energy of formation [K]
+            include_nist_data: Whether to include NIST data in the entry set.
+            include_freed_data: Whether to include Freed data in the entry set.
+            apply_carbonate_correction: Whether to apply the fit energy
+                correction for carbonates.
+            ignore_nist_solids: Whether to ignore NIST data for the solids specified in
+                the "data/nist/ignore_solids.json" file.
+            minimize_obj_size: Whether to minimize the size of the object by removing
+                unnecessary attributes from the entries.
 
         Returns:
             A GibbsEntrySet containing a collection of GibbsComputedEntry and
@@ -480,6 +506,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_nist_data=include_nist_data,
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
+                ignore_nist_solids=ignore_nist_solids,
                 minimize_obj_size=minimize_obj_size,
             )
 
@@ -492,6 +519,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_nist_data=include_nist_data,
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
+                ignore_nist_solids=ignore_nist_solids,
                 minimize_obj_size=minimize_obj_size,
             )
             new_entries.update(gibbs_set)
@@ -575,7 +603,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return d
 
     @staticmethod
-    def _check_for_experimental(formula: str, cls_name: str, temperature: float):
+    def _check_for_experimental(
+        formula: str, cls_name: str, temperature: float, ignore_nist_solids: bool
+    ):
         cls_name = cls_name.lower()
         if cls_name in ("nist", "nistreferenceentry"):
             cl = NISTReferenceEntry
@@ -586,6 +616,12 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         entry = None
         if formula in cl.REFERENCES:
+            if (
+                cl == NISTReferenceEntry
+                and ignore_nist_solids
+                and formula in IGNORE_NIST_SOLIDS
+            ):
+                return None
             try:
                 entry = cl(composition=Composition(formula), temperature=temperature)
             except ValueError as error:

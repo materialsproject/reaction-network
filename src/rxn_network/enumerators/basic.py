@@ -33,7 +33,7 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    CHUNK_SIZE = 2500
+    CHUNK_SIZE = 100  # number of reactions to process in a single ray task
 
     def __init__(
         self,
@@ -159,7 +159,7 @@ class BasicEnumerator(Enumerator):
         results = []
 
         if not batch_size:
-            batch_size = ray.cluster_resources()["CPU"] * 2
+            batch_size = ray.cluster_resources()["CPU"]
 
         with tqdm(
             total=self._num_chunks(items, open_combos), disable=self.quiet
@@ -421,7 +421,7 @@ class BasicOpenEnumerator(BasicEnumerator):
     the ReactionSet class).
     """
 
-    CHUNK_SIZE = 2500
+    CHUNK_SIZE = 1000  # number of reactions to process in a single ray task
 
     def __init__(
         self,
