@@ -313,7 +313,9 @@ class InterfaceReactionHull(MSONable):
         if len(coords) == 2:
             return 0
 
-        return ConvexHull(coords).volume  # this is how area is defined in scipy
+        return ConvexHull(
+            coords, qhull_options="QJ i"
+        ).volume  # this is how area is defined in scipy
 
     def get_coords_in_range(self, x1, x2):
         """

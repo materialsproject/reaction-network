@@ -10,10 +10,10 @@ from pymatgen.analysis.chempot_diagram import plotly_layouts
 
 def plot_reaction_scatter(
     df: DataFrame,
-    x="energy",
-    y="secondary_competition",
+    x="secondary_competition",
+    y="energy",
     z=None,
-    color="has_added_elems",
+    color=None,
     plot_pareto=True,
 ) -> px.scatter:
     """

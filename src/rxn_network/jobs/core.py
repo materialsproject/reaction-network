@@ -206,7 +206,7 @@ class CalculateCompetitionMaker(Maker):
         for rxn_set in rxn_sets[1:]:
             all_rxns = all_rxns.add_rxn_set(rxn_set)
 
-        if self.open_elem:
+        if self.open_elem:  # reinitialize with open element
             all_rxns = ReactionSet(
                 all_rxns.entries,
                 all_rxns.indices,
@@ -227,6 +227,22 @@ class CalculateCompetitionMaker(Maker):
             f"Identified {len(target_rxns)} target reactions out of"
             f" {size} total reactions."
         )
+
+        logger.info(
+            "Removing unnecessary reactions from total reactions to save memory..."
+        )
+
+        all_target_reactants = {
+            reactant.reduced_formula for r in target_rxns for reactant in r.reactants
+        }
+        all_rxns = ReactionSet.from_rxns(
+            list(all_rxns.get_rxns_by_reactants(all_target_reactants))
+        )
+
+        logger.info(f"Keeping {len(all_rxns)} out of {size} total reactions...")
+
+        size = len(all_rxns)
+
         logger.info("Placing reactions in ray object store...")
 
         all_rxns = ray.put(all_rxns)
@@ -272,7 +288,7 @@ class CalculateCompetitionMaker(Maker):
         logger.info(f"Available memory: {memory_size}")
 
         num_cpus = int(ray.cluster_resources()["CPU"]) - 1
-        logger.info(f"Available CPUs - 1: {num_cpus}")
+        logger.info(f"Available CPUs-1: {num_cpus}")
 
         batch_size = self.batch_size
         if batch_size is None:
@@ -280,13 +296,13 @@ class CalculateCompetitionMaker(Maker):
             if memory_size < (size * memory_per_rxn * num_cpus):
                 batch_size = memory_size // (size * memory_per_rxn)
                 logger.info(
-                    f"Memory size too small for {num_cpus} batches. "
+                    f"Memory size too small for {num_cpus} batches!"
                     f"Using batch size of {batch_size} instead."
                 )
 
         chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
 
-        logger.info(f"Using batch size of {batch_size} and chunk size of {chunk_size}")
+        logger.info(f"Using batch size of {batch_size} and chunk size of {chunk_size}.")
 
         rxn_chunk_refs = []
         results = []
@@ -313,7 +329,7 @@ class CalculateCompetitionMaker(Maker):
                 if self.open_formula:
                     reactant_formulas.append(self.open_formula)
 
-                task_memory = memory_per_rxn * (size)
+                task_memory = memory_per_rxn * chunk_size
 
                 rxn_chunk_refs.append(
                     _get_competition_decorated_rxns_by_chunk.options(
