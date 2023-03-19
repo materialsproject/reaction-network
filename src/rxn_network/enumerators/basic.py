@@ -33,8 +33,6 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    CHUNK_SIZE = 100  # number of reactions to process in a single ray task
-
     def __init__(
         self,
         precursors: Optional[List[str]] = None,
@@ -47,11 +45,11 @@ class BasicEnumerator(Enumerator):
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
+        batch_multiplicity: int = 2,
+        chunk_multiplicity: int = 10,
         quiet: bool = False,
     ):
         """
-        Supplied target and calculator parameters are automatically initialized as
-        objects during enumeration.
 
         Args:
             precursors: Optional list of precursor formulas; only reactions
@@ -89,6 +87,8 @@ class BasicEnumerator(Enumerator):
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
         self.calculate_e_above_hulls = calculate_e_above_hulls
+        self.batch_multiplicity = batch_multiplicity
+        self.chunk_multiplicity = chunk_multiplicity
         self.quiet = quiet
 
         self._stabilize = False
@@ -100,15 +100,17 @@ class BasicEnumerator(Enumerator):
         self._build_pd = False
         self._build_grand_pd = False
 
-    def enumerate(self, entries: GibbsEntrySet, batch_size=None) -> ReactionSet:
+    def enumerate(
+        self,
+        entries: GibbsEntrySet,
+    ) -> ReactionSet:
         """
         Calculate all possible reactions given a set of entries. If the enumerator was
         initialized with specified precursors or target, the reactions will be filtered
         by these constraints. Every enumerator follows a standard procedure:
 
         1. Initialize entries, i.e., ensure that precursors and target are considered
-        stable entries within the entry set. If using ChempotDistanceCalculator, ensure
-        that entries are filtered by stability.
+        stable entries within the entry set.
 
         2. Get a dictionary representing every possible "node", i.e. phase combination,
         grouped by chemical system.
@@ -158,12 +160,19 @@ class BasicEnumerator(Enumerator):
         rxn_chunk_refs = []  # type: ignore
         results = []
 
-        if not batch_size:
-            batch_size = ray.cluster_resources()["CPU"]
+        num_cpus = int(ray.cluster_resources()["CPU"])
+        logger.info(f"Available CPUs: {num_cpus}")
+        batch_size = (
+            num_cpus * self.batch_multiplicity
+        )  # how many chunks to load at once
 
-        with tqdm(
-            total=self._num_chunks(items, open_combos), disable=self.quiet
-        ) as pbar:
+        chunk_size, num_chunks = self._get_chunk_size_and_num_chunks(
+            items, open_combos, self.chunk_multiplicity, batch_size
+        )
+
+        logger.info(f"Batch size: {batch_size}. Chunk size: {chunk_size}")
+
+        with tqdm(total=num_chunks, disable=self.quiet) as pbar:
             for item in items:
                 chemsys, combos = item
 
@@ -188,7 +197,7 @@ class BasicEnumerator(Enumerator):
                 grand_pd = ray.put(grand_pd)
 
                 for rxn_iterable_chunk in grouper(
-                    self._get_rxn_iterable(combos, open_combos), self.CHUNK_SIZE
+                    self._get_rxn_iterable(combos, open_combos), chunk_size
                 ):
                     if len(rxn_chunk_refs) > batch_size:
                         num_ready = len(rxn_chunk_refs) - batch_size
@@ -197,7 +206,6 @@ class BasicEnumerator(Enumerator):
                         )
                         for completed_ref in newly_completed:
                             results.extend(ray.get(completed_ref))
-
                             pbar.update(1)
 
                     rxn_chunk_refs.append(
@@ -239,20 +247,29 @@ class BasicEnumerator(Enumerator):
         return rxn_set
 
     @classmethod
-    def _num_chunks(cls, items, open_combos):
-        _ = open_combos  # not used
+    def _get_chunk_size_and_num_chunks(
+        cls, items, open_combos, chunk_multiplicity, batch_size
+    ):
+        _ = open_combos  # not used in BasicEnumerator
 
-        n = 0
+        size = 0
         for _, i in items:
             num_combos = cls._rxn_iter_length(i, open_combos)
-            if num_combos > 0:
-                n += num_combos // cls.CHUNK_SIZE + 1
+            size += num_combos
 
-        return n
+        chunk_size = size // (batch_size * chunk_multiplicity) + 1
+
+        # because actual number of chunks differs from: size // chunk_size
+        num_chunks = 0
+        for _, i in items:
+            num_combos = cls._rxn_iter_length(i, open_combos)
+            num_chunks += num_combos // chunk_size + bool(num_combos % chunk_size)
+
+        return chunk_size, num_chunks
 
     @staticmethod
     def _rxn_iter_length(combos, open_combos):
-        _ = open_combos  # not used
+        _ = open_combos  # not used in BasicEnumerator
         return comb(len(combos), 2)
 
     def _get_combos_dict(
@@ -421,8 +438,6 @@ class BasicOpenEnumerator(BasicEnumerator):
     the ReactionSet class).
     """
 
-    CHUNK_SIZE = 1000  # number of reactions to process in a single ray task
-
     def __init__(
         self,
         open_phases: List[str],
@@ -437,6 +452,8 @@ class BasicOpenEnumerator(BasicEnumerator):
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
+        batch_multiplicity: int = 2,
+        chunk_multiplicity: int = 10,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -473,6 +490,10 @@ class BasicOpenEnumerator(BasicEnumerator):
             max_num_constraints=max_num_constraints,
             remove_unbalanced=remove_unbalanced,
             remove_changed=remove_changed,
+            calculate_e_above_hulls=calculate_e_above_hulls,
+            quiet=quiet,
+            batch_multiplicity=batch_multiplicity,
+            chunk_multiplicity=chunk_multiplicity,
         )
         self.open_phases: List[str] = open_phases
 

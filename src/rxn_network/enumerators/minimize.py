@@ -25,8 +25,6 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     excluded.
     """
 
-    CHUNK_SIZE = 100  # number of reactions to process in a single ray task
-
     def __init__(
         self,
         precursors: Optional[List[str]] = None,
@@ -35,8 +33,12 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         exclusive_targets: bool = False,
         filter_by_chemsys: Optional[str] = None,
         max_num_constraints: int = 1,
+        remove_unbalanced: bool = True,
+        remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
+        batch_multiplicity: int = 2,
+        chunk_multiplicity: int = 10,
     ):
         """
         Args:
@@ -58,7 +60,13 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
             filter_by_chemsys=filter_by_chemsys,
+            max_num_constraints=max_num_constraints,
+            remove_unbalanced=remove_unbalanced,
+            remove_changed=remove_changed,
+            calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
+            batch_multiplicity=batch_multiplicity,
+            chunk_multiplicity=chunk_multiplicity,
         )
         self._build_pd = True
 
@@ -106,8 +114,6 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     phase space. Identity reactions are excluded.
     """
 
-    CHUNK_SIZE = 100
-
     def __init__(
         self,
         open_elem: Element,
@@ -117,8 +123,13 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
         filter_by_chemsys: Optional[str] = None,
-        max_num_constraints=1,
+        max_num_constraints: int = 1,
+        remove_unbalanced: bool = True,
+        remove_changed: bool = True,
+        calculate_e_above_hulls: bool = False,
         quiet: bool = False,
+        batch_multiplicity: int = 2,
+        chunk_multiplicity: int = 10,
     ):
         """
         Args:
@@ -143,7 +154,13 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
             filter_by_chemsys=filter_by_chemsys,
+            max_num_constraints=max_num_constraints,
+            remove_unbalanced=remove_unbalanced,
+            remove_changed=remove_changed,
+            calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
+            batch_multiplicity=batch_multiplicity,
+            chunk_multiplicity=chunk_multiplicity,
         )
         self.open_elem = Element(open_elem)
         self.open_phases = [Composition(str(self.open_elem)).reduced_formula]
