@@ -33,6 +33,8 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
+    MIN_CHUNK_SIZE = 250
+
     def __init__(
         self,
         precursors: Optional[List[str]] = None,
@@ -259,6 +261,11 @@ class BasicEnumerator(Enumerator):
 
         chunk_size = size // (batch_size * chunk_multiplicity) + 1
 
+        if (
+            chunk_size < cls.MIN_CHUNK_SIZE
+        ):  # it becomes inefficient to parallelize small tasks
+            chunk_size = cls.MIN_CHUNK_SIZE
+
         # because actual number of chunks differs from: size // chunk_size
         num_chunks = 0
         for _, i in items:
@@ -437,6 +444,8 @@ class BasicOpenEnumerator(BasicEnumerator):
     this does not return OpenComputedReaction objects (this can be calculated using
     the ReactionSet class).
     """
+
+    MIN_CHUNK_SIZE = 250
 
     def __init__(
         self,
