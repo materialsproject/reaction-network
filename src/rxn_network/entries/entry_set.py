@@ -280,7 +280,12 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         new_entries = []
 
         for entry in self.entries_list:
-            new_entry = entry.get_new_temperature(new_temperature)
+            try:
+                new_entry = entry.get_new_temperature(new_temperature)
+            except ValueError as e:
+                logger.warning(f"Could not get new temperature for entry: {entry}. {e}")
+                continue
+
             new_entry.data["e_above_hull"] = None
             new_entries.append(new_entry)
 
