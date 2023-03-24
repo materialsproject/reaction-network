@@ -37,7 +37,7 @@ class ReactionSet(MSONable):
         coeffs: Union[np.ndarray, List[List[float]]],
         open_elem: Optional[Union[str, Element]] = None,
         chempot: float = 0.0,
-        all_data: Optional[List] = None,
+        all_data: Optional[Union[np.ndarray, List]] = None,
     ):
         """
         Args:
@@ -49,12 +49,15 @@ class ReactionSet(MSONable):
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
             all_data: Optional list of data for each reaction
         """
+        if all_data is None:
+            all_data = []
+
         self.entries = entries
-        self.indices = indices
-        self.coeffs = coeffs
+        self.indices = np.array(indices, dtype="object")  # smaller memory footprint
+        self.coeffs = np.array(coeffs, dtype="object")
         self.open_elem = open_elem
         self.chempot = chempot
-        self.all_data = all_data if all_data else []
+        self.all_data = np.array(all_data, dtype="object")
 
         self.mu_dict = None
         if open_elem:
@@ -268,11 +271,11 @@ class ReactionSet(MSONable):
 
         return ReactionSet(
             self.entries,
-            self.indices + new_indices,
-            self.coeffs + new_coeffs,
+            np.concatenate((self.indices, new_indices)),
+            np.concatenate((self.coeffs, new_coeffs)),
             self.open_elem,
             self.chempot,
-            self.all_data + new_data,
+            np.concatenate((self.all_data + new_data)),
         )
 
     def add_rxn_set(self, rxn_set):
@@ -289,9 +292,9 @@ class ReactionSet(MSONable):
         open_elem = self.open_elem
         chempot = self.chempot
 
-        indices = self.indices + rxn_set.indices
-        coeffs = self.coeffs + rxn_set.coeffs
-        all_data = self.all_data + rxn_set.all_data
+        indices = np.concatenate((self.indices, rxn_set.indices))
+        coeffs = np.concatenate((self.coeffs, rxn_set.coeffs))
+        all_data = np.concatenate((self.all_data, rxn_set.all_data))
 
         return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
 
@@ -379,36 +382,35 @@ class ReactionSet(MSONable):
                     if idx2 in indices_to_remove:
                         continue
 
-                    coeffs2_sorted = [coeffs2[indices2.index(i)] for i in indices1]
+                    coeffs2_sorted = [
+                        coeffs2[list(indices2).index(i)] for i in indices1
+                    ]
 
-                    ratios = np.array(coeffs1) / np.array(coeffs2_sorted)
+                    ratios = np.array(
+                        np.array(coeffs1) / np.array(coeffs2_sorted), dtype=float
+                    )
+
                     if (
                         ratios <= 1e-8
                     ).any():  # do not remove any reaction with negative ratio
                         continue
 
-                    if np.isclose(ratios[0], ratios).all():
+                    if np.isclose(ratios, ratios[0]).all():
                         if idx2 in idxs_to_keep:
                             indices_to_remove.add(idx1)
                         else:
                             indices_to_remove.add(idx2)
 
-        new_indices = []
-        new_coeffs = []
-        new_all_data = []
-
-        for idx in set(range(len(self))) - indices_to_remove:
-            new_indices.append(self.indices[idx])
-            new_coeffs.append(self.coeffs[idx])
-            new_all_data.append(self.all_data[idx])
+        slicer = np.full(len(self), True)
+        slicer[list(indices_to_remove)] = False
 
         return ReactionSet(
             self.entries,
-            new_indices,
-            new_coeffs,
+            self.indices[slicer],
+            self.coeffs[slicer],
             self.open_elem,
             self.chempot,
-            new_all_data,
+            self.all_data[slicer],
         )
 
     def _get_rxns_by_indices(
@@ -417,21 +419,10 @@ class ReactionSet(MSONable):
         """
         Return a list of reactions with the given indices.
         """
-        if idxs == range(len(self.coeffs)):
-            indices_slice = self.indices
-            coeffs_slice = self.coeffs
-            data_slice = self.all_data
-        else:
-            indices_slice = []
-            coeffs_slice = []
-            data_slice = []
-
-            for idx in idxs:
-                indices_slice.append(self.indices[idx])
-                coeffs_slice.append(self.coeffs[idx])
-                data_slice.append(self.all_data[idx])
-
-        for indices, coeffs, data in zip(indices_slice, coeffs_slice, data_slice):
+        idxs = np.array(idxs)
+        for indices, coeffs, data in zip(
+            self.indices[idxs], self.coeffs[idxs], self.all_data[idxs]
+        ):
             entries = [self.entries[i] for i in indices]
             if self.mu_dict:
                 rxn = OpenComputedReaction(
