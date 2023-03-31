@@ -235,9 +235,7 @@ class CalculateCompetitionMaker(Maker):
         all_target_reactants = {
             reactant.reduced_formula for r in target_rxns for reactant in r.reactants
         }
-        all_rxns = ReactionSet.from_rxns(
-            list(all_rxns.get_rxns_by_reactants(all_target_reactants))
-        )
+        all_rxns = all_rxns.get_rxns_by_reactants(all_target_reactants, return_set=True)
 
         logger.info(f"Keeping {len(all_rxns)} out of {size} total reactions...")
 
@@ -282,7 +280,7 @@ class CalculateCompetitionMaker(Maker):
         return doc
 
     def _get_competition_decorated_rxns(self, target_rxns, all_rxns, size):
-        memory_per_rxn = 1000  # actual is 700-800ish; this adds some buffer
+        memory_per_rxn = 35  # 35 bytes per reaction (with overhead)
 
         memory_size = int(ray.cluster_resources()["memory"])
         logger.info(f"Available memory: {memory_size}")

@@ -298,7 +298,7 @@ class ReactionSet(MSONable):
 
         return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
 
-    def get_rxns_by_reactants(self, reactants: List[str]):
+    def get_rxns_by_reactants(self, reactants: List[str], return_set: bool = False):
         """
         Return a list of reactions with the given reactants.
         """
@@ -319,9 +319,12 @@ class ReactionSet(MSONable):
             if r_indices.issubset(reactant_indices):
                 idxs.append(idx)
 
+        if return_set:
+            return self._get_rxn_set_by_indices(idxs)
+
         return self._get_rxns_by_indices(idxs)
 
-    def get_rxns_by_product(self, product: str):
+    def get_rxns_by_product(self, product: str, return_set: bool = False):
         """
         Return a list of reactions which contain the given product formula.
         """
@@ -341,6 +344,9 @@ class ReactionSet(MSONable):
             p_indices = {i for c, i in zip(coeffs, indices) if c > -1e-12}
             if product_index in p_indices:
                 idxs.append(idx)
+
+        if return_set:
+            return self._get_rxn_set_by_indices(idxs)
 
         return self._get_rxns_by_indices(idxs)
 
@@ -435,6 +441,23 @@ class ReactionSet(MSONable):
                 rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
 
             yield rxn
+
+    def _get_rxn_set_by_indices(
+        self, idxs: Union[List[int], range]
+    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
+        """
+        Return a list of reactions with the given indices.
+        """
+        idxs = np.array(idxs)
+
+        return ReactionSet(
+            entries=self.entries,
+            indices=self.indices[idxs],
+            coeffs=self.coeffs[idxs],
+            open_elem=self.open_elem,
+            chempot=self.chempot,
+            all_data=self.all_data[idxs],
+        )
 
     @staticmethod
     def _get_added_elems(
