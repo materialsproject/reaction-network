@@ -243,7 +243,7 @@ class CalculateCompetitionMaker(Maker):
 
         logger.info("Placing reactions in ray object store...")
 
-        all_rxns = ray.put(all_rxns)
+        all_rxns = ray.put(all_rxns.as_dict())
         logger.info("Beginning competition calculations...")
 
         decorated_rxns = target_rxns
@@ -281,6 +281,7 @@ class CalculateCompetitionMaker(Maker):
 
     def _get_competition_decorated_rxns(self, target_rxns, all_rxns, size):
         memory_per_rxn = 35  # 35 bytes per reaction (with overhead)
+        all_rxns = ReactionSet.from_dict(all_rxns)
 
         memory_size = int(ray.cluster_resources()["memory"])
         logger.info(f"Available memory: {memory_size}")

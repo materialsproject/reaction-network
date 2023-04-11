@@ -33,11 +33,11 @@ class ReactionSet(MSONable):
     def __init__(
         self,
         entries: List[ComputedEntry],
-        indices: Union[np.ndarray, List[List[int]]],
-        coeffs: Union[np.ndarray, List[List[float]]],
+        indices: Dict[int, np.ndarray],
+        coeffs: Dict[int, np.ndarray],
         open_elem: Optional[Union[str, Element]] = None,
         chempot: float = 0.0,
-        all_data: Optional[Union[np.ndarray, List]] = None,
+        all_data: Optional[Dict[int, np.ndarray]] = None,
     ):
         """
         Args:
@@ -49,17 +49,18 @@ class ReactionSet(MSONable):
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
             all_data: Optional list of data for each reaction
         """
-        if all_data is None:
-            all_data = []
-
         self.entries = entries
-        self.indices = np.array(indices, dtype="object")  # smaller memory footprint
-        self.coeffs = np.array(coeffs, dtype="object")
+        self.indices = indices
+        self.coeffs = coeffs
         self.open_elem = open_elem
         self.chempot = chempot
-        self.all_data = np.array(all_data, dtype="object")
+        self.all_data = all_data
+
+        if all_data is None:
+            all_data = {i: np.array([]) for i in self.indices}
 
         self.mu_dict = None
+
         if open_elem:
             self.mu_dict = {Element(open_elem): chempot}  # type: ignore
 
@@ -67,10 +68,12 @@ class ReactionSet(MSONable):
         self,
     ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
         """
-        Returns list of ComputedReaction objects or OpenComputedReaction objects (when
+        Generator for all ComputedReaction objects or OpenComputedReaction objects (when
         open element and chempot are specified) for the reaction set.
         """
-        return self._get_rxns_by_indices(idxs=range(len(self.coeffs)))
+        return self._get_rxns_by_indices(
+            idxs={i: slice(0, len(c)) for i, c in self.indices.items()}
+        )
 
     @classmethod
     def from_rxns(
@@ -98,20 +101,33 @@ class ReactionSet(MSONable):
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
 
         all_entry_indices: Dict[str, ComputedEntry] = {}
-        indices, coeffs, data = [], [], []
+        indices, coeffs, data = {}, {}, {}  # keys are reaction sizes
 
         for rxn in rxns:
             rxn_indices = []
+            size = len(rxn.entries)
+
             for e in rxn.entries:
                 idx = all_entry_indices.get(e)
                 if idx is None:
                     idx = entries.index(e)
                     all_entry_indices[e] = idx
+
                 rxn_indices.append(idx)
 
-            indices.append(rxn_indices)
-            coeffs.append(list(rxn.coefficients))
-            data.append(rxn.data)
+            if size not in indices:
+                indices[size] = []
+                coeffs[size] = []
+                data[size] = []
+
+            indices[size].append(rxn_indices)
+            coeffs[size].append(list(rxn.coefficients))
+            data[size].append(rxn.data)
+
+        for size in indices:
+            indices[size] = np.array(indices[size])
+            coeffs[size] = np.array(coeffs[size])
+            data[size] = np.array(data[size])
 
         all_open_elems: Set[Element] = set()
         all_chempots: Set[float] = set()
@@ -171,7 +187,6 @@ class ReactionSet(MSONable):
                 other: any other data associated with reaction
 
         """
-
         data: Dict[str, Any] = OrderedDict({k: [] for k in ["rxn", "energy"]})
         attrs = []
 
@@ -271,14 +286,14 @@ class ReactionSet(MSONable):
 
         return ReactionSet(
             self.entries,
-            np.concatenate((self.indices, new_indices)),
-            np.concatenate((self.coeffs, new_coeffs)),
+            np.concatenate((self.indices, np.array(new_indices))),
+            np.concatenate((self.coeffs, np.array(new_coeffs))),
             self.open_elem,
             self.chempot,
-            np.concatenate((self.all_data + new_data)),
+            np.concatenate((self.all_data, np.array(new_data))),
         )
 
-    def add_rxn_set(self, rxn_set):
+    def add_rxn_set(self, rxn_set: "ReactionSet") -> "ReactionSet":
         """Adds a new reaction set to current reaction set.
 
         Warning: new reaction set must have the same entries as the current reaction
@@ -287,37 +302,56 @@ class ReactionSet(MSONable):
         """
         if self.entries != rxn_set.entries:
             raise ValueError(
-                "Reaction sets must have identical entries property to add."
+                "Reaction sets must have identical entries property to combine."
             )
         open_elem = self.open_elem
         chempot = self.chempot
 
-        indices = np.concatenate((self.indices, rxn_set.indices))
-        coeffs = np.concatenate((self.coeffs, rxn_set.coeffs))
-        all_data = np.concatenate((self.all_data, rxn_set.all_data))
+        for size in rxn_set.indices:
+            if size not in self.indices:
+                self.indices[size] = rxn_set.indices[size]
+                self.coeffs[size] = rxn_set.coeffs[size]
+                self.all_data[size] = rxn_set.all_data[size]
+            else:
+                indices = np.concatenate(self.indices, rxn_set.indices[size])
+                coeffs = np.concatenate(self.coeffs, rxn_set.coeffs[size])
+                all_data = np.concatenate(self.all_data, rxn_set.all_data[size])
 
         return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
 
-    def get_rxns_by_reactants(self, reactants: List[str], return_set: bool = False):
+    def get_rxns_by_reactants(
+        self, reactants: List[str], return_set: bool = False
+    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
         """
         Return a list of reactions with the given reactants.
         """
-        idxs = []
         reactants = [Composition(r).reduced_formula for r in reactants]
 
-        reactant_indices = {
-            idx
-            for idx, e in enumerate(self.entries)
-            if e.composition.reduced_formula in reactants
-        }
+        reactant_indices = list(
+            {
+                idx
+                for idx, e in enumerate(self.entries)
+                if e.composition.reduced_formula in reactants
+            }
+        )
 
         if not reactant_indices:
             return []
 
-        for idx, (coeffs, indices) in enumerate(zip(self.coeffs, self.indices)):
-            r_indices = {i for c, i in zip(coeffs, indices) if c < 1e-12}
-            if r_indices.issubset(reactant_indices):
-                idxs.append(idx)
+        idxs: Dict[int, List[int]] = {}
+        for size, indices in self.indices.items():
+            idxs[size] = []
+            contains_reactants = np.isin(indices, reactant_indices).sum(axis=1) == len(
+                reactant_indices
+            )
+            for idx, coeffs, indices in zip(
+                np.argwhere(contains_reactants).flatten(),
+                self.coeffs[size][contains_reactants],
+                self.indices[size][contains_reactants],
+            ):
+                r_indices = {i for c, i in zip(coeffs, indices) if c < 1e-12}
+                if r_indices.issubset(reactant_indices):
+                    idxs[size].append(idx)
 
         if return_set:
             return self._get_rxn_set_by_indices(idxs)
@@ -328,7 +362,6 @@ class ReactionSet(MSONable):
         """
         Return a list of reactions which contain the given product formula.
         """
-        idxs = []
         product = Composition(product).reduced_formula
 
         product_index = None
@@ -340,10 +373,19 @@ class ReactionSet(MSONable):
         if not product_index:
             return []
 
-        for idx, (coeffs, indices) in enumerate(zip(self.coeffs, self.indices)):
-            p_indices = {i for c, i in zip(coeffs, indices) if c > -1e-12}
-            if product_index in p_indices:
-                idxs.append(idx)
+        idxs: Dict[int, ndarray] = {}
+        for size, indices in self.indices.items():
+            idxs[size] = []
+            contains_product = np.isin(indices, product_index).any(axis=1)
+
+            for idx, coeffs, indices in zip(
+                np.argwhere(contains_product).flatten(),
+                self.coeffs[size][contains_product],
+                self.indices[size][contains_product],
+            ):
+                p_indices = {i for c, i in zip(coeffs, indices) if c > -1e-12}
+                if product_index in p_indices:
+                    idxs[size].append(idx)
 
         if return_set:
             return self._get_rxn_set_by_indices(idxs)
@@ -354,109 +396,127 @@ class ReactionSet(MSONable):
         """
         Return a new ReactionSet object with duplicate reactions removed
         """
-        indices_to_remove = set()
-        if len(self.coeffs) == 0:
-            return self
 
-        rxns_list = list(self.get_rxns())
+        def get_idxs_to_remove(selected_coeffs, possible_duplicates):
+            multiples = possible_duplicates / selected_coeffs
+            return np.argwhere(
+                np.apply_along_axis(
+                    lambda r: np.isclose(r[0], r), axis=1, arr=multiples
+                ).all(axis=1)
+            ).flatten()
 
-        idxs_to_keep: List[int] = []
-        if ensure_rxns:
-            idxs_to_keep = [rxns_list.index(r) for r in ensure_rxns]
+        ensure_rxn_data = {}
+        filter_idxs = {size: [] for size in self.indices}
+        for rxn in ensure_rxns or []:
+            rxn_idxs = [self.entries.index(e) for e in rxn.entries]
+            rxn_coeffs = rxn.coefficients
+            size = len(rxn_idxs)
+            if size in ensure_rxn_data:
+                ensure_rxn_data[size].append((rxn_idxs, rxn_coeffs))
+            else:
+                ensure_rxn_data[size] = [(rxn_idxs, rxn_coeffs)]
 
-        # groupby only works with pre-sorted arrays
-        sorted_coeffs, sorted_idxs, sorted_indices = zip(
-            *list(
-                sorted(
-                    zip(self.coeffs, range(len(self.indices)), self.indices),
-                    key=lambda x: sorted(x[2]),
-                )
+        for size in self.indices:
+            rxn_idxs_to_remove = []
+            rxn_idxs_to_keep = []
+
+            if size in ensure_rxn_data:
+                for rxn_idxs, rxn_coeffs in ensure_rxn_data[size]:
+                    possible_duplicates = np.argwhere(
+                        (self.indices[size] == rxn_idxs).all(axis=1)
+                    ).flatten()
+                    duplicates = np.argwhere(
+                        np.isclose(
+                            self.coeffs[size][possible_duplicates], rxn_coeffs
+                        ).all(axis=1)
+                    ).flatten()
+                    rxn_idxs_to_keep.append(possible_duplicates[duplicates[0]])
+
+            indices = np.sort(self.indices[size], axis=1)
+            coeffs = np.sort(self.coeffs[size], axis=1)
+
+            _, unique_idxs, counts = np.unique(
+                indices, return_index=True, return_counts=True, axis=0
             )
-        )
+            idxs_to_check = unique_idxs[np.argwhere(counts > 1).flatten()]
 
-        for i, group in groupby(
-            zip(sorted_coeffs, sorted_idxs, sorted_indices),
-            key=lambda i: sorted(i[2]),
-        ):
-            coeffs_group, idx_group, indices_group = zip(*group)
-            if len(idx_group) > 1:
-                for (idx1, coeffs1, indices1), (
-                    idx2,
-                    coeffs2,
-                    indices2,
-                ) in combinations(zip(idx_group, coeffs_group, indices_group), 2):
-                    if idx2 in indices_to_remove:
-                        continue
+            for idx in idxs_to_check:
+                current_coeffs = coeffs[idx]
+                current_indices = indices[idx]
+                possible_duplicate_idxs = np.argwhere(
+                    (indices == current_indices).all(axis=1)
+                ).flatten()
+                possible_duplicate_coeffs = coeffs[possible_duplicate_idxs]
 
-                    coeffs2_sorted = [
-                        coeffs2[list(indices2).index(i)] for i in indices1
-                    ]
-
-                    ratios = np.array(
-                        np.array(coeffs1) / np.array(coeffs2_sorted), dtype=float
+                duplicate_idxs = possible_duplicate_idxs[
+                    get_idxs_to_remove(current_coeffs, possible_duplicate_coeffs)
+                ]
+                if np.isin(rxn_idxs_to_keep, duplicate_idxs).any():
+                    rxn_idxs_to_remove.extend(
+                        [i for i in duplicate_idxs if i not in rxn_idxs_to_keep]
                     )
+                else:
+                    rxn_idxs_to_remove.extend(duplicate_idxs[1:].tolist())
 
-                    if (
-                        ratios <= 1e-8
-                    ).any():  # do not remove any reaction with negative ratio
-                        continue
+            filter_idxs[size] = [
+                i
+                for i in range(0, len(self.indices[size]))
+                if i not in rxn_idxs_to_remove
+            ]
 
-                    if np.isclose(ratios, ratios[0]).all():
-                        if idx2 in idxs_to_keep:
-                            indices_to_remove.add(idx1)
-                        else:
-                            indices_to_remove.add(idx2)
+        print(filter_idxs)
 
-        slicer = np.full(len(self), True)
-        slicer[list(indices_to_remove)] = False
-
-        return ReactionSet(
-            self.entries,
-            self.indices[slicer],
-            self.coeffs[slicer],
-            self.open_elem,
-            self.chempot,
-            self.all_data[slicer],
-        )
+        return self._get_rxn_set_by_indices(filter_idxs)
 
     def _get_rxns_by_indices(
-        self, idxs: Union[List[int], range]
+        self, idxs: Dict[int, np.ndarray]
     ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
         """
         Return a list of reactions with the given indices.
         """
-        idxs = np.array(idxs)
-        for indices, coeffs, data in zip(
-            self.indices[idxs], self.coeffs[idxs], self.all_data[idxs]
-        ):
-            entries = [self.entries[i] for i in indices]
-            if self.mu_dict:
-                rxn = OpenComputedReaction(
-                    entries=entries,
-                    coefficients=coeffs,
-                    data=data,
-                    chempots=self.mu_dict,
-                )
-            else:
-                rxn = ComputedReaction(entries=entries, coefficients=coeffs, data=data)
 
-            yield rxn
+        for size, idx_arr in idxs.items():
+            if not idx_arr:
+                idx_arr = slice(0, 0)
+            elif not isinstance(idx_arr, np.ndarray) and not isinstance(idx_arr, slice):
+                idx_arr = np.array(idx_arr)
 
-    def _get_rxn_set_by_indices(
-        self, idxs: Union[List[int], range]
-    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
+            for indices, coeffs, data in zip(
+                self.indices[size][idx_arr],
+                self.coeffs[size][idx_arr],
+                self.all_data[size][idx_arr],
+            ):
+                entries = [self.entries[i] for i in indices]
+                if self.mu_dict:
+                    rxn = OpenComputedReaction(
+                        entries=entries,
+                        coefficients=coeffs,
+                        data=data,
+                        chempots=self.mu_dict,
+                    )
+                else:
+                    rxn = ComputedReaction(
+                        entries=entries, coefficients=coeffs, data=data
+                    )
+
+                yield rxn
+
+    def _get_rxn_set_by_indices(self, idxs: Dict[int, np.ndarray]) -> "ReactionSet":
         """
         Return a list of reactions with the given indices.
         """
-        idxs = np.array(idxs)
 
         return ReactionSet(
             entries=self.entries,
-            indices=self.indices[idxs],
-            coeffs=self.coeffs[idxs],
+            indices={
+                size: self.indices[size][idx_arr] for size, idx_arr in idxs.items()
+            },
+            coeffs={size: self.coeffs[size][idx_arr] for size, idx_arr in idxs.items()},
             open_elem=self.open_elem,
             chempot=self.chempot,
-            all_data=self.all_data[idxs],
+            all_data={
+                size: self.all_data[size][idx_arr] for size, idx_arr in idxs.items()
+            },
         )
 
     @staticmethod
