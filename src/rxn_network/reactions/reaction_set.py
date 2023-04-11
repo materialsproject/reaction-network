@@ -3,6 +3,7 @@ Implements a class for conveniently and efficiently storing sets of ComputedReac
 objects which share entries.
 """
 from collections import OrderedDict
+from copy import deepcopy
 from functools import lru_cache
 from itertools import combinations, groupby
 from typing import Any, Collection, Dict, Iterable, List, Optional, Set, Union
@@ -278,20 +279,9 @@ class ReactionSet(MSONable):
         Warning: all new reactions must only have entires contained in the entries of
         the current reaction set.
         """
-        new_indices, new_coeffs, new_data = [], [], []
-        for rxn in rxns:
-            new_indices.append([self.entries.index(e) for e in rxn.entries])
-            new_coeffs.append(list(rxn.coefficients))
-            new_data.append(rxn.data)
+        new_rxn_set = ReactionSet.from_rxns(rxns)
 
-        return ReactionSet(
-            self.entries,
-            np.concatenate((self.indices, np.array(new_indices))),
-            np.concatenate((self.coeffs, np.array(new_coeffs))),
-            self.open_elem,
-            self.chempot,
-            np.concatenate((self.all_data, np.array(new_data))),
-        )
+        return self.add_rxn_set(new_rxn_set)
 
     def add_rxn_set(self, rxn_set: "ReactionSet") -> "ReactionSet":
         """Adds a new reaction set to current reaction set.
@@ -307,17 +297,29 @@ class ReactionSet(MSONable):
         open_elem = self.open_elem
         chempot = self.chempot
 
-        for size in rxn_set.indices:
-            if size not in self.indices:
-                self.indices[size] = rxn_set.indices[size]
-                self.coeffs[size] = rxn_set.coeffs[size]
-                self.all_data[size] = rxn_set.all_data[size]
-            else:
-                indices = np.concatenate((self.indices[size], rxn_set.indices[size]))
-                coeffs = np.concatenate((self.coeffs[size], rxn_set.coeffs[size]))
-                all_data = np.concatenate((self.all_data[size], rxn_set.all_data[size]))
+        new_indices = {}
+        new_coeffs = {}
+        new_all_data = {}
 
-        return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
+        for size in self.indices:
+            if size in rxn_set.indices:
+                new_indices[size] = np.concatenate(
+                    (self.indices[size], rxn_set.indices[size])
+                )
+                new_coeffs[size] = np.concatenate(
+                    (self.coeffs[size], rxn_set.coeffs[size])
+                )
+                new_all_data[size] = np.concatenate(
+                    (self.all_data[size], rxn_set.all_data[size])
+                )
+            else:
+                new_indices[size] = self.indices[size]
+                new_coeffs[size] = self.coeffs[size]
+                new_all_data[size] = self.all_data[size]
+
+        return ReactionSet(
+            self.entries, new_indices, new_coeffs, open_elem, chempot, new_all_data
+        )
 
     def get_rxns_by_reactants(
         self, reactants: List[str], return_set: bool = False
@@ -455,13 +457,10 @@ class ReactionSet(MSONable):
                     (indices == current_indices).all(axis=1)
                 ).flatten()
                 possible_duplicate_coeffs = coeffs[possible_duplicate_idxs]
-                print(current_coeffs, possible_duplicate_coeffs)
 
                 duplicate_idxs = possible_duplicate_idxs[
                     get_idxs_to_remove(current_coeffs, possible_duplicate_coeffs)
                 ]
-                print(duplicate_idxs)
-                print("\n")
                 if np.isin(rxn_idxs_to_keep, duplicate_idxs).any():
                     rxn_idxs_to_remove.extend(
                         [i for i in duplicate_idxs if i not in rxn_idxs_to_keep]
@@ -475,7 +474,7 @@ class ReactionSet(MSONable):
                 if i not in rxn_idxs_to_remove
             ]
 
-            print(list(self._get_rxns_by_indices(idxs={size: rxn_idxs_to_remove})))
+            # print(list(self._get_rxns_by_indices(idxs={size: rxn_idxs_to_remove})))
 
         return self._get_rxn_set_by_indices(filter_idxs)
 

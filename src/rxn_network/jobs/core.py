@@ -219,6 +219,7 @@ class CalculateCompetitionMaker(Maker):
         size = len(all_rxns)  # need to get size before storing in ray
 
         logger.info("Identifying target reactions...")
+        print(all_rxns.indices)
 
         target_rxns = ReactionSet.from_rxns(
             list(all_rxns.get_rxns_by_product(target_formula))
