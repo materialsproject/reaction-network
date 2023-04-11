@@ -313,9 +313,9 @@ class ReactionSet(MSONable):
                 self.coeffs[size] = rxn_set.coeffs[size]
                 self.all_data[size] = rxn_set.all_data[size]
             else:
-                indices = np.concatenate(self.indices, rxn_set.indices[size])
-                coeffs = np.concatenate(self.coeffs, rxn_set.coeffs[size])
-                all_data = np.concatenate(self.all_data, rxn_set.all_data[size])
+                indices = np.concatenate((self.indices[size], rxn_set.indices[size]))
+                coeffs = np.concatenate((self.coeffs[size], rxn_set.coeffs[size]))
+                all_data = np.concatenate((self.all_data[size], rxn_set.all_data[size]))
 
         return ReactionSet(self.entries, indices, coeffs, open_elem, chempot, all_data)
 
@@ -588,4 +588,4 @@ class ReactionSet(MSONable):
         """
         Return length of reactions stored in the set.
         """
-        return len(self.coeffs)
+        return sum(len(i) for i in self.indices.values())
