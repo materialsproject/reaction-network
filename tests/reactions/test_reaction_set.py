@@ -1,6 +1,7 @@
 """ Tests for ReactionSet."""
 from pathlib import Path
 
+import numpy as np
 import pytest
 from monty.serialization import loadfn
 from pymatgen.core.composition import Element
@@ -23,16 +24,22 @@ def open_rxn_set(ymno3_rxns):
 
 
 def test_get_rxns(ymno3_rxns, rxn_set, open_rxn_set):
-    open_rxns = list(open_rxn_set.get_rxns())
-    assert list(rxn_set.get_rxns()) == ymno3_rxns
-    assert open_rxns != ymno3_rxns
+    ymno3_rxns_set = set(
+        ymno3_rxns
+    )  # order may change when creating ReactionSet object
+    open_rxns = set(open_rxn_set.get_rxns())
+    assert set(rxn_set.get_rxns()) == ymno3_rxns_set
+    assert open_rxns != ymno3_rxns_set
     assert all([type(r) == OpenComputedReaction for r in open_rxns])
     assert all([r.chempots == {Element("O"): 0} for r in open_rxns])
 
 
 def test_calculate_costs(ymno3_rxns, rxn_set):
     cf = Softplus()
-    assert rxn_set.calculate_costs(cf) == [cf.evaluate(r) for r in ymno3_rxns]
+    assert np.allclose(
+        np.sort(np.array(rxn_set.calculate_costs(cf))),
+        np.sort(np.array([cf.evaluate(r) for r in ymno3_rxns])),
+    )
 
 
 def test_filter_duplicates(computed_rxn):

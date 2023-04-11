@@ -15,7 +15,7 @@ from tqdm import tqdm
 from rxn_network.core.enumerator import Enumerator
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.entries.utils import initialize_entry
-from rxn_network.enumerators.utils import get_rxn_info, group_by_chemsys
+from rxn_network.enumerators.utils import group_by_chemsys
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger, grouper, limited_powerset
@@ -49,6 +49,7 @@ class BasicEnumerator(Enumerator):
         calculate_e_above_hulls: bool = False,
         batch_multiplicity: int = 2,
         chunk_multiplicity: int = 10,
+        filter_duplicates: bool = True,
         quiet: bool = False,
     ):
         """
@@ -91,6 +92,7 @@ class BasicEnumerator(Enumerator):
         self.calculate_e_above_hulls = calculate_e_above_hulls
         self.batch_multiplicity = batch_multiplicity
         self.chunk_multiplicity = chunk_multiplicity
+        self.filter_duplicates = filter_duplicates
         self.quiet = quiet
 
         self._stabilize = False
@@ -235,16 +237,9 @@ class BasicEnumerator(Enumerator):
                 results.extend(ray.get(completed_ref))
                 pbar.update(1)
 
-        all_indices, all_coeffs, all_data = [], [], []
-        for r in results:
-            all_indices.append(r[0])
-            all_coeffs.append(r[1])
-            all_data.append(r[2])
-
-        rxn_set = ReactionSet(
-            entries.entries_list, all_indices, all_coeffs, all_data=all_data
+        rxn_set = ReactionSet.from_rxns(
+            results, filter_duplicates=self.filter_duplicates
         )
-        rxn_set = rxn_set.filter_duplicates()
 
         return rxn_set
 
@@ -461,6 +456,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
+        filter_duplicates: bool = True,
         batch_multiplicity: int = 2,
         chunk_multiplicity: int = 10,
     ):
@@ -503,6 +499,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             quiet=quiet,
             batch_multiplicity=batch_multiplicity,
             chunk_multiplicity=chunk_multiplicity,
+            filter_duplicates=filter_duplicates,
         )
         self.open_phases: List[str] = open_phases
 
@@ -611,7 +608,7 @@ def _react(
             product_entries = set(rxn.product_entries) - open_entries
 
             if precursor_func(reactant_entries) and target_func(product_entries):
-                rxns.append(get_rxn_info(rxn))
+                rxns.append(rxn)
 
         all_rxns.extend(rxns)
 

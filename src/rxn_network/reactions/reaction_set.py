@@ -373,7 +373,7 @@ class ReactionSet(MSONable):
         if not product_index:
             return []
 
-        idxs: Dict[int, ndarray] = {}
+        idxs: Dict[int, np.ndarray] = {}
         for size, indices in self.indices.items():
             idxs[size] = []
             contains_product = np.isin(indices, product_index).any(axis=1)
@@ -397,24 +397,30 @@ class ReactionSet(MSONable):
         Return a new ReactionSet object with duplicate reactions removed
         """
 
-        def get_idxs_to_remove(selected_coeffs, possible_duplicates):
-            multiples = possible_duplicates / selected_coeffs
+        def get_idxs_to_remove(selected, possible):
+            """Looks for reactions with coeffs that are positive multiples
+            of each other."""
+            multiples = possible / selected
             return np.argwhere(
                 np.apply_along_axis(
-                    lambda r: np.isclose(r[0], r), axis=1, arr=multiples
+                    lambda r: np.isclose(abs(r[0]), r), axis=1, arr=multiples
                 ).all(axis=1)
             ).flatten()
 
         ensure_rxn_data = {}
         filter_idxs = {size: [] for size in self.indices}
+
         for rxn in ensure_rxns or []:
-            rxn_idxs = [self.entries.index(e) for e in rxn.entries]
+            rxn_idxs = np.array([self.entries.index(e) for e in rxn.entries])
             rxn_coeffs = rxn.coefficients
+
             size = len(rxn_idxs)
             if size in ensure_rxn_data:
                 ensure_rxn_data[size].append((rxn_idxs, rxn_coeffs))
             else:
                 ensure_rxn_data[size] = [(rxn_idxs, rxn_coeffs)]
+
+        duplicate_rxns = {size: [] for size in self.indices}
 
         for size in self.indices:
             rxn_idxs_to_remove = []
@@ -432,8 +438,10 @@ class ReactionSet(MSONable):
                     ).flatten()
                     rxn_idxs_to_keep.append(possible_duplicates[duplicates[0]])
 
-            indices = np.sort(self.indices[size], axis=1)
-            coeffs = np.sort(self.coeffs[size], axis=1)
+            sorting_indices = np.argsort(self.indices[size], axis=1)
+
+            indices = np.take_along_axis(self.indices[size], sorting_indices, axis=1)
+            coeffs = np.take_along_axis(self.coeffs[size], sorting_indices, axis=1)
 
             _, unique_idxs, counts = np.unique(
                 indices, return_index=True, return_counts=True, axis=0
@@ -447,15 +455,18 @@ class ReactionSet(MSONable):
                     (indices == current_indices).all(axis=1)
                 ).flatten()
                 possible_duplicate_coeffs = coeffs[possible_duplicate_idxs]
+                print(current_coeffs, possible_duplicate_coeffs)
 
                 duplicate_idxs = possible_duplicate_idxs[
                     get_idxs_to_remove(current_coeffs, possible_duplicate_coeffs)
                 ]
+                print(duplicate_idxs)
+                print("\n")
                 if np.isin(rxn_idxs_to_keep, duplicate_idxs).any():
                     rxn_idxs_to_remove.extend(
                         [i for i in duplicate_idxs if i not in rxn_idxs_to_keep]
                     )
-                else:
+                elif len(duplicate_idxs) > 1:
                     rxn_idxs_to_remove.extend(duplicate_idxs[1:].tolist())
 
             filter_idxs[size] = [
@@ -464,7 +475,7 @@ class ReactionSet(MSONable):
                 if i not in rxn_idxs_to_remove
             ]
 
-        print(filter_idxs)
+            print(list(self._get_rxns_by_indices(idxs={size: rxn_idxs_to_remove})))
 
         return self._get_rxn_set_by_indices(filter_idxs)
 

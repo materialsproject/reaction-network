@@ -470,7 +470,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         cls,
         entries: Iterable[ComputedStructureEntry],
         temperature: float,
-        include_nist_data=False,
+        include_nist_data=True,
         include_freed_data=False,
         apply_carbonate_correction=True,
         ignore_nist_solids=True,
