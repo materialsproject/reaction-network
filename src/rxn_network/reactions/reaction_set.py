@@ -50,15 +50,38 @@ class ReactionSet(MSONable):
             all_data: Optional list of data for each reaction
         """
         self.entries = entries
-        self.indices = {int(size): np.array(arr) for size, arr in indices.items()}
-        self.coeffs = {int(size): np.array(arr) for size, arr in coeffs.items()}
+        self.indices = indices
+        self.coeffs = coeffs
         self.open_elem = open_elem
         self.chempot = chempot
-
         if all_data is None:
-            all_data = {i: np.array([]) for i in self.indices}
+            self.all_data = {int(i): np.array([]) for i in self.indices}
         else:
-            all_data = {int(size): np.array(arr) for size, arr in all_data.items()}
+            self.all_data = all_data
+
+        if not all(isinstance(k, int) for k in self.indices.keys()) or not all(
+            isinstance(v, np.ndarray) for v in self.indices.values()
+        ):
+            self.indices = {
+                int(size): np.array(arr) for size, arr in self.indices.items()
+            }
+
+        if not all(isinstance(k, int) for k in self.coeffs.keys()) or not all(
+            isinstance(v, np.ndarray) for v in self.coeffs.values()
+        ):
+            self.coeffs = {
+                int(size): np.array(arr) for size, arr in self.coeffs.items()
+            }
+
+        if not all(isinstance(k, int) for k in self.all_data.keys()) or not all(
+            isinstance(v, np.ndarray) for v in self.all_data.values()
+        ):
+            self.all_data = {
+                int(size): np.array(arr) for size, arr in self.all_data.items()
+            }
+
+        self.open_elem = open_elem
+        self.chempot = chempot
 
         self.all_data = all_data
         self.mu_dict = None
