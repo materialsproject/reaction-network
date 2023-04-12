@@ -472,7 +472,7 @@ class ReactionSet(MSONable):
                 np.where(inverse_indices == i)[0] for i, c in enumerate(counts) if c > 1
             ]
 
-            if len(group_indices) > 10:
+            if len(group_indices) > 100:
                 initialize_ray()
                 logger.warning(
                     f"Size {size} contains {len(group_indices)} possible duplicate"
