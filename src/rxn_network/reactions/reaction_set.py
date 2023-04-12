@@ -54,11 +54,13 @@ class ReactionSet(MSONable):
         self.coeffs = {int(size): np.array(arr) for size, arr in coeffs.items()}
         self.open_elem = open_elem
         self.chempot = chempot
-        self.all_data = {int(size): np.array(arr) for size, arr in all_data.items()}
 
         if all_data is None:
             all_data = {i: np.array([]) for i in self.indices}
+        else:
+            all_data = {int(size): np.array(arr) for size, arr in all_data.items()}
 
+        self.all_data = all_data
         self.mu_dict = None
 
         if open_elem:
