@@ -49,7 +49,7 @@ class BasicEnumerator(Enumerator):
         calculate_e_above_hulls: bool = False,
         batch_multiplicity: int = 2,
         chunk_multiplicity: int = 10,
-        filter_duplicates: bool = True,
+        filter_duplicates: bool = False,
         quiet: bool = False,
     ):
         """
@@ -456,7 +456,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
-        filter_duplicates: bool = True,
+        filter_duplicates: bool = False,
         batch_multiplicity: int = 2,
         chunk_multiplicity: int = 10,
     ):

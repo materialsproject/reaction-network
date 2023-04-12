@@ -83,7 +83,6 @@ class ReactionSet(MSONable):
         self.open_elem = open_elem
         self.chempot = chempot
 
-        self.all_data = all_data
         self.mu_dict = None
 
         if open_elem:
