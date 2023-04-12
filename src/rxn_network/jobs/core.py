@@ -219,11 +219,9 @@ class CalculateCompetitionMaker(Maker):
         size = len(all_rxns)  # need to get size before storing in ray
 
         logger.info("Identifying target reactions...")
-        print(all_rxns.indices)
 
-        target_rxns = ReactionSet.from_rxns(
-            list(all_rxns.get_rxns_by_product(target_formula))
-        )
+        target_rxns = all_rxns.get_rxns_by_product(target_formula, return_set=True)
+
         logger.info(
             f"Identified {len(target_rxns)} target reactions out of"
             f" {size} total reactions."
@@ -282,7 +280,6 @@ class CalculateCompetitionMaker(Maker):
 
     def _get_competition_decorated_rxns(self, target_rxns, all_rxns, size):
         memory_per_rxn = 35  # 35 bytes per reaction (with overhead)
-        all_rxns = ReactionSet.from_dict(all_rxns)
 
         memory_size = int(ray.cluster_resources()["memory"])
         logger.info(f"Available memory: {memory_size}")
@@ -528,6 +525,7 @@ class PathwaySolverMaker(Maker):
 @ray.remote
 def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
     decorated_rxns = []
+    all_rxns = ReactionSet.from_dict(all_rxns)
 
     for rxn in rxn_chunk:
         if not rxn:

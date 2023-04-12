@@ -3,7 +3,6 @@ Implements a class for conveniently and efficiently storing sets of ComputedReac
 objects which share entries.
 """
 from collections import OrderedDict
-from copy import deepcopy
 from functools import lru_cache
 from itertools import combinations, groupby
 from typing import Any, Collection, Dict, Iterable, List, Optional, Set, Union
@@ -51,11 +50,11 @@ class ReactionSet(MSONable):
             all_data: Optional list of data for each reaction
         """
         self.entries = entries
-        self.indices = indices
-        self.coeffs = coeffs
+        self.indices = {int(size): np.array(arr) for size, arr in indices.items()}
+        self.coeffs = {int(size): np.array(arr) for size, arr in coeffs.items()}
         self.open_elem = open_elem
         self.chempot = chempot
-        self.all_data = all_data
+        self.all_data = {int(size): np.array(arr) for size, arr in all_data.items()}
 
         if all_data is None:
             all_data = {i: np.array([]) for i in self.indices}
@@ -343,9 +342,7 @@ class ReactionSet(MSONable):
         idxs: Dict[int, List[int]] = {}
         for size, indices in self.indices.items():
             idxs[size] = []
-            contains_reactants = np.isin(indices, reactant_indices).sum(axis=1) == len(
-                reactant_indices
-            )
+            contains_reactants = np.isin(indices, reactant_indices).any(axis=1)
             for idx, coeffs, indices in zip(
                 np.argwhere(contains_reactants).flatten(),
                 self.coeffs[size][contains_reactants],
@@ -421,8 +418,6 @@ class ReactionSet(MSONable):
                 ensure_rxn_data[size].append((rxn_idxs, rxn_coeffs))
             else:
                 ensure_rxn_data[size] = [(rxn_idxs, rxn_coeffs)]
-
-        duplicate_rxns = {size: [] for size in self.indices}
 
         for size in self.indices:
             rxn_idxs_to_remove = []

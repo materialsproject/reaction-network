@@ -16,7 +16,6 @@ def run_enumerators(enumerators, entries):
     for enumerator in enumerators:
         logger.info(f"Running {enumerator.__class__.__name__}")
         rxns = enumerator.enumerate(entries)
-        print(rxns.indices)
 
         logger.info(f"Adding {len(rxns)} reactions to reaction set")
 
