@@ -238,7 +238,7 @@ class BasicEnumerator(Enumerator):
                 pbar.update(1)
 
         rxn_set = ReactionSet.from_rxns(
-            results, filter_duplicates=self.filter_duplicates
+            results, entries=entries, filter_duplicates=self.filter_duplicates
         )
 
         return rxn_set

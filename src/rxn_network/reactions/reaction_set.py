@@ -8,15 +8,21 @@ from itertools import combinations, groupby
 from typing import Any, Collection, Dict, Iterable, List, Optional, Set, Union
 
 import numpy as np
+import ray
 from monty.json import MSONable
 from pandas import DataFrame
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
+from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
 from rxn_network.core.cost_function import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
+from rxn_network.utils.funcs import get_logger, grouper
+from rxn_network.utils.ray import initialize_ray
+
+logger = get_logger(__name__)
 
 
 class ReactionSet(MSONable):
@@ -420,82 +426,106 @@ class ReactionSet(MSONable):
         Return a new ReactionSet object with duplicate reactions removed
         """
 
-        def get_idxs_to_remove(selected, possible):
-            """Looks for reactions with coeffs that are positive multiples
-            of each other."""
-            multiples = possible / selected
-            return np.argwhere(
-                np.apply_along_axis(
-                    lambda r: np.isclose(abs(r[0]), r), axis=1, arr=multiples
-                ).all(axis=1)
-            ).flatten()
+        ensure_idxs = {size: [] for size in self.indices}
+        idxs_to_keep = {size: [] for size in self.indices}
 
-        ensure_rxn_data = {}
-        filter_idxs = {size: [] for size in self.indices}
-
+        # identify indices to keep
         for rxn in ensure_rxns or []:
             rxn_idxs = np.array([self.entries.index(e) for e in rxn.entries])
             rxn_coeffs = rxn.coefficients
 
             size = len(rxn_idxs)
-            if size in ensure_rxn_data:
-                ensure_rxn_data[size].append((rxn_idxs, rxn_coeffs))
+
+            # filter by first column to save some time (full filter is long)
+            quick_filter = np.argwhere(
+                rxn_idxs[0] == self.indices[size][:, 0]
+            ).flatten()
+
+            for i, idxs, coeffs in zip(
+                quick_filter,
+                self.indices[size][quick_filter],
+                self.coeffs[size][quick_filter],
+            ):
+                if idxs == rxn_idxs and coeffs == rxn_coeffs:
+                    ensure_idxs[size].append(i)
+                    break
             else:
-                ensure_rxn_data[size] = [(rxn_idxs, rxn_coeffs)]
+                raise ValueError(f"{rxn} not found in ReactionSet!")
 
         for size in self.indices:
-            rxn_idxs_to_remove = []
-            rxn_idxs_to_keep = []
+            ensure_idxs_to_keep = ensure_idxs[size]
 
-            if size in ensure_rxn_data:
-                for rxn_idxs, rxn_coeffs in ensure_rxn_data[size]:
-                    possible_duplicates = np.argwhere(
-                        (self.indices[size] == rxn_idxs).all(axis=1)
-                    ).flatten()
-                    duplicates = np.argwhere(
-                        np.isclose(
-                            self.coeffs[size][possible_duplicates], rxn_coeffs
-                        ).all(axis=1)
-                    ).flatten()
-                    rxn_idxs_to_keep.append(possible_duplicates[duplicates[0]])
+            column_sorting_indices = np.argsort(self.indices[size], axis=1)
 
-            sorting_indices = np.argsort(self.indices[size], axis=1)
-
-            indices = np.take_along_axis(self.indices[size], sorting_indices, axis=1)
-            coeffs = np.take_along_axis(self.coeffs[size], sorting_indices, axis=1)
-
-            _, unique_idxs, counts = np.unique(
-                indices, return_index=True, return_counts=True, axis=0
+            # sort coeffs and indices by entry number
+            indices = np.take_along_axis(
+                self.indices[size], column_sorting_indices, axis=1
             )
-            idxs_to_check = unique_idxs[np.argwhere(counts > 1).flatten()]
+            coeffs = np.take_along_axis(
+                self.coeffs[size], column_sorting_indices, axis=1
+            )
 
-            for idx in idxs_to_check:
-                current_coeffs = coeffs[idx]
-                current_indices = indices[idx]
-                possible_duplicate_idxs = np.argwhere(
-                    (indices == current_indices).all(axis=1)
-                ).flatten()
-                possible_duplicate_coeffs = coeffs[possible_duplicate_idxs]
-
-                duplicate_idxs = possible_duplicate_idxs[
-                    get_idxs_to_remove(current_coeffs, possible_duplicate_coeffs)
-                ]
-                if np.isin(rxn_idxs_to_keep, duplicate_idxs).any():
-                    rxn_idxs_to_remove.extend(
-                        [i for i in duplicate_idxs if i not in rxn_idxs_to_keep]
-                    )
-                elif len(duplicate_idxs) > 1:
-                    rxn_idxs_to_remove.extend(duplicate_idxs[1:].tolist())
-
-            filter_idxs[size] = [
-                i
-                for i in range(0, len(self.indices[size]))
-                if i not in rxn_idxs_to_remove
+            _, inverse_indices, counts = np.unique(
+                indices, axis=0, return_inverse=True, return_counts=True
+            )
+            group_indices = [
+                np.where(inverse_indices == i)[0] for i, c in enumerate(counts) if c > 1
             ]
 
-            # print(list(self._get_rxns_by_indices(idxs={size: rxn_idxs_to_remove})))
+            if len(group_indices) > 10:
+                initialize_ray()
+                logger.warning(
+                    f"Size {size} contains {len(group_indices)} possible duplicate"
+                    " sets. This may take a long time to filter. Attempting to"
+                    " parallelize."
+                )
+                num_cpus = int(ray.cluster_resources()["CPU"]) - 1
+                batch_size = num_cpus
+                chunk_size = (len(group_indices) // batch_size) + 1
 
-        return self._get_rxn_set_by_indices(filter_idxs)
+                coeffs = ray.put(coeffs)
+
+                chunk_refs = []
+                results = []
+
+                with tqdm(total=len(group_indices) // chunk_size + 1) as pbar:
+                    for chunk in grouper(
+                        group_indices,
+                        chunk_size,
+                        fillvalue=None,
+                    ):
+                        chunk = [c for c in chunk if c is not None]
+                        if len(chunk_refs) > batch_size:
+                            num_ready = len(chunk_refs) - batch_size
+                            newly_completed, chunk_refs = ray.wait(
+                                chunk_refs, num_returns=num_ready
+                            )
+                            for completed_ref in newly_completed:
+                                results.append(ray.get(completed_ref))
+                                pbar.update(1)
+
+                        chunk_refs.append(
+                            _process_duplicates_ray.remote(
+                                chunk, coeffs, ensure_idxs_to_keep
+                            )
+                        )
+
+                    newly_completed, chunk_refs = ray.wait(
+                        chunk_refs, num_returns=len(chunk_refs)
+                    )
+                    for completed_ref in newly_completed:
+                        results.append(ray.get(completed_ref))
+                        pbar.update(1)
+
+                results = [idx for c in results for idx in c]
+                idxs_to_keep[size] = results
+
+            else:
+                idxs_to_keep[size] = _process_duplicates(
+                    group_indices, coeffs, ensure_idxs_to_keep
+                )
+
+        return self._get_rxn_set_by_indices(idxs_to_keep)
 
     def _get_rxns_by_indices(
         self, idxs: Dict[int, np.ndarray]
@@ -607,3 +637,93 @@ class ReactionSet(MSONable):
         Return length of reactions stored in the set.
         """
         return sum(len(i) for i in self.indices.values())
+
+
+def _get_idxs_to_keep(rows, ensure_idxs=None):
+    """Looks for reactions with coeffs that are positive multiples
+    of each other."""
+    sorted_indices = np.argsort(np.abs(rows).sum(axis=1))  # sort by abs sum
+    sorted_rows = rows[sorted_indices]
+    if ensure_idxs is not None:
+        ensure_idxs = set(ensure_idxs)
+
+    to_keep, to_remove = [], []
+    for idx, row in zip(sorted_indices, sorted_rows):
+        if idx in to_remove:
+            continue
+
+        multiples = sorted_rows / row
+        duplicates = np.argwhere(
+            np.apply_along_axis(
+                lambda r: np.isclose(abs(r[0]), r), axis=1, arr=multiples
+            ).all(axis=1)
+        ).flatten()
+
+        group = sorted_indices[duplicates]
+        if ensure_idxs is not None:
+            group_set = set(group)
+            overlap = ensure_idxs & group_set
+
+            if overlap:
+                if not overlap.issubset(to_keep):
+                    difference = group_set - ensure_idxs
+                    to_keep.extend(list(overlap))
+                    to_remove.extend(list(difference))
+            else:
+                to_keep.append(group[0])
+                to_remove.extend(group[1:])
+
+        else:
+            to_keep.append(group[0])
+            to_remove.extend(group[1:])
+
+    return sorted(to_keep)
+
+
+@ray.remote
+def _process_duplicates_ray(
+    groups: List[np.ndarray],
+    coeffs: np.ndarray,
+    ensure_idxs: List[int],
+) -> List[int]:
+    """
+    Process a chunk of reactions to find duplicates.
+
+    Args:
+        chunk: chunk of reactions to process
+        coeffs: corresponding coefficients
+        ensure_idxs: indices of reactions to ensure are kept
+        size: size of reactions to process
+
+    Returns:
+        List of indices to keep
+    """
+    idxs_to_keep = _process_duplicates(groups, coeffs, ensure_idxs)
+
+    return idxs_to_keep
+
+
+def _process_duplicates(
+    groups: List[np.ndarray],
+    coeffs: np.ndarray,
+    ensure_idxs: List[int],
+) -> List[int]:
+    """
+    Process a chunk of reactions to find duplicates.
+
+    Args:
+        chunk: chunk of reactions to process
+        coeffs: corresponding coefficients
+        ensure_idxs: indices of reactions to ensure are kept
+        size: size of reactions to process
+
+    Returns:
+        List of indices to keep
+    """
+    idxs_to_keep = []
+    for group in groups:
+        possible_duplicate_coeffs = coeffs[group]
+        keep_idxs = _get_idxs_to_keep(possible_duplicate_coeffs, ensure_idxs)
+        idxs_to_keep.extend(keep_idxs)
+
+    return idxs_to_keep
