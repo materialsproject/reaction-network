@@ -279,10 +279,10 @@ class CalculateCompetitionMaker(Maker):
         return doc
 
     def _get_competition_decorated_rxns(self, target_rxns, all_rxns, size):
-        memory_per_rxn = 35  # 35 bytes per reaction (with overhead)
+        # memory_per_rxn = 35  # 35 bytes per reaction (with overhead)
 
-        memory_size = int(ray.cluster_resources()["memory"])
-        logger.info(f"Available memory: {memory_size}")
+        # memory_size = int(ray.cluster_resources()["memory"])
+        # logger.info(f"Available memory: {memory_size}")
 
         num_cpus = int(ray.cluster_resources()["CPU"]) - 1
         logger.info(f"Available CPUs-1: {num_cpus}")
@@ -290,12 +290,12 @@ class CalculateCompetitionMaker(Maker):
         batch_size = self.batch_size
         if batch_size is None:
             batch_size = num_cpus
-            if memory_size < (size * memory_per_rxn * num_cpus):
-                batch_size = memory_size // (size * memory_per_rxn)
-                logger.info(
-                    f"Memory size too small for {num_cpus} batches!"
-                    f"Using batch size of {batch_size} instead."
-                )
+            # if memory_size < (size * memory_per_rxn * num_cpus):
+            #     batch_size = memory_size // (size * memory_per_rxn)
+            #     logger.info(
+            #         f"Memory size too small for {num_cpus} batches!"
+            #         f"Using batch size of {batch_size} instead."
+            #     )
 
         chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
 
@@ -326,11 +326,11 @@ class CalculateCompetitionMaker(Maker):
                 if self.open_formula:
                     reactant_formulas.append(self.open_formula)
 
-                task_memory = memory_per_rxn * chunk_size
+                # task_memory = memory_per_rxn * chunk_size
 
                 rxn_chunk_refs.append(
                     _get_competition_decorated_rxns_by_chunk.options(
-                        memory=task_memory
+                        # memory=task_memory
                     ).remote(chunk, all_rxns, self.open_formula, self.temp)
                 )
 
