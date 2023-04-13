@@ -468,18 +468,21 @@ class ReactionSet(MSONable):
                 self.coeffs[size], column_sorting_indices, axis=1
             )
 
-            _, inverse_indices, counts = np.unique(
-                indices, axis=0, return_inverse=True, return_counts=True
+            _, unique_idx, inverse_indices, counts = np.unique(
+                indices,
+                axis=0,
+                return_index=True,
+                return_inverse=True,
+                return_counts=True,
             )
 
             keep = []
             group_indices = []
             for i, c in enumerate(counts):
-                match = np.where(inverse_indices == i)[0]
                 if c == 1:
-                    keep.append(match[0])
+                    keep.append(unique_idx[i])
                 elif c > 1:
-                    group_indices.append(match)
+                    group_indices.append(np.where(inverse_indices == i)[0])
 
             idxs_to_keep[size] = keep
 
