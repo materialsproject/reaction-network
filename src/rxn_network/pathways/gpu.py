@@ -14,6 +14,9 @@ def _balance_path_arrays_gpu(
     """
     WARNING: this GPU-based method is experimental. Use at your own risk.
 
+    It turns out that pseudoinverses are not faster on the GPU than the CPU. (at least,
+    not yet!)
+
     Args:
         comp_matrices: Array containing stoichiometric coefficients of all
             compositions in all reactions, for each trial combination.
@@ -94,6 +97,5 @@ def _balance_path_arrays_gpu(
 
     # checkpoint3 = datetime.now()
     # print(f"Converting back to CPU took: {checkpoint3-checkpoint2}")
-    print("I'm done - GPU!")
 
     return filtered_comp_matrices, filtered_multiplicities

@@ -339,11 +339,11 @@ class PathwaySolver(Solver):
 
         rxn_set = ReactionSet(
             intermediates.entries_list,
-            [],
-            [],
+            {},
+            {},
             open_elem=self.open_elem,
             chempot=self.chempot,
-            all_data=[],
+            all_data={},
         )
 
         if use_basic_enumerator:
@@ -447,7 +447,6 @@ def _balance_path_arrays_cpu(
         filtered_comp_matrices[i] = comp_matrices[idx]
         filtered_multiplicities[i] = all_multiplicities[idx]
 
-    print("I'm done - CPU!")
     return filtered_comp_matrices, filtered_multiplicities
 
 

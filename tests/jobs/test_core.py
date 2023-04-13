@@ -2,6 +2,7 @@
 
 import pytest
 from jobflow.managers.local import run_locally
+from monty.serialization import dumpfn
 
 from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.jobs.core import (
@@ -57,7 +58,7 @@ def competition_job(calculate_competition_maker, all_ymno_rxns, filtered_entries
 @pytest.fixture
 def network_maker():
     network_maker = NetworkMaker(
-        precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"], calculate_pathways=10
+        precursors=["Y2O3", "Mn2O3"], targets=["YMn2O5", "Mn3O4"], calculate_pathways=10
     )
     return network_maker
 
@@ -117,7 +118,7 @@ def test_network_job(network_job, job_store):
     output = run_locally(network_job, store=job_store, ensure_success=True)
     doc = output[network_job.uuid][1].output
     assert doc.__class__.__name__ == "NetworkTaskDocument"
-    assert len(doc.paths) == 10
+    assert len(doc.paths) == 20
 
 
 def test_pathway_solver_job(pathway_solver_job, job_store):

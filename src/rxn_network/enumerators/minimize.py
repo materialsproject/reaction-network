@@ -68,6 +68,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             remove_changed=remove_changed,
             calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
+            filter_duplicates=filter_duplicates,
             batch_multiplicity=batch_multiplicity,
             chunk_multiplicity=chunk_multiplicity,
         )
@@ -152,6 +153,8 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             exclusive_targets: Whether to consider only reactions that make the
                 provided target directly (i.e. with no byproducts). Defualts to False.
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
+            filter_duplicates: Whether to filter duplicate reactions. Defaults to True
+                for grand potential enumerator due to how common duplicate reactions are.
         """
 
         super().__init__(
@@ -165,6 +168,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             remove_changed=remove_changed,
             calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
+            filter_duplicates=filter_duplicates,
             batch_multiplicity=batch_multiplicity,
             chunk_multiplicity=chunk_multiplicity,
         )
