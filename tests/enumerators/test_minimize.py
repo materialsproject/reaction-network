@@ -118,6 +118,7 @@ def test_enumerate_grand_potential(filtered_entries, grand_potential_enumerator)
     expected_num_rxns = 42
 
     rxns = grand_potential_enumerator.enumerate(filtered_entries)
+    print(list(rxns))
 
     assert len(rxns) == expected_num_rxns
     assert all([not r.is_identity for r in rxns])

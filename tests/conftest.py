@@ -31,7 +31,8 @@ def gibbs_entries():
 
 @pytest.fixture(scope="session")
 def entries():
-    return GibbsEntrySet(loadfn("Cl_Mn_Na_O_Y_entries.json.gz"))
+    """Doesn't apply Gibbs corrections"""
+    return GibbsEntrySet(loadfn(TEST_FILES_PATH / "Cl_Mn_Na_O_Y_entries.json.gz"))
 
 
 @pytest.fixture(scope="session")

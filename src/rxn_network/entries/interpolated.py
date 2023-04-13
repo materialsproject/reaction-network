@@ -46,6 +46,7 @@ class InterpolatedEntry(ComputedEntry):
                 with the entry. Defaults to None.
             entry_id: An optional id to uniquely identify the entry.
         """
+        composition = Composition(composition)
         if entry_id is None:
             entry_id = f"InterpolatedEntry ({composition.reduced_formula})"
 

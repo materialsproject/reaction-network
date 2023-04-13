@@ -26,6 +26,7 @@ def run_enumerators(enumerators, entries):
 
     logger.info("Completed reaction enumeration. Filtering duplicates...")
     rxn_set = rxn_set.filter_duplicates()
+    logger.info("Completed duplicate filtering.")
     return rxn_set
 
 

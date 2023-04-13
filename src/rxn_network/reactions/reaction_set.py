@@ -416,10 +416,18 @@ class ReactionSet(MSONable):
 
         return self._get_rxns_by_indices(idxs)
 
-    def filter_duplicates(self, ensure_rxns: Optional[List[ComputedReaction]] = None):
+    def filter_duplicates(
+        self, ensure_rxns: Optional[List[ComputedReaction]] = None, parallelize=True
+    ):
         """
-        Return a new ReactionSet object with duplicate reactions removed
+        Return a new ReactionSet object with duplicate reactions removed.
+
+        Duplicate reactions include those that are multiples of each other. For example,
+        if a reaction set contains both A + B -> C and 2A + 2B -> 2C, the second
+        reaction will be removed.
         """
+        if parallelize:
+            initialize_ray()
 
         ensure_idxs = {size: [] for size in self.indices}
         idxs_to_keep = {size: [] for size in self.indices}
@@ -447,7 +455,7 @@ class ReactionSet(MSONable):
             else:
                 raise ValueError(f"{rxn} not found in ReactionSet!")
 
-        for size in self.indices:
+        for size in sorted(self.indices.keys()):
             ensure_idxs_to_keep = ensure_idxs[size]
 
             column_sorting_indices = np.argsort(self.indices[size], axis=1)
@@ -463,17 +471,19 @@ class ReactionSet(MSONable):
             _, inverse_indices, counts = np.unique(
                 indices, axis=0, return_inverse=True, return_counts=True
             )
-            group_indices = [
-                np.where(inverse_indices == i)[0] for i, c in enumerate(counts) if c > 1
-            ]
 
-            if len(group_indices) > 100:
-                initialize_ray()
-                logger.warning(
-                    f"Size {size} contains {len(group_indices)} possible duplicate"
-                    " sets. This may take a long time to filter. Attempting to"
-                    " parallelize."
-                )
+            keep = []
+            group_indices = []
+            for i, c in enumerate(counts):
+                match = np.where(inverse_indices == i)[0]
+                if c == 1:
+                    keep.append(match[0])
+                elif c > 1:
+                    group_indices.append(match)
+
+            idxs_to_keep[size] = keep
+
+            if parallelize:
                 num_cpus = int(ray.cluster_resources()["CPU"]) - 1
                 batch_size = num_cpus
                 chunk_size = (len(group_indices) // batch_size) + 1
@@ -483,7 +493,10 @@ class ReactionSet(MSONable):
                 chunk_refs = []
                 results = []
 
-                with tqdm(total=len(group_indices) // chunk_size + 1) as pbar:
+                with tqdm(
+                    total=len(group_indices) // chunk_size + 1,
+                    desc=f"Filtering duplicates (size {size})",
+                ) as pbar:
                     for chunk in grouper(
                         group_indices,
                         chunk_size,
@@ -513,11 +526,10 @@ class ReactionSet(MSONable):
                         pbar.update(1)
 
                 results = [idx for c in results for idx in c]
-                idxs_to_keep[size] = results
-
+                idxs_to_keep[size].extend(results)
             else:
-                idxs_to_keep[size] = _process_duplicates(
-                    group_indices, coeffs, ensure_idxs_to_keep
+                idxs_to_keep[size].extend(
+                    _process_duplicates(group_indices, coeffs, ensure_idxs_to_keep)
                 )
 
         return self._get_rxn_set_by_indices(idxs_to_keep)
@@ -719,6 +731,6 @@ def _process_duplicates(
     for group in groups:
         possible_duplicate_coeffs = coeffs[group]
         keep_idxs = _get_idxs_to_keep(possible_duplicate_coeffs, ensure_idxs)
-        idxs_to_keep.extend(keep_idxs)
+        idxs_to_keep.extend(group[keep_idxs])
 
     return idxs_to_keep

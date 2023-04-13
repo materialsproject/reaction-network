@@ -127,4 +127,3 @@ def get_computed_rxn(
         rxn = ComputedReaction.balance(reactant_entries, product_entries)
 
     return rxn
-

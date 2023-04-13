@@ -35,11 +35,13 @@ def initialize_ray(quiet=False):
             )
             ray.init()
 
-    logger.info(
-        f"HOST: {ray.nodes()[0]['NodeManagerHostname']}, "
-        f"Num CPUs: {ray.cluster_resources()['CPU']}, "
-        f"Total Memory: {ray.cluster_resources()['memory']}"
-    )
+        logger.info(
+            f"HOST: {ray.nodes()[0]['NodeManagerHostname']}, "
+            f"Num CPUs: {ray.cluster_resources()['CPU']}, "
+            f"Total Memory: {ray.cluster_resources()['memory']}"
+        )
+    else:
+        logger.info("Ray is already initialized.")
 
 
 def to_iterator(obj_ids, get_obj_ids=False):

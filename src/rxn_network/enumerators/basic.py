@@ -176,7 +176,11 @@ class BasicEnumerator(Enumerator):
 
         logger.info(f"Batch size: {batch_size}. Chunk size: {chunk_size}")
 
-        with tqdm(total=num_chunks, disable=self.quiet) as pbar:
+        with tqdm(
+            total=num_chunks,
+            disable=self.quiet,
+            desc=f"Enumerating reactions ({self.__class__.__name__})",
+        ) as pbar:
             for item in items:
                 chemsys, combos = item
 

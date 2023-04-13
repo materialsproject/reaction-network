@@ -133,7 +133,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
-        filter_duplicates: bool = False,
+        filter_duplicates: bool = True,
         batch_multiplicity: int = 2,
         chunk_multiplicity: int = 10,
     ):
