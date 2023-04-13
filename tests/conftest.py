@@ -12,12 +12,12 @@ from rxn_network.reactions.hull import InterfaceReactionHull
 
 # load files
 TEST_FILES_PATH = Path(__file__).parent / "test_files"
-ENTRIES_LIST = loadfn(TEST_FILES_PATH / "Cl_Mn_Na_O_Y_entries.json.gz")
+ENTRIES_LIST = loadfn(TEST_FILES_PATH / "Mn_O_Y_entries.json.gz")
 
 
 @pytest.fixture(scope="session")
 def mp_entries():
-    return loadfn(TEST_FILES_PATH / "Mn_O_Y_entries.json.gz")
+    return ENTRIES_LIST
 
 
 @pytest.fixture(scope="session")
@@ -31,7 +31,7 @@ def gibbs_entries():
 
 @pytest.fixture(scope="session")
 def entries():
-    return GibbsEntrySet(ENTRIES_LIST)
+    return GibbsEntrySet(loadfn("Cl_Mn_Na_O_Y_entries.json.gz"))
 
 
 @pytest.fixture(scope="session")

@@ -46,6 +46,9 @@ class InterpolatedEntry(ComputedEntry):
                 with the entry. Defaults to None.
             entry_id: An optional id to uniquely identify the entry.
         """
+        if entry_id is None:
+            entry_id = f"InterpolatedEntry ({composition.reduced_formula})"
+
         super().__init__(
             composition,
             energy,

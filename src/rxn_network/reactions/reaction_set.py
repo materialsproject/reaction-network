@@ -130,20 +130,15 @@ class ReactionSet(MSONable):
 
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
 
-        all_entry_indices: Dict[str, ComputedEntry] = {}
+        all_entry_indices: Dict[str, int] = {
+            entry.entry_id: idx for idx, entry in enumerate(entries)
+        }
         indices, coeffs, data = {}, {}, {}  # keys are reaction sizes
 
         for rxn in rxns:
-            rxn_indices = []
             size = len(rxn.entries)
 
-            for e in rxn.entries:
-                idx = all_entry_indices.get(e)
-                if idx is None:
-                    idx = entries.index(e)
-                    all_entry_indices[e] = idx
-
-                rxn_indices.append(idx)
+            rxn_indices = [all_entry_indices[e.entry_id] for e in rxn.entries]
 
             if size not in indices:
                 indices[size] = []
@@ -151,7 +146,7 @@ class ReactionSet(MSONable):
                 data[size] = []
 
             indices[size].append(rxn_indices)
-            coeffs[size].append(list(rxn.coefficients))
+            coeffs[size].append(rxn.coefficients)
             data[size].append(rxn.data)
 
         for size in indices:

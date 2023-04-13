@@ -38,7 +38,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
             Optional dictionary containing entry data
         """
         formula = composition.reduced_formula
-        entry_id = self.__class__.__name__
+        entry_id = f"{self.__class__.__name__} ({formula} at {temperature} K)"
 
         self._temperature = temperature
         self._validate_temperature(formula, temperature)
