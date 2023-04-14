@@ -525,7 +525,7 @@ class PathwaySolverMaker(Maker):
 @ray.remote
 def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
     decorated_rxns = []
-    all_rxns = ReactionSet.from_dict(all_rxns)
+    all_rxns = ReactionSet.from_dict(all_rxns)  # stored in Ray as a dict
 
     for rxn in rxn_chunk:
         if not rxn:
