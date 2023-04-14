@@ -522,36 +522,6 @@ class PathwaySolverMaker(Maker):
         return doc
 
 
-@ray.remote
-def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
-    decorated_rxns = []
-    all_rxns = ReactionSet.from_dict(all_rxns)  # stored in Ray as a dict
-
-    for rxn in rxn_chunk:
-        if not rxn:
-            continue
-
-        reactant_formulas = [r.reduced_formula for r in rxn.reactants]
-        reactants_with_open = reactant_formulas.copy()
-
-        if open_formula:
-            reactants_with_open.append(open_formula)
-
-        competing_rxns = all_rxns.get_rxns_by_reactants(reactants_with_open)
-
-        if len(reactant_formulas) >= 3:
-            if open_formula:
-                reactant_formulas = list(set(reactant_formulas) - {open_formula})
-            else:
-                raise ValueError("Can only have 2 precursors, excluding open element!")
-
-        decorated_rxns.append(
-            _get_competition_decorated_rxn(rxn, competing_rxns, reactant_formulas, temp)
-        )
-
-    return decorated_rxns
-
-
 def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
     """ """
     if len(precursors_list) == 1:
@@ -597,6 +567,36 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
             decorated_rxn.data["secondary_competition_area"] = None
 
     return decorated_rxn
+
+
+@ray.remote
+def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
+    decorated_rxns = []
+    all_rxns = ReactionSet.from_dict(all_rxns)  # stored in Ray as a dict
+
+    for rxn in rxn_chunk:
+        if not rxn:
+            continue
+
+        reactant_formulas = [r.reduced_formula for r in rxn.reactants]
+        reactants_with_open = reactant_formulas.copy()
+
+        if open_formula:
+            reactants_with_open.append(open_formula)
+
+        competing_rxns = all_rxns.get_rxns_by_reactants(reactants_with_open)
+
+        if len(reactant_formulas) >= 3:
+            if open_formula:
+                reactant_formulas = list(set(reactant_formulas) - {open_formula})
+            else:
+                raise ValueError("Can only have 2 precursors, excluding open element!")
+
+        decorated_rxns.append(
+            _get_competition_decorated_rxn(rxn, competing_rxns, reactant_formulas, temp)
+        )
+
+    return decorated_rxns
 
 
 @ray.remote
