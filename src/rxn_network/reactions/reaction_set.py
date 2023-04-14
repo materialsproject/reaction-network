@@ -20,7 +20,7 @@ from rxn_network.core.cost_function import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.utils.funcs import get_logger, grouper
-from rxn_network.utils.ray import initialize_ray
+from rxn_network.utils.ray import initialize_ray, to_iterator
 
 logger = get_logger(__name__)
 
@@ -428,6 +428,8 @@ class ReactionSet(MSONable):
         """
         if parallelize:
             initialize_ray()
+            num_cpus = int(ray.cluster_resources()["CPU"]) - 1
+            chunk_refs = []
 
         ensure_idxs = {size: [] for size in self.indices}
         idxs_to_keep = {size: [] for size in self.indices}
@@ -484,56 +486,40 @@ class ReactionSet(MSONable):
                 elif c > 1:
                     group_indices.append(np.where(inverse_indices == i)[0])
 
+            num_groups = len(group_indices)
             idxs_to_keep[size] = keep
 
+            if num_groups == 0:
+                continue
+
             if parallelize:
-                num_cpus = int(ray.cluster_resources()["CPU"]) - 1
-                batch_size = num_cpus
-                chunk_size = (len(group_indices) // batch_size) + 1
+                chunk_size = (num_groups // num_cpus) + 1
 
                 coeffs = ray.put(coeffs)
 
-                chunk_refs = []
-                results = []
-
-                with tqdm(
-                    total=len(group_indices) // chunk_size + 1,
-                    desc=f"Filtering duplicates (size {size})",
-                ) as pbar:
-                    for chunk in grouper(
-                        group_indices,
-                        chunk_size,
-                        fillvalue=None,
-                    ):
-                        chunk = [c for c in chunk if c is not None]
-                        if len(chunk_refs) > batch_size:
-                            num_ready = len(chunk_refs) - batch_size
-                            newly_completed, chunk_refs = ray.wait(
-                                chunk_refs, num_returns=num_ready
-                            )
-                            for completed_ref in newly_completed:
-                                results.append(ray.get(completed_ref))
-                                pbar.update(1)
-
-                        chunk_refs.append(
-                            _process_duplicates_ray.remote(
-                                chunk, coeffs, ensure_idxs_to_keep
-                            )
+                for chunk in grouper(
+                    group_indices,
+                    chunk_size,
+                    fillvalue=None,
+                ):
+                    chunk_refs.append(
+                        _process_duplicates_ray.remote(
+                            size, chunk, coeffs, ensure_idxs_to_keep
                         )
-
-                    newly_completed, chunk_refs = ray.wait(
-                        chunk_refs, num_returns=len(chunk_refs)
                     )
-                    for completed_ref in newly_completed:
-                        results.append(ray.get(completed_ref))
-                        pbar.update(1)
-
-                results = [idx for c in results for idx in c]
-                idxs_to_keep[size].extend(results)
             else:
                 idxs_to_keep[size].extend(
                     _process_duplicates(group_indices, coeffs, ensure_idxs_to_keep)
                 )
+
+        if parallelize:
+            for result in tqdm(
+                to_iterator(chunk_refs),
+                total=len(chunk_refs),
+                desc="Filtering duplicates",
+            ):
+                size, data = result
+                idxs_to_keep[size].extend(data)
 
         return self._get_rxn_set_by_indices(idxs_to_keep)
 
@@ -692,6 +678,7 @@ def _get_idxs_to_keep(rows, ensure_idxs=None):
 
 @ray.remote
 def _process_duplicates_ray(
+    size: int,
     groups: List[np.ndarray],
     coeffs: np.ndarray,
     ensure_idxs: List[int],
@@ -710,7 +697,7 @@ def _process_duplicates_ray(
     """
     idxs_to_keep = _process_duplicates(groups, coeffs, ensure_idxs)
 
-    return idxs_to_keep
+    return size, idxs_to_keep
 
 
 def _process_duplicates(
@@ -732,6 +719,8 @@ def _process_duplicates(
     """
     idxs_to_keep = []
     for group in groups:
+        if group is None:
+            continue
         possible_duplicate_coeffs = coeffs[group]
         keep_idxs = _get_idxs_to_keep(possible_duplicate_coeffs, ensure_idxs)
         idxs_to_keep.extend(group[keep_idxs])
