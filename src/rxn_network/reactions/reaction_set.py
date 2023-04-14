@@ -480,11 +480,15 @@ class ReactionSet(MSONable):
 
             keep = []
             group_indices = []
-            for i, c in enumerate(counts):
-                if c == 1:
-                    keep.append(unique_idx[i])
-                elif c > 1:
-                    group_indices.append(np.where(inverse_indices == i)[0])
+
+            for i in np.split(
+                np.argsort(inverse_indices),
+                np.cumsum(np.unique(inverse_indices, return_counts=True)[1])[:-1],
+            ):  # this was suggested by ChatGPT; a little hacky
+                if len(i) == 1:
+                    keep.append(i[0])
+                else:
+                    group_indices.append(i)
 
             num_groups = len(group_indices)
             idxs_to_keep[size] = keep
