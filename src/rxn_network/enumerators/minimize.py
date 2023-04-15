@@ -6,6 +6,7 @@ minimization technique, with or without the option of an open entry.
 from itertools import product
 from typing import List, Optional
 
+from monty.json import MontyDecoder
 from pymatgen.analysis.interface_reactions import (
     GrandPotentialInterfacialReactivity,
     InterfacialReactivity,
@@ -25,7 +26,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     excluded.
     """
 
-    MIN_CHUNK_SIZE = 10000
+    MIN_CHUNK_SIZE = 1000
 
     def __init__(
         self,
@@ -40,8 +41,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
         filter_duplicates: bool = False,
-        batch_multiplicity: int = 2,
-        chunk_multiplicity: int = 10,
+        chunk_size: int = MIN_CHUNK_SIZE,
     ):
         """
         Args:
@@ -69,8 +69,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
             filter_duplicates=filter_duplicates,
-            batch_multiplicity=batch_multiplicity,
-            chunk_multiplicity=chunk_multiplicity,
+            chunk_size=chunk_size,
         )
         self._build_pd = True
 
@@ -80,6 +79,10 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     ):
         """React method for MinimizeGibbsEnumerator, which uses the interfacial reaction
         approach (see _react_interface())"""
+        decoder = MontyDecoder()
+
+        filtered_entries = decoder.process_decoded(filtered_entries)
+        pd = decoder.process_decoded(pd)
 
         r = list(reactants)
         r0 = r[0]
@@ -118,7 +121,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     phase space. Identity reactions are excluded.
     """
 
-    MIN_CHUNK_SIZE = 10000
+    MIN_CHUNK_SIZE = 1000
 
     def __init__(
         self,
@@ -135,8 +138,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
         filter_duplicates: bool = True,
-        batch_multiplicity: int = 2,
-        chunk_multiplicity: int = 10,
+        chunk_size: int = MIN_CHUNK_SIZE,
     ):
         """
         Args:
@@ -154,7 +156,8 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
                 provided target directly (i.e. with no byproducts). Defualts to False.
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
             filter_duplicates: Whether to filter duplicate reactions. Defaults to True
-                for grand potential enumerator due to how common duplicate reactions are.
+                for grand potential enumerator due to how common duplicate reactions
+                are.
         """
 
         super().__init__(
@@ -169,8 +172,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
             filter_duplicates=filter_duplicates,
-            batch_multiplicity=batch_multiplicity,
-            chunk_multiplicity=chunk_multiplicity,
+            chunk_size=chunk_size,
         )
         self.open_elem = Element(open_elem)
         self.open_phases = [Composition(str(self.open_elem)).reduced_formula]
@@ -184,6 +186,12 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     ):
         """Same as the MinimizeGibbsEnumerator react function, but with ability to
         specify open element and grand potential phase diagram"""
+        decoder = MontyDecoder()
+
+        filtered_entries = decoder.process_decoded(filtered_entries)
+        pd = decoder.process_decoded(pd)
+        grand_pd = decoder.process_decoded(grand_pd)
+
         r = list(reactants)
         r0 = r[0]
 

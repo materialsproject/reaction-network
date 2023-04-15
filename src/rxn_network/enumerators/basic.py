@@ -19,7 +19,7 @@ from rxn_network.enumerators.utils import group_by_chemsys
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger, grouper, limited_powerset
-from rxn_network.utils.ray import initialize_ray
+from rxn_network.utils.ray import initialize_ray, to_iterator
 
 logger = get_logger(__name__)
 
@@ -47,8 +47,7 @@ class BasicEnumerator(Enumerator):
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
-        batch_multiplicity: int = 2,
-        chunk_multiplicity: int = 10,
+        chunk_size: int = MIN_CHUNK_SIZE,
         filter_duplicates: bool = False,
         quiet: bool = False,
     ):
@@ -90,8 +89,7 @@ class BasicEnumerator(Enumerator):
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
         self.calculate_e_above_hulls = calculate_e_above_hulls
-        self.batch_multiplicity = batch_multiplicity
-        self.chunk_multiplicity = chunk_multiplicity
+        self.chunk_size = chunk_size
         self.filter_duplicates = filter_duplicates
         self.quiet = quiet
 
@@ -164,82 +162,60 @@ class BasicEnumerator(Enumerator):
         rxn_chunk_refs = []  # type: ignore
         results = []
 
-        num_cpus = int(ray.cluster_resources()["CPU"])
-        logger.info(f"Available CPUs: {num_cpus}")
-        batch_size = (
-            num_cpus * self.batch_multiplicity
-        )  # how many chunks to load at once
+        num_chunks = self._get_num_chunks(items, open_combos, self.chunk_size)
 
-        chunk_size, num_chunks = self._get_chunk_size_and_num_chunks(
-            items, open_combos, self.chunk_multiplicity, batch_size
-        )
+        for item in sorted(items, key=lambda x: len(x[1]), reverse=True):
+            chemsys, combos = item
 
-        logger.info(f"Batch size: {batch_size}. Chunk size: {chunk_size}")
+            elems = chemsys.split("-")
 
-        with tqdm(
+            filtered_entries = None
+            pd = None
+            grand_pd = None
+
+            if self.build_pd or self.build_grand_pd:
+                filtered_entries = entries.get_subset_in_chemsys(elems)
+
+            if self.build_pd:
+                pd = PhaseDiagram(filtered_entries)
+                pd = ray.put(pd.as_dict())
+
+            if self.build_grand_pd:
+                chempots = getattr(self, "chempots")
+                grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
+                grand_pd = ray.put(grand_pd.as_dict())
+
+            if filtered_entries is not None:
+                filtered_entries = ray.put(filtered_entries.as_dict())
+
+            for rxn_iterable_chunk in grouper(
+                self._get_rxn_iterable(combos, open_combos), self.chunk_size
+            ):
+                rxn_chunk_refs.append(
+                    _react.remote(
+                        rxn_iterable_chunk,
+                        react_function,
+                        open_entries,
+                        precursors,
+                        targets,
+                        p_set_func,
+                        t_set_func,
+                        remove_unbalanced,
+                        remove_changed,
+                        max_num_constraints,
+                        filtered_entries,
+                        pd,
+                        grand_pd,
+                    )
+                )
+
+        for completed in tqdm(
+            to_iterator(rxn_chunk_refs),
             total=num_chunks,
             disable=self.quiet,
             desc=f"Enumerating reactions ({self.__class__.__name__})",
-        ) as pbar:
-            for item in items:
-                chemsys, combos = item
-
-                elems = chemsys.split("-")
-
-                filtered_entries = None
-                pd = None
-                grand_pd = None
-
-                if self.build_pd or self.build_grand_pd:
-                    filtered_entries = entries.get_subset_in_chemsys(elems)
-
-                if self.build_pd:
-                    pd = PhaseDiagram(filtered_entries)
-
-                if self.build_grand_pd:
-                    chempots = getattr(self, "chempots")
-                    grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
-
-                filtered_entries = ray.put(filtered_entries)
-                pd = ray.put(pd)
-                grand_pd = ray.put(grand_pd)
-
-                for rxn_iterable_chunk in grouper(
-                    self._get_rxn_iterable(combos, open_combos), chunk_size
-                ):
-                    if len(rxn_chunk_refs) > batch_size:
-                        num_ready = len(rxn_chunk_refs) - batch_size
-                        newly_completed, rxn_chunk_refs = ray.wait(
-                            rxn_chunk_refs, num_returns=num_ready
-                        )
-                        for completed_ref in newly_completed:
-                            results.extend(ray.get(completed_ref))
-                            pbar.update(1)
-
-                    rxn_chunk_refs.append(
-                        _react.remote(
-                            rxn_iterable_chunk,
-                            react_function,
-                            open_entries,
-                            precursors,
-                            targets,
-                            p_set_func,
-                            t_set_func,
-                            remove_unbalanced,
-                            remove_changed,
-                            max_num_constraints,
-                            filtered_entries,
-                            pd,
-                            grand_pd,
-                        )
-                    )
-
-            newly_completed, rxn_chunk_refs = ray.wait(
-                rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
-            )
-            for completed_ref in newly_completed:
-                results.extend(ray.get(completed_ref))
-                pbar.update(1)
+        ):
+            results.extend(completed)
 
         rxn_set = ReactionSet.from_rxns(
             results, entries=entries, filter_duplicates=self.filter_duplicates
@@ -248,30 +224,15 @@ class BasicEnumerator(Enumerator):
         return rxn_set
 
     @classmethod
-    def _get_chunk_size_and_num_chunks(
-        cls, items, open_combos, chunk_multiplicity, batch_size
-    ):
+    def _get_num_chunks(cls, items, open_combos, chunk_size):
         _ = open_combos  # not used in BasicEnumerator
 
-        size = 0
-        for _, i in items:
-            num_combos = cls._rxn_iter_length(i, open_combos)
-            size += num_combos
-
-        chunk_size = size // (batch_size * chunk_multiplicity) + 1
-
-        if (
-            chunk_size < cls.MIN_CHUNK_SIZE
-        ):  # it becomes inefficient to parallelize small tasks
-            chunk_size = cls.MIN_CHUNK_SIZE
-
-        # because actual number of chunks differs from: size // chunk_size
         num_chunks = 0
         for _, i in items:
             num_combos = cls._rxn_iter_length(i, open_combos)
             num_chunks += num_combos // chunk_size + bool(num_combos % chunk_size)
 
-        return chunk_size, num_chunks
+        return num_chunks
 
     @staticmethod
     def _rxn_iter_length(combos, open_combos):
@@ -461,8 +422,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         calculate_e_above_hulls: bool = False,
         quiet: bool = False,
         filter_duplicates: bool = False,
-        batch_multiplicity: int = 2,
-        chunk_multiplicity: int = 10,
+        chunk_size: int = MIN_CHUNK_SIZE,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -501,8 +461,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             remove_changed=remove_changed,
             calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
-            batch_multiplicity=batch_multiplicity,
-            chunk_multiplicity=chunk_multiplicity,
+            chunk_size=chunk_size,
             filter_duplicates=filter_duplicates,
         )
         self.open_phases: List[str] = open_phases
