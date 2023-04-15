@@ -35,7 +35,7 @@ from rxn_network.reactions.basic import BasicReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger, grouper
-from rxn_network.utils.ray import initialize_ray
+from rxn_network.utils.ray import initialize_ray, to_iterator
 
 logger = get_logger(__name__)
 
@@ -178,13 +178,15 @@ class CalculateCompetitionMaker(Maker):
     """Maker to create job for calculating competition of a set of reactions and
     target formula."""
 
+    CHUNK_SIZE = 100
+
     name: str = "calculate_competition"
     open_elem: Optional[Element] = None
     chempot: Optional[float] = 0.0
     calculate_competition: bool = True
     calculate_chempot_distances: bool = True
     temp: float = 300.0
-    chunk_size: Optional[int] = None
+    chunk_size: int = CHUNK_SIZE
     batch_size: Optional[int] = None
     cpd_kwargs: dict = field(default_factory=dict)
 
@@ -248,9 +250,7 @@ class CalculateCompetitionMaker(Maker):
         decorated_rxns = target_rxns
 
         if self.calculate_competition:
-            decorated_rxns = self._get_competition_decorated_rxns(
-                target_rxns, all_rxns, size
-            )
+            decorated_rxns = self._get_competition_decorated_rxns(target_rxns, all_rxns)
 
         logger.info("Calculating chemical potential distances...")
 
@@ -278,81 +278,37 @@ class CalculateCompetitionMaker(Maker):
         doc.task_label = self.name
         return doc
 
-    def _get_competition_decorated_rxns(self, target_rxns, all_rxns, size):
-        # memory_per_rxn = 35  # 35 bytes per reaction (with overhead)
-
-        # memory_size = int(ray.cluster_resources()["memory"])
-        # logger.info(f"Available memory: {memory_size}")
-
-        num_cpus = int(ray.cluster_resources()["CPU"]) - 1
-        logger.info(f"Available CPUs-1: {num_cpus}")
-
-        batch_size = self.batch_size
-        if batch_size is None:
-            batch_size = num_cpus
-            # if memory_size < (size * memory_per_rxn * num_cpus):
-            #     batch_size = memory_size // (size * memory_per_rxn)
-            #     logger.info(
-            #         f"Memory size too small for {num_cpus} batches!"
-            #         f"Using batch size of {batch_size} instead."
-            #     )
-
-        chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
-
-        logger.info(f"Using batch size of {batch_size} and chunk size of {chunk_size}.")
-
+    def _get_competition_decorated_rxns(self, target_rxns, all_rxns):
         rxn_chunk_refs = []
         results = []
 
-        with tqdm(total=len(target_rxns) // chunk_size + 1) as pbar:
-            for chunk in grouper(
-                target_rxns,
-                chunk_size,
-                fillvalue=None,
-            ):
-                chunk = [c for c in chunk if c is not None]
-                if len(rxn_chunk_refs) > batch_size:
-                    num_ready = len(rxn_chunk_refs) - batch_size
-                    newly_completed, rxn_chunk_refs = ray.wait(
-                        rxn_chunk_refs, num_returns=num_ready
-                    )
-                    for completed_ref in newly_completed:
-                        results.append(ray.get(completed_ref))
-                        pbar.update(1)
-
-                reactant_formulas = [
-                    c.reduced_formula for rxn in chunk for c in rxn.reactants
-                ]
-                if self.open_formula:
-                    reactant_formulas.append(self.open_formula)
-
-                # task_memory = memory_per_rxn * chunk_size
-
-                rxn_chunk_refs.append(
-                    _get_competition_decorated_rxns_by_chunk.remote(
-                        chunk, all_rxns, self.open_formula, self.temp
-                    )
+        for chunk in grouper(
+            target_rxns,
+            self.chunk_size,
+            fillvalue=None,
+        ):
+            rxn_chunk_refs.append(
+                _get_competition_decorated_rxns_by_chunk.remote(
+                    chunk, all_rxns, self.open_formula, self.temp
                 )
-
-            newly_completed, rxn_chunk_refs = ray.wait(
-                rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
             )
-            for completed_ref in newly_completed:
-                results.append(ray.get(completed_ref))
-                pbar.update(1)
 
-        decorated_rxns = [rxn for r_set in results for rxn in r_set]
+        decorated_rxns = []
+        size = len(rxn_chunk_refs)
+
+        for r_set in tqdm(
+            to_iterator(rxn_chunk_refs),
+            desc="Calculating competition...",
+            total=size,
+        ):
+            decorated_rxns.extend(r_set)
 
         return ReactionSet.from_rxns(decorated_rxns)
 
     def _get_chempot_decorated_rxns(self, target_rxns, entries):
         initialize_ray()
 
-        batch_size = self.batch_size or int(ray.cluster_resources()["CPU"] - 1)
-
-        chunk_size = self.chunk_size or (len(target_rxns) // batch_size) + 1
         rxn_chunk_refs = []
-        results = []
 
         open_elem = target_rxns.open_elem
         chempot = target_rxns.chempot
@@ -360,36 +316,25 @@ class CalculateCompetitionMaker(Maker):
         entries = ray.put(entries)
         cpd_kwargs = ray.put(self.cpd_kwargs)
 
-        with tqdm(total=len(target_rxns) // chunk_size + 1) as pbar:
-            for chunk in grouper(
-                sorted(target_rxns, key=lambda r: r.chemical_system),
-                chunk_size,
-                fillvalue=None,
-            ):
-                chunk = [c for c in chunk if c is not None]
-                if len(rxn_chunk_refs) > batch_size:
-                    num_ready = len(rxn_chunk_refs) - batch_size
-                    newly_completed, rxn_chunk_refs = ray.wait(
-                        rxn_chunk_refs, num_returns=num_ready
-                    )
-                    for completed_ref in newly_completed:
-                        results.append(ray.get(completed_ref))
-                        pbar.update(1)
-
-                rxn_chunk_refs.append(
-                    _get_chempot_decorated_rxns_by_chunk.remote(
-                        chunk, entries, cpd_kwargs, open_elem, chempot
-                    )
+        for chunk in grouper(
+            sorted(target_rxns, key=lambda r: r.chemical_system),
+            self.chunk_size,
+            fillvalue=None,
+        ):
+            rxn_chunk_refs.append(
+                _get_chempot_decorated_rxns_by_chunk.remote(
+                    chunk, entries, cpd_kwargs, open_elem, chempot
                 )
-
-            newly_completed, rxn_chunk_refs = ray.wait(
-                rxn_chunk_refs, num_returns=len(rxn_chunk_refs)
             )
-            for completed_ref in newly_completed:
-                results.append(ray.get(completed_ref))
-                pbar.update(1)
 
-        decorated_rxns = [rxn for r_set in results for rxn in r_set]
+        size = len(rxn_chunk_refs)
+        decorated_rxns = []
+        for r_set in tqdm(
+            to_iterator(rxn_chunk_refs),
+            desc="Calculating chemical potential distances...",
+            total=size,
+        ):
+            decorated_rxns.extend(r_set)
 
         return ReactionSet.from_rxns(decorated_rxns)
 
@@ -608,6 +553,8 @@ def _get_chempot_decorated_rxns_by_chunk(
 
     if open_elem:
         open_elem_set = {open_elem}
+
+    rxn_chunk = [r for r in rxn_chunk if r is not None]
 
     for rxn in sorted(rxn_chunk, key=lambda rxn: len(rxn.elements), reverse=True):
         chemsys = rxn.chemical_system
