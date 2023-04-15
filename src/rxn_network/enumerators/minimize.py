@@ -6,7 +6,6 @@ minimization technique, with or without the option of an open entry.
 from itertools import product
 from typing import List, Optional
 
-from monty.json import MontyDecoder
 from pymatgen.analysis.interface_reactions import (
     GrandPotentialInterfacialReactivity,
     InterfacialReactivity,
@@ -26,7 +25,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     excluded.
     """
 
-    MIN_CHUNK_SIZE = 5000
+    MIN_CHUNK_SIZE = 10000
 
     def __init__(
         self,
@@ -79,10 +78,6 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     ):
         """React method for MinimizeGibbsEnumerator, which uses the interfacial reaction
         approach (see _react_interface())"""
-        decoder = MontyDecoder()
-
-        filtered_entries = decoder.process_decoded(filtered_entries)
-        pd = decoder.process_decoded(pd)
 
         r = list(reactants)
         r0 = r[0]
@@ -121,7 +116,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     phase space. Identity reactions are excluded.
     """
 
-    MIN_CHUNK_SIZE = 5000
+    MIN_CHUNK_SIZE = 1000
 
     def __init__(
         self,
@@ -186,11 +181,6 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     ):
         """Same as the MinimizeGibbsEnumerator react function, but with ability to
         specify open element and grand potential phase diagram"""
-        decoder = MontyDecoder()
-
-        filtered_entries = decoder.process_decoded(filtered_entries)
-        pd = decoder.process_decoded(pd)
-        grand_pd = decoder.process_decoded(grand_pd)
 
         r = list(reactants)
         r0 = r[0]

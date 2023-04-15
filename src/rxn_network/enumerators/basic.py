@@ -178,15 +178,15 @@ class BasicEnumerator(Enumerator):
 
             if self.build_pd:
                 pd = PhaseDiagram(filtered_entries)
-                pd = ray.put(pd.as_dict())
+                pd = ray.put(pd)
 
             if self.build_grand_pd:
                 chempots = getattr(self, "chempots")
                 grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
-                grand_pd = ray.put(grand_pd.as_dict())
+                grand_pd = ray.put(grand_pd)
 
             if filtered_entries is not None:
-                filtered_entries = ray.put(filtered_entries.as_dict())
+                filtered_entries = ray.put(filtered_entries)
 
             for rxn_iterable_chunk in grouper(
                 self._get_rxn_iterable(combos, open_combos), self.chunk_size
