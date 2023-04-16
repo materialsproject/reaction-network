@@ -280,7 +280,6 @@ class CalculateCompetitionMaker(Maker):
 
     def _get_competition_decorated_rxns(self, target_rxns, all_rxns):
         rxn_chunk_refs = []
-        results = []
 
         for chunk in grouper(
             target_rxns,

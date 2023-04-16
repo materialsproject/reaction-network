@@ -147,8 +147,6 @@ class BasicEnumerator(Enumerator):
         if not open_combos:
             open_combos = []
 
-        items = combos_dict.items()
-
         precursors = ray.put(precursors)
         targets = ray.put(targets)
         react_function = ray.put(self._react_function)
@@ -159,38 +157,48 @@ class BasicEnumerator(Enumerator):
         remove_changed = ray.put(self.remove_changed)
         max_num_constraints = ray.put(self.max_num_constraints)
 
-        rxn_chunk_refs = []  # type: ignore
-        results = []
+        entries_ref = ray.put(entries)
 
-        num_chunks = self._get_num_chunks(items, open_combos, self.chunk_size)
+        pd_dict = {}
+        if self._build_pd or self._build_grand_pd:
+            # pre-loop for phase diagram construction
+            num_cpus = int(ray.cluster_resources()["CPU"]) - 1
+            num_pd_chunks = int(len(combos_dict) // num_cpus) + 1
 
-        for item in sorted(items, key=lambda x: len(x[1]), reverse=True):
+            pd_dict_refs = []
+            for item_chunk in grouper(combos_dict.items(), num_cpus):
+                pd_dict_refs.append(
+                    _get_entries_and_pds.remote(
+                        item_chunk,
+                        entries_ref,
+                        self.build_pd,
+                        self.build_grand_pd,
+                        getattr(self, "chempots", None),
+                    )
+                )
+
+            for completed in tqdm(
+                to_iterator(pd_dict_refs),
+                total=num_pd_chunks,
+                disable=self.quiet,
+                desc=f"Building phase diagrams ({self.__class__.__name__})",
+            ):
+                pd_dict.update(completed)
+
+        rxn_chunk_refs, results = [], []  # type: ignore
+        num_chunks = self._get_num_chunks(
+            combos_dict.items(), open_combos, self.chunk_size
+        )
+        for item in sorted(combos_dict.items(), key=lambda x: len(x[1]), reverse=True):
             chemsys, combos = item
-
-            elems = chemsys.split("-")
-
-            filtered_entries = None
-            pd = None
-            grand_pd = None
-
-            if self.build_pd or self.build_grand_pd:
-                filtered_entries = entries.get_subset_in_chemsys(elems)
-
-            if self.build_pd:
-                pd = PhaseDiagram(filtered_entries)
-                pd = ray.put(pd)
-
-            if self.build_grand_pd:
-                chempots = getattr(self, "chempots")
-                grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
-                grand_pd = ray.put(grand_pd)
-
-            if filtered_entries is not None:
-                filtered_entries = ray.put(filtered_entries)
 
             for rxn_iterable_chunk in grouper(
                 self._get_rxn_iterable(combos, open_combos), self.chunk_size
             ):
+                filtered_entries, pd, grand_pd = None, None, None
+                if self._build_pd or self._build_grand_pd:
+                    filtered_entries, pd, grand_pd = pd_dict[chemsys]
+
                 rxn_chunk_refs.append(
                     _react.remote(
                         rxn_iterable_chunk,
@@ -576,3 +584,31 @@ def _react(
         all_rxns.extend(rxns)
 
     return all_rxns
+
+
+@ray.remote
+def _get_entries_and_pds(
+    combos_dict_chunk, entries, build_pd, build_grand_pd, chempots
+):
+    pd_dict = {}
+    for item in combos_dict_chunk:
+        if item is None:
+            continue
+        chemsys, combos = item
+        elems = chemsys.split("-")
+
+        filtered_entries = None
+        pd = None
+        grand_pd = None
+
+        if build_pd or build_grand_pd:
+            filtered_entries = entries.get_subset_in_chemsys(elems)
+
+        if build_pd:
+            pd = PhaseDiagram(filtered_entries)
+
+        if build_grand_pd:
+            grand_pd = GrandPotentialPhaseDiagram(filtered_entries, chempots)
+
+        pd_dict[chemsys] = (filtered_entries, pd, grand_pd)
+    return pd_dict
