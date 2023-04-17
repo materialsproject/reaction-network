@@ -25,7 +25,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     excluded.
     """
 
-    MIN_CHUNK_SIZE = 10000
+    MIN_CHUNK_SIZE = 1000
 
     def __init__(
         self,

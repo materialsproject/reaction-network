@@ -33,7 +33,7 @@ class BasicEnumerator(Enumerator):
     products may not be stable with respect to each other.
     """
 
-    MIN_CHUNK_SIZE = 250
+    MIN_CHUNK_SIZE = 1000
 
     def __init__(
         self,
@@ -185,41 +185,58 @@ class BasicEnumerator(Enumerator):
             ):
                 pd_dict.update(completed)
 
-        rxn_chunk_refs, results = [], []  # type: ignore
-        num_chunks = self._get_num_chunks(
-            combos_dict.items(), open_combos, self.chunk_size
-        )
-        for item in sorted(combos_dict.items(), key=lambda x: len(x[1]), reverse=True):
+        to_run, current_chunk = [], []
+        for item in combos_dict.items():
             chemsys, combos = item
+            rxn_iter = list(self._get_rxn_iterable(combos, open_combos))
 
-            for rxn_iterable_chunk in grouper(
-                self._get_rxn_iterable(combos, open_combos), self.chunk_size
-            ):
-                filtered_entries, pd, grand_pd = None, None, None
-                if self._build_pd or self._build_grand_pd:
-                    filtered_entries, pd, grand_pd = pd_dict[chemsys]
+            filtered_entries, pd, grand_pd = None, None, None
+            if self._build_pd or self._build_grand_pd:
+                filtered_entries, pd, grand_pd = pd_dict[chemsys]
 
-                rxn_chunk_refs.append(
-                    _react.remote(
-                        rxn_iterable_chunk,
-                        react_function,
-                        open_entries,
-                        precursors,
-                        targets,
-                        p_set_func,
-                        t_set_func,
-                        remove_unbalanced,
-                        remove_changed,
-                        max_num_constraints,
-                        filtered_entries,
-                        pd,
-                        grand_pd,
-                    )
+            filtered_entries = ray.put(filtered_entries)
+            pd = ray.put(pd)
+            grand_pd = ray.put(grand_pd)
+
+            current_chunk_length = sum(len(c[0]) for c in current_chunk)
+
+            current_chunk.append(([], filtered_entries, pd, grand_pd))
+            for r in rxn_iter:
+                if current_chunk_length == self.chunk_size:
+                    to_run.append(current_chunk)
+                    current_chunk = [([r], filtered_entries, pd, grand_pd)]
+                    current_chunk_length = 1
+                else:
+                    current_chunk[-1][0].append(r)
+                    current_chunk_length += 1
+
+            if current_chunk_length == self.chunk_size:
+                to_run.append(current_chunk)
+                current_chunk = []
+
+        if current_chunk:
+            to_run.append(current_chunk)
+
+        rxn_chunk_refs, results = [], []  # type: ignore
+        for chunk in to_run:
+            rxn_chunk_refs.append(
+                _react.remote(
+                    chunk,
+                    react_function,
+                    open_entries,
+                    precursors,
+                    targets,
+                    p_set_func,
+                    t_set_func,
+                    remove_unbalanced,
+                    remove_changed,
+                    max_num_constraints,
                 )
+            )
 
         for completed in tqdm(
             to_iterator(rxn_chunk_refs),
-            total=num_chunks,
+            total=len(to_run),
             disable=self.quiet,
             desc=f"Enumerating reactions ({self.__class__.__name__})",
         ):
@@ -413,7 +430,7 @@ class BasicOpenEnumerator(BasicEnumerator):
     the ReactionSet class).
     """
 
-    MIN_CHUNK_SIZE = 250
+    MIN_CHUNK_SIZE = 1000
 
     def __init__(
         self,
@@ -506,7 +523,7 @@ class BasicOpenEnumerator(BasicEnumerator):
 
 @ray.remote
 def _react(
-    rxn_iterable,
+    chunk,
     react_function,
     open_entries,
     precursors,
@@ -516,9 +533,6 @@ def _react(
     remove_unbalanced,
     remove_changed,
     max_num_constraints,
-    filtered_entries,
-    pd,
-    grand_pd,
 ):
     """
     This function is a wrapper for the specific react function of each enumerator. This
@@ -530,58 +544,64 @@ def _react(
 
     """
     all_rxns = []
+    for rxn_iterable, filtered_entries, pd, grand_pd in chunk:
+        filtered_entries = ray.get(filtered_entries)
+        pd = ray.get(pd)
+        grand_pd = ray.get(grand_pd)
 
-    for rp in rxn_iterable:
-        if not rp:
-            continue
+        for rp in rxn_iterable:
+            if not rp:
+                continue
 
-        r = set(rp[0]) if rp[0] else set()
-        p = set(rp[1]) if rp[1] else set()
+            r = set(rp[0]) if rp[0] else set()
+            p = set(rp[1]) if rp[1] else set()
 
-        all_phases = r | p
+            all_phases = r | p
 
-        precursor_func = (
-            getattr(precursors | open_entries, p_set_func)
-            if precursors
-            else lambda e: True
-        )
-        target_func = (
-            getattr(targets | open_entries, t_set_func) if targets else lambda e: True
-        )
+            precursor_func = (
+                getattr(precursors | open_entries, p_set_func)
+                if precursors
+                else lambda e: True
+            )
+            target_func = (
+                getattr(targets | open_entries, t_set_func)
+                if targets
+                else lambda e: True
+            )
 
-        if (
-            (r & p)
-            or (precursors and not precursors & all_phases)
-            or (p and targets and not targets & all_phases)
-        ):
-            continue
-
-        if not (precursor_func(r) or (p and precursor_func(p))):
-            continue
-        if p and not (target_func(r) or target_func(p)):
-            continue
-
-        suggested_rxns = react_function(
-            r, p, filtered_entries=filtered_entries, pd=pd, grand_pd=grand_pd
-        )
-
-        rxns = []
-        for rxn in suggested_rxns:
             if (
-                rxn.is_identity
-                or (remove_unbalanced and not rxn.balanced)
-                or (remove_changed and rxn.lowest_num_errors != 0)
-                or rxn.data["num_constraints"] > max_num_constraints
+                (r & p)
+                or (precursors and not precursors & all_phases)
+                or (p and targets and not targets & all_phases)
             ):
                 continue
 
-            reactant_entries = set(rxn.reactant_entries) - open_entries
-            product_entries = set(rxn.product_entries) - open_entries
+            if not (precursor_func(r) or (p and precursor_func(p))):
+                continue
+            if p and not (target_func(r) or target_func(p)):
+                continue
 
-            if precursor_func(reactant_entries) and target_func(product_entries):
-                rxns.append(rxn)
+            suggested_rxns = react_function(
+                r, p, filtered_entries=filtered_entries, pd=pd, grand_pd=grand_pd
+            )
 
-        all_rxns.extend(rxns)
+            rxns = []
+            for rxn in suggested_rxns:
+                if (
+                    rxn.is_identity
+                    or (remove_unbalanced and not rxn.balanced)
+                    or (remove_changed and rxn.lowest_num_errors != 0)
+                    or rxn.data["num_constraints"] > max_num_constraints
+                ):
+                    continue
+
+                reactant_entries = set(rxn.reactant_entries) - open_entries
+                product_entries = set(rxn.product_entries) - open_entries
+
+                if precursor_func(reactant_entries) and target_func(product_entries):
+                    rxns.append(rxn)
+
+            all_rxns.extend(rxns)
 
     return all_rxns
 
