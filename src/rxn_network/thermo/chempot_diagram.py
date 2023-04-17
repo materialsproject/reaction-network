@@ -188,22 +188,34 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         """Returns the distance between two parallel hyperplanes"""
         return np.abs(delta_b) / np.linalg.norm(a)
 
-    def _get_metastable_domain(self, formula):
+    def _get_metastable_domain(self, formula, tol=1e-1):
         """Returns the metastable domain for a given formula"""
         if formula in self._metastable_domains:
             return self._metastable_domains[formula]
 
         orig_entry = self._entry_set.get_min_entry_by_formula(formula)
-        new_entry = self._entry_set.get_stabilized_entry(orig_entry, tol=1e-1)
+        new_entry = self._entry_set.get_stabilized_entry(orig_entry, tol=tol)
         self._entry_set.add(new_entry)
         cpd = ChemicalPotentialDiagram(self._entry_set, default_min_limit=-500)
 
         try:
             metastable_domain = cpd.domains[formula]
         except KeyError as exc:
-            raise ValueError(
-                f"Metastable domain for {formula} not found! Please investigate."
-            ) from exc
+            # sometimes if the entry is exactly on the hull it fails, so set force=True
+            self._entry_set.remove(new_entry)
+            new_entry = self._entry_set.get_stabilized_entry(
+                orig_entry, tol=tol, force=True
+            )
+            self._entry_set.add(new_entry)
+            cpd = ChemicalPotentialDiagram(self._entry_set, default_min_limit=-500)
+
+            try:
+                metastable_domain = cpd.domains[formula]
+            except KeyError:
+                raise ValueError(
+                    "Failed even after attempted fix. Metastable domain for"
+                    f" {formula} can not be created!"
+                ) from exc
 
         self._metastable_domains[formula] = metastable_domain
         self._entry_set.remove(new_entry)

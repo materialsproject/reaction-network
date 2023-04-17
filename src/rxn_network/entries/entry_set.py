@@ -220,7 +220,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return self.min_entries_by_formula[Composition(formula).reduced_formula]
 
     def get_stabilized_entry(
-        self, entry: ComputedEntry, tol: float = 1e-3
+        self, entry: ComputedEntry, tol: float = 1e-3, force=False
     ) -> ComputedEntry:
         """
         Helper method for lowering the energy of a single entry such that it is just
@@ -246,7 +246,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         if e_above_hull is None:
             e_above_hull = self.get_e_above_hull(entry)
 
-        if e_above_hull == 0.0:
+        if e_above_hull == 0.0 and not force:
             new_entry = entry
         else:
             e_adj = -1 * e_above_hull * entry.composition.num_atoms - tol
