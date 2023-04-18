@@ -34,6 +34,7 @@ class BasicEnumerator(Enumerator):
     """
 
     MIN_CHUNK_SIZE = 2500
+    MAX_NUM_JOBS = 10000
 
     def __init__(
         self,
@@ -48,6 +49,7 @@ class BasicEnumerator(Enumerator):
         remove_changed: bool = True,
         calculate_e_above_hulls: bool = False,
         chunk_size: int = MIN_CHUNK_SIZE,
+        max_num_jobs: int = MAX_NUM_JOBS,
         filter_duplicates: bool = False,
         quiet: bool = False,
     ):
@@ -90,6 +92,7 @@ class BasicEnumerator(Enumerator):
         self.remove_changed = remove_changed
         self.calculate_e_above_hulls = calculate_e_above_hulls
         self.chunk_size = chunk_size
+        self.max_num_jobs = max_num_jobs
         self.filter_duplicates = filter_duplicates
         self.quiet = quiet
 
@@ -159,10 +162,11 @@ class BasicEnumerator(Enumerator):
 
         entries_ref = ray.put(entries)
 
+        num_cpus = int(ray.cluster_resources()["CPU"])
+
         pd_dict = {}
         if self._build_pd or self._build_grand_pd:
             # pre-loop for phase diagram construction
-            num_cpus = int(ray.cluster_resources()["CPU"]) - 1
             pd_chunk_size = int(len(combos_dict) // num_cpus) + 1
 
             pd_dict_refs = []
@@ -184,6 +188,16 @@ class BasicEnumerator(Enumerator):
                 desc=f"Building phase diagrams ({self.__class__.__name__})",
             ):
                 pd_dict.update(completed)
+
+        chunk_size = self.chunk_size
+        total = sum(self._rxn_iter_length(c, open_combos) for c in combos_dict.values())
+
+        if total / chunk_size > self.max_num_jobs:
+            chunk_size = int(total // self.max_num_jobs) + 1
+            logger.info(
+                f"Increasing chunk size to {chunk_size} due to max job limit of"
+                f" {self.max_num_jobs}"
+            )
 
         to_run, current_chunk = [], []
         for item in tqdm(
@@ -207,7 +221,7 @@ class BasicEnumerator(Enumerator):
 
             current_chunk.append(([], filtered_entries, pd, grand_pd))
             for r in rxn_iter:
-                if current_chunk_length == self.chunk_size:
+                if current_chunk_length == chunk_size:
                     to_run.append(current_chunk)
                     current_chunk = [([r], filtered_entries, pd, grand_pd)]
                     current_chunk_length = 1
@@ -215,7 +229,7 @@ class BasicEnumerator(Enumerator):
                     current_chunk[-1][0].append(r)
                     current_chunk_length += 1
 
-            if current_chunk_length == self.chunk_size:
+            if current_chunk_length == chunk_size:
                 to_run.append(current_chunk)
                 current_chunk = []
 
@@ -436,6 +450,7 @@ class BasicOpenEnumerator(BasicEnumerator):
     """
 
     MIN_CHUNK_SIZE = 2500
+    MAX_NUM_JOBS = 10000
 
     def __init__(
         self,
@@ -453,6 +468,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         quiet: bool = False,
         filter_duplicates: bool = False,
         chunk_size: int = MIN_CHUNK_SIZE,
+        max_num_jobs: int = MAX_NUM_JOBS,
     ):
         """
         Supplied target and calculator parameters are automatically initialized as
@@ -492,6 +508,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
             chunk_size=chunk_size,
+            max_num_jobs=max_num_jobs,
             filter_duplicates=filter_duplicates,
         )
         self.open_phases: List[str] = open_phases

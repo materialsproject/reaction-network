@@ -25,7 +25,8 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     excluded.
     """
 
-    MIN_CHUNK_SIZE = 2500
+    MIN_CHUNK_SIZE = 1000
+    MAX_NUM_JOBS = 10000
 
     def __init__(
         self,
@@ -41,6 +42,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         quiet: bool = False,
         filter_duplicates: bool = False,
         chunk_size: int = MIN_CHUNK_SIZE,
+        max_num_jobs: int = MAX_NUM_JOBS,
     ):
         """
         Args:
@@ -69,6 +71,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             quiet=quiet,
             filter_duplicates=filter_duplicates,
             chunk_size=chunk_size,
+            max_num_jobs=max_num_jobs,
         )
         self._build_pd = True
 
@@ -116,7 +119,8 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     phase space. Identity reactions are excluded.
     """
 
-    MIN_CHUNK_SIZE = 2500
+    MIN_CHUNK_SIZE = 1000
+    MAX_NUM_JOBS = 10000
 
     def __init__(
         self,
@@ -134,6 +138,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         quiet: bool = False,
         filter_duplicates: bool = True,
         chunk_size: int = MIN_CHUNK_SIZE,
+        max_num_jobs: int = MAX_NUM_JOBS,
     ):
         """
         Args:
@@ -168,6 +173,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             quiet=quiet,
             filter_duplicates=filter_duplicates,
             chunk_size=chunk_size,
+            max_num_jobs=max_num_jobs,
         )
         self.open_elem = Element(open_elem)
         self.open_phases = [Composition(str(self.open_elem)).reduced_formula]
