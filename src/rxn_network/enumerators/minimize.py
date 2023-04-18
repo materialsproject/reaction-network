@@ -25,7 +25,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     excluded.
     """
 
-    MIN_CHUNK_SIZE = 5000
+    MIN_CHUNK_SIZE = 2500
 
     def __init__(
         self,
@@ -116,7 +116,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     phase space. Identity reactions are excluded.
     """
 
-    MIN_CHUNK_SIZE = 5000
+    MIN_CHUNK_SIZE = 2500
 
     def __init__(
         self,
