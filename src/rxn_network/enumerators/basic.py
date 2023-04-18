@@ -163,10 +163,10 @@ class BasicEnumerator(Enumerator):
         if self._build_pd or self._build_grand_pd:
             # pre-loop for phase diagram construction
             num_cpus = int(ray.cluster_resources()["CPU"]) - 1
-            num_pd_chunks = int(len(combos_dict) // num_cpus) + 1
+            pd_chunk_size = int(len(combos_dict) // num_cpus) + 1
 
             pd_dict_refs = []
-            for item_chunk in grouper(combos_dict.items(), num_cpus):
+            for item_chunk in grouper(combos_dict.items(), pd_chunk_size):
                 pd_dict_refs.append(
                     _get_entries_and_pds.remote(
                         item_chunk,
@@ -179,7 +179,7 @@ class BasicEnumerator(Enumerator):
 
             for completed in tqdm(
                 to_iterator(pd_dict_refs),
-                total=num_pd_chunks,
+                total=len(pd_dict_refs),
                 disable=self.quiet,
                 desc=f"Building phase diagrams ({self.__class__.__name__})",
             ):
