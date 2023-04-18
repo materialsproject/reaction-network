@@ -186,7 +186,12 @@ class BasicEnumerator(Enumerator):
                 pd_dict.update(completed)
 
         to_run, current_chunk = [], []
-        for item in combos_dict.items():
+        for item in tqdm(
+            combos_dict.items(),
+            disable=self.quiet,
+            desc="Building chunks...",
+            total=len(combos_dict),
+        ):
             chemsys, combos = item
             rxn_iter = list(self._get_rxn_iterable(combos, open_combos))
 
