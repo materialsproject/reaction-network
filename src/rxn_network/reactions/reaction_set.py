@@ -5,7 +5,7 @@ objects which share entries.
 from collections import OrderedDict
 from functools import lru_cache
 from itertools import combinations, groupby
-from typing import Any, Collection, Dict, Iterable, List, Optional, Set, Union
+from typing import Any, Collection, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import ray
@@ -303,7 +303,7 @@ class ReactionSet(MSONable):
         Warning: all new reactions must only have entires contained in the entries of
         the current reaction set.
         """
-        new_rxn_set = ReactionSet.from_rxns(rxns)
+        new_rxn_set = ReactionSet.from_rxns(rxns, entries=self.entries)
 
         return self.add_rxn_set(new_rxn_set)
 
@@ -325,8 +325,8 @@ class ReactionSet(MSONable):
         new_coeffs = {}
         new_all_data = {}
 
-        for size in self.indices:
-            if size in rxn_set.indices:
+        for size in set(list(self.indices.keys()) + list(rxn_set.indices.keys())):
+            if size in self.indices and size in rxn_set.indices:
                 new_indices[size] = np.concatenate(
                     (self.indices[size], rxn_set.indices[size])
                 )
@@ -336,10 +336,14 @@ class ReactionSet(MSONable):
                 new_all_data[size] = np.concatenate(
                     (self.all_data[size], rxn_set.all_data[size])
                 )
-            else:
+            elif size in self.indices:
                 new_indices[size] = self.indices[size]
                 new_coeffs[size] = self.coeffs[size]
                 new_all_data[size] = self.all_data[size]
+            elif size in rxn_set.indices:
+                new_indices[size] = rxn_set.indices[size]
+                new_coeffs[size] = rxn_set.coeffs[size]
+                new_all_data[size] = rxn_set.all_data[size]
 
         return ReactionSet(
             self.entries, new_indices, new_coeffs, open_elem, chempot, new_all_data
@@ -451,7 +455,7 @@ class ReactionSet(MSONable):
                 self.indices[size][quick_filter],
                 self.coeffs[size][quick_filter],
             ):
-                if idxs == rxn_idxs and coeffs == rxn_coeffs:
+                if (idxs == rxn_idxs).all() and (coeffs == rxn_coeffs).all():
                     ensure_idxs[size].append(i)
                     break
             else:
@@ -460,9 +464,8 @@ class ReactionSet(MSONable):
         for size in sorted(self.indices.keys()):
             ensure_idxs_to_keep = ensure_idxs[size]
 
+            # reordering columns in ascending entry idx
             column_sorting_indices = np.argsort(self.indices[size], axis=1)
-
-            # sort coeffs and indices by entry number
             indices = np.take_along_axis(
                 self.indices[size], column_sorting_indices, axis=1
             )
@@ -470,12 +473,10 @@ class ReactionSet(MSONable):
                 self.coeffs[size], column_sorting_indices, axis=1
             )
 
-            _, unique_idx, inverse_indices, counts = np.unique(
+            _, inverse_indices = np.unique(
                 indices,
                 axis=0,
-                return_index=True,
                 return_inverse=True,
-                return_counts=True,
             )
 
             keep = []
@@ -484,7 +485,7 @@ class ReactionSet(MSONable):
             for i in np.split(
                 np.argsort(inverse_indices),
                 np.cumsum(np.unique(inverse_indices, return_counts=True)[1])[:-1],
-            ):  # this was suggested by ChatGPT; a little hacky
+            ):  # this was suggested by ChatGPT
                 if len(i) == 1:
                     keep.append(i[0])
                 else:
@@ -660,7 +661,7 @@ def _get_idxs_to_keep(rows, ensure_idxs=None):
         ).flatten()
 
         group = sorted_indices[duplicates]
-        if ensure_idxs is not None:
+        if ensure_idxs:
             group_set = set(group)
             overlap = ensure_idxs & group_set
 
@@ -672,7 +673,6 @@ def _get_idxs_to_keep(rows, ensure_idxs=None):
             else:
                 to_keep.append(group[0])
                 to_remove.extend(group[1:])
-
         else:
             to_keep.append(group[0])
             to_remove.extend(group[1:])
@@ -686,7 +686,7 @@ def _process_duplicates_ray(
     groups: List[np.ndarray],
     coeffs: np.ndarray,
     ensure_idxs: List[int],
-) -> List[int]:
+) -> Tuple[int, List[int]]:
     """
     Process a chunk of reactions to find duplicates.
 
@@ -700,7 +700,6 @@ def _process_duplicates_ray(
         List of indices to keep
     """
     idxs_to_keep = _process_duplicates(groups, coeffs, ensure_idxs)
-
     return size, idxs_to_keep
 
 
@@ -726,7 +725,11 @@ def _process_duplicates(
         if group is None:
             continue
         possible_duplicate_coeffs = coeffs[group]
-        keep_idxs = _get_idxs_to_keep(possible_duplicate_coeffs, ensure_idxs)
+        relative_ensure_idxs = []
+        for idx in ensure_idxs:
+            if idx in group:
+                relative_ensure_idxs.append(np.argwhere(group == idx).flatten()[0])
+        keep_idxs = _get_idxs_to_keep(possible_duplicate_coeffs, relative_ensure_idxs)
         idxs_to_keep.extend(group[keep_idxs])
 
     return idxs_to_keep
