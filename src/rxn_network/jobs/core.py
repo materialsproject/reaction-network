@@ -252,7 +252,9 @@ class CalculateCompetitionMaker(Maker):
         decorated_rxns = target_rxns
 
         if self.calculate_competition:
-            decorated_rxns = self._get_competition_decorated_rxns(target_rxns, all_rxns)
+            decorated_rxns = self._get_competition_decorated_rxns(
+                target_rxns, all_rxns, size
+            )
 
         logger.info("Calculating chemical potential distances...")
 
@@ -280,10 +282,9 @@ class CalculateCompetitionMaker(Maker):
         doc.task_label = self.name
         return doc
 
-    def _get_competition_decorated_rxns(self, target_rxns, all_rxns):
+    def _get_competition_decorated_rxns(self, target_rxns, all_rxns, num_rxns):
         rxn_chunk_refs = []
 
-        num_rxns = len(all_rxns)
         memory_per_rxn = 350  # approx 350 byte overhead per rxn (conservative)
 
         for chunk in grouper(
