@@ -292,6 +292,15 @@ class GibbsComputedEntry(ComputedEntry):
 
         return False
 
+    @property
+    def unique_id(self) -> str:
+        """
+        Returns a unique ID for the entry based on its entry-id and temperature. This is
+        useful because the same entry-id can be used for multiple entries at different
+        temperatures.
+        """
+        return f"{self.entry_id}_{self.temperature}"
+
     def as_dict(self) -> dict:
         """Returns an MSONable dict."""
         data = super().as_dict()

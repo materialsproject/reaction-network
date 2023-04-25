@@ -347,11 +347,19 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             description="Keeps track of uncertainty in interpolation",
         )
 
+        temp = 0
+        for e in pd_entries:
+            if e.__class__.__name__ == "GibbsComputedEntry" or isinstance(
+                e, ExperimentalReferenceEntry
+            ):
+                temp = e.temperature  # get temperature from any entry
+                break
+
         return InterpolatedEntry(
             comp,
             energy,
             energy_adjustments=[adj],
-            entry_id=f"(Interpolated Entry: {comp.formula})",
+            entry_id=f"InterpolatedEntry-{comp.formula}_{temp}",
         )
 
     def get_e_above_hull(self, entry: ComputedEntry) -> float:

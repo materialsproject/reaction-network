@@ -130,15 +130,16 @@ class ReactionSet(MSONable):
 
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
 
+        # need to index by unique ID in case mixing different temperatures
         all_entry_indices: Dict[str, int] = {
-            entry.entry_id: idx for idx, entry in enumerate(entries)
+            entry.unique_id: idx for idx, entry in enumerate(entries)
         }
         indices, coeffs, data = {}, {}, {}  # keys are reaction sizes
 
         for rxn in rxns:
             size = len(rxn.entries)
 
-            rxn_indices = [all_entry_indices[e.entry_id] for e in rxn.entries]
+            rxn_indices = [all_entry_indices[e.unique_id] for e in rxn.entries]
 
             if size not in indices:
                 indices[size] = []
@@ -221,7 +222,7 @@ class ReactionSet(MSONable):
         for r in self.get_rxns():
             attrs = list(r.data.keys())  # get extra attributes from first reaction
             entry_data = r.entries[0].data
-            if "e_above_hull" in entry_data:
+            if entry_data.get("e_above_hull") is not None:
                 calculate_e_above_hulls = True
                 data["max_e_hull_reactants"] = []
                 data["max_e_hull_products"] = []
@@ -259,10 +260,16 @@ class ReactionSet(MSONable):
 
             if calculate_e_above_hulls:
                 data["max_e_hull_reactants"].append(
-                    max(e.data.get("e_above_hull", 0.0) for e in rxn.reactant_entries)
+                    max(
+                        e.data.get("e_above_hull", 0.0) or 0.0
+                        for e in rxn.reactant_entries
+                    )
                 )
                 data["max_e_hull_products"].append(
-                    max(e.data.get("e_above_hull", 0.0) for e in rxn.product_entries)
+                    max(
+                        e.data.get("e_above_hull", 0.0) or 0.0
+                        for e in rxn.product_entries
+                    )
                 )
             if determine_theoretical:
                 data["num_theoretical_reactants"].append(
@@ -431,7 +438,8 @@ class ReactionSet(MSONable):
         reaction will be removed.
         """
         if parallelize:
-            initialize_ray()
+            if not ray.is_initialized():
+                initialize_ray()
             num_cpus = int(ray.cluster_resources()["CPU"]) - 1
             chunk_refs = []
 

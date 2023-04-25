@@ -186,6 +186,25 @@ class InterfaceReactionHull(MSONable):
 
         return primary
 
+    def get_primary_competition_max_energy(self, reaction: ComputedReaction, temp=300):
+        """
+        Calculates the score for a given reaction. This formula is based on a
+        methodology presented in the following paper: (TBD)
+
+        Args:
+            reaction: Reaction to calculate the competition score for.
+
+        Returns:
+            The competition score for the reaction
+        """
+        energy = reaction.energy_per_atom
+        idx = self.reactions.index(reaction)
+        competing_rxns = self.reactions[:idx] + self.reactions[idx + 1 :]
+        competing_rxn_energies = [r.energy_per_atom for r in competing_rxns]
+        min_energy = min(competing_rxn_energies)
+
+        return np.log(1 + (273 / temp) * np.exp(energy - min_energy))
+
     def get_secondary_competition(
         self, reaction: ComputedReaction, normalize=True, recursive=False
     ):

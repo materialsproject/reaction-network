@@ -115,7 +115,8 @@ class PathwaySolver(Solver):
                     "GPU acceleration requires cupy to be installed."
                 ) from e
 
-        initialize_ray()
+        if not ray.is_initialized():
+            initialize_ray()
 
         entries_copy = deepcopy(self.entries)
         entries = entries_copy.entries_list

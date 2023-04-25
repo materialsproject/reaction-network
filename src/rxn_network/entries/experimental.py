@@ -38,7 +38,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
             Optional dictionary containing entry data
         """
         formula = composition.reduced_formula
-        entry_id = f"{self.__class__.__name__} ({formula} at {temperature} K)"
+        entry_id = f"{self.__class__.__name__}-{formula}_{temperature}"
 
         self._temperature = temperature
         self._validate_temperature(formula, temperature)
@@ -133,6 +133,15 @@ class ExperimentalReferenceEntry(ComputedEntry):
     def is_element(self) -> bool:
         """Returns True if the entry is an element."""
         return self.composition.is_element
+
+    @property
+    def unique_id(self) -> str:
+        """
+        Returns a unique ID for the entry based on its entry-id and temperature. This is
+        useful because the same entry-id can be used for multiple entries at different
+        temperatures.
+        """
+        return self.entry_id
 
     def as_dict(self):
         """

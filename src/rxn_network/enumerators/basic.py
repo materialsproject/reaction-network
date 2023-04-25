@@ -132,8 +132,8 @@ class BasicEnumerator(Enumerator):
         Args:
             entries: the set of all entries to enumerate from
         """
-
-        initialize_ray()
+        if not ray.is_initialized():
+            initialize_ray()
 
         entries, precursors, targets, open_entries = self._get_initialized_entries(
             entries

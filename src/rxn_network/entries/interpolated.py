@@ -20,10 +20,10 @@ class InterpolatedEntry(ComputedEntry):
         composition: Composition,
         energy: float,
         correction: float = 0.0,
-        energy_adjustments: list = None,
-        parameters: dict = None,
-        data: dict = None,
-        entry_id: object = None,
+        energy_adjustments: list | None = None,
+        parameters: dict | None = None,
+        data: dict | None = None,
+        entry_id: object | None = None,
     ):
         """
         Initializes an InterpolatedEntry.
@@ -47,8 +47,9 @@ class InterpolatedEntry(ComputedEntry):
             entry_id: An optional id to uniquely identify the entry.
         """
         composition = Composition(composition)
+
         if entry_id is None:
-            entry_id = f"InterpolatedEntry ({composition.reduced_formula})"
+            entry_id = f"{self.__class__.__name__}-{composition.formula}"
 
         super().__init__(
             composition,
@@ -71,6 +72,13 @@ class InterpolatedEntry(ComputedEntry):
             A GrandComputedEntry.
         """
         return GrandPotPDEntry(self, chempots)
+
+    @property
+    def unique_id(self) -> str:
+        """
+        Returns a unique ID for the entry.
+        """
+        return self.entry_id
 
     @property
     def is_experimental(self) -> bool:

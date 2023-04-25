@@ -14,6 +14,7 @@ from rxn_network.core.cost_function import CostFunction
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
     PrimaryCompetitionCalculator,
+    PrimaryCompetitionMaxCalculator,
     SecondaryCompetitionAreaCalculator,
     SecondaryCompetitionCalculator,
     SecondaryCompetitionMaxCalculator,
@@ -198,7 +199,8 @@ class CalculateCompetitionMaker(Maker):
 
     @job(rxns="rxns", output_schema=CompetitionTaskDocument)
     def make(self, rxn_sets, entries, target_formula):
-        initialize_ray()
+        if not ray.is_initialized():
+            initialize_ray()
 
         target_formula = Composition(target_formula).reduced_formula
         added_elements, added_chemsys = get_added_elem_data(entries, [target_formula])
@@ -305,7 +307,8 @@ class CalculateCompetitionMaker(Maker):
         return ReactionSet.from_rxns(decorated_rxns)
 
     def _get_chempot_decorated_rxns(self, target_rxns, entries):
-        initialize_ray()
+        if not ray.is_initialized():
+            initialize_ray()
 
         rxn_chunk_refs = []
 
@@ -475,6 +478,10 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         primary_competition = InterfaceReactionHull._primary_competition_from_energies(  # pylint: disable=protected-access, line-too-long # noqa: E501
             rxn.energy_per_atom, other_energies, temp=temp
         )
+
+        primary_competition_max = np.log(
+            1 + (273 / temp) * np.exp(energy - min(other_energies))
+        )
         energy_diffs = rxn.energy_per_atom - np.append(
             other_energies, 0.0
         )  # consider identity reaction as well
@@ -484,6 +491,7 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
             secondary_rxn_energies.max() if secondary_rxn_energies.any() else 0.0
         )
         rxn.data["primary_competition"] = round(primary_competition, 4)
+        rxn.data["primary_competition_max"] = round(primary_competition_max, 4)
         rxn.data["secondary_competition"] = round(secondary_competition, 4)
         rxn.data["secondary_competition_max"] = round(secondary_competition, 4)  # same
         rxn.data["secondary_competition_area"] = round(secondary_competition, 4)  # same
