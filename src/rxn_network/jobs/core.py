@@ -302,7 +302,7 @@ class CalculateCompetitionMaker(Maker):
 
         for chunk in grouper(
             target_rxns,
-            self.chunk_size,
+            chunk_size,
             fillvalue=None,
         ):
             rxn_chunk_refs.append(
