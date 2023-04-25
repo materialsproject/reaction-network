@@ -285,7 +285,20 @@ class CalculateCompetitionMaker(Maker):
     def _get_competition_decorated_rxns(self, target_rxns, all_rxns, num_rxns):
         rxn_chunk_refs = []
 
-        memory_per_rxn = 350  # approx 350 byte overhead per rxn (conservative)
+        memory_per_rxn = 320  # approx 300 bytes overhead per rxn (conservative)
+
+        num_cpus = ray.cluster_resources()["CPU"]
+        available_memory = ray.cluster_resources()["memory"]
+
+        chunk_size = self.chunk_size
+        needed_memory_per_cpu = memory_per_rxn * num_rxns
+
+        if num_cpus * needed_memory_per_cpu > available_memory:
+            logger.info("Not enough memory to use all CPUs simultaneously.")
+            chunk_size = (
+                int(len(target_rxns) // (available_memory // needed_memory_per_cpu)) + 1
+            )
+            logger.info(f"Setting new chunk size to {chunk_size}.")
 
         for chunk in grouper(
             target_rxns,
