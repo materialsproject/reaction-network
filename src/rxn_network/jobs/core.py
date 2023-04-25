@@ -283,15 +283,18 @@ class CalculateCompetitionMaker(Maker):
     def _get_competition_decorated_rxns(self, target_rxns, all_rxns):
         rxn_chunk_refs = []
 
+        num_rxns = len(all_rxns)
+        memory_per_rxn = 350  # approx 350 byte overhead per rxn (conservative)
+
         for chunk in grouper(
             target_rxns,
             self.chunk_size,
             fillvalue=None,
         ):
             rxn_chunk_refs.append(
-                _get_competition_decorated_rxns_by_chunk.remote(
-                    chunk, all_rxns, self.open_formula, self.temp
-                )
+                _get_competition_decorated_rxns_by_chunk.options(
+                    memory=num_rxns * memory_per_rxn
+                ).remote(chunk, all_rxns, self.open_formula, self.temp)
             )
 
         decorated_rxns = []
@@ -472,11 +475,12 @@ class PathwaySolverMaker(Maker):
 def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
     """ """
     if len(precursors_list) == 1:
+        energy = rxn.energy_per_atom
         other_energies = np.array(
             [r.energy_per_atom for r in competing_rxns if r != rxn]
         )
         primary_competition = InterfaceReactionHull._primary_competition_from_energies(  # pylint: disable=protected-access, line-too-long # noqa: E501
-            rxn.energy_per_atom, other_energies, temp=temp
+            energy, other_energies, temp=temp
         )
 
         primary_competition_max = np.log(
@@ -505,15 +509,17 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         )
 
         calc_1 = PrimaryCompetitionCalculator(irh=irh, temp=temp)
-        calc_2 = SecondaryCompetitionCalculator(irh=irh)
-        calc_3 = SecondaryCompetitionMaxCalculator(irh=irh)
-        calc_4 = SecondaryCompetitionAreaCalculator(irh=irh)
+        calc_2 = PrimaryCompetitionMaxCalculator(irh=irh, temp=temp)
+        calc_3 = SecondaryCompetitionCalculator(irh=irh)
+        calc_4 = SecondaryCompetitionMaxCalculator(irh=irh)
+        calc_5 = SecondaryCompetitionAreaCalculator(irh=irh)
 
         decorated_rxn = calc_1.decorate(rxn)
         decorated_rxn = calc_2.decorate(decorated_rxn)
         decorated_rxn = calc_3.decorate(decorated_rxn)
+        decorated_rxn = calc_4.decorate(decorated_rxn)
         try:  # this has been failing lately
-            decorated_rxn = calc_4.decorate(decorated_rxn)
+            decorated_rxn = calc_5.decorate(decorated_rxn)
         except Exception:
             print("Secondary competition area error with rxn: ", decorated_rxn)
             decorated_rxn.data["secondary_competition_area"] = None
