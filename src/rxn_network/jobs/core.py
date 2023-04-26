@@ -496,7 +496,6 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         primary_competition = InterfaceReactionHull._primary_competition_from_energies(  # pylint: disable=protected-access, line-too-long # noqa: E501
             energy, other_energies, temp=temp
         )
-
         primary_competition_max = np.log(
             1 + (273 / temp) * np.exp(energy - min(other_energies))
         )
