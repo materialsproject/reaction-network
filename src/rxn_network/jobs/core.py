@@ -495,15 +495,16 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         other_energies = np.array(
             [r.energy_per_atom for r in competing_rxns if r != rxn]
         )
+        if not np.isclose(other_energies, 0.0).any():
+            other_energies = np.append(other_energies, 0.0)  # need identity reaction
+
         primary_competition = InterfaceReactionHull._primary_competition_from_energies(  # pylint: disable=protected-access, line-too-long # noqa: E501
             energy, other_energies, temp=temp
         )
         primary_competition_max = np.log(
             1 + (273 / temp) * np.exp(energy - min(other_energies))
         )
-        energy_diffs = rxn.energy_per_atom - np.append(
-            other_energies, 0.0
-        )  # consider identity reaction as well
+        energy_diffs = rxn.energy_per_atom - other_energies
 
         secondary_rxn_energies = energy_diffs[energy_diffs > 0]
         secondary_competition = (
@@ -545,7 +546,9 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
 @ray.remote
 def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
     decorated_rxns = []
-    all_rxns = ReactionSet.from_dict(all_rxns)  # stored in Ray as a dict
+    all_rxns = ReactionSet.from_dict(
+        all_rxns
+    )  # stored in Ray as a dict (should be memory efficient)
 
     for rxn in rxn_chunk:
         if not rxn:

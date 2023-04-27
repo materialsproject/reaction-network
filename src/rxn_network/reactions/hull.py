@@ -199,7 +199,7 @@ class InterfaceReactionHull(MSONable):
         """
         energy = reaction.energy_per_atom
         coord = self.get_coordinate(reaction)
-        matching = np.where(self.coords == coord)[
+        matching = np.where(self.coords[:, 0] == coord)[
             0
         ]  # remove all reactions at same coordinate
 
@@ -214,7 +214,7 @@ class InterfaceReactionHull(MSONable):
         competing_rxn_energies = [r.energy_per_atom for r in competing_rxns]
         min_energy = min(competing_rxn_energies)
 
-        return np.log(1 + (273 / temp) * np.exp(energy - min_energy))
+        return np.log(1 + (temp / 273) * np.exp(energy - min_energy))
 
     def get_secondary_competition(
         self, reaction: ComputedReaction, normalize=True, recursive=False
