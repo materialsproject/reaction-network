@@ -124,7 +124,14 @@ class RetrosynthesisFlowMaker(Maker):
         jobs.append(enumeration_job)
 
         base_rxn_set = enumeration_job.output.rxns
-        base_calculate_competition_job = self.calculate_competition_maker.make(
+        calculate_competition_maker = self.calculate_competition_maker.update_kwargs(
+            {
+                "temp": self.get_entry_set_maker.temperature,
+            },
+            nested=False,
+        )
+
+        base_calculate_competition_job = calculate_competition_maker.make(
             rxn_sets=[base_rxn_set],
             entries=entries,
             target_formula=target_formula,
@@ -138,16 +145,14 @@ class RetrosynthesisFlowMaker(Maker):
                     {"name": self.enumeration_maker.name + subname},
                     nested=False,
                 )
-                calculate_competition_maker = (
-                    self.calculate_competition_maker.update_kwargs(
-                        {
-                            "chempot": chempot,
-                            "open_elem": self.open_elem,
-                            "temp": self.get_entry_set_maker.temperature,
-                            "name": self.calculate_competition_maker.name + subname,
-                        },
-                        nested=False,
-                    )
+                calculate_competition_maker = calculate_competition_maker.update_kwargs(
+                    {
+                        "chempot": chempot,
+                        "open_elem": self.open_elem,
+                        "temp": self.get_entry_set_maker.temperature,
+                        "name": self.calculate_competition_maker.name + subname,
+                    },
+                    nested=False,
                 )
 
                 open_enumerators = []

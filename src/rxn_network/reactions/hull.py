@@ -198,7 +198,18 @@ class InterfaceReactionHull(MSONable):
             The competition score for the reaction
         """
         energy = reaction.energy_per_atom
-        idx = self.reactions.index(reaction)
+        coord = self.get_coordinate(reaction)
+        matching = np.where(irh.coords == coord)[
+            0
+        ]  # remove all reactions at same coordinate
+
+        idx_min = matching.min()
+        idx_max = matching.max()
+
+        competing_rxns = (
+            irh.reactions[:idx_min] + irh.reactions[idx_max + 1 :]
+        )  # assumes ordered
+
         competing_rxns = self.reactions[:idx] + self.reactions[idx + 1 :]
         competing_rxn_energies = [r.energy_per_atom for r in competing_rxns]
         min_energy = min(competing_rxn_energies)
