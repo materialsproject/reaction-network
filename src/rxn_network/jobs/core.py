@@ -502,7 +502,7 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
             energy, other_energies, temp=temp
         )
         primary_competition_max = np.log(
-            1 + (273 / temp) * np.exp(energy - min(other_energies))
+            1 + (temp / 273) * np.exp(energy - min(other_energies))
         )
         energy_diffs = rxn.energy_per_atom - other_energies
 
