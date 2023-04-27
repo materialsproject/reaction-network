@@ -131,15 +131,24 @@ class ReactionSet(MSONable):
         entries = sorted(list(set(entries)), key=lambda r: r.composition)
 
         # need to index by unique ID in case mixing different temperatures
-        all_entry_indices: Dict[str, int] = {
-            entry.unique_id: idx for idx, entry in enumerate(entries)
-        }
+        all_entry_indices = {}
+        for idx, entry in enumerate(entries):
+            if hasattr(entry, "unique_id"):
+                all_entry_indices[entry.unique_id] = idx
+            else:
+                all_entry_indices[entry.entry_id] = idx
+
         indices, coeffs, data = {}, {}, {}  # keys are reaction sizes
 
         for rxn in rxns:
             size = len(rxn.entries)
 
-            rxn_indices = [all_entry_indices[e.unique_id] for e in rxn.entries]
+            rxn_indices = []
+            for e in rxn.entries:
+                if hasattr(e, "unique_id"):
+                    rxn_indices.append(all_entry_indices[e.unique_id])
+                else:
+                    rxn_indices.append(all_entry_indices[e.entry_id])
 
             if size not in indices:
                 indices[size] = []

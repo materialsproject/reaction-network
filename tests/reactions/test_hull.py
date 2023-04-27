@@ -80,6 +80,19 @@ def test_get_primary_competition(irh_batio, stable_rxn, unstable_rxn):
     )
 
 
+def test_get_primary_competition_max(irh_batio, stable_rxn, unstable_rxn):
+    assert irh_batio.get_primary_competition_max_energy(
+        stable_rxn, temp=300
+    ) == pytest.approx(0.655066280264885)
+    assert irh_batio.get_primary_competition_max_energy(
+        unstable_rxn, temp=300
+    ) == pytest.approx(1.2729842928567934)
+
+    assert irh_batio.get_primary_competition_max_energy(
+        stable_rxn, temp=1000
+    ) == pytest.approx(0.24496847448377526)
+
+
 def test_get_secondary_competition(irh_batio, stable_rxn, unstable_rxn):
     assert irh_batio.get_secondary_competition(stable_rxn) == pytest.approx(
         0.41705577943708827
