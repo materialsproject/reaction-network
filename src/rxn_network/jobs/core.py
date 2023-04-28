@@ -103,8 +103,27 @@ class GetEntrySetMaker(Maker):
             if self.MP_API_KEY:
                 kwargs["api_key"] = self.MP_API_KEY
 
-            with MPRester(**kwargs) as mpr:
-                entries = mpr.get_entries_in_chemsys(elements=chemsys)
+            elems = {Element(i) for i in chemsys.split("-")}
+
+            if len(elems) <= 5:
+                with MPRester(**kwargs) as mpr:
+                    entries = mpr.get_entries_in_chemsys(
+                        elements=chemsys,
+                        additional_criteria={"thermo_types": ["GGA_GGA+U"]},
+                    )
+            else:  # this approach is faster for big systems
+                other_elems = self._get_exclude_elems(elems)
+
+                with MPRester(**kwargs) as mpr:
+                    docs = mpr.summary.search(
+                        exclude_elements=other_elems, all_fields=False, deprecated=False
+                    )
+                mpids = [d.material_id for d in docs]
+
+                with MPRester(**kwargs) as mpr:
+                    entries = mpr.get_entries(
+                        mpids, additional_criteria={"thermo_types": ["GGA_GGA+U"]}
+                    )
 
         entries = process_entries(
             entries,
@@ -128,6 +147,17 @@ class GetEntrySetMaker(Maker):
         doc.task_label = self.name
 
         return doc
+
+    @staticmethod
+    def _get_exclude_elems(elems):
+        exclude_elems = []
+        for e in Element:
+            if e in elems:
+                continue
+            else:
+                exclude_elems.append(str(e))
+
+        return exclude_elems
 
 
 @dataclass
