@@ -34,7 +34,7 @@ class BasicEnumerator(Enumerator):
     """
 
     MIN_CHUNK_SIZE = 2500
-    MAX_NUM_JOBS = 10000
+    MAX_NUM_JOBS = 5000
 
     def __init__(
         self,
@@ -450,7 +450,7 @@ class BasicOpenEnumerator(BasicEnumerator):
     """
 
     MIN_CHUNK_SIZE = 2500
-    MAX_NUM_JOBS = 10000
+    MAX_NUM_JOBS = 5000
 
     def __init__(
         self,

@@ -26,7 +26,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     """
 
     MIN_CHUNK_SIZE = 1000
-    MAX_NUM_JOBS = 10000
+    MAX_NUM_JOBS = 1000
 
     def __init__(
         self,
@@ -120,7 +120,7 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     """
 
     MIN_CHUNK_SIZE = 1000
-    MAX_NUM_JOBS = 10000
+    MAX_NUM_JOBS = 1000
 
     def __init__(
         self,
