@@ -14,10 +14,10 @@ from rxn_network.core.cost_function import CostFunction
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
     PrimaryCompetitionCalculator,
-    PrimaryCompetitionMaxCalculator,
     SecondaryCompetitionAreaCalculator,
     SecondaryCompetitionCalculator,
     SecondaryCompetitionMaxCalculator,
+    SecondaryCompetitionWithEhullCalculator,
 )
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
@@ -154,8 +154,7 @@ class GetEntrySetMaker(Maker):
         for e in Element:
             if e in elems:
                 continue
-            else:
-                exclude_elems.append(str(e))
+            exclude_elems.append(str(e))
 
         return exclude_elems
 
@@ -340,7 +339,7 @@ class CalculateCompetitionMaker(Maker):
             rxn_chunk_refs.append(
                 _get_competition_decorated_rxns_by_chunk.options(
                     memory=num_rxns * memory_per_rxn
-                ).remote(chunk, all_rxns, self.open_formula, self.temp)
+                ).remote(chunk, all_rxns, self.open_formula)
             )
 
         decorated_rxns = []
@@ -518,7 +517,7 @@ class PathwaySolverMaker(Maker):
         return doc
 
 
-def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
+def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list):
     """ """
     if len(precursors_list) == 1:
         energy = rxn.energy_per_atom
@@ -528,21 +527,16 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
         if not np.isclose(other_energies, 0.0).any():
             other_energies = np.append(other_energies, 0.0)  # need identity reaction
 
-        primary_competition = InterfaceReactionHull._primary_competition_from_energies(  # pylint: disable=protected-access, line-too-long # noqa: E501
-            energy, other_energies, temp=temp
-        )
-        primary_competition_max = np.log(
-            1 + (temp / 273) * np.exp(energy - min(other_energies))
-        )
-        energy_diffs = rxn.energy_per_atom - other_energies
+        primary_competition = energy - other_energies.min()
 
+        energy_diffs = rxn.energy_per_atom - other_energies
         secondary_rxn_energies = energy_diffs[energy_diffs > 0]
         secondary_competition = (
             secondary_rxn_energies.max() if secondary_rxn_energies.any() else 0.0
         )
         rxn.data["primary_competition"] = round(primary_competition, 4)
-        rxn.data["primary_competition_max"] = round(primary_competition_max, 4)
         rxn.data["secondary_competition"] = round(secondary_competition, 4)
+        rxn.data["secondary_competition_with_ehull"] = round(secondary_competition, 4)
         rxn.data["secondary_competition_max"] = round(secondary_competition, 4)  # same
         rxn.data["secondary_competition_area"] = round(secondary_competition, 4)  # same
 
@@ -554,9 +548,9 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
             list(competing_rxns),
         )
 
-        calc_1 = PrimaryCompetitionCalculator(irh=irh, temp=temp)
-        calc_2 = PrimaryCompetitionMaxCalculator(irh=irh, temp=temp)
-        calc_3 = SecondaryCompetitionCalculator(irh=irh)
+        calc_1 = PrimaryCompetitionCalculator(irh=irh)
+        calc_2 = SecondaryCompetitionCalculator(irh=irh)
+        calc_3 = SecondaryCompetitionWithEhullCalculator(irh=irh)
         calc_4 = SecondaryCompetitionMaxCalculator(irh=irh)
         calc_5 = SecondaryCompetitionAreaCalculator(irh=irh)
 
@@ -574,7 +568,7 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list, temp):
 
 
 @ray.remote
-def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, temp):
+def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula):
     decorated_rxns = []
     all_rxns = ReactionSet.from_dict(
         all_rxns
@@ -599,7 +593,7 @@ def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula, 
                 raise ValueError("Can only have 2 precursors, excluding open element!")
 
         decorated_rxns.append(
-            _get_competition_decorated_rxn(rxn, competing_rxns, reactant_formulas, temp)
+            _get_competition_decorated_rxn(rxn, competing_rxns, reactant_formulas)
         )
 
     return decorated_rxns

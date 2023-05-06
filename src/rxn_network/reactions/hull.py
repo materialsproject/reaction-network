@@ -166,7 +166,7 @@ class InterfaceReactionHull(MSONable):
 
         raise ValueError("No reactions found!")
 
-    def get_primary_competition(self, reaction: ComputedReaction, temp=300):
+    def get_primary_competition(self, reaction: ComputedReaction):
         """
         Calculates the primary competition score for a given reaction. This formula is
         based on a methodology presented in the following paper: (TBD)
@@ -176,26 +176,6 @@ class InterfaceReactionHull(MSONable):
 
         Returns:
             The c-score for the reaction
-        """
-        energy = reaction.energy_per_atom
-        idx = self.reactions.index(reaction)
-        competing_rxns = self.reactions[:idx] + self.reactions[idx + 1 :]
-        primary = self._primary_competition_from_energies(
-            energy, [r.energy_per_atom for r in competing_rxns], temp
-        )
-
-        return primary
-
-    def get_primary_competition_max_energy(self, reaction: ComputedReaction, temp=300):
-        """
-        Calculates the score for a given reaction. This formula is based on a
-        methodology presented in the following paper: (TBD)
-
-        Args:
-            reaction: Reaction to calculate the competition score for.
-
-        Returns:
-            The competition score for the reaction
         """
         energy = reaction.energy_per_atom
         coord = self.get_coordinate(reaction)
@@ -214,10 +194,14 @@ class InterfaceReactionHull(MSONable):
         competing_rxn_energies = [r.energy_per_atom for r in competing_rxns]
         min_energy = min(competing_rxn_energies)
 
-        return np.log(1 + (temp / 273) * np.exp(energy - min_energy))
+        return energy - min_energy
 
     def get_secondary_competition(
-        self, reaction: ComputedReaction, normalize=True, recursive=False
+        self,
+        reaction: ComputedReaction,
+        normalize=True,
+        recursive=False,
+        include_e_hull=False,
     ):
         """
         Calculates the score for a given reaction. This formula is based on a
@@ -230,6 +214,7 @@ class InterfaceReactionHull(MSONable):
             The competition score for the reaction
         """
         x = self.get_coordinate(reaction)
+
         if recursive:
             (
                 left_energy,
@@ -256,8 +241,9 @@ class InterfaceReactionHull(MSONable):
         if normalize:
             energy = energy / total
 
-        e_above_hull = self.get_energy_above_hull(reaction)
-        energy -= e_above_hull
+        if include_e_hull:
+            e_above_hull = self.get_energy_above_hull(reaction)
+            energy -= e_above_hull
 
         return -1 * energy
 

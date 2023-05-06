@@ -153,7 +153,6 @@ class PrimaryCompetitionCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        temp=300,
         name="primary_competition",
     ):
         """
@@ -164,7 +163,6 @@ class PrimaryCompetitionCalculator(Calculator):
             name: the data dictionary key with which to store the calculated value.
         """
         self.irh = irh
-        self.temp = temp
         self._name = name
 
     def calculate(self, rxn: ComputedReaction) -> float:
@@ -180,55 +178,7 @@ class PrimaryCompetitionCalculator(Calculator):
         Returns:
             The competitiveness score
         """
-        return self.irh.get_primary_competition(rxn, temp=self.temp)
-
-    @property
-    def name(self):
-        """Returns the name of the data dictionary key where the value is stored"""
-        return self._name
-
-
-class PrimaryCompetitionMaxCalculator(Calculator):
-    """
-    Calculator for determining the level of primary competition for a reaction
-    (in eV/atom).
-
-    WARNING: This calculator is working but has not been sufficiently tested. Use at
-    your own risk.
-
-    """
-
-    def __init__(
-        self,
-        irh: InterfaceReactionHull,
-        temp=300,
-        name="primary_competition_max",
-    ):
-        """
-        Args:
-            entries: Iterable of entries to be used for reaction enumeration in
-                determining primary competition score.
-            cost_function: The cost function used to determine the c-score
-            name: the data dictionary key with which to store the calculated value.
-        """
-        self.irh = irh
-        self.temp = temp
-        self._name = name
-
-    def calculate(self, rxn: ComputedReaction) -> float:
-        """
-        Calculates the competitiveness score for a given reaction by enumerating
-        competing reactions, evaluating their cost with the supplied cost function, and
-        then using the c-score formula, i.e. the _get_c_score() method, to determine the
-        competitiveness score.
-
-        Args:
-            rxn: the ComputedReaction object to be evaluated
-
-        Returns:
-            The competitiveness score
-        """
-        return self.irh.get_primary_competition_max_energy(rxn, temp=self.temp)
+        return self.irh.get_primary_competition(rxn)
 
     @property
     def name(self):
@@ -275,6 +225,52 @@ class SecondaryCompetitionCalculator(Calculator):
             The competitiveness score
         """
         return self.irh.get_secondary_competition(rxn)
+
+    @property
+    def name(self):
+        """Returns the name of the data dictionary key where the value is stored"""
+        return self._name
+
+
+class SecondaryCompetitionWithEhullCalculator(Calculator):
+    """
+    Calculator for determining the secondary competition for a reaction
+    (in eV/atom).
+
+    WARNING: This calculator is working but has not been sufficiently tested. Use at
+    your own risk.
+
+    """
+
+    def __init__(
+        self,
+        irh: InterfaceReactionHull,
+        name="secondary_competition_with_ehull",
+    ):
+        """
+        Args:
+            entries: Iterable of entries to be used for reaction enumeration in
+                determining c-score
+            cost_function: The cost function used to determine the c-score
+            name: the data dictionary key with which to store the calculated value.
+        """
+        self.irh = irh
+        self._name = name
+
+    def calculate(self, rxn: ComputedReaction) -> float:
+        """
+        Calculates the competitiveness score for a given reaction by enumerating
+        competing reactions, evaluating their cost with the supplied cost function, and
+        then using the c-score formula, i.e. the _get_c_score() method, to determine the
+        competitiveness score.
+
+        Args:
+            rxn: the ComputedReaction object to be evaluated
+
+        Returns:
+            The competitiveness score
+        """
+        return self.irh.get_secondary_competition(rxn, include_e_hull=True)
 
     @property
     def name(self):
