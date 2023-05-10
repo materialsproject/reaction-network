@@ -47,7 +47,7 @@ def plot_reaction_scatter(
             units = "eV/atom"
         elif name == "primary_competition":
             label = "Primary Competition"
-            units = "a.u."
+            units = "eV/atom"
         elif name == "secondary_competition":
             label = "Secondary Competition"
             units = "eV/atom"
