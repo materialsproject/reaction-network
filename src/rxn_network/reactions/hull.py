@@ -262,7 +262,7 @@ class InterfaceReactionHull(MSONable):
         left_energy = self.get_max_decomposition_energy(0, x)
         right_energy = self.get_max_decomposition_energy(x, 1)
 
-        return -1 * (left_energy + right_energy - self.get_energy_above_hull(reaction))
+        return -1 * (left_energy + right_energy)
 
     def get_secondary_competition_area(self, reaction: ComputedReaction):
         """

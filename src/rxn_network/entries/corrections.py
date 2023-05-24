@@ -5,7 +5,7 @@ Energy correction classes for entry objects.
 from pymatgen.entries.computed_entries import CompositionEnergyAdjustment
 
 CARBONATE_CORRECTION = (
-    0.82820  # eV per (CO3)2- anion in composition; see Jupyter NB for fitting
+    0.830  # eV per (CO3)2- anion in composition; see Jupyter NB for fitting
 )
 
 
