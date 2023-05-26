@@ -111,7 +111,6 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         if f1 in self.domains:
             pts1 = self.domains[f1]
         else:
-            print(f1)
             pts1 = self._get_metastable_domain(f1)
 
         if f2 in self.domains:
