@@ -101,6 +101,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         Args:
             f1: chemical formula (1)
             f2: chemical formula (2)
+            offset: an optional offset to add to the calculated distance
 
         Returns:
             Shortest distance between domain boundaries in the full
@@ -110,6 +111,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         if f1 in self.domains:
             pts1 = self.domains[f1]
         else:
+            print(f1)
             pts1 = self._get_metastable_domain(f1)
 
         if f2 in self.domains:
@@ -188,8 +190,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         """Returns the distance between two parallel hyperplanes"""
         return np.abs(delta_b) / np.linalg.norm(a)
 
-    def _get_metastable_domain(self, formula, tol=1e-1):
-        """Returns the metastable domain for a given formula"""
+    def _get_metastable_domain(self, formula, tol=1e-5):
+        """Returns the metastable domain for a given formula. Tol is passed to
+        GibbsEntrySet.get_stabilized_entry and will affect the size of the domain."""
         if formula in self._metastable_domains:
             return self._metastable_domains[formula]
 

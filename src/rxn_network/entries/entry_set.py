@@ -235,6 +235,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             entry: A computed entry object.
             tol: The numerical padding added to the energy correction to guarantee
                 that it is determined to be stable during phase diagram construction.
+            force: due to numerical stability issues, if the entry is very close to the
+                hull (i.e., e_above_hull > 0 but very small), it may not be stabilized.
+                This option forces stabilization even if e_above_hull is "zero".
 
         Returns:
             A new ComputedEntry with energy adjustment making it appear to be stable.
