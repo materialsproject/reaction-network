@@ -205,9 +205,10 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             metastable_domain = cpd.domains[formula]
         except KeyError as exc:
             # sometimes if the entry is exactly on the hull it fails, so set force=True
+            # and make bigger tolerance
             self._entry_set.remove(new_entry)
             new_entry = self._entry_set.get_stabilized_entry(
-                orig_entry, tol=tol, force=True
+                orig_entry, tol=1e-2, force=True
             )
             self._entry_set.add(new_entry)
             cpd = ChemicalPotentialDiagram(self._entry_set, default_min_limit=-500)
