@@ -65,7 +65,7 @@ class GetEntrySetMaker(Maker):
 
     name: str = "get_and_process_entries"
     temperature: int = 300
-    include_nist_data: bool = False
+    include_nist_data: bool = True
     include_freed_data: bool = False
     e_above_hull: float = 0.0
     filter_at_temperature: Optional[int] = None

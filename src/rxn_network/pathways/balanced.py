@@ -30,7 +30,7 @@ class BalancedPathway(BasicPathway):
         Args:
             reactions: list of ComputedReaction objects which occur along path.
             coefficients: list of coefficients to balance each of these reactions,
-                respectively
+                respectively.
             costs: list of corresponding costs for each reaction.
             balanced: whether or not the reaction pathway is balanced.
                 Defaults to False.
