@@ -21,48 +21,6 @@ from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.reaction_set import ReactionSet
 
 
-class Graph(PyDiGraph):
-    """
-    Thin wrapper around rx.PyDiGraph to allow for serialization.
-    """
-
-    def as_dict(self):
-        """Represents the PyDiGraph object as a serializable dictionary (see monty
-        package, MSONable, for more information"""
-        d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
-
-        d["nodes"] = [n.as_dict() for n in self.nodes()]
-        d["node_indices"] = list(self.node_indices())
-        d["edges"] = [
-            (*e, obj.as_dict() if hasattr(obj, "as_dict") else obj)
-            for e, obj in zip(self.edge_list(), self.edges())
-        ]
-
-        return d
-
-    @classmethod
-    def from_dict(cls, d):
-        """Instantiates a Graph object from a dictionary (see monty package, MSONable,
-        for more information)"""
-        nodes = MontyDecoder().process_decoded(d["nodes"])
-        node_indices = MontyDecoder().process_decoded(d["node_indices"])
-        edges = [(e[0], e[1], MontyDecoder().process_decoded(e[2])) for e in d["edges"]]
-
-        nodes = dict(zip(nodes, node_indices))
-
-        graph = cls()
-        new_indices = graph.add_nodes_from(list(nodes.keys()))
-        mapping = {nodes[node]: idx for idx, node in zip(new_indices, nodes.keys())}
-
-        new_mapping = []
-        for edge in edges:
-            new_mapping.append((mapping[edge[0]], mapping[edge[1]], edge[2]))
-
-        graph.add_edges_from(new_mapping)
-
-        return graph
-
-
 class ReactionNetwork(Network):
     """
     Main reaction network class for building graph networks and performing
@@ -339,6 +297,48 @@ class ReactionNetwork(Network):
             f"{self.chemsys}, "
             f"with Graph: {str(self._g)}"
         )
+
+
+class Graph(PyDiGraph):
+    """
+    Thin wrapper around rx.PyDiGraph to allow for serialization.
+    """
+
+    def as_dict(self):
+        """Represents the PyDiGraph object as a serializable dictionary (see monty
+        package, MSONable, for more information"""
+        d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
+
+        d["nodes"] = [n.as_dict() for n in self.nodes()]
+        d["node_indices"] = list(self.node_indices())
+        d["edges"] = [
+            (*e, obj.as_dict() if hasattr(obj, "as_dict") else obj)
+            for e, obj in zip(self.edge_list(), self.edges())
+        ]
+
+        return d
+
+    @classmethod
+    def from_dict(cls, d):
+        """Instantiates a Graph object from a dictionary (see monty package, MSONable,
+        for more information)"""
+        nodes = MontyDecoder().process_decoded(d["nodes"])
+        node_indices = MontyDecoder().process_decoded(d["node_indices"])
+        edges = [(e[0], e[1], MontyDecoder().process_decoded(e[2])) for e in d["edges"]]
+
+        nodes = dict(zip(nodes, node_indices))
+
+        graph = cls()
+        new_indices = graph.add_nodes_from(list(nodes.keys()))
+        mapping = {nodes[node]: idx for idx, node in zip(new_indices, nodes.keys())}
+
+        new_mapping = []
+        for edge in edges:
+            new_mapping.append((mapping[edge[0]], mapping[edge[1]], edge[2]))
+
+        graph.add_edges_from(new_mapping)
+
+        return graph
 
 
 def get_rxn_nodes_and_edges(rxns: ReactionSet):
