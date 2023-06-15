@@ -66,6 +66,11 @@ def ymno3_rxns():
 
 
 @pytest.fixture(scope="session")
+def ymno3_gibbs_rxns():
+    return loadfn(TEST_FILES_PATH / "ymno3_gibbs_rxns.json.gz")
+
+
+@pytest.fixture(scope="session")
 def all_ymno_rxns():
     return loadfn(TEST_FILES_PATH / "all_ymno_rxns.json.gz")
 

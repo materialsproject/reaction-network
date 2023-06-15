@@ -545,6 +545,37 @@ class ReactionSet(MSONable):
 
         return self._get_rxn_set_by_indices(idxs_to_keep)
 
+    def set_chempot(self, open_el: Optional[Union[str, Element]], chempot: float):
+        """Returns a new ReactionSet containing the same reactions as this ReactionSet
+        but with a grand potential change recalculated under the constraint defined by the
+        provided open element and its chemical potential.
+
+        Args:
+            open_el (Optional[Union[str, Element]]): The element to be considered open.
+            chempot (float): The open element's chemical potential (for use in energy change calculation)
+
+        Returns:
+            ReactionSet: A new ReactionSet containing reactions with the recalculated energies.
+        """
+        return ReactionSet(self.entries, self.indices, self.coeffs, open_el, chempot, self.all_data)
+
+    def set_new_temperature(self, new_temp: float):
+        """Returns a new ReactionSet containing the same reactions as this ReactionSet but with
+        a recalculated Gibb's/Grand potential change reflecting formation energies calculated at
+        the provided temperature.
+
+        Args:
+            new_temp (float): The temperature for which new reaction energies should be calculated.
+
+        Returns:
+            ReactionSet: The new ReactionSet containing the recalculated reactions.
+        """
+        new_rxns = []
+        for rxn in self.get_rxns():
+            new_rxns.append(rxn.get_new_temperature(new_temp))
+
+        return ReactionSet.from_rxns(new_rxns, open_elem=self.open_elem, chempot=self.chempot)
+
     def _get_rxns_by_indices(
         self, idxs: Dict[int, np.ndarray]
     ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
