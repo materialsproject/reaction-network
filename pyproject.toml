@@ -46,7 +46,7 @@ docs = [
     "jupyter_contrib_nbextensions==0.7.0",
     "mkdocs==1.4.2",
     "mkdocs-autorefs==0.4.1",
-    "mkdocs-coverage==0.2.6",
+    "mkdocs-coverage==0.2.7",
     "mkdocs-jupyter==0.22.0",
     "mkdocs-section-index==0.3.4",
     "mkdocstrings==0.20.0",
