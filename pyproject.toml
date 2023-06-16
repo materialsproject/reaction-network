@@ -44,7 +44,7 @@ dependencies = [
 [project.optional-dependencies]
 docs = [
     "jupyter_contrib_nbextensions==0.7.0",
-    "mkdocs==1.4.2",
+    "mkdocs==1.4.3",
     "mkdocs-autorefs==0.4.1",
     "mkdocs-coverage==0.2.6",
     "mkdocs-jupyter==0.22.0",
