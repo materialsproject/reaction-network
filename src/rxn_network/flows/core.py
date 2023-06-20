@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Collection, List, Optional
 
@@ -24,8 +26,48 @@ logger = get_logger(__name__)
 
 
 @dataclass
-class RetrosynthesisFlowMaker(Maker):
-    name: str = "identify_synthesis_recipes"
+class SynthesisPlanningFlowMaker(Maker):
+    """Maker to create a solid-state synthesis planning flow.
+
+    This flow has three stages.
+     1) Entries are acquired via the `GetEntrySetMaker`. This job both gets the computed
+        entries from a databse (e.g., Materials Project) and processes them for use in
+        the reaction network.
+    2) Reactions are enumerated per the provided `ReactionEnumerationMaker` (and associated
+       enumerators). This computes the full "reaction network" so that selectivity can
+       be calculated.
+    3) The competition of all synthesis reactions to the desired target is assessed per
+       the settings in the `CalculateCompetitionMaker`.
+
+    This flow also has the option to include an "open" element and a list of chempots.
+    This will enumerate reactions at different conditions and evaluate their
+    selectivities at those conditinons.
+
+    This flow does not produce a specific output document. Instead, it is convenient to
+    analyze output documents from each of the jobs in the flow based on the desired
+    analysis. For the final "results", access the reaction set produced by the
+    `CalculateCompetitionMaker` at the conditions of interest.
+
+    Args:
+        name: Name of the flow. Automatically generated if not provided.
+        get_entry_set_maker: Maker to create the `GetEntrySetJob`
+        enumeration_maker: Maker to create the `ReactionEnumerationJob`
+        calculate_competition_maker: Maker to create the `CalculateCompetitionJob`
+        open_elem: Element to use as the "open" element. If provided, the flow will
+            enumerate reactions at different chemical potentials of this element.
+        chempots: List of chemical potentials to use for the "open" element. If
+            provided, the flow will enumerate reactions at different chemical potentials
+            of this element.
+        use_basic_enumerators: Whether to use the `BasicEnumerator` and
+            `BasicOpenEnumerator` in the enumeration job.
+        use_minimize_enumerators: Whether to use the `MinimizeGibbsEnumerator` and the
+            `MinimizeGrandPotentialEnumerator` in the enumeration job.
+        basic_enumerator_kwargs: Keyword arguments to pass to the basic enumerators.
+        minimize_enumerator_kwargs: Keyword arguments to pass to the minimize
+            enumerators.
+    """
+
+    name: str = "synthesis_planning"
     get_entry_set_maker: GetEntrySetMaker = field(default_factory=GetEntrySetMaker)
     enumeration_maker: ReactionEnumerationMaker = field(
         default_factory=ReactionEnumerationMaker
@@ -33,8 +75,8 @@ class RetrosynthesisFlowMaker(Maker):
     calculate_competition_maker: CalculateCompetitionMaker = field(
         default_factory=CalculateCompetitionMaker
     )
-    open_elem: Optional[Element] = None
-    chempots: Optional[List[float]] = None
+    open_elem: Element | None = None
+    chempots: list[float] | None = None
     use_basic_enumerators: bool = True
     use_minimize_enumerators: bool = True
     basic_enumerator_kwargs: dict = field(default_factory=dict)
@@ -49,8 +91,8 @@ class RetrosynthesisFlowMaker(Maker):
     def make(  # type: ignore
         self,
         target_formula: str,
-        added_elems: Optional[Collection[str]] = None,
-        entries: Optional[GibbsEntrySet] = None,
+        added_elems: Collection[str] | None = None,
+        entries: GibbsEntrySet | None = None,
     ):
         target_formula = Composition(target_formula).reduced_formula
 
@@ -199,8 +241,8 @@ class NetworkFlowMaker(Maker):
     )
     network_maker: NetworkMaker = field(default_factory=NetworkMaker)
     solver_maker: Optional[PathwaySolverMaker] = None
-    open_elem: Optional[Element] = None
-    chempots: Optional[List[float]] = None
+    open_elem: Element | None = None
+    chempots: list[float] | None = None
     use_basic_enumerators: bool = True
     use_minimize_enumerators: bool = True
     basic_enumerator_kwargs: dict = field(default_factory=dict)
