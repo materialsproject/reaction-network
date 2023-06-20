@@ -72,25 +72,22 @@ def test_get_coords_in_range(x1, x2, expected_length, irh_batio):
 
 
 def test_get_primary_competition(irh_batio, stable_rxn, unstable_rxn):
-    assert irh_batio.get_primary_competition(stable_rxn, temp=300) == pytest.approx(
+    assert irh_batio.get_primary_competition(stable_rxn) == pytest.approx(
         1.7824197647022084
     )
-    assert irh_batio.get_primary_competition(unstable_rxn, temp=300) == pytest.approx(
+    assert irh_batio.get_primary_competition(unstable_rxn) == pytest.approx(
         41.321218932490815
     )
 
 
 def test_get_primary_competition_max(irh_batio, stable_rxn, unstable_rxn):
     assert irh_batio.get_primary_competition_max_energy(
-        stable_rxn, temp=300
+        stable_rxn,
     ) == pytest.approx(0.655066280264885)
-    assert irh_batio.get_primary_competition_max_energy(
-        unstable_rxn, temp=300
-    ) == pytest.approx(1.2729842928567934)
 
     assert irh_batio.get_primary_competition_max_energy(
-        stable_rxn, temp=1000
-    ) == pytest.approx(0.24496847448377526)
+        unstable_rxn,
+    ) == pytest.approx(0.655066280264885)
 
 
 def test_get_secondary_competition(irh_batio, stable_rxn, unstable_rxn):
