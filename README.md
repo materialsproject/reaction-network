@@ -1,6 +1,6 @@
 # ![Reaction Network](docs/images/logo.png)
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/GENESIS-EFRC/reaction-network/testing.yml?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/materialsproject/reaction-network/testing.yml?style=for-the-badge)
 ![Codecov](https://img.shields.io/codecov/c/github/GENESIS-EFRC/reaction-network?style=for-the-badge)
 
 ![PyPI - Python
