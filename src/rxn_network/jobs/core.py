@@ -71,6 +71,7 @@ class GetEntrySetMaker(Maker):
     filter_at_temperature: Optional[int] = None
     include_polymorphs: bool = False
     formulas_to_include: list = field(default_factory=list)
+    custom_entries: list = field(default_factory=list)
     calculate_e_above_hulls: bool = True
     ignore_nist_solids: bool = True
     MP_API_KEY: Optional[str] = None
@@ -124,6 +125,9 @@ class GetEntrySetMaker(Maker):
                     entries = mpr.get_entries(
                         mpids, additional_criteria={"thermo_types": ["GGA_GGA+U"]}
                     )
+
+        if self.custom_entries:
+            entries.extend(self.custom_entries)
 
         entries = process_entries(
             entries,
