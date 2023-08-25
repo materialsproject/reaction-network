@@ -40,11 +40,7 @@ class ReactionNetwork(Network):
 
         Args:
             rxns: Reaction set of reactions
-            enumerators: iterable of enumerators which will be called during the
-                build of the network
             cost_function: the function used to calculate the cost of each reaction edge
-            open_elem: Optional name of an element that is kept open during reaction
-            chempot: Optional associated chemical potential of open element
         """
         super().__init__(rxns=rxns, cost_function=cost_function)
 
