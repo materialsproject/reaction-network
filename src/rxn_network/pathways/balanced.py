@@ -6,9 +6,9 @@ from typing import List, Union
 import numpy as np
 
 from rxn_network.core.composition import Composition
-from rxn_network.core.pathway import Pathway
-from rxn_network.core.reaction import Reaction
+from rxn_network.pathways.base import Pathway
 from rxn_network.pathways.basic import BasicPathway
+from rxn_network.reactions.base import Reaction
 from rxn_network.utils.funcs import limited_powerset
 
 

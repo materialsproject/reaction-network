@@ -11,10 +11,10 @@ from pymatgen.entries import Entry
 from rustworkx import PyDiGraph
 from tqdm import tqdm
 
-from rxn_network.core.cost_function import CostFunction
-from rxn_network.core.network import Network
+from rxn_network.costs.base import CostFunction
 from rxn_network.costs.softplus import Softplus
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
+from rxn_network.network.base import Network
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.pathways.pathway_set import PathwaySet

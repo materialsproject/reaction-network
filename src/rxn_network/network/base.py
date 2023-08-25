@@ -7,9 +7,9 @@ from typing import List
 
 from monty.json import MSONable
 
-from rxn_network.core.cost_function import CostFunction
-from rxn_network.core.pathway import Pathway
+from rxn_network.costs.base import CostFunction
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.pathways.base import Pathway
 from rxn_network.reactions.reaction_set import ReactionSet
 
 
@@ -72,10 +72,7 @@ class Network(MSONable, metaclass=ABCMeta):
         return "-".join(sorted(self.entries.chemsys))
 
 
-
-
 class GraphAdaptor(metaclass=ABCMeta):
-
     @abstractmethod
     def create(self):
         """Create the graph"""

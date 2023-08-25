@@ -14,8 +14,7 @@ from pymatgen.core.composition import Element
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
-from rxn_network.core.cost_function import CostFunction
-from rxn_network.core.solver import Solver
+from rxn_network.costs.base import CostFunction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (
@@ -23,6 +22,7 @@ from rxn_network.enumerators.minimize import (
     MinimizeGrandPotentialEnumerator,
 )
 from rxn_network.pathways.balanced import BalancedPathway
+from rxn_network.pathways.base import Solver
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction

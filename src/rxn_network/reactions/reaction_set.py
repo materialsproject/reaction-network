@@ -16,7 +16,7 @@ from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
-from rxn_network.core.cost_function import CostFunction
+from rxn_network.costs.base import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.utils.funcs import get_logger, grouper
@@ -557,7 +557,9 @@ class ReactionSet(MSONable):
         Returns:
             ReactionSet: A new ReactionSet containing reactions with the recalculated energies.
         """
-        return ReactionSet(self.entries, self.indices, self.coeffs, open_el, chempot, self.all_data)
+        return ReactionSet(
+            self.entries, self.indices, self.coeffs, open_el, chempot, self.all_data
+        )
 
     def set_new_temperature(self, new_temp: float):
         """Returns a new ReactionSet containing the same reactions as this ReactionSet but with
@@ -574,7 +576,9 @@ class ReactionSet(MSONable):
         for rxn in self.get_rxns():
             new_rxns.append(rxn.get_new_temperature(new_temp))
 
-        return ReactionSet.from_rxns(new_rxns, open_elem=self.open_elem, chempot=self.chempot)
+        return ReactionSet.from_rxns(
+            new_rxns, open_elem=self.open_elem, chempot=self.chempot
+        )
 
     def _get_rxns_by_indices(
         self, idxs: Dict[int, np.ndarray]

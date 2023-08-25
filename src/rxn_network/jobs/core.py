@@ -10,7 +10,7 @@ from pymatgen.core.composition import Element
 from tqdm import tqdm
 
 from rxn_network.core.composition import Composition
-from rxn_network.core.cost_function import CostFunction
+from rxn_network.costs.base import CostFunction
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
     PrimaryCompetitionCalculator,

@@ -1,5 +1,5 @@
 """
-Basic interface for a reaction cost Calculator
+Basic interface for a Calculator and CostFunction.
 """
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
@@ -7,18 +7,18 @@ from typing import List
 
 from monty.json import MSONable
 
-from rxn_network.core.reaction import Reaction
+from rxn_network.reactions.base import Reaction
 
 
 class Calculator(MSONable, metaclass=ABCMeta):
     """
-    Base definition for a property calculator
+    Base definition for a property calculator.
     """
 
     @abstractmethod
     def calculate(self, rxn: Reaction) -> float:
         """
-        Evaluates the specified property of a reaction
+        Evaluates the specified property of a reaction.
         """
 
     def decorate(self, rxn: Reaction) -> Reaction:
@@ -80,4 +80,16 @@ class Calculator(MSONable, metaclass=ABCMeta):
         """
         The name of the calculator; used to store the value within the reaction's data
         dictionary
+        """
+
+
+class CostFunction(MSONable, metaclass=ABCMeta):
+    """
+    Base definition for a cost function
+    """
+
+    @abstractmethod
+    def evaluate(self, rxn: Reaction) -> float:
+        """
+        Evaluates the total cost function on a reaction
         """

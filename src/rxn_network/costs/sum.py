@@ -5,7 +5,7 @@ from typing import List, Optional
 
 import numpy as np
 
-from rxn_network.core.cost_function import CostFunction
+from rxn_network.costs.base import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 
 

@@ -7,7 +7,7 @@ from typing import Callable, List
 import numpy as np
 from pymatgen.analysis.phase_diagram import PDEntry
 
-from rxn_network.core.calculator import Calculator
+from rxn_network.costs.base import Calculator
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
