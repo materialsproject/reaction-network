@@ -11,7 +11,7 @@ from pymatgen.analysis.phase_diagram import PhaseDiagram
 from scipy.ndimage.filters import median_filter
 from tqdm import tqdm
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
 
 

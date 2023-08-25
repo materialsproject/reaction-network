@@ -3,7 +3,7 @@
 import pytest
 from jobflow.managers.local import run_locally
 
-from rxn_network.flows.core import NetworkFlowMaker, RetrosynthesisFlowMaker
+from rxn_network.flows.core import NetworkFlowMaker, SynthesisPlanningFlowMaker
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def network_flow_job(filtered_entries):
 @pytest.fixture
 def retrosynthesis_flow_job(filtered_entries):
     """Create retrosynthesis flow job"""
-    return RetrosynthesisFlowMaker().make("YMnO3", entries=filtered_entries)
+    return SynthesisPlanningFlowMaker().make("YMnO3", entries=filtered_entries)
 
 
 def test_network_flow_job_no_paths(network_flow_job, job_store):

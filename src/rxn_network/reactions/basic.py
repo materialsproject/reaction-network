@@ -14,7 +14,7 @@ import numpy as np
 from monty.fractions import gcd_float
 from pymatgen.core.composition import Element
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 from rxn_network.reactions.base import Reaction
 
 TOLERANCE = 1e-6  # Tolerance for determining if a particular component fraction is > 0.

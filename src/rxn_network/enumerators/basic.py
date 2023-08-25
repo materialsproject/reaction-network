@@ -24,7 +24,6 @@ from rxn_network.utils.ray import initialize_ray, to_iterator
 logger = get_logger(__name__)
 
 
-# test
 class BasicEnumerator(Enumerator):
     """
     Enumerator for finding all simple reactions within a set of entries, up to a

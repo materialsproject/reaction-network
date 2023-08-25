@@ -12,7 +12,7 @@ import pandas
 from thermochem.janaf import Janafdb
 from tqdm import tqdm
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 
 JMOL_PER_EV = 96485.307499258
 

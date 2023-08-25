@@ -12,7 +12,7 @@ from pymatgen.analysis.interface_reactions import (
 )
 from pymatgen.core.composition import Element
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.enumerators.utils import get_computed_rxn
 

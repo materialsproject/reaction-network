@@ -86,6 +86,7 @@ def pathway_solver_job(
 
 
 def test_entry_job(entry_job, job_store):
+    """Note: this test will fail if there is no internet connection."""
     output = run_locally(entry_job, store=job_store, ensure_success=True)
 
     doc = output[entry_job.uuid][1].output

@@ -12,7 +12,7 @@ from plotly.graph_objs import Figure
 from pymatgen.core.units import kb
 from scipy.spatial import ConvexHull
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 from rxn_network.reactions.computed import ComputedReaction
 
 

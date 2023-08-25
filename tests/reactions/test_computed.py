@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 from monty.serialization import loadfn
 
-from rxn_network.entries.gibbs import GibbsComputedEntry
 from rxn_network.reactions.computed import ComputedReaction
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"

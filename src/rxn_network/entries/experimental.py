@@ -9,7 +9,7 @@ from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
 from scipy.interpolate import interp1d
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 
 
 class ExperimentalReferenceEntry(ComputedEntry):

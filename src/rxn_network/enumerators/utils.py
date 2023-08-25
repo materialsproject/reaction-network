@@ -7,8 +7,8 @@ from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry, Entry
 
-from rxn_network.core.reaction import Reaction
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.reactions.base import Reaction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 
@@ -27,7 +27,7 @@ def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
 
 
 def get_total_chemsys_str(
-    entries: Iterable[Entry], open_elems: Optional[Iterable[Union[Element]]] = None
+    entries: Iterable[Entry], open_elems: Iterable[Element] | None = None
 ) -> str:
     """
     Returns chemical system string for set of entries, with optional open element.

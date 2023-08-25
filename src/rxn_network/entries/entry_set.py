@@ -23,7 +23,7 @@ from pymatgen.entries.computed_entries import (
 from pymatgen.entries.entry_tools import EntrySet
 from tqdm import tqdm
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 from rxn_network.data import PATH_TO_NIST
 from rxn_network.entries.corrections import CarbonateCorrection
 from rxn_network.entries.experimental import ExperimentalReferenceEntry

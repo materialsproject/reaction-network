@@ -5,7 +5,7 @@ import math
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import ComputedEntry
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 
 
 class InterpolatedEntry(ComputedEntry):

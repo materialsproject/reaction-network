@@ -6,7 +6,7 @@ from pymatgen.core.composition import Composition as PymatgenComposition
 
 class Composition(PymatgenComposition):
     """
-    Modified composition class adapted from pymatgen.
+    Modified Composition class adapted from pymatgen.
 
     The purpose of this is to modify / extend methods for better performance within the
     rxn_network package.

@@ -13,7 +13,7 @@ from numba import jit
 from pymatgen.core.composition import Element
 from tqdm import tqdm
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 from rxn_network.costs.base import CostFunction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
@@ -75,8 +75,6 @@ class PathwaySolver(Solver):
         use_basic_enumerator: bool = True,
         use_minimize_enumerator: bool = False,
         filter_interdependent: bool = True,
-        use_gpu: bool = False,
-        cpu_gpu_ratio: Optional[int] = None,
     ) -> PathwaySet:
         """
 
@@ -107,13 +105,6 @@ class PathwaySolver(Solver):
             raise ValueError(
                 "Net reaction must be balanceable to find all reaction pathways."
             )
-        if use_gpu:
-            try:
-                from rxn_network.pathways.gpu import _balance_path_arrays_gpu
-            except ImportError as e:
-                raise ImportError(
-                    "GPU acceleration requires cupy to be installed."
-                ) from e
 
         if not ray.is_initialized():
             initialize_ray()
@@ -162,10 +153,6 @@ class PathwaySolver(Solver):
         num_cpus = ray.cluster_resources()["CPU"]
         batch_size = self.batch_size or num_cpus - 1
 
-        if use_gpu:
-            num_gpus = ray.cluster_resources()["GPU"]
-            cpu_gpu_ratio = cpu_gpu_ratio or num_cpus // num_gpus
-
         net_coeff_filter = np.argwhere(net_rxn_vector != 0).flatten()
         net_coeff_filter = ray.put(net_coeff_filter)
         cleaned_reactions_ref = ray.put(cleaned_reactions)
@@ -200,7 +187,6 @@ class PathwaySolver(Solver):
         logger.info("Comp matrices done...")
 
         num_cpu_jobs = 0
-        num_gpu_jobs = 0
 
         c_m_mats = []
         c_m_mats_refs = []
@@ -220,18 +206,11 @@ class PathwaySolver(Solver):
                 splits = [comp_matrix]  # only submit one job for small n
 
             for group in splits:
-                print(group.shape)
                 if len(group) == 0:  # catch empty matrices
                     continue
-                if use_gpu and (
-                    num_gpu_jobs <= num_gpus
-                    or num_cpu_jobs / num_gpu_jobs > cpu_gpu_ratio
-                ):
-                    path_balancer = _balance_path_arrays_gpu
-                    num_gpu_jobs += 1
-                else:
-                    path_balancer = _balance_path_arrays_cpu_wrapper
-                    num_cpu_jobs += 1
+
+                path_balancer = _balance_path_arrays_cpu_wrapper
+                num_cpu_jobs += 1
 
                 c_m_mats_refs.append(
                     path_balancer.remote(
@@ -254,7 +233,6 @@ class PathwaySolver(Solver):
                     batch_count += 1
 
                     num_cpu_jobs = 0
-                    num_gpu_jobs = 0
 
                     c_m_mats_refs = []
 

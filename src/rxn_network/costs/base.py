@@ -1,5 +1,5 @@
 """
-Basic interface for a Calculator and CostFunction.
+Basic interface and implementation for a Calculator and CostFunction.
 """
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy

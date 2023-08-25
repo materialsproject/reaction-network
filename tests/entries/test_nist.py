@@ -1,9 +1,9 @@
-""" Tests for NistReferenceEntry. """
+""" Tests for NISTReferenceEntry. """
 import pytest
-from pymatgen.core.composition import Element
+from pymatgen.core.periodic_table import Element
 from pymatgen.entries.computed_entries import ManualEnergyAdjustment
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 from rxn_network.entries.nist import NISTReferenceEntry
 
 

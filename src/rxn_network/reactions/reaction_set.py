@@ -4,7 +4,6 @@ objects which share entries.
 """
 from collections import OrderedDict
 from functools import lru_cache
-from itertools import combinations, groupby
 from typing import Any, Collection, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 import numpy as np
@@ -15,7 +14,7 @@ from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 from rxn_network.costs.base import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction

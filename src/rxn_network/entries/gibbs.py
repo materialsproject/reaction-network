@@ -19,7 +19,7 @@ from pymatgen.entries.computed_entries import (
 )
 from scipy.interpolate import interp1d
 
-from rxn_network.core.composition import Composition
+from rxn_network.composition import Composition
 from rxn_network.data import G_ELEMS
 
 
