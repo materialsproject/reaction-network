@@ -1,6 +1,5 @@
 """
-This module implements two types of basic reaction enumerators, differing in the option
-to consider open entries.
+This module implements two types of basic (combinatorial) reaction enumerators.
 """
 from copy import deepcopy
 from itertools import combinations, product
@@ -316,12 +315,12 @@ class BasicEnumerator(Enumerator):
         self, open_entries
     ) -> Optional[List[Set[ComputedEntry]]]:
         """No open entries for BasicEnumerator, returns None"""
-        _ = (self, open_entries)  # unused_arguments
+        _ = (self, open_entries)  # unused
         return None
 
     @staticmethod
     def _react_function(reactants, products, **kwargs):
-        _ = kwargs  # unused_argument
+        _ = kwargs  # unused
         forward_rxn = ComputedReaction.balance(reactants, products)
         backward_rxn = forward_rxn.reverse()
         return [forward_rxn, backward_rxn]
@@ -329,7 +328,7 @@ class BasicEnumerator(Enumerator):
     @staticmethod
     def _get_rxn_iterable(combos, open_combos):
         """Get all reaction/product combinations"""
-        _ = open_combos  # unused argument
+        _ = open_combos  # unused
 
         return combinations(combos, 2)
 

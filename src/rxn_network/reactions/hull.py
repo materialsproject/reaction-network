@@ -250,7 +250,7 @@ class InterfaceReactionHull(MSONable):
     def get_secondary_competition_max_energy(self, reaction: ComputedReaction):
         """
         Calculates the score for a given reaction. This formula is based on a
-        methodology presented in the following paper: (TBD)
+        methodology presented in the following paper:
 
         Args:
             reaction: Reaction to calculate the competition score for.

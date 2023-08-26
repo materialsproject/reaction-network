@@ -1,7 +1,7 @@
 """ Tests for Softplus """
 import pytest
 
-from rxn_network.costs.softplus import Softplus
+from rxn_network.costs.functions import Softplus
 
 
 @pytest.fixture(scope="module")

@@ -12,7 +12,7 @@ from rustworkx import PyDiGraph
 from tqdm import tqdm
 
 from rxn_network.costs.base import CostFunction
-from rxn_network.costs.softplus import Softplus
+from rxn_network.costs.functions import Softplus
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.network.base import Network
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType

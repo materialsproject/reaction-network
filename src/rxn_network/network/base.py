@@ -1,5 +1,5 @@
 """
-Basic interface for a reaction network.
+Basic interface for a reaction network and its graph.
 """
 import logging
 from abc import ABCMeta, abstractmethod
