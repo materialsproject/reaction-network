@@ -14,7 +14,7 @@ from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.costs.base import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction

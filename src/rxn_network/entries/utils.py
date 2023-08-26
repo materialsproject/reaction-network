@@ -12,7 +12,7 @@ from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.utils.funcs import get_logger
 

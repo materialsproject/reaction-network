@@ -5,7 +5,7 @@ from pymatgen.core.composition import Element
 from pymatgen.entries.mixing_scheme import MaterialsProjectDFTMixingScheme
 from tqdm import tqdm
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.utils.funcs import get_logger
 
 logger = get_logger(__name__)

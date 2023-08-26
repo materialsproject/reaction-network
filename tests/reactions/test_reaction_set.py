@@ -4,7 +4,7 @@ import pytest
 from monty.serialization import loadfn
 from pymatgen.core.composition import Element
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.costs.functions import Softplus
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction

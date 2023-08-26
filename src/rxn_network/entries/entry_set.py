@@ -3,12 +3,11 @@ An entry set class for automatically building GibbsComputedEntry objects. Some o
 code has been adapted from the EntrySet class in pymatgen.
 """
 import collections
-import math
-import warnings
 from copy import deepcopy
 from functools import cached_property
 from typing import Dict, Iterable, List, Optional, Set, Union
 
+import numpy as np
 from monty.dev import deprecated
 from monty.json import MontyDecoder, MSONable
 from monty.serialization import loadfn
@@ -23,7 +22,7 @@ from pymatgen.entries.computed_entries import (
 from pymatgen.entries.entry_tools import EntrySet
 from tqdm import tqdm
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.data import PATH_TO_NIST
 from rxn_network.entries.corrections import CarbonateCorrection
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
@@ -36,16 +35,17 @@ from rxn_network.utils.funcs import get_logger
 
 logger = get_logger(__name__)
 
-
+#  prefer computed data for solids with high melting points (T >= 1500 ºC)
 IGNORE_NIST_SOLIDS = loadfn(PATH_TO_NIST / "ignore_solids.json")
 
 
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     """
     This object is based on pymatgen's EntrySet class and includes factory methods for
-    constructing GibbsComputedEntry objects from zero-temperature ComputedStructureEntry
-    objects. It also offers convenient methods for acquiring entries from the entry set,
-    whether that be using composition, stability, chemical system, etc.
+    constructing GibbsComputedEntry objects from "zero-temperature"
+    ComputedStructureEntry objects. It also offers convenient methods for acquiring
+    entries from the entry set, whether that be using composition, stability, chemical
+    system, etc.
     """
 
     def __init__(
@@ -61,10 +61,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Args:
             entries: A collection of entry objects that will make up the entry set.
             calculate_e_above_hulls: Whether to pre-calculate the energy above hull for
-                each entry and store that in that entry's data.
+                each entry and store that in that entry's data. Defaults to False.
             minimize_object_size: Whether to reduce the size of the entry set by
                 removing metadata from each entry. This may be useful when working with
-                entry sets (or ComputedReaction sets).
+                large entry sets (or ComputedReaction sets). Defaults to False.
         """
         self.entries = set(entries)
         self.calculate_e_above_hulls = calculate_e_above_hulls
@@ -84,12 +84,12 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     def __iter__(self):
         return self.entries.__iter__()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.entries)
 
-    def add(self, entry: Union[GibbsComputedEntry, ExperimentalReferenceEntry]):
+    def add(self, entry: Union[GibbsComputedEntry, ExperimentalReferenceEntry]) -> None:
         """
-        Add an entry to the set.
+        Add an entry to the set in place.
 
         Args:
             entry: An entry object.
@@ -99,9 +99,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     def update(
         self, entries: Iterable[Union[GibbsComputedEntry, ExperimentalReferenceEntry]]
-    ):
+    ) -> None:
         """
-        Add an iterable of entries to the set.
+        Add an iterable of entries to the set in place.
 
         Args:
             entry: An iterable of entry objects.
@@ -109,9 +109,11 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         self.entries.update(entries)
         self._clear_cache()
 
-    def discard(self, entry: Union[GibbsComputedEntry, ExperimentalReferenceEntry]):
+    def discard(
+        self, entry: Union[GibbsComputedEntry, ExperimentalReferenceEntry]
+    ) -> None:
         """
-        Discard an entry.
+        Discard an entry in place.
 
         :param element: Entry
         """
@@ -119,7 +121,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         self._clear_cache()
 
     @cached_property
-    def pd_dict(self):
+    def pd_dict(self) -> dict:
         """
         Returns a dictionary of phase diagrams, keyed by the chemical system. This is
         acquired using the helper method expand_pd() and represents one of the simplest
@@ -127,7 +129,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         return expand_pd(self.entries)
 
-    def get_subset_in_chemsys(self, chemsys: List[str]) -> "GibbsEntrySet":
+    def get_subset_in_chemsys(self, chemsys: List[str] | str) -> "GibbsEntrySet":
         """
         Returns a GibbsEntrySet containing only the set of entries belonging to
         a particular chemical system (including subsystems). For example, if the entries
@@ -139,6 +141,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         Returns: GibbsEntrySet
         """
+        if isinstance(chemsys, str):
+            chemsys = chemsys.split("-")
         chem_sys = set(chemsys)
         if not chem_sys.issubset(self.chemsys):
             raise ValueError(f"{chem_sys} is not a subset of {self.chemsys}")
@@ -404,14 +408,17 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             pd: Phase Diagram object (pymatgen)
             temperature: Temperature [K] for determining Gibbs Free Energy of
                 formation, dGf(T)
-            include_nist_data: Whether to include NIST data in the entry set.
-            include_freed_data: Whether to include Freed data in the entry set.
+            include_nist_data: Whether to include NIST data in the entry set. Defaults
+                to True.
+            include_freed_data: Whether to include Freed data in the entry set. Defaults
+                to False. Use at your own risk!
             apply_carbonate_correction: Whether to apply the fit energy
-                correction for carbonates.
+                correction for carbonates. Defaults to True.
             ignore_nist_solids: Whether to ignore NIST data for the solids specified in
-                the "data/nist/ignore_solids.json" file.
+                the "data/nist/ignore_solids.json" file; these all have melting points
+                Tm >= 1500 ºC. Defaults to Ture.
             minimize_obj_size: Whether to minimize the size of the object by removing
-                unnecessary attributes from the entries.
+                unnecessary attributes from the entries. Defaults to False.
 
         Returns:
             A GibbsEntrySet containing a collection of GibbsComputedEntry and
@@ -489,23 +496,28 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     ) -> "GibbsEntrySet":
         """
         Constructor method for initializing GibbsEntrySet from T = 0 K
-        ComputedStructureEntry objects, as acquired from a thermochemical
-        database e.g. The Materials Project. Automatically expands the phase
-        diagram for large chemical systems (10 or more elements) to avoid limitations
-        of Qhull.
+        ComputedStructureEntry objects, as acquired from a thermochemical database e.g.
+        The Materials Project.
+
+        Automatically expands the phase diagram for large chemical systems (10 or more
+        elements) to avoid limitations of Qhull.
 
         Args:
-            entries: List of ComputedStructureEntry objects, as downloaded from The
+            entries: Iterable of ComputedStructureEntry objects, as downloaded from The
                 Materials Project API.
-            temperature: Temperature for estimating Gibbs free energy of formation [K]
-            include_nist_data: Whether to include NIST data in the entry set.
-            include_freed_data: Whether to include Freed data in the entry set.
+            temperature: Temperature [K] for determining Gibbs Free Energy of
+                formation, dGf(T)
+            include_nist_data: Whether to include NIST data in the entry set. Defaults
+                to True.
+            include_freed_data: Whether to include Freed data in the entry set. Defaults
+                to False. Use at your own risk!
             apply_carbonate_correction: Whether to apply the fit energy
-                correction for carbonates.
+                correction for carbonates. Defaults to True.
             ignore_nist_solids: Whether to ignore NIST data for the solids specified in
-                the "data/nist/ignore_solids.json" file.
+                the "data/nist/ignore_solids.json" file; these all have melting points
+                Tm >= 1500 ºC. Defaults to Ture.
             minimize_obj_size: Whether to minimize the size of the object by removing
-                unnecessary attributes from the entries.
+                unnecessary attributes from the entries. Defaults to False.
 
         Returns:
             A GibbsEntrySet containing a collection of GibbsComputedEntry and
@@ -541,33 +553,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             new_entries.update(gibbs_set)
 
         return cls(list(new_entries))
-
-    @classmethod
-    def from_entries(
-        cls,
-        entries: Iterable[ComputedStructureEntry],
-        temperature: float,
-        include_nist_data=True,
-        include_freed_data=False,
-        apply_carbonate_correction=True,
-        minimize_obj_size=False,
-    ) -> "GibbsEntrySet":
-        """
-        This method is deprecated. Use from_computed_entries instead.
-        """
-        warnings.warn(
-            "This method is deprecated. Use from_computed_entries instead.",
-            category=FutureWarning,
-        )
-
-        return cls.from_computed_entries(
-            entries,
-            temperature,
-            include_nist_data,
-            include_freed_data,
-            apply_carbonate_correction,
-            minimize_obj_size,
-        )
 
     @cached_property
     def entries_list(self) -> List[ComputedEntry]:
@@ -652,6 +637,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     def _get_carbonate_correction(entry):
         """
         Helper method for determining the carbonate correction for an entry.
+
         WARNING: Correction has been fit only to MP-derived entries (i.e., entries run
         with MP input sets). Please check that the correction is valid for your entry.
         """
@@ -675,13 +661,13 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         if num_c == 0 or num_o == 0:
             return None
 
-        if not math.isclose(num_o / num_c, 3):
+        if not np.isclose(num_o / num_c, 3):
             return None
 
         return CarbonateCorrection(num_c)
 
     @staticmethod
-    def get_adjusted_entry(entry, adjustment):
+    def get_adjusted_entry(entry: GibbsComputedEntry, adjustment) -> GibbsComputedEntry:
         entry_dict = entry.as_dict()
         original_entry = entry_dict.get("entry", None)
 
@@ -697,7 +683,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     def _clear_cache(self):
         """
-        Clears cached properties.
+        Clears all cached properties: 1) entries_list, 2) pd_dict, and 3)
+        min_entries_by_formula.
         """
         try:
             del self.entries_list

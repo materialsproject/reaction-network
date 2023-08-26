@@ -1,6 +1,4 @@
-"""
-A calculator class for determining chemical potential distance of reactions
-"""
+"""A calculator class for determining chemical potential distance of reactions."""
 from itertools import chain, combinations, product
 from typing import Callable, Iterable, List
 
@@ -14,11 +12,10 @@ from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 
 class ChempotDistanceCalculator(Calculator):
-    """
-    Calculator for determining the aggregated "chemical potential distance" for a reaction,
-    in units of eV/atom. This is a reaction selectivity metric based on an aggregation
-    function applied to the chemical potential differences of reactant-product and
-    product-product interfaces in a reaction.
+    """Calculator for determining the aggregated "chemical potential distance" for a
+    reaction, in units of eV/atom. This is a reaction selectivity metric based on an
+    aggregation function applied to the chemical potential differences of reactant-
+    product and product-product interfaces in a reaction.
 
     If you use this cost metric, please cite the following work:
 
@@ -27,7 +24,6 @@ class ChempotDistanceCalculator(Calculator):
         Manganese Oxide Synthesis via Local Chemical Potentials in Hyperdimensional Phase
         Space. J. Am. Chem. Soc. 2021, 143 (37), 15185-15194.
         https://doi.org/10.1021/jacs.1c06229.
-
     """
 
     def __init__(
@@ -40,9 +36,10 @@ class ChempotDistanceCalculator(Calculator):
         Args:
             cpd: the chemical potential diagram for the phase space in which the
                 reaction(s) exist
-            mu_func: the function (or string name of the function) used to aggregate the interfacial
-                chemical potential distances into a single value describing the whole
-                reaction. Current options are 1) max, 2) mean, and 3) sum (default).
+            mu_func: the function (or string name of the function) used to aggregate the
+                interfacial chemical potential distances into a single value describing
+                the whole reaction. Current options are 1) max, 2) mean, and 3) sum
+                (default).
             name: the data dictionary key with which to store the calculated value.
                 Defaults to "chempot_distance".
         """
@@ -66,12 +63,11 @@ class ChempotDistanceCalculator(Calculator):
             self._open_elems = set(cpd.entries[0].chempots.keys())
 
     def calculate(self, rxn: ComputedReaction) -> float:
-        """
-        Calculates the aggregate chemical potential distance in eV/atom. The mu_func
+        """Calculates the aggregate chemical potential distance in eV/atom. The mu_func
         parameter determines how the individual pairwise interface distances are
-        aggregated into a single value describing the overall reaction. When
-        mu_func = "sum" (i.e., the default setting), the total chemical potential
-        distance is returned.
+        aggregated into a single value describing the overall reaction. When mu_func =
+        "sum" (i.e., the default setting), the total chemical potential distance is
+        returned.
 
         Args:
             rxn: the ComputedReaction object
@@ -117,8 +113,7 @@ class ChempotDistanceCalculator(Calculator):
         name: str = "chempot_distance",
         **kwargs,
     ) -> "ChempotDistanceCalculator":
-        """
-        Convenience constructor which first builds the ChemicalPotentialDiagram
+        """Convenience constructor which first builds the ChemicalPotentialDiagram
         object from a list of entry objects.
 
         Args:
@@ -139,19 +134,16 @@ class ChempotDistanceCalculator(Calculator):
 
 
 class PrimaryCompetitionCalculator(Calculator):
-    """
-    Calculator for determining the primary competition, C_1, for a reaction
-    (units: eV/atom).
+    """Calculator for determining the primary competition, C_1, for a reaction (units:
+    eV/atom).
 
-    If you use this selectivity metric in your work, please cite the
-    following work:
+    If you use this selectivity metric in your work, please cite the following work:
 
-        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A. A.;
-        Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.; Ceder,
-        G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
+        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
+        A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
+        Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
         Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
         August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
-
     """
 
     def __init__(
@@ -170,8 +162,7 @@ class PrimaryCompetitionCalculator(Calculator):
         self.name = name
 
     def calculate(self, rxn: ComputedReaction) -> float:
-        """
-        Calculates the competitiveness score for a given reaction by enumerating
+        """Calculates the competitiveness score for a given reaction by enumerating
         competing reactions, evaluating their cost with the supplied cost function, and
         then using the c-score formula, i.e. the _get_c_score() method, to determine the
         competitiveness score.
@@ -186,19 +177,16 @@ class PrimaryCompetitionCalculator(Calculator):
 
 
 class SecondaryCompetitionCalculator(Calculator):
-    """
-    Calculator for determining the secondary competition, C_2, for a reaction
-    (in eV/atom).
+    """Calculator for determining the secondary competition, C_2, for a reaction (in
+    eV/atom).
 
-    If you use this selectivity metric in your work, please cite the
-    following work:
+    If you use this selectivity metric in your work, please cite the following work:
 
-        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A. A.;
-        Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.; Ceder,
-        G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
+        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
+        A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
+        Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
         Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
         August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
-
     """
 
     def __init__(
@@ -217,8 +205,7 @@ class SecondaryCompetitionCalculator(Calculator):
         self.name = name
 
     def calculate(self, rxn: ComputedReaction) -> float:
-        """
-        Calculates the secondary competition per its implementation in the
+        """Calculates the secondary competition per its implementation in the
         InterfaceReactionHull class.
 
         Args:
@@ -232,8 +219,9 @@ class SecondaryCompetitionCalculator(Calculator):
 
 class SecondaryCompetitionWithEhullCalculator(Calculator):
     """
-    WARNING: this is an alternative calculator for secondary competition (C_2) that includes the
-    energy above hull of the target reaciton. It should only be used for testing purposes.
+    WARNING: this is an alternative calculator for secondary competition (C_2) that
+    includes the energy above hull of the target reaciton. It should only be used for
+    testing purposes.
     """
 
     def __init__(
@@ -252,9 +240,8 @@ class SecondaryCompetitionWithEhullCalculator(Calculator):
         self.name = name
 
     def calculate(self, rxn: ComputedReaction) -> float:
-        """
-        Calculates the secondary competition with e_hull per its implementation in the
-        InterfaceReactionHull class.
+        """Calculates the secondary competition with e_hull per its implementation in
+        the InterfaceReactionHull class.
 
         Args:
             rxn: the ComputedReaction object to be evaluated
@@ -288,8 +275,7 @@ class SecondaryCompetitionMaxCalculator(Calculator):
         self.name = name
 
     def calculate(self, rxn: ComputedReaction) -> float:
-        """
-        Calculates the secondary competition with max energies.
+        """Calculates the secondary competition with max energies.
 
         Args:
             rxn: the ComputedReaction object to be evaluated
@@ -323,8 +309,7 @@ class SecondaryCompetitionAreaCalculator(Calculator):
         self.name = name
 
     def calculate(self, rxn: ComputedReaction) -> float:
-        """
-        Calculates an area for secondary competition.
+        """Calculates an area for secondary competition.
 
         Args:
             rxn: the ComputedReaction object to be evaluated

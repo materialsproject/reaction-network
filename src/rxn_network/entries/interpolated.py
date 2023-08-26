@@ -1,11 +1,10 @@
 """Class for intepolated entries"""
 
-import math
-
+import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import ComputedEntry
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 
 
 class InterpolatedEntry(ComputedEntry):
@@ -99,7 +98,7 @@ class InterpolatedEntry(ComputedEntry):
         if not type(other) is type(self):
             return False
 
-        if not math.isclose(self.energy, other.energy):
+        if not np.isclose(self.energy, other.energy):
             return False
 
         if getattr(self, "entry_id", None) and getattr(other, "entry_id", None):

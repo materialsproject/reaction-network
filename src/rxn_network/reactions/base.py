@@ -8,7 +8,7 @@ import numpy as np
 from monty.json import MSONable
 from pymatgen.core.composition import Element
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 
 
 class Reaction(MSONable, metaclass=ABCMeta):

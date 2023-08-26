@@ -6,7 +6,7 @@ from typing import Collection, List, Optional
 from jobflow import Flow, Maker
 from pymatgen.core.composition import Element
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (

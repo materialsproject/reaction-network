@@ -2,7 +2,6 @@
 A reaction class that builds reactions based on ComputedEntry objects and provides
 information about reaction thermodynamics.
 """
-import math
 from functools import cached_property
 from typing import Dict, List, Optional, Union
 
@@ -11,7 +10,7 @@ from pymatgen.core.composition import Element
 from pymatgen.entries.computed_entries import ComputedEntry
 from uncertainties import ufloat
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.reactions.basic import BasicReaction
 
 
@@ -260,6 +259,6 @@ class ComputedReaction(BasicReaction):
         is_equal = BasicReaction.__eq__(self, other)
 
         if is_equal:
-            is_equal = math.isclose(self.energy_per_atom, other.energy_per_atom)
+            is_equal = np.isclose(self.energy_per_atom, other.energy_per_atom)
 
         return is_equal

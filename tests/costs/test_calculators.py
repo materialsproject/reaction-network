@@ -149,7 +149,6 @@ def test_cpd_calculator_from_entries(entries, mu_func, rxn):
 def test_primary_competition_calculate(
     primary_competition_calculator, stable_rxn, unstable_rxn, irh_batio
 ):
-
     assert primary_competition_calculator.calculate(stable_rxn) == pytest.approx(
         irh_batio.get_primary_competition(stable_rxn)
     )

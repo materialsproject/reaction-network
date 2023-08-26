@@ -12,10 +12,10 @@ from rxn_network.reactions.computed import ComputedReaction
 class Softplus(CostFunction):
     """
     The softplus cost function is a smoothed version of the Rectified Linear Unit (ReLU)
-    function commonly used in neural networks. It has the property that the
-    output goes to 0 as the input goes to negative infinity, but the output
-    approaches a linear scaling as the input goes to positive infinity. This is an
-    especially useful mapping for determining a cost ranking of a reaction.
+    function commonly used in neural networks. It has the property that the output goes
+    to 0 as the input goes to negative infinity, but the output approaches a linear
+    scaling as the input goes to positive infinity. This is an especially useful mapping
+    for determining a cost ranking of a reaction.
     """
 
     def __init__(

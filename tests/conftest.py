@@ -5,7 +5,7 @@ from jobflow.core.store import JobStore
 from maggma.stores import MemoryStore
 from monty.serialization import loadfn
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.entries.interpolated import InterpolatedEntry
 from rxn_network.reactions.hull import InterfaceReactionHull
@@ -22,7 +22,7 @@ def mp_entries():
 
 @pytest.fixture(scope="session")
 def gibbs_entries():
-    ents = GibbsEntrySet.from_entries(
+    ents = GibbsEntrySet.from_computed_entries(
         ENTRIES_LIST,
         temperature=1000,
     )

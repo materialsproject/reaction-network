@@ -5,7 +5,7 @@ test module for pymatgen.analysis.reaction_calculator
 import pytest
 from pymatgen.core.composition import Element
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.reactions.basic import BasicReaction
 
 

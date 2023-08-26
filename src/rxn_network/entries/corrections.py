@@ -11,7 +11,11 @@ CARBONATE_CORRECTION = (
 
 class CarbonateCorrection(CompositionEnergyAdjustment):
     """
-    Correct carbonate energies to obtain the right formation energies.
+    Supplies a carbonate correction due to systematic GGA errors in carbonate formation
+    energies.
+
+    See provided jupyter NB for fitting of the correction:
+    data/fit_carbonate_correction.ipynb
     """
 
     def __init__(self, num_ions, carbonate_correction=CARBONATE_CORRECTION):

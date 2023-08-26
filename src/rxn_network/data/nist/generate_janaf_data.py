@@ -1,5 +1,5 @@
 """ 
-Script for generating file: data/nist/compounds.json.gz
+Script for generating file: data/nist/compounds.json.gz. Requires thermochem package. 
 """
 
 import gzip
@@ -12,7 +12,7 @@ import pandas
 from thermochem.janaf import Janafdb
 from tqdm import tqdm
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 
 JMOL_PER_EV = 96485.307499258
 

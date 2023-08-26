@@ -8,12 +8,12 @@ from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
 from rxn_network.entries.entry_set import GibbsEntrySet
 
 
-@pytest.mark.parametrize(
-    "chemsys", [["Mn", "O", "Y"], ["Mn", "O"], ["Y", "O"], ["O"], ["Mn", "Y"]]
-)
+@pytest.mark.parametrize("chemsys", [["Mn", "O", "Y"], "Mn-O", ["Y", "O"], "O", ["O"]])
 def test_get_subset_in_chemsys(chemsys, gibbs_entries):
     subset = gibbs_entries.get_subset_in_chemsys(chemsys)
-    desired_chemsys = set(sorted(chemsys))
+    if isinstance(chemsys, str):
+        chemsys = chemsys.split("-")
+    desired_chemsys = set(chemsys)
     assert subset.chemsys == desired_chemsys
 
     for e in gibbs_entries:
@@ -106,7 +106,6 @@ def test_get_stabilized_entry(gibbs_entries):
 
 
 def test_get_adjusted_entry(interpolated_entry):
-
     entry_copy = deepcopy(interpolated_entry)
     entry_copy.energy_adjustments.append(ConstantEnergyAdjustment(0.1))
 

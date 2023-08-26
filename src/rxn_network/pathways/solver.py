@@ -13,7 +13,7 @@ from numba import jit
 from pymatgen.core.composition import Element
 from tqdm import tqdm
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.costs.base import CostFunction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
@@ -257,7 +257,7 @@ class PathwaySolver(Solver):
                     *[
                         (entries[idx], c)
                         for idx, c in enumerate(rxn_mat)
-                        if not math.isclose(c, 0.0)
+                        if not np.isclose(c, 0.0)
                     ]
                 )
 

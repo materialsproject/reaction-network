@@ -19,7 +19,7 @@ from pymatgen.entries.computed_entries import (
 )
 from scipy.interpolate import interp1d
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.data import G_ELEMS
 
 
@@ -339,10 +339,10 @@ class GibbsComputedEntry(ComputedEntry):
         if not type(other) is type(self):
             return False
 
-        if not math.isclose(self.temperature, other.temperature):
+        if not np.isclose(self.temperature, other.temperature):
             return False
 
-        if not math.isclose(self.energy, other.energy):
+        if not np.isclose(self.energy, other.energy):
             return False
 
         if getattr(self, "entry_id", None) and getattr(other, "entry_id", None):

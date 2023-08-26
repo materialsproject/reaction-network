@@ -104,6 +104,9 @@ known_first_party = "rxn_network"
 [tool.pytest]
 addopts = "--durations=10"
 
+[tool.pytest.ini_options]
+addopts = "-n auto"
+
 [tool.setuptools.package-data]
 rxn_network = ["py.typed"]
 

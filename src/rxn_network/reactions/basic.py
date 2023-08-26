@@ -3,7 +3,6 @@ This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.
 """
 
-import math
 import re
 from copy import deepcopy
 from functools import cached_property
@@ -14,7 +13,7 @@ import numpy as np
 from monty.fractions import gcd_float
 from pymatgen.core.composition import Element
 
-from rxn_network.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.reactions.base import Reaction
 
 TOLERANCE = 1e-6  # Tolerance for determining if a particular component fraction is > 0.
@@ -396,7 +395,7 @@ class BasicReaction(Reaction):
         if self.balanced is False:  # if not balanced, can not check coefficients
             return True
         return all(
-            math.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
+            np.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
             for c in self.reactant_coeffs
         )
 
