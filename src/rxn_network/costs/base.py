@@ -1,13 +1,16 @@
 """
 Basic interface and implementation for a Calculator and CostFunction.
 """
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
-from typing import List
+from typing import TYPE_CHECKING
 
 from monty.json import MSONable
 
-from rxn_network.reactions.base import Reaction
+if TYPE_CHECKING:
+    from rxn_network.reactions.base import Reaction
 
 
 class Calculator(MSONable, metaclass=ABCMeta):
@@ -21,7 +24,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
         Evaluates a particular property of a reaction relevant to its cost ranking.
         """
 
-    def calculate_many(self, rxns: List[Reaction]) -> List[float]:
+    def calculate_many(self, rxns: list[Reaction]) -> list[float]:
         """
         Convenience method for performing calculate() on a list of reactions.
 
@@ -56,7 +59,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
         new_rxn.data[self.name] = self.calculate(new_rxn)
         return new_rxn
 
-    def decorate_many(self, rxns: List[Reaction]) -> List[Reaction]:
+    def decorate_many(self, rxns: list[Reaction]) -> list[Reaction]:
         """
         Convenience method for performing decorate() on a list of reactions.
 

@@ -25,9 +25,9 @@ logger = get_logger(__name__)
 
 class BasicEnumerator(Enumerator):
     """
-    Enumerator for finding all simple reactions within a set of entries, up to a
-    maximum reactant/product cardinality (n); i.e., how many phases on either side of
-    the reaction. This approach does not explicitly take into account thermodynamic
+    Enumerator for finding all simple reactions within a set of entries, up to a maximum
+    reactant/product cardinality (n); i.e., how many phases on either side of the
+    reaction. This approach does not explicitly take into account thermodynamic
     stability (i.e. phase diagram). This allows for enumeration of reactions where the
     products may not be stable with respect to each other.
     """
@@ -64,9 +64,9 @@ class BasicEnumerator(Enumerator):
             n: Maximum reactant/product cardinality; i.e., largest possible number of
                 entries on either side of the reaction. Defaults to 2.
             exclusive_precursors: Whether to consider only reactions that have reactants
-                which are a subset of the provided list of precursors. In other
-                words, if True, this only identifies reactions with reactants selected
-                from the precursors argument. Defaults to True.
+                which are a subset of the provided list of precursors. In other words,
+                if True, this only identifies reactions with reactants selected from the
+                precursors argument. Defaults to True.
             exclusive_targets: Whether to consider only reactions that make the
                 form products that are a subset of the provided list of targets. If
                 False, this only identifies reactions with no unspecified byproducts.

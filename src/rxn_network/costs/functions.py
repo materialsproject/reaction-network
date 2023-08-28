@@ -1,12 +1,16 @@
 """
 Implementation of cost functions used in the package (e.g., Softplus, WeightedSum).
 """
-from typing import List, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from rxn_network.costs.base import CostFunction
-from rxn_network.reactions.computed import ComputedReaction
+
+if TYPE_CHECKING:
+    from rxn_network.reactions.computed import ComputedReaction
 
 
 class Softplus(CostFunction):
@@ -21,8 +25,8 @@ class Softplus(CostFunction):
     def __init__(
         self,
         temp: float = 300,
-        params: Optional[List[str]] = None,
-        weights: Optional[List[float]] = None,
+        params: list[str] | None = None,
+        weights: list[float] | None = None,
     ):
         """
         Args:
@@ -89,8 +93,8 @@ class WeightedSum(CostFunction):
 
     def __init__(
         self,
-        params: Optional[List[str]] = None,
-        weights: Optional[List[float]] = None,
+        params: list[str] | None = None,
+        weights: list[float] | None = None,
     ):
         """
         Args:

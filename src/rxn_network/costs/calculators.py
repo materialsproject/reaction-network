@@ -1,14 +1,19 @@
 """A calculator class for determining chemical potential distance of reactions."""
+from __future__ import annotations
+
 from itertools import chain, combinations, product
-from typing import Callable, Iterable, List
+from typing import TYPE_CHECKING, Callable, Iterable
 
 import numpy as np
-from pymatgen.analysis.phase_diagram import PDEntry
 
 from rxn_network.costs.base import Calculator
-from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.reactions.hull import InterfaceReactionHull
-from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
+
+if TYPE_CHECKING:
+    from pymatgen.analysis.phase_diagram import PDEntry
+
+    from rxn_network.reactions.computed import ComputedReaction
+    from rxn_network.reactions.hull import InterfaceReactionHull
+    from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 
 class ChempotDistanceCalculator(Calculator):
@@ -108,7 +113,7 @@ class ChempotDistanceCalculator(Calculator):
     @classmethod
     def from_entries(
         cls,
-        entries: List[PDEntry],
+        entries: list[PDEntry],
         mu_func: Callable[[Iterable[float]], float] | str = "sum",
         name: str = "chempot_distance",
         **kwargs,
@@ -149,7 +154,7 @@ class PrimaryCompetitionCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        name="primary_competition",
+        name: str = "primary_competition",
     ):
         """
         Args:
@@ -192,7 +197,7 @@ class SecondaryCompetitionCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        name="secondary_competition",
+        name: str = "secondary_competition",
     ):
         """
         Args:
@@ -227,7 +232,7 @@ class SecondaryCompetitionWithEhullCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        name="secondary_competition_with_ehull",
+        name: str = "secondary_competition_with_ehull",
     ):
         """
         Args:
@@ -262,7 +267,7 @@ class SecondaryCompetitionMaxCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        name="secondary_competition_max",
+        name: str = "secondary_competition_max",
     ):
         """
         Args:
@@ -296,7 +301,7 @@ class SecondaryCompetitionAreaCalculator(Calculator):
     def __init__(
         self,
         irh: InterfaceReactionHull,
-        name="secondary_competition_area",
+        name: str = "secondary_competition_area",
     ):
         """
         Args:

@@ -18,13 +18,15 @@ class CarbonateCorrection(CompositionEnergyAdjustment):
     data/fit_carbonate_correction.ipynb
     """
 
-    def __init__(self, num_ions, carbonate_correction=CARBONATE_CORRECTION):
+    def __init__(
+        self, num_ions: int, carbonate_correction: float = CARBONATE_CORRECTION
+    ):
         """
         Initalizes a carbonate correction object
 
         Args:
-            num_ions (int): Number of carbonate ions in the composition object
-            carbonate_correction (float): Energy correction per atom per (CO3)2- anion
+            num_ions: Number of carbonate ions in the composition object
+            carbonate_correction: Energy correction, eV per (CO3)2- anion
         """
         self._num_ions = num_ions
         self._carbonate_correction = carbonate_correction
@@ -39,14 +41,14 @@ class CarbonateCorrection(CompositionEnergyAdjustment):
         )
 
     @property
-    def num_ions(self):
+    def num_ions(self) -> int:
         """
         Number of carbonate ions ion the composition object
         """
         return self._num_ions
 
     @property
-    def carbonate_correction(self):
+    def carbonate_correction(self) -> float:
         """
         Energy correction for carbonate ion, eV per (CO3)2- anion
         """

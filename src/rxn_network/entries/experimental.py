@@ -1,8 +1,10 @@
 """
 Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
 """
+from __future__ import annotations
+
 import hashlib
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING
 
 from monty.json import MontyDecoder
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
@@ -10,6 +12,9 @@ from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
 from scipy.interpolate import interp1d
 
 from rxn_network.core import Composition
+
+if TYPE_CHECKING:
+    from pymatgen.core.periodic_table import Element
 
 
 class ExperimentalReferenceEntry(ComputedEntry):
@@ -19,23 +24,23 @@ class ExperimentalReferenceEntry(ComputedEntry):
     formation, dGf(T) from tabulated reference values.
     """
 
-    REFERENCES: Dict = {}
+    REFERENCES: dict = {}
 
     def __init__(
         self,
         composition: Composition,
         temperature: float,
-        energy_adjustments: Optional[List[EnergyAdjustment]] = None,
-        data: Optional[dict] = None,
+        energy_adjustments: list[EnergyAdjustment] | None = None,
+        data: dict | None = None,
     ):
         """
         Args:
-            composition: Composition object (pymatgen). temperature: Temperature in
-            Kelvin. If temperature is not selected within
-                the range of the reference data (see self._validate_temperature), then
+            composition: Composition object
+            temperature: Temperature in Kelvin. If temperature is not selected within
+                the range of the reference  data (see self._validate_temperature), then
                 this will raise an error.
-            energy_adjustments: A list of EnergyAdjustments to apply to the entry. data:
-            Optional dictionary containing entry data
+            energy_adjustments: A list of EnergyAdjustments to apply to the entry.
+            data: Optional dictionary containing entry data
         """
         formula = composition.reduced_formula
         entry_id = f"{self.__class__.__name__}-{formula}_{temperature}"
@@ -74,7 +79,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
         new_entry = self.from_dict(new_entry_dict)
         return new_entry
 
-    def to_grand_entry(self, chempots):
+    def to_grand_entry(self, chempots: dict[Element, float]):
         """
         Convert an ExperimentalReferenceEntry to a GrandComputedEntry.
 
@@ -170,14 +175,14 @@ class ExperimentalReferenceEntry(ComputedEntry):
         )
         return entry
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         output = [
             f"{self.__class__.__name__} | {self.composition.reduced_formula}",
             f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
         ]
         return "\n".join(output)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
             return (
                 (self.composition.reduced_formula == other.composition.reduced_formula)
@@ -186,7 +191,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
             )
         return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         data_md5 = hashlib.md5(  # nosec
             f"{self.__class__.__name__}{self.composition}_{self.temperature}".encode(
                 "utf-8"

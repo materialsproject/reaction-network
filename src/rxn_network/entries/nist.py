@@ -2,13 +2,17 @@
 Implements an Entry that looks up pre-tabulated Gibbs free energies from the NIST-JANAF
 tables.
 """
-from typing import Dict, List, Optional
+from __future__ import annotations
 
-from pymatgen.entries.computed_entries import EnergyAdjustment
+from typing import TYPE_CHECKING
 
-from rxn_network.core import Composition
 from rxn_network.data import PATH_TO_NIST, load_experimental_data
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
+
+if TYPE_CHECKING:
+    from pymatgen.entries.computed_entries import EnergyAdjustment
+
+    from rxn_network.core import Composition
 
 G_COMPOUNDS = load_experimental_data(PATH_TO_NIST / "compounds.json.gz")
 
@@ -31,8 +35,8 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
         self,
         composition: Composition,
         temperature: float,
-        energy_adjustments: Optional[List[EnergyAdjustment]] = None,
-        data: Optional[Dict] = None,
+        energy_adjustments: list[EnergyAdjustment] | None = None,
+        data: dict | None = None,
     ):
         """
         Args:
@@ -40,7 +44,8 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
             temperature: Temperature in Kelvin. If temperature is not selected from
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
-            data: Optional dictionary containing entry data
+            energy_adjustments: A list of EnergyAdjustments to apply to the entry.
+            data: Optional dictionary containing entry data.
         """
         super().__init__(
             composition=composition,
