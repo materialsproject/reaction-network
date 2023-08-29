@@ -90,14 +90,14 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             targets=targets,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
-            filter_by_chemsys=filter_by_chemsys,
-            max_num_constraints=max_num_constraints,
-            remove_unbalanced=remove_unbalanced,
-            remove_changed=remove_changed,
-            quiet=quiet,
             filter_duplicates=filter_duplicates,
+            filter_by_chemsys=filter_by_chemsys,
             chunk_size=chunk_size,
             max_num_jobs=max_num_jobs,
+            remove_unbalanced=remove_unbalanced,
+            remove_changed=remove_changed,
+            max_num_constraints=max_num_constraints,
+            quiet=quiet,
         )
         self._build_pd = True
 
@@ -220,15 +220,14 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             targets=targets,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
-            filter_by_chemsys=filter_by_chemsys,
-            max_num_constraints=max_num_constraints,
-            remove_unbalanced=remove_unbalanced,
-            remove_changed=remove_changed,
-            calculate_e_above_hulls=calculate_e_above_hulls,
-            quiet=quiet,
             filter_duplicates=filter_duplicates,
+            filter_by_chemsys=filter_by_chemsys,
             chunk_size=chunk_size,
             max_num_jobs=max_num_jobs,
+            remove_unbalanced=remove_unbalanced,
+            remove_changed=remove_changed,
+            max_num_constraints=max_num_constraints,
+            quiet=quiet,
         )
         self.open_elem = Element(open_elem)
         self.open_phases = [Composition(str(self.open_elem)).reduced_formula]

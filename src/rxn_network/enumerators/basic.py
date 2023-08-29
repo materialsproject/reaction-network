@@ -110,13 +110,13 @@ class BasicEnumerator(Enumerator):
         self.n = n
         self.exclusive_precursors = exclusive_precursors
         self.exclusive_targets = exclusive_targets
+        self.filter_duplicates = filter_duplicates
         self.filter_by_chemsys = filter_by_chemsys
-        self.max_num_constraints = max_num_constraints
-        self.remove_unbalanced = remove_unbalanced
-        self.remove_changed = remove_changed
         self.chunk_size = chunk_size
         self.max_num_jobs = max_num_jobs
-        self.filter_duplicates = filter_duplicates
+        self.remove_unbalanced = remove_unbalanced
+        self.remove_changed = remove_changed
+        self.max_num_constraints = max_num_constraints
         self.quiet = quiet
 
         self._stabilize = False
@@ -550,15 +550,14 @@ class BasicOpenEnumerator(BasicEnumerator):
             n=n,
             exclusive_precursors=exclusive_precursors,
             exclusive_targets=exclusive_targets,
+            filter_duplicates=filter_duplicates,
             filter_by_chemsys=filter_by_chemsys,
-            max_num_constraints=max_num_constraints,
-            remove_unbalanced=remove_unbalanced,
-            remove_changed=remove_changed,
-            calculate_e_above_hulls=calculate_e_above_hulls,
-            quiet=quiet,
             chunk_size=chunk_size,
             max_num_jobs=max_num_jobs,
-            filter_duplicates=filter_duplicates,
+            remove_unbalanced=remove_unbalanced,
+            remove_changed=remove_changed,
+            max_num_constraints=max_num_constraints,
+            quiet=quiet,
         )
         self.open_phases: list[str] = open_phases
 
