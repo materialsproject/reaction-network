@@ -3,11 +3,12 @@ An entry set class for automatically building GibbsComputedEntry objects. Some o
 code has been adapted from the EntrySet class in pymatgen.
 """
 from __future__ import annotations
-import inspect
+
 import collections
+import inspect
 from copy import deepcopy
 from functools import cached_property
-from typing import Iterable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 import numpy as np
 from monty.json import MontyDecoder, MSONable
@@ -15,9 +16,7 @@ from monty.serialization import loadfn
 from numpy.random import normal
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import (
-    ConstantEnergyAdjustment,
-)
+from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
 from pymatgen.entries.entry_tools import EntrySet
 from tqdm import tqdm
 
@@ -38,7 +37,11 @@ logger = get_logger(__name__)
 IGNORE_NIST_SOLIDS = loadfn(PATH_TO_NIST / "ignore_solids.json")
 
 if TYPE_CHECKING:
-    from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry, EnergyAdjustment
+    from pymatgen.entries.computed_entries import (
+        ComputedEntry,
+        ComputedStructureEntry,
+        EnergyAdjustment,
+    )
 
 
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):
@@ -52,7 +55,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     def __init__(
         self,
-        entries: Iterable[GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry],
+        entries: Iterable[
+            GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry
+        ],
         calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
     ):
@@ -81,7 +86,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             for e in self.entries:
                 e.data["e_above_hull"] = self.get_e_above_hull(e)
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         return item in self.entries
 
     def __iter__(self):
@@ -90,7 +95,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     def __len__(self) -> int:
         return len(self.entries)
 
-    def add(self, entry: GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry) -> None:
+    def add(
+        self, entry: GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry
+    ) -> None:
         """
         Add an entry to the set in place.
 
@@ -101,7 +108,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         self._clear_cache()
 
     def update(
-        self, entries: Iterable[GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry]
+        self,
+        entries: Iterable[
+            GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry
+        ],
     ) -> None:
         """
         Add an iterable of entries to the set in place.
@@ -112,9 +122,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         self.entries.update(entries)
         self._clear_cache()
 
-    def discard(
-        self, entry: GibbsComputedEntry | ExperimentalReferenceEntry
-    ) -> None:
+    def discard(self, entry: GibbsComputedEntry | ExperimentalReferenceEntry) -> None:
         """
         Discard an entry in place.
 
@@ -522,7 +530,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 to False. WARNING: This dataset has not been thoroughly tested. Use at
                 your own risk!
             apply_carbonate_correction: Whether to apply the fit GGA energy correction for
-                carbonates. Defaults to True. 
+                carbonates. Defaults to True.
             ignore_nist_solids: Whether to ignore NIST data for the solids specified in
                 the "data/nist/ignore_solids.json" file; these all have melting points
                 Tm >= 1500 ºC. Defaults to True.
@@ -619,7 +627,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return chemsys
 
     @staticmethod
-    def get_adjusted_entry(entry: GibbsComputedEntry, adjustment: EnergyAdjustment) -> GibbsComputedEntry:
+    def get_adjusted_entry(
+        entry: GibbsComputedEntry, adjustment: EnergyAdjustment
+    ) -> GibbsComputedEntry:
         entry_dict = entry.as_dict()
         original_entry = entry_dict.get("entry", None)
 
@@ -674,9 +684,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         comp = entry.composition
 
-        if not {Element("C"), Element("O")}.issubset(
-            comp.elements
-        ):
+        if not {Element("C"), Element("O")}.issubset(comp.elements):
             return None
 
         if entry.parameters.get("run_type", None) not in ["GGA", "GGA+U"]:
@@ -698,12 +706,12 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     def _clear_cache(self):
         """
         Clears all cached properties. This method is called whenever the entry set is
-        modified in place.
+        modified in place (as is done with the add method, etc.)
         """
         for name, value in inspect.getmembers(GibbsEntrySet):
             if isinstance(value, cached_property):
                 try:
-                    del getattr(self, name)
+                    attr = getattr(self, name)
+                    del attr
                 except AttributeError:
                     pass
-

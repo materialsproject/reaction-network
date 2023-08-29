@@ -1,12 +1,18 @@
 """
-Basic interface for a reaction pathway solver.
+Basic interface for a reaction pathway.
 """
+from __future__ import annotations
+
 from abc import ABCMeta
-from typing import List
+from typing import TYPE_CHECKING
 
 from monty.json import MSONable
 
-from rxn_network.reactions.base import Reaction
+if TYPE_CHECKING:
+    from pymatgen.entries.computed_entries import ComputedEntry
+
+    from rxn_network.core import Composition
+    from rxn_network.reactions.base import Reaction
 
 
 class Pathway(MSONable, metaclass=ABCMeta):
@@ -14,95 +20,49 @@ class Pathway(MSONable, metaclass=ABCMeta):
     Base definition for a reaction pathway.
     """
 
-    _reactions: List[Reaction]
+    _reactions: list[Reaction]
 
     @property
-    def entries(self):
-        """Entry objects in this Pathway"""
+    def entries(self) -> set[ComputedEntry]:
+        """Entry objects in this pathway"""
         return {entry for rxn in self._reactions for entry in rxn.entries}
 
     @property
-    def all_reactants(self):
-        """Entries serving as a reactant in any sub reaction"""
+    def all_reactants(self) -> set[Composition]:
+        """Reactant compositions for all reactions in the pathway"""
         return {entry for rxn in self._reactions for entry in rxn.reactants}
 
     @property
-    def all_products(self):
-        """Entries serving as a product in any sub reaction"""
+    def all_products(self) -> set[Composition]:
+        """Product compositions reaction in the pathway"""
         return {entry for rxn in self._reactions for entry in rxn.products}
 
     @property
-    def compositions(self):
-        """Compositions in the reaction"""
+    def compositions(self) -> list[Composition]:
+        """All compositions in the reaction"""
         return list(self.all_reactants | self.all_products)
 
     @property
-    def reactants(self):
-        """The reactants of this whole reaction pathway"""
+    def reactants(self) -> set[Composition]:
+        """The reactant compositions of this whole/net reaction pathway"""
         return self.all_reactants - self.all_products
 
     @property
-    def products(self):
-        """The products of this whole reaction pathway"""
+    def products(self) -> set[Composition]:
+        """The product compositions of this whole/net reaction pathway"""
         return self.all_products - self.all_reactants
 
     @property
-    def intermediates(self):
-        """Intermediates as entries in this reaction pathway"""
+    def intermediates(self) -> set[Composition]:
+        """Intermediate compositions in this reaction pathway"""
         return self.all_products & self.all_reactants
 
     @property
-    def energy(self):
+    def energy(self) -> float:
         """Total energy of this reaction pathway"""
         return sum(rxn.energy for rxn in self._reactions)
 
     @property
-    def energy_per_atom(self):
-        """Total energy per atom of this reaction pathway"""
+    def energy_per_atom(self) -> float:
+        """Total normalized energy of this reaction pathway"""
         return sum(rxn.energy_per_atom for rxn in self._reactions)
-
-
-class Solver(MSONable, metaclass=ABCMeta):
-    """
-    Base definition for a pathway solver class.
-    """
-
-    def __init__(self, pathways):
-        self._pathways = pathways
-
-        rxns = []
-        costs = []
-
-        for path in self._pathways.get_paths():
-            for rxn, cost in zip(path.reactions, path.costs):
-                if rxn not in rxns:
-                    rxns.append(rxn)
-                    costs.append(cost)
-
-        self._reactions = rxns
-        self._costs = costs
-
-    @property
-    def pathways(self) -> List[Pathway]:
-        """Pathways used in solver class"""
-        return self._pathways
-
-    @property
-    def reactions(self) -> List[Reaction]:
-        """Reactions used in solver class"""
-        return self._reactions
-
-    @property
-    def costs(self) -> List[float]:
-        """Costs used in solver class"""
-        return self._costs
-
-    @property
-    def num_rxns(self) -> int:
-        """Length of the reaction list"""
-        return len(self.reactions)
-
-    @property
-    def num_entries(self) -> int:
-        """Length of entry list"""
-        return len(self._entries)

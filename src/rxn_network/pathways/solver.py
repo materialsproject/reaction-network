@@ -2,19 +2,21 @@
 Implements a reaction pathway solver class which efficiently solves mass balance
 equations using matrix operations.
 """
-import math
+from __future__ import annotations
+
+from abc import ABCMeta
 from copy import deepcopy
 from itertools import combinations
-from typing import Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 import ray
+from monty.json import MSONable
 from numba import jit
 from pymatgen.core.composition import Element
 from tqdm import tqdm
 
 from rxn_network.core import Composition
-from rxn_network.costs.base import CostFunction
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 from rxn_network.enumerators.minimize import (
@@ -30,14 +32,71 @@ from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger, grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
 
+if TYPE_CHECKING:
+    from rxn_network.costs.base import CostFunction
+    from rxn_network.pathways.base import Pathway
+    from rxn_network.reactions.base import Reaction
+
 logger = get_logger(__name__)
+
+
+class Solver(MSONable, metaclass=ABCMeta):
+    """
+    Base definition for a pathway solver class.
+    """
+
+    def __init__(self, pathways: PathwaySet):
+        self._pathways = pathways
+
+        rxns = []
+        costs = []
+
+        for path in self._pathways.paths:
+            for rxn, cost in zip(path.reactions, path.costs):
+                if rxn not in rxns:
+                    rxns.append(rxn)
+                    costs.append(cost)
+
+        self._reactions = rxns
+        self._costs = costs
+
+    @property
+    def pathways(self) -> list[Pathway]:
+        """Pathways used in solver class"""
+        return self._pathways
+
+    @property
+    def reactions(self) -> list[Reaction]:
+        """Reactions used in solver class"""
+        return self._reactions
+
+    @property
+    def costs(self) -> list[float]:
+        """Costs used in solver class"""
+        return self._costs
+
+    @property
+    def num_rxns(self) -> int:
+        """Length of the reaction list"""
+        return len(self.reactions)
+
+    @property
+    def num_entries(self) -> int:
+        """Length of entry list"""
+        return len(self._entries)
 
 
 class PathwaySolver(Solver):
     """
     Solver that implements an efficient method (using numba) for finding balanced
     reaction pathways from a list of graph-derived reaction pathways (i.e. a list of
-    lists of reactions)
+    lists of reactions).
+
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
     """
 
     def __init__(
@@ -45,10 +104,10 @@ class PathwaySolver(Solver):
         pathways: PathwaySet,
         entries: GibbsEntrySet,
         cost_function: CostFunction,
-        open_elem: str = None,
-        chempot: float = None,
-        chunk_size=100000,
-        batch_size=None,
+        open_elem: str | Element | None = None,
+        chempot: float | None = None,
+        chunk_size: int = 100000,
+        batch_size: int | None = None,
     ):
         """
         Args:
@@ -68,7 +127,7 @@ class PathwaySolver(Solver):
 
     def solve(
         self,
-        net_rxn: Union[ComputedReaction, OpenComputedReaction],
+        net_rxn: ComputedReaction | OpenComputedReaction,
         max_num_combos: int = 4,
         find_intermediate_rxns: bool = True,
         intermediate_rxn_energy_cutoff: float = 0.0,
@@ -372,10 +431,10 @@ def _balance_path_arrays_cpu(
     comp_matrices: np.ndarray,
     net_coeffs: np.ndarray,
     tol: float = 1e-6,
-):
+) -> tuple(np.ndarray, np.ndarray):
     """
     Fast solution for reaction multiplicities via mass balance stochiometric
-    constraints. Parallelized using Numba. Can be applied to large batches (100K-1M
+    constraints. Parallelized using Numba JIT. Can be applied to large batches (100K-1M
     sets of reactions at a time.)
 
     Args:
@@ -383,7 +442,7 @@ def _balance_path_arrays_cpu(
             compositions in all reactions, for each trial combination.
         net_coeffs: Array containing stoichiometric coefficients of net reaction.
         tol: numerical tolerance for determining if a multiplicity is zero
-            (reaction was removed).
+            (i.e., if reaction was removed).
     """
     shape = comp_matrices.shape
     net_coeff_filter = np.argwhere(net_coeffs != 0).flatten()
@@ -452,4 +511,5 @@ def _balance_path_arrays_cpu_wrapper(
     comp_matrices,
     net_rxn_vector,
 ):
+    """Wraps pathway balancing method with ray.remote decorator"""
     return _balance_path_arrays_cpu(comp_matrices, net_rxn_vector)

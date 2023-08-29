@@ -2,12 +2,16 @@
 Entry objects used in a Network. These network entry objects hold multiple entries and
 can be used as data for a node in the graph.
 """
+from __future__ import annotations
+
 from enum import Enum, auto
-from typing import List
+from typing import TYPE_CHECKING, Collection
 
 from monty.json import MSONable
 from monty.serialization import MontyDecoder
-from pymatgen.entries import Entry
+
+if TYPE_CHECKING:
+    from pymatgen.entries import Entry
 
 
 class NetworkEntryType(Enum):
@@ -23,13 +27,13 @@ class NetworkEntryType(Enum):
 class NetworkEntry(MSONable):
     """
     Helper class for describing combinations of ComputedEntry-like objects in context
-    of a reaction network.
+    of a reaction network. This entry will represent a node in the network.
     """
 
-    def __init__(self, entries: List[Entry], description: NetworkEntryType):
+    def __init__(self, entries: Collection[Entry], description: NetworkEntryType):
         """
         Args:
-            entries: list of Entry-like objects
+            entries: Collection of Entry-like objects
             description: Node type (e.g., Precursors, Target... see NetworkEntryType
                 class)
         """
@@ -41,7 +45,7 @@ class NetworkEntry(MSONable):
         self.dim = len(self.chemsys)
         self.description = description
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         """MSONable dict representation"""
         return {
             "@module": self.__class__.__module__,
@@ -51,19 +55,19 @@ class NetworkEntry(MSONable):
         }
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, d) -> "NetworkEntryType":
         """Load from MSONable dict"""
         return cls(
             MontyDecoder().process_decoded(d["entries"]),
             NetworkEntryType(d["description"]),
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         formulas = [entry.composition.reduced_formula for entry in self.entries]
         formulas.sort()
         return f"{self.description.name}: {','.join(formulas)}"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
             if self.description == other.description:
                 if self.chemsys == other.chemsys:

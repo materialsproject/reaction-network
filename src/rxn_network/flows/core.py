@@ -1,7 +1,8 @@
+"""Core flows for the reaction-network package."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Collection, List, Optional
+from typing import TYPE_CHECKING
 
 from jobflow import Flow, Maker
 from pymatgen.core.composition import Element
@@ -27,10 +28,12 @@ logger = get_logger(__name__)
 
 @dataclass
 class SynthesisPlanningFlowMaker(Maker):
-    """Maker to create a solid-state synthesis planning flow.
+    """
+    Maker to create a solid-state synthesis planning flow.
 
-    This flow has three stages.
-     1) Entries are acquired via the `GetEntrySetMaker`. This job both gets the computed
+    This flow has three stages:
+
+    1) Entries are acquired via the `GetEntrySetMaker`. This job both gets the computed
         entries from a databse (e.g., Materials Project) and processes them for use in
         the reaction network.
     2) Reactions are enumerated per the provided `ReactionEnumerationMaker` (and associated
@@ -47,6 +50,14 @@ class SynthesisPlanningFlowMaker(Maker):
     analyze output documents from each of the jobs in the flow based on the desired
     analysis. For the final "results", access the reaction set produced by the
     `CalculateCompetitionMaker` at the conditions of interest.
+
+    If you use this code in your work, please consider citing the following work:
+
+        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
+        A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
+        Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
+        Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
+        August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
 
     Args:
         name: Name of the flow. Automatically generated if not provided.
@@ -234,6 +245,14 @@ class SynthesisPlanningFlowMaker(Maker):
 
 @dataclass
 class NetworkFlowMaker(Maker):
+    """
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
+    """
+
     name: str = "find_reaction_pathways"
     get_entry_set_maker: GetEntrySetMaker = field(default_factory=GetEntrySetMaker)
     enumeration_maker: ReactionEnumerationMaker = field(

@@ -34,6 +34,12 @@ class BasicEnumerator(Enumerator):
     reaction. This approach does not explicitly take into account thermodynamic
     stability (i.e. phase diagram). This allows for enumeration of reactions where the
     products may not be stable with respect to each other.
+
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
     """
 
     MIN_CHUNK_SIZE = 2500
@@ -122,20 +128,20 @@ class BasicEnumerator(Enumerator):
         initialized with specified precursors or target, the reactions will be filtered
         by these constraints. Every enumerator follows a standard procedure:
 
-        1. Initialize entries, i.e., ensure that precursors and target are considered
-        stable entries within the entry set.
+        1) Initialize entries, i.e., ensure that precursors and target are considered
+            stable entries within the entry set.
 
-        2. Get a dictionary representing every possible "node", i.e. phase combination,
-        grouped by chemical system.
+        2) Get a dictionary representing every possible "node", i.e. phase combination,
+            grouped by chemical system.
 
-        3. Filter the combos dictionary for chemical systems which are not relevant;
-        i.e., don't contain elements in precursors and/or target.
+        3) Filter the combos dictionary for chemical systems which are not relevant;
+            i.e., don't contain elements in precursors and/or target.
 
-        4. Iterate through each chemical system, initializing calculators,
-        and computing all possible reactions for reactant/product pair and/or
-        thermodynamically predicted reactions for given reactants.
+        4) Iterate through each chemical system, initializing calculators,
+            and computing all possible reactions for reactant/product pair and/or
+            thermodynamically predicted reactions for given reactants.
 
-        5. Add reactions to growing list, repeat Step 4 until combos dict exhausted.
+        5) Add reactions to growing list, repeat Step 4 until combos dict exhausted.
 
         Args:
             entries: the set of all entries to enumerate from
@@ -455,6 +461,12 @@ class BasicOpenEnumerator(BasicEnumerator):
     maximum reactant/product cardinality (n), with any number of open phases. Note:
     this does not return OpenComputedReaction objects (this can be calculated using
     the ReactionSet class).
+
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
     """
 
     MIN_CHUNK_SIZE = 2500

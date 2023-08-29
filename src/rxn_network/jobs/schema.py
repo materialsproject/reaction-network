@@ -1,6 +1,8 @@
 """Core definition for various task and synthesis recipe documents"""
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element

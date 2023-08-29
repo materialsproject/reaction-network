@@ -28,12 +28,14 @@ class GibbsComputedEntry(ComputedEntry):
     """
     An extension to ComputedEntry which estimates the Gibbs free energy of formation
     of solids using energy adjustments from the machine-learned SISSO descriptor from
-    Bartel et al. (2018).
+    Bartel et al. (2018).  Note that this is similar to the implementation within
+    pymatgen, but has been refactored here to add extra functionality.
 
     WARNING: This descriptor only applies to solids. See entries.nist.NISTReferenceEntry
     for common gases (e.g. CO2).
 
-    Reference:
+    If you use this entry class in your work, please consider citing the following
+    paper:
         Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R., Tumas, W., Weimer,
         A. W., … Holder, A. M. (2018). Physical descriptor for the Gibbs energy of
         inorganic crystalline solids and temperature-dependent materials chemistry.
@@ -173,8 +175,8 @@ class GibbsComputedEntry(ComputedEntry):
         volume_per_atom: float, reduced_mass: float, temp: float
     ) -> float:
         """
-        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
-        Bartel et al. (2018).
+        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in Bartel et al.
+        (2018).
 
         Args:
             vol_per_atom: volume per atom [Å^3/atom]

@@ -1,9 +1,11 @@
 """
 Implementation of reaction network interface.
 """
+from __future__ import annotations
+
 from dataclasses import field
 from queue import Empty, PriorityQueue
-from typing import Iterable, List, Union
+from typing import TYPE_CHECKING, Iterable
 
 import rustworkx as rx
 from monty.json import MontyDecoder
@@ -11,7 +13,6 @@ from pymatgen.entries import Entry
 from rustworkx import PyDiGraph
 from tqdm import tqdm
 
-from rxn_network.costs.base import CostFunction
 from rxn_network.costs.functions import Softplus
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.network.base import Network
@@ -20,11 +21,22 @@ from rxn_network.pathways.basic import BasicPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.reaction_set import ReactionSet
 
+if TYPE_CHECKING:
+    from rxn_network.costs.base import CostFunction
+
 
 class ReactionNetwork(Network):
     """
     Main reaction network class for building graph networks and performing
-    pathfinding. Graphs are built using rustworkx.
+    pathfinding. Graphs are built using the rustworkx package (a NetworkX equivalent
+    implemented in Rust).
+
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
+
     """
 
     def __init__(
@@ -33,22 +45,25 @@ class ReactionNetwork(Network):
         cost_function: CostFunction = field(default_factory=Softplus),
     ):
         """
-        Initialize a ReactionNetwork object for a set of reactions.
+        Initialize a ReactionNetwork object for a reaction set and cost function.
 
-        Note: the precursors and target are not set by default. You must call
-        set_precursors() and set_target() in place.
+        To build the graph network, call the build() method in-place.
 
         Args:
-            rxns: Reaction set of reactions
-            cost_function: the function used to calculate the cost of each reaction edge
+            rxns: Set of reactions used to construct the network.
+            cost_function: The function used to calculate the cost of each reaction
+                edge. Defaults to a Softplus function with default settings (i.e.
+                energy_per_atom only).
         """
         super().__init__(rxns=rxns, cost_function=cost_function)
 
-    def build(self):
+    def build(self) -> None:
         """
         In-place method. Construct the reaction network graph object and store under the
-        "graph" attribute. Does NOT initialize precursors or target; you must call
-        set_precursors() or set_target() to do so.
+        "graph" attribute.
+
+        WARNING: This does NOT initialize the precursors or target attributes; you must
+        call set_precursors() or set_target() to do so.
 
         Returns:
             None
@@ -65,13 +80,15 @@ class ReactionNetwork(Network):
 
         self._g = g
 
-    def find_pathways(self, targets: List[str], k: float = 15) -> List[BasicPathway]:
+    def find_pathways(
+        self, targets: list[Entry | str], k: int = 15
+    ) -> list[BasicPathway]:
         """
-        Find the k-shortest paths to a provided list of 1 or more targets.
+        Find the k-shortest paths to a provided list of one or more targets.
 
         Args:
-            targets: List of the formulas of each target
-            k: Number of shortest paths to find for each target
+            targets: List of the formulas or entry objects of each target.
+            k: Number of k-shortest paths to find for each target. Defaults to 15.
 
         Returns:
             List of BasicPathway objects to all provided targets.
@@ -91,7 +108,7 @@ class ReactionNetwork(Network):
 
         return paths
 
-    def set_precursors(self, precursors: Iterable[Union[Entry, str]]):
+    def set_precursors(self, precursors: Iterable[Entry | str]):
         """
         In-place method. Sets the precursors of the network. Removes all references to
         previous precursors.
@@ -156,7 +173,7 @@ class ReactionNetwork(Network):
         g.add_edges_from(edges_to_add)
         self._precursors = precursors
 
-    def set_target(self, target: Union[Entry, str]):
+    def set_target(self, target: Entry | str):
         """
         In-place method. Can only provide one target entry or formula at a time.
 
@@ -215,7 +232,7 @@ class ReactionNetwork(Network):
 
         self._target = target
 
-    def _k_shortest_paths(self, k):
+    def _k_shortest_paths(self, k: int):
         """Wrapper for finding the k shortest paths using Yen's algorithm. Returns
         BasicPathway objects"""
         g = self._g
@@ -236,7 +253,7 @@ class ReactionNetwork(Network):
         return paths
 
     @staticmethod
-    def _path_from_graph(g, path, cf):
+    def _path_from_graph(g, path, cf: CostFunction):
         """Gets a BasicPathway object from a shortest path found in the network"""
         rxns = []
         costs = []
@@ -254,7 +271,7 @@ class ReactionNetwork(Network):
         return BasicPathway(reactions=rxns, costs=costs)
 
     @property
-    def graph(self):
+    def graph(self) -> Graph:
         """Returns the Graph object"""
         return self._g
 
@@ -272,7 +289,7 @@ class ReactionNetwork(Network):
         return d
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, d) -> "ReactionNetwork":
         """Instantiate object from MSONable dict"""
         precursors = d.pop("precursors", None)
         target = d.pop("target", None)

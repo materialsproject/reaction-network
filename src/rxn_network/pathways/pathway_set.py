@@ -2,18 +2,20 @@
 Implements a class for conveniently and efficiently storing sets of Pathway-based
 objects which share entries/reactions.
 """
+from __future__ import annotations
 
-from functools import lru_cache
-from typing import List, Union
+from functools import cached_property
+from typing import TYPE_CHECKING
 
 import numpy as np
 from monty.json import MSONable
 
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.basic import BasicPathway
-from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
+
+if TYPE_CHECKING:
+    from rxn_network.pathways.base import Pathway
 
 
 class PathwaySet(MSONable):
@@ -22,36 +24,44 @@ class PathwaySet(MSONable):
     represents a set of pathways as a (non-rectangular) 2D array of indices
     corresponding to reactions within a reaction set. This is useful for dumping
     reaction pathway data to a database.
+
+    This object can easily be initialized through the from_paths() constructor.
     """
 
     def __init__(
         self,
         reaction_set: ReactionSet,
-        indices: Union[np.ndarray, List[List[int]]],
-        coefficients: Union[np.ndarray, List[List[float]]],
-        costs: Union[np.ndarray, List[List[float]]],
+        indices: np.ndarray | list[list[int]],
+        coefficients: np.ndarray | list[list[float]],
+        costs: np.ndarray | list[list[float]],
     ):
         """
         Args:
             reaction_set: The reaction set containing all reactions in the pathways.
             indices: A list of lists of indices corresponding to reactions in the
-                reaction set
-            coefficients: A list of coefficients representing the multiplicities (how
-                much of) each reaction in the pathway.
-            costs: A list of costs for each pathway.
+                reaction set.
+            coefficients: An array or list of coefficients representing the
+                multiplicities (i.e., how much of) each reaction in the pathway.
+            costs: An array or list of costs for each pathway.
         """
         self.reaction_set = reaction_set
         self.indices = indices
         self.coefficients = coefficients
         self.costs = costs
 
-    @lru_cache(1)
-    def get_paths(
-        self,
-    ) -> List[Union[ComputedReaction, OpenComputedReaction]]:
+    @cached_property
+    def paths(self) -> list[Pathway]:
         """
-        Returns list of BalancedPathway objects represented by the PathwaySet. Cached
-        for efficiency.
+        Returns list of Pathway objects represented by the PathwaySet. Cached for
+        efficiency.
+        """
+        return self._get_paths()
+
+    def _get_paths(
+        self,
+    ) -> list[Pathway]:
+        """
+        Returns list of Pathway objects represented by the PathwaySet.
         """
         paths = []
 
@@ -78,11 +88,10 @@ class PathwaySet(MSONable):
     @classmethod
     def from_paths(
         cls,
-        paths: List[Union[ComputedReaction, OpenComputedReaction]],
+        paths: list[Pathway],
     ) -> "PathwaySet":
         """
-        Initiate a PathwaySet object from a list of paths. Including a list of
-        unique entries saves some computation time.
+        Initialize a PathwaySet object from a list of paths.
 
         Args:
             paths: List of Pathway objects
@@ -100,19 +109,16 @@ class PathwaySet(MSONable):
         return cls(
             reaction_set=reaction_set,
             indices=indices,
-            coefficients=coefficients,  # type: ignore
+            coefficients=coefficients,
             costs=costs,
         )
 
     @staticmethod
     def _get_reaction_set(
-        paths: List[Union[ComputedReaction, OpenComputedReaction]],
+        paths: list[Pathway],
     ) -> ReactionSet:
         """
         Returns a reaction set built from a list of paths.
-
-        Args:
-            paths: List of Pathway objects
         """
         return ReactionSet.from_rxns([rxn for path in paths for rxn in path.reactions])
 
@@ -120,9 +126,9 @@ class PathwaySet(MSONable):
         """
         Iterates over the PathwaySet.
         """
-        return iter(self.get_paths())
+        return iter(self.paths)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Returns the number of pathways in the PathwaySet.
         """

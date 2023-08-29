@@ -148,7 +148,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
         """
         return self.entry_id
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         """
         Returns:
             A dict representation of the Entry.
@@ -165,7 +165,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
         return d
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, d) -> "ExperimentalReferenceEntry":
         dec = MontyDecoder()
         entry = cls(
             composition=Composition(d["composition"]),

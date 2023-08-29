@@ -1,7 +1,9 @@
-"""Core jobs for reaction-network creation and analysis."""
+"""Core jobs for reaction network creation and analysis."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Iterable, List, Optional
+from typing import TYPE_CHECKING, Iterable
 
 import numpy as np
 import ray
@@ -10,7 +12,6 @@ from pymatgen.core.composition import Element
 from tqdm import tqdm
 
 from rxn_network.core import Composition
-from rxn_network.costs.base import CostFunction
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
     PrimaryCompetitionCalculator,
@@ -37,6 +38,9 @@ from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger, grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
+
+if TYPE_CHECKING:
+    from rxn_network.costs.base import CostFunction
 
 logger = get_logger(__name__)
 
@@ -68,15 +72,15 @@ class GetEntrySetMaker(Maker):
     include_nist_data: bool = True
     include_freed_data: bool = False
     e_above_hull: float = 0.0
-    filter_at_temperature: Optional[int] = None
+    filter_at_temperature: int | None = None
     include_polymorphs: bool = False
     formulas_to_include: list = field(default_factory=list)
     custom_entries: list = field(default_factory=list)
     calculate_e_above_hulls: bool = True
     ignore_nist_solids: bool = True
-    MP_API_KEY: Optional[str] = None
-    entry_db_name: Optional[str] = None
-    property_data: Optional[List[str]] = None
+    MP_API_KEY: str | None = None
+    entry_db_name: str | None = None
+    property_data: list[str] | None = None
 
     @job(entries="entries", output_schema=EntrySetDocument)
     def make(self, chemsys):
@@ -167,6 +171,12 @@ class GetEntrySetMaker(Maker):
 class ReactionEnumerationMaker(Maker):
     """
     Maker to create job for enumerating reactions from a set of entries.
+
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
     """
 
     name: str = "enumerate_reactions"
@@ -209,19 +219,30 @@ class ReactionEnumerationMaker(Maker):
 
 @dataclass
 class CalculateCompetitionMaker(Maker):
-    """Maker to create job for calculating competition of a set of reactions and
-    target formula."""
+    """
+    Maker to create job for calculating competition of a set of reactions and
+    target formula.
+
+    If you use this code in your work, please consider citing the following work:
+
+        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
+        A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
+        Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
+        Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
+        August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
+
+    """
 
     CHUNK_SIZE = 100
 
     name: str = "calculate_competition"
-    open_elem: Optional[Element] = None
-    chempot: Optional[float] = 0.0
+    open_elem: Element | None = None
+    chempot: float | None = 0.0
     calculate_competition: bool = True
     calculate_chempot_distances: bool = True
     temp: float = 300.0
     chunk_size: int = CHUNK_SIZE
-    batch_size: Optional[int] = None
+    batch_size: int | None = None
     cpd_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self):
@@ -398,14 +419,20 @@ class NetworkMaker(Maker):
     """
     Maker for generating reaction networks and performing pathfinding from a set of
     previously enumerated reactions.
+
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
     """
 
     name: str = "build_and_analyze_network"
     cost_function: CostFunction = field(default_factory=Softplus)
-    precursors: Optional[List[str]] = None
-    targets: Optional[List[str]] = None
-    calculate_pathways: Optional[int] = 10
-    open_elem: Optional[Element] = None
+    precursors: list[str] | None = None
+    targets: list[str] | None = None
+    calculate_pathways: int | None = 10
+    open_elem: Element | None = None
     chempot: float = 0.0
 
     @job(network="network", output_schema=NetworkTaskDocument)
@@ -448,14 +475,20 @@ class PathwaySolverMaker(Maker):
     """
     Maker for solving balanced reaction pathways from a set of (unbalanced) pathways
     returned as part of reaction network analysis.
+
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
     """
 
     name: str = "solve pathways"
     cost_function: CostFunction = field(default_factory=Softplus)
-    precursors: List[str] = field(default_factory=list)
-    targets: List[str] = field(default_factory=list)
-    open_elem: Optional[Element] = None
-    chempot: Optional[float] = None
+    precursors: list[str] = field(default_factory=list)
+    targets: list[str] = field(default_factory=list)
+    open_elem: Element | None = None
+    chempot: float | None = None
     max_num_combos: int = 4
     find_intermediate_rxns: bool = True
     intermediate_rxn_energy_cutoff: float = 0.0

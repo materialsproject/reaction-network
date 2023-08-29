@@ -19,6 +19,12 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
     thermodynamics; i.e., they appear when taking the convex hull along a straight line
     connecting any two phases in G-x phase space. Identity reactions are automatically
     excluded.
+
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
     """
 
     MIN_CHUNK_SIZE = 1000
@@ -112,6 +118,12 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
     that are predicted by thermo; i.e., they appear when taking the
     convex hull along a straight line connecting any two phases in Phi-x
     phase space. Identity reactions are excluded.
+
+    If you use this code in your own work, please consider citing this paper:
+
+        McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+        Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+        Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
     """
 
     MIN_CHUNK_SIZE = 1000

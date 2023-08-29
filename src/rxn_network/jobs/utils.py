@@ -1,5 +1,8 @@
 """Definitions of common job functions"""
+from __future__ import annotations
+
 from collections import OrderedDict
+from typing import TYPE_CHECKING, Iterable
 
 from pymatgen.core.composition import Element
 from pymatgen.entries.mixing_scheme import MaterialsProjectDFTMixingScheme
@@ -8,10 +11,15 @@ from tqdm import tqdm
 from rxn_network.core import Composition
 from rxn_network.utils.funcs import get_logger
 
+if TYPE_CHECKING:
+    from rxn_network.enumerators.base import Enumerator
+
 logger = get_logger(__name__)
 
 
-def run_enumerators(enumerators, entries):
+def run_enumerators(
+    enumerators: Iterable[Enumerator], entries: Collection[ComputedEntry]
+):
     rxn_set = None
     for enumerator in enumerators:
         logger.info(f"Running {enumerator.__class__.__name__}")

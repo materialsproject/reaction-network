@@ -1,9 +1,11 @@
 """
 Basic interface for a reaction network and its graph.
 """
+from __future__ import annotations
+
 import logging
 from abc import ABCMeta, abstractmethod
-from typing import List
+from typing import TYPE_CHECKING
 
 from monty.json import MSONable
 

@@ -3,7 +3,7 @@ Utility functions used by the reaction enumerator classes.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 from pymatgen.analysis.interface_reactions import (
     GrandPotentialInterfacialReactivity,
