@@ -24,7 +24,6 @@ from rxn_network.enumerators.minimize import (
     MinimizeGrandPotentialEnumerator,
 )
 from rxn_network.pathways.balanced import BalancedPathway
-from rxn_network.pathways.base import Solver
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction

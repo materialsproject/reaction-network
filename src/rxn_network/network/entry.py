@@ -11,6 +11,7 @@ from monty.json import MSONable
 from monty.serialization import MontyDecoder
 
 if TYPE_CHECKING:
+    from pymatgen.core.periodic_table import Element
     from pymatgen.entries import Entry
 
 
@@ -37,13 +38,33 @@ class NetworkEntry(MSONable):
             description: Node type (e.g., Precursors, Target... see NetworkEntryType
                 class)
         """
-        self.entries = set(entries)
-        self.elements = sorted(
+        self._entries = set(entries)
+        self._elements = sorted(
             list({elem for entry in entries for elem in entry.composition.elements})
         )
-        self.chemsys = "-".join([str(e) for e in self.elements])
-        self.dim = len(self.chemsys)
-        self.description = description
+        self._chemsys = "-".join([str(e) for e in self.elements])
+        self._dim = len(self.chemsys)
+        self._description = description
+
+    @property
+    def entries(self) -> set[Entry]:
+        return self._entries
+
+    @property
+    def elements(self) -> list[Element]:
+        return self._elements
+
+    @property
+    def chemsys(self) -> str:
+        return self._chemsys
+
+    @property
+    def dim(self) -> int:
+        return self._dim
+
+    @property
+    def description(self) -> NetworkEntryType:
+        return self._description
 
     def as_dict(self) -> dict:
         """MSONable dict representation"""
@@ -55,7 +76,7 @@ class NetworkEntry(MSONable):
         }
 
     @classmethod
-    def from_dict(cls, d) -> "NetworkEntryType":
+    def from_dict(cls, d: dict) -> "NetworkEntryType":
         """Load from MSONable dict"""
         return cls(
             MontyDecoder().process_decoded(d["entries"]),
@@ -84,28 +105,18 @@ class DummyEntry(NetworkEntry):
     node to facilitate pathfinding to all nodes, etc.
     """
 
-    def __init__(self):  # pylint: disable=super-init-not-called
+    def __init__(self):
         """Dummy node doesn't need any parameters"""
+        self._entries = set()
+        self._elements = []
+        self._chemsys = ""
+        self._dim = 0
+        self._description = NetworkEntryType.Dummy
 
-    @property
-    def entries(self):
-        """No entries in DummyEntry"""
-        return []
-
-    @property
-    def chemsys(self):
-        """No Chemsys to DummyEntry"""
-        return ""
-
-    @property
-    def description(self):
-        """DummyEntry is always of type Dummy"""
-        return NetworkEntryType.Dummy
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "Dummy Node"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self is other
 
     def __hash__(self):

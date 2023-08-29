@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Collection
 
 from jobflow import Flow, Maker
 from pymatgen.core.composition import Element
@@ -29,18 +29,17 @@ logger = get_logger(__name__)
 @dataclass
 class SynthesisPlanningFlowMaker(Maker):
     """
-    Maker to create a solid-state synthesis planning flow.
+    Maker to create an inorganic synthesis planning workflow. This flow has three
+    stages:
 
-    This flow has three stages:
-
-    1) Entries are acquired via the `GetEntrySetMaker`. This job both gets the computed
+    1)  Entries are acquired via `GetEntrySetMaker`. This job both gets the computed
         entries from a databse (e.g., Materials Project) and processes them for use in
         the reaction network.
-    2) Reactions are enumerated per the provided `ReactionEnumerationMaker` (and associated
-       enumerators). This computes the full "reaction network" so that selectivity can
-       be calculated.
-    3) The competition of all synthesis reactions to the desired target is assessed per
-       the settings in the `CalculateCompetitionMaker`.
+    2)  Reactions are enumerated via the provided `ReactionEnumerationMaker` (and
+        associated enumerators). This computes the full reaction network so that
+        selectivities can be calculated.
+    3)  The competition of all synthesis reactions to the desired target is assessed via
+        the `CalculateCompetitionMaker`.
 
     This flow also has the option to include an "open" element and a list of chempots.
     This will enumerate reactions at different conditions and evaluate their
@@ -48,8 +47,8 @@ class SynthesisPlanningFlowMaker(Maker):
 
     This flow does not produce a specific output document. Instead, it is convenient to
     analyze output documents from each of the jobs in the flow based on the desired
-    analysis. For the final "results", access the reaction set produced by the
-    `CalculateCompetitionMaker` at the conditions of interest.
+    analysis. For the final "results", one should access the reaction set produced by
+    the `CalculateCompetitionMaker` at the conditions of interest.
 
     If you use this code in your work, please consider citing the following work:
 
@@ -61,18 +60,23 @@ class SynthesisPlanningFlowMaker(Maker):
 
     Args:
         name: Name of the flow. Automatically generated if not provided.
-        get_entry_set_maker: Maker to create the `GetEntrySetJob`
-        enumeration_maker: Maker to create the `ReactionEnumerationJob`
-        calculate_competition_maker: Maker to create the `CalculateCompetitionJob`
-        open_elem: Element to use as the "open" element. If provided, the flow will
-            enumerate reactions at different chemical potentials of this element.
+        get_entry_set_maker: `GetEntrySetMaker`used to create the job for acquiring
+            entries. Automatically generated with default settings if not provided.
+        enumeration_maker: `ReactionEnumerationMaker` used to create the reaction
+            enumeration job. Automatically generated with default settings if not
+            provided.
+        calculate_competition_maker: `CalculateCompetitionMaker` used to create the
+            selectivity analysis job. Automatically generated with default settings if
+            not provided.
+        open_elem: Optional element to use as the "open" element. If provided, the flow
+            will  enumerate reactions at different chemical potentials of this element.
         chempots: List of chemical potentials to use for the "open" element. If
             provided, the flow will enumerate reactions at different chemical potentials
             of this element.
         use_basic_enumerators: Whether to use the `BasicEnumerator` and
-            `BasicOpenEnumerator` in the enumeration job.
+            `BasicOpenEnumerator` enumerators in the enumeration job.
         use_minimize_enumerators: Whether to use the `MinimizeGibbsEnumerator` and the
-            `MinimizeGrandPotentialEnumerator` in the enumeration job.
+            `MinimizeGrandPotentialEnumerator` enumerators in the enumeration job.
         basic_enumerator_kwargs: Keyword arguments to pass to the basic enumerators.
         minimize_enumerator_kwargs: Keyword arguments to pass to the minimize
             enumerators.
@@ -86,7 +90,7 @@ class SynthesisPlanningFlowMaker(Maker):
     calculate_competition_maker: CalculateCompetitionMaker = field(
         default_factory=CalculateCompetitionMaker
     )
-    open_elem: Element | None = None
+    open_elem: Element | str | None = None
     chempots: list[float] | None = None
     use_basic_enumerators: bool = True
     use_minimize_enumerators: bool = True
@@ -105,6 +109,19 @@ class SynthesisPlanningFlowMaker(Maker):
         added_elems: Collection[str] | None = None,
         entries: GibbsEntrySet | None = None,
     ):
+        """
+        Returns a flow used for planning optimal synthesis recipes to a specified
+        target.
+
+        Args:
+            target_formula: The chemical formula of a target phase (e.g., "BaTiO3").
+            added_elems: An optional list of additional elements to consider (e.g.,
+                ["C", "H"]). Defaults to None.
+            entries: An optional provided set of entries to enumerate from. If entries
+                are not provided, then they will be acquired from a database (e.g.,
+                Materials Project) and processed using the GetEntrySetMaker.
+
+        """
         target_formula = Composition(target_formula).reduced_formula
 
         flow_name = f"Synthesis planning: {target_formula}"
@@ -246,11 +263,51 @@ class SynthesisPlanningFlowMaker(Maker):
 @dataclass
 class NetworkFlowMaker(Maker):
     """
+    Maker to create a chemical reaction network and perform (balanced) pathfinding on
+    the network.
+
+    This flow has four stages:
+
+    1)  Entries are acquired via `GetEntrySetMaker`. This job both gets the computed
+        entries from a databse (e.g., Materials Project) and processes them for use in
+        the reaction network.
+    2)  Reactions are enumerated via the provided `ReactionEnumerationMaker` (and
+        associated enumerators).
+    3)  The network is created using `NetworkMaker` and basic paths are found
+        (k-shortest paths to each target).
+    4)  The final balanced reaction pathways are produced using the `SolverMaker`.
+
     If you use this code in your own work, please consider citing this paper:
 
         McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
         Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
         Communications 2021, 12 (1), 3097. https://doi.org/10.1038/s41467-021-23339-x.
+
+    Args:
+        name: The name of the network flow. Automatically assigned if not provided.
+        get_entry_set_maker: `GetEntrySetMaker`used to create the job for acquiring
+            entries. Automatically generated with default settings if not provided.
+        enumeration_maker: `ReactionEnumerationMaker` used to create the reaction
+            enumeration job. Automatically generated with default settings if not
+            provided.
+        network_maker: `NetworkMaker` used to create the reaction network from sets of
+            reactions. Also identifies basic reaction pathways. Automatically generated
+            with default settings if not provided.
+        solver_maker: `PathwaySolverMaker` used to find balanced reaction pathways from
+            set of pathways emerging from pathfinding. Automatically generated with
+            default settings if not provided.
+        open_elem: Optional element to use as the "open" element. If provided, the flow
+            will enumerate reactions at different chemical potentials of this element.
+        chempots: List of chemical potentials to use for the "open" element. If
+            provided, the flow will enumerate reactions at different chemical potentials
+            of this element.
+        use_basic_enumerators: Whether to use the `BasicEnumerator` and
+            `BasicOpenEnumerator` enumerators in the enumeration job.
+        use_minimize_enumerators: Whether to use the `MinimizeGibbsEnumerator` and the
+            `MinimizeGrandPotentialEnumerator` enumerators in the enumeration job.
+        basic_enumerator_kwargs: Keyword arguments to pass to the basic enumerators.
+        minimize_enumerator_kwargs: Keyword arguments to pass to the minimize
+            enumerators.
     """
 
     name: str = "find_reaction_pathways"
@@ -259,7 +316,7 @@ class NetworkFlowMaker(Maker):
         default_factory=ReactionEnumerationMaker
     )
     network_maker: NetworkMaker = field(default_factory=NetworkMaker)
-    solver_maker: Optional[PathwaySolverMaker] = None
+    solver_maker: PathwaySolverMaker | None = None
     open_elem: Element | None = None
     chempots: list[float] | None = None
     use_basic_enumerators: bool = True

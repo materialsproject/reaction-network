@@ -22,10 +22,9 @@ if TYPE_CHECKING:
 
 class PathwayPlotter(MSONable):
     """
-    Helper class for plotting a reaction pathway and the corresponding energy cascade.
+    WARNING: This is an EXPERIMENTAL CLASS. Use at your own risk.
 
-    Note:
-        This class is far from complete and is not intended yet for general use.
+    Helper class for plotting a reaction pathway and the corresponding energy cascade.
     """
 
     def __init__(

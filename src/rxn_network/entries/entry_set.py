@@ -7,7 +7,7 @@ from __future__ import annotations
 import collections
 import inspect
 from copy import deepcopy
-from functools import cached_property
+from functools import cached_property, lru_cache
 from typing import TYPE_CHECKING, Iterable
 
 import numpy as np
@@ -140,7 +140,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         return expand_pd(self.entries)
 
-    @cached_property
+    @lru_cache(1)
     def get_subset_in_chemsys(self, chemsys: list[str] | str) -> "GibbsEntrySet":
         """
         Returns a GibbsEntrySet containing only the set of entries belonging to
@@ -280,9 +280,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return new_entry
 
-    def get_entries_with_new_temperature(
-        self, new_temperature: float
-    ) -> "GibbsEntrySet":
+    def get_entries_with_new_temperature(self, new_temperature: float) -> GibbsEntrySet:
         """
         Returns a new GibbsEntrySet with entries that have had their energies
         modified by using a new temperature.
@@ -306,7 +304,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             new_entries, calculate_e_above_hulls=self.calculate_e_above_hulls
         )
 
-    def get_entries_with_jitter(self) -> "GibbsEntrySet":
+    def get_entries_with_jitter(self) -> GibbsEntrySet:
         """
         Returns a new GibbsEntrySet with entries that have had their energies shifted by
         randomly sampled noise to account for uncertainty in data. This is done by
@@ -398,12 +396,12 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         cls,
         pd: PhaseDiagram,
         temperature: float,
-        include_nist_data=True,
-        include_freed_data=False,
-        apply_carbonate_correction=True,
-        ignore_nist_solids=True,
-        minimize_obj_size=False,
-    ) -> "GibbsEntrySet":
+        include_nist_data: bool = True,
+        include_freed_data: bool = False,
+        apply_carbonate_correction: bool = True,
+        ignore_nist_solids: bool = True,
+        minimize_obj_size: bool = False,
+    ) -> GibbsEntrySet:
         """
         Constructor method for building a GibbsEntrySet from an existing phase diagram.
 
@@ -486,7 +484,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return cls(gibbs_entries, minimize_obj_size=minimize_obj_size)
 
-    def copy(self) -> "GibbsEntrySet":
+    def copy(self) -> GibbsEntrySet:
         """Returns a copy of the entry set."""
         return GibbsEntrySet(entries=self.entries)
 
@@ -505,11 +503,11 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         cls,
         entries: Iterable[ComputedStructureEntry],
         temperature: float,
-        include_nist_data=True,
-        include_freed_data=False,
-        apply_carbonate_correction=True,
-        ignore_nist_solids=True,
-        minimize_obj_size=False,
+        include_nist_data: bool = True,
+        include_freed_data: bool = False,
+        apply_carbonate_correction: bool = True,
+        ignore_nist_solids: bool = True,
+        minimize_obj_size: bool = False,
     ) -> "GibbsEntrySet":
         """
         Constructor method for initializing GibbsEntrySet from T = 0 K
@@ -703,7 +701,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return CarbonateCorrection(num_c)
 
-    def _clear_cache(self):
+    def _clear_cache(self) -> None:
         """
         Clears all cached properties. This method is called whenever the entry set is
         modified in place (as is done with the add method, etc.)

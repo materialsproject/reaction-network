@@ -1,44 +1,33 @@
 """Definitions of common job functions"""
 from __future__ import annotations
 
-from collections import OrderedDict
 from typing import TYPE_CHECKING, Iterable
 
 from pymatgen.core.composition import Element
-from pymatgen.entries.mixing_scheme import MaterialsProjectDFTMixingScheme
-from tqdm import tqdm
 
 from rxn_network.core import Composition
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
-    from rxn_network.enumerators.base import Enumerator
+    from rxn_network.entries.entry_set import GibbsEntrySet
 
 logger = get_logger(__name__)
 
 
-def run_enumerators(
-    enumerators: Iterable[Enumerator], entries: Collection[ComputedEntry]
-):
-    rxn_set = None
-    for enumerator in enumerators:
-        logger.info(f"Running {enumerator.__class__.__name__}")
-        rxns = enumerator.enumerate(entries)
+def get_added_elem_data(
+    entries: GibbsEntrySet, targets: Iterable[Composition | str]
+) -> tuple(list[Element], str):
+    """
+    Given a provided entry set and targets, this identifies which elements in the entry
+    set are "additional" (not found in the target)
 
-        logger.info(f"Adding {len(rxns)} reactions to reaction set")
+    Args:
+        entries: the full entry set
+        targets: the target phase compositions
 
-        if rxn_set is None:
-            rxn_set = rxns
-        else:
-            rxn_set = rxn_set.add_rxn_set(rxns)
-
-    logger.info("Completed reaction enumeration. Filtering duplicates...")
-    rxn_set = rxn_set.filter_duplicates()
-    logger.info("Completed duplicate filtering.")
-    return rxn_set
-
-
-def get_added_elem_data(entries, targets):
+    Returns:
+        A tuple of the additional elements and their chemical system string.
+    """
     added_elems = entries.chemsys - {
         str(e) for target in targets for e in Composition(target).elements
     }
@@ -46,40 +35,3 @@ def get_added_elem_data(entries, targets):
     added_elements = [Element(e) for e in added_elems]
 
     return added_elements, added_chemsys
-
-
-def process_entries_with_mixing_scheme(entries):
-    """
-    Temporary utility method for processing entries with the new R2SCAN mixing scheme.
-    This is useful if mp-api is delivering incorrect entries.
-    """
-    reverse_entry_dict = OrderedDict()
-
-    for e in sorted(entries, key=lambda i: len(i.composition.elements), reverse=True):
-        chemsys_str = "-".join(sorted([str(el) for el in e.composition.elements]))
-        if chemsys_str in reverse_entry_dict:
-            reverse_entry_dict[chemsys_str].append(e)
-        else:
-            reverse_entry_dict[chemsys_str] = [e]
-
-    processed_entries = set()
-    seen_chemsyses = []
-
-    for chemsys, _ in tqdm(reverse_entry_dict.items()):
-        if chemsys in seen_chemsyses:
-            continue
-        els = chemsys.split("-")
-        ents = []
-        for chemsys_2, entries_2 in reverse_entry_dict.items():
-            els_2 = chemsys_2.split("-")
-            if set(els_2).issubset(els):
-                seen_chemsyses.append(chemsys_2)
-                ents.extend(entries_2)
-
-        new_ents = MaterialsProjectDFTMixingScheme().process_entries(
-            ents, verbose=False
-        )
-
-        processed_entries.update(new_ents)
-
-    return processed_entries

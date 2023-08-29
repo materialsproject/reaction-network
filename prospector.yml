@@ -30,6 +30,7 @@ pylint:
     - import-outside-toplevel
     - arguments_differ
     - duplicate-code
+    - too-many-arguments
     - too-many-branches
     - too-many-statements
     - too-many-boolean-expressions

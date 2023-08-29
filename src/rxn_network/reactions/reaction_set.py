@@ -142,7 +142,10 @@ class ReactionSet(MSONable):
             else:
                 all_entry_indices[entry.entry_id] = idx
 
-        indices, coeffs, data = {}, {}, {}  # keys are reaction sizes
+        # group by reaction size to ensure rectangular matrices
+        indices: dict[int, list] = {}
+        coeffs: dict[int, list] = {}
+        data: dict[int, list] = {}
 
         for rxn in rxns:
             size = len(rxn.entries)
@@ -202,8 +205,8 @@ class ReactionSet(MSONable):
         self,
         cost_function: CostFunction,
         target: Composition | None = None,
-        calculate_uncertainties=False,
-        calculate_separable=False,
+        calculate_uncertainties: bool = False,
+        calculate_separable: bool = False,
     ) -> DataFrame:
         """
         Make a dataframe of reactions from a ReactionSet object.
@@ -316,7 +319,7 @@ class ReactionSet(MSONable):
         """
         return [cf.evaluate(rxn) for rxn in self.get_rxns()]
 
-    def add_rxns(self, rxns):
+    def add_rxns(self, rxns: Collection[ComputedReaction | OpenComputedReaction]):
         """
         Return a new ReactionSet with the reactions added.
 
@@ -327,7 +330,7 @@ class ReactionSet(MSONable):
 
         return self.add_rxn_set(new_rxn_set)
 
-    def add_rxn_set(self, rxn_set: "ReactionSet") -> "ReactionSet":
+    def add_rxn_set(self, rxn_set: ReactionSet) -> ReactionSet:
         """Adds a new reaction set to current reaction set.
 
         Warning: new reaction set must have the same entries as the current reaction
@@ -409,6 +412,12 @@ class ReactionSet(MSONable):
     def get_rxns_by_product(self, product: str, return_set: bool = False):
         """
         Return a list of reactions which contain the given product formula.
+
+        Args:
+            product: The product's formula
+            return_set: Whether to return the identified reactions in the form of a
+                ReactionSet object. Defaults to False.
+
         """
         product = Composition(product).reduced_formula
 
@@ -444,13 +453,21 @@ class ReactionSet(MSONable):
         self,
         ensure_rxns: list[ComputedReaction | OpenComputedReaction] | None = None,
         parallelize: bool = True,
-    ):
+    ) -> ReactionSet:
         """
-        Return a new ReactionSet object with duplicate reactions removed.
+        Returns a new ReactionSet object with duplicate reactions removed.
 
-        Duplicate reactions include those that are multiples of each other. For example,
-        if a reaction set contains both A + B -> C and 2A + 2B -> 2C, the second
+        NOTE: Duplicate reactions include those that are multiples of each other. For
+        example, if a reaction set contains both A + B -> C and 2A + 2B -> 2C, the second
         reaction will be removed.
+
+        Args:
+            ensure_rxns: An optional list of reactions to ensure are contained within
+                the filtered set that is returned. This is important for some cases
+                (e.g., pathfinding), where you expect a certain reaction object to be in
+                the set.
+            parallelize: Whether to parallelize duplicate checking with Ray. This can be
+                a slow procedure otherwise. Defaults to True.
         """
         if parallelize:
             if not ray.is_initialized():
@@ -551,32 +568,37 @@ class ReactionSet(MSONable):
 
         return self._get_rxn_set_by_indices(idxs_to_keep)
 
-    def set_chempot(self, open_el: str | Element | None, chempot: float):
-        """Returns a new ReactionSet containing the same reactions as this ReactionSet
-        but with a grand potential change recalculated under the constraint defined by the
+    def set_chempot(self, open_el: str | Element | None, chempot: float) -> ReactionSet:
+        """
+        Returns a new ReactionSet containing the same reactions as this ReactionSet but
+        with a grand potential change recalculated under the constraint defined by the
         provided open element and its chemical potential.
 
         Args:
             open_el: The element to be considered open.
-            chempot: The open element's chemical potential (for use in energy change calculation)
+            chempot: The open element's chemical potential (for use in energy change
+                calculation)
 
         Returns:
-            ReactionSet: A new ReactionSet containing reactions with the recalculated energies.
+            ReactionSet: A new ReactionSet containing reactions with the recalculated
+                energies.
         """
         return ReactionSet(
             self.entries, self.indices, self.coeffs, open_el, chempot, self.all_data
         )
 
-    def set_new_temperature(self, new_temp: float):
-        """Returns a new ReactionSet containing the same reactions as this ReactionSet but with
-        a recalculated Gibb's/Grand potential change reflecting formation energies calculated at
-        the provided temperature.
+    def set_new_temperature(self, new_temp: float) -> ReactionSet:
+        """
+        Returns a new ReactionSet containing the same reactions as this ReactionSet but
+        with a recalculated Gibb's/Grand potential change reflecting formation energies
+        calculated at the provided temperature.
 
         Args:
-            new_temp (float): The temperature for which new reaction energies should be calculated.
+            new_temp: The temperature for which new reaction energies should be
+                calculated.
 
         Returns:
-            ReactionSet: The new ReactionSet containing the recalculated reactions.
+            The new ReactionSet containing the recalculated reactions.
         """
         new_rxns = []
         for rxn in self.get_rxns():
@@ -621,9 +643,9 @@ class ReactionSet(MSONable):
 
     def _get_rxn_set_by_indices(self, idxs: dict[int, np.ndarray]) -> "ReactionSet":
         """
-        Return a list of reactions with the given indices.
+        Return a list of reactions with the given indices. This is the backbone of other
+        reaction subset generation methods.
         """
-
         return ReactionSet(
             entries=self.entries,
             indices={
@@ -699,8 +721,7 @@ class ReactionSet(MSONable):
 
 
 def _get_idxs_to_keep(rows, ensure_idxs=None):
-    """Looks for reactions with coeffs that are positive multiples
-    of each other."""
+    """Looks for reactions with coeffs that are positive multiples of each other."""
     sorted_indices = np.argsort(np.abs(rows).sum(axis=1))  # sort by abs sum
     sorted_rows = rows[sorted_indices]
     if ensure_idxs is not None:
@@ -746,13 +767,14 @@ def _process_duplicates_ray(
     ensure_idxs: list[int],
 ) -> tuple[int, list[int]]:
     """
-    Process a chunk of reactions to find duplicates.
+    Process a chunk of reactions to find duplicates. This is a remote function within
+    Ray.
 
     Args:
-        chunk: chunk of reactions to process
+        size: size of reactions to process
+        groups: chunks of reactions to process
         coeffs: corresponding coefficients
         ensure_idxs: indices of reactions to ensure are kept
-        size: size of reactions to process
 
     Returns:
         List of indices to keep

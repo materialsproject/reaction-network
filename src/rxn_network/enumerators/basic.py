@@ -282,7 +282,7 @@ class BasicEnumerator(Enumerator):
         return rxn_set
 
     @classmethod
-    def _get_num_chunks(cls, items, open_combos, chunk_size):
+    def _get_num_chunks(cls, items, open_combos, chunk_size) -> int:
         _ = open_combos  # not used in BasicEnumerator
 
         num_chunks = 0
@@ -293,7 +293,7 @@ class BasicEnumerator(Enumerator):
         return num_chunks
 
     @staticmethod
-    def _rxn_iter_length(combos, open_combos):
+    def _rxn_iter_length(combos, open_combos) -> int:
         _ = open_combos  # not used in BasicEnumerator
         return comb(len(combos), 2)
 
@@ -438,18 +438,18 @@ class BasicEnumerator(Enumerator):
         return filtered_dict
 
     @property
-    def stabilize(self):
+    def stabilize(self) -> bool:
         """Whether or not to use only stable entries in analysis"""
         return self._stabilize
 
     @property
-    def build_pd(self):
+    def build_pd(self) -> bool:
         """Whether or not to build a PhaseDiagram object during reaction enumeration (
         useful for some analyses)"""
         return self._build_pd
 
     @property
-    def build_grand_pd(self):
+    def build_grand_pd(self) -> bool:
         """Whether or not to build a GrandPotentialPhaseDiagram object during
         reaction enumeration (useful for some analyses)"""
         return self._build_grand_pd
@@ -580,7 +580,8 @@ def _react(
     user-defined enumerator settings. It can also be called as a remote function using
     ray, allowing for parallel computation during reaction enumeration.
 
-    Note: this function is not intended to to be called directly!
+    WARNING: this function is not intended to to be called directly by the user and
+    should only be used by the enumerator classes.
 
     """
     all_rxns = []
@@ -654,7 +655,7 @@ def _get_entries_and_pds(
     for item in combos_dict_chunk:
         if item is None:
             continue
-        chemsys, combos = item
+        chemsys, _ = item
         elems = chemsys.split("-")
 
         filtered_entries = None

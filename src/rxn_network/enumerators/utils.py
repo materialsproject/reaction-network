@@ -3,7 +3,7 @@ Utility functions used by the reaction enumerator classes.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 from pymatgen.analysis.interface_reactions import (
     GrandPotentialInterfacialReactivity,
@@ -15,13 +15,18 @@ from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
+from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
+    from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
     from pymatgen.entries.computed_entries import Entry
 
     from rxn_network.core import Composition
     from rxn_network.entries.entry_set import GibbsEntrySet
+    from rxn_network.enumerators.base import Enumerator
     from rxn_network.reactions.base import Reaction
+
+logger = get_logger(__name__)
 
 
 def get_computed_rxn(
@@ -54,7 +59,11 @@ def get_computed_rxn(
 
 
 def react_interface(
-    r1: Composition, r2: Composition, filtered_entries, pd, grand_pd=None
+    r1: Composition,
+    r2: Composition,
+    filtered_entries: GibbsEntrySet,
+    pd: PhaseDiagram,
+    grand_pd: GrandPotentialPhaseDiagram | None = None,
 ):
     """Simple API for InterfacialReactivity module from pymatgen."""
     chempots = None
@@ -172,3 +181,31 @@ def stabilize_entries(
         new_entries.append(new_entry)
 
     return new_entries
+
+
+def run_enumerators(enumerators: Iterable[Enumerator], entries: GibbsEntrySet):
+    """
+    Utility method for calling enumerate() for a list of enumerators on a particular set
+    of entries. Reaction sets are automatically combined and duplicates are filtered.
+
+    Args:
+        enumerators: an iterable of enumerators to use for reaction enumeration
+        entries: an entry set to provide to the enumerate() function.
+    """
+    rxn_set = None
+    for enumerator in enumerators:
+        logger.info(f"Running {enumerator.__class__.__name__}")
+        rxns = enumerator.enumerate(entries)
+
+        logger.info(f"Adding {len(rxns)} reactions to reaction set")
+
+        if rxn_set is None:
+            rxn_set = rxns
+        else:
+            rxn_set = rxn_set.add_rxn_set(rxns)
+
+    logger.info("Completed reaction enumeration. Filtering duplicates...")
+    if rxn_set is not None:
+        rxn_set = rxn_set.filter_duplicates()
+    logger.info("Completed duplicate filtering.")
+    return rxn_set

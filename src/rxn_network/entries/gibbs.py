@@ -36,6 +36,7 @@ class GibbsComputedEntry(ComputedEntry):
 
     If you use this entry class in your work, please consider citing the following
     paper:
+
         Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R., Tumas, W., Weimer,
         A. W., … Holder, A. M. (2018). Physical descriptor for the Gibbs energy of
         inorganic crystalline solids and temperature-dependent materials chemistry.
