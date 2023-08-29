@@ -90,7 +90,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     def __len__(self) -> int:
         return len(self.entries)
 
-    def add(self, entry: GibbsComputedEntry | ExperimentalReferenceEntry | Interpolated Entry) -> None:
+    def add(self, entry: GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry) -> None:
         """
         Add an entry to the set in place.
 

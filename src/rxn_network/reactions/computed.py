@@ -2,16 +2,20 @@
 A reaction class that builds reactions based on ComputedEntry objects and provides
 information about reaction thermodynamics.
 """
+from __future__ import annotations
+
 from functools import cached_property
-from typing import Dict, List, Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import ComputedEntry
 from uncertainties import ufloat
 
 from rxn_network.core import Composition
 from rxn_network.reactions.basic import BasicReaction
+
+if TYPE_CHECKING:
+    from pymatgen.entries.computed_entries import ComputedEntry
 
 
 class ComputedReaction(BasicReaction):
@@ -23,17 +27,17 @@ class ComputedReaction(BasicReaction):
 
     def __init__(
         self,
-        entries: List[ComputedEntry],
-        coefficients: Union[np.ndarray, List[float]],
-        data: Optional[Dict] = None,
-        lowest_num_errors: Union[int, float] = 0,
+        entries: list[ComputedEntry],
+        coefficients: np.ndarray | list[float],
+        data: dict | None = None,
+        lowest_num_errors: int | float = 0,
     ):
         """
         Args:
             entries: List of ComputedEntry objects.
-            coefficients: List of reaction coefficients.
+            coefficients: List or array of reaction coefficients.
             data: Optional dict of data
-            lowest_num_errors: number of "errors" encountered during reaction balancing
+            lowest_num_errors: number of "errors" encountered during reaction balancing.
         """
         self._entries = list(entries)
         self.reactant_entries = [
@@ -51,9 +55,9 @@ class ComputedReaction(BasicReaction):
     @classmethod
     def balance(
         cls,
-        reactant_entries: List[ComputedEntry],
-        product_entries: List[ComputedEntry],
-        data: Optional[Dict] = None,
+        reactant_entries: list[ComputedEntry],
+        product_entries: list[ComputedEntry],
+        data: dict | None = None,
     ) -> "ComputedReaction":
         """
         Balances and returns a new ComputedReaction.
@@ -83,7 +87,7 @@ class ComputedReaction(BasicReaction):
             lowest_num_errors=lowest_num_errors,
         )
 
-    def get_new_temperature(self, new_temperature: float):
+    def get_new_temperature(self, new_temperature: float) -> "ComputedReaction":
         """
         Returns a new reaction with the temperature changed.
 
@@ -108,7 +112,7 @@ class ComputedReaction(BasicReaction):
 
     def get_energy(self):
         """ """
-        calc_energies: Dict[Composition, float] = {}
+        calc_energies: dict[Composition, float] = {}
 
         for entry in self._entries:
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()
@@ -127,7 +131,7 @@ class ComputedReaction(BasicReaction):
         Returns (float):
             The calculated reaction energy.
         """
-        calc_energies: Dict[Composition, float] = {}
+        calc_energies: dict[Composition, float] = {}
 
         for entry in self._entries:
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()
@@ -156,7 +160,7 @@ class ComputedReaction(BasicReaction):
         the energies of the reactants/products.
         """
 
-        calc_energies: Dict[Composition, ufloat] = {}
+        calc_energies: dict[Composition, ufloat] = {}
 
         for entry in self._entries:
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()
@@ -181,7 +185,7 @@ class ComputedReaction(BasicReaction):
         return self.energy_uncertainty / self.num_atoms
 
     @property
-    def entries(self) -> List[ComputedEntry]:
+    def entries(self) -> list[ComputedEntry]:
         """
         Returns a copy of the entries
         """
@@ -241,7 +245,7 @@ class ComputedReaction(BasicReaction):
         coeffs *= scale_factor
         return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
 
-    def get_entry_idx_vector(self, n):
+    def get_entry_idx_vector(self, n) -> np.ndarray:
         indices = [e.data["idx"] for e in self.entries]
         # if None in indices:
         #     raise ValueError(
@@ -252,10 +256,7 @@ class ComputedReaction(BasicReaction):
         v[indices] = self.coefficients
         return v
 
-    def __hash__(self):
-        return BasicReaction.__hash__(self)
-
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         is_equal = BasicReaction.__eq__(self, other)
 
         if is_equal:

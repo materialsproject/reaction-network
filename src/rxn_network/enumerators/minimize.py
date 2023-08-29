@@ -2,19 +2,15 @@
 This module implements two types of reaction enumerators using a free energy
 minimization technique, with or without the option of an open entry.
 """
+from __future__ import annotations
 
 from itertools import product
-from typing import List, Optional
 
-from pymatgen.analysis.interface_reactions import (
-    GrandPotentialInterfacialReactivity,
-    InterfacialReactivity,
-)
 from pymatgen.core.composition import Element
 
 from rxn_network.core import Composition
 from rxn_network.enumerators.basic import BasicEnumerator
-from rxn_network.enumerators.utils import get_computed_rxn
+from rxn_network.enumerators.utils import react_interface
 
 
 class MinimizeGibbsEnumerator(BasicEnumerator):
@@ -30,11 +26,11 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
 
     def __init__(
         self,
-        precursors: Optional[List[str]] = None,
-        targets: Optional[List[str]] = None,
+        precursors: list[str] | None = None,
+        targets: list[str] | None = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
-        filter_by_chemsys: Optional[str] = None,
+        filter_by_chemsys: str | None = None,
         max_num_constraints: int = 1,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
@@ -49,8 +45,6 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             precursors: Optional formulas of precursors.
             targets: Optional formulas of targets; only reactions which make
                 these targets will be enumerated.
-            calculators: Optional list of Calculator object names; see calculators
-                module for options (e.g., ["ChempotDistanceCalculator"])
             exclusive_precursors: Whether to consider only reactions that have
                 reactants which are a subset of the provided list of precursors.
                 Defaults to True.
@@ -127,11 +121,11 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         self,
         open_elem: Element,
         mu: float,
-        precursors: Optional[List[str]] = None,
-        targets: Optional[List[str]] = None,
+        precursors: list[str] | None = None,
+        targets: list[str] | None = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
-        filter_by_chemsys: Optional[str] = None,
+        filter_by_chemsys: str | None = None,
         max_num_constraints: int = 1,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
@@ -148,8 +142,6 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             precursors: Optional formulas of precursors.
             targets: Optional formulas of targets; only reactions which make
                 these targets will be enumerated.
-            calculators: Optional list of Calculator object names; see calculators
-                module for options (e.g., ["ChempotDistanceCalculator])
             exclusive_precursors: Whether to consider only reactions that have
                 reactants which are a subset of the provided list of precursors.
                 Defaults to True.
@@ -213,35 +205,3 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
             pd,
             grand_pd=grand_pd,
         )
-
-
-def react_interface(r1, r2, filtered_entries, pd, grand_pd=None):
-    """Simple API for InterfacialReactivity module from pymatgen."""
-    chempots = None
-
-    if grand_pd:
-        interface = GrandPotentialInterfacialReactivity(
-            r1,
-            r2,
-            grand_pd,
-            pd_non_grand=pd,
-            norm=True,
-            include_no_mixing_energy=True,
-            use_hull_energy=True,
-        )
-        chempots = grand_pd.chempots
-
-    else:
-        interface = InterfacialReactivity(
-            r1,
-            r2,
-            pd,
-            use_hull_energy=True,
-        )
-
-    rxns = []
-    for _, _, _, rxn, _ in interface.get_kinks():
-        rxn = get_computed_rxn(rxn, filtered_entries, chempots)
-        rxns.append(rxn)
-
-    return rxns

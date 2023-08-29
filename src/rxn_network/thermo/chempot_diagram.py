@@ -2,16 +2,21 @@
 This module implements added features to the ChemicalPotentialDiagram class from
 pymatgen.
 """
+from __future__ import annotations
+
 from functools import cached_property
-from typing import Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.analysis.chempot_diagram import ChemicalPotentialDiagram as ChempotDiagram
-from pymatgen.analysis.phase_diagram import PDEntry, PhaseDiagram
-from pymatgen.core.composition import Element
+from pymatgen.analysis.phase_diagram import PhaseDiagram
 from scipy.spatial import HalfspaceIntersection, KDTree
 
 from rxn_network.entries.entry_set import GibbsEntrySet
+
+if TYPE_CHECKING:
+    from pymatgen.analysis.phase_diagram import PDEntry
+    from pymatgen.core.periodic_table import Element
 
 
 class ChemicalPotentialDiagram(ChempotDiagram):
@@ -33,9 +38,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
-        entries: List[PDEntry],
-        limits: Optional[Dict[Element, float]] = None,
-        default_min_limit: Optional[float] = -100.0,
+        entries: list[PDEntry],
+        limits: dict[Element, float] | None = None,
+        default_min_limit: float | None = -100.0,
     ):
         """
         Initialize a ChemicalPotentialDiagram object.
@@ -94,9 +99,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         self._border_hyperplane_indices = list(
             range(num_hyperplanes, num_hyperplanes + num_border_hyperplanes)
         )
-        self._metastable_domains: Dict[str, List] = {}  # for caching
+        self._metastable_domains: dict[str, list] = {}  # for caching
 
-    def shortest_domain_distance(self, f1: str, f2: str, offset=0.0) -> float:
+    def shortest_domain_distance(self, f1: str, f2: str, offset: float = 0.0) -> float:
         """
         Args:
             f1: chemical formula (1)
@@ -127,9 +132,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         interior_point = np.min(self.lims, axis=1) + 1e-1
         return HalfspaceIntersection(hs_hyperplanes, interior_point)
 
-    def _get_domains(self) -> Dict[str, np.ndarray]:
+    def _get_domains(self) -> dict[str, np.ndarray]:
         """Returns a dictionary of domains as {formula: np.ndarray}"""
-        domains: Dict[str, List] = {
+        domains: dict[str, list] = {
             entry.composition.reduced_formula: [] for entry in self._hyperplane_entries
         }
         entries = self._hyperplane_entries
@@ -145,7 +150,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         return {k: np.array(v) for k, v in domains.items() if v}
 
-    def _get_hyperplanes_and_entries(self) -> Tuple[np.ndarray, List[PDEntry]]:
+    def _get_hyperplanes_and_entries(self) -> tuple[np.ndarray, list[PDEntry]]:
         """Returns both the array of hyperplanes, as well as a list of the minimum
         entries"""
         data = np.array([self._get_hyperplane(e) for e in self._min_entries])
@@ -231,12 +236,12 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         return self._hs_int
 
     @cached_property
-    def domains(self) -> Dict[str, np.ndarray]:
+    def domains(self) -> dict[str, np.ndarray]:
         """Mapping of formulas to array of domain boundary points"""
         return self._get_domains()
 
     @property
-    def metastable_domains(self) -> Dict[str, np.ndarray]:
+    def metastable_domains(self) -> dict[str, np.ndarray]:
         """
         Gets a dictionary of the chemical potential domains for metastable chemical
         formulas. This corresponds to the domains of the relevant phases if they were

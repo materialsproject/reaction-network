@@ -1,19 +1,93 @@
 """
-Utility functions used by the enumerator classes.
+Utility functions used by the reaction enumerator classes.
 """
-from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
+from __future__ import annotations
 
+from typing import TYPE_CHECKING, Iterable
+
+from pymatgen.analysis.interface_reactions import (
+    GrandPotentialInterfacialReactivity,
+    InterfacialReactivity,
+)
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import ComputedEntry, Entry
+from pymatgen.core.periodic_table import Element
+from pymatgen.entries.computed_entries import ComputedEntry
 
-from rxn_network.entries.entry_set import GibbsEntrySet
-from rxn_network.reactions.base import Reaction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 
+if TYPE_CHECKING:
+    from pymatgen.entries.computed_entries import Entry
 
-def get_elems_set(entries: Iterable[Entry]) -> Set[str]:
+    from rxn_network.core import Composition
+    from rxn_network.entries.entry_set import GibbsEntrySet
+    from rxn_network.reactions.base import Reaction
+
+
+def get_computed_rxn(
+    rxn: Reaction, entries: GibbsEntrySet, chempots: dict[Element, float] | None = None
+) -> ComputedReaction:
+    """
+    Provided with a Reaction object and a list of possible entries, this function
+    returns a new ComputedReaction object containing a selection of those entries.
+
+    Args:
+        rxn: Reaction object
+        entries: Iterable of entries
+
+    Returns:
+        A ComputedReaction object transformed from a normal Reaction object
+    """
+    reactant_entries = [
+        entries.get_min_entry_by_formula(r.reduced_formula) for r in rxn.reactants
+    ]
+    product_entries = [
+        entries.get_min_entry_by_formula(p.reduced_formula) for p in rxn.products
+    ]
+
+    if chempots:
+        rxn = OpenComputedReaction.balance(reactant_entries, product_entries, chempots)
+    else:
+        rxn = ComputedReaction.balance(reactant_entries, product_entries)
+
+    return rxn
+
+
+def react_interface(
+    r1: Composition, r2: Composition, filtered_entries, pd, grand_pd=None
+):
+    """Simple API for InterfacialReactivity module from pymatgen."""
+    chempots = None
+
+    if grand_pd:
+        interface = GrandPotentialInterfacialReactivity(
+            r1,
+            r2,
+            grand_pd,
+            pd_non_grand=pd,
+            norm=True,
+            include_no_mixing_energy=True,
+            use_hull_energy=True,
+        )
+        chempots = grand_pd.chempots
+
+    else:
+        interface = InterfacialReactivity(
+            r1,
+            r2,
+            pd,
+            use_hull_energy=True,
+        )
+
+    rxns = []
+    for _, _, _, rxn, _ in interface.get_kinks():
+        rxn = get_computed_rxn(rxn, filtered_entries, chempots)
+        rxns.append(rxn)
+
+    return rxns
+
+
+def get_elems_set(entries: Iterable[Entry]) -> set[str]:
     """
     Returns chemical system as a set of element names, for set of entries.
 
@@ -43,7 +117,7 @@ def get_total_chemsys_str(
 
 
 def group_by_chemsys(
-    combos: Iterable[Tuple[Entry]], open_elems: Optional[Iterable[Element]] = None
+    combos: Iterable[tuple[Entry]], open_elems: Iterable[Element] | None = None
 ) -> dict:
     """
     Groups entry combinations by chemical system, with optional open element.
@@ -55,7 +129,7 @@ def group_by_chemsys(
     Returns:
         Dictionary of entry combos grouped by chemical system
     """
-    combo_dict: Dict[str, List[Tuple[Entry]]] = {}
+    combo_dict: dict[str, list[tuple[Entry]]] = {}
     for combo in combos:
         key = get_total_chemsys_str(combo, open_elems)
         if key in combo_dict:
@@ -68,7 +142,7 @@ def group_by_chemsys(
 
 def stabilize_entries(
     pd: PhaseDiagram, entries_to_adjust: Iterable[Entry], tol: float = 1e-6
-) -> List[Entry]:
+) -> list[Entry]:
     """
     Simple method for stabilizing entries by decreasing their energy to be on the hull.
 
@@ -98,32 +172,3 @@ def stabilize_entries(
         new_entries.append(new_entry)
 
     return new_entries
-
-
-def get_computed_rxn(
-    rxn: Reaction, entries: GibbsEntrySet, chempots=None
-) -> ComputedReaction:
-    """
-    Provided with a Reaction object and a list of possible entries, this function
-    returns a new ComputedReaction object containing a selection of those entries.
-
-    Args:
-        rxn: Reaction object
-        entries: Iterable of entries
-
-    Returns:
-        A ComputedReaction object transformed from a normal Reaction object
-    """
-    reactant_entries = [
-        entries.get_min_entry_by_formula(r.reduced_formula) for r in rxn.reactants
-    ]
-    product_entries = [
-        entries.get_min_entry_by_formula(p.reduced_formula) for p in rxn.products
-    ]
-
-    if chempots:
-        rxn = OpenComputedReaction.balance(reactant_entries, product_entries, chempots)
-    else:
-        rxn = ComputedReaction.balance(reactant_entries, product_entries)
-
-    return rxn

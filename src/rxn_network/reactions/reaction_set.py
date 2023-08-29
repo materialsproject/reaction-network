@@ -2,24 +2,29 @@
 Implements a class for conveniently and efficiently storing sets of ComputedReaction
 objects which share entries.
 """
+from __future__ import annotations
+
 from collections import OrderedDict
 from functools import lru_cache
-from typing import Any, Collection, Dict, Iterable, List, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Any, Collection, Iterable
 
 import numpy as np
 import ray
 from monty.json import MSONable
 from pandas import DataFrame
 from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
 
 from rxn_network.core import Composition
-from rxn_network.costs.base import CostFunction
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.utils.funcs import get_logger, grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
+
+if TYPE_CHECKING:
+    from pymatgen.entries.computed_entries import ComputedEntry
+
+    from rxn_network.costs.base import CostFunction
 
 logger = get_logger(__name__)
 
@@ -37,12 +42,12 @@ class ReactionSet(MSONable):
 
     def __init__(
         self,
-        entries: List[ComputedEntry],
-        indices: Dict[int, np.ndarray],
-        coeffs: Dict[int, np.ndarray],
-        open_elem: Optional[Union[str, Element]] = None,
+        entries: list[ComputedEntry],
+        indices: dict[int, np.ndarray],
+        coeffs: dict[int, np.ndarray],
+        open_elem: str | Element | None = None,
         chempot: float = 0.0,
-        all_data: Optional[Dict[int, np.ndarray]] = None,
+        all_data: dict[int, np.ndarray] | None = None,
     ):
         """
         Args:
@@ -95,7 +100,7 @@ class ReactionSet(MSONable):
 
     def get_rxns(
         self,
-    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
+    ) -> Iterable[ComputedReaction | OpenComputedReaction]:
         """
         Generator for all ComputedReaction objects or OpenComputedReaction objects (when
         open element and chempot are specified) for the reaction set.
@@ -107,9 +112,9 @@ class ReactionSet(MSONable):
     @classmethod
     def from_rxns(
         cls,
-        rxns: Collection[Union[ComputedReaction, OpenComputedReaction]],
-        entries: Optional[Collection[ComputedEntry]] = None,
-        open_elem: Optional[Union[str, Element]] = None,
+        rxns: Collection[ComputedReaction | OpenComputedReaction],
+        entries: Collection[ComputedEntry] | None = None,
+        open_elem: str | Element | None = None,
         chempot: float = 0.0,
         filter_duplicates: bool = False,
     ) -> "ReactionSet":
@@ -163,8 +168,8 @@ class ReactionSet(MSONable):
             coeffs[size] = np.array(coeffs[size])
             data[size] = np.array(data[size])
 
-        all_open_elems: Set[Element] = set()
-        all_chempots: Set[float] = set()
+        all_open_elems: set[Element] = set()
+        all_chempots: set[float] = set()
 
         if (
             all(r.__class__.__name__ == "OpenComputedReaction" for r in rxns)
@@ -196,7 +201,7 @@ class ReactionSet(MSONable):
     def to_dataframe(
         self,
         cost_function: CostFunction,
-        target: Optional[Composition] = None,
+        target: Composition | None = None,
         calculate_uncertainties=False,
         calculate_separable=False,
     ) -> DataFrame:
@@ -221,7 +226,7 @@ class ReactionSet(MSONable):
                 other: any other data associated with reaction
 
         """
-        data: Dict[str, Any] = OrderedDict({k: [] for k in ["rxn", "energy"]})
+        data: dict[str, Any] = OrderedDict({k: [] for k in ["rxn", "energy"]})
         attrs = []
 
         calculate_e_above_hulls = False
@@ -302,7 +307,7 @@ class ReactionSet(MSONable):
     def calculate_costs(
         self,
         cf: CostFunction,
-    ) -> List[float]:
+    ) -> list[float]:
         """
         Evaluate a cost function on an acquired set of reactions.
 
@@ -365,8 +370,8 @@ class ReactionSet(MSONable):
         )
 
     def get_rxns_by_reactants(
-        self, reactants: List[str], return_set: bool = False
-    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
+        self, reactants: list[str], return_set: bool = False
+    ) -> Iterable[ComputedReaction | OpenComputedReaction]:
         """
         Return a list of reactions with the given reactants.
         """
@@ -383,7 +388,7 @@ class ReactionSet(MSONable):
         if not reactant_indices:
             return []
 
-        idxs: Dict[int, List[int]] = {}
+        idxs: dict[int, list[int]] = {}
         for size, indices in self.indices.items():
             idxs[size] = []
             contains_reactants = np.isin(indices, reactant_indices).any(axis=1)
@@ -416,7 +421,7 @@ class ReactionSet(MSONable):
         if not product_index:
             return []
 
-        idxs: Dict[int, np.ndarray] = {}
+        idxs: dict[int, np.ndarray] = {}
         for size, indices in self.indices.items():
             idxs[size] = []
             contains_product = np.isin(indices, product_index).any(axis=1)
@@ -436,7 +441,9 @@ class ReactionSet(MSONable):
         return self._get_rxns_by_indices(idxs)
 
     def filter_duplicates(
-        self, ensure_rxns: Optional[List[ComputedReaction]] = None, parallelize=True
+        self,
+        ensure_rxns: list[ComputedReaction | OpenComputedReaction] | None = None,
+        parallelize: bool = True,
     ):
         """
         Return a new ReactionSet object with duplicate reactions removed.
@@ -544,14 +551,14 @@ class ReactionSet(MSONable):
 
         return self._get_rxn_set_by_indices(idxs_to_keep)
 
-    def set_chempot(self, open_el: Optional[Union[str, Element]], chempot: float):
+    def set_chempot(self, open_el: str | Element | None, chempot: float):
         """Returns a new ReactionSet containing the same reactions as this ReactionSet
         but with a grand potential change recalculated under the constraint defined by the
         provided open element and its chemical potential.
 
         Args:
-            open_el (Optional[Union[str, Element]]): The element to be considered open.
-            chempot (float): The open element's chemical potential (for use in energy change calculation)
+            open_el: The element to be considered open.
+            chempot: The open element's chemical potential (for use in energy change calculation)
 
         Returns:
             ReactionSet: A new ReactionSet containing reactions with the recalculated energies.
@@ -580,8 +587,8 @@ class ReactionSet(MSONable):
         )
 
     def _get_rxns_by_indices(
-        self, idxs: Dict[int, np.ndarray]
-    ) -> Iterable[Union[ComputedReaction, OpenComputedReaction]]:
+        self, idxs: dict[int, np.ndarray]
+    ) -> Iterable[ComputedReaction | OpenComputedReaction]:
         """
         Return a list of reactions with the given indices.
         """
@@ -612,7 +619,7 @@ class ReactionSet(MSONable):
 
                 yield rxn
 
-    def _get_rxn_set_by_indices(self, idxs: Dict[int, np.ndarray]) -> "ReactionSet":
+    def _get_rxn_set_by_indices(self, idxs: dict[int, np.ndarray]) -> "ReactionSet":
         """
         Return a list of reactions with the given indices.
         """
@@ -632,7 +639,7 @@ class ReactionSet(MSONable):
 
     @staticmethod
     def _get_added_elems(
-        rxn: Union[ComputedReaction, OpenComputedReaction], target: Composition
+        rxn: ComputedReaction | OpenComputedReaction, target: Composition | str
     ) -> str:
         """
         Get list of added elements for a reaction.
@@ -669,7 +676,7 @@ class ReactionSet(MSONable):
         return f"{entry.composition.reduced_formula}_{round(entry.energy_per_atom, 4)}"
 
     @staticmethod
-    def _get_unique_entries(rxns: Collection[ComputedReaction]) -> Set[ComputedEntry]:
+    def _get_unique_entries(rxns: Collection[ComputedReaction]) -> set[ComputedEntry]:
         """
         Return only unique entries from reactions
         """
@@ -734,10 +741,10 @@ def _get_idxs_to_keep(rows, ensure_idxs=None):
 @ray.remote
 def _process_duplicates_ray(
     size: int,
-    groups: List[np.ndarray],
+    groups: list[np.ndarray],
     coeffs: np.ndarray,
-    ensure_idxs: List[int],
-) -> Tuple[int, List[int]]:
+    ensure_idxs: list[int],
+) -> tuple[int, list[int]]:
     """
     Process a chunk of reactions to find duplicates.
 
@@ -755,10 +762,10 @@ def _process_duplicates_ray(
 
 
 def _process_duplicates(
-    groups: List[np.ndarray],
+    groups: list[np.ndarray],
     coeffs: np.ndarray,
-    ensure_idxs: List[int],
-) -> List[int]:
+    ensure_idxs: list[int],
+) -> list[int]:
     """
     Process a chunk of reactions to find duplicates.
 

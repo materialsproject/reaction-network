@@ -1,5 +1,5 @@
 """
-Basic interface for a reaction Enumerator
+Basic interface for a reaction Enumerator.
 """
 import logging
 from abc import ABCMeta, abstractmethod

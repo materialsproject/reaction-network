@@ -2,19 +2,22 @@
 This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.
 """
+from __future__ import annotations
 
 import re
 from copy import deepcopy
 from functools import cached_property
 from itertools import chain, combinations
-from typing import Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from monty.fractions import gcd_float
-from pymatgen.core.composition import Element
 
 from rxn_network.core import Composition
 from rxn_network.reactions.base import Reaction
+
+if TYPE_CHECKING:
+    from pymatgen.core.periodic_table import Element
 
 TOLERANCE = 1e-6  # Tolerance for determining if a particular component fraction is > 0.
 
@@ -27,11 +30,11 @@ class BasicReaction(Reaction):
 
     def __init__(
         self,
-        compositions: List[Composition],
-        coefficients: Union[List[float], np.ndarray],
-        balanced: Optional[bool] = None,
-        data: Optional[Dict] = None,
-        lowest_num_errors: Union[int, float] = 0,
+        compositions: list[Composition],
+        coefficients: list[float] | np.ndarray,
+        balanced: bool | None = None,
+        data: dict | None = None,
+        lowest_num_errors: int | float = 0,
     ):
         """
         A BasicReaction object is defined by a list of compositions and their
@@ -86,9 +89,9 @@ class BasicReaction(Reaction):
     @classmethod
     def balance(
         cls,
-        reactants: List[Composition],
-        products: List[Composition],
-        data: Optional[Dict] = None,
+        reactants: list[Composition],
+        products: list[Composition],
+        data: dict | None = None,
     ) -> "BasicReaction":
         """
         Reactants and products to be specified as list of
@@ -296,14 +299,14 @@ class BasicReaction(Reaction):
         return {c: coeff / total for c, coeff in self.product_coeffs.items()}
 
     @classmethod
-    def from_string(cls, rxn_string) -> "BasicReaction":
+    def from_string(cls, rxn_string: str) -> "BasicReaction":
         """
         Generates a balanced reaction from a string. The reaction must
         already be balanced.
 
         Args:
             rxn_string:
-                The reaction string. For example, "4 Li + O2-> 2Li2O"
+                The reaction string. For example, "4 Li + O2-> 2 Li2O"
 
         Returns:
             BalancedReaction
@@ -325,7 +328,7 @@ class BasicReaction(Reaction):
 
     @classmethod
     def from_formulas(
-        cls, reactants: List[str], products: List[str]
+        cls, reactants: list[str], products: list[str]
     ) -> "BasicReaction":
         """
         Initialize a reaction from a list of 1) reactant formulas and 2) product
@@ -346,17 +349,17 @@ class BasicReaction(Reaction):
         return rxn
 
     @property
-    def reactants(self) -> List[Composition]:
+    def reactants(self) -> list[Composition]:
         """List of reactants for this reaction"""
         return list(self.reactant_coeffs.keys())
 
     @property
-    def products(self) -> List[Composition]:
+    def products(self) -> list[Composition]:
         """List of products for this reaction"""
         return list(self.product_coeffs.keys())
 
     @property
-    def compositions(self) -> List[Composition]:
+    def compositions(self) -> list[Composition]:
         """List of composition objects for this reaction"""
         return self._compositions
 
@@ -384,7 +387,7 @@ class BasicReaction(Reaction):
         raise ValueError("No energy per atom for a basic reaction!")
 
     @cached_property
-    def is_identity(self):
+    def is_identity(self) -> bool:
         """Returns True if the reaction has identical reactants and products"""
         return self._get_is_identity()
 
@@ -400,12 +403,12 @@ class BasicReaction(Reaction):
         )
 
     @cached_property
-    def chemical_system(self):
+    def chemical_system(self) -> str:
         """Returns the chemical system as string in the form of A-B-C-..."""
         return "-".join(sorted([str(el) for el in self.elements]))
 
     @property
-    def normalized_repr(self):
+    def normalized_repr(self) -> str:
         """
         A normalized representation of the reaction. All factors are converted
         to lowest common factors.
@@ -414,8 +417,8 @@ class BasicReaction(Reaction):
 
     @classmethod
     def _balance_coeffs(
-        cls, reactants: List[Composition], products: List[Composition]
-    ) -> Tuple[np.ndarray, Union[int, float], int]:
+        cls, reactants: list[Composition], products: list[Composition]
+    ) -> tuple[np.ndarray, int | float, int]:
         """
         Balances the reaction and returns the new coefficient matrix
         """
@@ -505,7 +508,7 @@ class BasicReaction(Reaction):
         return " + ".join(reactant_str) + " -> " + " + ".join(product_str)
 
     @classmethod
-    def _str_from_comp(cls, coeffs, compositions, reduce=False):
+    def _str_from_comp(cls, coeffs, compositions, reduce=False) -> str:
         r_coeffs = np.zeros(len(coeffs))
         r_formulas = []
         for i, (amt, comp) in enumerate(zip(coeffs, compositions)):
@@ -519,7 +522,7 @@ class BasicReaction(Reaction):
             factor = 1
         return cls._str_from_formulas(r_coeffs, r_formulas), factor
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self is other:
             return True
 
@@ -548,8 +551,8 @@ class BasicReaction(Reaction):
             (self.chemical_system, tuple(sorted(self.coefficients)))
         )  # not checking here for reactions that are multiples (too expensive)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self._str_from_comp(self.coefficients, self.compositions)[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()

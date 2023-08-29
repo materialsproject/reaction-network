@@ -1,4 +1,4 @@
-"""Functions for working with Ray."""
+"""Functions for working with Ray (parallelization library)."""
 import os
 
 import ray
@@ -8,7 +8,7 @@ from rxn_network.utils.funcs import get_logger
 logger = get_logger(__name__)
 
 
-def initialize_ray(quiet=False):
+def initialize_ray(quiet: bool = False):
     """
     Simple function to initialize ray. Basic support for running ray on multiple nodes.
     Currently supports SLURM and PBS job schedulers.
@@ -44,7 +44,7 @@ def initialize_ray(quiet=False):
         logger.info("Ray is already initialized.")
 
 
-def to_iterator(obj_ids, get_obj_ids=False):
+def to_iterator(obj_ids, get_obj_ids: bool = False):
     """
     Method to convert a list of ray object ids to an iterator that can be used in a for
     loop.

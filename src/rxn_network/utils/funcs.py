@@ -1,4 +1,4 @@
-""" Utility functions used throughout the reaction-network package."""
+"""Utility functions used throughout the reaction-network package."""
 
 import logging
 import sys
@@ -8,14 +8,14 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-def limited_powerset(iterable, max_size) -> Iterable:
+def limited_powerset(iterable: Iterable, max_size: int) -> Iterable:
     """
     Helper method for generating subsets ranging from singular
     length to maximum length specified by max_size.
 
     Args:
-        iterable (list/set): all objects to consider.
-        max_size (int): upper limit for size of combination subsets.
+        iterable: all objects to consider.
+        max_size: upper limit for size of combination subsets.
 
     Returns:
         All combination sets up to maximum size
@@ -25,7 +25,7 @@ def limited_powerset(iterable, max_size) -> Iterable:
     )
 
 
-def grouper(iterable: Iterable, n: int, fillvalue: Any = None):
+def grouper(iterable: Iterable, n: int, fillvalue: Any = None) -> Iterable:
     """
     Collects data into fixed-length chunks or blocks.
 
@@ -82,6 +82,6 @@ def get_logger(
 
 def datetime_str() -> str:
     """
-    Get a string representation of the current time. Borrowed from atomate2.
+    Get a string representation of the current time. Borrowed from atomate2 package.
     """
     return str(datetime.utcnow())

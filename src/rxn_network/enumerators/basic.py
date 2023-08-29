@@ -1,14 +1,15 @@
 """
 This module implements two types of basic (combinatorial) reaction enumerators.
 """
+from __future__ import annotations
+
 from copy import deepcopy
 from itertools import combinations, product
 from math import comb
-from typing import List, Optional, Set
+from typing import TYPE_CHECKING
 
 import ray
 from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
-from pymatgen.entries.computed_entries import ComputedEntry
 from tqdm import tqdm
 
 from rxn_network.entries.entry_set import GibbsEntrySet
@@ -19,6 +20,9 @@ from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger, grouper, limited_powerset
 from rxn_network.utils.ray import initialize_ray, to_iterator
+
+if TYPE_CHECKING:
+    from pymatgen.entries.computed_entries import ComputedEntry
 
 logger = get_logger(__name__)
 
@@ -37,44 +41,50 @@ class BasicEnumerator(Enumerator):
 
     def __init__(
         self,
-        precursors: Optional[List[str]] = None,
-        targets: Optional[List[str]] = None,
+        precursors: list[str] | None = None,
+        targets: list[str] | None = None,
         n: int = 2,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
-        filter_by_chemsys: Optional[str] = None,
-        max_num_constraints=1,
-        remove_unbalanced: bool = True,
-        remove_changed: bool = True,
-        calculate_e_above_hulls: bool = False,
+        filter_duplicates: bool = False,
+        filter_by_chemsys: str | None = None,
         chunk_size: int = MIN_CHUNK_SIZE,
         max_num_jobs: int = MAX_NUM_JOBS,
-        filter_duplicates: bool = False,
+        remove_unbalanced: bool = True,
+        remove_changed: bool = True,
+        max_num_constraints: int = 1,
         quiet: bool = False,
     ):
         """
 
         Args:
-            precursors: Optional list of precursor formulas; only reactions
-                which contain at least these phases as reactants will be enumerated. See
-                the "exclusive_precursors" parameter for more details.
-            targets: Optional list of target formulas; only reactions which include
-                formation of at least one of these targets will be enumerated. See the
-                "exclusive_targets" parameter for more details.
-            n: Maximum reactant/product cardinality; i.e., largest possible number of
-                entries on either side of the reaction. Defaults to 2.
-            exclusive_precursors: Whether to consider only reactions that have reactants
-                which are a subset of the provided list of precursors. In other words,
-                if True, this only identifies reactions with reactants selected from the
-                precursors argument. Defaults to True.
-            exclusive_targets: Whether to consider only reactions that make the
-                form products that are a subset of the provided list of targets. If
-                False, this only identifies reactions with no unspecified byproducts.
-                Defualts to False.
-            remove_unbalanced: Whether to remove reactions which are unbalanced.
-                Defaults to True.
+            precursors: Optional list of precursor formulas. The only reactions that
+                will be enumerated are those featuring one or more of these compositions
+                as reactants. The "exclusive_precursors" parameter allows one to tune
+                whether the enumerated reactions should include ALL precursors (the
+                default) or just one.
+            targets: Optional list of target formulas. The only reactions that
+                will be enumerated are those featuring one or more of these compositions
+                as products. The "exclusive_targets" parameter allows one to tune
+                whether the enumerated reactions should include ALL targets or just one
+                (the default).
+            n: Maximum reactant/product cardinality. This it the largest possible number
+                of entries on either side of the reaction. Defaults to 2.
+            exclusive_precursors: Whether enumerated reactions are required to have
+                reactants that are a subset of the provided list of precursors. If True
+                (the default), this only identifies reactions with reactants selected
+                from the provided precursors.
+            exclusive_targets: Whether enumerated reactions are required to have
+                products that are a subset of the provided list of targets. If False,
+                (the default), this identifies all reactions containing at least one
+                composition from the provided list of targets (and any number of
+                byproducts).
+            remove_unbalanced: Whether to remove reactions which are unbalanced; this is
+                usually advisable. Defaults to True.
             remove_changed: Whether to remove reactions which can only be balanced by
-                removing a reactant/product or having it change sides. Defaults to True.
+                removing a reactant/product or having it change sides. This is also
+                advisable for ensuring that only unique reaction sets are produced.
+                Defaults to True.
             calculate_e_above_hulls: Whether to calculate e_above_hull for each entry
                 upon initialization of the entries at the beginning of enumeration.
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
@@ -89,7 +99,6 @@ class BasicEnumerator(Enumerator):
         self.max_num_constraints = max_num_constraints
         self.remove_unbalanced = remove_unbalanced
         self.remove_changed = remove_changed
-        self.calculate_e_above_hulls = calculate_e_above_hulls
         self.chunk_size = chunk_size
         self.max_num_jobs = max_num_jobs
         self.filter_duplicates = filter_duplicates
@@ -100,7 +109,7 @@ class BasicEnumerator(Enumerator):
         self._p_set_func = "issuperset" if self.exclusive_precursors else "intersection"
         self._t_set_func = "issuperset" if self.exclusive_targets else "intersection"
 
-        self.open_phases: Optional[List] = None
+        self.open_phases: list | None = None
         self._build_pd = False
         self._build_grand_pd = False
 
@@ -313,7 +322,7 @@ class BasicEnumerator(Enumerator):
 
     def _get_open_combos(  # pylint: disable=useless-return
         self, open_entries
-    ) -> Optional[List[Set[ComputedEntry]]]:
+    ) -> list[set[ComputedEntry]] | None:
         """No open entries for BasicEnumerator, returns None"""
         _ = (self, open_entries)  # unused
         return None
@@ -453,13 +462,13 @@ class BasicOpenEnumerator(BasicEnumerator):
 
     def __init__(
         self,
-        open_phases: List[str],
-        precursors: Optional[List[str]] = None,
-        targets: Optional[List[str]] = None,
+        open_phases: list[str],
+        precursors: list[str] | None = None,
+        targets: list[str] | None = None,
         n: int = 2,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
-        filter_by_chemsys: Optional[str] = None,
+        filter_by_chemsys: str | None = None,
         max_num_constraints: int = 1,
         remove_unbalanced: bool = True,
         remove_changed: bool = True,
@@ -479,8 +488,6 @@ class BasicOpenEnumerator(BasicEnumerator):
                 which have these phases as reactants will be enumerated.
             targets: Optional list of formulas of targets; only reactions
                 which make this target will be enumerated.
-            calculators: Optional list of Calculator object names; see calculators
-                module for options (e.g., ["ChempotDistanceCalculator]).
             n: Maximum reactant/product cardinality; i.e., largest possible number of
                 entries on either side of the reaction.
             exclusive_precursors: Whether to consider only reactions that have
@@ -510,7 +517,7 @@ class BasicOpenEnumerator(BasicEnumerator):
             max_num_jobs=max_num_jobs,
             filter_duplicates=filter_duplicates,
         )
-        self.open_phases: List[str] = open_phases
+        self.open_phases: list[str] = open_phases
 
     @staticmethod
     def _rxn_iter_length(combos, open_combos):

@@ -1,18 +1,22 @@
 """
-A reaction class that builds reactions based on ComputedEntry objects under the
-presence of an open entry (e.g. O2), and provides information about reaction
-thermodynamics computed as changes in grand potential.
+A reaction class that builds reactions based on ComputedEntry objects under the presence
+of an open entry (e.g. O2), and provides information about reaction thermodynamics
+computed as changes in grand potential.
 """
+from __future__ import annotations
+
 from functools import cached_property
-from typing import Dict, List, Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core import Composition
 from rxn_network.reactions.computed import ComputedReaction
+
+if TYPE_CHECKING:
+    from pymatgen.entries.computed_entries import ComputedEntry
 
 
 class OpenComputedReaction(ComputedReaction):
@@ -23,11 +27,11 @@ class OpenComputedReaction(ComputedReaction):
 
     def __init__(
         self,
-        entries: List[ComputedEntry],
-        coefficients: Union[np.ndarray, List[float]],
-        chempots: Dict[Element, float],
-        data: Optional[Dict] = None,
-        lowest_num_errors=None,
+        entries: list[ComputedEntry],
+        coefficients: np.ndarray | list[float],
+        chempots: dict[Element, float],
+        data: dict | None = None,
+        lowest_num_errors: int | None = None,
     ):
         """
         Args:
@@ -61,10 +65,10 @@ class OpenComputedReaction(ComputedReaction):
     @classmethod
     def balance(  # type: ignore
         cls,
-        reactant_entries: List[ComputedEntry],
-        product_entries: List[ComputedEntry],
-        chempots: Dict[Element, float],
-        data: Optional[Dict] = None,
+        reactant_entries: list[ComputedEntry],
+        product_entries: list[ComputedEntry],
+        chempots: dict[Element, float],
+        data: dict | None = None,
     ) -> "OpenComputedReaction":
         """
         Balances and returns a new ComputedReaction.
@@ -108,7 +112,7 @@ class OpenComputedReaction(ComputedReaction):
 
         return rxn
 
-    def get_new_temperature(self, new_temperature: float):
+    def get_new_temperature(self, new_temperature: float) -> "OpenComputedReaction":
         """
         Returns a new reaction with the temperature changed.
 
@@ -138,7 +142,7 @@ class OpenComputedReaction(ComputedReaction):
         Returns (float):
             The calculated reaction energy.
         """
-        calc_energies: Dict[Composition, float] = {}
+        calc_energies: dict[Composition, float] = {}
 
         for entry in self.grand_entries:
             attr = "composition"
@@ -156,7 +160,7 @@ class OpenComputedReaction(ComputedReaction):
         )
 
     @property
-    def elements(self) -> List[Element]:
+    def elements(self) -> list[Element]:
         """
         List of elements in the reaction
         """
@@ -228,8 +232,8 @@ class OpenComputedReaction(ComputedReaction):
 
     @classmethod
     def from_computed_rxn(
-        cls, reaction: ComputedReaction, chempots: Dict[Element, float]
-    ):
+        cls, reaction: ComputedReaction, chempots: dict[Element, float]
+    ) -> "OpenComputedReaction":
         return cls(
             entries=reaction.entries.copy(),
             coefficients=reaction.coefficients.copy(),
@@ -247,13 +251,13 @@ class OpenComputedReaction(ComputedReaction):
         return d
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, d) -> "OpenComputedReaction":
         """
         Returns an OpenComputedReaction object from a dictionary representation.
         """
         d["chempots"] = {Element(symbol): u for symbol, u in d["chempots"].items()}
         return super().from_dict(d)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         cp = f"({','.join([f'mu_{e}={m}' for e, m in self.chempots.items()])})"
         return f"{super().__repr__()} {cp}"

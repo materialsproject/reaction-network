@@ -1,8 +1,8 @@
 """Code for analyzing sets of reactions between two phases."""
+from __future__ import annotations
 
 from functools import cached_property, lru_cache
 from itertools import combinations
-from typing import List, Tuple
 
 import numpy as np
 import plotly.express as px
@@ -27,15 +27,15 @@ class InterfaceReactionHull(MSONable):
         self,
         c1: Composition,
         c2: Composition,
-        reactions: List[ComputedReaction],
-        max_num_constraints=1,
+        reactions: list[ComputedReaction],
     ):
         """
         Args:
             c1: Composition of reactant 1
             c2: Composition of reactant 2
             reactions: List of reactions containing all enumerated reactions between the
-                two reactants. Note that this list should
+                two reactants. Note that this list should not include identity reactions
+                of the precursors.
         """
         self.c1 = Composition(c1).reduced_composition
         self.c2 = Composition(c2).reduced_composition
@@ -51,17 +51,12 @@ class InterfaceReactionHull(MSONable):
             if self.e1 is not None and self.e2 is not None:
                 break
         else:
-            print(c1, c2)
-            print(reactions)
             raise ValueError(
-                "Provided reactions do not correspond to reactant compositons!"
+                "Provided reactions do not correspond to reactant compositons!",
+                c1,
+                c2,
+                reactions,
             )
-
-        reactions = [
-            r
-            for r in reactions
-            if r.data.get("num_constraints", 1) <= max_num_constraints
-        ]
 
         endpoint_reactions = [
             ComputedReaction.balance([self.e1], [self.e1]),
@@ -82,7 +77,7 @@ class InterfaceReactionHull(MSONable):
         self.hull = ConvexHull(self.coords)
         self.endpoint_reactions = endpoint_reactions
 
-    def plot(self, y_max=0.2):
+    def plot(self, y_max: float = 0.2) -> Figure:
         """
         Plot the reaction hull.
         """
@@ -103,7 +98,7 @@ class InterfaceReactionHull(MSONable):
 
         return fig
 
-    def get_energy_above_hull(self, reaction):
+    def get_energy_above_hull(self, reaction: ComputedReaction) -> float:
         """
         Get the energy of a reaction above the reaction hull.
         """
@@ -113,7 +108,7 @@ class InterfaceReactionHull(MSONable):
 
         return e_above_hull
 
-    def get_coordinate(self, reaction):
+    def get_coordinate(self, reaction: ComputedReaction) -> float:
         """Get coordinate of reaction in reaction hull. This is expressed as the atomic
         mixing ratio of component 2 in the reaction."""
         amt_c1 = reaction.reactant_atomic_fractions.get(self.c1, 0)
@@ -128,7 +123,7 @@ class InterfaceReactionHull(MSONable):
 
         return round(coordinate, 12)  # avoids numerical issues
 
-    def get_hull_energy(self, coordinate):
+    def get_hull_energy(self, coordinate: float) -> float:
         """
         Get the energy of the reaction at a given coordinate.
 
@@ -141,7 +136,9 @@ class InterfaceReactionHull(MSONable):
         reactions = self.get_reactions_by_coordinate(coordinate)
         return sum(weight * r.energy_per_atom for r, weight in reactions.items())
 
-    def get_reactions_by_coordinate(self, coordinate):
+    def get_reactions_by_coordinate(
+        self, coordinate: float
+    ) -> dict[ComputedReaction, float]:
         """Get the reaction(s) at a given coordinate."""
         sorted_vertices = np.sort(self.hull_vertices)
         for i in range(len(sorted_vertices) - 1):
@@ -165,16 +162,23 @@ class InterfaceReactionHull(MSONable):
 
         raise ValueError("No reactions found!")
 
-    def get_primary_competition(self, reaction: ComputedReaction):
+    def get_primary_competition(self, reaction: ComputedReaction) -> float:
         """
-        Calculates the primary competition score for a given reaction. This formula is
-        based on a methodology presented in the following paper: (TBD)
+        Calculates the primary competition, C_1, for a reaction (in eV/atom).
+
+        If you use this selectivity metric in your work, please cite the following work:
+
+            McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
+            A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
+            Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
+            Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
+            August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
 
         Args:
-            reaction: Reaction to calculate the primary competition score for.
+            reaction: A computed reaction.
 
         Returns:
-            The c-score for the reaction
+            The primary competition (C1 score) in eV/atom.
         """
         energy = reaction.energy_per_atom
         coord = self.get_coordinate(reaction)
@@ -198,23 +202,44 @@ class InterfaceReactionHull(MSONable):
     def get_secondary_competition(
         self,
         reaction: ComputedReaction,
-        normalize=True,
-        recursive=False,
-        include_e_hull=False,
-    ):
+        normalize: bool = True,
+        include_e_hull: bool = False,
+        recursive: bool = False,
+    ) -> float:
         """
-        Calculates the score for a given reaction. This formula is based on a
-        methodology presented in the following paper: (TBD)
+        Calculates the secondary competition, C_2, for a reaction (in eV/atom).
+
+        If you use this selectivity metric in your work, please cite the following work:
+
+            McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
+            A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
+            Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
+            Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
+            August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
 
         Args:
-            reaction: Reaction to calculate the competition score for.
+            reaction: A computed reaction.
+            normalize: Whether or not to normalize the sum of secondary reaction
+                sequence energies by the total number of sequnces. Defaults to True
+                according to original definition.
+            include_e_hull: Whether or not to include the energy above hull of the
+                target reaction in the definition of C_2. According to the original
+                paper, this defaults to False.
+            recursive: Whether or not to perform the secondary reaction analysis via a
+                recursive approach. This should return the same answer, but much slower.
+                This argument exists for debugging / validation and defaults to False.
 
         Returns:
-            The competition score for the reaction
+            The secondary competition (C2 score) in eV/atom.
         """
         x = self.get_coordinate(reaction)
 
-        if recursive:
+        if not recursive:
+            left_energy = self.get_decomposition_energy(0, x)
+            left_num_paths = self.count(len(self.get_coords_in_range(0, x)) - 2)
+            right_energy = self.get_decomposition_energy(x, 1)
+            right_num_paths = self.count(len(self.get_coords_in_range(x, 1)) - 2)
+        else:
             (
                 left_energy,
                 left_num_paths,
@@ -223,11 +248,6 @@ class InterfaceReactionHull(MSONable):
                 right_energy,
                 right_num_paths,
             ) = self.get_decomposition_energy_and_num_paths_recursive(x, 1)
-        else:
-            left_energy = self.get_decomposition_energy(0, x)
-            left_num_paths = self.count(len(self.get_coords_in_range(0, x)) - 2)
-            right_energy = self.get_decomposition_energy(x, 1)
-            right_num_paths = self.count(len(self.get_coords_in_range(x, 1)) - 2)
 
         if left_num_paths == 0:
             left_num_paths = 1
@@ -246,7 +266,7 @@ class InterfaceReactionHull(MSONable):
 
         return -1 * energy
 
-    def get_secondary_competition_max_energy(self, reaction: ComputedReaction):
+    def get_secondary_competition_max_energy(self, reaction: ComputedReaction) -> float:
         """
         Calculates the score for a given reaction. This formula is based on a
         methodology presented in the following paper:
@@ -263,7 +283,7 @@ class InterfaceReactionHull(MSONable):
 
         return -1 * (left_energy + right_energy)
 
-    def get_secondary_competition_area(self, reaction: ComputedReaction):
+    def get_secondary_competition_area(self, reaction: ComputedReaction) -> float:
         """
         Calculates the score for a given reaction. This formula is based on a
         methodology presented in the following paper: (TBD)
@@ -280,7 +300,7 @@ class InterfaceReactionHull(MSONable):
 
         return left_area + right_area
 
-    def get_max_decomposition_energy(self, x1: float, x2: float):
+    def get_max_decomposition_energy(self, x1: float, x2: float) -> float:
         coords = self.get_coords_in_range(x1, x2)
 
         max_energy = 0
@@ -295,7 +315,7 @@ class InterfaceReactionHull(MSONable):
 
         return max_energy
 
-    def get_decomposition_energy(self, x1: float, x2: float):
+    def get_decomposition_energy(self, x1: float, x2: float) -> float:
         """
         Calculates the energy of the reaction decomposition between two points.
 
@@ -323,7 +343,7 @@ class InterfaceReactionHull(MSONable):
 
         return energy
 
-    def get_decomposition_area(self, x1: float, x2: float):
+    def get_decomposition_area(self, x1: float, x2: float) -> float:
         coords = self.get_coords_in_range(x1, x2)
         if len(coords) == 2:
             return 0
@@ -332,7 +352,7 @@ class InterfaceReactionHull(MSONable):
             coords, qhull_options="QJ i"
         ).volume  # this is how area is defined in scipy
 
-    def get_coords_in_range(self, x1, x2):
+    def get_coords_in_range(self, x1: float, x2: float) -> np.ndarray:
         """
         Get the coordinates in the range [x1, x2].
 
@@ -373,7 +393,7 @@ class InterfaceReactionHull(MSONable):
 
         return coords[coords[:, 0].argsort()]
 
-    def count(self, num):
+    def count(self, num: int) -> int:
         """
         Reurns the number of decomposition pathways for the interface reaction hull
         based on the number of **product** vertices (i.e., total # of vertices
@@ -419,8 +439,12 @@ class InterfaceReactionHull(MSONable):
 
     @lru_cache(maxsize=128)
     def get_decomposition_energy_and_num_paths_recursive(
-        self, x1: float, x2: float, use_x_min_ref=True, use_x_max_ref=True
-    ) -> Tuple[float, int]:
+        self,
+        x1: float,
+        x2: float,
+        use_x_min_ref: bool = True,
+        use_x_max_ref: bool = True,
+    ) -> tuple[float, int]:
         """
         This is a recursive implementation of the get_decomposition_energy function. It
         significantly slower than the non-recursive implementation but is more
@@ -583,7 +607,7 @@ class InterfaceReactionHull(MSONable):
         return line_data
 
     @cached_property
-    def hull_vertices(self):
+    def hull_vertices(self) -> np.ndarray:
         hull_vertices = [
             i
             for i in self.hull.vertices
@@ -597,7 +621,7 @@ class InterfaceReactionHull(MSONable):
         return np.array(hull_vertices)
 
     @cached_property
-    def stable_reactions(self):
+    def stable_reactions(self) -> list[ComputedReaction]:
         """
         Returns the reactions that are stable (on the convex hull) of the interface
         reaction hull.
@@ -634,15 +658,3 @@ class InterfaceReactionHull(MSONable):
         yd = y1 + xd * (y3 - y1)
 
         return y2 - yd
-
-    @staticmethod
-    def _primary_competition_from_energies(rxn_energy, other_rxn_energies, temp):
-        """
-        Calculates the primary competition given a list of reaction energies.
-        """
-        all_rxn_energies = np.append(other_rxn_energies, rxn_energy)
-        Q = np.sum(np.exp(-all_rxn_energies / (kb * temp)))
-
-        probability = np.exp(-rxn_energy / (kb * temp)) / Q
-
-        return -np.log(probability)
