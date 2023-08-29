@@ -36,26 +36,53 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         targets: list[str] | None = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
-        filter_by_chemsys: str | None = None,
-        max_num_constraints: int = 1,
-        remove_unbalanced: bool = True,
-        remove_changed: bool = True,
-        calculate_e_above_hulls: bool = False,
-        quiet: bool = False,
         filter_duplicates: bool = False,
+        filter_by_chemsys: str | None = None,
         chunk_size: int = MIN_CHUNK_SIZE,
         max_num_jobs: int = MAX_NUM_JOBS,
+        remove_unbalanced: bool = True,
+        remove_changed: bool = True,
+        max_num_constraints: int = 1,
+        quiet: bool = False,
     ):
         """
         Args:
-            precursors: Optional formulas of precursors.
-            targets: Optional formulas of targets; only reactions which make
-                these targets will be enumerated.
-            exclusive_precursors: Whether to consider only reactions that have
-                reactants which are a subset of the provided list of precursors.
+            precursors: Optional list of precursor formulas. The only reactions that
+                will be enumerated are those featuring one or more of these compositions
+                as reactants. The "exclusive_precursors" parameter allows one to tune
+                whether the enumerated reactions should include ALL precursors (the
+                default) or just one.
+            targets: Optional list of target formulas. The only reactions that
+                will be enumerated are those featuring one or more of these compositions
+                as products. The "exclusive_targets" parameter allows one to tune
+                whether the enumerated reactions should include ALL targets or just one
+                (the default).
+            exclusive_precursors: Whether enumerated reactions are required to have
+                reactants that are a subset of the provided list of precursors. If True
+                (the default), this only identifies reactions with reactants selected
+                from the provided precursors.
+            exclusive_targets: Whether enumerated reactions are required to have
+                products that are a subset of the provided list of targets. If False,
+                (the default), this identifies all reactions containing at least one
+                composition from the provided list of targets (and any number of
+                byproducts).
+            filter_duplicates: Whether to remove duplicate reactions. Defaults to False.
+            filter_by_chemsys: An optional chemical system for which to filter produced
+                reactions by. This ensures that all output reactions contain at least
+                one element within the provided system.
+            chunk_size: The minimum number of reactions per chunk procssed. Needs to be
+                sufficiently large to make parallelization a cost-effective strategy.
+                Defaults to MIN_CHUNK_SIZE.
+            max_num_jobs: The upper limit for the number of jobs created. Defaults to
+                MAX_NUM_JOBS.
+            remove_unbalanced: Whether to remove reactions which are unbalanced; this is
+                usually advisable. Defaults to True.
+            remove_changed: Whether to remove reactions which can only be balanced by
+                removing a reactant/product or having it change sides. This is also
+                advisable for ensuring that only unique reaction sets are produced.
                 Defaults to True.
-            exclusive_targets: Whether to consider only reactions that make the
-                provided target directly (i.e. with no byproducts). Defualts to False.
+            max_num_constraints: The maximum number of allowable constraints enforced by
+                reaction balancing. Defaults to 1 (which is usually advisable).
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
         super().__init__(
@@ -67,7 +94,6 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
             max_num_constraints=max_num_constraints,
             remove_unbalanced=remove_unbalanced,
             remove_changed=remove_changed,
-            calculate_e_above_hulls=calculate_e_above_hulls,
             quiet=quiet,
             filter_duplicates=filter_duplicates,
             chunk_size=chunk_size,
@@ -137,32 +163,56 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         targets: list[str] | None = None,
         exclusive_precursors: bool = True,
         exclusive_targets: bool = False,
+        filter_duplicates: bool = False,
         filter_by_chemsys: str | None = None,
-        max_num_constraints: int = 1,
-        remove_unbalanced: bool = True,
-        remove_changed: bool = True,
-        calculate_e_above_hulls: bool = False,
-        quiet: bool = False,
-        filter_duplicates: bool = True,
         chunk_size: int = MIN_CHUNK_SIZE,
         max_num_jobs: int = MAX_NUM_JOBS,
+        remove_unbalanced: bool = True,
+        remove_changed: bool = True,
+        max_num_constraints: int = 1,
+        quiet: bool = False,
     ):
         """
         Args:
-            open_elem: The element to be considered as open
-            mu: The chemical potential of the open element
-            precursors: Optional formulas of precursors.
-            targets: Optional formulas of targets; only reactions which make
-                these targets will be enumerated.
-            exclusive_precursors: Whether to consider only reactions that have
-                reactants which are a subset of the provided list of precursors.
+            open_elem: The element to be considered as open.
+            mu: The chemical potential of the open element (eV).
+            precursors: Optional list of precursor formulas. The only reactions that
+                will be enumerated are those featuring one or more of these compositions
+                as reactants. The "exclusive_precursors" parameter allows one to tune
+                whether the enumerated reactions should include ALL precursors (the
+                default) or just one.
+            targets: Optional list of target formulas. The only reactions that
+                will be enumerated are those featuring one or more of these compositions
+                as products. The "exclusive_targets" parameter allows one to tune
+                whether the enumerated reactions should include ALL targets or just one
+                (the default).
+            exclusive_precursors: Whether enumerated reactions are required to have
+                reactants that are a subset of the provided list of precursors. If True
+                (the default), this only identifies reactions with reactants selected
+                from the provided precursors.
+            exclusive_targets: Whether enumerated reactions are required to have
+                products that are a subset of the provided list of targets. If False,
+                (the default), this identifies all reactions containing at least one
+                composition from the provided list of targets (and any number of
+                byproducts).
+            filter_duplicates: Whether to remove duplicate reactions. Defaults to False.
+            filter_by_chemsys: An optional chemical system for which to filter produced
+                reactions by. This ensures that all output reactions contain at least
+                one element within the provided system.
+            chunk_size: The minimum number of reactions per chunk procssed. Needs to be
+                sufficiently large to make parallelization a cost-effective strategy.
+                Defaults to MIN_CHUNK_SIZE.
+            max_num_jobs: The upper limit for the number of jobs created. Defaults to
+                MAX_NUM_JOBS.
+            remove_unbalanced: Whether to remove reactions which are unbalanced; this is
+                usually advisable. Defaults to True.
+            remove_changed: Whether to remove reactions which can only be balanced by
+                removing a reactant/product or having it change sides. This is also
+                advisable for ensuring that only unique reaction sets are produced.
                 Defaults to True.
-            exclusive_targets: Whether to consider only reactions that make the
-                provided target directly (i.e. with no byproducts). Defualts to False.
+            max_num_constraints: The maximum number of allowable constraints enforced by
+                reaction balancing. Defaults to 1 (which is usually advisable).
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
-            filter_duplicates: Whether to filter duplicate reactions. Defaults to True
-                for grand potential enumerator due to how common duplicate reactions
-                are.
         """
 
         super().__init__(
