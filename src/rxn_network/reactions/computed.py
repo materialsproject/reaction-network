@@ -244,3 +244,9 @@ class ComputedReaction(BasicReaction):
             is_equal = np.isclose(self.energy_per_atom, other.energy_per_atom)
 
         return is_equal
+
+    def __hash__(self):
+        """Must be redefined due to overriding __eq__"""
+        return hash(
+            (self.chemical_system, tuple(sorted(self.coefficients)))
+        )  # not checking here for reactions that are multiples (too expensive)

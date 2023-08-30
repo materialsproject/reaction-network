@@ -296,7 +296,7 @@ class CalculateCompetitionMaker(Maker):
         chunk_size: The number of reactions to put into each parallelized chunk. See
             class variable, CHUNK_SIZE. This will automatically be re-computed if
             out-of-memory issues are anticipated.
-
+        cpd_kwargs: Optional keyword arguments passed to ChempotDistanceCalculator.
     """
 
     CHUNK_SIZE = 100
@@ -307,7 +307,6 @@ class CalculateCompetitionMaker(Maker):
     calculate_competition: bool = True
     calculate_chempot_distances: bool = True
     chunk_size: int = CHUNK_SIZE
-    batch_size: int | None = None
     cpd_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self):
@@ -419,7 +418,6 @@ class CalculateCompetitionMaker(Maker):
             "added_chemsys": added_chemsys,
             "calculate_competition": self.calculate_competition,
             "calculate_chempot_distances": self.calculate_chempot_distances,
-            "batch_size": self.batch_size,
             "cpd_kwargs": self.cpd_kwargs,
         }
 

@@ -30,8 +30,9 @@ class Softplus(CostFunction):
     ):
         """
         Args:
-            temp: temperature in Kelvin [K]. This serves as a scale factor for the output
-                of the function. Higher temperatures -> lower costs. Defaults to 300 K.
+            temp: temperature in Kelvin [K]. This serves as a scale factor for the
+                output of the function. Higher temperatures -> lower costs. Defaults to
+                300 K.
             params: List of data dictionary keys for function parameters used as an
                 argument to the softplus function. Defaults to ["energy_per_atom"]
             weights: List of corresponding values by which to weight the

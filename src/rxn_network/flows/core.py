@@ -196,12 +196,7 @@ class SynthesisPlanningFlowMaker(Maker):
         jobs.append(enumeration_job)
 
         base_rxn_set = enumeration_job.output.rxns
-        calculate_competition_maker = self.calculate_competition_maker.update_kwargs(
-            {
-                "temp": self.get_entry_set_maker.temperature,
-            },
-            nested=False,
-        )
+        calculate_competition_maker = self.calculate_competition_maker
 
         base_calculate_competition_job = calculate_competition_maker.make(
             rxn_sets=[base_rxn_set],
@@ -221,7 +216,6 @@ class SynthesisPlanningFlowMaker(Maker):
                     {
                         "chempot": chempot,
                         "open_elem": self.open_elem,
-                        "temp": self.get_entry_set_maker.temperature,
                         "name": self.calculate_competition_maker.name + subname,
                     },
                     nested=False,

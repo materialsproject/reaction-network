@@ -37,8 +37,8 @@ class OpenComputedReaction(ComputedReaction):
         Args:
             entries: List of ComputedEntry objects.
             coefficients: List of reaction coefficients.
-            chempots: Dict of chemical potentials corresponding to open elements
-            data: Optional dict of data
+            chempots: Dict of chemical potentials corresponding to open elements.
+            data: Optional dict of data.
             lowest_num_errors: number of "errors" encountered during reaction
                 balancing
         """

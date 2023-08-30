@@ -126,7 +126,7 @@ def get_total_chemsys_str(
 
 
 def group_by_chemsys(
-    combos: Iterable[tuple[Entry]], open_elems: Iterable[Element] | None = None
+    combos: Iterable[tuple[Entry, ...]], open_elems: Iterable[Element] | None = None
 ) -> dict:
     """
     Groups entry combinations by chemical system, with optional open element.
@@ -138,7 +138,7 @@ def group_by_chemsys(
     Returns:
         Dictionary of entry combos grouped by chemical system
     """
-    combo_dict: dict[str, list[tuple[Entry]]] = {}
+    combo_dict: dict[str, list[tuple[Entry, ...]]] = {}
     for combo in combos:
         key = get_total_chemsys_str(combo, open_elems)
         if key in combo_dict:

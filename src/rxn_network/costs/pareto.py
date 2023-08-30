@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 def get_pareto_front(
     df: DataFrame,
-    metrics: tuple[str] = (
+    metrics: tuple[str, ...] = (
         "energy",
         "primary_competition",
         "secondary_competition",

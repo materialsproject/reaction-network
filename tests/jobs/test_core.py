@@ -2,7 +2,6 @@
 
 import pytest
 from jobflow.managers.local import run_locally
-from monty.serialization import dumpfn
 
 from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.jobs.core import (

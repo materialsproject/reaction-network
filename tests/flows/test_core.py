@@ -15,7 +15,7 @@ def network_flow_job(filtered_entries):
 
 
 @pytest.fixture
-def retrosynthesis_flow_job(filtered_entries):
+def synthesis_planning_flow_job(filtered_entries):
     """Create retrosynthesis flow job"""
     return SynthesisPlanningFlowMaker().make("YMnO3", entries=filtered_entries)
 
@@ -27,8 +27,10 @@ def test_network_flow_job_no_paths(network_flow_job, job_store):
     doc = output[network_flow_job.job_uuids[-1]][1].output
 
 
-def test_retrosynthesis_flow_job(retrosynthesis_flow_job, job_store):
-    assert len(retrosynthesis_flow_job.jobs) == 2
-    output = run_locally(retrosynthesis_flow_job, store=job_store, ensure_success=True)
+def test_synthesis_planning_flow_job(synthesis_planning_flow_job, job_store):
+    assert len(synthesis_planning_flow_job.jobs) == 2
+    output = run_locally(
+        synthesis_planning_flow_job, store=job_store, ensure_success=True
+    )
 
-    competition_doc = output[retrosynthesis_flow_job.job_uuids[-1]][1].output
+    competition_doc = output[synthesis_planning_flow_job.job_uuids[-1]][1].output

@@ -32,7 +32,16 @@ def gibbs_enumerator_with_precursors_and_target():
 
 @pytest.fixture(scope="module")
 def grand_potential_enumerator():
-    return MinimizeGrandPotentialEnumerator(open_elem=Element("O"), mu=0.0, quiet=True)
+    return MinimizeGrandPotentialEnumerator(
+        open_elem=Element("O"), filter_duplicates=False, mu=0.0, quiet=True
+    )
+
+
+@pytest.fixture(scope="module")
+def grand_potential_enumerator_no_duplicates():
+    return MinimizeGrandPotentialEnumerator(
+        open_elem=Element("O"), mu=0.0, filter_duplicates=True, quiet=True
+    )
 
 
 @pytest.fixture(scope="module")
@@ -45,7 +54,11 @@ def grand_potential_enumerator_with_precursors():
 @pytest.fixture(scope="module")
 def grand_potential_enumerator_with_target():
     return MinimizeGrandPotentialEnumerator(
-        open_elem=Element("O"), mu=0.0, targets=["Y2Mn2O7"], quiet=True
+        open_elem=Element("O"),
+        mu=0.0,
+        targets=["Y2Mn2O7"],
+        filter_duplicates=True,
+        quiet=True,
     )
 
 
@@ -115,10 +128,20 @@ def test_enumerate_gibbs_with_precursors_and_target(
 
 
 def test_enumerate_grand_potential(filtered_entries, grand_potential_enumerator):
-    expected_num_rxns = 42
+    expected_num_rxns = 119
 
     rxns = grand_potential_enumerator.enumerate(filtered_entries)
-    print(list(rxns))
+
+    assert len(rxns) == expected_num_rxns
+    assert all([not r.is_identity for r in rxns])
+
+
+def test_enumerate_grand_potential_no_duplicates(
+    filtered_entries, grand_potential_enumerator_no_duplicates
+):
+    expected_num_rxns = 42
+
+    rxns = grand_potential_enumerator_no_duplicates.enumerate(filtered_entries)
 
     assert len(rxns) == expected_num_rxns
     assert all([not r.is_identity for r in rxns])

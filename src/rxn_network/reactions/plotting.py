@@ -82,7 +82,7 @@ def plot_reaction_scatter(
         cols = (x, y, z)
 
     if plot_pareto:
-        pareto_df = get_pareto_front(df, cols=cols)
+        pareto_df = get_pareto_front(df, metrics=cols)
         df = df.loc[~df.index.isin(pareto_df.index)]
 
         arr = pareto_df[list(cols)].to_numpy()
@@ -91,7 +91,7 @@ def plot_reaction_scatter(
                 x=arr[:, 0],
                 y=arr[:, 1],
                 hovertext=pareto_df["rxn"],
-                marker=dict(size=10, color="seagreen", symbol="diamond"),
+                marker={"size": 10, "color": "seagreen", "symbol": "diamond"},
                 mode="markers",
                 name="Pareto front",
             )
@@ -101,7 +101,7 @@ def plot_reaction_scatter(
                 y=arr[:, 1],
                 z=arr[:, 2],
                 hovertext=pareto_df["rxn"],
-                marker=dict(size=10, color="seagreen", symbol="diamond"),
+                marker={"size": 10, "color": "seagreen", "symbol": "diamond"},
                 mode="markers",
                 name="Pareto front",
             )
@@ -125,11 +125,11 @@ def plot_reaction_scatter(
         for t in ["xaxis", "yaxis", "zaxis"]:
             layout_3d["scene"][t] = axis_layout
 
-        layout_3d["scene_camera"] = dict(
-            eye=dict(x=-5, y=-5, z=5),  # zoomed out
-            projection=dict(type="orthographic"),
-            center=dict(x=-0.2, y=-0.2, z=-0.1),
-        )
+        layout_3d["scene_camera"] = {
+            "eye": {"x": -5, "y": -5, "z": 5},  # zoomed out
+            "projection": {"type": "orthographic"},
+            "center": {"x": -0.2, "y": -0.2, "z": -0.1},
+        }
 
         fig = px.scatter_3d(
             df,
@@ -174,14 +174,14 @@ def pretty_df_layout(df: DataFrame):
     """Improve visibility for a pandas DataFrame with wide column names"""
     return df.style.set_table_styles(
         [
-            dict(
-                selector="th",
-                props=[
+            {
+                "selector": "th",
+                "props": [
                     ("max-width", "70px"),
                     ("text-overflow", "ellipsis"),
                     ("overflow", "hidden"),
                 ],
-            )
+            }
         ]
     )  # improve rendering in Jupyter
 

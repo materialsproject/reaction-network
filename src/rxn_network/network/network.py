@@ -253,7 +253,8 @@ class ReactionNetwork(Network):
             paths.append(self._path_from_graph(g, path, self.cost_function))
 
         for path in paths:
-            logger.info(path, "\n")
+            logger.info(path)
+            logger.info("\n")
 
         return paths
 

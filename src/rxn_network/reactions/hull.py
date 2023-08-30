@@ -8,7 +8,6 @@ import numpy as np
 import plotly.express as px
 from monty.json import MSONable
 from plotly.graph_objs import Figure
-from pymatgen.core.units import kb
 from scipy.spatial import ConvexHull
 
 from rxn_network.core import Composition
@@ -168,11 +167,12 @@ class InterfaceReactionHull(MSONable):
 
         If you use this selectivity metric in your work, please cite the following work:
 
-            McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
-            A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
-            Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
-            Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
-            August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
+            McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao,
+            A. A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah,
+            P. G.; Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic
+            Selectivity of Solid-State Reactions for the Predictive Synthesis of
+            Inorganic Materials. arXiv August 22, 2023.
+            https://doi.org/10.48550/arXiv.2308.11816.
 
         Args:
             reaction: A computed reaction.
@@ -211,11 +211,12 @@ class InterfaceReactionHull(MSONable):
 
         If you use this selectivity metric in your work, please cite the following work:
 
-            McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
-            A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
-            Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
-            Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
-            August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
+            McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao,
+            A. A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah,
+            P. G.; Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic
+            Selectivity of Solid-State Reactions for the Predictive Synthesis of
+            Inorganic Materials. arXiv August 22, 2023.
+            https://doi.org/10.48550/arXiv.2308.11816.
 
         Args:
             reaction: A computed reaction.
