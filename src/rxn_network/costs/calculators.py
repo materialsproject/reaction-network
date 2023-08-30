@@ -7,13 +7,13 @@ from typing import TYPE_CHECKING, Callable, Iterable
 import numpy as np
 
 from rxn_network.costs.base import Calculator
+from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 if TYPE_CHECKING:
     from pymatgen.analysis.phase_diagram import PDEntry
 
     from rxn_network.reactions.computed import ComputedReaction
     from rxn_network.reactions.hull import InterfaceReactionHull
-    from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 
 class ChempotDistanceCalculator(Calculator):
@@ -24,17 +24,17 @@ class ChempotDistanceCalculator(Calculator):
 
     If you use this cost metric, please cite the following work:
 
-        Todd, P. K.; McDermott, M. J.; Rom, C. L.; Corrao, A. A.; Denney, J. J.; Dwaraknath,
-        S. S.; Khalifah, P. G.; Persson, K. A.;  Neilson, J. R. Selectivity in Yttrium
-        Manganese Oxide Synthesis via Local Chemical Potentials in Hyperdimensional Phase
-        Space. J. Am. Chem. Soc. 2021, 143 (37), 15185-15194.
+        Todd, P. K.; McDermott, M. J.; Rom, C. L.; Corrao, A. A.; Denney, J. J.;
+        Dwaraknath, S. S.; Khalifah, P. G.; Persson, K. A.;  Neilson, J. R. Selectivity
+        in Yttrium Manganese Oxide Synthesis via Local Chemical Potentials in
+        Hyperdimensional Phase Space. J. Am. Chem. Soc. 2021, 143 (37), 15185-15194.
         https://doi.org/10.1021/jacs.1c06229.
     """
 
     def __init__(
         self,
         cpd: ChemicalPotentialDiagram,
-        mu_func: Callable[[Iterable[float]], float] | str = "sum",
+        mu_func: Callable | str = "sum",
         name: str = "chempot_distance",
     ):
         """
@@ -54,9 +54,9 @@ class ChempotDistanceCalculator(Calculator):
         if mu_func == "max":
             self.mu_func = max
         elif mu_func == "mean":
-            self.mu_func = np.mean
+            self.mu_func = np.mean  # type: ignore
         elif mu_func == "sum":
-            self.mu_func = sum
+            self.mu_func = sum  # type: ignore
         elif isinstance(mu_func, str):
             raise ValueError(
                 "Provided mu_func name is not a known function; please provide the"
@@ -117,7 +117,7 @@ class ChempotDistanceCalculator(Calculator):
         mu_func: Callable[[Iterable[float]], float] | str = "sum",
         name: str = "chempot_distance",
         **kwargs,
-    ) -> "ChempotDistanceCalculator":
+    ) -> ChempotDistanceCalculator:
         """Convenience constructor which first builds the ChemicalPotentialDiagram
         object from a list of entry objects.
 

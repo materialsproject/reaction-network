@@ -58,7 +58,7 @@ class ComputedReaction(BasicReaction):
         reactant_entries: list[ComputedEntry],
         product_entries: list[ComputedEntry],
         data: dict | None = None,
-    ) -> "ComputedReaction":
+    ) -> ComputedReaction:
         """
         Balances and returns a new ComputedReaction.
 
@@ -87,7 +87,7 @@ class ComputedReaction(BasicReaction):
             lowest_num_errors=lowest_num_errors,
         )
 
-    def get_new_temperature(self, new_temperature: float) -> "ComputedReaction":
+    def get_new_temperature(self, new_temperature: float) -> ComputedReaction:
         """
         Returns a new reaction with the temperature changed.
 
@@ -108,21 +108,6 @@ class ComputedReaction(BasicReaction):
             self.coefficients,
             data=self.data,
             lowest_num_errors=self.lowest_num_errors,
-        )
-
-    def get_energy(self):
-        """ """
-        calc_energies: dict[Composition, float] = {}
-
-        for entry in self._entries:
-            (comp, factor) = entry.composition.get_reduced_composition_and_factor()
-            calc_energies[comp] = min(
-                calc_energies.get(comp, float("inf")), entry.energy / factor
-            )
-
-        return sum(
-            amt * calc_energies[c]
-            for amt, c in zip(self.coefficients, self.compositions)
         )
 
     @cached_property
@@ -149,7 +134,7 @@ class ComputedReaction(BasicReaction):
         """
         Returns (float):
             The calculated reaction energy in eV, divided by the total number of atoms
-            in the reaction.
+            in the reaction. Cached for speedup.
         """
         return self.energy / self.num_atoms
 
@@ -157,7 +142,7 @@ class ComputedReaction(BasicReaction):
     def energy_uncertainty(self) -> float:
         """
         Calculates the uncertainty in the reaction energy based on the uncertainty in
-        the energies of the reactants/products.
+        the energies of the reactants/products. Cached for speedup.
         """
 
         calc_energies: dict[Composition, ufloat] = {}
@@ -191,7 +176,7 @@ class ComputedReaction(BasicReaction):
         """
         return self._entries
 
-    def copy(self) -> "ComputedReaction":
+    def copy(self) -> ComputedReaction:
         """
         Returns a copy of the Reaction object
         """
@@ -199,7 +184,7 @@ class ComputedReaction(BasicReaction):
             self.entries, self.coefficients, self.data, self.lowest_num_errors
         )
 
-    def reverse(self) -> "ComputedReaction":
+    def reverse(self) -> ComputedReaction:
         """
         Returns a reversed reaction (i.e. sides flipped)
 
@@ -208,7 +193,7 @@ class ComputedReaction(BasicReaction):
             self.entries, -1 * self.coefficients, self.data, self.lowest_num_errors
         )
 
-    def normalize_to(self, comp: Composition, factor: float = 1) -> "ComputedReaction":
+    def normalize_to(self, comp: Composition, factor: float = 1) -> ComputedReaction:
         """
         Normalizes the reaction to one of the compositions via the provided factor.
 
@@ -226,7 +211,7 @@ class ComputedReaction(BasicReaction):
 
     def normalize_to_element(
         self, element: Element, factor: float = 1
-    ) -> "ComputedReaction":
+    ) -> ComputedReaction:
         """
         Normalizes the reaction to one of the elements.
         By default, normalizes such that the amount of the element is 1.

@@ -55,7 +55,8 @@ class Network(MSONable, metaclass=ABCMeta):
         """Set the phase used as a target in the network (in-place)"""
 
     def as_dict(self) -> dict:
-        """Returns MSONable dict for serialization. See monty package for more nformation."""
+        """Returns MSONable dict for serialization. See monty package for more
+        information."""
         d = super().as_dict()
         d["precursors"] = list(self.precursors) if self.precursors else None
         d["target"] = self.target
@@ -80,12 +81,12 @@ class Network(MSONable, metaclass=ABCMeta):
         return network
 
     @property
-    def precursors(self) -> set[Entry]:
+    def precursors(self) -> set[Entry] | None:
         """The phases used as precursors in the network"""
         return self._precursors
 
     @property
-    def target(self) -> Entry:
+    def target(self) -> Entry | None:
         """The phase used as a target in the network"""
         return self._target
 

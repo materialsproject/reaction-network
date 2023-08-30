@@ -151,7 +151,7 @@ class PathwayPlotter(MSONable):
         return list({e for f in self.formulas for e in Composition(f).elements})
 
     @property
-    def num_atoms_df(self) -> int:
+    def num_atoms_df(self) -> pandas.DataFrame:
         """
         Returns a dataframe of the number of atoms in each phase
         """

@@ -1,10 +1,16 @@
 """Class for intepolated entries"""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core import Composition
+
+if TYPE_CHECKING:
+    from pymatgen.core.periodic_table import Element
 
 
 class InterpolatedEntry(ComputedEntry):
@@ -25,17 +31,16 @@ class InterpolatedEntry(ComputedEntry):
         entry_id: object | None = None,
     ):
         """
-        Initializes an InterpolatedEntry.
 
         Args:
-            composition (Composition): Composition of the entry. For
+            composition: Composition of the entry. For
                 flexibility, this can take the form of all the typical input
                 taken by a Composition, including a {symbol: amt} dict,
                 a string formula, and others.
-            energy (float): Energy of the entry. Usually the final calculated
+            energy: Energy of the entry. Usually the final calculated
                 energy from VASP or other electronic structure codes.
-            correction (float): Manually set an energy correction, will ignore
-                energy_adjustments if specified.
+            correction: Manually set an energy correction, will ignore
+                energy_adjustments if specified. Defaults to 0.
             energy_adjustments: An optional list of EnergyAdjustment to
                 be applied to the energy. This is used to modify the energy for
                 certain analyses. Defaults to None.
@@ -60,7 +65,7 @@ class InterpolatedEntry(ComputedEntry):
             entry_id=entry_id,
         )
 
-    def to_grand_entry(self, chempots):
+    def to_grand_entry(self, chempots: dict[Element, float]) -> GrandPotPDEntry:
         """
         Convert a GibbsComputedEntry to a GrandComputedEntry.
 
@@ -94,7 +99,7 @@ class InterpolatedEntry(ComputedEntry):
         ]
         return "\n".join(output)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not type(other) is type(self):
             return False
 

@@ -61,9 +61,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
 
         self.name = formula
 
-    def get_new_temperature(
-        self, new_temperature: float
-    ) -> "ExperimentalReferenceEntry":
+    def get_new_temperature(self, new_temperature: float) -> ExperimentalReferenceEntry:
         """
         Return a copy of the NISTReferenceEntry at the new specified temperature.
 
@@ -165,7 +163,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
         return d
 
     @classmethod
-    def from_dict(cls, d) -> "ExperimentalReferenceEntry":
+    def from_dict(cls, d) -> ExperimentalReferenceEntry:
         dec = MontyDecoder()
         entry = cls(
             composition=Composition(d["composition"]),

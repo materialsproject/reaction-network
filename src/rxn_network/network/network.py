@@ -290,10 +290,10 @@ class Graph(PyDiGraph):
         """
         d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
 
-        d["nodes"] = [n.as_dict() for n in self.nodes()]
-        d["node_indices"] = list(self.node_indices())
+        d["nodes"] = [n.as_dict() for n in self.nodes()]  # type: ignore
+        d["node_indices"] = list(self.node_indices())  # type: ignore
         d["edges"] = [
-            (*e, obj.as_dict() if hasattr(obj, "as_dict") else obj)
+            (*e, obj.as_dict() if hasattr(obj, "as_dict") else obj)  # type: ignore
             for e, obj in zip(self.edge_list(), self.edges())
         ]
 
@@ -333,7 +333,7 @@ class Graph(PyDiGraph):
 
 def get_rxn_nodes_and_edges(
     rxns: ReactionSet,
-) -> tuple(list[NetworkEntry], list[tuple[int, int, Reaction]]):
+) -> tuple[list[NetworkEntry], list[tuple[int, int, Reaction]]]:
     """
     Given a reaction set, return a list of nodes and edges for constructing the
     reaction network.
@@ -343,7 +343,8 @@ def get_rxn_nodes_and_edges(
 
     Returns:
         A tuple consisting of (nodes, edges) where nodes is a list of NetworkEntry
-        objects and edges is a list of tuples of the form (source_idx, target_idx, reaction).
+        objects and edges is a list of tuples of the form (source_idx, target_idx,
+        reaction).
     """
     nodes, edges = [], []
 

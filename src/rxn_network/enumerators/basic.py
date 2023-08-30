@@ -222,7 +222,7 @@ class BasicEnumerator(Enumerator):
                 f" {self.max_num_jobs}"
             )
 
-        to_run, current_chunk = [], []
+        to_run, current_chunk = [], []  # type: ignore
         for item in tqdm(
             combos_dict.items(),
             disable=self.quiet,
@@ -240,7 +240,7 @@ class BasicEnumerator(Enumerator):
             pd = ray.put(pd)
             grand_pd = ray.put(grand_pd)
 
-            current_chunk_length = sum(len(c[0]) for c in current_chunk)
+            current_chunk_length = sum(len(c[0]) for c in current_chunk)  # type: ignore
 
             current_chunk.append(([], filtered_entries, pd, grand_pd))
             for r in rxn_iter:
@@ -366,7 +366,7 @@ class BasicEnumerator(Enumerator):
         precursors, targets = set(), set()
 
         entries_new = GibbsEntrySet(
-            deepcopy(entries), calculate_e_above_hulls=self.calculate_e_above_hulls
+            deepcopy(entries),
         )
 
         if self.precursors:

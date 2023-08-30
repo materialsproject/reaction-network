@@ -10,8 +10,8 @@ from pymatgen.core.composition import Element
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.base import Enumerator
 from rxn_network.network.base import Network
-from rxn_network.pathways.base import Solver
 from rxn_network.pathways.pathway_set import PathwaySet
+from rxn_network.pathways.solver import Solver
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import datetime_str

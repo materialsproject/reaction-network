@@ -215,8 +215,8 @@ class PathwaySolver(Solver):
         net_coeff_filter = ray.put(net_coeff_filter)
         cleaned_reactions_ref = ray.put(cleaned_reactions)
 
-        comp_matrices = {n: [] for n in range(1, max_num_combos + 1)}
-        comp_matrices_refs_dict = {}
+        comp_matrices = {n: [] for n in range(1, max_num_combos + 1)}  # type: ignore
+        comp_matrices_refs_dict = {}  # type: ignore
 
         for n in range(1, max_num_combos + 1):
             comp_matrices_refs_dict[n] = []
@@ -229,7 +229,7 @@ class PathwaySolver(Solver):
 
         logger.info("Building comp matrices...")
 
-        num_objs = sum(len(i) for i in comp_matrices_refs_dict.values())
+        num_objs = sum(len(i) for i in comp_matrices_refs_dict.values())  # type: ignore
 
         with tqdm(total=num_objs) as pbar:
             for n, comp_matrices_refs in comp_matrices_refs_dict.items():
@@ -239,7 +239,7 @@ class PathwaySolver(Solver):
 
                 comp_matrices[n] = np.concatenate(comp_matrices[n])
 
-                if not comp_matrices[n].any():
+                if not comp_matrices[n].any():  # type: ignore
                     del comp_matrices[n]
 
         logger.info("Comp matrices done...")
@@ -384,21 +384,20 @@ class PathwaySolver(Solver):
         )
 
         if use_basic_enumerator:
-            be = BasicEnumerator(targets=target_formulas, calculate_e_above_hulls=False)
+            be = BasicEnumerator(targets=target_formulas)
             rxn_set = rxn_set.add_rxn_set(be.enumerate(intermediates))
 
             if self.open_elem:
                 boe = BasicOpenEnumerator(
                     open_phases=[Composition(str(self.open_elem)).reduced_formula],
                     targets=target_formulas,
-                    calculate_e_above_hulls=False,
                 )
 
                 rxn_set = rxn_set.add_rxn_set(boe.enumerate(intermediates))
 
         if use_minimize_enumerator:
             mge = MinimizeGibbsEnumerator(
-                targets=target_formulas, calculate_e_above_hulls=False
+                targets=target_formulas,
             )
             rxn_set = rxn_set.add_rxn_set(mge.enumerate(intermediates))
 
@@ -430,7 +429,7 @@ def _balance_path_arrays_cpu(
     comp_matrices: np.ndarray,
     net_coeffs: np.ndarray,
     tol: float = 1e-6,
-) -> tuple(np.ndarray, np.ndarray):
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Fast solution for reaction multiplicities via mass balance stochiometric
     constraints. Parallelized using Numba JIT. Can be applied to large batches (100K-1M
@@ -449,7 +448,7 @@ def _balance_path_arrays_cpu(
     all_multiplicities = np.zeros((shape[0], shape[1]), np.float64)
     indices = np.full(shape[0], False)
 
-    for i in range(shape[0]):  # pylint: disable=not-an-iterable
+    for i in range(shape[0]):
         correct = True
         for j in range(len_net_coeff_filter):
             idx = net_coeff_filter[j]

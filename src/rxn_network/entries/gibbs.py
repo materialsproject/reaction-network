@@ -115,7 +115,7 @@ class GibbsComputedEntry(ComputedEntry):
         self.formation_energy_per_atom = formation_energy_per_atom
         self.temperature = temperature
 
-    def get_new_temperature(self, new_temperature: float) -> "GibbsComputedEntry":
+    def get_new_temperature(self, new_temperature: float) -> GibbsComputedEntry:
         """
         Return a copy of the GibbsComputedEntry at the new specified temperature.
 
@@ -255,7 +255,7 @@ class GibbsComputedEntry(ComputedEntry):
         formation_energy_per_atom: float,
         temperature: float,
         **kwargs,
-    ) -> "GibbsComputedEntry":
+    ) -> GibbsComputedEntry:
         """
         Constructor method for building a GibbsComputedEntry from a structure,
         formation enthalpy, and temperature.
@@ -313,7 +313,7 @@ class GibbsComputedEntry(ComputedEntry):
         return data
 
     @classmethod
-    def from_dict(cls, d: dict) -> "GibbsComputedEntry":
+    def from_dict(cls, d: dict) -> GibbsComputedEntry:
         """ "Returns a GibbsComputedEntry object from MSONable dictionary"""
         dec = MontyDecoder()
         entry = cls(

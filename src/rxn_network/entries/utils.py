@@ -78,7 +78,11 @@ def process_entries(
         include_freed_data=include_freed_data,
         ignore_nist_solids=ignore_nist_solids,
     )
-    included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include]
+    included_entries = (
+        [initialize_entry(f, entry_set) for f in formulas_to_include]
+        if formulas_to_include
+        else []
+    )
 
     entry_set = entry_set.filter_by_stability(
         e_above_hull=e_above_hull, include_polymorphs=include_polymorphs

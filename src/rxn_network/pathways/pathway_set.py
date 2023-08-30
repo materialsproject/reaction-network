@@ -32,7 +32,7 @@ class PathwaySet(MSONable):
         self,
         reaction_set: ReactionSet,
         indices: np.ndarray | list[list[int]],
-        coefficients: np.ndarray | list[list[float]],
+        coefficients: np.ndarray | list[list[float] | None],
         costs: np.ndarray | list[list[float]],
     ):
         """
@@ -89,7 +89,7 @@ class PathwaySet(MSONable):
     def from_paths(
         cls,
         paths: list[Pathway],
-    ) -> "PathwaySet":
+    ) -> PathwaySet:
         """
         Initialize a PathwaySet object from a list of paths.
 

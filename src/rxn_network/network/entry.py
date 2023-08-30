@@ -76,7 +76,7 @@ class NetworkEntry(MSONable):
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "NetworkEntryType":
+    def from_dict(cls, d: dict) -> NetworkEntryType:
         """Load from MSONable dict"""
         return cls(
             MontyDecoder().process_decoded(d["entries"]),

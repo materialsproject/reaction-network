@@ -7,7 +7,7 @@ from __future__ import annotations
 import collections
 import inspect
 from copy import deepcopy
-from functools import cached_property, lru_cache
+from functools import cached_property
 from typing import TYPE_CHECKING, Iterable
 
 import numpy as np
@@ -140,8 +140,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         return expand_pd(self.entries)
 
-    @lru_cache(1)
-    def get_subset_in_chemsys(self, chemsys: list[str] | str) -> "GibbsEntrySet":
+    def get_subset_in_chemsys(self, chemsys: list[str] | str) -> GibbsEntrySet:
         """
         Returns a GibbsEntrySet containing only the set of entries belonging to
         a particular chemical system (including subsystems). For example, if the entries
@@ -169,7 +168,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     def filter_by_stability(
         self, e_above_hull: float, include_polymorphs: bool | None = False
-    ) -> "GibbsEntrySet":
+    ) -> GibbsEntrySet:
         """
         Filter the entry set by a metastability (energy above hull) cutoff.
 
@@ -508,11 +507,11 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         apply_carbonate_correction: bool = True,
         ignore_nist_solids: bool = True,
         minimize_obj_size: bool = False,
-    ) -> "GibbsEntrySet":
+    ) -> GibbsEntrySet:
         """
         Constructor method for initializing GibbsEntrySet from T = 0 K
-        ComputedStructureEntry objects, as acquired from a thermochemical database (e.g.,
-        The Materials Project).
+        ComputedStructureEntry objects, as acquired from a thermochemical database
+        (e.g., The Materials Project).
 
         Automatically expands the phase diagram for large chemical systems (10 or more
         elements) to avoid limitations of Qhull.
@@ -527,8 +526,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             include_freed_data: Whether to include FREED data in the entry set. Defaults
                 to False. WARNING: This dataset has not been thoroughly tested. Use at
                 your own risk!
-            apply_carbonate_correction: Whether to apply the fit GGA energy correction for
-                carbonates. Defaults to True.
+            apply_carbonate_correction: Whether to apply the fit GGA energy correction
+                for carbonates. Defaults to True.
             ignore_nist_solids: Whether to ignore NIST data for the solids specified in
                 the "data/nist/ignore_solids.json" file; these all have melting points
                 Tm >= 1500 ºC. Defaults to True.
@@ -605,9 +604,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         temp = 0
         for e in self.entries:
-            if isinstance(e, GibbsComputedEntry) or isinstance(
-                e, ExperimentalReferenceEntry
-            ):
+            if isinstance(e, (ExperimentalReferenceEntry, GibbsComputedEntry)):
                 temp = e.temperature  # get temperature from any entry
                 break
         return temp
@@ -709,7 +706,6 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         for name, value in inspect.getmembers(GibbsEntrySet):
             if isinstance(value, cached_property):
                 try:
-                    attr = getattr(self, name)
-                    del attr
+                    delattr(self, name)
                 except AttributeError:
-                    pass
+                    continue

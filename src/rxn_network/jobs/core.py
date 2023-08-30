@@ -15,10 +15,7 @@ from rxn_network.core import Composition
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
     PrimaryCompetitionCalculator,
-    SecondaryCompetitionAreaCalculator,
     SecondaryCompetitionCalculator,
-    SecondaryCompetitionMaxCalculator,
-    SecondaryCompetitionWithEhullCalculator,
 )
 from rxn_network.costs.functions import Softplus
 from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
@@ -190,7 +187,7 @@ class GetEntrySetMaker(Maker):
         return doc
 
     @staticmethod
-    def _get_exclude_elems(elems: list[Element]):
+    def _get_exclude_elems(elems):
         """
         Get the inverse element selection. Helpful for faster querying of very large
         chemical systems).
@@ -341,7 +338,8 @@ class CalculateCompetitionMaker(Maker):
                 be used to facilitate selectivity calculations and ensure all reaction
                 sets can be easily combined.
             target_formula: The formula of the desired target phase. This will be used
-                to identify all synthesis reactions (i.e., those that produce the target).
+                to identify all synthesis reactions (i.e., those that produce the
+                target).
 
         Returns:
             A job that returns synthesis reactions to the target phase, decorated with

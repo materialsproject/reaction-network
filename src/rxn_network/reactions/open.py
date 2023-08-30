@@ -69,7 +69,7 @@ class OpenComputedReaction(ComputedReaction):
         product_entries: list[ComputedEntry],
         chempots: dict[Element, float],
         data: dict | None = None,
-    ) -> "OpenComputedReaction":
+    ) -> OpenComputedReaction:
         """
         Balances and returns a new ComputedReaction.
 
@@ -112,7 +112,7 @@ class OpenComputedReaction(ComputedReaction):
 
         return rxn
 
-    def get_new_temperature(self, new_temperature: float) -> "OpenComputedReaction":
+    def get_new_temperature(self, new_temperature: float) -> OpenComputedReaction:
         """
         Returns a new reaction with the temperature changed.
 
@@ -178,7 +178,7 @@ class OpenComputedReaction(ComputedReaction):
             sorted([str(e) for e in set(self.elements) | set(self.open_elems)])
         )
 
-    def copy(self) -> "OpenComputedReaction":
+    def copy(self) -> OpenComputedReaction:
         """
         Returns a copy of the OpenComputedReaction object.
         """
@@ -233,7 +233,7 @@ class OpenComputedReaction(ComputedReaction):
     @classmethod
     def from_computed_rxn(
         cls, reaction: ComputedReaction, chempots: dict[Element, float]
-    ) -> "OpenComputedReaction":
+    ) -> OpenComputedReaction:
         return cls(
             entries=reaction.entries.copy(),
             coefficients=reaction.coefficients.copy(),
@@ -251,7 +251,7 @@ class OpenComputedReaction(ComputedReaction):
         return d
 
     @classmethod
-    def from_dict(cls, d) -> "OpenComputedReaction":
+    def from_dict(cls, d) -> OpenComputedReaction:
         """
         Returns an OpenComputedReaction object from a dictionary representation.
         """

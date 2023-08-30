@@ -117,7 +117,7 @@ class ReactionSet(MSONable):
         open_elem: str | Element | None = None,
         chempot: float = 0.0,
         filter_duplicates: bool = False,
-    ) -> "ReactionSet":
+    ) -> ReactionSet:
         """
         Initiate a ReactionSet object from a list of reactions. Including a list of
         unique entries saves some computation time.
@@ -143,9 +143,7 @@ class ReactionSet(MSONable):
                 all_entry_indices[entry.entry_id] = idx
 
         # group by reaction size to ensure rectangular matrices
-        indices: dict[int, list] = {}
-        coeffs: dict[int, list] = {}
-        data: dict[int, list] = {}
+        indices, coeffs, data = {}, {}, {}  # type: ignore
 
         for rxn in rxns:
             size = len(rxn.entries)
@@ -391,7 +389,7 @@ class ReactionSet(MSONable):
         if not reactant_indices:
             return []
 
-        idxs: dict[int, list[int]] = {}
+        idxs = {}  # type: ignore
         for size, indices in self.indices.items():
             idxs[size] = []
             contains_reactants = np.isin(indices, reactant_indices).any(axis=1)
@@ -430,7 +428,7 @@ class ReactionSet(MSONable):
         if not product_index:
             return []
 
-        idxs: dict[int, np.ndarray] = {}
+        idxs = {}  # type: ignore
         for size, indices in self.indices.items():
             idxs[size] = []
             contains_product = np.isin(indices, product_index).any(axis=1)
@@ -458,8 +456,8 @@ class ReactionSet(MSONable):
         Returns a new ReactionSet object with duplicate reactions removed.
 
         NOTE: Duplicate reactions include those that are multiples of each other. For
-        example, if a reaction set contains both A + B -> C and 2A + 2B -> 2C, the second
-        reaction will be removed.
+        example, if a reaction set contains both A + B -> C and 2A + 2B -> 2C, the
+        second reaction will be removed.
 
         Args:
             ensure_rxns: An optional list of reactions to ensure are contained within
@@ -475,8 +473,8 @@ class ReactionSet(MSONable):
             num_cpus = int(ray.cluster_resources()["CPU"]) - 1
             chunk_refs = []
 
-        ensure_idxs = {size: [] for size in self.indices}
-        idxs_to_keep = {size: [] for size in self.indices}
+        ensure_idxs = {size: [] for size in self.indices}  # type: ignore
+        idxs_to_keep = {size: [] for size in self.indices}  # type: ignore
 
         # identify indices to keep
         for rxn in ensure_rxns or []:
@@ -609,7 +607,7 @@ class ReactionSet(MSONable):
         )
 
     def _get_rxns_by_indices(
-        self, idxs: dict[int, np.ndarray]
+        self, idxs
     ) -> Iterable[ComputedReaction | OpenComputedReaction]:
         """
         Return a list of reactions with the given indices.
@@ -641,7 +639,7 @@ class ReactionSet(MSONable):
 
                 yield rxn
 
-    def _get_rxn_set_by_indices(self, idxs: dict[int, np.ndarray]) -> "ReactionSet":
+    def _get_rxn_set_by_indices(self, idxs) -> ReactionSet:
         """
         Return a list of reactions with the given indices. This is the backbone of other
         reaction subset generation methods.

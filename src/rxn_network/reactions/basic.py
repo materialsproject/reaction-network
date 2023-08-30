@@ -92,7 +92,7 @@ class BasicReaction(Reaction):
         reactants: list[Composition],
         products: list[Composition],
         data: dict | None = None,
-    ) -> "BasicReaction":
+    ) -> BasicReaction:
         """
         Reactants and products to be specified as list of
         pymatgen.core.Composition. e.g., [comp1, comp2]
@@ -123,7 +123,7 @@ class BasicReaction(Reaction):
             lowest_num_errors=lowest_num_errors,
         )
 
-    def normalize_to(self, comp: Composition, factor: float = 1) -> "BasicReaction":
+    def normalize_to(self, comp: Composition, factor: float = 1) -> BasicReaction:
         """
         Normalizes the reaction to one of the compositions via the provided factor.
 
@@ -142,7 +142,7 @@ class BasicReaction(Reaction):
 
     def normalize_to_element(
         self, element: Element, factor: float = 1
-    ) -> "BasicReaction":
+    ) -> BasicReaction:
         """
         Normalizes the reaction to one of the elements.
         By default, normalizes such that the amount of the element is 1.
@@ -192,7 +192,7 @@ class BasicReaction(Reaction):
         """
         return self._str_from_comp(self.coefficients, self.compositions, True)
 
-    def copy(self) -> "BasicReaction":
+    def copy(self) -> BasicReaction:
         """Returns a copy of the BasicReaction object"""
         return BasicReaction(
             compositions=self.compositions,
@@ -202,7 +202,7 @@ class BasicReaction(Reaction):
             lowest_num_errors=self.lowest_num_errors,
         )
 
-    def reverse(self) -> "BasicReaction":
+    def reverse(self) -> BasicReaction:
         """
         Returns a copy of the original BasicReaction object where original reactants are
         new products, and vice versa.
@@ -299,7 +299,7 @@ class BasicReaction(Reaction):
         return {c: coeff / total for c, coeff in self.product_coeffs.items()}
 
     @classmethod
-    def from_string(cls, rxn_string: str) -> "BasicReaction":
+    def from_string(cls, rxn_string: str) -> BasicReaction:
         """
         Generates a balanced reaction from a string. The reaction must
         already be balanced.
@@ -327,9 +327,7 @@ class BasicReaction(Reaction):
         return cls._from_coeff_dicts(reactant_coeffs, product_coeffs)
 
     @classmethod
-    def from_formulas(
-        cls, reactants: list[str], products: list[str]
-    ) -> "BasicReaction":
+    def from_formulas(cls, reactants: list[str], products: list[str]) -> BasicReaction:
         """
         Initialize a reaction from a list of 1) reactant formulas and 2) product
         formulas.
@@ -484,7 +482,7 @@ class BasicReaction(Reaction):
         return np.squeeze(best_soln), lowest_num_errors, num_constraints
 
     @staticmethod
-    def _from_coeff_dicts(reactant_coeffs, product_coeffs) -> "BasicReaction":
+    def _from_coeff_dicts(reactant_coeffs, product_coeffs) -> BasicReaction:
         reactant_comps, r_coefs = zip(
             *[(comp, -1 * coeff) for comp, coeff in reactant_coeffs.items()]
         )
@@ -508,7 +506,7 @@ class BasicReaction(Reaction):
         return " + ".join(reactant_str) + " -> " + " + ".join(product_str)
 
     @classmethod
-    def _str_from_comp(cls, coeffs, compositions, reduce=False) -> str:
+    def _str_from_comp(cls, coeffs, compositions, reduce=False) -> tuple[str, float]:
         r_coeffs = np.zeros(len(coeffs))
         r_formulas = []
         for i, (amt, comp) in enumerate(zip(coeffs, compositions)):
