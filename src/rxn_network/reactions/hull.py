@@ -353,7 +353,7 @@ class InterfaceReactionHull(MSONable):
             coords, qhull_options="QJ i"
         ).volume  # this is how area is defined in scipy
 
-    def get_coords_in_range(self, x1: float, x2: float) -> np.ndarray:
+    def get_coords_in_range(self, x1: float, x2: float):
         """
         Get the coordinates in the range [x1, x2].
 
@@ -392,7 +392,7 @@ class InterfaceReactionHull(MSONable):
 
         coords = np.array(coords)
 
-        return coords[coords[:, 0].argsort()]
+        return coords[coords[:, 0].argsort()]  # type: ignore
 
     def count(self, num: int) -> int:
         """
