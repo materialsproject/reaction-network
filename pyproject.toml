@@ -59,7 +59,7 @@ tests = ["pytest==7.4.0", "pytest-cov==4.1.0", "mp-api==0.35.1"]
 strict = [
     "numba==0.57.0",
     "pymatgen==2023.08.10",
-    "jobflow==0.1.11",
+    "jobflow==0.1.13",
     "ray==2.6.3",
     "rustworkx==0.12.1",
 ]
