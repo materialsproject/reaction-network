@@ -5,7 +5,7 @@ import sys
 from datetime import datetime
 from itertools import chain, combinations, zip_longest
 from pathlib import Path
-from typing import Optional, Any, Iterable
+from typing import Any, Iterable
 
 
 def limited_powerset(iterable: Iterable, max_size: int) -> Iterable:
