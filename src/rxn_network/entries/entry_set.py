@@ -614,7 +614,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Use at your own risk if mixing GibbsComputedEntry objects calculated at
         different temperatures -- this poses even more theoretical problems!
         """
-        temp = 0
+        temp = 0.0
         for e in self.entries:
             if isinstance(e, (ExperimentalReferenceEntry, GibbsComputedEntry)):
                 temp = e.temperature  # get temperature from any entry

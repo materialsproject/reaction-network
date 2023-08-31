@@ -31,7 +31,7 @@ class OpenComputedReaction(ComputedReaction):
         coefficients: np.ndarray | list[float],
         chempots: dict[Element, float],
         data: dict | None = None,
-        lowest_num_errors: int | None = None,
+        lowest_num_errors: int | float = 0,
     ):
         """
         Args:

@@ -126,7 +126,6 @@ class GetEntrySetMaker(Maker):
             entries = get_all_entries_in_chemsys(
                 entry_db,
                 chemsys,
-                inc_structure=True,
                 compatible_only=True,
                 property_data=property_data,
                 use_premade_entries=False,
@@ -309,7 +308,7 @@ class CalculateCompetitionMaker(Maker):
 
     name: str = "calculate_competition"
     open_elem: Element | None = None
-    chempot: float | None = 0.0
+    chempot: float = 0.0
     calculate_competition: bool = True
     calculate_chempot_distances: bool = True
     chunk_size: int = CHUNK_SIZE
@@ -389,7 +388,9 @@ class CalculateCompetitionMaker(Maker):
         all_target_reactants = {
             reactant.reduced_formula for r in target_rxns for reactant in r.reactants
         }
-        all_rxns = all_rxns.get_rxns_by_reactants(all_target_reactants, return_set=True)
+        all_rxns = all_rxns.get_rxns_by_reactants(
+            all_target_reactants, return_set=True  # type: ignore
+        )
 
         logger.info(f"Keeping {len(all_rxns)} out of {size} total reactions...")
 
@@ -622,7 +623,7 @@ class PathwaySolverMaker(Maker):
         targets: The target formulas for the overall net reaction. These must be
             provided and result in a valid net reaction (together with the precursors).
         open_elem: An optional open element used by PathwaySolver.
-        chempot: The chemical potential of the open element, if any. Defaults to None.
+        chempot: The chemical potential of the open element, if any. Defaults to 0.
         max_num_combos: The maximum allowable size of the balanced reaction pathway.
             At values <=5, the solver will start to take a significant amount of
             time to run.
@@ -645,7 +646,7 @@ class PathwaySolverMaker(Maker):
     precursors: list[str] = field(default_factory=list)
     targets: list[str] = field(default_factory=list)
     open_elem: Element | None = None
-    chempot: float | None = None
+    chempot: float = 0.0
     max_num_combos: int = 4
     find_intermediate_rxns: bool = True
     intermediate_rxn_energy_cutoff: float = 0.0

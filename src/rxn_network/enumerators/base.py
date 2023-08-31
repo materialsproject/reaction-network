@@ -10,9 +10,8 @@ from typing import TYPE_CHECKING, Collection
 from monty.json import MSONable
 
 if TYPE_CHECKING:
-    from pymatgen.entries.computed_entries import ComputedEntry
-
     from rxn_network.core import Composition
+    from rxn_network.entries.entry_set import GibbsEntrySet
 
 
 class Enumerator(MSONable, metaclass=ABCMeta):
@@ -31,7 +30,7 @@ class Enumerator(MSONable, metaclass=ABCMeta):
         self.targets = targets or []
 
     @abstractmethod
-    def enumerate(self, entries: Collection[ComputedEntry]):
+    def enumerate(self, entries: GibbsEntrySet):
         """
         Enumerates the potential reactions from the list of entries
         """

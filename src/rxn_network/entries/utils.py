@@ -271,7 +271,7 @@ def get_all_entries_in_chemsys(
     db: MongoStore,
     elements: str | list[str],
     compatible_only: bool = True,
-    inc_structure: str | None = None,
+    inc_structure: str | None = "final",
     property_data: list | None = None,
     use_premade_entries: bool = False,
     conventional_unit_cell: bool = False,

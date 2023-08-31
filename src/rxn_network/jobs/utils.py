@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 
 def get_added_elem_data(
     entries: GibbsEntrySet, targets: Iterable[Composition | str]
-) -> tuple(list[Element], str):
+) -> tuple[list[Element], str]:
     """
     Given a provided entry set and targets, this identifies which elements in the entry
     set are "additional" (not found in the target)

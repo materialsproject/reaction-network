@@ -8,17 +8,17 @@ from queue import Empty, PriorityQueue
 from typing import TYPE_CHECKING, Iterable
 
 import rustworkx as rx
-from monty.json import MontyDecoder
 from pymatgen.entries import Entry
-from rustworkx import PyDiGraph
 from tqdm import tqdm
 
 from rxn_network.costs.functions import Softplus
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
-from rxn_network.network.base import Network
+from rxn_network.network.base import Graph, Network
 from rxn_network.network.entry import NetworkEntry, NetworkEntryType
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.pathways.pathway_set import PathwaySet
+from rxn_network.reactions.computed import ComputedReaction
+from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger
 
@@ -77,14 +77,14 @@ class ReactionNetwork(Network):
         g = Graph()
 
         nodes, edges = get_rxn_nodes_and_edges(self.rxns)
-        edges.extend(get_loopback_edges(nodes))
+        edges.extend(get_loopback_edges(nodes))  # type: ignore
 
         g.add_nodes_from(nodes)
         g.add_edges_from(edges)
 
         logger.info(f"Built graph with {g.num_nodes()} nodes and {g.num_edges()} edges")
 
-        self._g = g
+        self._g = g  # type: ignore
 
     def find_pathways(
         self, targets: list[Entry | str], k: int = 15
@@ -105,7 +105,9 @@ class ReactionNetwork(Network):
         paths = []
         for target in targets:
             self.set_target(target)
-            print(f"Paths to {self.target.composition.reduced_formula} \n")
+            print(
+                f"Paths to {self.target.composition.reduced_formula} \n"  # type: ignore
+            )
             print("--------------------------------------- \n")
             pathways = self._k_shortest_paths(k=k)
             paths.extend(pathways)
@@ -241,10 +243,12 @@ class ReactionNetwork(Network):
         """Wrapper for finding the k shortest paths using Yen's algorithm. Returns
         BasicPathway objects"""
         g = self._g
+        if not g:
+            raise ValueError("Must call build() before pathfinding!")
         paths = []
 
         precursors_node = g.find_node_by_weight(
-            NetworkEntry(self.precursors, NetworkEntryType.Precursors)
+            NetworkEntry(self.precursors, NetworkEntryType.Precursors)  # type: ignore
         )
         target_node = g.find_node_by_weight(
             NetworkEntry([self.target], NetworkEntryType.Target)
@@ -274,61 +278,6 @@ class ReactionNetwork(Network):
                 costs.append(get_edge_weight(e, cf))
 
         return BasicPathway(reactions=rxns, costs=costs)
-
-
-class Graph(PyDiGraph):
-    """
-    Thin wrapper around rx.PyDiGraph to allow for serialization and optimized database
-    storage.
-    """
-
-    def as_dict(self) -> dict:
-        """
-        Represents the PyDiGraph object as a serializable dictionary.
-
-        See monty package (MSONable) for more information.
-        """
-        d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
-
-        d["nodes"] = [n.as_dict() for n in self.nodes()]  # type: ignore
-        d["node_indices"] = list(self.node_indices())  # type: ignore
-        d["edges"] = [
-            (*e, obj.as_dict() if hasattr(obj, "as_dict") else obj)  # type: ignore
-            for e, obj in zip(self.edge_list(), self.edges())
-        ]
-
-        return d
-
-    @classmethod
-    def from_dict(cls, d: dict) -> Graph:
-        """
-        Instantiates a Graph object from a dictionary.
-
-        See as_dict() and monty package (MSONable) for more information.
-        """
-        nodes = MontyDecoder().process_decoded(d["nodes"])
-        node_indices = MontyDecoder().process_decoded(d["node_indices"])
-        edges = [(e[0], e[1], MontyDecoder().process_decoded(e[2])) for e in d["edges"]]
-
-        nodes = dict(zip(nodes, node_indices))
-
-        graph = cls()
-        new_indices = graph.add_nodes_from(list(nodes.keys()))
-        mapping = {nodes[node]: idx for idx, node in zip(new_indices, nodes.keys())}
-
-        new_mapping = []
-        for edge in edges:
-            new_mapping.append((mapping[edge[0]], mapping[edge[1]], edge[2]))
-
-        graph.add_edges_from(new_mapping)
-
-        return graph
-
-    def __repr__(self) -> str:
-        return (
-            super().__repr__()
-            + f" with {self.num_nodes()} nodes and {self.num_edges()} edges"
-        )
 
 
 def get_rxn_nodes_and_edges(
@@ -369,7 +318,9 @@ def get_rxn_nodes_and_edges(
     return nodes, edges
 
 
-def get_loopback_edges(nodes: list[NetworkEntry]) -> list[tuple[int, int, Reaction]]:
+def get_loopback_edges(
+    nodes: list[NetworkEntry],
+) -> list[tuple[int, int, str]]:
     """
     Given a list of nodes to check, this function finds and returns loopback
     edges (i.e., edges that connect a product node to its equivalent reactant node)
@@ -408,7 +359,7 @@ def get_edge_weight(edge_obj: object, cf: CostFunction):
         "target_edge",
     ]:
         return 0.0
-    if edge_obj.__class__.__name__ in ["ComputedReaction", "OpenComputedReaction"]:
+    if isinstance(edge_obj, (ComputedReaction, OpenComputedReaction)):
         return cf.evaluate(edge_obj)
 
     raise ValueError("Unknown edge type")
@@ -455,7 +406,7 @@ def yens_ksp(
 
     g = g.copy()
 
-    path = rx.dijkstra_shortest_paths(
+    path = rx.dijkstra_shortest_paths(  # type: ignore
         g, precursors_node, target_node, weight_fn=get_edge_weight_with_cf
     )
 
@@ -492,7 +443,7 @@ def yens_ksp(
                     g.remove_edge(path[i], path[i + 1])
                     removed_edges.append((path[i], path[i + 1], e))
 
-            spur_path = rx.dijkstra_shortest_paths(
+            spur_path = rx.dijkstra_shortest_paths(  # type: ignore
                 g, spur_node, target_node, weight_fn=get_edge_weight_with_cf
             )
 

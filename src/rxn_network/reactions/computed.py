@@ -241,7 +241,9 @@ class ComputedReaction(BasicReaction):
         is_equal = BasicReaction.__eq__(self, other)
 
         if is_equal:
-            is_equal = np.isclose(self.energy_per_atom, other.energy_per_atom)
+            is_equal = np.isclose(  # type: ignore
+                self.energy_per_atom, other.energy_per_atom
+            )
 
         return is_equal
 

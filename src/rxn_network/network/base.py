@@ -7,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, Iterable
 
 from monty.json import MontyDecoder, MSONable
+from rustworkx import PyDiGraph
 
 from rxn_network.entries.entry_set import GibbsEntrySet
 
@@ -109,3 +110,58 @@ class Network(MSONable, metaclass=ABCMeta):
 
     def __str__(self) -> str:
         return self.__repr__()
+
+
+class Graph(PyDiGraph):
+    """
+    Thin wrapper around rx.PyDiGraph to allow for serialization and optimized database
+    storage.
+    """
+
+    def as_dict(self) -> dict:
+        """
+        Represents the PyDiGraph object as a serializable dictionary.
+
+        See monty package (MSONable) for more information.
+        """
+        d = {"@module": self.__class__.__module__, "@class": self.__class__.__name__}
+
+        d["nodes"] = [n.as_dict() for n in self.nodes()]  # type: ignore
+        d["node_indices"] = list(self.node_indices())  # type: ignore
+        d["edges"] = [
+            (*e, obj.as_dict() if hasattr(obj, "as_dict") else obj)  # type: ignore
+            for e, obj in zip(self.edge_list(), self.edges())
+        ]
+
+        return d
+
+    @classmethod
+    def from_dict(cls, d: dict) -> Graph:
+        """
+        Instantiates a Graph object from a dictionary.
+
+        See as_dict() and monty package (MSONable) for more information.
+        """
+        nodes = MontyDecoder().process_decoded(d["nodes"])
+        node_indices = MontyDecoder().process_decoded(d["node_indices"])
+        edges = [(e[0], e[1], MontyDecoder().process_decoded(e[2])) for e in d["edges"]]
+
+        nodes = dict(zip(nodes, node_indices))
+
+        graph = cls()
+        new_indices = graph.add_nodes_from(list(nodes.keys()))
+        mapping = {nodes[node]: idx for idx, node in zip(new_indices, nodes.keys())}
+
+        new_mapping = []
+        for edge in edges:
+            new_mapping.append((mapping[edge[0]], mapping[edge[1]], edge[2]))
+
+        graph.add_edges_from(new_mapping)
+
+        return graph
+
+    def __repr__(self) -> str:
+        return (
+            super().__repr__()
+            + f" with {self.num_nodes()} nodes and {self.num_edges()} edges"
+        )
