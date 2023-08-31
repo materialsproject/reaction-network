@@ -27,6 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[strict]
           pip install black prospector[with_mypy]
+          pip install -U prospector
 
       - name: Lint with black
         run: |

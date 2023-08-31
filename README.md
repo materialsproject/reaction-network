@@ -23,9 +23,8 @@ pip install -U reaction-network
 The package will then be installed under the name `rxn_network`. The Materials Project
 API is not installed by default anc can be installed via: `pip install -U mp-api`.
 
-*As of version 7.0, the `reaction-network` package no longer uses `graph-tool`. All
-network functionality is now implemented using `rustworkx`. This means it is no longer
-required to complete any extra installations.*
+> **Note**
+> As of version 7.0 and beyond, the `reaction-network` package no longer uses `graph-tool`. All network functionality is now implemented using `rustworkx`. This means it is no longer required to complete any extra installations.
 
 ## Tutorials
 
