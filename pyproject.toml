@@ -25,7 +25,6 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
@@ -74,21 +73,26 @@ changelog = "https://github.com/GENESIS-EFRC/reaction-network/blob/main/docs/CHA
 [tool.coverage.run]
 include = ["src/*"]
 parallel = true
-branch = true
+branch = false
 
 [tool.coverage.paths]
 source = ["src/"]
 
 [tool.coverage.report]
-skip_covered = true
 show_missing = true
-exclude_lines = [
+skip_covered = true
+exclude_also = [
     '\#\s*pragma: no cover',
     '^\s*assert False(,|$)',
     'if typing.TYPE_CHECKING:',
     '^\s*@overload( |$)',
+    'if TYPE_CHECKING:',
 ]
-omit = ["data/nist/generate_janaf_data.py", "pathways/plotting.py"]
+omit = [
+    "src/rxn_network/data/nist/generate_janaf_data.py",
+    "src/rxn_network/network/visualize.py",
+    "src/rxn_network/pathways/plotting.py",
+]
 
 [tool.flake8]
 exclude = ".git,__pycache__,tests"

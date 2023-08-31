@@ -140,3 +140,9 @@ def test_equals(entries):
     assert entries[300] != entries[600]
 
     assert entry1 != entry2
+
+
+def test_unique_id(entries):
+    entry = entries[300]
+    assert str(entry.temperature) in entry.unique_id
+    assert str(entry.composition.reduced_formula) in entry.unique_id

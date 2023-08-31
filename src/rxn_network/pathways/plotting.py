@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas
 from monty.json import MSONable
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-from scipy.ndimage.filters import median_filter
+from scipy.ndimage import median_filter
 from tqdm import tqdm
 
 from rxn_network.core import Composition

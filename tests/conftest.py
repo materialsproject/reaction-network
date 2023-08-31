@@ -13,6 +13,7 @@ from rxn_network.reactions.hull import InterfaceReactionHull
 # load files
 TEST_FILES_PATH = Path(__file__).parent / "test_files"
 ENTRIES_LIST = loadfn(TEST_FILES_PATH / "Mn_O_Y_entries.json.gz")
+ENTRIES_WITH_NA_CL = loadfn(TEST_FILES_PATH / "Cl_Mn_Na_O_Y_entries.json.gz")
 
 
 @pytest.fixture(scope="session")
@@ -32,7 +33,14 @@ def gibbs_entries():
 @pytest.fixture(scope="session")
 def entries():
     """Doesn't apply Gibbs corrections"""
-    return GibbsEntrySet(loadfn(TEST_FILES_PATH / "Cl_Mn_Na_O_Y_entries.json.gz"))
+    return GibbsEntrySet(ENTRIES_WITH_NA_CL)
+
+
+@pytest.fixture(scope="session")
+def gibbs_entries_with_na_cl(entries):
+    return GibbsEntrySet.from_computed_entries(
+        list(entries), temperature=1000
+    ).filter_by_stability(0.0)
 
 
 @pytest.fixture(scope="session")
