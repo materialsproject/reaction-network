@@ -22,9 +22,9 @@ authors = [{ name = "Matthew McDermott", email = "mcdermott@lbl.gov" }]
 dynamic = ["version"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
@@ -33,7 +33,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Chemistry",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "pymatgen>=2023.5.31",
     "numba>=0.57.0",
@@ -104,7 +104,7 @@ exclude = ".git,__pycache__,tests"
 max-line-length = 88
 max-doc-length = 88
 extend-ignore = "E741,W291,W293,E501,E231,E203,F401"
-min-python-version = "3.8.0"
+min-python-version = "3.9.0"
 docstring-convention = "google"
 
 [tool.isort]
