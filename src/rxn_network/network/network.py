@@ -105,8 +105,8 @@ class ReactionNetwork(Network):
         paths = []
         for target in targets:
             self.set_target(target)
-            logger.info(f"Paths to {self.target.composition.reduced_formula} \n")
-            logger.info("--------------------------------------- \n")
+            print(f"Paths to {self.target.composition.reduced_formula} \n")
+            print("--------------------------------------- \n")
             pathways = self._k_shortest_paths(k=k)
             paths.extend(pathways)
 
@@ -253,8 +253,7 @@ class ReactionNetwork(Network):
             paths.append(self._path_from_graph(g, path, self.cost_function))
 
         for path in paths:
-            logger.info(path)
-            logger.info("\n")
+            print(path, "\n")
 
         return paths
 
