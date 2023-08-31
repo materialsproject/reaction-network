@@ -399,6 +399,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_freed_data: bool = False,
         apply_carbonate_correction: bool = True,
         ignore_nist_solids: bool = True,
+        calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
     ) -> GibbsEntrySet:
         """
@@ -417,6 +418,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             ignore_nist_solids: Whether to ignore NIST data for the solids specified in
                 the "data/nist/ignore_solids.json" file; these all have melting points
                 Tm >= 1500 ºC. Defaults to Ture.
+            calculate_e_above_hulls: Whether to calculate energy above hull for each
+                entry and store in the entry's data. Defaults to False.
             minimize_obj_size: Whether to minimize the size of the object by removing
                 unnecessary attributes from the entries. Defaults to False.
 
@@ -481,7 +484,11 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
             gibbs_entries.extend(new_entries)
 
-        return cls(gibbs_entries, minimize_obj_size=minimize_obj_size)
+        return cls(
+            gibbs_entries,
+            calculate_e_above_hulls=calculate_e_above_hulls,
+            minimize_obj_size=minimize_obj_size,
+        )
 
     def copy(self) -> GibbsEntrySet:
         """Returns a copy of the entry set."""
@@ -506,6 +513,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_freed_data: bool = False,
         apply_carbonate_correction: bool = True,
         ignore_nist_solids: bool = True,
+        calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
     ) -> GibbsEntrySet:
         """
@@ -531,6 +539,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             ignore_nist_solids: Whether to ignore NIST data for the solids specified in
                 the "data/nist/ignore_solids.json" file; these all have melting points
                 Tm >= 1500 ºC. Defaults to True.
+            calculate_e_above_hulls: Whether to calculate energy above hull for each
+                entry and store in the entry's data. Defaults to False.
             minimize_obj_size: Whether to minimize the size of the object by removing
                 unrequired attributes from the entries. Defaults to False.
 
@@ -550,6 +560,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
                 ignore_nist_solids=ignore_nist_solids,
+                calculate_e_above_hulls=calculate_e_above_hulls,
                 minimize_obj_size=minimize_obj_size,
             )
 
@@ -563,6 +574,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
                 ignore_nist_solids=ignore_nist_solids,
+                calculate_e_above_hulls=calculate_e_above_hulls,
                 minimize_obj_size=minimize_obj_size,
             )
             new_entries.update(gibbs_set)

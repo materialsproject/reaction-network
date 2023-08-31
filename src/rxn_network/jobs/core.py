@@ -70,7 +70,7 @@ class GetEntrySetMaker(Maker):
             included in the processed dataset. Sometimes, entries are filtered out that
             one would like to include, or entries don't exist for those compositions.
         calculate_e_above_hulls: Whether to calculate e_above_hull and store as an
-            attribute in the data dictionary for each entry.
+            attribute in the data dictionary for each entry. Defaults to True.
         ignore_nist_solids: Whether to ignore NIST data for solids with high melting
             points (Tm >= 1500 ºC). Defaults to True.
         custom_entries: An optional list of user-created entries that will be added to
@@ -132,7 +132,13 @@ class GetEntrySetMaker(Maker):
                 use_premade_entries=False,
             )
         else:
-            from mp_api.client import MPRester
+            try:
+                from mp_api.client import MPRester
+            except ImportError as err:
+                raise ImportError(
+                    "You may need to install the Materials Project API: pip install -U"
+                    " mp-api"
+                ) from err
 
             kwargs = {}
             if self.MP_API_KEY:

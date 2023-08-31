@@ -215,19 +215,20 @@ class BasicReaction(Reaction):
             lowest_num_errors=self.lowest_num_errors,
         )
 
-    def is_separable(self, target: Composition) -> bool:
+    def is_separable(self, target: str | Composition) -> bool:
         """
         Checks if the reaction forms byproducts which are separable from the target
         composition; i.e., byproducts do not contain any of the elements in the target
         phase.
 
         Args:
-            target: Composition object of target; elements in this phase will be used to
+            target: Composition of target; elements in this phase will be used to
                 determine whether byproducts only contain added elements.
 
         Returns:
             True if reaction is separable from target, False otherwise.
         """
+        target = Composition(target)
         identified_targets = [
             c
             for c in self.compositions

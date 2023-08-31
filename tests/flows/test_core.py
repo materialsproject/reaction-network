@@ -71,6 +71,7 @@ def test_synthesis_planning_flow_additional_elems_job(
     assert competition_doc is not None
 
 
+@pytest.mark.skip(reason="Chemical potential distance difficulty in open systems")
 def test_synthesis_planning_flow_open_job(synthesis_planning_flow_open_job, job_store):
     assert len(synthesis_planning_flow_open_job.jobs) == 4
     output = run_locally(

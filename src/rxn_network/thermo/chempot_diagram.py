@@ -192,7 +192,8 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         return HalfspaceIntersection(hs_hyperplanes, interior_point)
 
     def _get_domains(self) -> dict[str, np.ndarray]:
-        """Returns a dictionary of chemical potential domains as {formula: np.ndarray}"""
+        """Returns a dictionary of chemical potential domains as {formula:
+        np.ndarray}"""
         domains: dict[str, list] = {
             entry.composition.reduced_formula: [] for entry in self._hyperplane_entries
         }
