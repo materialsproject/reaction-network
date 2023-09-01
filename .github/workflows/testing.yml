@@ -75,6 +75,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install pandoc
+        run: sudo apt-get install pandoc
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v4.3.0
         with:
@@ -87,5 +90,5 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[strict,docs]
 
-      - name: Build docs
-        run: mkdocs build
+      - name: Build
+        run: sphinx-build docs docs_build

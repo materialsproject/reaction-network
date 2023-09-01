@@ -11,9 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
 
-      - name: Install pandoc
-        run: sudo apt-get install pandoc
-
       - name: Set up Python 3.11
         uses: actions/setup-python@v4.3.0
         with:
@@ -43,6 +40,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install pandoc
+        run: sudo apt-get install pandoc
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v4.3.0
         with:
@@ -65,8 +65,7 @@ jobs:
           git config --local user.name "materialsproject"
           git stash
           git pull origin main
-          mv CHANGELOG.md docs/
-          git add docs/CHANGELOG.md && git commit -m 'Updated CHANGELOG.md'
+          git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md'
 
       - name: Push changes
         uses: ad-m/github-push-action@master
@@ -80,4 +79,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3.9.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+          publish_dir: ./docs_build
