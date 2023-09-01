@@ -2,5 +2,5 @@ Tutorials
 =========
 
 .. toctree::
-   _collections/1_enumerators
-   _collections/2_networks
+   notebooks/1_enumerators
+   notebooks/2_networks

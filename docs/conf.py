@@ -39,7 +39,6 @@ extensions = [
     "nbsphinx",
     "sphinxcontrib.autodoc_pydantic",
     "sphinx_copybutton",
-    "sphinxcontrib.collections",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -78,20 +77,6 @@ autodoc_pydantic_settings_show_validator_members = False
 autodoc_pydantic_settings_member_order = "bysource"
 autodoc_pydantic_field_list_validators = False
 autodoc_pydantic_field_show_constraints = False
-
-# sphinx-collections
-collections = {
-    "enumerators": {
-        "driver": "copy_file",
-        "source": "examples/1_enumerators.ipynb",
-        "target": "1_enumerators.ipynb",
-    },
-    "networks": {
-        "driver": "copy_file",
-        "source": "examples/2_networks.ipynb",
-        "target": "2_networks.ipynb",
-    },
-}
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -141,13 +126,13 @@ html_theme_options = {
         "font-size--small--4": "87.5%",
     },
 }
-html_title = "rxn_network"
+html_title = "reaction-network"
 
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.8", None),
+    "python": ("https://docs.python.org/3.8/", None),
     "matplotlib": ("http://matplotlib.org", None),
     "networkx": ("https://networkx.org/documentation/stable/", None),
 }
