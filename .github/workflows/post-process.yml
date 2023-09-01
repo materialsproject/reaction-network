@@ -16,7 +16,7 @@ jobs:
         name: Merge me!
         uses: ridedott/merge-me-action@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SEMVER_BUMP_TOKEN}}
 
   auto-gen-release:
     runs-on: ubuntu-latest
