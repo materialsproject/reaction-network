@@ -2,16 +2,21 @@
 This module implements added features to the ChemicalPotentialDiagram class from
 pymatgen.
 """
+from __future__ import annotations
+
 from functools import cached_property
-from typing import Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.analysis.chempot_diagram import ChemicalPotentialDiagram as ChempotDiagram
-from pymatgen.analysis.phase_diagram import PDEntry, PhaseDiagram
-from pymatgen.core.composition import Element
+from pymatgen.analysis.phase_diagram import PhaseDiagram
 from scipy.spatial import HalfspaceIntersection, KDTree
 
 from rxn_network.entries.entry_set import GibbsEntrySet
+
+if TYPE_CHECKING:
+    from pymatgen.analysis.phase_diagram import PDEntry
+    from pymatgen.core.periodic_table import Element
 
 
 class ChemicalPotentialDiagram(ChempotDiagram):
@@ -21,8 +26,8 @@ class ChemicalPotentialDiagram(ChempotDiagram):
     efficiently calculating the shortest distance between two chemical potential
     domains.
 
-    For more information on this specific implementation of the algorithm,
-    please cite/reference the paper below:
+    For more information on this specific implementation of the algorithm, please
+    cite/reference the paper below:
 
         Todd, P. K., McDermott, M. J., Rom, C. L., Corrao, A. A., Denney, J. J.,
         Dwaraknath, S. S.,  Khalifah, P. G., Persson, K. A., & Neilson, J. R. (2021).
@@ -33,9 +38,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
-        entries: List[PDEntry],
-        limits: Optional[Dict[Element, float]] = None,
-        default_min_limit: Optional[float] = -100.0,
+        entries: list[PDEntry],
+        limits: dict[Element, float] | None = None,
+        default_min_limit: float | None = -100.0,
     ):
         """
         Initialize a ChemicalPotentialDiagram object.
@@ -43,17 +48,17 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         Args:
             entries: List of PDEntry-like objects containing a composition and
                 energy. Must contain elemental references and be suitable for typical
-                phase diagram construction. Entries must be within a chemical system of
-                with 2+ elements
+                phase diagram construction. Entries must be within a chemical system
+                with 2 or more elements.
             limits: Bounds of elemental chemical potentials (min, max), which are
                 used to construct the border hyperplanes used in the
                 HalfspaceIntersection algorithm; these constrain the space over which
                 the domains are calculated and also determine the size of the plotted
                 diagram. Any elemental limits not specified are covered in the
-                default_min_limit argument
+                default_min_limit argument.
             default_min_limit (float): Default minimum chemical potential limit for
                 unspecified elements within the "limits" argument. This results in
-                default limits of (-100, 0)
+                default limits of (-100, 0).
         """
         self.entries = list(
             sorted(entries, key=lambda e: e.composition.reduced_formula)
@@ -94,17 +99,22 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         self._border_hyperplane_indices = list(
             range(num_hyperplanes, num_hyperplanes + num_border_hyperplanes)
         )
-        self._metastable_domains: Dict[str, List] = {}  # for caching
+        self._metastable_domains: dict[str, list] = {}  # for caching
 
-    def shortest_domain_distance(self, f1: str, f2: str, offset=0.0) -> float:
+    def shortest_domain_distance(self, f1: str, f2: str, offset: float = 0.0) -> float:
         """
+        Returns the chemical potential distance between two phase domains. Also works
+        for metastable phases (see metastable_domains property).
+
         Args:
-            f1: chemical formula (1)
-            f2: chemical formula (2)
+            f1: chemical formula of phase 1
+            f2: chemical formula of phase 2
+            offset: an optional offset (eV/atom) to add to the calculated distance. See
+                get_offset() method.
 
         Returns:
-            Shortest distance between domain boundaries in the full
-            (hyper)dimensional space, calculated using KDTree.
+            Shortest distance between domain boundaries in the full (hyper)dimensional
+            space, calculated using KDTree.
         """
 
         if f1 in self.domains:
@@ -121,14 +131,70 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         return min(tree.query(pts2)[0]) + offset
 
+    def get_offset(self, entry: PDEntry) -> float:
+        """
+        For a given entry, returns the distance between its hyperplane and the surface
+        of the chemical potential diagram. This allows one to represent the energy above
+        hull in chemical potential space. Returns zero for stable entries.
+
+        Args:
+            entry: A stable or metastable entry within the chemical potential diagram
+        Returns:
+            Offset in chemical potential distance (eV/atom)
+        """
+        if (
+            entry in self._min_entries
+            and entry.composition.reduced_formula in self.domains
+        ):
+            offset = 0.0
+        else:
+            e_above_hull = self._entry_set.get_e_above_hull(entry)
+            hyperplane = self._get_hyperplane(entry)
+            offset = self._get_distance_between_parallel_hyperplanes(
+                hyperplane[:-1], e_above_hull
+            )
+
+        return offset
+
+    @cached_property
+    def domains(self) -> dict[str, np.ndarray]:
+        """
+        Mapping of formulas to array of domain boundary points. Cached for quicker
+        calculations.
+        """
+        return self._get_domains()
+
+    @property
+    def metastable_domains(self) -> dict[str, np.ndarray]:
+        """
+        Gets a dictionary of the chemical potential domains for metastable chemical
+        formulas. This corresponds to the domains of the relevant phases if they were
+        just barely thermodynamically stable (on the hull).
+        """
+        return {
+            e.composition.reduced_formula: self._get_metastable_domain(
+                e.composition.reduced_formula
+            )
+            for e in self._min_entries
+            if e.composition.reduced_formula not in self.domains
+        }
+
+    @property
+    def hs_int(self) -> HalfspaceIntersection:
+        """
+        Returns the scipy HalfSpaceIntersection object used to calculate all domains.
+        """
+        return self._hs_int
+
     def _get_halfspace_intersection(self):
         hs_hyperplanes = np.vstack([self._hyperplanes, self._border_hyperplanes])
         interior_point = np.min(self.lims, axis=1) + 1e-1
         return HalfspaceIntersection(hs_hyperplanes, interior_point)
 
-    def _get_domains(self) -> Dict[str, np.ndarray]:
-        """Returns a dictionary of domains as {formula: np.ndarray}"""
-        domains: Dict[str, List] = {
+    def _get_domains(self) -> dict[str, np.ndarray]:
+        """Returns a dictionary of chemical potential domains as {formula:
+        np.ndarray}"""
+        domains: dict[str, list] = {
             entry.composition.reduced_formula: [] for entry in self._hyperplane_entries
         }
         entries = self._hyperplane_entries
@@ -144,7 +210,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
         return {k: np.array(v) for k, v in domains.items() if v}
 
-    def _get_hyperplanes_and_entries(self) -> Tuple[np.ndarray, List[PDEntry]]:
+    def _get_hyperplanes_and_entries(self) -> tuple[np.ndarray, list[PDEntry]]:
         """Returns both the array of hyperplanes, as well as a list of the minimum
         entries"""
         data = np.array([self._get_hyperplane(e) for e in self._min_entries])
@@ -167,70 +233,43 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         )
         return data
 
-    def get_offset(self, entry):
-        """ """
-        if (
-            entry in self._min_entries
-            and entry.composition.reduced_formula in self.domains
-        ):
-            offset = 0.0
-        else:
-            e_above_hull = self._entry_set.get_e_above_hull(entry)
-            hyperplane = self._get_hyperplane(entry)
-            offset = self._get_distance_between_parallel_hyperplanes(
-                hyperplane[:-1], e_above_hull
-            )
-
-        return offset
-
-    @staticmethod
-    def _get_distance_between_parallel_hyperplanes(a, delta_b):
-        """Returns the distance between two parallel hyperplanes"""
-        return np.abs(delta_b) / np.linalg.norm(a)
-
-    def _get_metastable_domain(self, formula):
-        """Returns the metastable domain for a given formula"""
+    def _get_metastable_domain(self, formula, tol=1e-5):
+        """Returns the metastable domain for a given formula. Tol is passed to
+        GibbsEntrySet.get_stabilized_entry and will affect the size of the domain."""
         if formula in self._metastable_domains:
             return self._metastable_domains[formula]
 
         orig_entry = self._entry_set.get_min_entry_by_formula(formula)
-        new_entry = self._entry_set.get_stabilized_entry(orig_entry, tol=1e-1)
+        new_entry = self._entry_set.get_stabilized_entry(orig_entry, tol=tol)
         self._entry_set.add(new_entry)
         cpd = ChemicalPotentialDiagram(self._entry_set, default_min_limit=-500)
 
         try:
             metastable_domain = cpd.domains[formula]
         except KeyError as exc:
-            raise ValueError(
-                f"Metastable domain for {formula} not found! Please investigate."
-            ) from exc
+            # sometimes if the entry is exactly on the hull it fails, so set force=True
+            # and make bigger tolerance
+            self._entry_set.remove(new_entry)
+            new_entry = self._entry_set.get_stabilized_entry(
+                orig_entry, tol=1e-2, force=True
+            )
+            self._entry_set.add(new_entry)
+            cpd = ChemicalPotentialDiagram(self._entry_set, default_min_limit=-500)
+
+            try:
+                metastable_domain = cpd.domains[formula]
+            except KeyError:
+                raise ValueError(
+                    "Failed even after attempted fix. Metastable domain for"
+                    f" {formula} can not be created!"
+                ) from exc
 
         self._metastable_domains[formula] = metastable_domain
         self._entry_set.remove(new_entry)
 
         return metastable_domain
 
-    @property
-    def hs_int(self):
-        """Returns the scipy HalfSpaceIntersection object"""
-        return self._hs_int
-
-    @cached_property
-    def domains(self) -> Dict[str, np.ndarray]:
-        """Mapping of formulas to array of domain boundary points"""
-        return self._get_domains()
-
-    @property
-    def metastable_domains(self) -> Dict[str, np.ndarray]:
-        """
-        Gets a dictionary of the chemical potential domains for metastable chemical
-        formulas. This corresponds to the domains of the relevant phases if they were
-        just barely stable
-        """
-        return {
-            e.composition.reduced_formula: self._get_metastable_domain(
-                e.composition.reduced_formula
-            )
-            for e in self._min_entries
-            if e.composition.reduced_formula not in self.domains
-        }
+    @staticmethod
+    def _get_distance_between_parallel_hyperplanes(a, delta_b):
+        """Returns the distance between two parallel hyperplanes"""
+        return np.abs(delta_b) / np.linalg.norm(a)

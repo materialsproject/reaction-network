@@ -1,4 +1,3 @@
 """
-Calculators used to determine properties of a reaction, and cost functions which
-aggregate these into an assigned cost.
+Calculators and cost functions for determining relative ordering of reactions.
 """

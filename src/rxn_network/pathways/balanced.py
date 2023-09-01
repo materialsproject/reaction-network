@@ -1,15 +1,19 @@
 """
-Implements a class for storing balanced reaction pathways.
+Implements a class for storing a balanced reaction pathway.
 """
-from typing import List, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-from rxn_network.core.composition import Composition
-from rxn_network.core.pathway import Pathway
-from rxn_network.core.reaction import Reaction
+from rxn_network.core import Composition
+from rxn_network.pathways.base import Pathway
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.utils.funcs import limited_powerset
+
+if TYPE_CHECKING:
+    from rxn_network.reactions.base import Reaction
 
 
 class BalancedPathway(BasicPathway):
@@ -21,54 +25,27 @@ class BalancedPathway(BasicPathway):
 
     def __init__(
         self,
-        reactions: List[Reaction],
-        coefficients: List[float],
-        costs: List[float],
+        reactions: list[Reaction],
+        coefficients: list[float],
+        costs: list[float],
         balanced: bool = False,
     ):
         """
         Args:
             reactions: list of ComputedReaction objects which occur along path.
-            coefficients: list of coefficients to balance each of these reactions,
-                respectively
+            coefficients: list of coefficients to balance each corresponding reaction.
             costs: list of corresponding costs for each reaction.
             balanced: whether or not the reaction pathway is balanced.
-                Defaults to False.
+                Defaults to False and should ideally be set through PathwaySolver.
         """
         self.coefficients = coefficients
         super().__init__(reactions=reactions, costs=costs)
 
         self.balanced = balanced
 
-    def __eq__(self, other):
-        if super().__eq__(other):
-            return np.allclose(self.costs, other.costs)
-
-        return False
-
-    def __hash__(self):
-        return hash((tuple(self.reactions), tuple(self.coefficients)))
-
-    @classmethod
-    def balance(
-        cls,
-        pathway_sets: Union[List[Pathway], List[List[Reaction]]],
-        net_reaction: Reaction,
-        tol=1e-6,
-    ):
+    def get_comp_matrix(self) -> np.ndarray:
         """
-        TODO: Implement this method
-
-        Balances multiple reaction pathways to a net reaction.
-
-        NOTE: Currently, to automatically balance and create a BalancedPathway object,
-        you must use the PathwaySolver class.
-        """
-
-    def comp_matrix(self) -> np.ndarray:
-        """
-        Internal method for getting the composition matrix used in the balancing
-        procedure.
+        Gets the composition matrix used in the balancing procedure.
 
         Returns:
             An array representing the composition matrix for a reaction
@@ -83,9 +60,9 @@ class BalancedPathway(BasicPathway):
             ]
         )
 
-    def get_coeff_vector_for_rxn(self, rxn) -> np.ndarray:
+    def get_coeff_vector_for_rxn(self, rxn: Reaction) -> np.ndarray:
         """
-        Internal method for getting the net reaction coefficients vector.
+        Gets the net reaction coefficients vector.
 
         Args:
             rxn: Reaction object to get coefficients for
@@ -100,9 +77,9 @@ class BalancedPathway(BasicPathway):
             ]
         )
 
-    def contains_interdependent_rxns(self, precursors: List[Composition]) -> bool:
+    def contains_interdependent_rxns(self, precursors: list[Composition]) -> bool:
         """
-        Whether or not the pathway contains interdependent reactions, given a list of
+        Whether or not the pathway contains interdependent reactions given a list of
         provided precursors.
 
         Args:
@@ -147,12 +124,37 @@ class BalancedPathway(BasicPathway):
 
         return interdependent
 
+    @classmethod
+    def balance(
+        cls,
+        pathway_sets: list[Pathway] | list[list[Reaction]],
+        net_reaction: Reaction,
+        tol: float = 1e-6,
+    ):
+        """Not implemented. See PathwaySolver class."""
+
+        _, _, _ = pathway_sets, net_reaction, tol
+
+        raise NotImplementedError(
+            "Currently, to automatically balance and create a BalancedPathway object,"
+            " you must use the PathwaySolver class."
+        )
+
     @property
     def average_cost(self) -> float:
         """Returns the mean cost of the pathway"""
         return np.dot(self.coefficients, self.costs) / sum(self.coefficients)
 
-    def __repr__(self):
+    def __eq__(self, other) -> bool:
+        if super().__eq__(other):
+            return np.allclose(self.costs, other.costs)
+
+        return False
+
+    def __hash__(self):
+        return hash((tuple(self.reactions), tuple(self.coefficients)))
+
+    def __repr__(self) -> str:
         path_info = ""
         for rxn in self.reactions:
             path_info += f"{rxn} (dG = {round(rxn.energy_per_atom, 3)} eV/atom) \n"

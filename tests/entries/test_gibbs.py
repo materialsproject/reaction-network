@@ -134,8 +134,23 @@ def test_eq_different_class(entry, mp_entries):
     assert entry != mp_entries[0]
 
 
+def test_eq_no_entry_id(entry):
+    e1 = entry.copy()
+    e2 = entry.copy()
+
+    e1.entry_id = None
+    e2.entry_id = None
+
+    assert e1 == e2
+
+
 def test_invalid_temperature(entry):
     with pytest.raises(ValueError):
         entry.get_new_temperature(299)
     with pytest.raises(ValueError):
         entry.get_new_temperature(2001)
+
+
+def test_unique_id(entry):
+    assert str(entry.temperature) in entry.unique_id
+    assert str(entry.entry_id) in entry.unique_id

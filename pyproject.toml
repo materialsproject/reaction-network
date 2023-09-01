@@ -4,15 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reaction-network"
-description = "Reaction-network is a Python package for predicting and designing chemical reaction pathways in inorganic materials synthesis."
+description = "Reaction-network is a Python package for synthesis planning and prediction of chemical reaction pathways in inorganic materials synthesis."
 readme = "README.md"
 keywords = [
     "reaction",
     "network",
     "computational",
     "graph",
+    "inorganic",
     "materials",
     "retrosynthesis",
+    "synthesis",
+    "planning",
 ]
 license = { text = "modified BSD" }
 authors = [{ name = "Matthew McDermott", email = "mcdermott@lbl.gov" }]
@@ -22,7 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.11",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
@@ -33,60 +36,66 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "pymatgen>=2022.8.23",
-    "numba>=0.56.1",
-    "jobflow>=0.1.8",
-    "ray>=2.0.0",
-    "mp-api>=0.30.0",
-    "rustworkx>=0.12.0",
+    "pymatgen>=2023.5.31",
+    "numba>=0.57.0",
+    "jobflow>=0.1.13",
+    "ray>=2.5.0",
+    "rustworkx>=0.12.1",
 ]
 
 [project.optional-dependencies]
 docs = [
-    "jupyter_contrib_nbextensions==0.7.0",
-    "mkdocs==1.4.2",
-    "mkdocs-autorefs==0.4.1",
-    "mkdocs-coverage==0.2.6",
-    "mkdocs-jupyter==0.22.0",
-    "mkdocs-section-index==0.3.4",
-    "mkdocstrings==0.20.0",
-    "mkdocstrings-python==0.8.3",
-    "pymdown-extensions==9.9.2",
+    "autodoc_pydantic==1.9.0",
+    "furo==2023.8.19",
+    "ipython==8.14.0",
+    "myst_parser==2.0.0",
+    "nbsphinx==0.9.3",
+    "sphinx-copybutton==0.5.2",
+    "sphinx==7.2.4",
 
 ]
-plotting = ["graphistry==0.28.7"]
-tests = ["pytest==7.1.3", "pytest-cov==4.0.0"]
+tests = [
+    "mp-api==0.35.1",
+    "pytest==7.4.0",
+    "pytest-cov==4.1.0",
+    "pytest-xdist==3.3.1",
+]
 strict = [
-    "numba==0.56.4",
-    "pymatgen==2023.1.30",
-    "jobflow==0.1.9",
-    "ray==2.2.0",
-    "mp-api==0.30.8",
+    "numba==0.57.0",
+    "pymatgen==2023.08.10",
+    "jobflow==0.1.13",
+    "ray==2.6.3",
     "rustworkx==0.12.1",
 ]
 
 [project.urls]
-homepage = "https://genesis-efrc.github.io/reaction-network/"
-documentation = "https://genesis-efrc.github.io/reaction-network/"
-repository = "https://github.com/GENESIS-EFRC/reaction-network"
-changelog = "https://github.com/GENESIS-EFRC/reaction-network/blob/main/docs/CHANGELOG.md"
+homepage = "https://materialsproject.github.io/reaction-network/"
+documentation = "https://materialsproject.github.io/reaction-network/"
+repository = "https://github.com/materialsproject/reaction-network"
+changelog = "https://github.com/materialsproject/reaction-network/blob/main/docs/CHANGELOG.md"
 
 [tool.coverage.run]
 include = ["src/*"]
 parallel = true
-branch = true
+branch = false
 
 [tool.coverage.paths]
 source = ["src/"]
 
 [tool.coverage.report]
-skip_covered = true
 show_missing = true
-exclude_lines = [
+skip_covered = true
+exclude_also = [
     '\#\s*pragma: no cover',
     '^\s*assert False(,|$)',
     'if typing.TYPE_CHECKING:',
     '^\s*@overload( |$)',
+    'if TYPE_CHECKING:',
+]
+omit = [
+    "src/rxn_network/data/nist/generate_janaf_data.py",
+    "src/rxn_network/network/visualize.py",
+    "src/rxn_network/pathways/plotting.py",
 ]
 
 [tool.flake8]
@@ -103,6 +112,9 @@ known_first_party = "rxn_network"
 
 [tool.pytest]
 addopts = "--durations=10"
+
+[tool.pytest.ini_options]
+addopts = "-n auto"
 
 [tool.setuptools.package-data]
 rxn_network = ["py.typed"]

@@ -8,12 +8,12 @@ from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
 from rxn_network.entries.entry_set import GibbsEntrySet
 
 
-@pytest.mark.parametrize(
-    "chemsys", [["Mn", "O", "Y"], ["Mn", "O"], ["Y", "O"], ["O"], ["Mn", "Y"]]
-)
+@pytest.mark.parametrize("chemsys", [["Mn", "O", "Y"], "Mn-O", ["Y", "O"], "O", ["O"]])
 def test_get_subset_in_chemsys(chemsys, gibbs_entries):
     subset = gibbs_entries.get_subset_in_chemsys(chemsys)
-    desired_chemsys = set(sorted(chemsys))
+    if isinstance(chemsys, str):
+        chemsys = chemsys.split("-")
+    desired_chemsys = set(chemsys)
     assert subset.chemsys == desired_chemsys
 
     for e in gibbs_entries:
@@ -105,8 +105,22 @@ def test_get_stabilized_entry(gibbs_entries):
         assert e_stable in PhaseDiagram(entries).stable_entries
 
 
-def test_get_adjusted_entry(interpolated_entry):
+def test_get_entries_with_new_temperature(gibbs_entries):
+    new_temp = 500
+    new_entries = gibbs_entries.get_entries_with_new_temperature(new_temp)
+    assert all(e.temperature == new_temp for e in new_entries)
 
+
+def test_get_entries_with_jitter(gibbs_entries):
+    new_entries = gibbs_entries.get_entries_with_jitter()
+    for new_ent, old_ent in zip(new_entries, gibbs_entries):
+        if new_ent.is_element:
+            assert new_ent.energy == pytest.approx(old_ent.energy)
+        else:
+            assert not new_ent.energy == pytest.approx(old_ent.energy)
+
+
+def test_get_adjusted_entry(interpolated_entry):
     entry_copy = deepcopy(interpolated_entry)
     entry_copy.energy_adjustments.append(ConstantEnergyAdjustment(0.1))
 

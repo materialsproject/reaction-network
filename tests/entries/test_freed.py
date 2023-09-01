@@ -2,7 +2,7 @@
 
 import pytest
 
-from rxn_network.core.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.entries.freed import FREEDReferenceEntry
 
 

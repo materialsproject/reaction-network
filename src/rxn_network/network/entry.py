@@ -2,12 +2,17 @@
 Entry objects used in a Network. These network entry objects hold multiple entries and
 can be used as data for a node in the graph.
 """
+from __future__ import annotations
+
 from enum import Enum, auto
-from typing import List
+from typing import TYPE_CHECKING, Collection
 
 from monty.json import MSONable
 from monty.serialization import MontyDecoder
-from pymatgen.entries import Entry
+
+if TYPE_CHECKING:
+    from pymatgen.core.periodic_table import Element
+    from pymatgen.entries import Entry
 
 
 class NetworkEntryType(Enum):
@@ -23,25 +28,45 @@ class NetworkEntryType(Enum):
 class NetworkEntry(MSONable):
     """
     Helper class for describing combinations of ComputedEntry-like objects in context
-    of a reaction network.
+    of a reaction network. This entry will represent a node in the network.
     """
 
-    def __init__(self, entries: List[Entry], description: NetworkEntryType):
+    def __init__(self, entries: Collection[Entry], description: NetworkEntryType):
         """
         Args:
-            entries: list of Entry-like objects
+            entries: Collection of Entry-like objects
             description: Node type (e.g., Precursors, Target... see NetworkEntryType
                 class)
         """
-        self.entries = set(entries)
-        self.elements = sorted(
+        self._entries = set(entries)
+        self._elements = sorted(
             list({elem for entry in entries for elem in entry.composition.elements})
         )
-        self.chemsys = "-".join([str(e) for e in self.elements])
-        self.dim = len(self.chemsys)
-        self.description = description
+        self._chemsys = "-".join([str(e) for e in self.elements])
+        self._dim = len(self.chemsys)
+        self._description = description
 
-    def as_dict(self):
+    @property
+    def entries(self) -> set[Entry]:
+        return self._entries
+
+    @property
+    def elements(self) -> list[Element]:
+        return self._elements
+
+    @property
+    def chemsys(self) -> str:
+        return self._chemsys
+
+    @property
+    def dim(self) -> int:
+        return self._dim
+
+    @property
+    def description(self) -> NetworkEntryType:
+        return self._description
+
+    def as_dict(self) -> dict:
         """MSONable dict representation"""
         return {
             "@module": self.__class__.__module__,
@@ -51,19 +76,19 @@ class NetworkEntry(MSONable):
         }
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, d: dict) -> NetworkEntryType:
         """Load from MSONable dict"""
         return cls(
             MontyDecoder().process_decoded(d["entries"]),
             NetworkEntryType(d["description"]),
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         formulas = [entry.composition.reduced_formula for entry in self.entries]
         formulas.sort()
         return f"{self.description.name}: {','.join(formulas)}"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
             if self.description == other.description:
                 if self.chemsys == other.chemsys:
@@ -80,28 +105,18 @@ class DummyEntry(NetworkEntry):
     node to facilitate pathfinding to all nodes, etc.
     """
 
-    def __init__(self):  # pylint: disable=super-init-not-called
+    def __init__(self):
         """Dummy node doesn't need any parameters"""
+        self._entries = set()
+        self._elements = []
+        self._chemsys = ""
+        self._dim = 0
+        self._description = NetworkEntryType.Dummy
 
-    @property
-    def entries(self):
-        """No entries in DummyEntry"""
-        return []
-
-    @property
-    def chemsys(self):
-        """No Chemsys to DummyEntry"""
-        return ""
-
-    @property
-    def description(self):
-        """DummyEntry is always of type Dummy"""
-        return NetworkEntryType.Dummy
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "Dummy Node"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self is other
 
     def __hash__(self):

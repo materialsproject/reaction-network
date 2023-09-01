@@ -1,0 +1,41 @@
+html {
+    font-size: 100% !important;
+    font-weight: 400;
+}
+
+@media (min-width: 97em) {
+    html {
+        font-size: 100%;
+    }
+}
+
+/* Hide link icons in external links*/
+.rst-content.style-external-links a.reference.external:after {
+    display: none;
+}
+
+.sidebar-tree .reference.external:after {
+    display: none;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.15rem;
+}
+
+/* Hide nbsphinx prompt numbers */
+div.nbinput div.prompt {
+    display: none;
+}
+
+/* Hide nbsphinx prompt numbers */
+div.nboutput div.prompt {
+    display: none;
+}

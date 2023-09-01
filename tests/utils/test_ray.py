@@ -39,33 +39,42 @@ def test_initialize_ray_quiet(caplog):
     ray.shutdown()
 
 
-def test_initialize_ray_with_slurm_cluster():
+def test_initialize_ray_with_slurm_cluster(capsys):
     """Test initialize_ray"""
 
     original_ip_head = os.environ.get("ip_head")
     os.environ["ip_head"] = "test_ip_head"
 
     if ray.is_initialized():
-        ray.shutdown()  # note: this test may still fail if ray is initialized elsewhere
+        ray.shutdown()
 
-    with pytest.raises(Exception) as error:
-        initialize_ray(quiet=False)
-    assert "ConnectionError" in str(error.type)
+    try:
+        initialize_ray()
+    except Exception as error:  # if it does fail, make sure it's the right error
+        assert "ConnectionError" in str(error.type)
+
+    if "Connected" in capsys.readouterr().err:
+        pytest.skip(
+            "Skipping test_initialize_ray_with_slurm_cluster due to existing cluster"
+        )
 
     if original_ip_head is not None:
         os.environ["ip_head"] = original_ip_head  # tear down
 
 
-def test_initialize_ray_with_pbs_cluster():
+def test_initialize_ray_with_pbs_cluster(capsys):
     original_pbs_nnodes = os.environ.get("PBS_NNODES")
     os.environ["PBS_NNODES"] = "2"
 
-    if ray.is_initialized():
-        ray.shutdown()  # note: this test may still fail if ray is initialized elsewhere
+    try:
+        initialize_ray()
+    except Exception as error:  # if it does fail, make sure it's the right error
+        assert "ConnectionError" in str(error.type)
 
-    with pytest.raises(Exception) as error:
-        initialize_ray(quiet=False)
-    assert "ConnectionError" in str(error.type)
+    if "Connected" in capsys.readouterr().err:
+        pytest.skip(
+            "Skipping test_initialize_ray_with_slurm_cluster due to existing cluster"
+        )
 
     if original_pbs_nnodes is not None:
         os.environ["PBS_NNODES"] = original_pbs_nnodes

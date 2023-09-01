@@ -1,7 +1,8 @@
 """ Tests for BasicEnumerator and BasicOpenEnumerator """
 from pathlib import Path
-from monty.serialization import loadfn
+
 import pytest
+from monty.serialization import loadfn
 
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 
@@ -77,7 +78,7 @@ def test_enumerate(
         rxns = enumerator.enumerate(filtered_entries)
 
         assert expected_num_rxns == len(rxns)
-        assert len(rxns) == len(set(rxns))
+        assert len(rxns) == len(set(rxns))  # no duplicates
         assert all([not r.is_identity for r in rxns])
 
 
@@ -86,12 +87,10 @@ def test_enumerate_with_precursors(
     basic_enumerator_with_precursors,
     basic_open_enumerator_with_precursors,
 ):
-
     for enumerator in [
         basic_enumerator_with_precursors,
         basic_open_enumerator_with_precursors,
     ]:
-
         precursors = set(enumerator.precursors)
         rxns = enumerator.enumerate(filtered_entries)
 
@@ -103,7 +102,6 @@ def test_enumerate_with_precursors(
 def test_enumerate_with_target(
     filtered_entries, basic_enumerator_with_target, basic_open_enumerator_with_target
 ):
-
     for enumerator in [basic_enumerator_with_target, basic_open_enumerator_with_target]:
         rxns = enumerator.enumerate(filtered_entries)
         targets = enumerator.targets

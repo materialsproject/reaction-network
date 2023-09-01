@@ -1,6 +1,6 @@
 """
-Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), Barin tables
-(all compounds), and FactSage (elements)
+Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), FREED (all
+compounds), and FactSage (elemental chemical potentials)
 """
 from pathlib import Path
 from typing import Any, Dict, Union
@@ -9,11 +9,10 @@ from monty.serialization import loadfn
 
 cwd = Path(__file__).parent.resolve()
 
-PATH_TO_BARIN = cwd / "barin"
 PATH_TO_FREED = cwd / "freed"
 PATH_TO_NIST = cwd / "nist"
 
-G_ELEMS = loadfn(cwd / "elements.json")
+G_ELEMS = loadfn(cwd / "mu_elements.json")
 
 
 def load_experimental_data(fn: Union[str, Path]) -> Dict[str, Dict[float, Any]]:

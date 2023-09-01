@@ -10,21 +10,14 @@ nav:
       - Network:
           - Network: ../examples/2_network.ipynb
   - Reference:
-      - Core:
-          Calculator: reference/core/calculator.md
-          Composition: reference/core/composition.md
-          Cost Function: reference/core/cost_function.md
-          Enumerator: reference/core/enumerator.md
-          Network: reference/core/network.md
-          Pathway: reference/core/pathway.md
-          Reaction: reference/core/reaction.md
-          Solver: reference/core/solver.md
+      - Core: reference/core.md
       - Costs:
+          Base: reference/costs/base.md
           Calculators: reference/costs/calculators.md
-          Softplus: reference/costs/softplus.md
+          Functions: reference/costs/functions.md
+          Pareto: reference/costs/pareto.md
       - Data: reference/data/data.md
       - Entries:
-          Barin: reference/entries/barin.md
           Corrections: reference/entries/corrections.md
           Entry Set: reference/entries/entry_set.md
           Experimental: reference/entries/experimental.md
@@ -34,6 +27,7 @@ nav:
           Nist: reference/entries/nist.md
           Utils: reference/entries/utils.md
       - Enumerators:
+          Base: reference/enumerators/base.md
           Basic: reference/enumerators/basic.md
           Minimize: reference/enumerators/minimize.md
           Utils: reference/enumerators/utils.md
@@ -41,17 +35,22 @@ nav:
           Core: reference/flows/core.md
       - Jobs:
           Core: reference/jobs/core.md
+          Schema: reference/jobs/schema.md
+          Utils: reference/jobs/utils.md
       - Network:
+          Base: reference/network/base.md
           Entry: reference/network/entry.md
           Network: reference/network/network.md
           Visualize: reference/network/visualize.md
       - Pathways:
           Balanced: reference/pathways/balanced.md
+          Base: reference/pathways/base.md
           Basic: reference/pathways/basic.md
           Pathway Set: reference/pathways/pathway_set.md
           Plotting: reference/pathways/plotting.md
           Solver: reference/pathways/solver.md
       - Reactions:
+          Base: reference/reactions/base.md
           Basic: reference/reactions/basic.md
           Computed: reference/reactions/computed.md
           Hull: reference/reactions/hull.md
@@ -66,8 +65,8 @@ nav:
           Ray: reference/utils/ray.md
   - CHANGELOG: CHANGELOG.md
 
-repo_url: https://github.com/GENESIS-EFRC/reaction-network/
-site_url: https://genesis-efrc.github.io/reaction-network/
+repo_url: https://github.com/materialsproject/reaction-network/
+site_url: https://materialsproject.github.io/reaction-network/
 repo_name: Github
 
 theme:

@@ -1,9 +1,9 @@
-""" Tests for NistReferenceEntry. """
+""" Tests for NISTReferenceEntry. """
 import pytest
-from pymatgen.core.composition import Element
+from pymatgen.core.periodic_table import Element
 from pymatgen.entries.computed_entries import ManualEnergyAdjustment
 
-from rxn_network.core.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.entries.nist import NISTReferenceEntry
 
 
@@ -140,3 +140,9 @@ def test_equals(entries):
     assert entries[300] != entries[600]
 
     assert entry1 != entry2
+
+
+def test_unique_id(entries):
+    entry = entries[300]
+    assert str(entry.temperature) in entry.unique_id
+    assert str(entry.composition.reduced_formula) in entry.unique_id

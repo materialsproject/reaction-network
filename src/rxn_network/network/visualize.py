@@ -1,15 +1,21 @@
 """
 Functions for visualizing/plotting reaction networks.
 """
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import matplotlib.cm
 import numpy as np
-import rustworkx as rx
 from rustworkx.visualization import mpl_draw
 
+if TYPE_CHECKING:
+    from rustworkx import PyGraph
 
-def plot_network(graph: rx.PyGraph, vertex_cmap_name: str = "jet", **kwargs):
+
+def plot_network(graph: PyGraph, vertex_cmap_name: str = "jet", **kwargs):
     """
-    Plots a reaction network using rustworkx visualization tools (i.e., mpl_draw)
+    Plots a reaction network using rustworkx visualization tools (i.e., mpl_draw).
 
     Args:
         graph: a rustworkx PyGraph object

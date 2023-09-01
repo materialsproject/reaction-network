@@ -1,11 +1,14 @@
-"""Functions for working with Ray."""
-import logging
+"""Functions for working with Ray (parallelization library)."""
 import os
 
 import ray
 
+from rxn_network.utils.funcs import get_logger
 
-def initialize_ray(quiet=False):
+logger = get_logger(__name__)
+
+
+def initialize_ray(quiet: bool = False):
     """
     Simple function to initialize ray. Basic support for running ray on multiple nodes.
     Currently supports SLURM and PBS job schedulers.
@@ -18,7 +21,6 @@ def initialize_ray(quiet=False):
         Checks environment for PBS_NNODES > 1.
 
     """
-    logger = logging.getLogger("enumerator")
     if not quiet:
         logger.setLevel("INFO")
     if not ray.is_initialized():
@@ -33,17 +35,23 @@ def initialize_ray(quiet=False):
             )
             ray.init()
 
-            logger.info(
-                f"HOST: {ray.nodes()[0]['NodeManagerHostname']},"
-                f" {ray.nodes()[0]['Resources']}"
-            )
+        logger.info(
+            f"HOST: {ray.nodes()[0]['NodeManagerHostname']}, "
+            f"Num CPUs: {ray.cluster_resources()['CPU']}, "
+            f"Total Memory: {ray.cluster_resources()['memory']}"
+        )
+    else:
+        logger.info("Ray is already initialized.")
 
 
-def to_iterator(obj_ids):
+def to_iterator(obj_ids, get_obj_ids: bool = False):
     """
     Method to convert a list of ray object ids to an iterator that can be used in a for
     loop.
     """
     while obj_ids:
         done, obj_ids = ray.wait(obj_ids)
-        yield ray.get(done[0])
+        if get_obj_ids:
+            yield done[0], ray.get(done[0])
+        else:
+            yield ray.get(done[0])

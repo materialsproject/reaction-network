@@ -1,34 +1,43 @@
 """
-Utility functions for plotting reaction data/analysis.
+Utility functions for plotting reaction data & performing analysis.
 """
-import numpy as np
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import plotly.express as px
 import plotly.graph_objects as go
-from pandas import DataFrame
 from pymatgen.analysis.chempot_diagram import plotly_layouts
+
+from rxn_network.costs.pareto import get_pareto_front
+
+if TYPE_CHECKING:
+    from pandas import DataFrame
 
 
 def plot_reaction_scatter(
     df: DataFrame,
-    x="energy",
-    y="secondary_selectivity",
-    z=None,
-    color="has_added_elems",
-    plot_pareto=True,
+    x: str = "secondary_competition",
+    y: str = "energy",
+    z: str | None = None,
+    color: str | None = None,
+    plot_pareto: bool = True,
 ) -> px.scatter:
     """
-    Plot a Plotly scatter plot of chemical potential distance vs energy.
+    Plot a Plotly scatter plot (2D or 3D) of reactions on various thermodynamic metric
+    axes. This also constructs the Pareto front on the provided dimensions.
 
     Args:
-        df: DataFrame with columns: rxn, energy, distance, added_elems
+        df: DataFrame with columns: rxn, energy, (primary_competition),
+            (secondary_competition), (chempot_distance), (added_elems), (dE)
 
     Returns:
         Plotly scatter plot
     """
 
     def get_label_and_units(name):
-        label = ""
-        units = ""
+        label, units = "", ""
+
         if name == "energy":
             label = (
                 r"$\mathsf{Reaction~driving~force} ~"
@@ -45,15 +54,16 @@ def plot_reaction_scatter(
             if z is not None:
                 label = "Total chemical potential distance"
             units = "eV/atom"
-        elif name == "primary_selectivity":
-            label = "Primary Selectivity"
-            units = "a.u."
-        elif name == "secondary_selectivity":
-            label = "Secondary Selectivity"
+        elif name == "primary_competition":
+            label = "Primary Competition"
+            units = "eV/atom"
+        elif name == "secondary_competition":
+            label = "Secondary Competition"
             units = "eV/atom"
         elif name == "dE":
             label = "Uncertainty"
             units = "eV/atom"
+
         return label, units
 
     df = df.copy()
@@ -72,7 +82,7 @@ def plot_reaction_scatter(
         cols = (x, y, z)
 
     if plot_pareto:
-        pareto_df = get_pareto_front(df, cols=cols)
+        pareto_df = get_pareto_front(df, metrics=cols)
         df = df.loc[~df.index.isin(pareto_df.index)]
 
         arr = pareto_df[list(cols)].to_numpy()
@@ -81,7 +91,7 @@ def plot_reaction_scatter(
                 x=arr[:, 0],
                 y=arr[:, 1],
                 hovertext=pareto_df["rxn"],
-                marker=dict(size=10, color="seagreen", symbol="diamond"),
+                marker={"size": 10, "color": "seagreen", "symbol": "diamond"},
                 mode="markers",
                 name="Pareto front",
             )
@@ -91,7 +101,7 @@ def plot_reaction_scatter(
                 y=arr[:, 1],
                 z=arr[:, 2],
                 hovertext=pareto_df["rxn"],
-                marker=dict(size=10, color="seagreen", symbol="diamond"),
+                marker={"size": 10, "color": "seagreen", "symbol": "diamond"},
                 mode="markers",
                 name="Pareto front",
             )
@@ -115,11 +125,11 @@ def plot_reaction_scatter(
         for t in ["xaxis", "yaxis", "zaxis"]:
             layout_3d["scene"][t] = axis_layout
 
-        layout_3d["scene_camera"] = dict(
-            eye=dict(x=-5, y=-5, z=5),  # zoomed out
-            projection=dict(type="orthographic"),
-            center=dict(x=-0.2, y=-0.2, z=-0.1),
-        )
+        layout_3d["scene_camera"] = {
+            "eye": {"x": -5, "y": -5, "z": 5},  # zoomed out
+            "projection": {"type": "orthographic"},
+            "center": {"x": -0.2, "y": -0.2, "z": -0.1},
+        }
 
         fig = px.scatter_3d(
             df,
@@ -160,68 +170,23 @@ def plot_reaction_scatter(
     return fig
 
 
-def get_pareto_front(
-    df: DataFrame,
-    cols=("energy", "primary_selectivity", "secondary_selectivity"),
-    maximize=False,
-):
-    df_original = df.copy()
-    df = df_original[list(cols)]
-    pts = df.to_numpy()
-
-    if maximize:
-        pts[:, 1:] = pts[:, 1:] * -1
-
-    return df_original[is_pareto_efficient(pts, return_mask=True)]
-
-
-def is_pareto_efficient(costs, return_mask=True):
-    """
-    Directly borrowed from @Peter's numpy-based solution on stackoverflow. Please
-    give him an upvote here: https://stackoverflow.com/a/40239615.
-    Thank you @Peter!
-
-    Find the pareto-efficient points
-    :param costs: An (n_points, n_costs) array
-    :param return_mask: True to return a mask
-    :return: An array of indices of pareto-efficient points.
-        If return_mask is True, this will be an (n_points, ) boolean array
-        Otherwise it will be a (n_efficient_points, ) integer array of indices.
-    """
-    is_efficient = np.arange(costs.shape[0])
-    n_points = costs.shape[0]
-    next_point_index = 0  # Next index in the is_efficient array to search for
-    while next_point_index < len(costs):
-        nondominated_point_mask = np.any(costs < costs[next_point_index], axis=1)
-        nondominated_point_mask[next_point_index] = True
-        is_efficient = is_efficient[nondominated_point_mask]  # Remove dominated points
-        costs = costs[nondominated_point_mask]
-        next_point_index = np.sum(nondominated_point_mask[:next_point_index]) + 1
-    if return_mask:
-        is_efficient_mask = np.zeros(n_points, dtype=bool)
-        is_efficient_mask[is_efficient] = True
-        return is_efficient_mask
-
-    return is_efficient
-
-
-def pretty_df_layout(df):
+def pretty_df_layout(df: DataFrame):
     """Improve visibility for a pandas DataFrame with wide column names"""
     return df.style.set_table_styles(
         [
-            dict(
-                selector="th",
-                props=[
+            {
+                "selector": "th",
+                "props": [
                     ("max-width", "70px"),
                     ("text-overflow", "ellipsis"),
                     ("overflow", "hidden"),
                 ],
-            )
+            }
         ]
     )  # improve rendering in Jupyter
 
 
-def filter_df_by_precursors(df, precursors):
+def filter_df_by_precursors(df: DataFrame, precursors: list[str]):
     """Filter a reaction DataFrame by available precursors"""
     df = df.copy()
     df["precursors"] = [

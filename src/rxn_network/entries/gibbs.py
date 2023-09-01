@@ -3,40 +3,44 @@ A computed entry object for estimating the Gibbs free energy of formation. Note 
 this is similar to the implementation within pymatgen, but has been refactored here to
 add extra functionality.
 """
+from __future__ import annotations
+
 from copy import deepcopy
 from itertools import combinations
-from typing import List, Optional
+from typing import TYPE_CHECKING
 
 import numpy as np
 from monty.json import MontyDecoder
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
-from pymatgen.core.structure import Structure
-from pymatgen.entries.computed_entries import (
-    ComputedEntry,
-    ConstantEnergyAdjustment,
-    EnergyAdjustment,
-)
+from pymatgen.entries.computed_entries import ComputedEntry, ConstantEnergyAdjustment
 from scipy.interpolate import interp1d
 
-from rxn_network.core.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.data import G_ELEMS
+
+if TYPE_CHECKING:
+    from pymatgen.core.periodic_table import Element
+    from pymatgen.core.structure import Structure
+    from pymatgen.entries.computed_entries import EnergyAdjustment
 
 
 class GibbsComputedEntry(ComputedEntry):
     """
     An extension to ComputedEntry which estimates the Gibbs free energy of formation
     of solids using energy adjustments from the machine-learned SISSO descriptor from
-    Bartel et al. (2018).
+    Bartel et al. (2018).  Note that this is similar to the implementation within
+    pymatgen, but has been refactored here to add extra functionality.
 
-    WARNING: This descriptor only applies to solids. See
-    entries.nist.NISTReferenceEntry for common gases (e.g. CO2).
+    WARNING: This descriptor only applies to solids. See entries.nist.NISTReferenceEntry
+    for common gases (e.g. CO2).
 
-    Reference:
-        Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R.,
-        Tumas, W., Weimer, A. W., … Holder, A. M. (2018). Physical descriptor for
-        the Gibbs energy of inorganic crystalline solids and
-        temperature-dependent materials chemistry. Nature Communications, 9(1),
-        4168. https://doi.org/10.1038/s41467-018-06682-4
+    If you use this entry class in your work, please consider citing the following
+    paper:
+
+        Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R., Tumas, W., Weimer,
+        A. W., … Holder, A. M. (2018). Physical descriptor for the Gibbs energy of
+        inorganic crystalline solids and temperature-dependent materials chemistry.
+        Nature Communications, 9(1), 4168. https://doi.org/10.1038/s41467-018-06682-4.
     """
 
     def __init__(
@@ -45,10 +49,10 @@ class GibbsComputedEntry(ComputedEntry):
         formation_energy_per_atom: float,
         volume_per_atom: float,
         temperature: float,
-        energy_adjustments: Optional[List[EnergyAdjustment]] = None,
-        parameters: Optional[dict] = None,
-        data: Optional[dict] = None,
-        entry_id: Optional[object] = None,
+        energy_adjustments: list[EnergyAdjustment] | None = None,
+        parameters: dict | None = None,
+        data: dict | None = None,
+        entry_id: object | None = None,
     ):
         """
 
@@ -67,10 +71,10 @@ class GibbsComputedEntry(ComputedEntry):
             temperature: Temperature [K] by which to acquire dGf(T); must be selected
                 from a range of [300, 2000] K. If temperature is not selected from one
                 of [300, 400, 500, ... 2000 K], then free energies will be interpolated.
-            energy_adjustments: Optional list of energy adjustments
-            parameters: Optional list of calculation parameters
-            data: Optional dictionary containing entry data
-            entry_id: Optional entry-id, such as the entry's mp-id
+            energy_adjustments: Optional list of energy adjustments.
+            parameters: Optional list of calculation parameters.
+            data: Optional dictionary containing entry data.
+            entry_id: Optional entry id, such as the entry's mpid.
         """
         composition = Composition(composition)
         self._composition = composition
@@ -111,7 +115,7 @@ class GibbsComputedEntry(ComputedEntry):
         self.formation_energy_per_atom = formation_energy_per_atom
         self.temperature = temperature
 
-    def get_new_temperature(self, new_temperature: float) -> "GibbsComputedEntry":
+    def get_new_temperature(self, new_temperature: float) -> GibbsComputedEntry:
         """
         Return a copy of the GibbsComputedEntry at the new specified temperature.
 
@@ -152,7 +156,7 @@ class GibbsComputedEntry(ComputedEntry):
             self.volume_per_atom, reduced_mass, temperature
         ) - self._sum_g_i(self._composition, temperature)
 
-    def to_grand_entry(self, chempots):
+    def to_grand_entry(self, chempots: dict[Element, float]):
         """
         Convert a GibbsComputedEntry to a GrandComputedEntry.
 
@@ -172,8 +176,8 @@ class GibbsComputedEntry(ComputedEntry):
         volume_per_atom: float, reduced_mass: float, temp: float
     ) -> float:
         """
-        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in
-        Bartel et al. (2018).
+        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in Bartel et al.
+        (2018).
 
         Args:
             vol_per_atom: volume per atom [Å^3/atom]
@@ -251,7 +255,7 @@ class GibbsComputedEntry(ComputedEntry):
         formation_energy_per_atom: float,
         temperature: float,
         **kwargs,
-    ) -> "GibbsComputedEntry":
+    ) -> GibbsComputedEntry:
         """
         Constructor method for building a GibbsComputedEntry from a structure,
         formation enthalpy, and temperature.
@@ -291,6 +295,15 @@ class GibbsComputedEntry(ComputedEntry):
 
         return False
 
+    @property
+    def unique_id(self) -> str:
+        """
+        Returns a unique ID for the entry based on its entry-id and temperature. This is
+        useful because the same entry-id can be used for multiple entries at different
+        temperatures.
+        """
+        return f"{self.entry_id}_{self.temperature}"
+
     def as_dict(self) -> dict:
         """Returns an MSONable dict."""
         data = super().as_dict()
@@ -300,7 +313,7 @@ class GibbsComputedEntry(ComputedEntry):
         return data
 
     @classmethod
-    def from_dict(cls, d: dict) -> "GibbsComputedEntry":
+    def from_dict(cls, d: dict) -> GibbsComputedEntry:
         """ "Returns a GibbsComputedEntry object from MSONable dictionary"""
         dec = MontyDecoder()
         entry = cls(
@@ -327,6 +340,9 @@ class GibbsComputedEntry(ComputedEntry):
 
     def __eq__(self, other):
         if not type(other) is type(self):
+            return False
+
+        if not np.isclose(self.temperature, other.temperature):
             return False
 
         if not np.isclose(self.energy, other.energy):

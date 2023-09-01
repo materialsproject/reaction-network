@@ -1,32 +1,36 @@
 """
 This module contains functions for plotting experimental reaction pathway data.
 """
+from __future__ import annotations
 
-from typing import Dict, List
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import pandas
 from monty.json import MSONable
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-from scipy.ndimage.filters import median_filter
+from scipy.ndimage import median_filter
 from tqdm import tqdm
 
-from rxn_network.core.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
+
+if TYPE_CHECKING:
+    from pymatgen.core.periodic_table import Element
+    from pymatgen.entries.computed_entries import ComputedEntry
 
 
 class PathwayPlotter(MSONable):
     """
-    Helper class for plotting a reaction pathway and the corresponding energy cascade.
+    WARNING: This is an EXPERIMENTAL CLASS. Use at your own risk.
 
-    Note:
-        This class is far from complete and is not intended yet for general use.
+    Helper class for plotting a reaction pathway and the corresponding energy cascade.
     """
 
     def __init__(
         self,
-        phase_amounts: Dict[str, List[float]],
-        temps: List[float],
+        phase_amounts: dict[str, list[float]],
+        temps: list[float],
         apply_smoothing: bool = True,
     ):
         """
@@ -50,7 +54,7 @@ class PathwayPlotter(MSONable):
         """
         return self.df.plot()
 
-    def plot_energy_cascade(self, entries):
+    def plot_energy_cascade(self, entries: list[ComputedEntry] | GibbsEntrySet):
         """
         Returns a plot of the energy cascade given a list of entries.
 
@@ -140,35 +144,35 @@ class PathwayPlotter(MSONable):
         return el_df
 
     @property
-    def elems(self):
+    def elems(self) -> list[Element]:
         """
         Returns a list of elements in the pathway
         """
         return list({e for f in self.formulas for e in Composition(f).elements})
 
     @property
-    def num_atoms_df(self):
+    def num_atoms_df(self) -> pandas.DataFrame:
         """
         Returns a dataframe of the number of atoms in each phase
         """
         return self._num_atoms_df
 
     @property
-    def formulas(self):
+    def formulas(self) -> list[str]:
         """
         Returns a list of formulas in the pathway
         """
         return self._formulas
 
     @property
-    def df(self):
+    def df(self) -> pandas.DataFrame:
         """
         Returns a dataframe of the pathway
         """
         return self._df
 
     @property
-    def compositions(self):
+    def compositions(self) -> pandas.Series:
         """
         Returns the composition of the pathway
         """

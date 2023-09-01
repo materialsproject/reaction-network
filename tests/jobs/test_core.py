@@ -5,11 +5,13 @@ from jobflow.managers.local import run_locally
 
 from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.jobs.core import (
+    CalculateCompetitionMaker,
     GetEntrySetMaker,
     NetworkMaker,
     PathwaySolverMaker,
     ReactionEnumerationMaker,
 )
+from rxn_network.reactions.reaction_set import ReactionSet
 
 
 @pytest.fixture
@@ -38,9 +40,24 @@ def enumeration_job(reaction_enumeration_maker, filtered_entries):
 
 
 @pytest.fixture
+def calculate_competition_maker():
+    calculate_competition_maker = CalculateCompetitionMaker()
+    return calculate_competition_maker
+
+
+@pytest.fixture
+def competition_job(calculate_competition_maker, all_ymno_rxns, filtered_entries):
+    target_formula = "YMnO3"
+    job = calculate_competition_maker.make(
+        [ReactionSet.from_rxns(all_ymno_rxns)], filtered_entries, target_formula
+    )
+    return job
+
+
+@pytest.fixture
 def network_maker():
     network_maker = NetworkMaker(
-        precursors=["Y2O3", "Mn2O3"], targets=["YMnO3"], calculate_pathways=10
+        precursors=["Y2O3", "Mn2O3"], targets=["YMn2O5", "Mn3O4"], calculate_pathways=10
     )
     return network_maker
 
@@ -68,6 +85,7 @@ def pathway_solver_job(
 
 
 def test_entry_job(entry_job, job_store):
+    """Note: this test will fail if there is no internet connection."""
     output = run_locally(entry_job, store=job_store, ensure_success=True)
 
     doc = output[entry_job.uuid][1].output
@@ -86,11 +104,21 @@ def test_enumeration_job(enumeration_job, job_store):
     assert doc.__class__.__name__ == "EnumeratorTaskDocument"
 
 
+def test_calculate_competition_job(competition_job, job_store):
+    output = run_locally(competition_job, store=job_store, ensure_success=True)
+    doc = output[competition_job.uuid][1].output
+    assert doc.__class__.__name__ == "CompetitionTaskDocument"
+    for r in doc.rxns:
+        assert r.data["primary_competition"] is not None
+        assert r.data["secondary_competition"] is not None
+        assert r.data["chempot_distance"] is not None
+
+
 def test_network_job(network_job, job_store):
     output = run_locally(network_job, store=job_store, ensure_success=True)
     doc = output[network_job.uuid][1].output
     assert doc.__class__.__name__ == "NetworkTaskDocument"
-    assert len(doc.paths) == 10
+    assert len(doc.paths) == 20
 
 
 def test_pathway_solver_job(pathway_solver_job, job_store):

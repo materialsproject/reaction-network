@@ -1,18 +1,22 @@
 """
-A reaction class that builds reactions based on ComputedEntry objects under the
-presence of an open entry (e.g. O2), and provides information about reaction
-thermodynamics computed as changes in grand potential.
+A reaction class that builds reactions based on ComputedEntry objects under the presence
+of an open entry (e.g. O2), and provides information about reaction thermodynamics
+computed as changes in grand potential.
 """
+from __future__ import annotations
+
 from functools import cached_property
-from typing import Dict, List, Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import ComputedEntry
 
-from rxn_network.core.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.reactions.computed import ComputedReaction
+
+if TYPE_CHECKING:
+    from pymatgen.entries.computed_entries import ComputedEntry
 
 
 class OpenComputedReaction(ComputedReaction):
@@ -23,18 +27,18 @@ class OpenComputedReaction(ComputedReaction):
 
     def __init__(
         self,
-        entries: List[ComputedEntry],
-        coefficients: Union[np.ndarray, List[float]],
-        chempots: Dict[Element, float],
-        data: Optional[Dict] = None,
-        lowest_num_errors=None,
+        entries: list[ComputedEntry],
+        coefficients: np.ndarray | list[float],
+        chempots: dict[Element, float],
+        data: dict | None = None,
+        lowest_num_errors: int | float = 0,
     ):
         """
         Args:
             entries: List of ComputedEntry objects.
             coefficients: List of reaction coefficients.
-            chempots: Dict of chemical potentials corresponding to open elements
-            data: Optional dict of data
+            chempots: Dict of chemical potentials corresponding to open elements.
+            data: Optional dict of data.
             lowest_num_errors: number of "errors" encountered during reaction
                 balancing
         """
@@ -61,11 +65,11 @@ class OpenComputedReaction(ComputedReaction):
     @classmethod
     def balance(  # type: ignore
         cls,
-        reactant_entries: List[ComputedEntry],
-        product_entries: List[ComputedEntry],
-        chempots: Dict[Element, float],
-        data: Optional[Dict] = None,
-    ) -> "OpenComputedReaction":
+        reactant_entries: list[ComputedEntry],
+        product_entries: list[ComputedEntry],
+        chempots: dict[Element, float],
+        data: dict | None = None,
+    ) -> OpenComputedReaction:
         """
         Balances and returns a new ComputedReaction.
 
@@ -108,13 +112,37 @@ class OpenComputedReaction(ComputedReaction):
 
         return rxn
 
+    def get_new_temperature(self, new_temperature: float) -> OpenComputedReaction:
+        """
+        Returns a new reaction with the temperature changed.
+
+        Args:
+            new_temperature: New temperature in Kelvin
+        """
+        try:
+            new_entries = [e.get_new_temperature(new_temperature) for e in self.entries]
+        except AttributeError as e:
+            raise AttributeError(
+                "One or more of the entries in the reaction is not associated with a"
+                " temperature. Please use the GibbsComputedEntry class for all entries"
+                " in the reaction."
+            ) from e
+
+        return OpenComputedReaction(
+            new_entries,
+            self.coefficients,
+            chempots=self.chempots,
+            data=self.data,
+            lowest_num_errors=self.lowest_num_errors,
+        )
+
     @property
     def energy(self) -> float:
         """
         Returns (float):
             The calculated reaction energy.
         """
-        calc_energies: Dict[Composition, float] = {}
+        calc_energies: dict[Composition, float] = {}
 
         for entry in self.grand_entries:
             attr = "composition"
@@ -132,7 +160,7 @@ class OpenComputedReaction(ComputedReaction):
         )
 
     @property
-    def elements(self) -> List[Element]:
+    def elements(self) -> list[Element]:
         """
         List of elements in the reaction
         """
@@ -150,7 +178,7 @@ class OpenComputedReaction(ComputedReaction):
             sorted([str(e) for e in set(self.elements) | set(self.open_elems)])
         )
 
-    def copy(self) -> "OpenComputedReaction":
+    def copy(self) -> OpenComputedReaction:
         """
         Returns a copy of the OpenComputedReaction object.
         """
@@ -204,8 +232,8 @@ class OpenComputedReaction(ComputedReaction):
 
     @classmethod
     def from_computed_rxn(
-        cls, reaction: ComputedReaction, chempots: Dict[Element, float]
-    ):
+        cls, reaction: ComputedReaction, chempots: dict[Element, float]
+    ) -> OpenComputedReaction:
         return cls(
             entries=reaction.entries.copy(),
             coefficients=reaction.coefficients.copy(),
@@ -223,13 +251,13 @@ class OpenComputedReaction(ComputedReaction):
         return d
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, d) -> OpenComputedReaction:
         """
         Returns an OpenComputedReaction object from a dictionary representation.
         """
         d["chempots"] = {Element(symbol): u for symbol, u in d["chempots"].items()}
         return super().from_dict(d)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         cp = f"({','.join([f'mu_{e}={m}' for e, m in self.chempots.items()])})"
         return f"{super().__repr__()} {cp}"

@@ -1,32 +1,33 @@
 """Definitions of common job functions"""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Iterable
 
 from pymatgen.core.composition import Element
 
-from rxn_network.core.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.utils.funcs import get_logger
+
+if TYPE_CHECKING:
+    from rxn_network.entries.entry_set import GibbsEntrySet
 
 logger = get_logger(__name__)
 
 
-def run_enumerators(enumerators, entries):
-    rxn_set = None
-    for enumerator in enumerators:
-        logger.info(f"Running {enumerator.__class__.__name__}")
-        rxns = enumerator.enumerate(entries)
+def get_added_elem_data(
+    entries: GibbsEntrySet, targets: Iterable[Composition | str]
+) -> tuple[list[Element], str]:
+    """
+    Given a provided entry set and targets, this identifies which elements in the entry
+    set are "additional" (not found in the target)
 
-        logger.info(f"Adding {len(rxns)} reactions to reaction set")
+    Args:
+        entries: the full entry set
+        targets: the target phase compositions
 
-        if rxn_set is None:
-            rxn_set = rxns
-        else:
-            rxn_set = rxn_set.add_rxn_set(rxns)
-
-    logger.info("Completed reaction enumeration. Filtering duplicates...")
-    rxn_set = rxn_set.filter_duplicates()
-    return rxn_set
-
-
-def get_added_elem_data(entries, targets):
+    Returns:
+        A tuple of the additional elements and their chemical system string.
+    """
     added_elems = entries.chemsys - {
         str(e) for target in targets for e in Composition(target).elements
     }

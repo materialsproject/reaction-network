@@ -1,9 +1,10 @@
 """ Tests for PathwaySolver"""
 from pathlib import Path
-import pytest
-import numpy as np
-from rxn_network.pathways.solver import _balance_path_arrays
 
+import numpy as np
+import pytest
+
+from rxn_network.pathways.solver import _balance_path_arrays_cpu
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 ARRAY_FILE = "comp_matrices.npy"
@@ -308,8 +309,8 @@ def m_mats():
     return arr
 
 
-def test_balance_path_arrays(comp_matrices, net_coeffs, c_mats, m_mats):
-    c_mats_actual, m_mats_actual = _balance_path_arrays(
+def test_balance_path_arrays_cpu(comp_matrices, net_coeffs, c_mats, m_mats):
+    c_mats_actual, m_mats_actual = _balance_path_arrays_cpu(
         comp_matrices, net_coeffs, tol=1e-6
     )
     assert np.allclose(c_mats, c_mats_actual)

@@ -5,7 +5,7 @@ test module for pymatgen.analysis.reaction_calculator
 import pytest
 from pymatgen.core.composition import Element
 
-from rxn_network.core.composition import Composition
+from rxn_network.core import Composition
 from rxn_network.reactions.basic import BasicReaction
 
 
@@ -244,3 +244,40 @@ def test_scientific_notation():
 
     assert str(rxn) == "FePO4 -> Fe1P1O3.9999 + 5e-05 O2"
     assert str(rxn2) == "1000 FePO4 + 20 CO -> 10 O2 + 1000 FePO4 + 20 C"
+
+
+@pytest.mark.parametrize(
+    "reactants, products, target, separable",
+    [
+        (["YOCl", "LiMnO2"], ["YMnO3", "LiCl"], "YMnO3", True),
+        (["Y2O3", "Mn2O3"], ["YMnO3"], "YMnO3", True),
+        (["Na2S", "FeCl2"], ["NaCl", "FeS"], "FeS", True),
+        (["Y2O3", "Mn2O3"], ["YMn2O5", "Mn3O4"], "YMn2O5", False),
+    ],
+)
+def test_is_separable(reactants, products, target, separable):
+    rxn = BasicReaction.from_formulas(reactants, products)
+    assert rxn.is_separable(Composition(target)) == separable
+
+
+@pytest.mark.parametrize(
+    "reactants, products, reactant_fractions, product_fractions",
+    [
+        (
+            ["YOCl", "LiMnO2"],
+            ["YMnO3", "LiCl"],
+            {Composition("YOCl"): 0.5, Composition("LiMnO2"): 0.5},
+            {Composition("YMnO3"): 0.5, Composition("LiCl"): 0.5},
+        ),
+        (
+            ["Li2CO3", "Mn2O3"],
+            ["LiMnO2", "CO2"],
+            {Composition("Li2CO3"): 0.5, Composition("Mn2O3"): 0.5},
+            {Composition("LiMnO2"): 2 / 3, Composition("CO2"): 1 / 3},
+        ),
+    ],
+)
+def test_molar_fractions(reactants, products, reactant_fractions, product_fractions):
+    rxn = BasicReaction.from_formulas(reactants, products)
+    assert rxn.reactant_molar_fractions == pytest.approx(reactant_fractions)
+    assert rxn.product_molar_fractions == pytest.approx(product_fractions)
