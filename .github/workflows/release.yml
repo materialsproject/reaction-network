@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
 
+      - name: Install pandoc
+        run: sudo apt-get install pandoc
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v4.3.0
         with:
@@ -71,7 +74,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
-        run: mkdocs build
+        run: sphinx-build docs docs_build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3.9.3

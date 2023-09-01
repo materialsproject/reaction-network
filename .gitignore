@@ -137,3 +137,5 @@ notebooks/network.gt.gz
 network.gt.gz
 
 examples/Bi-Fe-O-K-F.png
+
+docs_build/

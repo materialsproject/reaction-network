@@ -1,4 +1,4 @@
-# ![Reaction Network](docs/images/logo.png)
+# ![Reaction Network](docs/_static/img/logo.png)
 
 ![GitHub Workflow
 Status](https://img.shields.io/github/workflow/status/materialsproject/reaction-network/testing?style=for-the-badge)
