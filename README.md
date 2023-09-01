@@ -1,7 +1,7 @@
 # ![Reaction Network](docs/_static/img/logo.png)
 
 ![GitHub Workflow
-Status](https://img.shields.io/github/workflow/status/materialsproject/reaction-network/testing?style=for-the-badge)
+Status](https://img.shields.io/github/workflow/status/materialsproject/reaction-network/testing.yml?branch=main?style=for-the-badge)  https://img.shields.io/github/actions/workflow/status/<user>/<repo>/test.yml?branch=main
 ![Codecov](https://img.shields.io/codecov/c/github/materialsproject/reaction-network?style=for-the-badge)
 
 ![PyPI - Python
