@@ -1,0 +1,1561 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="rxn_network.enumerators" href="rxn_network.enumerators.html" /><link rel="prev" title="rxn_network.data" href="rxn_network.data.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+        <title>rxn_network.entries - reaction-network</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials.html">Notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="rxn_network.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.jobs.html">rxn_network.jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.network.html">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="rxn-network-entries">
+<h1>rxn_network.entries<a class="headerlink" href="#rxn-network-entries" title="Link to this heading">#</a></h1>
+<section id="module-rxn_network.entries.corrections">
+<span id="rxn-network-entries-corrections"></span><h2>rxn_network.entries.corrections<a class="headerlink" href="#module-rxn_network.entries.corrections" title="Link to this heading">#</a></h2>
+<p>Energy correction classes for entry objects.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.entries.corrections.CarbonateCorrection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.entries.corrections.</span></span><span class="sig-name descname"><span class="pre">CarbonateCorrection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_ions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbonate_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.83</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/corrections.html#CarbonateCorrection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.corrections.CarbonateCorrection" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CompositionEnergyAdjustment</span></code></p>
+<p>Supplies a carbonate correction due to systematic GGA errors in carbonate formation
+energies.</p>
+<p>See provided jupyter NB for fitting of the correction:
+data/fit_carbonate_correction.ipynb</p>
+<p>Initalizes a carbonate correction object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_ions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of carbonate ions in the composition object</p></li>
+<li><p><strong>carbonate_correction</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Energy correction, eV per (CO3)2- anion</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.corrections.CarbonateCorrection.num_ions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_ions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></em><a class="headerlink" href="#rxn_network.entries.corrections.CarbonateCorrection.num_ions" title="Link to this definition">#</a></dt>
+<dd><p>Number of carbonate ions ion the composition object</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.corrections.CarbonateCorrection.carbonate_correction">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">carbonate_correction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><a class="headerlink" href="#rxn_network.entries.corrections.CarbonateCorrection.carbonate_correction" title="Link to this definition">#</a></dt>
+<dd><p>Energy correction for carbonate ion, eV per (CO3)2- anion</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.entries.entry_set">
+<span id="rxn-network-entries-entry-set"></span><h2>rxn_network.entries.entry_set<a class="headerlink" href="#module-rxn_network.entries.entry_set" title="Link to this heading">#</a></h2>
+<p>An entry set class for automatically building GibbsComputedEntry objects. Some of this
+code has been adapted from the EntrySet class in pymatgen.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.normal">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.entries.entry_set.</span></span><span class="sig-name descname"><span class="pre">normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rxn_network.entries.entry_set.normal" title="Link to this definition">#</a></dt>
+<dd><p>Draw random samples from a normal (Gaussian) distribution.</p>
+<p>The probability density function of the normal distribution, first
+derived by De Moivre and 200 years later by both Gauss and Laplace
+independently <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, is often called the bell curve because of
+its characteristic shape (see the example below).</p>
+<p>The normal distributions occurs often in nature.  For example, it
+describes the commonly occurring distribution of samples influenced
+by a large number of tiny, random disturbances, each with its own
+unique distribution <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>New code should use the <cite>~numpy.random.Generator.normal</cite>
+method of a <cite>~numpy.random.Generator</cite> instance instead;
+please see the <span class="xref std std-ref">random-quick-start</span>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loc</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>array_like</em><em> of </em><em>floats</em>) – Mean (“centre”) of the distribution.</p></li>
+<li><p><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>array_like</em><em> of </em><em>floats</em>) – Standard deviation (spread or “width”) of the distribution. Must be
+non-negative.</p></li>
+<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em> of </em><em>ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal notranslate"><span class="pre">None</span></code> (default),
+a single value is returned if <code class="docutils literal notranslate"><span class="pre">loc</span></code> and <code class="docutils literal notranslate"><span class="pre">scale</span></code> are both scalars.
+Otherwise, <code class="docutils literal notranslate"><span class="pre">np.broadcast(loc,</span> <span class="pre">scale).size</span></code> samples are drawn.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>out</strong> – Drawn samples from the parameterized normal distribution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or scalar</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.stats.norm</span></code></dt><dd><p>probability density function, distribution or cumulative density function, etc.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">random.Generator.normal</span></code></dt><dd><p>which should be used for new code.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p>The probability density for the Gaussian distribution is</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[p(x) = \frac{1}{\sqrt{ 2 \pi \sigma^2 }}
+e^{ - \frac{ (x - \mu)^2 } {2 \sigma^2} },\]</div>
+</div>
+<p>where <span class="math notranslate nohighlight">\(\mu\)</span> is the mean and <span class="math notranslate nohighlight">\(\sigma\)</span> the standard
+deviation. The square of the standard deviation, <span class="math notranslate nohighlight">\(\sigma^2\)</span>,
+is called the variance.</p>
+<p>The function has its peak at the mean, and its “spread” increases with
+the standard deviation (the function reaches 0.607 times its maximum at
+<span class="math notranslate nohighlight">\(x + \sigma\)</span> and <span class="math notranslate nohighlight">\(x - \sigma\)</span> <a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>).  This implies that
+normal is more likely to return samples lying close to the mean, rather
+than those far away.</p>
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Wikipedia, “Normal distribution”,
+<a class="reference external" href="https://en.wikipedia.org/wiki/Normal_distribution">https://en.wikipedia.org/wiki/Normal_distribution</a></p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>)</span>
+<p>P. R. Peebles Jr., “Central Limit Theorem” in “Probability,
+Random Variables and Random Signal Principles”, 4th ed., 2001,
+pp. 51, 51, 125.</p>
+</aside>
+</aside>
+<p class="rubric">Examples</p>
+<p>Draw samples from the distribution:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span> <span class="c1"># mean and standard deviation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Verify the mean and the variance:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">abs</span><span class="p">(</span><span class="n">mu</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+<span class="go">0.0  # may vary</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">abs</span><span class="p">(</span><span class="n">sigma</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="go">0.1  # may vary</span>
+</pre></div>
+</div>
+<p>Display the histogram of the samples, along with
+the probability density function:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">count</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">ignored</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">*</span>
+<span class="gp">... </span>               <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="o">-</span> <span class="p">(</span><span class="n">bins</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="p">),</span>
+<span class="gp">... </span>         <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Two-by-four array of samples from the normal distribution with
+mean 3 and standard deviation 2.5:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">array([[-4.49401501,  4.00950034, -1.81814867,  7.29718677],   # random</span>
+<span class="go">       [ 0.39924804,  4.68456316,  4.99394529,  4.84057254]])  # random</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.entries.entry_set.</span></span><span class="sig-name descname"><span class="pre">GibbsEntrySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_e_above_hulls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_obj_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/collections.abc.html#collections.abc.MutableSet" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MutableSet</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">MSONable</span></code></p>
+<p>This object is based on pymatgen’s EntrySet class and includes factory methods for
+constructing GibbsComputedEntry objects from “zero-temperature”
+ComputedStructureEntry objects. It also offers convenient methods for acquiring
+entries from the entry set, whether that be using composition, stability, chemical
+system, etc.</p>
+<p>The supplied collection of entries will automatically be converted to a set of
+unique entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entries</strong> (<em>Iterable</em><em>[</em><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry" title="rxn_network.entries.gibbs.GibbsComputedEntry"><em>GibbsComputedEntry</em></a><em> | </em><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry" title="rxn_network.entries.experimental.ExperimentalReferenceEntry"><em>ExperimentalReferenceEntry</em></a><em> | </em><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry" title="rxn_network.entries.interpolated.InterpolatedEntry"><em>InterpolatedEntry</em></a><em>]</em>) – A collection of entry objects that will make up the entry set.</p></li>
+<li><p><strong>calculate_e_above_hulls</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to pre-calculate the energy above hull for
+each entry and store that in that entry’s data. Defaults to False.</p></li>
+<li><p><strong>minimize_obj_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to reduce the size of the entry set by
+removing metadata from each entry. This may be useful when working with
+extremely large entry sets (or ComputedReaction sets). Defaults to
+False.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.add" title="Link to this definition">#</a></dt>
+<dd><p>Add an entry to the set in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry</strong> (<a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry" title="rxn_network.entries.gibbs.GibbsComputedEntry"><em>GibbsComputedEntry</em></a><em> | </em><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry" title="rxn_network.entries.experimental.ExperimentalReferenceEntry"><em>ExperimentalReferenceEntry</em></a><em> | </em><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry" title="rxn_network.entries.interpolated.InterpolatedEntry"><em>InterpolatedEntry</em></a>) – An entry object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.update" title="Link to this definition">#</a></dt>
+<dd><p>Add an iterable of entries to the set in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entry</strong> – An iterable of entry objects.</p></li>
+<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Iterable" title="(in Python v3.8)"><em>Iterable</em></a><em>[</em><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry" title="rxn_network.entries.gibbs.GibbsComputedEntry"><em>GibbsComputedEntry</em></a><em> | </em><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry" title="rxn_network.entries.experimental.ExperimentalReferenceEntry"><em>ExperimentalReferenceEntry</em></a><em> | </em><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry" title="rxn_network.entries.interpolated.InterpolatedEntry"><em>InterpolatedEntry</em></a><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.discard">
+<span class="sig-name descname"><span class="pre">discard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.discard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.discard" title="Link to this definition">#</a></dt>
+<dd><p>Discard an entry in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> – Entry</p></li>
+<li><p><strong>entry</strong> (<a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry" title="rxn_network.entries.gibbs.GibbsComputedEntry"><em>GibbsComputedEntry</em></a><em> | </em><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry" title="rxn_network.entries.experimental.ExperimentalReferenceEntry"><em>ExperimentalReferenceEntry</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.pd_dict">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pd_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a></em><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.pd_dict" title="Link to this definition">#</a></dt>
+<dd><p>Returns a dictionary of phase diagrams, keyed by the chemical system. This is
+acquired using the helper method expand_pd() and represents one of the simplest
+divisions of sub-PDs for large chemical systems. Cached for speed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.get_subset_in_chemsys">
+<span class="sig-name descname"><span class="pre">get_subset_in_chemsys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chemsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.get_subset_in_chemsys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_subset_in_chemsys" title="Link to this definition">#</a></dt>
+<dd><p>Returns a GibbsEntrySet containing only the set of entries belonging to
+a particular chemical system (including subsystems). For example, if the entries
+are from the Li-Fe-P-O system, and chemsys=[“Li”, “O”], only the Li, O, and Li-O
+entries are returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chemsys</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Chemical system specified as list of elements. E.g., [“Li”, “O”]</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a></p>
+</dd>
+</dl>
+<p>Returns: GibbsEntrySet</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.filter_by_stability">
+<span class="sig-name descname"><span class="pre">filter_by_stability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_above_hull</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_polymorphs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.filter_by_stability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.filter_by_stability" title="Link to this definition">#</a></dt>
+<dd><p>Filter the entry set by a metastability (energy above hull) cutoff.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>e_above_hull</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Energy above hull, the cutoff describing the allowed
+metastability of the entries as determined via phase diagram
+construction.</p></li>
+<li><p><strong>include_polymorphs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> | </em><em>None</em>) – optional specification of whether to include
+metastable polymorphs. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new GibbsEntrySet where the entries have been filtered by an energy
+cutoff (e_above_hull) via phase diagram construction.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.build_indices">
+<span class="sig-name descname"><span class="pre">build_indices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.build_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.build_indices" title="Link to this definition">#</a></dt>
+<dd><p>Builds the indices for the entry set in place. This method is called whenever an
+entry is added/removed the entry set. The entry indices are useful for querying
+the entry set for specific entries.</p>
+<p>Warning: this internally modifies the entries in the entry set by updating data
+for each entry to include the index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.get_min_entry_by_formula">
+<span class="sig-name descname"><span class="pre">get_min_entry_by_formula</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">formula</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.get_min_entry_by_formula"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_min_entry_by_formula" title="Link to this definition">#</a></dt>
+<dd><p>Helper method for acquiring the ground state entry with the specified formula.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The chemical formula of the desired entry.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Ground state computed entry object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ComputedEntry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.get_stabilized_entry">
+<span class="sig-name descname"><span class="pre">get_stabilized_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.get_stabilized_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_stabilized_entry" title="Link to this definition">#</a></dt>
+<dd><p>Helper method for lowering the energy of a single entry such that it is just
+stable on the phase diagram. If the entry is already stable, it will be
+returned unchanged.</p>
+<p>Note: if the entry includes the “e_above_hull” data, this value will be used to
+stabilize the entry. Otherwise, the energy above hull will be calculated via
+creation of a phase diagram; this can take a long time for repeated calls.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entry</strong> (<em>ComputedEntry</em>) – A computed entry object.</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The numerical padding added to the energy correction to guarantee
+that it is determined to be stable during phase diagram construction.</p></li>
+<li><p><strong>force</strong> – due to numerical stability issues, if the entry is very close to the
+hull (i.e., e_above_hull &gt; 0 but very small), it may not be stabilized.
+This option forces stabilization even if e_above_hull evalutes to
+“zero”. This can be crucial for certain edge cases.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new ComputedEntry with energy adjustment making it appear to be stable
+with the current entry data (i.e., compositional phase diagram).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ComputedEntry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_new_temperature">
+<span class="sig-name descname"><span class="pre">get_entries_with_new_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_temperature</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.get_entries_with_new_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_new_temperature" title="Link to this definition">#</a></dt>
+<dd><p>Returns a new GibbsEntrySet with entries that have had their energies
+modified by using a new temperature.</p>
+<p>Note: this will clear the “e_above_hull” data for each entry and re-calculate
+them only if the original entry set had them calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_jitter">
+<span class="sig-name descname"><span class="pre">get_entries_with_jitter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.get_entries_with_jitter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_jitter" title="Link to this definition">#</a></dt>
+<dd><p>Returns a new GibbsEntrySet with entries that have had their energies shifted by
+randomly sampled noise to account for uncertainty in data. This is done by
+sampling from a Gaussian distribution using the entry’s “correction_uncertainty”
+attribute as the scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new GibbsEntrySet with entries that have had their energies shifted by
+random Gaussian noise based on their “correction_uncertainty” values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.get_interpolated_entry">
+<span class="sig-name descname"><span class="pre">get_interpolated_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">formula</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_per_atom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.get_interpolated_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_interpolated_entry" title="Link to this definition">#</a></dt>
+<dd><p>Helper method for interpolating an entry from the entry set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The chemical formula of the desired entry.</p></li>
+<li><p><strong>tol_per_atom</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – the energy shift (eV/atom) below the hull energy so that the
+interpolated entry is guaranteed to be stable. Defaults to 1 meV/atom.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An interpolated GibbsComputedEntry object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ComputedEntry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.get_e_above_hull">
+<span class="sig-name descname"><span class="pre">get_e_above_hull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.get_e_above_hull"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_e_above_hull" title="Link to this definition">#</a></dt>
+<dd><p>Helper method for calculating the energy above hull for a single entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry</strong> (<em>ComputedEntry</em>) – A ComputedEntry object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The energy above hull for the entry.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.from_pd">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_nist_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_freed_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_carbonate_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_nist_solids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_e_above_hulls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_obj_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.from_pd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.from_pd" title="Link to this definition">#</a></dt>
+<dd><p>Constructor method for building a GibbsEntrySet from an existing phase diagram.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pd</strong> (<em>PhaseDiagram</em>) – Phase Diagram object (pymatgen)</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Temperature [K] for determining Gibbs Free Energy of
+formation, dGf(T)</p></li>
+<li><p><strong>include_nist_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to include NIST data in the entry set. Defaults
+to True.</p></li>
+<li><p><strong>include_freed_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to include Freed data in the entry set. Defaults
+to False. Use at your own risk!</p></li>
+<li><p><strong>apply_carbonate_correction</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to apply the fit energy
+correction for carbonates. Defaults to True.</p></li>
+<li><p><strong>ignore_nist_solids</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to ignore NIST data for the solids specified in
+the “data/nist/ignore_solids.json” file; these all have melting points
+Tm &gt;= 1500 ºC. Defaults to Ture.</p></li>
+<li><p><strong>calculate_e_above_hulls</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to calculate energy above hull for each
+entry and store in the entry’s data. Defaults to False.</p></li>
+<li><p><strong>minimize_obj_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to minimize the size of the object by removing
+unnecessary attributes from the entries. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A GibbsEntrySet containing a collection of GibbsComputedEntry and
+experimental reference entry objects at the specified temperature.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.copy" title="Link to this definition">#</a></dt>
+<dd><p>Returns a copy of the entry set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.as_dict" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON serializable dict representation of the entry set.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.from_computed_entries">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_computed_entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_nist_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_freed_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_carbonate_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_nist_solids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_e_above_hulls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_obj_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/entry_set.html#GibbsEntrySet.from_computed_entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.from_computed_entries" title="Link to this definition">#</a></dt>
+<dd><p>Constructor method for initializing GibbsEntrySet from T = 0 K
+ComputedStructureEntry objects, as acquired from a thermochemical database
+(e.g., The Materials Project).</p>
+<p>Automatically expands the phase diagram for large chemical systems (10 or more
+elements) to avoid limitations of Qhull.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entries</strong> (<em>Iterable</em><em>[</em><em>ComputedStructureEntry</em><em>]</em>) – Iterable of ComputedStructureEntry objects. These can be downloaded
+from The Materials Project API or created manually with pymatgen.</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Temperature [K] for determining Gibbs Free Energy of
+formation, dGf(T)</p></li>
+<li><p><strong>include_nist_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to include NIST-JANAF data in the entry set.
+Defaults to True.</p></li>
+<li><p><strong>include_freed_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to include FREED data in the entry set. Defaults
+to False. WARNING: This dataset has not been thoroughly tested. Use at
+your own risk!</p></li>
+<li><p><strong>apply_carbonate_correction</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to apply the fit GGA energy correction
+for carbonates. Defaults to True.</p></li>
+<li><p><strong>ignore_nist_solids</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to ignore NIST data for the solids specified in
+the “data/nist/ignore_solids.json” file; these all have melting points
+Tm &gt;= 1500 ºC. Defaults to True.</p></li>
+<li><p><strong>calculate_e_above_hulls</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to calculate energy above hull for each
+entry and store in the entry’s data. Defaults to False.</p></li>
+<li><p><strong>minimize_obj_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to minimize the size of the object by removing
+unrequired attributes from the entries. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A GibbsEntrySet containing a collection of GibbsComputedEntry and
+experimental reference entry objects at the specified temperature.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet">GibbsEntrySet</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.entries_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">entries_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ComputedEntry</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.entries_list" title="Link to this definition">#</a></dt>
+<dd><p>Returns a list of all entries in the entry set.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.min_entries_by_formula">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">min_entries_by_formula</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedEntry</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.min_entries_by_formula" title="Link to this definition">#</a></dt>
+<dd><p>Returns a dict of minimum energy entries in the entry set, indexed by
+formula.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.temperature">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">temperature</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.temperature" title="Link to this definition">#</a></dt>
+<dd><p>Returns the temperature of entries in the dataset. More precisely, this is the
+temperature encountered when iterating over the dataset.</p>
+<p>Use at your own risk if mixing GibbsComputedEntry objects calculated at
+different temperatures – this poses even more theoretical problems!</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.entry_set.GibbsEntrySet.chemsys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">chemsys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#set" title="(in Python v3.8)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.entries.entry_set.GibbsEntrySet.chemsys" title="Link to this definition">#</a></dt>
+<dd><p>Returns:
+Set of symbols representing the chemical system, e.g., {“Li”, “Fe”, “P”,
+“O”}</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.entries.experimental">
+<span id="rxn-network-entries-experimental"></span><h2>rxn_network.entries.experimental<a class="headerlink" href="#module-rxn_network.entries.experimental" title="Link to this heading">#</a></h2>
+<p>Implements an Entry that looks up NIST pre-tabulated Gibbs free energies</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.entries.experimental.ExperimentalReferenceEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.entries.experimental.</span></span><span class="sig-name descname"><span class="pre">ExperimentalReferenceEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">composition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_adjustments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/experimental.html#ExperimentalReferenceEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ComputedEntry</span></code></p>
+<p>An Entry class for experimental reference data, to be sub-classed for specific data
+sources.  Given a composition, automatically finds the Gibbs free energy of
+formation, dGf(T) from tabulated reference values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>composition</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition object</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Temperature in Kelvin. If temperature is not selected within
+the range of the reference  data (see self._validate_temperature), then
+this will raise an error.</p></li>
+<li><p><strong>energy_adjustments</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>EnergyAdjustment</em><em>] </em><em>| </em><em>None</em>) – A list of EnergyAdjustments to apply to the entry.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dictionary containing entry data</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.experimental.ExperimentalReferenceEntry.get_new_temperature">
+<span class="sig-name descname"><span class="pre">get_new_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_temperature</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/experimental.html#ExperimentalReferenceEntry.get_new_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.get_new_temperature" title="Link to this definition">#</a></dt>
+<dd><p>Return a copy of the NISTReferenceEntry at the new specified temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The new temperature to use [K]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the NISTReferenceEntry at the new specified temperature.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry" title="rxn_network.entries.experimental.ExperimentalReferenceEntry"><em>ExperimentalReferenceEntry</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.experimental.ExperimentalReferenceEntry.to_grand_entry">
+<span class="sig-name descname"><span class="pre">to_grand_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chempots</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/experimental.html#ExperimentalReferenceEntry.to_grand_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.to_grand_entry" title="Link to this definition">#</a></dt>
+<dd><p>Convert an ExperimentalReferenceEntry to a GrandComputedEntry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – A dictionary of {element: chempot} pairs.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A GrandComputedEntry.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.experimental.ExperimentalReferenceEntry.temperature">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">temperature</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><a class="headerlink" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.temperature" title="Link to this definition">#</a></dt>
+<dd><p>Returns temperature used to calculate entry’s energy</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.experimental.ExperimentalReferenceEntry.is_experimental">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_experimental</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><a class="headerlink" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_experimental" title="Link to this definition">#</a></dt>
+<dd><p>Returns True by default.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.experimental.ExperimentalReferenceEntry.is_element">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_element</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><a class="headerlink" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_element" title="Link to this definition">#</a></dt>
+<dd><p>Returns True if the entry is an element.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.experimental.ExperimentalReferenceEntry.unique_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unique_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><a class="headerlink" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.unique_id" title="Link to this definition">#</a></dt>
+<dd><p>Returns a unique ID for the entry based on its entry-id and temperature. This is
+useful because the same entry-id can be used for multiple entries at different
+temperatures.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.experimental.ExperimentalReferenceEntry.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/experimental.html#ExperimentalReferenceEntry.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.as_dict" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dict representation of the Entry.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.experimental.ExperimentalReferenceEntry.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/experimental.html#ExperimentalReferenceEntry.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.from_dict" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>d</strong> – Dict representation.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ComputedEntry</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry" title="rxn_network.entries.experimental.ExperimentalReferenceEntry"><em>ExperimentalReferenceEntry</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.entries.freed">
+<span id="rxn-network-entries-freed"></span><h2>rxn_network.entries.freed<a class="headerlink" href="#module-rxn_network.entries.freed" title="Link to this heading">#</a></h2>
+<p>Implements an Entry that looks up pre-tabulated Gibbs free energies from the NIST-JANAF
+tables.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.entries.freed.FREEDReferenceEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.entries.freed.</span></span><span class="sig-name descname"><span class="pre">FREEDReferenceEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">composition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_adjustments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/freed.html#FREEDReferenceEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.freed.FREEDReferenceEntry" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry" title="rxn_network.entries.experimental.ExperimentalReferenceEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry</span></code></a></p>
+<p>An Entry class for FREED experimental reference data. Given a composition,
+automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
+reference values.</p>
+<dl class="simple">
+<dt>Reference:</dt><dd><p><a class="reference external" href="https://www.thermart.net/freed-thermodynamic-database/">https://www.thermart.net/freed-thermodynamic-database/</a></p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>composition</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition object</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Temperature in Kelvin. If temperature is not selected from
+one of [300, 400, 500, … 2000 K], then free energies will be
+interpolated. Defaults to 300 K.</p></li>
+<li><p><strong>energy_adjustments</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>EnergyAdjustment</em><em>] </em><em>| </em><em>None</em>) – A list of EnergyAdjustments to apply to the entry.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dictionary containing entry data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.entries.gibbs">
+<span id="rxn-network-entries-gibbs"></span><h2>rxn_network.entries.gibbs<a class="headerlink" href="#module-rxn_network.entries.gibbs" title="Link to this heading">#</a></h2>
+<p>A computed entry object for estimating the Gibbs free energy of formation. Note that
+this is similar to the implementation within pymatgen, but has been refactored here to
+add extra functionality.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.entries.gibbs.</span></span><span class="sig-name descname"><span class="pre">GibbsComputedEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">composition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formation_energy_per_atom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_per_atom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_adjustments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/gibbs.html#GibbsComputedEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ComputedEntry</span></code></p>
+<p>An extension to ComputedEntry which estimates the Gibbs free energy of formation
+of solids using energy adjustments from the machine-learned SISSO descriptor from
+Bartel et al. (2018).  Note that this is similar to the implementation within
+pymatgen, but has been refactored here to add extra functionality.</p>
+<p>WARNING: This descriptor only applies to solids. See entries.nist.NISTReferenceEntry
+for common gases (e.g. CO2).</p>
+<p>If you use this entry class in your work, please consider citing the following
+paper:</p>
+<blockquote>
+<div><p>Bartel, C. J., Millican, S. L., Deml, A. M., Rumptz, J. R., Tumas, W., Weimer,
+A. W., … Holder, A. M. (2018). Physical descriptor for the Gibbs energy of
+inorganic crystalline solids and temperature-dependent materials chemistry.
+Nature Communications, 9(1), 4168. <a class="reference external" href="https://doi.org/10.1038/s41467-018-06682-4">https://doi.org/10.1038/s41467-018-06682-4</a>.</p>
+</div></blockquote>
+<p>A new computed entry object is returned with a supplied energy correction
+representing the difference between the formation enthalpy at T=0K and the
+Gibbs formation energy at the specified temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>composition</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – The composition object (pymatgen)</p></li>
+<li><p><strong>formation_energy_per_atom</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Calculated formation enthalpy, dH, at T = 298 K,
+normalized to the total number of atoms in the composition. NOTE: since
+this is a _formation_ energy, it must be calculated using a phase
+diagram construction.</p></li>
+<li><p><strong>volume_per_atom</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The total volume of the associated structure divided by its
+number of atoms.</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Temperature [K] by which to acquire dGf(T); must be selected
+from a range of [300, 2000] K. If temperature is not selected from one
+of [300, 400, 500, … 2000 K], then free energies will be interpolated.</p></li>
+<li><p><strong>energy_adjustments</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>EnergyAdjustment</em><em>] </em><em>| </em><em>None</em>) – Optional list of energy adjustments.</p></li>
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional list of calculation parameters.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dictionary containing entry data.</p></li>
+<li><p><strong>entry_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a><em> | </em><em>None</em>) – Optional entry id, such as the entry’s mpid.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.get_new_temperature">
+<span class="sig-name descname"><span class="pre">get_new_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_temperature</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/gibbs.html#GibbsComputedEntry.get_new_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.get_new_temperature" title="Link to this definition">#</a></dt>
+<dd><p>Return a copy of the GibbsComputedEntry at the new specified temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The new temperature to use [K]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the GibbsComputedEntry, initialized at the new specified
+temperature.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry" title="rxn_network.entries.gibbs.GibbsComputedEntry"><em>GibbsComputedEntry</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.gibbs_adjustment">
+<span class="sig-name descname"><span class="pre">gibbs_adjustment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/gibbs.html#GibbsComputedEntry.gibbs_adjustment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.gibbs_adjustment" title="Link to this definition">#</a></dt>
+<dd><p>Returns the difference between the predicted Gibbs formation energy and the
+formation enthalpy at 298 K, i.e., dGf(T) - dHf(298 K). Calculated using
+SISSO descriptor from Bartel et al. (2018) and elemental chemical potentials
+(FactSage).</p>
+<p>Units: eV (not normalized)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The absolute temperature [K].</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The correction to Gibbs free energy of formation (eV) from DFT energy.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.to_grand_entry">
+<span class="sig-name descname"><span class="pre">to_grand_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chempots</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/gibbs.html#GibbsComputedEntry.to_grand_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.to_grand_entry" title="Link to this definition">#</a></dt>
+<dd><p>Convert a GibbsComputedEntry to a GrandComputedEntry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – A dictionary of {element: chempot} pairs.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A GrandComputedEntry.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/gibbs.html#GibbsComputedEntry.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.copy" title="Link to this definition">#</a></dt>
+<dd><p>Returns a copy of the ComputedEntry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.from_structure">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formation_energy_per_atom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/gibbs.html#GibbsComputedEntry.from_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.from_structure" title="Link to this definition">#</a></dt>
+<dd><p>Constructor method for building a GibbsComputedEntry from a structure,
+formation enthalpy, and temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>Structure</em>) – Structure object (pymatgen)</p></li>
+<li><p><strong>formation_energy_per_atom</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Formation enthalpy at T = 298 K associated
+with structure</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Desired temperature [K] for acquiring dGf(T)</p></li>
+<li><p><strong>**kwargs</strong> – Optional kwargs to be passed to GibbsComputedEntry.__init__</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new GibbsComputedEntry object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry" title="rxn_network.entries.gibbs.GibbsComputedEntry">GibbsComputedEntry</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.is_experimental">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_experimental</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.is_experimental" title="Link to this definition">#</a></dt>
+<dd><p>False}. If
+theoretical is not specified but there is greater than 1 icsd_id provided,
+assumes that the presence of an icsd_id means the entry is experimental.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns True if self.data contains {“theoretical”</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.unique_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unique_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.unique_id" title="Link to this definition">#</a></dt>
+<dd><p>Returns a unique ID for the entry based on its entry-id and temperature. This is
+useful because the same entry-id can be used for multiple entries at different
+temperatures.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/gibbs.html#GibbsComputedEntry.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.as_dict" title="Link to this definition">#</a></dt>
+<dd><p>Returns an MSONable dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/gibbs.html#GibbsComputedEntry.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.from_dict" title="Link to this definition">#</a></dt>
+<dd><p>“Returns a GibbsComputedEntry object from MSONable dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry" title="rxn_network.entries.gibbs.GibbsComputedEntry"><em>GibbsComputedEntry</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.entries.interpolated">
+<span id="rxn-network-entries-interpolated"></span><h2>rxn_network.entries.interpolated<a class="headerlink" href="#module-rxn_network.entries.interpolated" title="Link to this heading">#</a></h2>
+<p>Class for intepolated entries</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.entries.interpolated.InterpolatedEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.entries.interpolated.</span></span><span class="sig-name descname"><span class="pre">InterpolatedEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">composition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_adjustments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/interpolated.html#InterpolatedEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.interpolated.InterpolatedEntry" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ComputedEntry</span></code></p>
+<p>Lightweight Entry object for computed data. Contains facilities
+for applying corrections to the energy attribute and for storing
+calculation parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>composition</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition of the entry. For
+flexibility, this can take the form of all the typical input
+taken by a Composition, including a {symbol: amt} dict,
+a string formula, and others.</p></li>
+<li><p><strong>energy</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Energy of the entry. Usually the final calculated
+energy from VASP or other electronic structure codes.</p></li>
+<li><p><strong>correction</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Manually set an energy correction, will ignore
+energy_adjustments if specified. Defaults to 0.</p></li>
+<li><p><strong>energy_adjustments</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em> | </em><em>None</em>) – An optional list of EnergyAdjustment to
+be applied to the energy. This is used to modify the energy for
+certain analyses. Defaults to None.</p></li>
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – An optional dict of parameters associated with
+the entry. Defaults to None.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – An optional dict of any additional data associated
+with the entry. Defaults to None.</p></li>
+<li><p><strong>entry_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a><em> | </em><em>None</em>) – An optional id to uniquely identify the entry.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.interpolated.InterpolatedEntry.to_grand_entry">
+<span class="sig-name descname"><span class="pre">to_grand_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chempots</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/interpolated.html#InterpolatedEntry.to_grand_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.interpolated.InterpolatedEntry.to_grand_entry" title="Link to this definition">#</a></dt>
+<dd><p>Convert a GibbsComputedEntry to a GrandComputedEntry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – A dictionary of {element: chempot} pairs.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A GrandComputedEntry.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GrandPotPDEntry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.interpolated.InterpolatedEntry.unique_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unique_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><a class="headerlink" href="#rxn_network.entries.interpolated.InterpolatedEntry.unique_id" title="Link to this definition">#</a></dt>
+<dd><p>Returns a unique ID for the entry.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.entries.interpolated.InterpolatedEntry.is_experimental">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_experimental</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><a class="headerlink" href="#rxn_network.entries.interpolated.InterpolatedEntry.is_experimental" title="Link to this definition">#</a></dt>
+<dd><p>Returns True by default.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.entries.nist">
+<span id="rxn-network-entries-nist"></span><h2>rxn_network.entries.nist<a class="headerlink" href="#module-rxn_network.entries.nist" title="Link to this heading">#</a></h2>
+<p>Implements an Entry that looks up pre-tabulated Gibbs free energies from the NIST-JANAF
+tables.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.entries.nist.NISTReferenceEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.entries.nist.</span></span><span class="sig-name descname"><span class="pre">NISTReferenceEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">composition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_adjustments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/nist.html#NISTReferenceEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.nist.NISTReferenceEntry" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry" title="rxn_network.entries.experimental.ExperimentalReferenceEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry</span></code></a></p>
+<p>An Entry class for NIST-JANAF experimental reference data. Given a composition,
+automatically finds the Gibbs free energy of formation, dGf(T) from tabulated
+reference values.</p>
+<dl class="simple">
+<dt>Reference:</dt><dd><p>Malcolm W. Chase Jr. NIST-JANAF thermochemical tables. Fourth edition.
+Washington, DC : American Chemical Society;  New York : American Institute of
+Physics for the National Institute of Standards and Technology, 1998.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>composition</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition object (within pymatgen).</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Temperature in Kelvin. If temperature is not selected from
+one of [300, 400, 500, … 2000 K], then free energies will be
+interpolated. Defaults to 300 K.</p></li>
+<li><p><strong>energy_adjustments</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>EnergyAdjustment</em><em>] </em><em>| </em><em>None</em>) – A list of EnergyAdjustments to apply to the entry.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dictionary containing entry data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.entries.utils">
+<span id="rxn-network-entries-utils"></span><h2>rxn_network.entries.utils<a class="headerlink" href="#module-rxn_network.entries.utils" title="Link to this heading">#</a></h2>
+<p>Utility functions for acquiring, processing, or modifiying entries</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.entries.utils.process_entries">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.entries.utils.</span></span><span class="sig-name descname"><span class="pre">process_entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_above_hull</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_at_temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_nist_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_freed_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_polymorphs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formulas_to_include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_e_above_hulls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_nist_solids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/utils.html#process_entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.utils.process_entries" title="Link to this definition">#</a></dt>
+<dd><p>Convenience function for processing a set of ComputedStructureEntry objects into a
+GibbsEntrySet with specified parameters. This is used when building entries in most
+of the jobs/flows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Iterable" title="(in Python v3.8)"><em>Iterable</em></a><em>[</em><em>ComputedStructureEntry</em><em>]</em>) – Iterable of ComputedStructureEntry objects. These can be downloaded
+from The Materials Project API or created manually with pymatgen.</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Temperature [K] for determining Gibbs Free Energy of
+formation, dGf(T).</p></li>
+<li><p><strong>e_above_hull</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Energy above hull (eV/atom) for thermodynamic stability threshold;
+i.e., include all entries with energies below this value.</p></li>
+<li><p><strong>filter_at_temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> | </em><em>None</em>) – Temperature (in Kelvin) at which entries are filtered for
+thermodynamic stability (e.g., room temperature). Generally, this often
+differs from the synthesis temperature.</p></li>
+<li><p><strong>include_nist_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to include NIST-JANAF data in the entry set.
+Defaults to True.</p></li>
+<li><p><strong>include_freed_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to include FREED data in the entry set. Defaults
+to False. WARNING: This dataset has not been thoroughly tested. Use at
+your own risk!</p></li>
+<li><p><strong>formulas_to_include</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Iterable" title="(in Python v3.8)"><em>Iterable</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – An iterable of compositional formulas to ensure are
+included in the processed dataset. Sometimes, entries are filtered out that
+one would like to include, or entries don’t exist for those compositions.</p></li>
+<li><p><strong>calculate_e_above_hulls</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to calculate e_above_hull and store as an
+attribute in the data dictionary for each entry.</p></li>
+<li><p><strong>ignore_nist_solids</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to ignore NIST data for solids with high melting
+points (Tm &gt;= 1500 ºC). Defaults to True.</p></li>
+<li><p><strong>include_polymorphs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A GibbsEntrySet object containing entry objects with the user-specified
+constraints.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.entries.utils.initialize_entry">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.entries.utils.</span></span><span class="sig-name descname"><span class="pre">initialize_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">formula</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stabilize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/utils.html#initialize_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.utils.initialize_entry" title="Link to this definition">#</a></dt>
+<dd><p>Acquire an entry by user-specified formula. This method attemps to first
+get the entry; if it is not included in the set, it will create an interpolated
+entry. Finally, if stabilize=True, the energy will be lowered until it appears on
+teh hull.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Chemical formula</p></li>
+<li><p><strong>entry_set</strong> (<a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – Set of entries</p></li>
+<li><p><strong>stabilize</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether or not to stabilize the entry by decreasing its energy
+such that it is ‘on the hull’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.entries.utils.get_entries">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.entries.utils.</span></span><span class="sig-name descname"><span class="pre">get_entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chemsys_formula_id_criteria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compatible_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_premade_entries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conventional_unit_cell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_by_e_above_hull</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/utils.html#get_entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.utils.get_entries" title="Link to this definition">#</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function is legacy code directly adapted from pymatgen.ext.matproj. It is
+not broadly useful or applicable to other databases. It is only used in jobs
+interfaced directly with internal databases at the Materials Project. This code
+is not adequately tested and may not work as expected.</p>
+</div>
+<p>Get a list of ComputedEntries or ComputedStructureEntries corresponding to a
+chemical system, formula, or materials_id or full criteria.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>MongoStore</em>) – MongoStore object with database connection</p></li>
+<li><p><strong>chemsys_formula_id_criteria</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – A chemical system
+(e.g., Li-Fe-O), or formula (e.g., Fe2O3) or materials_id (e.g., mp-1234) or
+full Mongo-style dict criteria.</p></li>
+<li><p><strong>compatible_only</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to return only “compatible”
+entries. Compatible entries are entries that have been processed using the
+MaterialsProjectCompatibility class, which performs adjustments to allow
+mixing of GGA and GGA+U calculations for more accurate phase diagrams and
+reaction energies.</p></li>
+<li><p><strong>inc_structure</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – If None, entries returned are
+ComputedEntries. If inc_structure=”initial”, ComputedStructureEntries with
+initial structures are returned. Otherwise, ComputedStructureEntries with
+final structures are returned.</p></li>
+<li><p><strong>property_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – Specify additional properties to include in
+entry.data. If None, no data. Should be a subset of supported_properties.</p></li>
+<li><p><strong>use_premade_entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to use entry objects that have already been
+constructed. Defaults to False.</p></li>
+<li><p><strong>conventional_unit_cell</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to get the standard
+conventional unit cell</p></li>
+<li><p><strong>sort_by_e_above_hull</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to sort the list of entries by
+e_above_hull (will query e_above_hull as a property_data if True).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of ComputedEntry or ComputedStructureEntry objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.entries.utils.get_all_entries_in_chemsys">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.entries.utils.</span></span><span class="sig-name descname"><span class="pre">get_all_entries_in_chemsys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compatible_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'final'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_premade_entries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conventional_unit_cell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/utils.html#get_all_entries_in_chemsys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.utils.get_all_entries_in_chemsys" title="Link to this definition">#</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function is legacy code directly adapted from pymatgen.ext.matproj. It is
+not broadly useful or applicable to other databases. It is only used in jobs
+interfaced directly with internal databases at the Materials Project. This code
+is not adequately tested and may not work as expected.</p>
+</div>
+<p>Helper method for getting all entries in a total chemical system by querying
+database for all sub-chemical systems. Code adadpted from pymatgen.ext.matproj and
+modified to support very large chemical systems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>MongoStore</em>) – MongoStore object with database connection</p></li>
+<li><p><strong>elements</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – Chemical system string comprising element
+symbols separated by dashes, e.g., “Li-Fe-O” or List of element symbols,
+e.g., [“Li”, “Fe”, “O”].</p></li>
+<li><p><strong>compatible_only</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to return only “compatible”
+entries. Compatible entries are entries that have been processed using the
+MaterialsProjectCompatibility class, which performs adjustments to allow
+mixing of GGA and GGA+U calculations for more accurate phase diagrams and
+reaction energies.</p></li>
+<li><p><strong>inc_structure</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – If None, entries returned are
+ComputedEntries. If inc_structure=”final”, ComputedStructureEntries with
+final structures are returned. Otherwise, ComputedStructureEntries with
+initial structures are returned.</p></li>
+<li><p><strong>property_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Specify additional properties to include in
+entry.data. If None, no data. Should be a subset of
+supported_properties.</p></li>
+<li><p><strong>use_premade_entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to use entry objects that have already been
+constructed. Defaults to False.</p></li>
+<li><p><strong>conventional_unit_cell</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to get the standard
+conventional unit cell</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Chunk size, i.e., number of sub-chemical systems to consider</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of ComputedEntries.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[ComputedEntry]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.entries.utils.parse_criteria">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.entries.utils.</span></span><span class="sig-name descname"><span class="pre">parse_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">criteria_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/utils.html#parse_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.utils.parse_criteria" title="Link to this definition">#</a></dt>
+<dd><p>Parses a powerful and simple string criteria and generates a proper
+mongo syntax criteria.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>criteria_string</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <p>A string representing a search criteria.
+Also supports wild cards. E.g.,
+something like “<a href="#id6"><span class="problematic" id="id7">*</span></a>2O” gets converted to
+{‘pretty_formula’: {‘$in’: [u’B2O’, u’Xe2O’, u”Li2O”, …]}}</p>
+<dl class="simple">
+<dt>Other syntax examples:</dt><dd><p>mp-1234: Interpreted as a Materials ID.
+Fe2O3 or <a href="#id8"><span class="problematic" id="id9">*</span></a>2O3: Interpreted as reduced formulas.
+Li-Fe-O or <a href="#id10"><span class="problematic" id="id11">*</span></a>-Fe-O: Interpreted as chemical systems.</p>
+</dd>
+</dl>
+<p>You can mix and match with spaces, which are interpreted as
+“OR”. E.g., “mp-1234 FeO” means query for all compounds with
+reduced formula FeO or with materials_id mp-1234.</p>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A mongo query dict.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="rxn_network.enumerators.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">rxn_network.enumerators</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="rxn_network.data.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">rxn_network.data</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">rxn_network.entries</a><ul>
+<li><a class="reference internal" href="#module-rxn_network.entries.corrections">rxn_network.entries.corrections</a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.corrections.CarbonateCorrection"><code class="docutils literal notranslate"><span class="pre">CarbonateCorrection</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.corrections.CarbonateCorrection.num_ions"><code class="docutils literal notranslate"><span class="pre">CarbonateCorrection.num_ions</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.corrections.CarbonateCorrection.carbonate_correction"><code class="docutils literal notranslate"><span class="pre">CarbonateCorrection.carbonate_correction</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.entries.entry_set">rxn_network.entries.entry_set</a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.normal"><code class="docutils literal notranslate"><span class="pre">normal()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.add"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.add()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.update"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.update()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.discard"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.discard()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.pd_dict"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.pd_dict</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_subset_in_chemsys"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_subset_in_chemsys()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.filter_by_stability"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.filter_by_stability()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.build_indices"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.build_indices()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_min_entry_by_formula"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_min_entry_by_formula()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_stabilized_entry"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_stabilized_entry()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_new_temperature"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_entries_with_new_temperature()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_jitter"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_entries_with_jitter()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_interpolated_entry"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_interpolated_entry()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.get_e_above_hull"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_e_above_hull()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.from_pd"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.from_pd()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.copy"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.copy()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.as_dict"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.as_dict()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.from_computed_entries"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.from_computed_entries()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.entries_list"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.entries_list</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.min_entries_by_formula"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.min_entries_by_formula</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.temperature"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.temperature</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.entry_set.GibbsEntrySet.chemsys"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.chemsys</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.entries.experimental">rxn_network.entries.experimental</a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.get_new_temperature"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.get_new_temperature()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.to_grand_entry"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.to_grand_entry()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.temperature"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.temperature</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_experimental"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.is_experimental</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_element"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.is_element</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.unique_id"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.unique_id</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.as_dict"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.as_dict()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.experimental.ExperimentalReferenceEntry.from_dict"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.from_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.entries.freed">rxn_network.entries.freed</a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.freed.FREEDReferenceEntry"><code class="docutils literal notranslate"><span class="pre">FREEDReferenceEntry</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.entries.gibbs">rxn_network.entries.gibbs</a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry.get_new_temperature"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.get_new_temperature()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry.gibbs_adjustment"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.gibbs_adjustment()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry.to_grand_entry"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.to_grand_entry()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry.copy"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.copy()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry.from_structure"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.from_structure()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry.is_experimental"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.is_experimental</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry.unique_id"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.unique_id</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry.as_dict"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.as_dict()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry.from_dict"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.from_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.entries.interpolated">rxn_network.entries.interpolated</a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry.to_grand_entry"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.to_grand_entry()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry.unique_id"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.unique_id</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry.is_experimental"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.is_experimental</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.entries.nist">rxn_network.entries.nist</a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.nist.NISTReferenceEntry"><code class="docutils literal notranslate"><span class="pre">NISTReferenceEntry</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.entries.utils">rxn_network.entries.utils</a><ul>
+<li><a class="reference internal" href="#rxn_network.entries.utils.process_entries"><code class="docutils literal notranslate"><span class="pre">process_entries()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.utils.initialize_entry"><code class="docutils literal notranslate"><span class="pre">initialize_entry()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.utils.get_entries"><code class="docutils literal notranslate"><span class="pre">get_entries()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.utils.get_all_entries_in_chemsys"><code class="docutils literal notranslate"><span class="pre">get_all_entries_in_chemsys()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.utils.parse_criteria"><code class="docutils literal notranslate"><span class="pre">parse_criteria()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=521b6f53"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

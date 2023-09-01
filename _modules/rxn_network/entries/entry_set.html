@@ -1,0 +1,1059 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+        <title>rxn_network.entries.entry_set - reaction-network</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../tutorials.html">Notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../rxn_network.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.entries.html">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.jobs.html">rxn_network.jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.network.html">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <h1>Source code for rxn_network.entries.entry_set</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">An entry set class for automatically building GibbsComputedEntry objects. Some of this</span>
+<span class="sd">code has been adapted from the EntrySet class in pymatgen.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterable</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">monty.json</span> <span class="kn">import</span> <span class="n">MontyDecoder</span><span class="p">,</span> <span class="n">MSONable</span>
+<span class="kn">from</span> <span class="nn">monty.serialization</span> <span class="kn">import</span> <span class="n">loadfn</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">normal</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.phase_diagram</span> <span class="kn">import</span> <span class="n">PhaseDiagram</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="kn">import</span> <span class="n">Element</span>
+<span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ConstantEnergyAdjustment</span>
+<span class="kn">from</span> <span class="nn">pymatgen.entries.entry_tools</span> <span class="kn">import</span> <span class="n">EntrySet</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">rxn_network.data</span> <span class="kn">import</span> <span class="n">PATH_TO_NIST</span>
+<span class="kn">from</span> <span class="nn">rxn_network.entries.corrections</span> <span class="kn">import</span> <span class="n">CarbonateCorrection</span>
+<span class="kn">from</span> <span class="nn">rxn_network.entries.experimental</span> <span class="kn">import</span> <span class="n">ExperimentalReferenceEntry</span>
+<span class="kn">from</span> <span class="nn">rxn_network.entries.freed</span> <span class="kn">import</span> <span class="n">FREEDReferenceEntry</span>
+<span class="kn">from</span> <span class="nn">rxn_network.entries.gibbs</span> <span class="kn">import</span> <span class="n">GibbsComputedEntry</span>
+<span class="kn">from</span> <span class="nn">rxn_network.entries.interpolated</span> <span class="kn">import</span> <span class="n">InterpolatedEntry</span>
+<span class="kn">from</span> <span class="nn">rxn_network.entries.nist</span> <span class="kn">import</span> <span class="n">NISTReferenceEntry</span>
+<span class="kn">from</span> <span class="nn">rxn_network.thermo.utils</span> <span class="kn">import</span> <span class="n">expand_pd</span>
+<span class="kn">from</span> <span class="nn">rxn_network.utils.funcs</span> <span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1">#  prefer computed data for solids with high melting points (T &gt;= 1500 ºC)</span>
+<span class="n">IGNORE_NIST_SOLIDS</span> <span class="o">=</span> <span class="n">loadfn</span><span class="p">(</span><span class="n">PATH_TO_NIST</span> <span class="o">/</span> <span class="s2">&quot;ignore_solids.json&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">ComputedEntry</span><span class="p">,</span>
+        <span class="n">ComputedStructureEntry</span><span class="p">,</span>
+        <span class="n">EnergyAdjustment</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="GibbsEntrySet">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet">[docs]</a>
+<span class="k">class</span> <span class="nc">GibbsEntrySet</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">MutableSet</span><span class="p">,</span> <span class="n">MSONable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This object is based on pymatgen&#39;s EntrySet class and includes factory methods for</span>
+<span class="sd">    constructing GibbsComputedEntry objects from &quot;zero-temperature&quot;</span>
+<span class="sd">    ComputedStructureEntry objects. It also offers convenient methods for acquiring</span>
+<span class="sd">    entries from the entry set, whether that be using composition, stability, chemical</span>
+<span class="sd">    system, etc.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span>
+            <span class="n">GibbsComputedEntry</span> <span class="o">|</span> <span class="n">ExperimentalReferenceEntry</span> <span class="o">|</span> <span class="n">InterpolatedEntry</span>
+        <span class="p">],</span>
+        <span class="n">calculate_e_above_hulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">minimize_obj_size</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The supplied collection of entries will automatically be converted to a set of</span>
+<span class="sd">        unique entries.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entries: A collection of entry objects that will make up the entry set.</span>
+<span class="sd">            calculate_e_above_hulls: Whether to pre-calculate the energy above hull for</span>
+<span class="sd">                each entry and store that in that entry&#39;s data. Defaults to False.</span>
+<span class="sd">            minimize_obj_size: Whether to reduce the size of the entry set by</span>
+<span class="sd">                removing metadata from each entry. This may be useful when working with</span>
+<span class="sd">                extremely large entry sets (or ComputedReaction sets). Defaults to</span>
+<span class="sd">                False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calculate_e_above_hulls</span> <span class="o">=</span> <span class="n">calculate_e_above_hulls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize_obj_size</span> <span class="o">=</span> <span class="n">minimize_obj_size</span>
+
+        <span class="k">if</span> <span class="n">minimize_obj_size</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">calculate_e_above_hulls</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_e_above_hull</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GibbsEntrySet.add">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.add">[docs]</a>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">GibbsComputedEntry</span> <span class="o">|</span> <span class="n">ExperimentalReferenceEntry</span> <span class="o">|</span> <span class="n">InterpolatedEntry</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an entry to the set in place.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entry: An entry object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.update">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span>
+            <span class="n">GibbsComputedEntry</span> <span class="o">|</span> <span class="n">ExperimentalReferenceEntry</span> <span class="o">|</span> <span class="n">InterpolatedEntry</span>
+        <span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an iterable of entries to the set in place.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entry: An iterable of entry objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.discard">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.discard">[docs]</a>
+    <span class="k">def</span> <span class="nf">discard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">GibbsComputedEntry</span> <span class="o">|</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Discard an entry in place.</span>
+
+<span class="sd">        :param element: Entry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span></div>
+
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span> <span class="nf">pd_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary of phase diagrams, keyed by the chemical system. This is</span>
+<span class="sd">        acquired using the helper method expand_pd() and represents one of the simplest</span>
+<span class="sd">        divisions of sub-PDs for large chemical systems. Cached for speed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">expand_pd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GibbsEntrySet.get_subset_in_chemsys">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_subset_in_chemsys">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_subset_in_chemsys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chemsys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsEntrySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a GibbsEntrySet containing only the set of entries belonging to</span>
+<span class="sd">        a particular chemical system (including subsystems). For example, if the entries</span>
+<span class="sd">        are from the Li-Fe-P-O system, and chemsys=[&quot;Li&quot;, &quot;O&quot;], only the Li, O, and Li-O</span>
+<span class="sd">        entries are returned.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            chemsys: Chemical system specified as list of elements. E.g., [&quot;Li&quot;, &quot;O&quot;]</span>
+
+<span class="sd">        Returns: GibbsEntrySet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chemsys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">chemsys</span> <span class="o">=</span> <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        <span class="n">chem_sys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chemsys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chem_sys</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chemsys</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">chem_sys</span><span class="si">}</span><span class="s2"> is not a subset of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">subset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="n">elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">symbol</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="n">chem_sys</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">elements</span><span class="p">):</span>
+                <span class="n">subset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">GibbsEntrySet</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">calculate_e_above_hulls</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.filter_by_stability">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.filter_by_stability">[docs]</a>
+    <span class="k">def</span> <span class="nf">filter_by_stability</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">e_above_hull</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">include_polymorphs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsEntrySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter the entry set by a metastability (energy above hull) cutoff.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            e_above_hull: Energy above hull, the cutoff describing the allowed</span>
+<span class="sd">                metastability of the entries as determined via phase diagram</span>
+<span class="sd">                construction.</span>
+<span class="sd">            include_polymorphs: optional specification of whether to include</span>
+<span class="sd">                metastable polymorphs. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A new GibbsEntrySet where the entries have been filtered by an energy</span>
+<span class="sd">            cutoff (e_above_hull) via phase diagram construction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pd_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd_dict</span>
+
+        <span class="n">filtered_entries</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">GibbsComputedEntry</span> <span class="o">|</span> <span class="n">NISTReferenceEntry</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">all_comps</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GibbsComputedEntry</span> <span class="o">|</span> <span class="n">NISTReferenceEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">pd</span> <span class="ow">in</span> <span class="n">pd_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">all_entries</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">entry</span> <span class="ow">in</span> <span class="n">filtered_entries</span>
+                    <span class="ow">or</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_e_above_hull</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">e_above_hull</span>
+                <span class="p">):</span>
+                    <span class="k">continue</span>
+
+                <span class="n">formula</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">include_polymorphs</span> <span class="ow">and</span> <span class="p">(</span><span class="n">formula</span> <span class="ow">in</span> <span class="n">all_comps</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">all_comps</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span><span class="o">.</span><span class="n">energy_per_atom</span> <span class="o">&lt;</span> <span class="n">entry</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">filtered_entries</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">all_comps</span><span class="p">[</span><span class="n">formula</span><span class="p">])</span>
+
+                <span class="n">all_comps</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
+                <span class="n">filtered_entries</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.build_indices">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.build_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the indices for the entry set in place. This method is called whenever an</span>
+<span class="sd">        entry is added/removed the entry set. The entry indices are useful for querying</span>
+<span class="sd">        the entry set for specific entries.</span>
+
+<span class="sd">        Warning: this internally modifies the entries in the entry set by updating data</span>
+<span class="sd">        for each entry to include the index.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries_list</span><span class="p">):</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;idx&quot;</span><span class="p">:</span> <span class="n">idx</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.get_min_entry_by_formula">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_min_entry_by_formula">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_min_entry_by_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedEntry</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method for acquiring the ground state entry with the specified formula.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            formula: The chemical formula of the desired entry.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Ground state computed entry object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_entries_by_formula</span><span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.get_stabilized_entry">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_stabilized_entry">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_stabilized_entry</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">ComputedEntry</span><span class="p">,</span> <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedEntry</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method for lowering the energy of a single entry such that it is just</span>
+<span class="sd">        stable on the phase diagram. If the entry is already stable, it will be</span>
+<span class="sd">        returned unchanged.</span>
+
+<span class="sd">        Note: if the entry includes the &quot;e_above_hull&quot; data, this value will be used to</span>
+<span class="sd">        stabilize the entry. Otherwise, the energy above hull will be calculated via</span>
+<span class="sd">        creation of a phase diagram; this can take a long time for repeated calls.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entry: A computed entry object.</span>
+<span class="sd">            tol: The numerical padding added to the energy correction to guarantee</span>
+<span class="sd">                that it is determined to be stable during phase diagram construction.</span>
+<span class="sd">            force: due to numerical stability issues, if the entry is very close to the</span>
+<span class="sd">                hull (i.e., e_above_hull &gt; 0 but very small), it may not be stabilized.</span>
+<span class="sd">                This option forces stabilization even if e_above_hull evalutes to</span>
+<span class="sd">                &quot;zero&quot;. This can be crucial for certain edge cases.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A new ComputedEntry with energy adjustment making it appear to be stable</span>
+<span class="sd">            with the current entry data (i.e., compositional phase diagram).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">e_above_hull</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">):</span>
+            <span class="n">e_above_hull</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">e_above_hull</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">e_above_hull</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_e_above_hull</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">e_above_hull</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+            <span class="n">new_entry</span> <span class="o">=</span> <span class="n">entry</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">e_adj</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">e_above_hull</span> <span class="o">*</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">-</span> <span class="n">tol</span>
+            <span class="n">adjustment</span> <span class="o">=</span> <span class="n">ConstantEnergyAdjustment</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">e_adj</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Stabilization Adjustment&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Shifts energy so that entry is on the convex hull&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">new_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_adjusted_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">adjustment</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_entry</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.get_entries_with_new_temperature">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_new_temperature">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_entries_with_new_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsEntrySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new GibbsEntrySet with entries that have had their energies</span>
+<span class="sd">        modified by using a new temperature.</span>
+
+<span class="sd">        Note: this will clear the &quot;e_above_hull&quot; data for each entry and re-calculate</span>
+<span class="sd">        them only if the original entry set had them calculated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_entries</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries_list</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get_new_temperature</span><span class="p">(</span><span class="n">new_temperature</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not get new temperature for entry: </span><span class="si">{</span><span class="n">entry</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">new_entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">new_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+            <span class="n">new_entries</span><span class="p">,</span> <span class="n">calculate_e_above_hulls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">calculate_e_above_hulls</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.get_entries_with_jitter">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_jitter">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_entries_with_jitter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsEntrySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new GibbsEntrySet with entries that have had their energies shifted by</span>
+<span class="sd">        randomly sampled noise to account for uncertainty in data. This is done by</span>
+<span class="sd">        sampling from a Gaussian distribution using the entry&#39;s &quot;correction_uncertainty&quot;</span>
+<span class="sd">        attribute as the scale.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A new GibbsEntrySet with entries that have had their energies shifted by</span>
+<span class="sd">            random Gaussian noise based on their &quot;correction_uncertainty&quot; values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries_list</span><span class="p">)</span>
+        <span class="n">new_entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">jitter</span> <span class="o">=</span> <span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">entries</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_element</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">adj</span> <span class="o">=</span> <span class="n">ConstantEnergyAdjustment</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">jitter</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">entry</span><span class="o">.</span><span class="n">correction_uncertainty</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Random jitter&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s2">&quot;Randomly sampled (Gaussian) noise to account for uncertainty in&quot;</span>
+                    <span class="s2">&quot; data&quot;</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">new_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_adjusted_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">adj</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">GibbsEntrySet</span><span class="p">(</span><span class="n">new_entries</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.get_interpolated_entry">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_interpolated_entry">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_interpolated_entry</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tol_per_atom</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedEntry</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method for interpolating an entry from the entry set.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            formula: The chemical formula of the desired entry.</span>
+<span class="sd">            tol_per_atom: the energy shift (eV/atom) below the hull energy so that the</span>
+<span class="sd">                interpolated entry is guaranteed to be stable. Defaults to 1 meV/atom.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An interpolated GibbsComputedEntry object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_composition</span>
+        <span class="n">pd_entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_subset_in_chemsys</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">comp</span><span class="o">.</span><span class="n">elements</span><span class="p">])</span>
+
+        <span class="n">energy</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">PhaseDiagram</span><span class="p">(</span><span class="n">pd_entries</span><span class="p">)</span><span class="o">.</span><span class="n">get_hull_energy</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span>
+            <span class="o">-</span> <span class="n">tol_per_atom</span> <span class="o">*</span> <span class="n">comp</span><span class="o">.</span><span class="n">num_atoms</span>
+        <span class="p">)</span>
+
+        <span class="n">adj</span> <span class="o">=</span> <span class="n">ConstantEnergyAdjustment</span><span class="p">(</span>  <span class="c1"># for keeping track of uncertainty</span>
+            <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">uncertainty</span><span class="o">=</span><span class="mf">0.05</span> <span class="o">*</span> <span class="n">comp</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">,</span>  <span class="c1"># conservative: 50 meV/atom uncertainty</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Interpolation adjustment (for uncertainty)&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maintains uncertainty due to interpolation&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">InterpolatedEntry</span><span class="p">(</span>
+            <span class="n">comp</span><span class="p">,</span>
+            <span class="n">energy</span><span class="p">,</span>
+            <span class="n">energy_adjustments</span><span class="o">=</span><span class="p">[</span><span class="n">adj</span><span class="p">],</span>
+            <span class="n">entry_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;InterpolatedEntry-</span><span class="si">{</span><span class="n">comp</span><span class="o">.</span><span class="n">formula</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.get_e_above_hull">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_e_above_hull">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_e_above_hull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">ComputedEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method for calculating the energy above hull for a single entry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entry: A ComputedEntry object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The energy above hull for the entry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">e_above_hull</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">chemsys</span><span class="p">,</span> <span class="n">pd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">elems_pd</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span>
+            <span class="n">elems_entry</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">chemical_system</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">elems_entry</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">elems_pd</span><span class="p">):</span>
+                <span class="n">e_above_hull</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_e_above_hull</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">e_above_hull</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Entry not in any of the phase diagrams in pd_dict!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.from_pd">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.from_pd">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_pd</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">pd</span><span class="p">:</span> <span class="n">PhaseDiagram</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">include_nist_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">include_freed_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">apply_carbonate_correction</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">ignore_nist_solids</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">calculate_e_above_hulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">minimize_obj_size</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsEntrySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor method for building a GibbsEntrySet from an existing phase diagram.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pd: Phase Diagram object (pymatgen)</span>
+<span class="sd">            temperature: Temperature [K] for determining Gibbs Free Energy of</span>
+<span class="sd">                formation, dGf(T)</span>
+<span class="sd">            include_nist_data: Whether to include NIST data in the entry set. Defaults</span>
+<span class="sd">                to True.</span>
+<span class="sd">            include_freed_data: Whether to include Freed data in the entry set. Defaults</span>
+<span class="sd">                to False. Use at your own risk!</span>
+<span class="sd">            apply_carbonate_correction: Whether to apply the fit energy</span>
+<span class="sd">                correction for carbonates. Defaults to True.</span>
+<span class="sd">            ignore_nist_solids: Whether to ignore NIST data for the solids specified in</span>
+<span class="sd">                the &quot;data/nist/ignore_solids.json&quot; file; these all have melting points</span>
+<span class="sd">                Tm &gt;= 1500 ºC. Defaults to Ture.</span>
+<span class="sd">            calculate_e_above_hulls: Whether to calculate energy above hull for each</span>
+<span class="sd">                entry and store in the entry&#39;s data. Defaults to False.</span>
+<span class="sd">            minimize_obj_size: Whether to minimize the size of the object by removing</span>
+<span class="sd">                unnecessary attributes from the entries. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A GibbsEntrySet containing a collection of GibbsComputedEntry and</span>
+<span class="sd">            experimental reference entry objects at the specified temperature.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gibbs_entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">experimental_formulas</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">all_entries</span><span class="p">:</span>
+            <span class="n">composition</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span>
+            <span class="n">formula</span> <span class="o">=</span> <span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">composition</span><span class="o">.</span><span class="n">is_element</span>
+                <span class="ow">and</span> <span class="n">entry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">el_refs</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="ow">or</span> <span class="n">formula</span> <span class="ow">in</span> <span class="n">experimental_formulas</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">new_entries</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">new_entry</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">include_nist_data</span><span class="p">:</span>
+                <span class="n">new_entry</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_check_for_experimental</span><span class="p">(</span>
+                    <span class="n">formula</span><span class="p">,</span> <span class="s2">&quot;nist&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">ignore_nist_solids</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">new_entry</span><span class="p">:</span>
+                    <span class="n">new_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">include_freed_data</span><span class="p">:</span>
+                <span class="n">new_entry</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_check_for_experimental</span><span class="p">(</span>
+                    <span class="n">formula</span><span class="p">,</span> <span class="s2">&quot;freed&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">ignore_nist_solids</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">new_entry</span><span class="p">:</span>
+                    <span class="n">new_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">new_entry</span><span class="p">:</span>
+                <span class="n">experimental_formulas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">corr</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">apply_carbonate_correction</span><span class="p">:</span>
+                    <span class="n">corr</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_carbonate_correction</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+                <span class="n">energy_adjustments</span> <span class="o">=</span> <span class="p">[</span><span class="n">corr</span><span class="p">]</span> <span class="k">if</span> <span class="n">corr</span> <span class="k">else</span> <span class="kc">None</span>
+
+                <span class="n">structure</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">structure</span>
+                <span class="n">formation_energy_per_atom</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_form_energy_per_atom</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+                <span class="n">gibbs_entry</span> <span class="o">=</span> <span class="n">GibbsComputedEntry</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span>
+                    <span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">,</span>
+                    <span class="n">formation_energy_per_atom</span><span class="o">=</span><span class="n">formation_energy_per_atom</span><span class="p">,</span>
+                    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+                    <span class="n">energy_adjustments</span><span class="o">=</span><span class="n">energy_adjustments</span><span class="p">,</span>
+                    <span class="n">parameters</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">entry_id</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">entry_id</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="n">new_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gibbs_entry</span><span class="p">)</span>
+
+            <span class="n">gibbs_entries</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_entries</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">gibbs_entries</span><span class="p">,</span>
+            <span class="n">calculate_e_above_hulls</span><span class="o">=</span><span class="n">calculate_e_above_hulls</span><span class="p">,</span>
+            <span class="n">minimize_obj_size</span><span class="o">=</span><span class="n">minimize_obj_size</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.copy">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsEntrySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of the entry set.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">GibbsEntrySet</span><span class="p">(</span><span class="n">entries</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.as_dict">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.as_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            JSON serializable dict representation of the entry set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">]</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculate_e_above_hulls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_e_above_hulls</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="GibbsEntrySet.from_computed_entries">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.from_computed_entries">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_computed_entries</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ComputedStructureEntry</span><span class="p">],</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">include_nist_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">include_freed_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">apply_carbonate_correction</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">ignore_nist_solids</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">calculate_e_above_hulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">minimize_obj_size</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsEntrySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor method for initializing GibbsEntrySet from T = 0 K</span>
+<span class="sd">        ComputedStructureEntry objects, as acquired from a thermochemical database</span>
+<span class="sd">        (e.g., The Materials Project).</span>
+
+<span class="sd">        Automatically expands the phase diagram for large chemical systems (10 or more</span>
+<span class="sd">        elements) to avoid limitations of Qhull.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entries: Iterable of ComputedStructureEntry objects. These can be downloaded</span>
+<span class="sd">                from The Materials Project API or created manually with pymatgen.</span>
+<span class="sd">            temperature: Temperature [K] for determining Gibbs Free Energy of</span>
+<span class="sd">                formation, dGf(T)</span>
+<span class="sd">            include_nist_data: Whether to include NIST-JANAF data in the entry set.</span>
+<span class="sd">                Defaults to True.</span>
+<span class="sd">            include_freed_data: Whether to include FREED data in the entry set. Defaults</span>
+<span class="sd">                to False. WARNING: This dataset has not been thoroughly tested. Use at</span>
+<span class="sd">                your own risk!</span>
+<span class="sd">            apply_carbonate_correction: Whether to apply the fit GGA energy correction</span>
+<span class="sd">                for carbonates. Defaults to True.</span>
+<span class="sd">            ignore_nist_solids: Whether to ignore NIST data for the solids specified in</span>
+<span class="sd">                the &quot;data/nist/ignore_solids.json&quot; file; these all have melting points</span>
+<span class="sd">                Tm &gt;= 1500 ºC. Defaults to True.</span>
+<span class="sd">            calculate_e_above_hulls: Whether to calculate energy above hull for each</span>
+<span class="sd">                entry and store in the entry&#39;s data. Defaults to False.</span>
+<span class="sd">            minimize_obj_size: Whether to minimize the size of the object by removing</span>
+<span class="sd">                unrequired attributes from the entries. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A GibbsEntrySet containing a collection of GibbsComputedEntry and</span>
+<span class="sd">            experimental reference entry objects at the specified temperature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">e_set</span> <span class="o">=</span> <span class="n">EntrySet</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+        <span class="n">new_entries</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">GibbsComputedEntry</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">e_set</span><span class="o">.</span><span class="n">chemsys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">9</span><span class="p">:</span>  <span class="c1"># Qhull algorithm struggles beyond 9 dimensions</span>
+            <span class="n">pd</span> <span class="o">=</span> <span class="n">PhaseDiagram</span><span class="p">(</span><span class="n">e_set</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_pd</span><span class="p">(</span>
+                <span class="n">pd</span><span class="p">,</span>
+                <span class="n">temperature</span><span class="p">,</span>
+                <span class="n">include_nist_data</span><span class="o">=</span><span class="n">include_nist_data</span><span class="p">,</span>
+                <span class="n">include_freed_data</span><span class="o">=</span><span class="n">include_freed_data</span><span class="p">,</span>
+                <span class="n">apply_carbonate_correction</span><span class="o">=</span><span class="n">apply_carbonate_correction</span><span class="p">,</span>
+                <span class="n">ignore_nist_solids</span><span class="o">=</span><span class="n">ignore_nist_solids</span><span class="p">,</span>
+                <span class="n">calculate_e_above_hulls</span><span class="o">=</span><span class="n">calculate_e_above_hulls</span><span class="p">,</span>
+                <span class="n">minimize_obj_size</span><span class="o">=</span><span class="n">minimize_obj_size</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">pd_dict</span> <span class="o">=</span> <span class="n">expand_pd</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">e_set</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building entries from expanded phase diagrams...&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">pd</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">pd_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;GibbsComputedEntry&quot;</span><span class="p">):</span>
+            <span class="n">gibbs_set</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_pd</span><span class="p">(</span>
+                <span class="n">pd</span><span class="p">,</span>
+                <span class="n">temperature</span><span class="p">,</span>
+                <span class="n">include_nist_data</span><span class="o">=</span><span class="n">include_nist_data</span><span class="p">,</span>
+                <span class="n">include_freed_data</span><span class="o">=</span><span class="n">include_freed_data</span><span class="p">,</span>
+                <span class="n">apply_carbonate_correction</span><span class="o">=</span><span class="n">apply_carbonate_correction</span><span class="p">,</span>
+                <span class="n">ignore_nist_solids</span><span class="o">=</span><span class="n">ignore_nist_solids</span><span class="p">,</span>
+                <span class="n">calculate_e_above_hulls</span><span class="o">=</span><span class="n">calculate_e_above_hulls</span><span class="p">,</span>
+                <span class="n">minimize_obj_size</span><span class="o">=</span><span class="n">minimize_obj_size</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">new_entries</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gibbs_set</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">new_entries</span><span class="p">))</span></div>
+
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span> <span class="nf">entries_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of all entries in the entry set.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="p">))</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span> <span class="nf">min_entries_by_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ComputedEntry</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dict of minimum energy entries in the entry set, indexed by</span>
+<span class="sd">        formula.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">min_entries</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="n">formula</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span>
+            <span class="k">if</span> <span class="n">formula</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">min_entries</span><span class="p">:</span>
+                <span class="n">entries</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="o">==</span> <span class="n">formula</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span>
+                <span class="p">)</span>
+                <span class="n">min_entries</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)[</span>
+                    <span class="mi">0</span>
+                <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">min_entries</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span> <span class="nf">temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the temperature of entries in the dataset. More precisely, this is the</span>
+<span class="sd">        temperature encountered when iterating over the dataset.</span>
+
+<span class="sd">        Use at your own risk if mixing GibbsComputedEntry objects calculated at</span>
+<span class="sd">        different temperatures -- this poses even more theoretical problems!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="p">(</span><span class="n">ExperimentalReferenceEntry</span><span class="p">,</span> <span class="n">GibbsComputedEntry</span><span class="p">)):</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">temperature</span>  <span class="c1"># get temperature from any entry</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">temp</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span> <span class="nf">chemsys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Set of symbols representing the chemical system, e.g., {&quot;Li&quot;, &quot;Fe&quot;, &quot;P&quot;,</span>
+<span class="sd">            &quot;O&quot;}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chemsys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="n">chemsys</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">el</span><span class="o">.</span><span class="n">symbol</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+        <span class="k">return</span> <span class="n">chemsys</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_adjusted_entry</span><span class="p">(</span>
+        <span class="n">entry</span><span class="p">:</span> <span class="n">GibbsComputedEntry</span><span class="p">,</span> <span class="n">adjustment</span><span class="p">:</span> <span class="n">EnergyAdjustment</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsComputedEntry</span><span class="p">:</span>
+        <span class="n">entry_dict</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+        <span class="n">original_entry</span> <span class="o">=</span> <span class="n">entry_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;entry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">original_entry</span><span class="p">:</span>
+            <span class="n">energy_adjustments</span> <span class="o">=</span> <span class="n">original_entry</span><span class="p">[</span><span class="s2">&quot;energy_adjustments&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">energy_adjustments</span> <span class="o">=</span> <span class="n">entry_dict</span><span class="p">[</span><span class="s2">&quot;energy_adjustments&quot;</span><span class="p">]</span>
+
+        <span class="n">energy_adjustments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adjustment</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+        <span class="n">new_entry</span> <span class="o">=</span> <span class="n">MontyDecoder</span><span class="p">()</span><span class="o">.</span><span class="n">process_decoded</span><span class="p">(</span><span class="n">entry_dict</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_entry</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_for_experimental</span><span class="p">(</span>
+        <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cls_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ignore_nist_solids</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="p">):</span>
+        <span class="n">cls_name</span> <span class="o">=</span> <span class="n">cls_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">cls_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;nist&quot;</span><span class="p">,</span> <span class="s2">&quot;nistreferenceentry&quot;</span><span class="p">):</span>
+            <span class="n">cl</span> <span class="o">=</span> <span class="n">NISTReferenceEntry</span>
+        <span class="k">elif</span> <span class="n">cls_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;freed&quot;</span><span class="p">,</span> <span class="s2">&quot;freedreferenceentry&quot;</span><span class="p">):</span>
+            <span class="n">cl</span> <span class="o">=</span> <span class="n">FREEDReferenceEntry</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid class name for experimental reference entry.&quot;</span><span class="p">)</span>
+
+        <span class="n">entry</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">formula</span> <span class="ow">in</span> <span class="n">cl</span><span class="o">.</span><span class="n">REFERENCES</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">cl</span> <span class="o">==</span> <span class="n">NISTReferenceEntry</span>
+                <span class="ow">and</span> <span class="n">ignore_nist_solids</span>
+                <span class="ow">and</span> <span class="n">formula</span> <span class="ow">in</span> <span class="n">IGNORE_NIST_SOLIDS</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="n">cl</span><span class="p">(</span><span class="n">composition</span><span class="o">=</span><span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">),</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Compound </span><span class="si">{</span><span class="n">formula</span><span class="si">}</span><span class="s2"> is in </span><span class="si">{</span><span class="n">cl</span><span class="si">}</span><span class="s2"> tables but at different&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; temperatures!: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">entry</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_carbonate_correction</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method for determining the carbonate correction for an entry.</span>
+
+<span class="sd">        WARNING: The standard correction value provided in this module has been fit only</span>
+<span class="sd">        to MP-derived entries (i.e., entries calculated with MPRelaxSet and MPStaticSet</span>
+<span class="sd">        in VASP). Please check that the correction is valid for your entry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">{</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">),</span> <span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)}</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">elements</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;run_type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;GGA&quot;</span><span class="p">,</span> <span class="s2">&quot;GGA+U&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">el_amts</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">get_el_amt_dict</span><span class="p">()</span>  <span class="c1"># now get number of carbonate ions</span>
+
+        <span class="n">num_c</span> <span class="o">=</span> <span class="n">el_amts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">num_o</span> <span class="o">=</span> <span class="n">el_amts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_c</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">num_o</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">num_o</span> <span class="o">/</span> <span class="n">num_c</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">CarbonateCorrection</span><span class="p">(</span><span class="n">num_c</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clears all cached properties. This method is called whenever the entry set is</span>
+<span class="sd">        modified in place (as is done with the add method, etc.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">GibbsEntrySet</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">continue</span></div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=521b6f53"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>

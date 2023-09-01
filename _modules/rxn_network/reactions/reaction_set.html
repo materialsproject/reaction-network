@@ -1,0 +1,1134 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+        <title>rxn_network.reactions.reaction_set - reaction-network</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../tutorials.html">Notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../rxn_network.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.entries.html">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.jobs.html">rxn_network.jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.network.html">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <h1>Source code for rxn_network.reactions.reaction_set</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implements a class for conveniently and efficiently storing sets of ComputedReaction</span>
+<span class="sd">objects which share entries.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterable</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">from</span> <span class="nn">monty.json</span> <span class="kn">import</span> <span class="n">MSONable</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="kn">import</span> <span class="n">Element</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">rxn_network.reactions.computed</span> <span class="kn">import</span> <span class="n">ComputedReaction</span>
+<span class="kn">from</span> <span class="nn">rxn_network.reactions.open</span> <span class="kn">import</span> <span class="n">OpenComputedReaction</span>
+<span class="kn">from</span> <span class="nn">rxn_network.utils.funcs</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">grouper</span>
+<span class="kn">from</span> <span class="nn">rxn_network.utils.ray</span> <span class="kn">import</span> <span class="n">initialize_ray</span><span class="p">,</span> <span class="n">to_iterator</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span>
+
+    <span class="kn">from</span> <span class="nn">rxn_network.costs.base</span> <span class="kn">import</span> <span class="n">CostFunction</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ReactionSet">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet">[docs]</a>
+<span class="k">class</span> <span class="nc">ReactionSet</span><span class="p">(</span><span class="n">MSONable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A lightweight class for storing large sets of ComputedReaction objects.</span>
+<span class="sd">    Automatically represents a set of reactions as an array of coefficients with</span>
+<span class="sd">    a second array linking to a corresponding list of shared entries. This is useful for</span>
+<span class="sd">    dumping large amounts of reaction data to a database.</span>
+
+<span class="sd">    Note: this is not a true &quot;set&quot;; there is the option for filtering duplicates but it</span>
+<span class="sd">        is not explicitly required.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">entries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">],</span>
+        <span class="n">indices</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">coeffs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">open_elem</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Element</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">chempot</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">all_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            entries: List of ComputedEntry objects shared by reactions</span>
+<span class="sd">            indices: Array indexing the entry list; gets entries used by each</span>
+<span class="sd">                reaction object</span>
+<span class="sd">            coeffs: Array of all reaction coefficients</span>
+<span class="sd">            open_elem: Open element, e.g., &quot;O&quot;</span>
+<span class="sd">            chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N</span>
+<span class="sd">            all_data: Optional list of data for each reaction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="n">entries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="n">coeffs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="o">=</span> <span class="n">open_elem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chempot</span> <span class="o">=</span> <span class="n">chempot</span>
+        <span class="k">if</span> <span class="n">all_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span> <span class="o">=</span> <span class="n">all_data</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="k">for</span> <span class="n">size</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="k">for</span> <span class="n">size</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="k">for</span> <span class="n">size</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="o">=</span> <span class="n">open_elem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chempot</span> <span class="o">=</span> <span class="n">chempot</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu_dict</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">open_elem</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mu_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">Element</span><span class="p">(</span><span class="n">open_elem</span><span class="p">):</span> <span class="n">chempot</span><span class="p">}</span>  <span class="c1"># type: ignore</span>
+
+<div class="viewcode-block" id="ReactionSet.get_rxns">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.get_rxns">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_rxns</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ComputedReaction</span> <span class="o">|</span> <span class="n">OpenComputedReaction</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generator for all ComputedReaction objects or OpenComputedReaction objects (when</span>
+<span class="sd">        open element and chempot are specified) for the reaction set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns_by_indices</span><span class="p">(</span>
+            <span class="n">idxs</span><span class="o">=</span><span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.from_rxns">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.from_rxns">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_rxns</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">rxns</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="n">ComputedReaction</span> <span class="o">|</span> <span class="n">OpenComputedReaction</span><span class="p">],</span>
+        <span class="n">entries</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">open_elem</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Element</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">chempot</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">filter_duplicates</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReactionSet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initiate a ReactionSet object from a list of reactions. Including a list of</span>
+<span class="sd">        unique entries saves some computation time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rxns: List of ComputedReaction-like objects.</span>
+<span class="sd">            entries: Optional list of ComputedEntry objects</span>
+<span class="sd">            open_elem: Open element, e.g. &quot;O2&quot;</span>
+<span class="sd">            chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">entries</span><span class="p">:</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_unique_entries</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span>
+
+        <span class="n">entries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">entries</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">composition</span><span class="p">)</span>
+
+        <span class="c1"># need to index by unique ID in case mixing different temperatures</span>
+        <span class="n">all_entry_indices</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">entries</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s2">&quot;unique_id&quot;</span><span class="p">):</span>
+                <span class="n">all_entry_indices</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">unique_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">all_entry_indices</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">entry_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+
+        <span class="c1"># group by reaction size to ensure rectangular matrices</span>
+        <span class="n">indices</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>  <span class="c1"># type: ignore</span>
+
+        <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
+
+            <span class="n">rxn_indices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;unique_id&quot;</span><span class="p">):</span>
+                    <span class="n">rxn_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_entry_indices</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">unique_id</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">rxn_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_entry_indices</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">entry_id</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">size</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+                <span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn_indices</span><span class="p">)</span>
+            <span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">coefficients</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">])</span>
+            <span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">])</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">])</span>
+
+        <span class="n">all_open_elems</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">all_chempots</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">all</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;OpenComputedReaction&quot;</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">open_elem</span>
+        <span class="p">):</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">:</span>
+                <span class="n">all_open_elems</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">chempots</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">all_chempots</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">chempots</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_chempots</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_open_elems</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">chempot</span> <span class="o">=</span> <span class="n">all_chempots</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">open_elem</span> <span class="o">=</span> <span class="n">all_open_elems</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="n">rxn_set</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">,</span>
+            <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span>
+            <span class="n">coeffs</span><span class="o">=</span><span class="n">coeffs</span><span class="p">,</span>
+            <span class="n">open_elem</span><span class="o">=</span><span class="n">open_elem</span><span class="p">,</span>
+            <span class="n">chempot</span><span class="o">=</span><span class="n">chempot</span><span class="p">,</span>
+            <span class="n">all_data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filter_duplicates</span><span class="p">:</span>
+            <span class="n">rxn_set</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">filter_duplicates</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">rxn_set</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.to_dataframe">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.to_dataframe">[docs]</a>
+    <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Composition</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">calculate_uncertainties</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">calculate_separable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make a dataframe of reactions from a ReactionSet object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cost_function: Cost function to use for evaluating reaction costs</span>
+<span class="sd">            target: Optional target composition (used to determine added elements)</span>
+<span class="sd">            calculate_uncertainties: Whether to calculate uncertainties (dE column)</span>
+<span class="sd">            calculate_separable: Whether to calculate if the reaction products are</span>
+<span class="sd">                separable (see ComputedReaction.is_separable)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Pandas DataFrame with columns:</span>
+<span class="sd">                rxn: Reaction object</span>
+<span class="sd">                energy: reaction energy in eV/atom</span>
+<span class="sd">                dE (optional): uncertainty in reaction energy in eV/atom</span>
+<span class="sd">                added_elems (optional): List of added elements</span>
+<span class="sd">                separable (optional): whether reaction products are separable</span>
+<span class="sd">                cost: Cost of reaction</span>
+<span class="sd">                other: any other data associated with reaction</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">]})</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">calculate_e_above_hulls</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">determine_theoretical</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">():</span>
+            <span class="n">attrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>  <span class="c1"># get extra attributes from first reaction</span>
+            <span class="n">entry_data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">if</span> <span class="n">entry_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">calculate_e_above_hulls</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_e_hull_reactants&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_e_hull_products&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="s2">&quot;icsd_ids&quot;</span> <span class="ow">in</span> <span class="n">entry_data</span> <span class="ow">or</span> <span class="s2">&quot;theoretical&quot;</span> <span class="ow">in</span> <span class="n">entry_data</span><span class="p">:</span>
+                <span class="n">determine_theoretical</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_theoretical_reactants&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_theoretical_products&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">break</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="k">if</span> <span class="n">target</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="s2">&quot;num_constraints&quot;</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="n">attrs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;num_constraints&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">calculate_uncertainties</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;dE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">target</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;added_elems&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">calculate_separable</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;separable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_num_precursor_elems&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">attrs</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">]})</span>
+
+        <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">():</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;rxn&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">calculate_uncertainties</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;dE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">energy_uncertainty_per_atom</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">target</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;added_elems&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_added_elems</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">calculate_separable</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;separable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">is_separable</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">calculate_e_above_hulls</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_e_hull_reactants&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="nb">max</span><span class="p">(</span>
+                        <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="ow">or</span> <span class="mf">0.0</span>
+                        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactant_entries</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_e_hull_products&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="nb">max</span><span class="p">(</span>
+                        <span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="ow">or</span> <span class="mf">0.0</span>
+                        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">product_entries</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">determine_theoretical</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_theoretical_reactants&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="nb">sum</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">is_experimental</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactant_entries</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;num_theoretical_products&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="nb">sum</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">is_experimental</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">product_entries</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_num_precursor_elems&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">precursor</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span> <span class="k">for</span> <span class="n">precursor</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">))</span>
+
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cost_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">rxn</span><span class="p">))</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;cost&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.calculate_costs">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.calculate_costs">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate_costs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cf</span><span class="p">:</span> <span class="n">CostFunction</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate a cost function on an acquired set of reactions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cf: CostFunction object, e.g. Softplus()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">cf</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.add_rxns">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.add_rxns">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_rxns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxns</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="n">ComputedReaction</span> <span class="o">|</span> <span class="n">OpenComputedReaction</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a new ReactionSet with the reactions added.</span>
+
+<span class="sd">        Warning: all new reactions must only have entires contained in the entries of</span>
+<span class="sd">        the current reaction set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_rxn_set</span> <span class="o">=</span> <span class="n">ReactionSet</span><span class="o">.</span><span class="n">from_rxns</span><span class="p">(</span><span class="n">rxns</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_rxn_set</span><span class="p">(</span><span class="n">new_rxn_set</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.add_rxn_set">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.add_rxn_set">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_rxn_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn_set</span><span class="p">:</span> <span class="n">ReactionSet</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReactionSet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a new reaction set to current reaction set.</span>
+
+<span class="sd">        Warning: new reaction set must have the same entries as the current reaction</span>
+<span class="sd">        set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">!=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Reaction sets must have identical entries property to combine.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">open_elem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span>
+        <span class="n">chempot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chempot</span>
+
+        <span class="n">new_indices</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">new_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">new_all_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">rxn_set</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+            <span class="k">if</span> <span class="n">size</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="ow">and</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
+                <span class="n">new_indices</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">],</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">])</span>
+                <span class="p">)</span>
+                <span class="n">new_coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">],</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">])</span>
+                <span class="p">)</span>
+                <span class="n">new_all_data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_data</span><span class="p">[</span><span class="n">size</span><span class="p">],</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">all_data</span><span class="p">[</span><span class="n">size</span><span class="p">])</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">size</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
+                <span class="n">new_indices</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">]</span>
+                <span class="n">new_coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span>
+                <span class="n">new_all_data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
+                <span class="n">new_indices</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">]</span>
+                <span class="n">new_coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span>
+                <span class="n">new_all_data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">all_data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">ReactionSet</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="n">new_indices</span><span class="p">,</span> <span class="n">new_coeffs</span><span class="p">,</span> <span class="n">open_elem</span><span class="p">,</span> <span class="n">chempot</span><span class="p">,</span> <span class="n">new_all_data</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.get_rxns_by_reactants">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.get_rxns_by_reactants">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_rxns_by_reactants</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">reactants</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">return_set</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ComputedReaction</span> <span class="o">|</span> <span class="n">OpenComputedReaction</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of reactions with the given reactants.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reactants</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reactants</span><span class="p">]</span>
+
+        <span class="n">reactant_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="n">idx</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="ow">in</span> <span class="n">reactants</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">reactant_indices</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># type: ignore</span>
+        <span class="k">for</span> <span class="n">size</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">idxs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">contains_reactants</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">reactant_indices</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">contains_reactants</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">contains_reactants</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">contains_reactants</span><span class="p">],</span>
+            <span class="p">):</span>
+                <span class="n">r_indices</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="mf">1e-12</span><span class="p">}</span>
+                <span class="k">if</span> <span class="n">r_indices</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">reactant_indices</span><span class="p">):</span>
+                    <span class="n">idxs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_set</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_set_by_indices</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns_by_indices</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.get_rxns_by_product">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.get_rxns_by_product">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_rxns_by_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">return_set</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of reactions which contain the given product formula.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            product: The product&#39;s formula</span>
+<span class="sd">            return_set: Whether to return the identified reactions in the form of a</span>
+<span class="sd">                ReactionSet object. Defaults to False.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">product</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">product</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_formula</span>
+
+        <span class="n">product_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="o">==</span> <span class="n">product</span><span class="p">:</span>
+                <span class="n">product_index</span> <span class="o">=</span> <span class="n">idx</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">product_index</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># type: ignore</span>
+        <span class="k">for</span> <span class="n">size</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">idxs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">contains_product</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">product_index</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">contains_product</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">contains_product</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">contains_product</span><span class="p">],</span>
+            <span class="p">):</span>
+                <span class="n">p_indices</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mf">1e-12</span><span class="p">}</span>
+                <span class="k">if</span> <span class="n">product_index</span> <span class="ow">in</span> <span class="n">p_indices</span><span class="p">:</span>
+                    <span class="n">idxs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_set</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_set_by_indices</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxns_by_indices</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.filter_duplicates">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.filter_duplicates">[docs]</a>
+    <span class="k">def</span> <span class="nf">filter_duplicates</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ensure_rxns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ComputedReaction</span> <span class="o">|</span> <span class="n">OpenComputedReaction</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">parallelize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReactionSet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new ReactionSet object with duplicate reactions removed.</span>
+
+<span class="sd">        NOTE: Duplicate reactions include those that are multiples of each other. For</span>
+<span class="sd">        example, if a reaction set contains both A + B -&gt; C and 2A + 2B -&gt; 2C, the</span>
+<span class="sd">        second reaction will be removed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ensure_rxns: An optional list of reactions to ensure are contained within</span>
+<span class="sd">                the filtered set that is returned. This is important for some cases</span>
+<span class="sd">                (e.g., pathfinding), where you expect a certain reaction object to be in</span>
+<span class="sd">                the set.</span>
+<span class="sd">            parallelize: Whether to parallelize duplicate checking with Ray. This can be</span>
+<span class="sd">                a slow procedure otherwise. Defaults to True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">parallelize</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
+                <span class="n">initialize_ray</span><span class="p">()</span>
+            <span class="n">num_cpus</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">cluster_resources</span><span class="p">()[</span><span class="s2">&quot;CPU&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">chunk_refs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">ensure_idxs</span> <span class="o">=</span> <span class="p">{</span><span class="n">size</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">}</span>  <span class="c1"># type: ignore</span>
+        <span class="n">idxs_to_keep</span> <span class="o">=</span> <span class="p">{</span><span class="n">size</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">}</span>  <span class="c1"># type: ignore</span>
+
+        <span class="c1"># identify indices to keep</span>
+        <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">ensure_rxns</span> <span class="ow">or</span> <span class="p">[]:</span>
+            <span class="n">rxn_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">])</span>
+            <span class="n">rxn_coeffs</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">coefficients</span>
+
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rxn_idxs</span><span class="p">)</span>
+
+            <span class="c1"># filter by first column to save some time (full filter is long)</span>
+            <span class="n">quick_filter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span>
+                <span class="n">rxn_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idxs</span><span class="p">,</span> <span class="n">coeffs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">quick_filter</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">quick_filter</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">quick_filter</span><span class="p">],</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">idxs</span> <span class="o">==</span> <span class="n">rxn_idxs</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">coeffs</span> <span class="o">==</span> <span class="n">rxn_coeffs</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="n">ensure_idxs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rxn</span><span class="si">}</span><span class="s2"> not found in ReactionSet!&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">ensure_idxs_to_keep</span> <span class="o">=</span> <span class="n">ensure_idxs</span><span class="p">[</span><span class="n">size</span><span class="p">]</span>
+
+            <span class="c1"># reordering columns in ascending entry idx</span>
+            <span class="n">column_sorting_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">],</span> <span class="n">column_sorting_indices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">],</span> <span class="n">column_sorting_indices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+
+            <span class="n">_</span><span class="p">,</span> <span class="n">inverse_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+                <span class="n">indices</span><span class="p">,</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">keep</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">group_indices</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">inverse_indices</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">inverse_indices</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">])[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="p">):</span>  <span class="c1"># this was suggested by ChatGPT</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">keep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">group_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="n">num_groups</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_indices</span><span class="p">)</span>
+            <span class="n">idxs_to_keep</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span>
+
+            <span class="k">if</span> <span class="n">num_groups</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">parallelize</span><span class="p">:</span>
+                <span class="n">chunk_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_groups</span> <span class="o">//</span> <span class="n">num_cpus</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+                <span class="n">coeffs</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">grouper</span><span class="p">(</span>
+                    <span class="n">group_indices</span><span class="p">,</span>
+                    <span class="n">chunk_size</span><span class="p">,</span>
+                    <span class="n">fillvalue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="n">chunk_refs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">_process_duplicates_ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
+                            <span class="n">size</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">ensure_idxs_to_keep</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">idxs_to_keep</span><span class="p">[</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                    <span class="n">_process_duplicates</span><span class="p">(</span><span class="n">group_indices</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">ensure_idxs_to_keep</span><span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parallelize</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+                <span class="n">to_iterator</span><span class="p">(</span><span class="n">chunk_refs</span><span class="p">),</span>
+                <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk_refs</span><span class="p">),</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Filtering duplicates&quot;</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="n">size</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">result</span>
+                <span class="n">idxs_to_keep</span><span class="p">[</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rxn_set_by_indices</span><span class="p">(</span><span class="n">idxs_to_keep</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.set_chempot">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.set_chempot">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_chempot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_el</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Element</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chempot</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReactionSet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new ReactionSet containing the same reactions as this ReactionSet but</span>
+<span class="sd">        with a grand potential change recalculated under the constraint defined by the</span>
+<span class="sd">        provided open element and its chemical potential.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            open_el: The element to be considered open.</span>
+<span class="sd">            chempot: The open element&#39;s chemical potential (for use in energy change</span>
+<span class="sd">                calculation)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ReactionSet: A new ReactionSet containing reactions with the recalculated</span>
+<span class="sd">                energies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ReactionSet</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">open_el</span><span class="p">,</span> <span class="n">chempot</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReactionSet.set_new_temperature">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.set_new_temperature">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_new_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReactionSet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new ReactionSet containing the same reactions as this ReactionSet but</span>
+<span class="sd">        with a recalculated Gibb&#39;s/Grand potential change reflecting formation energies</span>
+<span class="sd">        calculated at the provided temperature.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            new_temp: The temperature for which new reaction energies should be</span>
+<span class="sd">                calculated.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The new ReactionSet containing the recalculated reactions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_rxns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">():</span>
+            <span class="n">new_rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">get_new_temperature</span><span class="p">(</span><span class="n">new_temp</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">ReactionSet</span><span class="o">.</span><span class="n">from_rxns</span><span class="p">(</span>
+            <span class="n">new_rxns</span><span class="p">,</span> <span class="n">open_elem</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">,</span> <span class="n">chempot</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chempot</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_get_rxns_by_indices</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">idxs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ComputedReaction</span> <span class="o">|</span> <span class="n">OpenComputedReaction</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of reactions with the given indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">size</span><span class="p">,</span> <span class="n">idx_arr</span> <span class="ow">in</span> <span class="n">idxs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">idx_arr</span><span class="p">:</span>
+                <span class="n">idx_arr</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx_arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx_arr</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="n">idx_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">idx_arr</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">indices</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">idx_arr</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">idx_arr</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">idx_arr</span><span class="p">],</span>
+            <span class="p">):</span>
+                <span class="n">entries</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu_dict</span><span class="p">:</span>
+                    <span class="n">rxn</span> <span class="o">=</span> <span class="n">OpenComputedReaction</span><span class="p">(</span>
+                        <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">,</span>
+                        <span class="n">coefficients</span><span class="o">=</span><span class="n">coeffs</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                        <span class="n">chempots</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mu_dict</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">rxn</span> <span class="o">=</span> <span class="n">ComputedReaction</span><span class="p">(</span>
+                        <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">,</span> <span class="n">coefficients</span><span class="o">=</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span>
+                    <span class="p">)</span>
+
+                <span class="k">yield</span> <span class="n">rxn</span>
+
+    <span class="k">def</span> <span class="nf">_get_rxn_set_by_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idxs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReactionSet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of reactions with the given indices. This is the backbone of other</span>
+<span class="sd">        reaction subset generation methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ReactionSet</span><span class="p">(</span>
+            <span class="n">entries</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span>
+            <span class="n">indices</span><span class="o">=</span><span class="p">{</span>
+                <span class="n">size</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">idx_arr</span><span class="p">]</span> <span class="k">for</span> <span class="n">size</span><span class="p">,</span> <span class="n">idx_arr</span> <span class="ow">in</span> <span class="n">idxs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">},</span>
+            <span class="n">coeffs</span><span class="o">=</span><span class="p">{</span><span class="n">size</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">idx_arr</span><span class="p">]</span> <span class="k">for</span> <span class="n">size</span><span class="p">,</span> <span class="n">idx_arr</span> <span class="ow">in</span> <span class="n">idxs</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+            <span class="n">open_elem</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">,</span>
+            <span class="n">chempot</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chempot</span><span class="p">,</span>
+            <span class="n">all_data</span><span class="o">=</span><span class="p">{</span>
+                <span class="n">size</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_data</span><span class="p">[</span><span class="n">size</span><span class="p">][</span><span class="n">idx_arr</span><span class="p">]</span> <span class="k">for</span> <span class="n">size</span><span class="p">,</span> <span class="n">idx_arr</span> <span class="ow">in</span> <span class="n">idxs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_added_elems</span><span class="p">(</span>
+        <span class="n">rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span> <span class="o">|</span> <span class="n">OpenComputedReaction</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Composition</span> <span class="o">|</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get list of added elements for a reaction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rxn: Reaction object</span>
+<span class="sd">            target: target composition (used to determine added elements)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">chemsys_prop</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;total_chemical_system&quot;</span>
+            <span class="k">if</span> <span class="n">rxn</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;OpenComputedReaction&quot;</span>
+            <span class="k">else</span> <span class="s2">&quot;chemical_system&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">added_elems</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">chemsys_prop</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">.</span><span class="n">chemical_system</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">added_elems_str</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">added_elems</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">added_elems_str</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_entry_key</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">ComputedEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a unique key for an entry. Assumes that a formula and energy alone should be</span>
+<span class="sd">        able to define a unique entry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            entry: Entry object</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_unique_entries</span><span class="p">(</span><span class="n">rxns</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return only unique entries from reactions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">entries</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterate over the reactions in the set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return length of reactions stored in the set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_get_idxs_to_keep</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">ensure_idxs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Looks for reactions with coeffs that are positive multiples of each other.&quot;&quot;&quot;</span>
+    <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># sort by abs sum</span>
+    <span class="n">sorted_rows</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="n">sorted_indices</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ensure_idxs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ensure_idxs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ensure_idxs</span><span class="p">)</span>
+
+    <span class="n">to_keep</span><span class="p">,</span> <span class="n">to_remove</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sorted_indices</span><span class="p">,</span> <span class="n">sorted_rows</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">multiples</span> <span class="o">=</span> <span class="n">sorted_rows</span> <span class="o">/</span> <span class="n">row</span>
+        <span class="n">duplicates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">r</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">arr</span><span class="o">=</span><span class="n">multiples</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="n">group</span> <span class="o">=</span> <span class="n">sorted_indices</span><span class="p">[</span><span class="n">duplicates</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ensure_idxs</span><span class="p">:</span>
+            <span class="n">group_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+            <span class="n">overlap</span> <span class="o">=</span> <span class="n">ensure_idxs</span> <span class="o">&amp;</span> <span class="n">group_set</span>
+
+            <span class="k">if</span> <span class="n">overlap</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">overlap</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">to_keep</span><span class="p">):</span>
+                    <span class="n">difference</span> <span class="o">=</span> <span class="n">group_set</span> <span class="o">-</span> <span class="n">ensure_idxs</span>
+                    <span class="n">to_keep</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">overlap</span><span class="p">))</span>
+                    <span class="n">to_remove</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">difference</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">to_keep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">to_remove</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_keep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">to_remove</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">to_keep</span><span class="p">)</span>
+
+
+<span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
+<span class="k">def</span> <span class="nf">_process_duplicates_ray</span><span class="p">(</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">groups</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">coeffs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">ensure_idxs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process a chunk of reactions to find duplicates. This is a remote function within</span>
+<span class="sd">    Ray.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        size: size of reactions to process</span>
+<span class="sd">        groups: chunks of reactions to process</span>
+<span class="sd">        coeffs: corresponding coefficients</span>
+<span class="sd">        ensure_idxs: indices of reactions to ensure are kept</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of indices to keep</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">idxs_to_keep</span> <span class="o">=</span> <span class="n">_process_duplicates</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">ensure_idxs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">size</span><span class="p">,</span> <span class="n">idxs_to_keep</span>
+
+
+<span class="k">def</span> <span class="nf">_process_duplicates</span><span class="p">(</span>
+    <span class="n">groups</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">coeffs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">ensure_idxs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process a chunk of reactions to find duplicates.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        chunk: chunk of reactions to process</span>
+<span class="sd">        coeffs: corresponding coefficients</span>
+<span class="sd">        ensure_idxs: indices of reactions to ensure are kept</span>
+<span class="sd">        size: size of reactions to process</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of indices to keep</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">idxs_to_keep</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">possible_duplicate_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="n">group</span><span class="p">]</span>
+        <span class="n">relative_ensure_idxs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">ensure_idxs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+                <span class="n">relative_ensure_idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">group</span> <span class="o">==</span> <span class="n">idx</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">keep_idxs</span> <span class="o">=</span> <span class="n">_get_idxs_to_keep</span><span class="p">(</span><span class="n">possible_duplicate_coeffs</span><span class="p">,</span> <span class="n">relative_ensure_idxs</span><span class="p">)</span>
+        <span class="n">idxs_to_keep</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="n">keep_idxs</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">idxs_to_keep</span>
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=521b6f53"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>

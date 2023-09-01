@@ -1,0 +1,804 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="rxn_network.pathways" href="rxn_network.pathways.html" /><link rel="prev" title="rxn_network.jobs" href="rxn_network.jobs.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+        <title>rxn_network.network - reaction-network</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials.html">Notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="rxn_network.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.jobs.html">rxn_network.jobs</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="rxn-network-network">
+<h1>rxn_network.network<a class="headerlink" href="#rxn-network-network" title="Link to this heading">#</a></h1>
+<section id="module-rxn_network.network.base">
+<span id="rxn-network-network-base"></span><h2>rxn_network.network.base<a class="headerlink" href="#module-rxn_network.network.base" title="Link to this heading">#</a></h2>
+<p>Basic interface for a reaction network and its graph.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.network.base.</span></span><span class="sig-name descname"><span class="pre">Network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rxns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Network" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MSONable</span></code></p>
+<p>Base definition for a reaction network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rxns</strong> (<a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet" title="rxn_network.reactions.reaction_set.ReactionSet"><em>ReactionSet</em></a>) – </p></li>
+<li><p><strong>cost_function</strong> (<a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction" title="rxn_network.costs.base.CostFunction"><em>CostFunction</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.build">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Network.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Network.build" title="Link to this definition">#</a></dt>
+<dd><p>Construct the network in-place from the supplied enumerators</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.find_pathways">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">find_pathways</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Network.find_pathways"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Network.find_pathways" title="Link to this definition">#</a></dt>
+<dd><p>Find reaction pathways</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway" title="rxn_network.pathways.base.Pathway">Pathway</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.set_precursors">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_precursors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precursors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Network.set_precursors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Network.set_precursors" title="Link to this definition">#</a></dt>
+<dd><p>Set the phases used as precursors in the network (in-place)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>precursors</strong> (<em>Iterable</em><em>[</em><em>Entry</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.set_target">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Network.set_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Network.set_target" title="Link to this definition">#</a></dt>
+<dd><p>Set the phase used as a target in the network (in-place)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target</strong> (<em>Entry</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Network.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Network.as_dict" title="Link to this definition">#</a></dt>
+<dd><p>Returns MSONable dict for serialization. See monty package for more
+information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Network.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Network.from_dict" title="Link to this definition">#</a></dt>
+<dd><p>Instantiate object from MSONable dict. See monty package for more
+information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#rxn_network.network.base.Network" title="rxn_network.network.base.Network"><em>Network</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.precursors">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">precursors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#set" title="(in Python v3.8)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Entry</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></em><a class="headerlink" href="#rxn_network.network.base.Network.precursors" title="Link to this definition">#</a></dt>
+<dd><p>The phases used as precursors in the network</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.target">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entry</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></em><a class="headerlink" href="#rxn_network.network.base.Network.target" title="Link to this definition">#</a></dt>
+<dd><p>The phase used as a target in the network</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graph</span></span><a class="headerlink" href="#rxn_network.network.base.Network.graph" title="Link to this definition">#</a></dt>
+<dd><p>Returns the network’s Graph object</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.network.base.Network.chemsys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">chemsys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><a class="headerlink" href="#rxn_network.network.base.Network.chemsys" title="Link to this definition">#</a></dt>
+<dd><p>A string representing the chemical system (elements) of the network</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.network.base.Graph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.network.base.</span></span><span class="sig-name descname"><span class="pre">Graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multigraph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Graph" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyDiGraph</span></code></p>
+<p>Thin wrapper around rx.PyDiGraph to allow for serialization and optimized database
+storage.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.base.Graph.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Graph.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Graph.as_dict" title="Link to this definition">#</a></dt>
+<dd><p>Represents the PyDiGraph object as a serializable dictionary.</p>
+<p>See monty package (MSONable) for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.base.Graph.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/base.html#Graph.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.base.Graph.from_dict" title="Link to this definition">#</a></dt>
+<dd><p>Instantiates a Graph object from a dictionary.</p>
+<p>See as_dict() and monty package (MSONable) for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#rxn_network.network.base.Graph" title="rxn_network.network.base.Graph"><em>Graph</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.network.entry">
+<span id="rxn-network-network-entry"></span><h2>rxn_network.network.entry<a class="headerlink" href="#module-rxn_network.network.entry" title="Link to this heading">#</a></h2>
+<p>Entry objects used in a Network. These network entry objects hold multiple entries and
+can be used as data for a node in the graph.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.network.entry.NetworkEntryType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.network.entry.</span></span><span class="sig-name descname"><span class="pre">NetworkEntryType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/entry.html#NetworkEntryType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.entry.NetworkEntryType" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Describes the Network Entry Type</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.network.entry.NetworkEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.network.entry.</span></span><span class="sig-name descname"><span class="pre">NetworkEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/entry.html#NetworkEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.entry.NetworkEntry" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MSONable</span></code></p>
+<p>Helper class for describing combinations of ComputedEntry-like objects in context
+of a reaction network. This entry will represent a node in the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entries</strong> (<em>Collection</em><em>[</em><em>Entry</em><em>]</em>) – Collection of Entry-like objects</p></li>
+<li><p><strong>description</strong> (<a class="reference internal" href="#rxn_network.network.entry.NetworkEntryType" title="rxn_network.network.entry.NetworkEntryType"><em>NetworkEntryType</em></a>) – Node type (e.g., Precursors, Target… see NetworkEntryType
+class)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.entry.NetworkEntry.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/entry.html#NetworkEntry.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.entry.NetworkEntry.as_dict" title="Link to this definition">#</a></dt>
+<dd><p>MSONable dict representation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.entry.NetworkEntry.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/entry.html#NetworkEntry.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.entry.NetworkEntry.from_dict" title="Link to this definition">#</a></dt>
+<dd><p>Load from MSONable dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#rxn_network.network.entry.NetworkEntryType" title="rxn_network.network.entry.NetworkEntryType"><em>NetworkEntryType</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.network.entry.DummyEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.network.entry.</span></span><span class="sig-name descname"><span class="pre">DummyEntry</span></span><a class="reference internal" href="_modules/rxn_network/network/entry.html#DummyEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.entry.DummyEntry" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rxn_network.network.entry.NetworkEntry" title="rxn_network.network.entry.NetworkEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkEntry</span></code></a></p>
+<p>A Dummy Entry that doesn’t hold any info. This maybe useful for serving as an empty
+node to facilitate pathfinding to all nodes, etc.</p>
+<p>Dummy node doesn’t need any parameters</p>
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.network.network">
+<span id="rxn-network-network-network"></span><h2>rxn_network.network.network<a class="headerlink" href="#module-rxn_network.network.network" title="Link to this heading">#</a></h2>
+<p>Implementation of reaction network and graph classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.network.network.ReactionNetwork">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.network.network.</span></span><span class="sig-name descname"><span class="pre">ReactionNetwork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rxns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_function=Field(name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=&lt;dataclasses._MISSING_TYPE</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_factory=&lt;class</span> <span class="pre">'rxn_network.costs.functions.Softplus'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repr=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compare=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=mappingproxy({})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kw_only=&lt;dataclasses._MISSING_TYPE</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_field_type=None)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/network.html#ReactionNetwork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.network.ReactionNetwork" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rxn_network.network.base.Network" title="rxn_network.network.base.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a></p>
+<p>Main reaction network class for building graph networks and performing
+pathfinding. Graphs are built using the rustworkx package (a NetworkX equivalent
+implemented in Rust).</p>
+<p>If you use this code in your own work, please consider citing this paper:</p>
+<blockquote>
+<div><p>McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+Communications 2021, 12 (1), 3097. <a class="reference external" href="https://doi.org/10.1038/s41467-021-23339-x">https://doi.org/10.1038/s41467-021-23339-x</a>.</p>
+</div></blockquote>
+<p>Initialize a ReactionNetwork object for a reaction set and cost function.</p>
+<p>To build the graph network, call the build() method in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rxns</strong> (<a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet" title="rxn_network.reactions.reaction_set.ReactionSet"><em>ReactionSet</em></a>) – Set of reactions used to construct the network.</p></li>
+<li><p><strong>cost_function</strong> (<a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction" title="rxn_network.costs.base.CostFunction"><em>CostFunction</em></a>) – The function used to calculate the cost of each reaction
+edge. Defaults to a Softplus function with default settings (i.e.
+energy_per_atom only).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.network.ReactionNetwork.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/network.html#ReactionNetwork.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.network.ReactionNetwork.build" title="Link to this definition">#</a></dt>
+<dd><p>In-place method. Construct the reaction network graph object and store under the
+“graph” attribute.</p>
+<p>WARNING: This does NOT initialize the precursors or target attributes; you must
+call set_precursors() or set_target() to do so.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.network.ReactionNetwork.find_pathways">
+<span class="sig-name descname"><span class="pre">find_pathways</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/network.html#ReactionNetwork.find_pathways"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.network.ReactionNetwork.find_pathways" title="Link to this definition">#</a></dt>
+<dd><p>Find the k-shortest paths to a provided list of one or more targets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>Entry</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – List of the formulas or entry objects of each target.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of k-shortest paths to find for each target. Defaults to 15.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of BasicPathway objects to all provided targets.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway" title="rxn_network.pathways.basic.BasicPathway"><em>BasicPathway</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.network.ReactionNetwork.set_precursors">
+<span class="sig-name descname"><span class="pre">set_precursors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precursors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/network.html#ReactionNetwork.set_precursors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.network.ReactionNetwork.set_precursors" title="Link to this definition">#</a></dt>
+<dd><p>In-place method. Sets the precursors of the network. Removes all references to
+previous precursors.</p>
+<p>If entries are provided, will use the entries to set the precursors. If strings
+are provided, will automatically find the lowest-energy entries with matching
+reduced_formula.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Iterable" title="(in Python v3.8)"><em>Iterable</em></a><em>[</em><em>Entry</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – iterable of entries/formulas of precursor phases.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.network.network.ReactionNetwork.set_target">
+<span class="sig-name descname"><span class="pre">set_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/network.html#ReactionNetwork.set_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.network.ReactionNetwork.set_target" title="Link to this definition">#</a></dt>
+<dd><p>In-place method. Can only provide one target entry or formula at a time.</p>
+<p>If entry is provided, will use that entry to set the target. If string is
+provided, will automatically find minimum-energy entry with
+matching reduced_formula.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target</strong> (<em>Entry</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Entry, or string of reduced formula, of target phase.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.network.network.get_rxn_nodes_and_edges">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.network.network.</span></span><span class="sig-name descname"><span class="pre">get_rxn_nodes_and_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rxns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/network.html#get_rxn_nodes_and_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.network.get_rxn_nodes_and_edges" title="Link to this definition">#</a></dt>
+<dd><p>Given a reaction set, return a list of nodes and edges for constructing the
+reaction network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rxns</strong> (<a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet" title="rxn_network.reactions.reaction_set.ReactionSet"><em>ReactionSet</em></a>) – a list of enumerated ComputedReaction objects to build a network from.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple consisting of (nodes, edges) where nodes is a list of NetworkEntry
+objects and edges is a list of tuples of the form (source_idx, target_idx,
+reaction).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="#rxn_network.network.entry.NetworkEntry" title="rxn_network.network.entry.NetworkEntry">NetworkEntry</a>], <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction" title="rxn_network.reactions.base.Reaction">Reaction</a>]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.network.network.get_loopback_edges">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.network.network.</span></span><span class="sig-name descname"><span class="pre">get_loopback_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/network.html#get_loopback_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.network.get_loopback_edges" title="Link to this definition">#</a></dt>
+<dd><p>Given a list of nodes to check, this function finds and returns loopback
+edges (i.e., edges that connect a product node to its equivalent reactant node)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nodes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="#rxn_network.network.entry.NetworkEntry" title="rxn_network.network.entry.NetworkEntry"><em>NetworkEntry</em></a><em>]</em>) – List of vertices from which to find loopback edges</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples of the form (source_idx, target_idx, reaction)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.network.network.get_edge_weight">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.network.network.</span></span><span class="sig-name descname"><span class="pre">get_edge_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/network.html#get_edge_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.network.get_edge_weight" title="Link to this definition">#</a></dt>
+<dd><p>Given an edge of a reaction network, calculates the cost/weight of that edge.
+Corresponds to zero for loopback &amp; precursor/target edges. Evaluates cost function
+for all reaction edges.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edge_obj</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – An edge in the reaction network</p></li>
+<li><p><strong>cf</strong> (<a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction" title="rxn_network.costs.base.CostFunction"><em>CostFunction</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.network.network.yens_ksp">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.network.network.</span></span><span class="sig-name descname"><span class="pre">yens_ksp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursors_node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/network.html#yens_ksp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.network.yens_ksp" title="Link to this definition">#</a></dt>
+<dd><p>Yen’s Algorithm for k-shortest paths, adopted for rustworkx.</p>
+<p>This implementation was inspired by the igraph implementation by Antonin Lenfant.</p>
+<dl class="simple">
+<dt>Reference (original Yen’s KSP paper):</dt><dd><p>Jin Y. Yen, “Finding the K Shortest Loopless Paths n a Network”, Management
+Science, Vol. 17, No. 11, Theory Series (Jul., 1971), pp. 712-716.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> (<em>rx.PyGraph</em>) – the rustworkx PyGraph object.</p></li>
+<li><p><strong>cf</strong> (<a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction" title="rxn_network.costs.base.CostFunction"><em>CostFunction</em></a>) – A cost function for evaluating the edge weights.</p></li>
+<li><p><strong>num_k</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – number of k shortest paths that should be found.</p></li>
+<li><p><strong>precursors_node</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the index of the node representing the precursors.</p></li>
+<li><p><strong>target_node</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the index of the node representing the targets.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List of lists of graph vertices corresponding to each shortest path</dt><dd><p>(sorted in increasing order by cost).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.network.visualize">
+<span id="rxn-network-network-visualize"></span><h2>rxn_network.network.visualize<a class="headerlink" href="#module-rxn_network.network.visualize" title="Link to this heading">#</a></h2>
+<p>Functions for visualizing/plotting reaction networks.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.network.visualize.plot_network">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.network.visualize.</span></span><span class="sig-name descname"><span class="pre">plot_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_cmap_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/network/visualize.html#plot_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.network.visualize.plot_network" title="Link to this definition">#</a></dt>
+<dd><p>Plots a reaction network using rustworkx visualization tools (i.e., mpl_draw).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph</strong> (<em>PyGraph</em>) – a rustworkx PyGraph object</p></li>
+<li><p><strong>vertex_cmap_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of . Defaults to “jet”.</p></li>
+<li><p><strong>**kwargs</strong> – keyword arguments to pass to mpl_draw</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="rxn_network.pathways.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">rxn_network.pathways</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="rxn_network.jobs.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">rxn_network.jobs</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">rxn_network.network</a><ul>
+<li><a class="reference internal" href="#module-rxn_network.network.base">rxn_network.network.base</a><ul>
+<li><a class="reference internal" href="#rxn_network.network.base.Network"><code class="docutils literal notranslate"><span class="pre">Network</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.build"><code class="docutils literal notranslate"><span class="pre">Network.build()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.find_pathways"><code class="docutils literal notranslate"><span class="pre">Network.find_pathways()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.set_precursors"><code class="docutils literal notranslate"><span class="pre">Network.set_precursors()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.set_target"><code class="docutils literal notranslate"><span class="pre">Network.set_target()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.as_dict"><code class="docutils literal notranslate"><span class="pre">Network.as_dict()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.from_dict"><code class="docutils literal notranslate"><span class="pre">Network.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.precursors"><code class="docutils literal notranslate"><span class="pre">Network.precursors</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.target"><code class="docutils literal notranslate"><span class="pre">Network.target</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.graph"><code class="docutils literal notranslate"><span class="pre">Network.graph</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Network.chemsys"><code class="docutils literal notranslate"><span class="pre">Network.chemsys</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.network.base.Graph"><code class="docutils literal notranslate"><span class="pre">Graph</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.network.base.Graph.as_dict"><code class="docutils literal notranslate"><span class="pre">Graph.as_dict()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.base.Graph.from_dict"><code class="docutils literal notranslate"><span class="pre">Graph.from_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.network.entry">rxn_network.network.entry</a><ul>
+<li><a class="reference internal" href="#rxn_network.network.entry.NetworkEntryType"><code class="docutils literal notranslate"><span class="pre">NetworkEntryType</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.entry.NetworkEntry"><code class="docutils literal notranslate"><span class="pre">NetworkEntry</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.network.entry.NetworkEntry.as_dict"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.as_dict()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.entry.NetworkEntry.from_dict"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.from_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.network.entry.DummyEntry"><code class="docutils literal notranslate"><span class="pre">DummyEntry</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.network.network">rxn_network.network.network</a><ul>
+<li><a class="reference internal" href="#rxn_network.network.network.ReactionNetwork"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.network.network.ReactionNetwork.build"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork.build()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.network.ReactionNetwork.find_pathways"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork.find_pathways()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.network.ReactionNetwork.set_precursors"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork.set_precursors()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.network.ReactionNetwork.set_target"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork.set_target()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.network.network.get_rxn_nodes_and_edges"><code class="docutils literal notranslate"><span class="pre">get_rxn_nodes_and_edges()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.network.get_loopback_edges"><code class="docutils literal notranslate"><span class="pre">get_loopback_edges()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.network.get_edge_weight"><code class="docutils literal notranslate"><span class="pre">get_edge_weight()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.network.network.yens_ksp"><code class="docutils literal notranslate"><span class="pre">yens_ksp()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.network.visualize">rxn_network.network.visualize</a><ul>
+<li><a class="reference internal" href="#rxn_network.network.visualize.plot_network"><code class="docutils literal notranslate"><span class="pre">plot_network()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=521b6f53"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>

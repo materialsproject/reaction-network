@@ -1,0 +1,905 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="rxn_network.core" href="rxn_network.core.html" /><link rel="prev" title="License" href="license.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+        <title>rxn_network - reaction-network</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials.html">Notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.jobs.html">rxn_network.jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.network.html">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="rxn-network">
+<h1>rxn_network<a class="headerlink" href="#rxn-network" title="Link to this heading">#</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.core.html">rxn_network.core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition"><code class="docutils literal notranslate"><span class="pre">Composition</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition.reduced_formula"><code class="docutils literal notranslate"><span class="pre">Composition.reduced_formula</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.costs.html">rxn_network.costs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.costs.html#module-rxn_network.costs.base">rxn_network.costs.base</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.Calculator"><code class="docutils literal notranslate"><span class="pre">Calculator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.Calculator.calculate"><code class="docutils literal notranslate"><span class="pre">Calculator.calculate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.Calculator.calculate_many"><code class="docutils literal notranslate"><span class="pre">Calculator.calculate_many()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.Calculator.decorate"><code class="docutils literal notranslate"><span class="pre">Calculator.decorate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.Calculator.decorate_many"><code class="docutils literal notranslate"><span class="pre">Calculator.decorate_many()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction"><code class="docutils literal notranslate"><span class="pre">CostFunction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction.evaluate"><code class="docutils literal notranslate"><span class="pre">CostFunction.evaluate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.costs.html#module-rxn_network.costs.calculators">rxn_network.costs.calculators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.ChempotDistanceCalculator"><code class="docutils literal notranslate"><span class="pre">ChempotDistanceCalculator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.ChempotDistanceCalculator.calculate"><code class="docutils literal notranslate"><span class="pre">ChempotDistanceCalculator.calculate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.ChempotDistanceCalculator.from_entries"><code class="docutils literal notranslate"><span class="pre">ChempotDistanceCalculator.from_entries()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.PrimaryCompetitionCalculator"><code class="docutils literal notranslate"><span class="pre">PrimaryCompetitionCalculator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.PrimaryCompetitionCalculator.calculate"><code class="docutils literal notranslate"><span class="pre">PrimaryCompetitionCalculator.calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionCalculator"><code class="docutils literal notranslate"><span class="pre">SecondaryCompetitionCalculator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionCalculator.calculate"><code class="docutils literal notranslate"><span class="pre">SecondaryCompetitionCalculator.calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionWithEhullCalculator"><code class="docutils literal notranslate"><span class="pre">SecondaryCompetitionWithEhullCalculator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionWithEhullCalculator.calculate"><code class="docutils literal notranslate"><span class="pre">SecondaryCompetitionWithEhullCalculator.calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionMaxCalculator"><code class="docutils literal notranslate"><span class="pre">SecondaryCompetitionMaxCalculator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionMaxCalculator.calculate"><code class="docutils literal notranslate"><span class="pre">SecondaryCompetitionMaxCalculator.calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionAreaCalculator"><code class="docutils literal notranslate"><span class="pre">SecondaryCompetitionAreaCalculator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionAreaCalculator.calculate"><code class="docutils literal notranslate"><span class="pre">SecondaryCompetitionAreaCalculator.calculate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.costs.html#module-rxn_network.costs.functions">rxn_network.costs.functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.functions.Softplus"><code class="docutils literal notranslate"><span class="pre">Softplus</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.functions.Softplus.evaluate"><code class="docutils literal notranslate"><span class="pre">Softplus.evaluate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.functions.WeightedSum"><code class="docutils literal notranslate"><span class="pre">WeightedSum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.functions.WeightedSum.evaluate"><code class="docutils literal notranslate"><span class="pre">WeightedSum.evaluate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.costs.html#module-rxn_network.costs.pareto">rxn_network.costs.pareto</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.pareto.get_pareto_front"><code class="docutils literal notranslate"><span class="pre">get_pareto_front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.pareto.is_pareto_efficient"><code class="docutils literal notranslate"><span class="pre">is_pareto_efficient()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.data.html">rxn_network.data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.data.html#rxn_network.data.load_experimental_data"><code class="docutils literal notranslate"><span class="pre">load_experimental_data()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.data.html#rxn_network.data.make_float_keys"><code class="docutils literal notranslate"><span class="pre">make_float_keys()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.entries.html">rxn_network.entries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html#module-rxn_network.entries.corrections">rxn_network.entries.corrections</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonateCorrection"><code class="docutils literal notranslate"><span class="pre">CarbonateCorrection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonateCorrection.num_ions"><code class="docutils literal notranslate"><span class="pre">CarbonateCorrection.num_ions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonateCorrection.carbonate_correction"><code class="docutils literal notranslate"><span class="pre">CarbonateCorrection.carbonate_correction</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html#module-rxn_network.entries.entry_set">rxn_network.entries.entry_set</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.normal"><code class="docutils literal notranslate"><span class="pre">normal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.add"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.update"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.discard"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.discard()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.pd_dict"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.pd_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_subset_in_chemsys"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_subset_in_chemsys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.filter_by_stability"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.filter_by_stability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.build_indices"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.build_indices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_min_entry_by_formula"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_min_entry_by_formula()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_stabilized_entry"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_stabilized_entry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_new_temperature"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_entries_with_new_temperature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_jitter"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_entries_with_jitter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_interpolated_entry"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_interpolated_entry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_e_above_hull"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_e_above_hull()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.from_pd"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.from_pd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.copy"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.as_dict"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.from_computed_entries"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.from_computed_entries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.entries_list"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.entries_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.min_entries_by_formula"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.min_entries_by_formula</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.temperature"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.temperature</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.chemsys"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.chemsys</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html#module-rxn_network.entries.experimental">rxn_network.entries.experimental</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.get_new_temperature"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.get_new_temperature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.to_grand_entry"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.to_grand_entry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.temperature"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.temperature</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_experimental"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.is_experimental</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_element"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.is_element</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.unique_id"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.unique_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.as_dict"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.from_dict"><code class="docutils literal notranslate"><span class="pre">ExperimentalReferenceEntry.from_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html#module-rxn_network.entries.freed">rxn_network.entries.freed</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.freed.FREEDReferenceEntry"><code class="docutils literal notranslate"><span class="pre">FREEDReferenceEntry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html#module-rxn_network.entries.gibbs">rxn_network.entries.gibbs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.get_new_temperature"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.get_new_temperature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.gibbs_adjustment"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.gibbs_adjustment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.to_grand_entry"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.to_grand_entry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.copy"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.from_structure"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.from_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.is_experimental"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.is_experimental</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.unique_id"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.unique_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.as_dict"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.from_dict"><code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry.from_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html#module-rxn_network.entries.interpolated">rxn_network.entries.interpolated</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry.to_grand_entry"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.to_grand_entry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry.unique_id"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.unique_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry.is_experimental"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.is_experimental</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html#module-rxn_network.entries.nist">rxn_network.entries.nist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.nist.NISTReferenceEntry"><code class="docutils literal notranslate"><span class="pre">NISTReferenceEntry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html#module-rxn_network.entries.utils">rxn_network.entries.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.utils.process_entries"><code class="docutils literal notranslate"><span class="pre">process_entries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.utils.initialize_entry"><code class="docutils literal notranslate"><span class="pre">initialize_entry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.utils.get_entries"><code class="docutils literal notranslate"><span class="pre">get_entries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.utils.get_all_entries_in_chemsys"><code class="docutils literal notranslate"><span class="pre">get_all_entries_in_chemsys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.utils.parse_criteria"><code class="docutils literal notranslate"><span class="pre">parse_criteria()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.enumerators.html">rxn_network.enumerators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.enumerators.html#module-rxn_network.enumerators.base">rxn_network.enumerators.base</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.base.Enumerator"><code class="docutils literal notranslate"><span class="pre">Enumerator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.base.Enumerator.enumerate"><code class="docutils literal notranslate"><span class="pre">Enumerator.enumerate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.enumerators.html#module-rxn_network.enumerators.basic">rxn_network.enumerators.basic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator"><code class="docutils literal notranslate"><span class="pre">BasicEnumerator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator.enumerate"><code class="docutils literal notranslate"><span class="pre">BasicEnumerator.enumerate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator.stabilize"><code class="docutils literal notranslate"><span class="pre">BasicEnumerator.stabilize</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator.build_pd"><code class="docutils literal notranslate"><span class="pre">BasicEnumerator.build_pd</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator.build_grand_pd"><code class="docutils literal notranslate"><span class="pre">BasicEnumerator.build_grand_pd</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicOpenEnumerator"><code class="docutils literal notranslate"><span class="pre">BasicOpenEnumerator</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.enumerators.html#module-rxn_network.enumerators.minimize">rxn_network.enumerators.minimize</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.minimize.MinimizeGibbsEnumerator"><code class="docutils literal notranslate"><span class="pre">MinimizeGibbsEnumerator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.minimize.MinimizeGrandPotentialEnumerator"><code class="docutils literal notranslate"><span class="pre">MinimizeGrandPotentialEnumerator</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.enumerators.html#module-rxn_network.enumerators.utils">rxn_network.enumerators.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.utils.get_computed_rxn"><code class="docutils literal notranslate"><span class="pre">get_computed_rxn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.utils.react_interface"><code class="docutils literal notranslate"><span class="pre">react_interface()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.utils.get_elems_set"><code class="docutils literal notranslate"><span class="pre">get_elems_set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.utils.get_total_chemsys_str"><code class="docutils literal notranslate"><span class="pre">get_total_chemsys_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.utils.group_by_chemsys"><code class="docutils literal notranslate"><span class="pre">group_by_chemsys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.utils.stabilize_entries"><code class="docutils literal notranslate"><span class="pre">stabilize_entries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.utils.run_enumerators"><code class="docutils literal notranslate"><span class="pre">run_enumerators()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.flows.html">rxn_network.flows</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.flows.html#rxn_network.flows.core.SynthesisPlanningFlowMaker"><code class="docutils literal notranslate"><span class="pre">SynthesisPlanningFlowMaker</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.flows.html#rxn_network.flows.core.SynthesisPlanningFlowMaker.make"><code class="docutils literal notranslate"><span class="pre">SynthesisPlanningFlowMaker.make()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.flows.html#rxn_network.flows.core.NetworkFlowMaker"><code class="docutils literal notranslate"><span class="pre">NetworkFlowMaker</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.flows.html#rxn_network.flows.core.NetworkFlowMaker.make"><code class="docutils literal notranslate"><span class="pre">NetworkFlowMaker.make()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.jobs.html">rxn_network.jobs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.jobs.html#module-rxn_network.jobs.core">rxn_network.jobs.core</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.GetEntrySetMaker"><code class="docutils literal notranslate"><span class="pre">GetEntrySetMaker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.GetEntrySetMaker.make"><code class="docutils literal notranslate"><span class="pre">GetEntrySetMaker.make()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.ReactionEnumerationMaker"><code class="docutils literal notranslate"><span class="pre">ReactionEnumerationMaker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.ReactionEnumerationMaker.make"><code class="docutils literal notranslate"><span class="pre">ReactionEnumerationMaker.make()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.CalculateCompetitionMaker"><code class="docutils literal notranslate"><span class="pre">CalculateCompetitionMaker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.CalculateCompetitionMaker.make"><code class="docutils literal notranslate"><span class="pre">CalculateCompetitionMaker.make()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.NetworkMaker"><code class="docutils literal notranslate"><span class="pre">NetworkMaker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.NetworkMaker.make"><code class="docutils literal notranslate"><span class="pre">NetworkMaker.make()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.PathwaySolverMaker"><code class="docutils literal notranslate"><span class="pre">PathwaySolverMaker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.core.PathwaySolverMaker.make"><code class="docutils literal notranslate"><span class="pre">PathwaySolverMaker.make()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.jobs.html#module-rxn_network.jobs.schema">rxn_network.jobs.schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.task_label"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.task_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.last_updated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.entries"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.entries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.e_above_hull"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.e_above_hull</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.include_polymorphs"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.include_polymorphs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.formulas_to_include"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.formulas_to_include</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.task_label"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.task_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.last_updated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.rxns"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.rxns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.targets"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.targets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.elements"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.elements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.chemsys"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.chemsys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.added_elements"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.added_elements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.added_chemsys"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.added_chemsys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.enumerators"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.enumerators</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.task_label"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.task_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.last_updated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.rxns"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.rxns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.target_formula"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.target_formula</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.open_elem"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.open_elem</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.chempot"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.chempot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.added_elements"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.added_elements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.added_chemsys"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.added_chemsys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.calculate_competition"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.calculate_competition</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.calculate_chempot_distances"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.calculate_chempot_distances</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.temp"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.temp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.batch_size"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.batch_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.cpd_kwargs"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.cpd_kwargs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.task_label"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.task_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.last_updated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.network"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.network</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.paths"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.paths</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.k"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.k</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.precursors"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.precursors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.targets"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.targets</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.task_label"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.task_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.last_updated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.solver"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.solver</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.balanced_paths"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.balanced_paths</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.precursors"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.precursors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.targets"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.targets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.net_rxn"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.net_rxn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.max_num_combos"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.max_num_combos</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.find_intermediate_rxns"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.find_intermediate_rxns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.intermediate_rxn_energy_cutoff"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.intermediate_rxn_energy_cutoff</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_basic_enumerator"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.use_basic_enumerator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_minimize_enumerator"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.use_minimize_enumerator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.filter_interdependent"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.filter_interdependent</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.jobs.html#module-rxn_network.jobs.utils">rxn_network.jobs.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.jobs.html#rxn_network.jobs.utils.get_added_elem_data"><code class="docutils literal notranslate"><span class="pre">get_added_elem_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.network.html">rxn_network.network</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.network.html#module-rxn_network.network.base">rxn_network.network.base</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network"><code class="docutils literal notranslate"><span class="pre">Network</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.build"><code class="docutils literal notranslate"><span class="pre">Network.build()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.find_pathways"><code class="docutils literal notranslate"><span class="pre">Network.find_pathways()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.set_precursors"><code class="docutils literal notranslate"><span class="pre">Network.set_precursors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.set_target"><code class="docutils literal notranslate"><span class="pre">Network.set_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.as_dict"><code class="docutils literal notranslate"><span class="pre">Network.as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.from_dict"><code class="docutils literal notranslate"><span class="pre">Network.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.precursors"><code class="docutils literal notranslate"><span class="pre">Network.precursors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.target"><code class="docutils literal notranslate"><span class="pre">Network.target</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.graph"><code class="docutils literal notranslate"><span class="pre">Network.graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network.chemsys"><code class="docutils literal notranslate"><span class="pre">Network.chemsys</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Graph"><code class="docutils literal notranslate"><span class="pre">Graph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Graph.as_dict"><code class="docutils literal notranslate"><span class="pre">Graph.as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Graph.from_dict"><code class="docutils literal notranslate"><span class="pre">Graph.from_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.network.html#module-rxn_network.network.entry">rxn_network.network.entry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntryType"><code class="docutils literal notranslate"><span class="pre">NetworkEntryType</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry"><code class="docutils literal notranslate"><span class="pre">NetworkEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.as_dict"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.from_dict"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.from_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.DummyEntry"><code class="docutils literal notranslate"><span class="pre">DummyEntry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.network.html#module-rxn_network.network.network">rxn_network.network.network</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork.build"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork.build()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork.find_pathways"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork.find_pathways()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork.set_precursors"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork.set_precursors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork.set_target"><code class="docutils literal notranslate"><span class="pre">ReactionNetwork.set_target()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.network.get_rxn_nodes_and_edges"><code class="docutils literal notranslate"><span class="pre">get_rxn_nodes_and_edges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.network.get_loopback_edges"><code class="docutils literal notranslate"><span class="pre">get_loopback_edges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.network.get_edge_weight"><code class="docutils literal notranslate"><span class="pre">get_edge_weight()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.network.yens_ksp"><code class="docutils literal notranslate"><span class="pre">yens_ksp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.network.html#module-rxn_network.network.visualize">rxn_network.network.visualize</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.visualize.plot_network"><code class="docutils literal notranslate"><span class="pre">plot_network()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.pathways.html">rxn_network.pathways</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html#module-rxn_network.pathways.balanced">rxn_network.pathways.balanced</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway"><code class="docutils literal notranslate"><span class="pre">BalancedPathway</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.get_comp_matrix"><code class="docutils literal notranslate"><span class="pre">BalancedPathway.get_comp_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.get_coeff_vector_for_rxn"><code class="docutils literal notranslate"><span class="pre">BalancedPathway.get_coeff_vector_for_rxn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.contains_interdependent_rxns"><code class="docutils literal notranslate"><span class="pre">BalancedPathway.contains_interdependent_rxns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.balance"><code class="docutils literal notranslate"><span class="pre">BalancedPathway.balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.average_cost"><code class="docutils literal notranslate"><span class="pre">BalancedPathway.average_cost</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html#module-rxn_network.pathways.base">rxn_network.pathways.base</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway"><code class="docutils literal notranslate"><span class="pre">Pathway</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.entries"><code class="docutils literal notranslate"><span class="pre">Pathway.entries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.all_reactants"><code class="docutils literal notranslate"><span class="pre">Pathway.all_reactants</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.all_products"><code class="docutils literal notranslate"><span class="pre">Pathway.all_products</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.compositions"><code class="docutils literal notranslate"><span class="pre">Pathway.compositions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.reactants"><code class="docutils literal notranslate"><span class="pre">Pathway.reactants</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.products"><code class="docutils literal notranslate"><span class="pre">Pathway.products</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.intermediates"><code class="docutils literal notranslate"><span class="pre">Pathway.intermediates</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.energy"><code class="docutils literal notranslate"><span class="pre">Pathway.energy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.energy_per_atom"><code class="docutils literal notranslate"><span class="pre">Pathway.energy_per_atom</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html#module-rxn_network.pathways.basic">rxn_network.pathways.basic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway"><code class="docutils literal notranslate"><span class="pre">BasicPathway</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway.reactions"><code class="docutils literal notranslate"><span class="pre">BasicPathway.reactions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway.total_cost"><code class="docutils literal notranslate"><span class="pre">BasicPathway.total_cost</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway.is_experimental"><code class="docutils literal notranslate"><span class="pre">BasicPathway.is_experimental</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html#module-rxn_network.pathways.pathway_set">rxn_network.pathways.pathway_set</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet"><code class="docutils literal notranslate"><span class="pre">PathwaySet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet.paths"><code class="docutils literal notranslate"><span class="pre">PathwaySet.paths</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet.from_paths"><code class="docutils literal notranslate"><span class="pre">PathwaySet.from_paths()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html#module-rxn_network.pathways.plotting">rxn_network.pathways.plotting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter"><code class="docutils literal notranslate"><span class="pre">PathwayPlotter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.plot_pathway"><code class="docutils literal notranslate"><span class="pre">PathwayPlotter.plot_pathway()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.plot_energy_cascade"><code class="docutils literal notranslate"><span class="pre">PathwayPlotter.plot_energy_cascade()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.elems"><code class="docutils literal notranslate"><span class="pre">PathwayPlotter.elems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.num_atoms_df"><code class="docutils literal notranslate"><span class="pre">PathwayPlotter.num_atoms_df</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.formulas"><code class="docutils literal notranslate"><span class="pre">PathwayPlotter.formulas</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.df"><code class="docutils literal notranslate"><span class="pre">PathwayPlotter.df</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.compositions"><code class="docutils literal notranslate"><span class="pre">PathwayPlotter.compositions</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html#module-rxn_network.pathways.solver">rxn_network.pathways.solver</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver"><code class="docutils literal notranslate"><span class="pre">Solver</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.pathways"><code class="docutils literal notranslate"><span class="pre">Solver.pathways</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.reactions"><code class="docutils literal notranslate"><span class="pre">Solver.reactions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.costs"><code class="docutils literal notranslate"><span class="pre">Solver.costs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.num_rxns"><code class="docutils literal notranslate"><span class="pre">Solver.num_rxns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.num_entries"><code class="docutils literal notranslate"><span class="pre">Solver.num_entries</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.PathwaySolver"><code class="docutils literal notranslate"><span class="pre">PathwaySolver</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.PathwaySolver.solve"><code class="docutils literal notranslate"><span class="pre">PathwaySolver.solve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.PathwaySolver.entries"><code class="docutils literal notranslate"><span class="pre">PathwaySolver.entries</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.reactions.html">rxn_network.reactions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html#module-rxn_network.reactions.base">rxn_network.reactions.base</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction"><code class="docutils literal notranslate"><span class="pre">Reaction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.reactants"><code class="docutils literal notranslate"><span class="pre">Reaction.reactants</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.products"><code class="docutils literal notranslate"><span class="pre">Reaction.products</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.coefficients"><code class="docutils literal notranslate"><span class="pre">Reaction.coefficients</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.energy"><code class="docutils literal notranslate"><span class="pre">Reaction.energy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.compositions"><code class="docutils literal notranslate"><span class="pre">Reaction.compositions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.elements"><code class="docutils literal notranslate"><span class="pre">Reaction.elements</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html#module-rxn_network.reactions.basic">rxn_network.reactions.basic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction"><code class="docutils literal notranslate"><span class="pre">BasicReaction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.balance"><code class="docutils literal notranslate"><span class="pre">BasicReaction.balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.normalize_to"><code class="docutils literal notranslate"><span class="pre">BasicReaction.normalize_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.normalize_to_element"><code class="docutils literal notranslate"><span class="pre">BasicReaction.normalize_to_element()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.get_el_amount"><code class="docutils literal notranslate"><span class="pre">BasicReaction.get_el_amount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.get_coeff"><code class="docutils literal notranslate"><span class="pre">BasicReaction.get_coeff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.normalized_repr_and_factor"><code class="docutils literal notranslate"><span class="pre">BasicReaction.normalized_repr_and_factor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.copy"><code class="docutils literal notranslate"><span class="pre">BasicReaction.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.reverse"><code class="docutils literal notranslate"><span class="pre">BasicReaction.reverse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.is_separable"><code class="docutils literal notranslate"><span class="pre">BasicReaction.is_separable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.reactant_atomic_fractions"><code class="docutils literal notranslate"><span class="pre">BasicReaction.reactant_atomic_fractions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.product_atomic_fractions"><code class="docutils literal notranslate"><span class="pre">BasicReaction.product_atomic_fractions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.reactant_molar_fractions"><code class="docutils literal notranslate"><span class="pre">BasicReaction.reactant_molar_fractions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.product_molar_fractions"><code class="docutils literal notranslate"><span class="pre">BasicReaction.product_molar_fractions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.from_string"><code class="docutils literal notranslate"><span class="pre">BasicReaction.from_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.from_formulas"><code class="docutils literal notranslate"><span class="pre">BasicReaction.from_formulas()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.reactants"><code class="docutils literal notranslate"><span class="pre">BasicReaction.reactants</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.products"><code class="docutils literal notranslate"><span class="pre">BasicReaction.products</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.compositions"><code class="docutils literal notranslate"><span class="pre">BasicReaction.compositions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.coefficients"><code class="docutils literal notranslate"><span class="pre">BasicReaction.coefficients</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.num_atoms"><code class="docutils literal notranslate"><span class="pre">BasicReaction.num_atoms</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.energy"><code class="docutils literal notranslate"><span class="pre">BasicReaction.energy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.energy_per_atom"><code class="docutils literal notranslate"><span class="pre">BasicReaction.energy_per_atom</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.is_identity"><code class="docutils literal notranslate"><span class="pre">BasicReaction.is_identity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.chemical_system"><code class="docutils literal notranslate"><span class="pre">BasicReaction.chemical_system</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.normalized_repr"><code class="docutils literal notranslate"><span class="pre">BasicReaction.normalized_repr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html#module-rxn_network.reactions.computed">rxn_network.reactions.computed</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction"><code class="docutils literal notranslate"><span class="pre">ComputedReaction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.balance"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.get_new_temperature"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.get_new_temperature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.energy"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.energy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.energy_per_atom"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.energy_per_atom</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.energy_uncertainty"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.energy_uncertainty</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.energy_uncertainty_per_atom"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.energy_uncertainty_per_atom</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.entries"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.entries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.copy"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.reverse"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.reverse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.normalize_to"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.normalize_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.normalize_to_element"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.normalize_to_element()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html#module-rxn_network.reactions.hull">rxn_network.reactions.hull</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.plot"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_energy_above_hull"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_energy_above_hull()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_coordinate"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_coordinate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_hull_energy"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_hull_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_reactions_by_coordinate"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_reactions_by_coordinate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_primary_competition"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_primary_competition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_secondary_competition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_max_energy"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_secondary_competition_max_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_area"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_secondary_competition_area()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_decomposition_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_coords_in_range"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_coords_in_range()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.count"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.stable_reactions"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.stable_reactions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.unstable_reactions"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.unstable_reactions</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html#module-rxn_network.reactions.open">rxn_network.reactions.open</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.balance"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.get_new_temperature"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.get_new_temperature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.energy"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.energy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.elements"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.elements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.total_chemical_system"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.total_chemical_system</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.copy"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.reverse"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.reverse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.reactant_atomic_fractions"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.reactant_atomic_fractions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.product_atomic_fractions"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.product_atomic_fractions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.as_dict"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.from_dict"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.from_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html#module-rxn_network.reactions.plotting">rxn_network.reactions.plotting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.plotting.plot_reaction_scatter"><code class="docutils literal notranslate"><span class="pre">plot_reaction_scatter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.plotting.pretty_df_layout"><code class="docutils literal notranslate"><span class="pre">pretty_df_layout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.plotting.filter_df_by_precursors"><code class="docutils literal notranslate"><span class="pre">filter_df_by_precursors()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html#module-rxn_network.reactions.reaction_set">rxn_network.reactions.reaction_set</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet"><code class="docutils literal notranslate"><span class="pre">ReactionSet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.get_rxns"><code class="docutils literal notranslate"><span class="pre">ReactionSet.get_rxns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.from_rxns"><code class="docutils literal notranslate"><span class="pre">ReactionSet.from_rxns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.to_dataframe"><code class="docutils literal notranslate"><span class="pre">ReactionSet.to_dataframe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.calculate_costs"><code class="docutils literal notranslate"><span class="pre">ReactionSet.calculate_costs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.add_rxns"><code class="docutils literal notranslate"><span class="pre">ReactionSet.add_rxns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.add_rxn_set"><code class="docutils literal notranslate"><span class="pre">ReactionSet.add_rxn_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.get_rxns_by_reactants"><code class="docutils literal notranslate"><span class="pre">ReactionSet.get_rxns_by_reactants()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.get_rxns_by_product"><code class="docutils literal notranslate"><span class="pre">ReactionSet.get_rxns_by_product()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.filter_duplicates"><code class="docutils literal notranslate"><span class="pre">ReactionSet.filter_duplicates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.set_chempot"><code class="docutils literal notranslate"><span class="pre">ReactionSet.set_chempot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.set_new_temperature"><code class="docutils literal notranslate"><span class="pre">ReactionSet.set_new_temperature()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.thermo.html">rxn_network.thermo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.thermo.html#module-rxn_network.thermo.chempot_diagram">rxn_network.thermo.chempot_diagram</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram"><code class="docutils literal notranslate"><span class="pre">ChemicalPotentialDiagram</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.shortest_domain_distance"><code class="docutils literal notranslate"><span class="pre">ChemicalPotentialDiagram.shortest_domain_distance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.get_offset"><code class="docutils literal notranslate"><span class="pre">ChemicalPotentialDiagram.get_offset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.domains"><code class="docutils literal notranslate"><span class="pre">ChemicalPotentialDiagram.domains</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.metastable_domains"><code class="docutils literal notranslate"><span class="pre">ChemicalPotentialDiagram.metastable_domains</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.hs_int"><code class="docutils literal notranslate"><span class="pre">ChemicalPotentialDiagram.hs_int</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.thermo.html#module-rxn_network.thermo.utils">rxn_network.thermo.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.thermo.html#rxn_network.thermo.utils.expand_pd"><code class="docutils literal notranslate"><span class="pre">expand_pd()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rxn_network.utils.html">rxn_network.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.utils.html#module-rxn_network.utils.funcs">rxn_network.utils.funcs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.utils.html#rxn_network.utils.funcs.limited_powerset"><code class="docutils literal notranslate"><span class="pre">limited_powerset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.utils.html#rxn_network.utils.funcs.grouper"><code class="docutils literal notranslate"><span class="pre">grouper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.utils.html#rxn_network.utils.funcs.get_project_root"><code class="docutils literal notranslate"><span class="pre">get_project_root()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.utils.html#rxn_network.utils.funcs.get_logger"><code class="docutils literal notranslate"><span class="pre">get_logger()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.utils.html#rxn_network.utils.funcs.datetime_str"><code class="docutils literal notranslate"><span class="pre">datetime_str()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.utils.html#module-rxn_network.utils.ray">rxn_network.utils.ray</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.utils.html#rxn_network.utils.ray.initialize_ray"><code class="docutils literal notranslate"><span class="pre">initialize_ray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rxn_network.utils.html#rxn_network.utils.ray.to_iterator"><code class="docutils literal notranslate"><span class="pre">to_iterator()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="rxn_network.core.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">rxn_network.core</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="license.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">License</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=521b6f53"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>

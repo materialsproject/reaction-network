@@ -1,0 +1,1069 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="rxn_network.network" href="rxn_network.network.html" /><link rel="prev" title="rxn_network.flows" href="rxn_network.flows.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+        <title>rxn_network.jobs - reaction-network</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials.html">Notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="rxn_network.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">rxn_network.jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.network.html">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="rxn-network-jobs">
+<h1>rxn_network.jobs<a class="headerlink" href="#rxn-network-jobs" title="Link to this heading">#</a></h1>
+<section id="module-rxn_network.jobs.core">
+<span id="rxn-network-jobs-core"></span><h2>rxn_network.jobs.core<a class="headerlink" href="#module-rxn_network.jobs.core" title="Link to this heading">#</a></h2>
+<p>Core jobs for reaction network creation and analysis.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.GetEntrySetMaker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.core.</span></span><span class="sig-name descname"><span class="pre">GetEntrySetMaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name='get_and_process_entries'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature=300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_above_hull=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_at_temperature=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_nist_data=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_freed_data=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_polymorphs=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formulas_to_include=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_e_above_hulls=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_nist_solids=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_entries=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MP_API_KEY=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_db_name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_data=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#GetEntrySetMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.GetEntrySetMaker" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Maker</span></code></p>
+<p>Maker to create job for acquiring and processing entries to be used in reaction
+enumeration or network building. See GibbsEntrySet for more information about how
+these are constructed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the job.</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Temperature [K] for determining Gibbs Free Energy of
+formation, dGf(T).</p></li>
+<li><p><strong>e_above_hull</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Energy above hull (eV/atom) for thermodynamic stability threshold;
+i.e., include all entries with energies below this value.</p></li>
+<li><p><strong>filter_at_temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> | </em><em>None</em>) – Temperature (in Kelvin) at which entries are filtered for
+thermodynamic stability (e.g., room temperature). Generally, this often
+differs from the synthesis temperature.</p></li>
+<li><p><strong>include_nist_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to include NIST-JANAF data in the entry set.
+Defaults to True.</p></li>
+<li><p><strong>include_freed_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to include FREED data in the entry set. Defaults
+to False. WARNING: This dataset has not been thoroughly tested. Use at
+your own risk!</p></li>
+<li><p><strong>formulas_to_include</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – An iterable of compositional formulas to ensure are
+included in the processed dataset. Sometimes, entries are filtered out that
+one would like to include, or entries don’t exist for those compositions.</p></li>
+<li><p><strong>calculate_e_above_hulls</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to calculate e_above_hull and store as an
+attribute in the data dictionary for each entry. Defaults to True.</p></li>
+<li><p><strong>ignore_nist_solids</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to ignore NIST data for solids with high melting
+points (Tm &gt;= 1500 ºC). Defaults to True.</p></li>
+<li><p><strong>custom_entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – An optional list of user-created entries that will be added to
+the final entry set.</p></li>
+<li><p><strong>MP_API_KEY</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – The Materials Project API key to use for querying MP using mp-api.
+If not provided, this will default to whatever is stored through
+configuration settings on the user’s machine.</p></li>
+<li><p><strong>entry_db_name</strong> (<em>for internal use only</em>) – if not None, then this method will use an
+internal materials databse using the get_all_entries_in_chemsys() method. If
+you wish to use this approach, you may need to reconfigure that method.</p></li>
+<li><p><strong>property_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – a list of attributes to ensure are included in each entry’s data,
+if available. This currently only applies to those using a custom entry DB
+(see above).</p></li>
+<li><p><strong>include_polymorphs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.GetEntrySetMaker.make">
+<span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chemsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#GetEntrySetMaker.make"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.GetEntrySetMaker.make" title="Link to this definition">#</a></dt>
+<dd><p>Returns a job that acquires a GibbsEntrySet for the desired chemical system.</p>
+<p>NOTE: This job stores the entry set in an additional store called
+“entries”. This needs to be configured through a user’s jobflow.yaml file. See
+“additional_stores”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chemsys</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The chemical system of the entry set to be acquired.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.ReactionEnumerationMaker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.core.</span></span><span class="sig-name descname"><span class="pre">ReactionEnumerationMaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'enumerate_reactions'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#ReactionEnumerationMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.ReactionEnumerationMaker" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Maker</span></code></p>
+<p>Maker to create a job for enumerating reactions from a set of entries. This is
+effectively a wrapper to the run_enumerators() function (see enumerators.utils) with
+a defined output document.</p>
+<p>If you use this code in your own work, please consider citing this paper:</p>
+<blockquote>
+<div><p>McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+Communications 2021, 12 (1), 3097. <a class="reference external" href="https://doi.org/10.1038/s41467-021-23339-x">https://doi.org/10.1038/s41467-021-23339-x</a>.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the job. This is automatically created if not provided.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.ReactionEnumerationMaker.make">
+<span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enumerators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#ReactionEnumerationMaker.make"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.ReactionEnumerationMaker.make" title="Link to this definition">#</a></dt>
+<dd><p>Returns a job that enumerates reactions from a set of entries.</p>
+<p>NOTE: This job stores the reaction set in an additional store called
+“rxns”. This needs to be configured through a user’s jobflow.yaml file. See
+“additional_stores”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>enumerators</strong> (<em>Iterable</em><em>[</em><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.base.Enumerator" title="rxn_network.enumerators.base.Enumerator"><em>Enumerator</em></a><em>]</em>) – An iterable of enumerators to perform enumeration (e.g.,
+[BasicEnumerator, BasicOpenEnumerator])</p></li>
+<li><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – An entry set provided to each of the enumerators</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.CalculateCompetitionMaker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.core.</span></span><span class="sig-name descname"><span class="pre">CalculateCompetitionMaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name='calculate_competition'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_elem=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chempot=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_competition=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_chempot_distances=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size=100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpd_kwargs=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#CalculateCompetitionMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.CalculateCompetitionMaker" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Maker</span></code></p>
+<p>Maker to create job for calculating selectivities of a set of reactions given a
+provided target formula. This is a component of the SynthesisPlanningFlowMaker.</p>
+<p>If you use this code in your work, please consider citing the following work:</p>
+<blockquote>
+<div><p>McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
+A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
+Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
+Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
+August 22, 2023. <a class="reference external" href="https://doi.org/10.48550/arXiv.2308.11816">https://doi.org/10.48550/arXiv.2308.11816</a>.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the job. Automatically created if not provided.</p></li>
+<li><p><strong>open_elem</strong> (<em>Element</em><em> | </em><em>None</em>) – An optional open element for performing selectivity calculations</p></li>
+<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – A (relative) chemical potential of the open element, if any. Defaults
+to 0 eV/atom.</p></li>
+<li><p><strong>calculate_competition</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether or not to calculate competition scores for
+reactions. See PrimaryCompetitionCalculator and
+SecondaryCompetitionCalculator. Defaults to True.</p></li>
+<li><p><strong>calculate_chempot_distances</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether or not to calculate chemical potential
+distances for reactions. See ChempotDistanceCalculator. Defaults to True.</p></li>
+<li><p><strong>chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of reactions to put into each parallelized chunk. See
+class variable, CHUNK_SIZE. This will automatically be re-computed if
+out-of-memory issues are anticipated.</p></li>
+<li><p><strong>cpd_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Optional keyword arguments passed to ChempotDistanceCalculator.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.CalculateCompetitionMaker.make">
+<span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rxn_sets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_formula</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#CalculateCompetitionMaker.make"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.CalculateCompetitionMaker.make" title="Link to this definition">#</a></dt>
+<dd><p>Returns a job that calculates competition scores and/or chemical potential
+distances for all synthesis reactions to a target phase given a provided list of
+reaction sets.</p>
+<p>NOTE: This job stores the reaction set in an additional store called
+“rxns”. This needs to be configured through a user’s jobflow.yaml file. See
+“additional_stores”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rxn_sets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet" title="rxn_network.reactions.reaction_set.ReactionSet"><em>ReactionSet</em></a><em>]</em>) – a list of reaction sets making up all enumerated reactions in the
+chemical reaction network of interest. These will automatically be
+combined and reprocessed to match the specified conditions (open_elem +
+chempot).</p></li>
+<li><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – The entry set used to enumerate all provided reactions. This will
+be used to facilitate selectivity calculations and ensure all reaction
+sets can be easily combined.</p></li>
+<li><p><strong>target_formula</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The formula of the desired target phase. This will be used
+to identify all synthesis reactions (i.e., those that produce the
+target).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A job that returns synthesis reactions to the target phase, decorated with
+the relevant selectivity metrics.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.NetworkMaker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.core.</span></span><span class="sig-name descname"><span class="pre">NetworkMaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name='build_and_analyze_network'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_function=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursors=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_pathways=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_elem=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chempot=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#NetworkMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.NetworkMaker" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Maker</span></code></p>
+<p>Maker for generating reaction networks and performing pathfinding from a set of
+previously enumerated reactions. This is a component of the NetworkFlowMaker.</p>
+<p>If you use this code in your own work, please consider citing this paper:</p>
+<blockquote>
+<div><p>McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+Communications 2021, 12 (1), 3097. <a class="reference external" href="https://doi.org/10.1038/s41467-021-23339-x">https://doi.org/10.1038/s41467-021-23339-x</a>.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the job. Automatically selected if not provided.</p></li>
+<li><p><strong>cost_function</strong> (<a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction" title="rxn_network.costs.base.CostFunction"><em>CostFunction</em></a>) – The cost function used to calculate the edge weights in the
+network.</p></li>
+<li><p><strong>precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – An optional list of precursor formulas used in call to
+set_precursors().</p></li>
+<li><p><strong>targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – An optional list of target formulas used in calls to set_target() as
+part of pathfinding.</p></li>
+<li><p><strong>calculate_pathways</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> | </em><em>None</em>) – If integer is provided, basic pathfinding is performed using
+the find_pathways() function up to the provided number of paths (k).
+Defaults to k=10. Provide a value of None if no pathfinding is to be
+performed.</p></li>
+<li><p><strong>open_elem</strong> (<em>Element</em><em> | </em><em>None</em>) – An optional open element used to re-initialize the total reaction
+set.</p></li>
+<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The chemical potential of the open element, if any. Defaults to 0.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.NetworkMaker.make">
+<span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rxn_sets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#NetworkMaker.make"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.NetworkMaker.make" title="Link to this definition">#</a></dt>
+<dd><p>Returns a job that creates a reaction network from an iterable of reaction sets
+(coming from reaction enumeration).</p>
+<p>NOTE: This job stores the network object in an additional store called
+“network”. This needs to be configured through a user’s jobflow.yaml file. See
+“additional_stores”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rxn_sets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Iterable" title="(in Python v3.8)"><em>Iterable</em></a><em>[</em><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet" title="rxn_network.reactions.reaction_set.ReactionSet"><em>ReactionSet</em></a><em>]</em>) – An iterable of reaction sets produced by reaction enumeration.
+These are combined, re-initialized according to provided environmental
+conditions, and then used to build the network.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A job that builds and stores the reaction network for enumerated reactions.
+Also performs basic pathfinding (but no balancing; see PathwaySolverMaker).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.PathwaySolverMaker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.core.</span></span><span class="sig-name descname"><span class="pre">PathwaySolverMaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name='solve</span> <span class="pre">pathways'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_function=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursors=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_elem=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chempot=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_combos=4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">find_intermediate_rxns=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intermediate_rxn_energy_cutoff=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_basic_enumerator=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_minimize_enumerator=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_interdependent=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#PathwaySolverMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.PathwaySolverMaker" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Maker</span></code></p>
+<p>Maker for solving balanced reaction pathways from a set of (unbalanced) pathways
+returned as part of reaction network analysis.</p>
+<p>If you use this code in your own work, please consider citing this paper:</p>
+<blockquote>
+<div><p>McDermott, M. J.; Dwaraknath, S. S.; Persson, K. A. A Graph-Based Network for
+Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
+Communications 2021, 12 (1), 3097. <a class="reference external" href="https://doi.org/10.1038/s41467-021-23339-x">https://doi.org/10.1038/s41467-021-23339-x</a>.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the job. Automatically selected if not provided.</p></li>
+<li><p><strong>cost_function</strong> (<a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction" title="rxn_network.costs.base.CostFunction"><em>CostFunction</em></a>) – The cost function used to calculate the weights of any new edges
+identified during solving (e.g., for intermediate reactions).</p></li>
+<li><p><strong>precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – The precursor formulas for the overall net reaction. These must be
+provided and result in a valid net reaction (together with the targets).</p></li>
+<li><p><strong>targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – The target formulas for the overall net reaction. These must be
+provided and result in a valid net reaction (together with the precursors).</p></li>
+<li><p><strong>open_elem</strong> (<em>Element</em><em> | </em><em>None</em>) – An optional open element used by PathwaySolver.</p></li>
+<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The chemical potential of the open element, if any. Defaults to 0.</p></li>
+<li><p><strong>max_num_combos</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum allowable size of the balanced reaction pathway.
+At values &lt;=5, the solver will start to take a significant amount of
+time to run.</p></li>
+<li><p><strong>find_intermediate_rxns</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to find intermediate reactions; crucial for
+finding pathways where intermediates react together, as these reactions
+may not occur in the graph-derived pathways. Defaults to True.</p></li>
+<li><p><strong>intermediate_rxn_energy_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – An energy cutoff by which to filter down
+intermediate reactions. This can be useful when there are a large number
+of possible intermediates. &lt; 0 means allow only exergonic reactions.</p></li>
+<li><p><strong>use_basic_enumerator</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to use the BasicEnumerator to find
+intermediate reactions. Defaults to True.</p></li>
+<li><p><strong>use_minimize_enumerator</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to use the MinimizeGibbsEnumerator to find
+intermediate reactions. Defaults to False.</p></li>
+<li><p><strong>filter_interdependent</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether or not to filter out pathways where reaction
+steps are interdependent. Defaults to True.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.jobs.core.PathwaySolverMaker.make">
+<span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pathways</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/core.html#PathwaySolverMaker.make"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.core.PathwaySolverMaker.make" title="Link to this definition">#</a></dt>
+<dd><p>Returns a job that produces balanced pathways from raw pathways coming out of
+network pathfinding.</p>
+<p>NOTE: This job stores the network object in an additional store called
+“paths”. This needs to be configured through a user’s jobflow.yaml file. See
+“additional_stores”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pathways</strong> (<a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet" title="rxn_network.pathways.pathway_set.PathwaySet"><em>PathwaySet</em></a>) – A set of pathways (as returned by find_pathways()).</p></li>
+<li><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – The entry set to use in path solving.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.jobs.schema">
+<span id="rxn-network-jobs-schema"></span><h2>rxn_network.jobs.schema<a class="headerlink" href="#module-rxn_network.jobs.schema" title="Link to this heading">#</a></h2>
+<p>Core definition for various task and synthesis recipe documents</p>
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EntrySetDocument">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.schema.</span></span><span class="sig-name descname"><span class="pre">EntrySetDocument</span></span><a class="reference internal" href="_modules/rxn_network/jobs/schema.html#EntrySetDocument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.schema.EntrySetDocument" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>A single entry set object as produced by the GetEntrySet job.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EntrySetDocument.task_label">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EntrySetDocument.task_label" title="Link to this definition">#</a></dt>
+<dd><p>The name of the task.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EntrySetDocument.last_updated">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_updated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><span class="pre">datetime</span></a></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EntrySetDocument.last_updated" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp of when the document was last updated.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EntrySetDocument.entries">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">entries</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><span class="pre">GibbsEntrySet</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EntrySetDocument.entries" title="Link to this definition">#</a></dt>
+<dd><p>The entry set object.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EntrySetDocument.e_above_hull">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">e_above_hull</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EntrySetDocument.e_above_hull" title="Link to this definition">#</a></dt>
+<dd><p>The e_above_hull cutoff.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EntrySetDocument.include_polymorphs">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">include_polymorphs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EntrySetDocument.include_polymorphs" title="Link to this definition">#</a></dt>
+<dd><p>Whether to include metastable polymorphs in the entry set.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EntrySetDocument.formulas_to_include">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">formulas_to_include</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EntrySetDocument.formulas_to_include" title="Link to this definition">#</a></dt>
+<dd><p>The required formulas to include during construciton.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.schema.</span></span><span class="sig-name descname"><span class="pre">EnumeratorTaskDocument</span></span><a class="reference internal" href="_modules/rxn_network/jobs/schema.html#EnumeratorTaskDocument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>A single task object from the reaction enumerator workflow.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.task_label">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.task_label" title="Link to this definition">#</a></dt>
+<dd><p>The name of the task.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.last_updated">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_updated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><span class="pre">datetime</span></a></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.last_updated" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp of when the document was last updated.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.rxns">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rxns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet" title="rxn_network.reactions.reaction_set.ReactionSet"><span class="pre">ReactionSet</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.rxns" title="Link to this definition">#</a></dt>
+<dd><p>The reaction set.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.targets">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">targets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.targets" title="Link to this definition">#</a></dt>
+<dd><p>The target formulas used in the enumerator(s).</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.elements">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Element</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.elements" title="Link to this definition">#</a></dt>
+<dd><p>The elements of the total chemical system</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.chemsys">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">chemsys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.chemsys" title="Link to this definition">#</a></dt>
+<dd><p>The total chemical system string (e.g., Fe-Li-O).</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.added_elements">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">added_elements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Element</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.added_elements" title="Link to this definition">#</a></dt>
+<dd><p>The elements added beyond the elements of the target(s).</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.added_chemsys">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">added_chemsys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.added_chemsys" title="Link to this definition">#</a></dt>
+<dd><p>The chemical system of the added elements</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.enumerators">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enumerators</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rxn_network.enumerators.html#rxn_network.enumerators.base.Enumerator" title="rxn_network.enumerators.base.Enumerator"><span class="pre">Enumerator</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.enumerators" title="Link to this definition">#</a></dt>
+<dd><p>A list of the enumerator objects used to calculate the reactions.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.schema.</span></span><span class="sig-name descname"><span class="pre">CompetitionTaskDocument</span></span><a class="reference internal" href="_modules/rxn_network/jobs/schema.html#CompetitionTaskDocument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>A document containing the reactions and their selectivities as created by the
+CalculateCompetitionMaker job.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.task_label">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.task_label" title="Link to this definition">#</a></dt>
+<dd><p>The name of the task.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.last_updated">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_updated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><span class="pre">datetime</span></a></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.last_updated" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp of when the document was last updated.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.rxns">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rxns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet" title="rxn_network.reactions.reaction_set.ReactionSet"><span class="pre">ReactionSet</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.rxns" title="Link to this definition">#</a></dt>
+<dd><p>The reaction set, where thereactions have calculated competition information stored in their data attribute.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.target_formula">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_formula</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.target_formula" title="Link to this definition">#</a></dt>
+<dd><p>The reduced chemical formula of the target material.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.open_elem">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">open_elem</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Element</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.open_elem" title="Link to this definition">#</a></dt>
+<dd><p>The open element (if any).</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.chempot">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">chempot</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.chempot" title="Link to this definition">#</a></dt>
+<dd><p>The chemical potential of the open element.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.added_elements">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">added_elements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Element</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.added_elements" title="Link to this definition">#</a></dt>
+<dd><p>The elements added beyond the elements of the target(s).</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.added_chemsys">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">added_chemsys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.added_chemsys" title="Link to this definition">#</a></dt>
+<dd><p>The chemical system of the added elements.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.calculate_competition">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_competition</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.calculate_competition" title="Link to this definition">#</a></dt>
+<dd><p>Whether to calculate competition scores.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.calculate_chempot_distances">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_chempot_distances</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.calculate_chempot_distances" title="Link to this definition">#</a></dt>
+<dd><p>Whether to calculate chemical potential distances.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.temp">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">temp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.temp" title="Link to this definition">#</a></dt>
+<dd><p>The temperature in K used to determine the primary competition weightings.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.batch_size">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">batch_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.batch_size" title="Link to this definition">#</a></dt>
+<dd><p>The batch size for the reaction set</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.cpd_kwargs">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cpd_kwargs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Dict" title="(in Python v3.8)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Any" title="(in Python v3.8)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.cpd_kwargs" title="Link to this definition">#</a></dt>
+<dd><p>The kwargs for ChempotDistanceCalculator.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.schema.</span></span><span class="sig-name descname"><span class="pre">NetworkTaskDocument</span></span><a class="reference internal" href="_modules/rxn_network/jobs/schema.html#NetworkTaskDocument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>The calculation output from the NetworkMaker workflow.</p>
+<p>Optionally includes unbalanced paths found during pathfinding.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument.task_label">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument.task_label" title="Link to this definition">#</a></dt>
+<dd><p>The name of the task.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument.last_updated">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_updated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><span class="pre">datetime</span></a></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument.last_updated" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp of when the document was last updated.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument.network">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">network</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="rxn_network.network.html#rxn_network.network.base.Network" title="rxn_network.network.base.Network"><span class="pre">Network</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument.network" title="Link to this definition">#</a></dt>
+<dd><p>The reaction network</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument.paths">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">paths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet" title="rxn_network.pathways.pathway_set.PathwaySet"><span class="pre">PathwaySet</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument.paths" title="Link to this definition">#</a></dt>
+<dd><p>The (simple/unbalanced) reaction pathways</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument.k">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument.k" title="Link to this definition">#</a></dt>
+<dd><p>The number of paths solved for, if any.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument.precursors">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">precursors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument.precursors" title="Link to this definition">#</a></dt>
+<dd><p>The precursor formulas.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument.targets">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">targets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument.targets" title="Link to this definition">#</a></dt>
+<dd><p>The target formulas.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class pydantic_model">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.schema.</span></span><span class="sig-name descname"><span class="pre">PathwaySolverTaskDocument</span></span><a class="reference internal" href="_modules/rxn_network/jobs/schema.html#PathwaySolverTaskDocument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>The calculation output from the PathwaySolverMaker workflow. Contains the pathway
+solver object and its calculated balanced pathways.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.task_label">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.task_label" title="Link to this definition">#</a></dt>
+<dd><p>The name of the task.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.last_updated">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_updated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><span class="pre">datetime</span></a></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.last_updated" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp of when the document was last updated.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.solver">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solver</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver" title="rxn_network.pathways.solver.Solver"><span class="pre">Solver</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.solver" title="Link to this definition">#</a></dt>
+<dd><p>The pathway solver used to calculate pathways.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.balanced_paths">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">balanced_paths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet" title="rxn_network.pathways.pathway_set.PathwaySet"><span class="pre">PathwaySet</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.balanced_paths" title="Link to this definition">#</a></dt>
+<dd><p>The balanced reaction pathways.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.precursors">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">precursors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.precursors" title="Link to this definition">#</a></dt>
+<dd><p>The precursor compositions.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.targets">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">targets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.targets" title="Link to this definition">#</a></dt>
+<dd><p>The target compositions.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.net_rxn">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">net_rxn</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><span class="pre">ComputedReaction</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.net_rxn" title="Link to this definition">#</a></dt>
+<dd><p>The net reaction used for pathway solving.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.max_num_combos">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_num_combos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.max_num_combos" title="Link to this definition">#</a></dt>
+<dd><p>The maximum number of combinations to consider in the pathway solver.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.find_intermediate_rxns">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">find_intermediate_rxns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.find_intermediate_rxns" title="Link to this definition">#</a></dt>
+<dd><p>Whether to find reactions from intermediate compositions.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.intermediate_rxn_energy_cutoff">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">intermediate_rxn_energy_cutoff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.intermediate_rxn_energy_cutoff" title="Link to this definition">#</a></dt>
+<dd><p>The mximum energy cutoff for filtering intermediate reactions.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.use_basic_enumerator">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">use_basic_enumerator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_basic_enumerator" title="Link to this definition">#</a></dt>
+<dd><p>Whether to use the basic enumerators in path solving.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.use_minimize_enumerator">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">use_minimize_enumerator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_minimize_enumerator" title="Link to this definition">#</a></dt>
+<dd><p>Whether to use the minimize enumerators in path solving.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.filter_interdependent">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_interdependent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.filter_interdependent" title="Link to this definition">#</a></dt>
+<dd><p>Whether to filter out interdependent pathway.s</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rxn_network.jobs.utils">
+<span id="rxn-network-jobs-utils"></span><h2>rxn_network.jobs.utils<a class="headerlink" href="#module-rxn_network.jobs.utils" title="Link to this heading">#</a></h2>
+<p>Definitions of common job functions</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rxn_network.jobs.utils.get_added_elem_data">
+<span class="sig-prename descclassname"><span class="pre">rxn_network.jobs.utils.</span></span><span class="sig-name descname"><span class="pre">get_added_elem_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/jobs/utils.html#get_added_elem_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.jobs.utils.get_added_elem_data" title="Link to this definition">#</a></dt>
+<dd><p>Given a provided entry set and targets, this identifies which elements in the entry
+set are “additional” (not found in the target)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – the full entry set</p></li>
+<li><p><strong>targets</strong> (<em>Iterable</em><em>[</em><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – the target phase compositions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of the additional elements and their chemical system string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[Element], <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="rxn_network.network.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">rxn_network.network</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="rxn_network.flows.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">rxn_network.flows</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">rxn_network.jobs</a><ul>
+<li><a class="reference internal" href="#module-rxn_network.jobs.core">rxn_network.jobs.core</a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.core.GetEntrySetMaker"><code class="docutils literal notranslate"><span class="pre">GetEntrySetMaker</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.core.GetEntrySetMaker.make"><code class="docutils literal notranslate"><span class="pre">GetEntrySetMaker.make()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.jobs.core.ReactionEnumerationMaker"><code class="docutils literal notranslate"><span class="pre">ReactionEnumerationMaker</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.core.ReactionEnumerationMaker.make"><code class="docutils literal notranslate"><span class="pre">ReactionEnumerationMaker.make()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.jobs.core.CalculateCompetitionMaker"><code class="docutils literal notranslate"><span class="pre">CalculateCompetitionMaker</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.core.CalculateCompetitionMaker.make"><code class="docutils literal notranslate"><span class="pre">CalculateCompetitionMaker.make()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.jobs.core.NetworkMaker"><code class="docutils literal notranslate"><span class="pre">NetworkMaker</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.core.NetworkMaker.make"><code class="docutils literal notranslate"><span class="pre">NetworkMaker.make()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.jobs.core.PathwaySolverMaker"><code class="docutils literal notranslate"><span class="pre">PathwaySolverMaker</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.core.PathwaySolverMaker.make"><code class="docutils literal notranslate"><span class="pre">PathwaySolverMaker.make()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.jobs.schema">rxn_network.jobs.schema</a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.task_label"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.task_label</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.last_updated</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.entries"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.entries</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.e_above_hull"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.e_above_hull</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.include_polymorphs"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.include_polymorphs</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.formulas_to_include"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.formulas_to_include</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.task_label"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.task_label</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.last_updated</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.rxns"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.rxns</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.targets"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.targets</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.elements"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.elements</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.chemsys"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.chemsys</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.added_elements"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.added_elements</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.added_chemsys"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.added_chemsys</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.enumerators"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.enumerators</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.task_label"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.task_label</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.last_updated</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.rxns"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.rxns</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.target_formula"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.target_formula</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.open_elem"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.open_elem</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.chempot"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.chempot</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.added_elements"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.added_elements</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.added_chemsys"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.added_chemsys</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.calculate_competition"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.calculate_competition</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.calculate_chempot_distances"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.calculate_chempot_distances</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.temp"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.temp</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.batch_size"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.batch_size</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.cpd_kwargs"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.cpd_kwargs</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.task_label"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.task_label</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.last_updated</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.network"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.network</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.paths"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.paths</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.k"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.k</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.precursors"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.precursors</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.targets"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.targets</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument</span></code></a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.task_label"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.task_label</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.last_updated"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.last_updated</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.solver"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.solver</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.balanced_paths"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.balanced_paths</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.precursors"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.precursors</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.targets"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.targets</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.net_rxn"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.net_rxn</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.max_num_combos"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.max_num_combos</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.find_intermediate_rxns"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.find_intermediate_rxns</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.intermediate_rxn_energy_cutoff"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.intermediate_rxn_energy_cutoff</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_basic_enumerator"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.use_basic_enumerator</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_minimize_enumerator"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.use_minimize_enumerator</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.filter_interdependent"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.filter_interdependent</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-rxn_network.jobs.utils">rxn_network.jobs.utils</a><ul>
+<li><a class="reference internal" href="#rxn_network.jobs.utils.get_added_elem_data"><code class="docutils literal notranslate"><span class="pre">get_added_elem_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=521b6f53"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>

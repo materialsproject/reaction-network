@@ -1,0 +1,1634 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 --><title>Index - reaction-network</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials.html">Notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="rxn_network.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.entries.html">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.jobs.html">rxn_network.jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.network.html">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#W"><strong>W</strong></a> | <a href="#Y"><strong>Y</strong></a></div>
+</section>
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.add">add() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.add_rxn_set">add_rxn_set() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.add_rxns">add_rxns() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.added_chemsys">added_chemsys (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.added_chemsys">(rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.added_elements">added_elements (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.added_elements">(rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.all_products">all_products (rxn_network.pathways.base.Pathway property)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.all_reactants">all_reactants (rxn_network.pathways.base.Pathway property)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.as_dict">as_dict() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+
+        <ul>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.as_dict">(rxn_network.entries.experimental.ExperimentalReferenceEntry method)</a>
+</li>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.as_dict">(rxn_network.entries.gibbs.GibbsComputedEntry method)</a>
+</li>
+          <li><a href="rxn_network.network.html#rxn_network.network.base.Graph.as_dict">(rxn_network.network.base.Graph method)</a>
+</li>
+          <li><a href="rxn_network.network.html#rxn_network.network.base.Network.as_dict">(rxn_network.network.base.Network method)</a>
+</li>
+          <li><a href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.as_dict">(rxn_network.network.entry.NetworkEntry method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.as_dict">(rxn_network.reactions.open.OpenComputedReaction method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.average_cost">average_cost (rxn_network.pathways.balanced.BalancedPathway property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.balance">balance() (rxn_network.pathways.balanced.BalancedPathway class method)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.balance">(rxn_network.reactions.basic.BasicReaction class method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.balance">(rxn_network.reactions.computed.ComputedReaction class method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.balance">(rxn_network.reactions.open.OpenComputedReaction class method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.balanced_paths">balanced_paths (rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway">BalancedPathway (class in rxn_network.pathways.balanced)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator">BasicEnumerator (class in rxn_network.enumerators.basic)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicOpenEnumerator">BasicOpenEnumerator (class in rxn_network.enumerators.basic)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway">BasicPathway (class in rxn_network.pathways.basic)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction">BasicReaction (class in rxn_network.reactions.basic)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.batch_size">batch_size (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.base.Network.build">build() (rxn_network.network.base.Network method)</a>
+
+        <ul>
+          <li><a href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork.build">(rxn_network.network.network.ReactionNetwork method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator.build_grand_pd">build_grand_pd (rxn_network.enumerators.basic.BasicEnumerator property)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.build_indices">build_indices() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator.build_pd">build_pd (rxn_network.enumerators.basic.BasicEnumerator property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.base.Calculator.calculate">calculate() (rxn_network.costs.base.Calculator method)</a>
+
+        <ul>
+          <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.ChempotDistanceCalculator.calculate">(rxn_network.costs.calculators.ChempotDistanceCalculator method)</a>
+</li>
+          <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.PrimaryCompetitionCalculator.calculate">(rxn_network.costs.calculators.PrimaryCompetitionCalculator method)</a>
+</li>
+          <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionAreaCalculator.calculate">(rxn_network.costs.calculators.SecondaryCompetitionAreaCalculator method)</a>
+</li>
+          <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionCalculator.calculate">(rxn_network.costs.calculators.SecondaryCompetitionCalculator method)</a>
+</li>
+          <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionMaxCalculator.calculate">(rxn_network.costs.calculators.SecondaryCompetitionMaxCalculator method)</a>
+</li>
+          <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionWithEhullCalculator.calculate">(rxn_network.costs.calculators.SecondaryCompetitionWithEhullCalculator method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.calculate_chempot_distances">calculate_chempot_distances (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.calculate_competition">calculate_competition (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.calculate_costs">calculate_costs() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.base.Calculator.calculate_many">calculate_many() (rxn_network.costs.base.Calculator method)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.CalculateCompetitionMaker">CalculateCompetitionMaker (class in rxn_network.jobs.core)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.base.Calculator">Calculator (class in rxn_network.costs.base)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonateCorrection.carbonate_correction">carbonate_correction (rxn_network.entries.corrections.CarbonateCorrection property)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonateCorrection">CarbonateCorrection (class in rxn_network.entries.corrections)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.chemical_system">chemical_system (rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        <li><a href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram">ChemicalPotentialDiagram (class in rxn_network.thermo.chempot_diagram)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.chempot">chempot (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.ChempotDistanceCalculator">ChempotDistanceCalculator (class in rxn_network.costs.calculators)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.chemsys">chemsys (rxn_network.entries.entry_set.GibbsEntrySet property)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.chemsys">(rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.network.html#rxn_network.network.base.Network.chemsys">(rxn_network.network.base.Network property)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.coefficients">coefficients (rxn_network.reactions.base.Reaction property)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.coefficients">(rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.core.html#rxn_network.core.Composition">Composition (class in rxn_network.core)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.compositions">compositions (rxn_network.pathways.base.Pathway property)</a>
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.compositions">(rxn_network.pathways.plotting.PathwayPlotter property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.compositions">(rxn_network.reactions.base.Reaction property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.compositions">(rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction">ComputedReaction (class in rxn_network.reactions.computed)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.contains_interdependent_rxns">contains_interdependent_rxns() (rxn_network.pathways.balanced.BalancedPathway method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.copy">copy() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+
+        <ul>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.copy">(rxn_network.entries.gibbs.GibbsComputedEntry method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.copy">(rxn_network.reactions.basic.BasicReaction method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.copy">(rxn_network.reactions.computed.ComputedReaction method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.copy">(rxn_network.reactions.open.OpenComputedReaction method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.base.CostFunction">CostFunction (class in rxn_network.costs.base)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.costs">costs (rxn_network.pathways.solver.Solver property)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.count">count() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.cpd_kwargs">cpd_kwargs (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.utils.html#rxn_network.utils.funcs.datetime_str">datetime_str() (in module rxn_network.utils.funcs)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.base.Calculator.decorate">decorate() (rxn_network.costs.base.Calculator method)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.base.Calculator.decorate_many">decorate_many() (rxn_network.costs.base.Calculator method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.df">df (rxn_network.pathways.plotting.PathwayPlotter property)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.discard">discard() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.domains">domains (rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram property)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.entry.DummyEntry">DummyEntry (class in rxn_network.network.entry)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.e_above_hull">e_above_hull (rxn_network.jobs.schema.EntrySetDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.elements">elements (rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.elements">(rxn_network.reactions.base.Reaction property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.elements">(rxn_network.reactions.open.OpenComputedReaction property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.elems">elems (rxn_network.pathways.plotting.PathwayPlotter property)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.energy">energy (rxn_network.pathways.base.Pathway property)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.energy">(rxn_network.reactions.base.Reaction property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.energy">(rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.energy">(rxn_network.reactions.computed.ComputedReaction property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.energy">(rxn_network.reactions.open.OpenComputedReaction property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.energy_per_atom">energy_per_atom (rxn_network.pathways.base.Pathway property)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.energy_per_atom">(rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.energy_per_atom">(rxn_network.reactions.computed.ComputedReaction property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.energy_uncertainty">energy_uncertainty (rxn_network.reactions.computed.ComputedReaction property)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.energy_uncertainty_per_atom">energy_uncertainty_per_atom (rxn_network.reactions.computed.ComputedReaction property)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.entries">entries (rxn_network.jobs.schema.EntrySetDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.entries">(rxn_network.pathways.base.Pathway property)</a>
+</li>
+          <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.PathwaySolver.entries">(rxn_network.pathways.solver.PathwaySolver property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.entries">(rxn_network.reactions.computed.ComputedReaction property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.entries_list">entries_list (rxn_network.entries.entry_set.GibbsEntrySet property)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.base.Enumerator.enumerate">enumerate() (rxn_network.enumerators.base.Enumerator method)</a>
+
+        <ul>
+          <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator.enumerate">(rxn_network.enumerators.basic.BasicEnumerator method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.base.Enumerator">Enumerator (class in rxn_network.enumerators.base)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.enumerators">enumerators (rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.base.CostFunction.evaluate">evaluate() (rxn_network.costs.base.CostFunction method)</a>
+
+        <ul>
+          <li><a href="rxn_network.costs.html#rxn_network.costs.functions.Softplus.evaluate">(rxn_network.costs.functions.Softplus method)</a>
+</li>
+          <li><a href="rxn_network.costs.html#rxn_network.costs.functions.WeightedSum.evaluate">(rxn_network.costs.functions.WeightedSum method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.thermo.html#rxn_network.thermo.utils.expand_pd">expand_pd() (in module rxn_network.thermo.utils)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry">ExperimentalReferenceEntry (class in rxn_network.entries.experimental)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.filter_by_stability">filter_by_stability() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.plotting.filter_df_by_precursors">filter_df_by_precursors() (in module rxn_network.reactions.plotting)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.filter_duplicates">filter_duplicates() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.filter_interdependent">filter_interdependent (rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.find_intermediate_rxns">find_intermediate_rxns (rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.base.Network.find_pathways">find_pathways() (rxn_network.network.base.Network method)</a>
+
+        <ul>
+          <li><a href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork.find_pathways">(rxn_network.network.network.ReactionNetwork method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.formulas">formulas (rxn_network.pathways.plotting.PathwayPlotter property)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.formulas_to_include">formulas_to_include (rxn_network.jobs.schema.EntrySetDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.freed.FREEDReferenceEntry">FREEDReferenceEntry (class in rxn_network.entries.freed)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.from_computed_entries">from_computed_entries() (rxn_network.entries.entry_set.GibbsEntrySet class method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.from_dict">from_dict() (rxn_network.entries.experimental.ExperimentalReferenceEntry class method)</a>
+
+        <ul>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.from_dict">(rxn_network.entries.gibbs.GibbsComputedEntry class method)</a>
+</li>
+          <li><a href="rxn_network.network.html#rxn_network.network.base.Graph.from_dict">(rxn_network.network.base.Graph class method)</a>
+</li>
+          <li><a href="rxn_network.network.html#rxn_network.network.base.Network.from_dict">(rxn_network.network.base.Network class method)</a>
+</li>
+          <li><a href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.from_dict">(rxn_network.network.entry.NetworkEntry class method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.from_dict">(rxn_network.reactions.open.OpenComputedReaction class method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.ChempotDistanceCalculator.from_entries">from_entries() (rxn_network.costs.calculators.ChempotDistanceCalculator class method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.from_formulas">from_formulas() (rxn_network.reactions.basic.BasicReaction class method)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet.from_paths">from_paths() (rxn_network.pathways.pathway_set.PathwaySet class method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.from_pd">from_pd() (rxn_network.entries.entry_set.GibbsEntrySet class method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.from_rxns">from_rxns() (rxn_network.reactions.reaction_set.ReactionSet class method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.from_string">from_string() (rxn_network.reactions.basic.BasicReaction class method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.from_structure">from_structure() (rxn_network.entries.gibbs.GibbsComputedEntry class method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.utils.get_added_elem_data">get_added_elem_data() (in module rxn_network.jobs.utils)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.utils.get_all_entries_in_chemsys">get_all_entries_in_chemsys() (in module rxn_network.entries.utils)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.get_coeff">get_coeff() (rxn_network.reactions.basic.BasicReaction method)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.get_coeff_vector_for_rxn">get_coeff_vector_for_rxn() (rxn_network.pathways.balanced.BalancedPathway method)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.get_comp_matrix">get_comp_matrix() (rxn_network.pathways.balanced.BalancedPathway method)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.utils.get_computed_rxn">get_computed_rxn() (in module rxn_network.enumerators.utils)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_coordinate">get_coordinate() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_coords_in_range">get_coords_in_range() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy">get_decomposition_energy() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive">get_decomposition_energy_and_num_paths_recursive() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_e_above_hull">get_e_above_hull() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.network.get_edge_weight">get_edge_weight() (in module rxn_network.network.network)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.get_el_amount">get_el_amount() (rxn_network.reactions.basic.BasicReaction method)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.utils.get_elems_set">get_elems_set() (in module rxn_network.enumerators.utils)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_energy_above_hull">get_energy_above_hull() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.utils.get_entries">get_entries() (in module rxn_network.entries.utils)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_jitter">get_entries_with_jitter() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_entries_with_new_temperature">get_entries_with_new_temperature() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_hull_energy">get_hull_energy() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_interpolated_entry">get_interpolated_entry() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.utils.html#rxn_network.utils.funcs.get_logger">get_logger() (in module rxn_network.utils.funcs)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.network.get_loopback_edges">get_loopback_edges() (in module rxn_network.network.network)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_min_entry_by_formula">get_min_entry_by_formula() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.get_new_temperature">get_new_temperature() (rxn_network.entries.experimental.ExperimentalReferenceEntry method)</a>
+
+        <ul>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.get_new_temperature">(rxn_network.entries.gibbs.GibbsComputedEntry method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.get_new_temperature">(rxn_network.reactions.computed.ComputedReaction method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.get_new_temperature">(rxn_network.reactions.open.OpenComputedReaction method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.get_offset">get_offset() (rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram method)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.pareto.get_pareto_front">get_pareto_front() (in module rxn_network.costs.pareto)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_primary_competition">get_primary_competition() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.utils.html#rxn_network.utils.funcs.get_project_root">get_project_root() (in module rxn_network.utils.funcs)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_reactions_by_coordinate">get_reactions_by_coordinate() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.network.get_rxn_nodes_and_edges">get_rxn_nodes_and_edges() (in module rxn_network.network.network)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.get_rxns">get_rxns() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.get_rxns_by_product">get_rxns_by_product() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.get_rxns_by_reactants">get_rxns_by_reactants() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition">get_secondary_competition() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_area">get_secondary_competition_area() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_max_energy">get_secondary_competition_max_energy() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_stabilized_entry">get_stabilized_entry() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_subset_in_chemsys">get_subset_in_chemsys() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.utils.get_total_chemsys_str">get_total_chemsys_str() (in module rxn_network.enumerators.utils)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.GetEntrySetMaker">GetEntrySetMaker (class in rxn_network.jobs.core)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.gibbs_adjustment">gibbs_adjustment() (rxn_network.entries.gibbs.GibbsComputedEntry method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry">GibbsComputedEntry (class in rxn_network.entries.gibbs)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet">GibbsEntrySet (class in rxn_network.entries.entry_set)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.base.Graph">Graph (class in rxn_network.network.base)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.base.Network.graph">graph (rxn_network.network.base.Network property)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.utils.group_by_chemsys">group_by_chemsys() (in module rxn_network.enumerators.utils)</a>
+</li>
+        <li><a href="rxn_network.utils.html#rxn_network.utils.funcs.grouper">grouper() (in module rxn_network.utils.funcs)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.hs_int">hs_int (rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.include_polymorphs">include_polymorphs (rxn_network.jobs.schema.EntrySetDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.utils.initialize_entry">initialize_entry() (in module rxn_network.entries.utils)</a>
+</li>
+        <li><a href="rxn_network.utils.html#rxn_network.utils.ray.initialize_ray">initialize_ray() (in module rxn_network.utils.ray)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull">InterfaceReactionHull (class in rxn_network.reactions.hull)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.intermediate_rxn_energy_cutoff">intermediate_rxn_energy_cutoff (rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.intermediates">intermediates (rxn_network.pathways.base.Pathway property)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry">InterpolatedEntry (class in rxn_network.entries.interpolated)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_element">is_element (rxn_network.entries.experimental.ExperimentalReferenceEntry property)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.is_experimental">is_experimental (rxn_network.entries.experimental.ExperimentalReferenceEntry property)</a>
+
+        <ul>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.is_experimental">(rxn_network.entries.gibbs.GibbsComputedEntry property)</a>
+</li>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry.is_experimental">(rxn_network.entries.interpolated.InterpolatedEntry property)</a>
+</li>
+          <li><a href="rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway.is_experimental">(rxn_network.pathways.basic.BasicPathway property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.is_identity">is_identity (rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.pareto.is_pareto_efficient">is_pareto_efficient() (in module rxn_network.costs.pareto)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.is_separable">is_separable() (rxn_network.reactions.basic.BasicReaction method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="K" class="genindex-section">
+  <h2>K</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.k">k (rxn_network.jobs.schema.NetworkTaskDocument attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.last_updated">last_updated (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.last_updated">(rxn_network.jobs.schema.EntrySetDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.last_updated">(rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.last_updated">(rxn_network.jobs.schema.NetworkTaskDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.last_updated">(rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.utils.html#rxn_network.utils.funcs.limited_powerset">limited_powerset() (in module rxn_network.utils.funcs)</a>
+</li>
+        <li><a href="rxn_network.data.html#rxn_network.data.load_experimental_data">load_experimental_data() (in module rxn_network.data)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.flows.html#rxn_network.flows.core.NetworkFlowMaker.make">make() (rxn_network.flows.core.NetworkFlowMaker method)</a>
+
+        <ul>
+          <li><a href="rxn_network.flows.html#rxn_network.flows.core.SynthesisPlanningFlowMaker.make">(rxn_network.flows.core.SynthesisPlanningFlowMaker method)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.CalculateCompetitionMaker.make">(rxn_network.jobs.core.CalculateCompetitionMaker method)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.GetEntrySetMaker.make">(rxn_network.jobs.core.GetEntrySetMaker method)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.NetworkMaker.make">(rxn_network.jobs.core.NetworkMaker method)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.PathwaySolverMaker.make">(rxn_network.jobs.core.PathwaySolverMaker method)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.ReactionEnumerationMaker.make">(rxn_network.jobs.core.ReactionEnumerationMaker method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.data.html#rxn_network.data.make_float_keys">make_float_keys() (in module rxn_network.data)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.max_num_combos">max_num_combos (rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.metastable_domains">metastable_domains (rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram property)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.min_entries_by_formula">min_entries_by_formula (rxn_network.entries.entry_set.GibbsEntrySet property)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.minimize.MinimizeGibbsEnumerator">MinimizeGibbsEnumerator (class in rxn_network.enumerators.minimize)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.minimize.MinimizeGrandPotentialEnumerator">MinimizeGrandPotentialEnumerator (class in rxn_network.enumerators.minimize)</a>
+</li>
+        <li>
+    module
+
+        <ul>
+          <li><a href="rxn_network.core.html#module-rxn_network.core">rxn_network.core</a>
+</li>
+          <li><a href="rxn_network.costs.html#module-rxn_network.costs.base">rxn_network.costs.base</a>
+</li>
+          <li><a href="rxn_network.costs.html#module-rxn_network.costs.calculators">rxn_network.costs.calculators</a>
+</li>
+          <li><a href="rxn_network.costs.html#module-rxn_network.costs.functions">rxn_network.costs.functions</a>
+</li>
+          <li><a href="rxn_network.costs.html#module-rxn_network.costs.pareto">rxn_network.costs.pareto</a>
+</li>
+          <li><a href="rxn_network.data.html#module-rxn_network.data">rxn_network.data</a>
+</li>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.corrections">rxn_network.entries.corrections</a>
+</li>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.entry_set">rxn_network.entries.entry_set</a>
+</li>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.experimental">rxn_network.entries.experimental</a>
+</li>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.freed">rxn_network.entries.freed</a>
+</li>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.gibbs">rxn_network.entries.gibbs</a>
+</li>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.interpolated">rxn_network.entries.interpolated</a>
+</li>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.nist">rxn_network.entries.nist</a>
+</li>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.utils">rxn_network.entries.utils</a>
+</li>
+          <li><a href="rxn_network.enumerators.html#module-rxn_network.enumerators.base">rxn_network.enumerators.base</a>
+</li>
+          <li><a href="rxn_network.enumerators.html#module-rxn_network.enumerators.basic">rxn_network.enumerators.basic</a>
+</li>
+          <li><a href="rxn_network.enumerators.html#module-rxn_network.enumerators.minimize">rxn_network.enumerators.minimize</a>
+</li>
+          <li><a href="rxn_network.enumerators.html#module-rxn_network.enumerators.utils">rxn_network.enumerators.utils</a>
+</li>
+          <li><a href="rxn_network.flows.html#module-rxn_network.flows.core">rxn_network.flows.core</a>
+</li>
+          <li><a href="rxn_network.jobs.html#module-rxn_network.jobs.core">rxn_network.jobs.core</a>
+</li>
+          <li><a href="rxn_network.jobs.html#module-rxn_network.jobs.schema">rxn_network.jobs.schema</a>
+</li>
+          <li><a href="rxn_network.jobs.html#module-rxn_network.jobs.utils">rxn_network.jobs.utils</a>
+</li>
+          <li><a href="rxn_network.network.html#module-rxn_network.network.base">rxn_network.network.base</a>
+</li>
+          <li><a href="rxn_network.network.html#module-rxn_network.network.entry">rxn_network.network.entry</a>
+</li>
+          <li><a href="rxn_network.network.html#module-rxn_network.network.network">rxn_network.network.network</a>
+</li>
+          <li><a href="rxn_network.network.html#module-rxn_network.network.visualize">rxn_network.network.visualize</a>
+</li>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.balanced">rxn_network.pathways.balanced</a>
+</li>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.base">rxn_network.pathways.base</a>
+</li>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.basic">rxn_network.pathways.basic</a>
+</li>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.pathway_set">rxn_network.pathways.pathway_set</a>
+</li>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.plotting">rxn_network.pathways.plotting</a>
+</li>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.solver">rxn_network.pathways.solver</a>
+</li>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.base">rxn_network.reactions.base</a>
+</li>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.basic">rxn_network.reactions.basic</a>
+</li>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.computed">rxn_network.reactions.computed</a>
+</li>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.hull">rxn_network.reactions.hull</a>
+</li>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.open">rxn_network.reactions.open</a>
+</li>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.plotting">rxn_network.reactions.plotting</a>
+</li>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.reaction_set">rxn_network.reactions.reaction_set</a>
+</li>
+          <li><a href="rxn_network.thermo.html#module-rxn_network.thermo.chempot_diagram">rxn_network.thermo.chempot_diagram</a>
+</li>
+          <li><a href="rxn_network.thermo.html#module-rxn_network.thermo.utils">rxn_network.thermo.utils</a>
+</li>
+          <li><a href="rxn_network.utils.html#module-rxn_network.utils.funcs">rxn_network.utils.funcs</a>
+</li>
+          <li><a href="rxn_network.utils.html#module-rxn_network.utils.ray">rxn_network.utils.ray</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.net_rxn">net_rxn (rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.base.Network">Network (class in rxn_network.network.base)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.network">network (rxn_network.jobs.schema.NetworkTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry">NetworkEntry (class in rxn_network.network.entry)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.entry.NetworkEntryType">NetworkEntryType (class in rxn_network.network.entry)</a>
+</li>
+        <li><a href="rxn_network.flows.html#rxn_network.flows.core.NetworkFlowMaker">NetworkFlowMaker (class in rxn_network.flows.core)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.NetworkMaker">NetworkMaker (class in rxn_network.jobs.core)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.nist.NISTReferenceEntry">NISTReferenceEntry (class in rxn_network.entries.nist)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.normal">normal() (in module rxn_network.entries.entry_set)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.normalize_to">normalize_to() (rxn_network.reactions.basic.BasicReaction method)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.normalize_to">(rxn_network.reactions.computed.ComputedReaction method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.normalize_to_element">normalize_to_element() (rxn_network.reactions.basic.BasicReaction method)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.normalize_to_element">(rxn_network.reactions.computed.ComputedReaction method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.normalized_repr">normalized_repr (rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.normalized_repr_and_factor">normalized_repr_and_factor() (rxn_network.reactions.basic.BasicReaction method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.num_atoms">num_atoms (rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.num_atoms_df">num_atoms_df (rxn_network.pathways.plotting.PathwayPlotter property)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.num_entries">num_entries (rxn_network.pathways.solver.Solver property)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonateCorrection.num_ions">num_ions (rxn_network.entries.corrections.CarbonateCorrection property)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.num_rxns">num_rxns (rxn_network.pathways.solver.Solver property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.open_elem">open_elem (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction">OpenComputedReaction (class in rxn_network.reactions.open)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.utils.parse_criteria">parse_criteria() (in module rxn_network.entries.utils)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.paths">paths (rxn_network.jobs.schema.NetworkTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet.paths">(rxn_network.pathways.pathway_set.PathwaySet property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway">Pathway (class in rxn_network.pathways.base)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter">PathwayPlotter (class in rxn_network.pathways.plotting)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.pathways">pathways (rxn_network.pathways.solver.Solver property)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet">PathwaySet (class in rxn_network.pathways.pathway_set)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.PathwaySolver">PathwaySolver (class in rxn_network.pathways.solver)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.PathwaySolverMaker">PathwaySolverMaker (class in rxn_network.jobs.core)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.pd_dict">pd_dict (rxn_network.entries.entry_set.GibbsEntrySet property)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.plot">plot() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.plot_energy_cascade">plot_energy_cascade() (rxn_network.pathways.plotting.PathwayPlotter method)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.visualize.plot_network">plot_network() (in module rxn_network.network.visualize)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.plotting.PathwayPlotter.plot_pathway">plot_pathway() (rxn_network.pathways.plotting.PathwayPlotter method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.plotting.plot_reaction_scatter">plot_reaction_scatter() (in module rxn_network.reactions.plotting)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.precursors">precursors (rxn_network.jobs.schema.NetworkTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.precursors">(rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.network.html#rxn_network.network.base.Network.precursors">(rxn_network.network.base.Network property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.plotting.pretty_df_layout">pretty_df_layout() (in module rxn_network.reactions.plotting)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.PrimaryCompetitionCalculator">PrimaryCompetitionCalculator (class in rxn_network.costs.calculators)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.utils.process_entries">process_entries() (in module rxn_network.entries.utils)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.product_atomic_fractions">product_atomic_fractions (rxn_network.reactions.basic.BasicReaction property)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.product_atomic_fractions">(rxn_network.reactions.open.OpenComputedReaction property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.product_molar_fractions">product_molar_fractions (rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.products">products (rxn_network.pathways.base.Pathway property)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.products">(rxn_network.reactions.base.Reaction property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.products">(rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.utils.react_interface">react_interface() (in module rxn_network.enumerators.utils)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.reactant_atomic_fractions">reactant_atomic_fractions (rxn_network.reactions.basic.BasicReaction property)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.reactant_atomic_fractions">(rxn_network.reactions.open.OpenComputedReaction property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.reactant_molar_fractions">reactant_molar_fractions (rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.base.Pathway.reactants">reactants (rxn_network.pathways.base.Pathway property)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction.reactants">(rxn_network.reactions.base.Reaction property)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.reactants">(rxn_network.reactions.basic.BasicReaction property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction">Reaction (class in rxn_network.reactions.base)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.ReactionEnumerationMaker">ReactionEnumerationMaker (class in rxn_network.jobs.core)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork">ReactionNetwork (class in rxn_network.network.network)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway.reactions">reactions (rxn_network.pathways.basic.BasicPathway property)</a>
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver.reactions">(rxn_network.pathways.solver.Solver property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet">ReactionSet (class in rxn_network.reactions.reaction_set)</a>
+</li>
+        <li><a href="rxn_network.core.html#rxn_network.core.Composition.reduced_formula">reduced_formula (rxn_network.core.Composition property)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.reverse">reverse() (rxn_network.reactions.basic.BasicReaction method)</a>
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.reverse">(rxn_network.reactions.computed.ComputedReaction method)</a>
+</li>
+          <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.reverse">(rxn_network.reactions.open.OpenComputedReaction method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.utils.run_enumerators">run_enumerators() (in module rxn_network.enumerators.utils)</a>
+</li>
+        <li>
+    rxn_network.core
+
+        <ul>
+          <li><a href="rxn_network.core.html#module-rxn_network.core">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.costs.base
+
+        <ul>
+          <li><a href="rxn_network.costs.html#module-rxn_network.costs.base">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.costs.calculators
+
+        <ul>
+          <li><a href="rxn_network.costs.html#module-rxn_network.costs.calculators">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.costs.functions
+
+        <ul>
+          <li><a href="rxn_network.costs.html#module-rxn_network.costs.functions">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.costs.pareto
+
+        <ul>
+          <li><a href="rxn_network.costs.html#module-rxn_network.costs.pareto">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.data
+
+        <ul>
+          <li><a href="rxn_network.data.html#module-rxn_network.data">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.entries.corrections
+
+        <ul>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.corrections">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.entries.entry_set
+
+        <ul>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.entry_set">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.entries.experimental
+
+        <ul>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.experimental">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.entries.freed
+
+        <ul>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.freed">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.entries.gibbs
+
+        <ul>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.gibbs">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.entries.interpolated
+
+        <ul>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.interpolated">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.entries.nist
+
+        <ul>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.nist">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.entries.utils
+
+        <ul>
+          <li><a href="rxn_network.entries.html#module-rxn_network.entries.utils">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.enumerators.base
+
+        <ul>
+          <li><a href="rxn_network.enumerators.html#module-rxn_network.enumerators.base">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.enumerators.basic
+
+        <ul>
+          <li><a href="rxn_network.enumerators.html#module-rxn_network.enumerators.basic">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.enumerators.minimize
+
+        <ul>
+          <li><a href="rxn_network.enumerators.html#module-rxn_network.enumerators.minimize">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.enumerators.utils
+
+        <ul>
+          <li><a href="rxn_network.enumerators.html#module-rxn_network.enumerators.utils">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    rxn_network.flows.core
+
+        <ul>
+          <li><a href="rxn_network.flows.html#module-rxn_network.flows.core">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.jobs.core
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#module-rxn_network.jobs.core">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.jobs.schema
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#module-rxn_network.jobs.schema">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.jobs.utils
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#module-rxn_network.jobs.utils">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.network.base
+
+        <ul>
+          <li><a href="rxn_network.network.html#module-rxn_network.network.base">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.network.entry
+
+        <ul>
+          <li><a href="rxn_network.network.html#module-rxn_network.network.entry">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.network.network
+
+        <ul>
+          <li><a href="rxn_network.network.html#module-rxn_network.network.network">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.network.visualize
+
+        <ul>
+          <li><a href="rxn_network.network.html#module-rxn_network.network.visualize">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.pathways.balanced
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.balanced">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.pathways.base
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.base">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.pathways.basic
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.basic">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.pathways.pathway_set
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.pathway_set">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.pathways.plotting
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.plotting">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.pathways.solver
+
+        <ul>
+          <li><a href="rxn_network.pathways.html#module-rxn_network.pathways.solver">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.reactions.base
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.base">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.reactions.basic
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.basic">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.reactions.computed
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.computed">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.reactions.hull
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.hull">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.reactions.open
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.open">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.reactions.plotting
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.plotting">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.reactions.reaction_set
+
+        <ul>
+          <li><a href="rxn_network.reactions.html#module-rxn_network.reactions.reaction_set">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.thermo.chempot_diagram
+
+        <ul>
+          <li><a href="rxn_network.thermo.html#module-rxn_network.thermo.chempot_diagram">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.thermo.utils
+
+        <ul>
+          <li><a href="rxn_network.thermo.html#module-rxn_network.thermo.utils">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.utils.funcs
+
+        <ul>
+          <li><a href="rxn_network.utils.html#module-rxn_network.utils.funcs">module</a>
+</li>
+        </ul></li>
+        <li>
+    rxn_network.utils.ray
+
+        <ul>
+          <li><a href="rxn_network.utils.html#module-rxn_network.utils.ray">module</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.rxns">rxns (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.rxns">(rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionAreaCalculator">SecondaryCompetitionAreaCalculator (class in rxn_network.costs.calculators)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionCalculator">SecondaryCompetitionCalculator (class in rxn_network.costs.calculators)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionMaxCalculator">SecondaryCompetitionMaxCalculator (class in rxn_network.costs.calculators)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.calculators.SecondaryCompetitionWithEhullCalculator">SecondaryCompetitionWithEhullCalculator (class in rxn_network.costs.calculators)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.set_chempot">set_chempot() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.set_new_temperature">set_new_temperature() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.network.html#rxn_network.network.base.Network.set_precursors">set_precursors() (rxn_network.network.base.Network method)</a>
+
+        <ul>
+          <li><a href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork.set_precursors">(rxn_network.network.network.ReactionNetwork method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.network.html#rxn_network.network.base.Network.set_target">set_target() (rxn_network.network.base.Network method)</a>
+
+        <ul>
+          <li><a href="rxn_network.network.html#rxn_network.network.network.ReactionNetwork.set_target">(rxn_network.network.network.ReactionNetwork method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.shortest_domain_distance">shortest_domain_distance() (rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram method)</a>
+</li>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.functions.Softplus">Softplus (class in rxn_network.costs.functions)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.PathwaySolver.solve">solve() (rxn_network.pathways.solver.PathwaySolver method)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.Solver">Solver (class in rxn_network.pathways.solver)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.solver">solver (rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.basic.BasicEnumerator.stabilize">stabilize (rxn_network.enumerators.basic.BasicEnumerator property)</a>
+</li>
+        <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.utils.stabilize_entries">stabilize_entries() (in module rxn_network.enumerators.utils)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.stable_reactions">stable_reactions (rxn_network.reactions.hull.InterfaceReactionHull property)</a>
+</li>
+        <li><a href="rxn_network.flows.html#rxn_network.flows.core.SynthesisPlanningFlowMaker">SynthesisPlanningFlowMaker (class in rxn_network.flows.core)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.network.html#rxn_network.network.base.Network.target">target (rxn_network.network.base.Network property)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.target_formula">target_formula (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.targets">targets (rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.targets">(rxn_network.jobs.schema.NetworkTaskDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.targets">(rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.task_label">task_label (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.task_label">(rxn_network.jobs.schema.EntrySetDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.task_label">(rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.task_label">(rxn_network.jobs.schema.NetworkTaskDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.task_label">(rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.temp">temp (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.temperature">temperature (rxn_network.entries.entry_set.GibbsEntrySet property)</a>
+
+        <ul>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.temperature">(rxn_network.entries.experimental.ExperimentalReferenceEntry property)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet.to_dataframe">to_dataframe() (rxn_network.reactions.reaction_set.ReactionSet method)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.to_grand_entry">to_grand_entry() (rxn_network.entries.experimental.ExperimentalReferenceEntry method)</a>
+
+        <ul>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.to_grand_entry">(rxn_network.entries.gibbs.GibbsComputedEntry method)</a>
+</li>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry.to_grand_entry">(rxn_network.entries.interpolated.InterpolatedEntry method)</a>
+</li>
+        </ul></li>
+        <li><a href="rxn_network.utils.html#rxn_network.utils.ray.to_iterator">to_iterator() (in module rxn_network.utils.ray)</a>
+</li>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.total_chemical_system">total_chemical_system (rxn_network.reactions.open.OpenComputedReaction property)</a>
+</li>
+        <li><a href="rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway.total_cost">total_cost (rxn_network.pathways.basic.BasicPathway property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.experimental.ExperimentalReferenceEntry.unique_id">unique_id (rxn_network.entries.experimental.ExperimentalReferenceEntry property)</a>
+
+        <ul>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.unique_id">(rxn_network.entries.gibbs.GibbsComputedEntry property)</a>
+</li>
+          <li><a href="rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry.unique_id">(rxn_network.entries.interpolated.InterpolatedEntry property)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.unstable_reactions">unstable_reactions (rxn_network.reactions.hull.InterfaceReactionHull property)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.update">update() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_basic_enumerator">use_basic_enumerator (rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_minimize_enumerator">use_minimize_enumerator (rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="W" class="genindex-section">
+  <h2>W</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.costs.html#rxn_network.costs.functions.WeightedSum">WeightedSum (class in rxn_network.costs.functions)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="Y" class="genindex-section">
+  <h2>Y</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rxn_network.network.html#rxn_network.network.network.yens_ksp">yens_ksp() (in module rxn_network.network.network)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=521b6f53"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>
