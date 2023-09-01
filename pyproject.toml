@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reaction-network"
-description = "Reaction-network is a Python package for synthesis planning and prediction of chemical reaction pathways in inorganic materials synthesis."
+description = "Reaction-network is a Python package for synthesis planning and predicting chemical reaction pathways in inorganic materials synthesis."
 readme = "README.md"
 keywords = [
     "reaction",
