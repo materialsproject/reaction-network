@@ -1,0 +1,3606 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+        <title>ARCHIVED: reaction-network (Demo Notebook) - reaction-network</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials.html">Notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../1_enumerators.html">1) Enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_networks.html">2) Networks</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../rxn_network.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.entries.html">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.jobs.html">rxn_network.jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.network.html">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="ARCHIVED:-reaction-network-(Demo-Notebook)">
+<h1>ARCHIVED: reaction-network (Demo Notebook)<a class="headerlink" href="#ARCHIVED:-reaction-network-(Demo-Notebook)" title="Link to this heading">#</a></h1>
+<section id="Author:-Matthew-McDermott">
+<h2>Author: Matthew McDermott<a class="headerlink" href="#Author:-Matthew-McDermott" title="Link to this heading">#</a></h2>
+</section>
+<section id="Updated:-April-12,-2021">
+<h2>Updated: April 12, 2021<a class="headerlink" href="#Updated:-April-12,-2021" title="Link to this heading">#</a></h2>
+<p>This notebook serves as a walkthrough for the basic use of the V1 <em>reaction-network</em> code, which is imported as <em>rxn_network</em>.</p>
+<p>In the following examples, we also recreate the results/analysis originally presented in the manuscript:</p>
+<p><strong>NOTE: The reaction-network code underwent a major refactor which makes this current demo notebook obsolete. However, it is being preserved/archived for reference, as it contains the examples used in the original paper.</strong></p>
+<section id="Imports">
+<h3>Imports<a class="headerlink" href="#Imports" title="Link to this heading">#</a></h3>
+<p>The following imports are required to access the Materials Project database and construct/analyze the networks.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+
+<span class="kn">from</span> <span class="nn">monty.json</span> <span class="kn">import</span> <span class="n">MontyDecoder</span>
+
+<span class="kn">import</span> <span class="nn">graph_tool.all</span> <span class="k">as</span> <span class="nn">gt</span>
+
+<span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">ReactionNetwork</span>
+<span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">GibbsComputedStructureEntry</span>
+<span class="kn">from</span> <span class="nn">rxn_network.helpers</span> <span class="kn">import</span> <span class="n">find_interdependent_rxns</span>
+<span class="kn">from</span> <span class="nn">rxn_network.reaction</span> <span class="kn">import</span> <span class="n">Reaction</span><span class="p">,</span> <span class="n">ComputedReaction</span>
+
+<span class="kn">from</span> <span class="nn">pymatgen</span> <span class="kn">import</span> <span class="n">MPRester</span><span class="p">,</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.phase_diagram</span> <span class="kn">import</span> <span class="n">PhaseDiagram</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Logging initialized&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ImportError</span>                               Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-2-69285a80b3bf&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">     10</span> <span class="ansi-green-fg">import</span> graph_tool<span class="ansi-blue-fg">.</span>all <span class="ansi-green-fg">as</span> gt
+<span class="ansi-green-intense-fg ansi-bold">     11</span>
+<span class="ansi-green-fg">---&gt; 12</span><span class="ansi-red-fg"> </span><span class="ansi-green-fg">from</span> rxn_network<span class="ansi-blue-fg">.</span>core <span class="ansi-green-fg">import</span> ReactionNetwork
+<span class="ansi-green-intense-fg ansi-bold">     13</span> <span class="ansi-green-fg">from</span> pymatgen<span class="ansi-blue-fg">.</span>entries<span class="ansi-blue-fg">.</span>computed_entries <span class="ansi-green-fg">import</span> GibbsComputedStructureEntry
+<span class="ansi-green-intense-fg ansi-bold">     14</span> <span class="ansi-green-fg">from</span> rxn_network<span class="ansi-blue-fg">.</span>helpers <span class="ansi-green-fg">import</span> find_interdependent_rxns
+
+<span class="ansi-red-fg">ImportError</span>: cannot import name &#39;ReactionNetwork&#39; from &#39;rxn_network.core&#39; (/Users/mcdermott/PycharmProjects/reaction-network/src/rxn_network/core/__init__.py)
+</pre></div></div>
+</div>
+<p>This code uses Dask to parallelize the building of the reaction network graph.</p>
+<p>The client is initialized below, and the Dask web GUI can be accessed via a local HTTP server (see Dask documentation for further details).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dask.distributed</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dask client initialized...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Dask client initialized...
+</pre></div></div>
+</div>
+<p>The following updated method is for backwards compatability with pymatgen’s updated GibbsComputedStructureEntry class.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">new_entry_from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Backwards compatability for loading old GibbsComputedStructureEntry objects.</span>
+
+<span class="sd">    :param d: Dict representation.</span>
+<span class="sd">    :return: GibbsComputedStructureEntry</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="n">MontyDecoder</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;formation_enthalpy&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+        <span class="n">formation_enthalpy_per_atom</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;formation_enthalpy&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">Composition</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;composition&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">num_atoms</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">formation_enthalpy_per_atom</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;formation_enthalpy_per_atom&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">dec</span><span class="o">.</span><span class="n">process_decoded</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;structure&quot;</span><span class="p">]),</span>
+        <span class="n">formation_enthalpy_per_atom</span><span class="p">,</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">],</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;gibbs_model&quot;</span><span class="p">],</span>
+        <span class="n">composition</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;composition&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">correction</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;correction&quot;</span><span class="p">],</span>
+        <span class="n">energy_adjustments</span><span class="o">=</span><span class="p">[</span><span class="n">dec</span><span class="o">.</span><span class="n">process_decoded</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;energy_adjustments&quot;</span><span class="p">,</span> <span class="p">{})],</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">process_decoded</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;parameters&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">process_decoded</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+        <span class="n">entry_id</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;entry_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="p">)</span>
+
+<span class="n">GibbsComputedStructureEntry</span><span class="o">.</span><span class="n">from_dict</span> <span class="o">=</span> <span class="n">new_entry_from_dict</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Main-script">
+<h3>Main script<a class="headerlink" href="#Main-script" title="Link to this heading">#</a></h3>
+<p>The following function’s code can be run as a standalone script to generate the reaction network and perform pathfinding. In the first example that follows, we will break down each of these steps so it is clear what each section of the script is doing. In the following sections, we will only povide the input parameters and refer you to running the main script yourself.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_reaction_network_analysis</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">include_metastable</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">chempots</span><span class="p">,</span> <span class="n">max_num_combos</span><span class="p">,</span> <span class="n">interpolate_comps</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        entries ([ComputedStructureEntry]): list of ComputedStructureEntry-</span>
+<span class="sd">                like objects to consider in network. These can be acquired</span>
+<span class="sd">                from Materials Project (using MPRester) or created manually in</span>
+<span class="sd">                pymatgen. Entries should have same compatability (e.g.</span>
+<span class="sd">                MPCompability) for phase diagram generation.</span>
+<span class="sd">        precursors ([str]): formulas for all phases which serve as the precursor reactants</span>
+<span class="sd">        targets ([str]): formulas for all phases which are the final products</span>
+<span class="sd">        temp (float):  Temperature (in Kelvin) used for estimating Gibbs</span>
+<span class="sd">                free energy of formation, as well as scaling the cost function</span>
+<span class="sd">                later during network generation. Must select from [300, 400,</span>
+<span class="sd">                500, ... 2000] K.</span>
+<span class="sd">        include_metastable (float): either a) the specified cutoff</span>
+<span class="sd">                for energy per atom (eV/atom) above hull, or b) True/False</span>
+<span class="sd">                if considering only stable vs. all entries. An energy cutoff of</span>
+<span class="sd">                0.1 eV/atom is a reasonable starting threshold for thermodynamic</span>
+<span class="sd">                stability. Defaults to False.</span>
+<span class="sd">        k (int): Number of shortest paths to calculate to each target (i.e. if</span>
+<span class="sd">                there are 3 targets and k=15, then 3x15 = 45 paths will be generated</span>
+<span class="sd">                and the reactions from these will be combined.</span>
+<span class="sd">        chempots (dict): Optional dictionary of elemental chemical potentials for calculating</span>
+<span class="sd">                predicted reactions from the grand potential phase diagram</span>
+<span class="sd">        max_num_combos (int):  upper limit on how many reactions to consider at a</span>
+<span class="sd">                time when combining possible reactions to form a total pathway. (default 4)</span>
+<span class="sd">        interpolate_comps ([str]): Optional lst of formulas of compositions which do not have</span>
+<span class="sd">                associated entries but should be included in the network construction with an</span>
+<span class="sd">                interpolated (hull) energy.</span>
+
+<span class="sd">    Returns (tuple): ReactionNetwork object and resulting paths</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">rn</span> <span class="o">=</span> <span class="n">ReactionNetwork</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span> <span class="n">interpolate_comps</span><span class="o">=</span><span class="n">interpolate_comps</span><span class="p">,</span>
+                         <span class="n">include_metastable</span><span class="o">=</span><span class="n">include_metastable</span><span class="p">)</span>
+
+    <span class="n">precursors_comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">precursors</span><span class="p">]</span>
+    <span class="n">targets_comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">]</span>
+
+    <span class="n">precursor_entries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">target_entries</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">rn</span><span class="o">.</span><span class="n">_filtered_entries</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="ow">in</span> <span class="n">precursors_comps</span><span class="p">:</span>
+            <span class="n">precursor_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="ow">in</span> <span class="n">targets_comps</span><span class="p">:</span>
+            <span class="n">target_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+    <span class="n">rn</span><span class="o">.</span><span class="n">generate_rxn_network</span><span class="p">(</span><span class="n">precursor_entries</span><span class="p">,</span><span class="n">target_entries</span><span class="p">)</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">rn</span><span class="o">.</span><span class="n">find_all_rxn_pathways</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="n">precursor_entries</span><span class="p">,</span> <span class="n">consider_crossover_rxns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                         <span class="n">max_num_combos</span><span class="o">=</span><span class="n">max_num_combos</span><span class="p">,</span> <span class="n">filter_interdependent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                        <span class="n">chempots</span><span class="o">=</span><span class="n">chempots</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rn</span><span class="p">,</span> <span class="n">paths</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="Example-1:-YMnO_3-assisted-metathesis">
+<h1>Example 1: YMnO<span class="math notranslate nohighlight">\(_3\)</span> assisted metathesis<a class="headerlink" href="#Example-1:-YMnO_3-assisted-metathesis" title="Link to this heading">#</a></h1>
+<p>First, we acquire Materials Project entries for the C-Cl-Li-Mn-O-Y chemical system via the MPRester API; please see materialsproject.org to create an account and get an API key.</p>
+<p>Note: <em>You may also use your own thermodynamic database entries, but they must be initialized as ComputedStructureEntry objects in pymatgen</em>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chemsys</span> <span class="o">=</span> <span class="s2">&quot;C-Cl-Li-Mn-O-Y&quot;</span>
+<span class="k">with</span> <span class="n">MPRester</span><span class="p">()</span> <span class="k">as</span> <span class="n">mpr</span><span class="p">:</span>  <span class="c1"># requires API key from Materials Project</span>
+    <span class="n">all_entries</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_entries_in_chemsys</span><span class="p">(</span><span class="n">chemsys</span><span class="p">,</span> <span class="n">inc_structure</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4781e3f44c3b428687aecae13ddf1aca", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/mcdermott/miniconda3/envs/rn_submit/lib/python3.8/site-packages/pymatgen/ext/matproj.py:559: FutureWarning: __init__ is deprecated
+MaterialsProjectCompatibility will be updated with new correction classes as well as new values of corrections and uncertainties in 2020
+  entries = MaterialsProjectCompatibility().process_entries(entries)
+</pre></div></div>
+</div>
+<p>Let’s first see how many of these entries are stable at T = 0 K by constructing a compositional phase diagram:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd_mp</span> <span class="o">=</span> <span class="n">PhaseDiagram</span><span class="p">(</span><span class="n">all_entries</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pd_mp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Li-Y-Mn-C-Cl-O phase diagram
+51 stable phases:
+YCCl, Y2O3, Li2O, LiYO2, YMn12, LiClO4, LiC12, Y2Cl3, Y2Mn2O7, LiO8, LiMnO2, CCl4, MnCO3, MnCl2, LiMn(CO3)2, Li2O2, Mn23C6, O2, Y4C7, Cl2O7, LiCl, Y3C4, Li, Y2C, ClO2, Y, YCl3, Mn2O3, C, YClO, Y4C5, YMnO3, Cl2, Mn3O4, Li2CO3, MnO2, MnO, Li6MnO4, Y12(MnC3)5, LiMn2O4, ClO3, Cl2O, Y(ClO4)3, Li2MnO3, Mn, YMn2O5, Li5Mn7O16, CO2, Mn8Cl3O10, Li4Mn5O12, Y10Mn13C18
+</pre></div></div>
+</div>
+<p>When we initialize the network in the next section, it will attempt to estimate the finite temperature phase diagram via a Gibbs estimation model, such as the SISSO model from Bartel et al. Let’s see what that does to the phase diagram at T = 900 K:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gibbs_entries</span> <span class="o">=</span> <span class="n">GibbsComputedStructureEntry</span><span class="o">.</span><span class="n">from_pd</span><span class="p">(</span><span class="n">pd_mp</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mi">900</span><span class="p">)</span>
+<span class="n">pd_gibbs</span> <span class="o">=</span> <span class="n">PhaseDiagram</span><span class="p">(</span><span class="n">gibbs_entries</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pd_gibbs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Li-Y-Mn-C-Cl-O phase diagram
+41 stable phases:
+MnCO3, Li2MnO3, O2, YMnO3, Y2C, Y2Mn2O7, YClO, Li2CO3, LiMn2O4, LiYO2, MnO, CCl3, LiC12, Y2MnC4, MnO2, Mn8Cl3O10, YMn2O5, Li3MnO3, Y12(MnC3)5, Li6MnO4, LiMnO2, Mn, Y2O3, Mn2O3, Li, Y4C5, YMn12, MnCl2, C, Cl2, Y10Mn13C18, LiCl, Li5Mn7O16, Mn3O4, Li2O, CCl2O, CO2, Y, YCl3, YCCl, Y4C7
+</pre></div></div>
+</div>
+<p>It appears that many structures are destabilized at high temperature according to the Gibbs SISSO descriptor. This will affect how we filter entries to include in the network.</p>
+<p>To create the reaction network, we must first initialize a ReactionNetwork object with a list of ComputedStructureEntry objects (at T = 0 K). This performs necessary preprocessing steps on the list of entries, such as converting them to <em>GibbsComputedStructureEntry</em> objects and filtering for thermodynamic stability. Please see the code documentation for more description on the input parameters. In the example below, we will be using a thermodynamic stability cutoff of +20 meV/atom above hull
+<strong>(this is a tighter cutoff than the one in the manuscript, 30 meV/atom, to lessen the compute time)</strong></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span> <span class="o">=</span> <span class="n">ReactionNetwork</span><span class="p">(</span><span class="n">all_entries</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span> <span class="n">include_metastable</span><span class="o">=</span><span class="mf">0.020</span><span class="p">)</span> <span class="c1"># include entries &lt;= 20 meV/atom above hull</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-1-f67023e3f699&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>rn <span class="ansi-blue-fg">=</span> ReactionNetwork<span class="ansi-blue-fg">(</span>all_entries<span class="ansi-blue-fg">,</span> n<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">2</span><span class="ansi-blue-fg">,</span> temp<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">900</span><span class="ansi-blue-fg">,</span> include_metastable<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">0.020</span><span class="ansi-blue-fg">)</span> <span class="ansi-red-fg"># include entries &lt;= 20 meV/atom above hull</span>
+
+<span class="ansi-red-fg">NameError</span>: name &#39;ReactionNetwork&#39; is not defined
+</pre></div></div>
+</div>
+<p>To actually create the reaction network graph, we must specify both a list of precursor entries and list of target entries. Either (or both) of these can also be empty; if so, the network will treat these precursor/target nodes as “dummy” nodes, meaning that they will link into/out of every node in the network.</p>
+<p>The assisted metathesis reaction reported by Todd &amp; Neilson (2019) we would like to study is the following:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[Mn_2O_3 + 2 YCl_3 + 3Li_2CO_3 \to 2YMnO_3 + 6LiCl + 3CO_2\]</div>
+</div>
+<p>We first identify the compositions of this reaction and verify that it is correct by having it automatically balanced:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">precursors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Mn2O3&quot;</span><span class="p">,</span> <span class="s2">&quot;YCl3&quot;</span><span class="p">,</span><span class="s2">&quot;Li2CO3&quot;</span><span class="p">]</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">,</span><span class="s2">&quot;CO2&quot;</span><span class="p">,</span><span class="s2">&quot;LiCl&quot;</span><span class="p">]</span>
+
+<span class="n">precursors</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">precursors</span><span class="p">]</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">]</span>
+
+<span class="n">net_rxn</span> <span class="o">=</span> <span class="n">Reaction</span><span class="p">(</span><span class="n">precursors</span><span class="p">,</span><span class="n">targets</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Net RXN: </span><span class="si">{</span><span class="n">net_rxn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Net RXN: 0.5 Mn2O3 + YCl3 + 1.5 Li2CO3 -&gt; YMnO3 + 1.5 CO2 + 3 LiCl
+</pre></div></div>
+</div>
+<p>We then need to select which entries correspond to the precursors and targets. If we only know the compositions we want, we need to iterate through all of the entries to find them:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">precursor_entries</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">target_entries</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">rn</span><span class="o">.</span><span class="n">_filtered_entries</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="ow">in</span> <span class="n">precursors</span><span class="p">:</span>
+        <span class="n">precursor_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+        <span class="n">target_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Finally, we generate the reaction network itself. This process iterates through all possible chemical reactions and creates weighted edges using the designated cost function.</p>
+<p><strong>IMPORTANT NOTE: this particular graph will likely take 3-5 minutes to generate, depending on your CPU specs.</strong> The progress of the calculation can be checked via the Dask web GUI. We strongly recommend you use computing resources for performing these calculations if available to you.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span><span class="o">.</span><span class="n">generate_rxn_network</span><span class="p">(</span><span class="n">precursor_entries</span><span class="p">,</span><span class="n">target_entries</span><span class="p">,</span><span class="s2">&quot;softplus&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:ReactionNetwork:Generating reactions by chemical subsystem...
+INFO:ReactionNetwork:Graph creation took 149.8 seconds.
+INFO:ReactionNetwork:Created graph with 3309 nodes and 31302 edges.
+</pre></div></div>
+</div>
+<p>Now that the graph is constructed, we can look for shortest paths on the graph to a specific target. For example, we can look at the shortest paths from the precursors to YMnO<span class="math notranslate nohighlight">\(_3\)</span> alone.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ymno3_entry</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">target_entries</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="o">==</span> <span class="s2">&quot;YMnO3&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">rn</span><span class="o">.</span><span class="n">set_target</span><span class="p">(</span><span class="n">ymno3_entry</span><span class="p">)</span>
+
+<span class="n">paths</span> <span class="o">=</span> <span class="n">rn</span><span class="o">.</span><span class="n">find_k_shortest_paths</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2 YCl3 + 9 Mn2O3 -&gt; Y2Mn2O7 + 2 Mn8Cl3O10 (dG = -0.015 eV/atom)
+0.5 Y2Mn2O7 + 0.5 Mn2O3 -&gt; MnO2 + YMnO3 (dG = 0.005 eV/atom)
+Total Cost: 0.528
+
+1.5 Li2CO3 + 0.5 Mn2O3 -&gt; Li3MnO3 + 1.5 CO2 (dG = 0.193 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.531
+
+YCl3 + 5 Mn2O3 -&gt; YMn2O5 + Mn8Cl3O10 (dG = -0.025 eV/atom)
+YMn2O5 -&gt; MnO2 + YMnO3 (dG = 0.048 eV/atom)
+Total Cost: 0.535
+
+2 YCl3 + 9 Mn2O3 -&gt; Y2Mn2O7 + 2 Mn8Cl3O10 (dG = -0.015 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+Total Cost: 0.536
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + YCl3 -&gt; YMnO3 + CCl3 (dG = 0.393 eV/atom)
+Total Cost: 0.649
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+3.429 Li2MnO3 + 3.286 Mn2O3 -&gt; Li3MnO3 + 0.4286 Li9Mn21O40 (dG = 0.029 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.764
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+3 Li2MnO3 + 2 Mn2O3 -&gt; Li3MnO3 + 3 LiMn2O4 (dG = 0.035 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.765
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+3.6 Li2MnO3 + 3.8 Mn2O3 -&gt; Li3MnO3 + 0.6 Li7Mn17O32 (dG = 0.039 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.766
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+3.429 Li2MnO3 + 3.286 Mn2O3 -&gt; Li3MnO3 + 0.4286 Li9Mn21O40 (dG = 0.029 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.767
+
+YCl3 + 5 Mn2O3 -&gt; YMn2O5 + Mn8Cl3O10 (dG = -0.025 eV/atom)
+0.625 Mn2O3 + 0.025 YMn2O5 -&gt; MnO2 + 0.025 YMn12 (dG = 0.363 eV/atom)
+0.56 MnO2 + 0.04 YMn12 -&gt; MnO + 0.04 YMnO3 (dG = -0.652 eV/atom)
+Total Cost: 0.768
+
+</pre></div></div>
+</div>
+<p>While this is nice for understanding which reaction(s) lead to YMnO<span class="math notranslate nohighlight">\(_3\)</span>, this pathway identification contains no enformcent of conservation of mass. Since we know the stoichiometric coefficients of the <strong>net</strong> reaction, we need to combine these shortest paths in a logical way.</p>
+<p>Thus net reaction pathways are identified by finding the k shortest paths to each target, and then attempting to combine identified reactions to form a set that satisifies the stoichiometry of the net reaction.</p>
+<p>You will see in the output below: 1) the k-shortest paths to each target, 2) a step showing the progress of identification of crossover reactions, and 3) a printed list of all reactions being considered during postprocessing.</p>
+<p><strong>IMPORTANT NOTE: the k-shortest paths algorithm (Yen’s algorithm) typically performs very quickly, but the postprocessing of combinations can take some time to generate and balance combinations. Even though it is parallelized, this step may take 5-10 mins depending on your computing specs.</strong> We again strongly recommend the use of computing resources for this task.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">max_num_combos</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">chempots</span> <span class="o">=</span> <span class="p">{</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">):</span><span class="mi">0</span><span class="p">}</span>
+
+<span class="n">paths</span> <span class="o">=</span> <span class="n">rn</span><span class="o">.</span><span class="n">find_all_rxn_pathways</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="n">precursor_entries</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="n">target_entries</span><span class="p">,</span>
+                                 <span class="n">consider_crossover_rxns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_num_combos</span><span class="o">=</span><span class="n">max_num_combos</span><span class="p">,</span>
+                                 <span class="n">filter_interdependent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">chempots</span><span class="o">=</span><span class="n">chempots</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:ReactionNetwork:NET RXN: 0.5 Li2CO3 + 0.1667 Mn2O3 + 0.3333 YCl3 -&gt; LiCl + 0.5 CO2 + 0.3333 YMnO3
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PATHS to LiCl
+
+---------------------------------------
+
+1.5 Li2CO3 + 0.5 Mn2O3 -&gt; Li3MnO3 + 1.5 CO2 (dG = 0.193 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.531
+
+Li2CO3 -&gt; Li2O + CO2 (dG = 0.308 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.546
+
+Li2CO3 -&gt; Li2O + CO2 (dG = 0.308 eV/atom)
+YCl3 + Li2O -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Total Cost: 0.551
+
+Li2CO3 -&gt; Li2O + CO2 (dG = 0.308 eV/atom)
+YCl3 + 2 Li2O -&gt; LiYO2 + 3 LiCl (dG = -0.271 eV/atom)
+Total Cost: 0.554
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2.286 Li2MnO3 + 1.857 Mn2O3 -&gt; Li2O + 0.2857 Li9Mn21O40 (dG = 0.047 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.751
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2.4 Li2MnO3 + 2.2 Mn2O3 -&gt; Li2O + 0.4 Li7Mn17O32 (dG = 0.056 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.753
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+2.286 Li2MnO3 + 1.857 Mn2O3 -&gt; Li2O + 0.2857 Li9Mn21O40 (dG = 0.047 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.754
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2 Li2MnO3 + Mn2O3 -&gt; Li2O + 2 LiMn2O4 (dG = 0.06 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.754
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2.286 Li2MnO3 + 1.857 Mn2O3 -&gt; Li2O + 0.2857 Li9Mn21O40 (dG = 0.047 eV/atom)
+YCl3 + Li2O -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Total Cost: 0.756
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+2.4 Li2MnO3 + 2.2 Mn2O3 -&gt; Li2O + 0.4 Li7Mn17O32 (dG = 0.056 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.756
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+2 Li2MnO3 + Mn2O3 -&gt; Li2O + 2 LiMn2O4 (dG = 0.06 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.757
+
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+0.8333 Mn2O3 + 0.3333 LiMnO2 -&gt; 0.1667 Li2O + Mn2O3 (dG = 0.027 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.757
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2.4 Li2MnO3 + 2.2 Mn2O3 -&gt; Li2O + 0.4 Li7Mn17O32 (dG = 0.056 eV/atom)
+YCl3 + Li2O -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Total Cost: 0.758
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+2.286 Li2MnO3 + 1.857 Mn2O3 -&gt; Li2O + 0.2857 Li9Mn21O40 (dG = 0.047 eV/atom)
+YCl3 + Li2O -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Total Cost: 0.759
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2.286 Li2MnO3 + 1.857 Mn2O3 -&gt; Li2O + 0.2857 Li9Mn21O40 (dG = 0.047 eV/atom)
+YCl3 + 2 Li2O -&gt; LiYO2 + 3 LiCl (dG = -0.271 eV/atom)
+Total Cost: 0.759
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2 Li2MnO3 + Mn2O3 -&gt; Li2O + 2 LiMn2O4 (dG = 0.06 eV/atom)
+YCl3 + Li2O -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Total Cost: 0.759
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+10 Li2MnO3 + 2.5 Mn2O3 -&gt; Li9Mn15O32 + 5.5 Li2O (dG = 0.083 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.76
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+11 Li2MnO3 + 4.5 Mn2O3 -&gt; Li9Mn20O40 + 6.5 Li2O (dG = 0.083 eV/atom)
+2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Total Cost: 0.76
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+2.4 Li2MnO3 + 2.2 Mn2O3 -&gt; Li2O + 0.4 Li7Mn17O32 (dG = 0.056 eV/atom)
+YCl3 + Li2O -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Total Cost: 0.761
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2.4 Li2MnO3 + 2.2 Mn2O3 -&gt; Li2O + 0.4 Li7Mn17O32 (dG = 0.056 eV/atom)
+YCl3 + 2 Li2O -&gt; LiYO2 + 3 LiCl (dG = -0.271 eV/atom)
+Total Cost: 0.761
+
+PATHS to CO2
+
+---------------------------------------
+
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+Total Cost: 0.286
+
+1.5 Li2CO3 + 0.5 Mn2O3 -&gt; Li3MnO3 + 1.5 CO2 (dG = 0.193 eV/atom)
+Total Cost: 0.313
+
+Li2CO3 -&gt; Li2O + CO2 (dG = 0.308 eV/atom)
+Total Cost: 0.345
+
+2 Mn2O3 -&gt; MnO2 + Mn3O4 (dG = 0.015 eV/atom)
+2 Li2CO3 + 5 MnO2 -&gt; Li4Mn5O12 + 2 CO2 (dG = 0.043 eV/atom)
+Total Cost: 0.544
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + Mn2O3 -&gt; CO2 + Mn3O4 (dG = 0.022 eV/atom)
+Total Cost: 0.548
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+1.5 MnCO3 + 3.5 Li2MnO3 -&gt; Li7Mn5O12 + 1.5 CO2 (dG = 0.03 eV/atom)
+Total Cost: 0.55
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + Li2MnO3 -&gt; CO2 + 2 LiMnO2 (dG = 0.033 eV/atom)
+Total Cost: 0.55
+
+2 Mn2O3 -&gt; MnO2 + Mn3O4 (dG = 0.015 eV/atom)
+Li2CO3 + MnO2 -&gt; Li2MnO3 + CO2 (dG = 0.072 eV/atom)
+Total Cost: 0.551
+
+Mn2O3 -&gt; MnO + MnO2 (dG = 0.097 eV/atom)
+2 Li2CO3 + 5 MnO2 -&gt; Li4Mn5O12 + 2 CO2 (dG = 0.043 eV/atom)
+Total Cost: 0.563
+
+Li2CO3 -&gt; Li2O + CO2 (dG = 0.308 eV/atom)
+Li2O + 2 CO2 -&gt; Li2CO3 + CO2 (dG = -0.205 eV/atom)
+Total Cost: 0.566
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 -&gt; MnO + CO2 (dG = 0.11 eV/atom)
+Total Cost: 0.569
+
+Mn2O3 -&gt; MnO + MnO2 (dG = 0.097 eV/atom)
+Li2CO3 + MnO2 -&gt; Li2MnO3 + CO2 (dG = 0.072 eV/atom)
+Total Cost: 0.57
+
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+0.3333 Li2CO3 + 0.6667 CO2 -&gt; 0.3333 Li2O + CO2 (dG = 0.154 eV/atom)
+Total Cost: 0.588
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2 Li2CO3 + Li2Mn(CO3)2 -&gt; Li6MnO4 + 4 CO2 (dG = 0.249 eV/atom)
+Total Cost: 0.603
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + 3 Li2CO3 -&gt; Li6MnO4 + 4 CO2 (dG = 0.254 eV/atom)
+Total Cost: 0.608
+
+1.5 Li2CO3 + 0.5 Mn2O3 -&gt; Li3MnO3 + 1.5 CO2 (dG = 0.193 eV/atom)
+0.3333 Li2CO3 + 0.6667 CO2 -&gt; 0.3333 Li2O + CO2 (dG = 0.154 eV/atom)
+Total Cost: 0.616
+
+Mn2O3 -&gt; MnO + MnO2 (dG = 0.097 eV/atom)
+3 Li2CO3 + MnO -&gt; Li6MnO4 + 3 CO2 (dG = 0.265 eV/atom)
+Total Cost: 0.621
+
+2 Mn2O3 -&gt; Mn + 3 MnO2 (dG = 0.329 eV/atom)
+2 Li2CO3 + 5 MnO2 -&gt; Li4Mn5O12 + 2 CO2 (dG = 0.043 eV/atom)
+Total Cost: 0.627
+
+2 Mn2O3 -&gt; Mn + 3 MnO2 (dG = 0.329 eV/atom)
+Li2CO3 + MnO2 -&gt; Li2MnO3 + CO2 (dG = 0.072 eV/atom)
+Total Cost: 0.634
+
+0.5 Mn2O3 -&gt; MnO + 0.25 O2 (dG = 0.264 eV/atom)
+3 Li2CO3 + MnO -&gt; Li6MnO4 + 3 CO2 (dG = 0.265 eV/atom)
+Total Cost: 0.666
+
+PATHS to YMnO3
+
+---------------------------------------
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+  0%|          | 0/561 [00:00&lt;?, ?it/s]
+  1%|          | 7/561 [00:00&lt;00:09, 55.67it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2 YCl3 + 9 Mn2O3 -&gt; Y2Mn2O7 + 2 Mn8Cl3O10 (dG = -0.015 eV/atom)
+0.5 Y2Mn2O7 + 0.5 Mn2O3 -&gt; MnO2 + YMnO3 (dG = 0.005 eV/atom)
+Total Cost: 0.528
+
+1.5 Li2CO3 + 0.5 Mn2O3 -&gt; Li3MnO3 + 1.5 CO2 (dG = 0.193 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.531
+
+YCl3 + 5 Mn2O3 -&gt; YMn2O5 + Mn8Cl3O10 (dG = -0.025 eV/atom)
+YMn2O5 -&gt; MnO2 + YMnO3 (dG = 0.048 eV/atom)
+Total Cost: 0.535
+
+2 YCl3 + 9 Mn2O3 -&gt; Y2Mn2O7 + 2 Mn8Cl3O10 (dG = -0.015 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+Total Cost: 0.536
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + YCl3 -&gt; YMnO3 + CCl3 (dG = 0.393 eV/atom)
+Total Cost: 0.649
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+3.429 Li2MnO3 + 3.286 Mn2O3 -&gt; Li3MnO3 + 0.4286 Li9Mn21O40 (dG = 0.029 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.764
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+3 Li2MnO3 + 2 Mn2O3 -&gt; Li3MnO3 + 3 LiMn2O4 (dG = 0.035 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.765
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+3.6 Li2MnO3 + 3.8 Mn2O3 -&gt; Li3MnO3 + 0.6 Li7Mn17O32 (dG = 0.039 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.766
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+3.429 Li2MnO3 + 3.286 Mn2O3 -&gt; Li3MnO3 + 0.4286 Li9Mn21O40 (dG = 0.029 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.767
+
+YCl3 + 5 Mn2O3 -&gt; YMn2O5 + Mn8Cl3O10 (dG = -0.025 eV/atom)
+0.625 Mn2O3 + 0.025 YMn2O5 -&gt; MnO2 + 0.025 YMn12 (dG = 0.363 eV/atom)
+0.56 MnO2 + 0.04 YMn12 -&gt; MnO + 0.04 YMnO3 (dG = -0.652 eV/atom)
+Total Cost: 0.768
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+3 Li2MnO3 + 2 Mn2O3 -&gt; Li3MnO3 + 3 LiMn2O4 (dG = 0.035 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.768
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+10 Li2MnO3 + 4.333 Mn2O3 -&gt; Li9Mn15O32 + 3.667 Li3MnO3 (dG = 0.049 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.769
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+11 Li2MnO3 + 6.667 Mn2O3 -&gt; Li9Mn20O40 + 4.333 Li3MnO3 (dG = 0.05 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.769
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+3.6 Li2MnO3 + 3.8 Mn2O3 -&gt; Li3MnO3 + 0.6 Li7Mn17O32 (dG = 0.039 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.769
+
+2 YCl3 + 9 Mn2O3 -&gt; Y2Mn2O7 + 2 Mn8Cl3O10 (dG = -0.015 eV/atom)
+0.0125 Y2Mn2O7 + 0.6375 Mn2O3 -&gt; MnO2 + 0.025 YMn12 (dG = 0.361 eV/atom)
+0.56 MnO2 + 0.04 YMn12 -&gt; MnO + 0.04 YMnO3 (dG = -0.652 eV/atom)
+Total Cost: 0.769
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2.571 Li2MnO3 + 0.7143 Mn2O3 -&gt; Li3MnO3 + 0.4286 Li5Mn7O16 (dG = 0.053 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.77
+
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+0.9091 Mn2O3 + 0.2727 LiMnO2 -&gt; 0.09091 Li3MnO3 + Mn2O3 (dG = 0.013 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.771
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2.455 Li2MnO3 + 1.455 Mn2O3 -&gt; Li3MnO3 + 0.2727 Li7Mn16O32 (dG = 0.06 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.771
+
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+10 Li2MnO3 + 4.333 Mn2O3 -&gt; Li9Mn15O32 + 3.667 Li3MnO3 (dG = 0.049 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.771
+
+2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2 (dG = 0.042 eV/atom)
+2.625 Li2MnO3 + 0.875 Mn2O3 -&gt; Li3MnO3 + 0.375 Li6Mn9O20 (dG = 0.06 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Total Cost: 0.771
+
+Finding crossover reactions paths...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+  2%|▏         | 13/561 [00:00&lt;00:09, 54.98it/s]
+  3%|▎         | 19/561 [00:00&lt;00:10, 49.32it/s]
+  4%|▍         | 25/561 [00:00&lt;00:10, 48.90it/s]
+  5%|▌         | 30/561 [00:00&lt;00:11, 48.12it/s]
+  6%|▌         | 35/561 [00:00&lt;00:11, 47.75it/s]
+  7%|▋         | 40/561 [00:00&lt;00:16, 32.05it/s]
+  8%|▊         | 44/561 [00:01&lt;00:19, 27.00it/s]
+  9%|▊         | 49/561 [00:01&lt;00:18, 28.07it/s]
+  9%|▉         | 53/561 [00:01&lt;00:20, 24.81it/s]
+ 10%|▉         | 56/561 [00:01&lt;00:19, 25.56it/s]
+ 11%|█         | 59/561 [00:01&lt;00:21, 23.85it/s]
+ 11%|█         | 62/561 [00:01&lt;00:20, 23.80it/s]
+ 12%|█▏        | 65/561 [00:02&lt;00:23, 21.31it/s]
+ 12%|█▏        | 69/561 [00:02&lt;00:20, 24.20it/s]
+ 13%|█▎        | 72/561 [00:02&lt;00:19, 24.51it/s]
+ 13%|█▎        | 75/561 [00:02&lt;00:19, 25.48it/s]
+ 14%|█▍        | 78/561 [00:02&lt;00:20, 23.23it/s]
+ 15%|█▍        | 82/561 [00:02&lt;00:17, 26.64it/s]
+ 15%|█▌        | 85/561 [00:02&lt;00:18, 25.63it/s]
+ 16%|█▌        | 88/561 [00:02&lt;00:17, 26.64it/s]
+ 16%|█▌        | 91/561 [00:03&lt;00:17, 26.98it/s]
+ 17%|█▋        | 94/561 [00:03&lt;00:18, 25.12it/s]
+ 17%|█▋        | 97/561 [00:03&lt;00:18, 24.90it/s]
+ 23%|██▎       | 128/561 [00:03&lt;00:04, 90.38it/s]
+ 24%|██▍       | 137/561 [00:03&lt;00:08, 48.27it/s]
+ 26%|██▌       | 144/561 [00:04&lt;00:10, 40.09it/s]
+ 27%|██▋       | 150/561 [00:04&lt;00:11, 35.61it/s]
+ 28%|██▊       | 155/561 [00:04&lt;00:12, 31.47it/s]
+ 28%|██▊       | 159/561 [00:04&lt;00:14, 28.31it/s]
+ 29%|██▉       | 163/561 [00:05&lt;00:14, 26.93it/s]
+ 30%|██▉       | 167/561 [00:05&lt;00:15, 25.40it/s]
+ 30%|███       | 170/561 [00:05&lt;00:17, 22.19it/s]
+ 31%|███       | 173/561 [00:05&lt;00:19, 19.78it/s]
+ 31%|███▏      | 176/561 [00:05&lt;00:19, 19.44it/s]
+ 32%|███▏      | 179/561 [00:06&lt;00:23, 16.46it/s]
+ 33%|███▎      | 183/561 [00:06&lt;00:20, 18.32it/s]
+ 33%|███▎      | 185/561 [00:06&lt;00:20, 18.08it/s]
+ 33%|███▎      | 187/561 [00:06&lt;00:20, 18.36it/s]
+ 34%|███▍      | 190/561 [00:06&lt;00:19, 19.14it/s]
+ 35%|███▍      | 194/561 [00:06&lt;00:16, 22.13it/s]
+ 35%|███▌      | 197/561 [00:06&lt;00:16, 22.52it/s]
+ 36%|███▌      | 200/561 [00:07&lt;00:16, 21.77it/s]
+ 36%|███▌      | 203/561 [00:07&lt;00:15, 22.97it/s]
+ 37%|███▋      | 206/561 [00:07&lt;00:16, 21.73it/s]
+ 37%|███▋      | 209/561 [00:07&lt;00:14, 23.49it/s]
+ 38%|███▊      | 212/561 [00:07&lt;00:14, 23.33it/s]
+ 38%|███▊      | 215/561 [00:07&lt;00:15, 22.86it/s]
+ 39%|███▉      | 218/561 [00:07&lt;00:15, 21.76it/s]
+ 39%|███▉      | 221/561 [00:07&lt;00:15, 22.58it/s]
+ 40%|███▉      | 224/561 [00:08&lt;00:13, 24.22it/s]
+ 40%|████      | 227/561 [00:08&lt;00:14, 22.69it/s]
+ 41%|████      | 230/561 [00:08&lt;00:13, 24.20it/s]
+ 42%|████▏     | 234/561 [00:08&lt;00:12, 25.84it/s]
+ 42%|████▏     | 237/561 [00:08&lt;00:13, 24.65it/s]
+ 43%|████▎     | 241/561 [00:08&lt;00:11, 27.67it/s]
+ 43%|████▎     | 244/561 [00:08&lt;00:12, 24.91it/s]
+ 44%|████▍     | 247/561 [00:08&lt;00:12, 25.23it/s]
+ 45%|████▍     | 250/561 [00:09&lt;00:12, 25.40it/s]
+ 45%|████▌     | 254/561 [00:09&lt;00:11, 26.08it/s]
+ 46%|████▌     | 257/561 [00:09&lt;00:11, 26.73it/s]
+ 47%|████▋     | 261/561 [00:09&lt;00:10, 28.04it/s]
+ 47%|████▋     | 264/561 [00:09&lt;00:11, 26.37it/s]
+ 48%|████▊     | 267/561 [00:09&lt;00:12, 24.45it/s]
+ 48%|████▊     | 270/561 [00:09&lt;00:11, 24.91it/s]
+ 49%|████▊     | 273/561 [00:09&lt;00:11, 25.99it/s]
+ 49%|████▉     | 276/561 [00:10&lt;00:11, 24.78it/s]
+ 50%|████▉     | 279/561 [00:10&lt;00:10, 25.86it/s]
+ 50%|█████     | 282/561 [00:10&lt;00:10, 26.94it/s]
+ 51%|█████     | 285/561 [00:10&lt;00:12, 22.61it/s]
+ 51%|█████▏    | 288/561 [00:10&lt;00:14, 19.36it/s]
+ 52%|█████▏    | 291/561 [00:10&lt;00:15, 17.38it/s]
+ 52%|█████▏    | 294/561 [00:11&lt;00:14, 18.86it/s]
+ 53%|█████▎    | 297/561 [00:11&lt;00:17, 15.48it/s]
+ 53%|█████▎    | 300/561 [00:11&lt;00:16, 16.13it/s]
+ 54%|█████▍    | 302/561 [00:11&lt;00:17, 14.79it/s]
+ 54%|█████▍    | 304/561 [00:11&lt;00:17, 14.45it/s]
+ 55%|█████▍    | 307/561 [00:11&lt;00:14, 17.07it/s]
+ 55%|█████▌    | 309/561 [00:11&lt;00:14, 17.63it/s]
+ 56%|█████▌    | 314/561 [00:12&lt;00:09, 25.18it/s]
+ 57%|█████▋    | 318/561 [00:12&lt;00:08, 27.83it/s]
+ 57%|█████▋    | 322/561 [00:12&lt;00:07, 30.77it/s]
+ 58%|█████▊    | 326/561 [00:12&lt;00:07, 32.30it/s]
+ 59%|█████▉    | 330/561 [00:12&lt;00:06, 34.00it/s]
+ 60%|█████▉    | 334/561 [00:12&lt;00:08, 28.33it/s]
+ 60%|██████    | 338/561 [00:12&lt;00:08, 26.66it/s]
+ 61%|██████    | 341/561 [00:13&lt;00:08, 25.19it/s]
+ 61%|██████▏   | 345/561 [00:13&lt;00:08, 26.54it/s]
+ 62%|██████▏   | 349/561 [00:13&lt;00:07, 27.87it/s]
+ 63%|██████▎   | 352/561 [00:13&lt;00:07, 26.88it/s]
+ 63%|██████▎   | 355/561 [00:13&lt;00:08, 23.69it/s]
+ 64%|██████▍   | 358/561 [00:13&lt;00:10, 19.61it/s]
+ 64%|██████▍   | 361/561 [00:13&lt;00:10, 18.70it/s]
+ 65%|██████▍   | 364/561 [00:14&lt;00:10, 19.23it/s]
+ 65%|██████▌   | 367/561 [00:14&lt;00:12, 15.83it/s]
+ 66%|██████▌   | 371/561 [00:14&lt;00:10, 18.46it/s]
+ 67%|██████▋   | 375/561 [00:14&lt;00:08, 22.25it/s]
+ 68%|██████▊   | 379/561 [00:14&lt;00:07, 24.75it/s]
+ 68%|██████▊   | 384/561 [00:14&lt;00:06, 29.18it/s]
+ 69%|██████▉   | 388/561 [00:15&lt;00:05, 31.45it/s]
+ 70%|██████▉   | 392/561 [00:15&lt;00:05, 29.75it/s]
+ 71%|███████   | 396/561 [00:15&lt;00:06, 25.82it/s]
+ 71%|███████   | 399/561 [00:15&lt;00:06, 24.90it/s]
+ 72%|███████▏  | 402/561 [00:15&lt;00:06, 24.17it/s]
+ 72%|███████▏  | 405/561 [00:15&lt;00:06, 24.77it/s]
+ 73%|███████▎  | 408/561 [00:15&lt;00:07, 20.83it/s]
+ 73%|███████▎  | 411/561 [00:16&lt;00:07, 19.80it/s]
+ 74%|███████▍  | 414/561 [00:16&lt;00:06, 21.65it/s]
+ 75%|███████▍  | 419/561 [00:16&lt;00:05, 26.57it/s]
+ 75%|███████▌  | 423/561 [00:16&lt;00:05, 26.79it/s]
+ 76%|███████▌  | 427/561 [00:16&lt;00:04, 28.66it/s]
+ 77%|███████▋  | 430/561 [00:16&lt;00:05, 25.71it/s]
+ 77%|███████▋  | 433/561 [00:16&lt;00:05, 24.73it/s]
+ 78%|███████▊  | 436/561 [00:17&lt;00:05, 22.96it/s]
+ 78%|███████▊  | 439/561 [00:17&lt;00:05, 24.11it/s]
+ 79%|███████▉  | 442/561 [00:17&lt;00:05, 21.21it/s]
+ 79%|███████▉  | 445/561 [00:17&lt;00:05, 21.50it/s]
+ 80%|███████▉  | 448/561 [00:17&lt;00:05, 22.15it/s]
+ 80%|████████  | 451/561 [00:17&lt;00:04, 23.41it/s]
+ 81%|████████  | 454/561 [00:17&lt;00:04, 24.80it/s]
+ 81%|████████▏ | 457/561 [00:18&lt;00:04, 21.00it/s]
+ 82%|████████▏ | 460/561 [00:18&lt;00:05, 19.76it/s]
+ 83%|████████▎ | 463/561 [00:18&lt;00:05, 18.24it/s]
+ 83%|████████▎ | 466/561 [00:18&lt;00:04, 19.63it/s]
+ 84%|████████▎ | 469/561 [00:18&lt;00:04, 18.77it/s]
+ 84%|████████▍ | 472/561 [00:18&lt;00:04, 20.77it/s]
+ 85%|████████▌ | 477/561 [00:18&lt;00:03, 26.47it/s]
+ 86%|████████▌ | 481/561 [00:19&lt;00:02, 29.57it/s]
+ 86%|████████▋ | 485/561 [00:19&lt;00:02, 27.58it/s]
+ 87%|████████▋ | 489/561 [00:19&lt;00:02, 28.73it/s]
+ 88%|████████▊ | 493/561 [00:19&lt;00:02, 29.59it/s]
+ 89%|████████▊ | 497/561 [00:19&lt;00:02, 24.23it/s]
+ 89%|████████▉ | 500/561 [00:19&lt;00:02, 21.88it/s]
+ 90%|████████▉ | 503/561 [00:19&lt;00:02, 21.94it/s]
+ 90%|█████████ | 506/561 [00:20&lt;00:02, 18.79it/s]
+ 91%|█████████ | 509/561 [00:20&lt;00:02, 20.11it/s]
+ 91%|█████████▏| 512/561 [00:20&lt;00:02, 18.76it/s]
+ 92%|█████████▏| 516/561 [00:20&lt;00:02, 21.88it/s]
+ 93%|█████████▎| 520/561 [00:20&lt;00:01, 25.46it/s]
+ 93%|█████████▎| 524/561 [00:20&lt;00:01, 28.17it/s]
+ 94%|█████████▍| 528/561 [00:21&lt;00:01, 28.01it/s]
+ 95%|█████████▍| 531/561 [00:21&lt;00:01, 28.47it/s]
+ 95%|█████████▌| 534/561 [00:21&lt;00:01, 25.79it/s]
+ 96%|█████████▌| 538/561 [00:21&lt;00:00, 24.92it/s]
+ 96%|█████████▋| 541/561 [00:21&lt;00:00, 23.84it/s]
+ 97%|█████████▋| 544/561 [00:21&lt;00:00, 24.99it/s]
+ 98%|█████████▊| 547/561 [00:21&lt;00:00, 23.52it/s]
+ 98%|█████████▊| 550/561 [00:21&lt;00:00, 22.78it/s]
+ 99%|█████████▉| 554/561 [00:22&lt;00:00, 23.39it/s]
+ 99%|█████████▉| 558/561 [00:22&lt;00:00, 25.96it/s]
+100%|██████████| 561/561 [00:22&lt;00:00, 25.05it/s]
+INFO:ReactionNetwork:Considering 89 reactions...
+
+0it [00:00, ?it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[1.5 Li2CO3 + 0.5 Mn2O3 -&gt; Li3MnO3 + 1.5 CO2,
+ YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl,
+ Li2CO3 -&gt; Li2O + CO2,
+ 2 YCl3 + 3 Li2O -&gt; Y2O3 + 6 LiCl,
+ YCl3 + Li2O -&gt; YClO + 2 LiCl,
+ YCl3 + 2 Li2O -&gt; LiYO2 + 3 LiCl,
+ 2 Li2CO3 + Mn2O3 -&gt; Li2MnO3 + Li2Mn(CO3)2,
+ 2.286 Li2MnO3 + 1.857 Mn2O3 -&gt; Li2O + 0.2857 Li9Mn21O40,
+ 2.4 Li2MnO3 + 2.2 Mn2O3 -&gt; Li2O + 0.4 Li7Mn17O32,
+ Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3,
+ 2 Li2MnO3 + Mn2O3 -&gt; Li2O + 2 LiMn2O4,
+ Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2,
+ 10 Li2MnO3 + 2.5 Mn2O3 -&gt; Li9Mn15O32 + 5.5 Li2O,
+ 11 Li2MnO3 + 4.5 Mn2O3 -&gt; Li9Mn20O40 + 6.5 Li2O,
+ 2 Mn2O3 -&gt; MnO2 + Mn3O4,
+ 2 Li2CO3 + 5 MnO2 -&gt; Li4Mn5O12 + 2 CO2,
+ MnCO3 + Mn2O3 -&gt; CO2 + Mn3O4,
+ 1.5 MnCO3 + 3.5 Li2MnO3 -&gt; Li7Mn5O12 + 1.5 CO2,
+ MnCO3 + Li2MnO3 -&gt; CO2 + 2 LiMnO2,
+ Li2CO3 + MnO2 -&gt; Li2MnO3 + CO2,
+ Mn2O3 -&gt; MnO + MnO2,
+ MnCO3 -&gt; MnO + CO2,
+ 2 Li2CO3 + Li2Mn(CO3)2 -&gt; Li6MnO4 + 4 CO2,
+ MnCO3 + 3 Li2CO3 -&gt; Li6MnO4 + 4 CO2,
+ 3 Li2CO3 + MnO -&gt; Li6MnO4 + 3 CO2,
+ 2 Mn2O3 -&gt; Mn + 3 MnO2,
+ 0.5 Mn2O3 -&gt; MnO + 0.25 O2,
+ 2 YCl3 + 9 Mn2O3 -&gt; Y2Mn2O7 + 2 Mn8Cl3O10,
+ 0.5 Y2Mn2O7 + 0.5 Mn2O3 -&gt; MnO2 + YMnO3,
+ YCl3 + 5 Mn2O3 -&gt; YMn2O5 + Mn8Cl3O10,
+ YMn2O5 -&gt; MnO2 + YMnO3,
+ 2 Y2Mn2O7 -&gt; O2 + 4 YMnO3,
+ MnCO3 + YCl3 -&gt; YMnO3 + CCl3,
+ 3.429 Li2MnO3 + 3.286 Mn2O3 -&gt; Li3MnO3 + 0.4286 Li9Mn21O40,
+ 3 Li2MnO3 + 2 Mn2O3 -&gt; Li3MnO3 + 3 LiMn2O4,
+ 3.6 Li2MnO3 + 3.8 Mn2O3 -&gt; Li3MnO3 + 0.6 Li7Mn17O32,
+ 0.625 Mn2O3 + 0.025 YMn2O5 -&gt; MnO2 + 0.025 YMn12,
+ 0.56 MnO2 + 0.04 YMn12 -&gt; MnO + 0.04 YMnO3,
+ 10 Li2MnO3 + 4.333 Mn2O3 -&gt; Li9Mn15O32 + 3.667 Li3MnO3,
+ 11 Li2MnO3 + 6.667 Mn2O3 -&gt; Li9Mn20O40 + 4.333 Li3MnO3,
+ 0.0125 Y2Mn2O7 + 0.6375 Mn2O3 -&gt; MnO2 + 0.025 YMn12,
+ 2.571 Li2MnO3 + 0.7143 Mn2O3 -&gt; Li3MnO3 + 0.4286 Li5Mn7O16,
+ 2.455 Li2MnO3 + 1.455 Mn2O3 -&gt; Li3MnO3 + 0.2727 Li7Mn16O32,
+ 2.625 Li2MnO3 + 0.875 Mn2O3 -&gt; Li3MnO3 + 0.375 Li6Mn9O20,
+ 0.1667 Li6MnO4 + 0.3333 CCl3 + 0.1667 O2 -&gt; LiCl + 0.1667 MnO2 + 0.3333 CO2,
+ 0.5 Li2O + 0.3333 CCl3 + 0.08333 O2 -&gt; LiCl + 0.3333 CO2,
+ 0.03704 Mn8Cl3O10 + 0.7037 Li3MnO3 + 0.2593 O2 -&gt; Li2MnO3 + 0.1111 LiCl,
+ 0.1818 Mn8Cl3O10 + 5.545 LiMnO2 + 1.545 O2 -&gt; Li5Mn7O16 + 0.5455 LiCl,
+ 0.07843 Mn8Cl3O10 + 0.3725 Li6MnO4 + 0.3627 O2 -&gt; Li2MnO3 + 0.2353 LiCl,
+ 0.3333 Mn8Cl3O10 + 0.1111 Li9Mn15O32 + 0.8889 O2 -&gt; LiCl + 4.333 MnO2,
+ 0.3333 Mn8Cl3O10 + 0.5 Li2Mn(CO3)2 + O2 -&gt; LiCl + 3.167 MnO2 + CO2,
+ YClO + 0.1429 Li7Mn16O32 -&gt; YMn2O5 + LiCl + 0.2857 MnO2,
+ YClO + LiMn2O4 -&gt; YMn2O5 + LiCl,
+ CCl3 + O2 -&gt; CO2 + 1.5 Cl2,
+ MnCO3 + 0.5 O2 -&gt; CO2 + MnO2,
+ 0.5 Y2O3 + 2 MnCO3 + 0.75 O2 -&gt; YMn2O5 + 2 CO2,
+ 0.3333 Mn8Cl3O10 + 0.5 Li2MnO3 + 0.75 O2 -&gt; LiCl + 3.167 MnO2,
+ LiYO2 + 0.2632 Mn8Cl3O10 + 0.3421 O2 -&gt; YMn2O5 + 0.7895 LiCl + 0.1053 Li2MnO3,
+ 0.3333 YCl3 + 0.1667 Li6MnO4 + 0.08333 O2 -&gt; LiCl + 0.08333 Y2Mn2O7 + 0.08333 Y2O3,
+ 0.3333 Mn8Cl3O10 + 0.1429 Li7Mn17O32 + 1.143 O2 -&gt; LiCl + 5.095 MnO2,
+ 0.3333 YCl3 + 0.3333 Li3MnO3 + 0.08333 O2 -&gt; LiCl + 0.1667 Y2Mn2O7,
+ 2 YCl3 + 11 LiMnO2 + 2 O2 -&gt; Li5Mn7O16 + 2 YMn2O5 + 6 LiCl,
+ 0.3333 Mn8Cl3O10 + 0.1111 Li9Mn20O40 + O2 -&gt; LiCl + 4.889 MnO2,
+ 0.3333 Mn8Cl3O10 + 0.1429 Li7Mn5O12 + 0.8571 O2 -&gt; LiCl + 3.381 MnO2,
+ 0.3333 Mn8Cl3O10 + 0.1667 Li6Mn9O20 + 0.8333 O2 -&gt; LiCl + 4.167 MnO2,
+ 0.3333 Mn8Cl3O10 + 0.2 Li5Mn7O16 + 0.8 O2 -&gt; LiCl + 4.067 MnO2,
+ 0.125 Mn8Cl3O10 + 1.187 Li2O + 0.2813 O2 -&gt; Li2MnO3 + 0.375 LiCl,
+ 0.3333 Mn8Cl3O10 + 0.25 Li4Mn5O12 + 0.75 O2 -&gt; LiCl + 3.917 MnO2,
+ YClO + 0.1111 Li9Mn21O40 + 0.1111 O2 -&gt; YMn2O5 + LiCl + 0.3333 MnO2,
+ 0.6667 CCl3 + 0.6667 O2 -&gt; Cl2 + 0.6667 CO2,
+ YClO + Li3MnO3 + 0.25 O2 -&gt; LiCl + Li2MnO3 + 0.5 Y2O3,
+ YClO + LiMnO2 + 0.25 O2 -&gt; LiCl + 0.5 Y2Mn2O7,
+ YClO + 0.25 Li6MnO4 + 0.125 O2 -&gt; LiCl + 0.25 Li2MnO3 + 0.5 Y2O3,
+ 0.3333 YCl3 + LiYO2 -&gt; LiCl + 0.6667 Y2O3,
+ 0.3333 Mn8Cl3O10 + 0.1111 Li9Mn21O40 + 1.111 O2 -&gt; LiCl + 5 MnO2,
+ YClO + 0.1111 Li9Mn20O40 -&gt; YMn2O5 + LiCl + 0.2222 MnO2,
+ YClO + 0.1429 Li7Mn5O12 + 0.1071 O2 -&gt; LiCl + 0.3571 Y2Mn2O7 + 0.1429 Y2O3,
+ YClO + 0.5 Li2O -&gt; LiCl + 0.5 Y2O3,
+ YClO + 0.1429 Li7Mn17O32 + 0.1429 O2 -&gt; YMn2O5 + LiCl + 0.4286 MnO2,
+ 0.3333 Mn8Cl3O10 + 0.1429 Li7Mn16O32 + O2 -&gt; LiCl + 4.952 MnO2,
+ 0.5 Li2CO3 + 0.3333 Mn8Cl3O10 + 0.75 O2 -&gt; LiCl + 2.667 MnO2 + 0.5 CO2,
+ 0.5 YCl3 + 0.5 Li2CO3 -&gt; LiCl + 0.5 CO2 + 0.5 YClO,
+ 0.3333 Mn8Cl3O10 + LiMn2O4 + O2 -&gt; LiCl + 4.667 MnO2,
+ 24 YCl3 + 11 Li7Mn5O12 + 2 O2 -&gt; Li5Mn7O16 + 24 YMn2O5 + 72 LiCl,
+ 0.3333 YCl3 + 0.5 Li2O -&gt; LiCl + 0.1667 Y2O3,
+ YCl3 + 0.4286 Li7Mn17O32 + 0.9286 O2 -&gt; YMn2O5 + 3 LiCl + 5.286 MnO2,
+ YClO + LiMnO2 -&gt; LiCl + YMnO3,
+ 0.3333 Li3MnO3 + 0.3333 YCl3 -&gt; LiCl + 0.3333 YMnO3,
+ 0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+1it [00:05,  5.36s/it]
+
+1it [00:00, 15.78it/s]
+
+0it [00:00, ?it/s]
+1it [00:01,  1.04s/it]
+INFO:ReactionNetwork:Generating and filtering size 4 pathways...
+
+  0%|          | 0/4 [00:00&lt;?, ?it/s]
+ 25%|██▌       | 1/4 [00:05&lt;00:17,  5.97s/it]
+ 50%|█████     | 2/4 [00:12&lt;00:12,  6.09s/it]
+ 75%|███████▌  | 3/4 [00:17&lt;00:05,  5.97s/it]
+100%|██████████| 4/4 [00:23&lt;00:00,  5.98s/it]
+5it [00:29,  5.88s/it]
+INFO:ReactionNetwork:Generating and filtering size 5 pathways...
+
+  0%|          | 0/83 [00:00&lt;?, ?it/s]
+  1%|          | 1/83 [00:07&lt;10:45,  7.87s/it]
+  2%|▏         | 2/83 [00:15&lt;10:08,  7.52s/it]
+  4%|▎         | 3/83 [00:22&lt;09:45,  7.31s/it]
+  5%|▍         | 4/83 [00:30&lt;10:03,  7.64s/it]
+  6%|▌         | 5/83 [00:39&lt;10:44,  8.26s/it]
+  7%|▋         | 6/83 [00:49&lt;11:12,  8.73s/it]
+  8%|▊         | 7/83 [00:58&lt;11:23,  9.00s/it]
+ 10%|▉         | 8/83 [01:07&lt;11:06,  8.89s/it]
+ 11%|█         | 9/83 [01:15&lt;10:31,  8.53s/it]
+ 12%|█▏        | 10/83 [01:23&lt;10:10,  8.36s/it]
+ 13%|█▎        | 11/83 [01:31&lt;09:48,  8.18s/it]
+ 14%|█▍        | 12/83 [01:39&lt;09:48,  8.29s/it]
+ 16%|█▌        | 13/83 [01:48&lt;10:01,  8.59s/it]
+ 17%|█▋        | 14/83 [01:58&lt;10:14,  8.90s/it]
+ 18%|█▊        | 15/83 [02:07&lt;09:59,  8.82s/it]
+ 19%|█▉        | 16/83 [02:14&lt;09:29,  8.51s/it]
+ 20%|██        | 17/83 [02:22&lt;09:02,  8.22s/it]
+ 22%|██▏       | 18/83 [02:29&lt;08:39,  7.99s/it]
+ 23%|██▎       | 19/83 [02:37&lt;08:21,  7.83s/it]
+ 24%|██▍       | 20/83 [02:44&lt;07:57,  7.59s/it]
+ 25%|██▌       | 21/83 [02:51&lt;07:32,  7.30s/it]
+ 27%|██▋       | 22/83 [02:57&lt;07:14,  7.12s/it]
+ 28%|██▊       | 23/83 [03:04&lt;07:01,  7.02s/it]
+ 29%|██▉       | 24/83 [03:11&lt;06:49,  6.93s/it]
+ 30%|███       | 25/83 [03:17&lt;06:36,  6.84s/it]
+ 31%|███▏      | 26/83 [03:24&lt;06:27,  6.80s/it]
+ 33%|███▎      | 27/83 [03:31&lt;06:19,  6.78s/it]
+ 34%|███▎      | 28/83 [03:38&lt;06:21,  6.94s/it]
+ 35%|███▍      | 29/83 [03:46&lt;06:23,  7.11s/it]
+ 36%|███▌      | 30/83 [03:53&lt;06:28,  7.33s/it]
+ 37%|███▋      | 31/83 [04:01&lt;06:30,  7.50s/it]
+ 39%|███▊      | 32/83 [04:09&lt;06:26,  7.58s/it]
+ 40%|███▉      | 33/83 [04:17&lt;06:17,  7.56s/it]
+ 41%|████      | 34/83 [04:24&lt;06:10,  7.57s/it]
+ 42%|████▏     | 35/83 [04:32&lt;06:07,  7.67s/it]
+ 43%|████▎     | 36/83 [04:40&lt;06:08,  7.85s/it]
+ 45%|████▍     | 37/83 [04:48&lt;06:01,  7.86s/it]
+ 46%|████▌     | 38/83 [04:56&lt;05:49,  7.77s/it]
+ 47%|████▋     | 39/83 [05:03&lt;05:33,  7.58s/it]
+ 48%|████▊     | 40/83 [05:10&lt;05:18,  7.40s/it]
+ 49%|████▉     | 41/83 [05:17&lt;05:03,  7.23s/it]
+ 51%|█████     | 42/83 [05:24&lt;04:55,  7.20s/it]
+ 52%|█████▏    | 43/83 [05:31&lt;04:50,  7.27s/it]
+ 53%|█████▎    | 44/83 [05:39&lt;04:49,  7.42s/it]
+ 54%|█████▍    | 45/83 [05:47&lt;04:44,  7.48s/it]
+ 55%|█████▌    | 46/83 [05:54&lt;04:37,  7.51s/it]
+ 57%|█████▋    | 47/83 [06:02&lt;04:27,  7.44s/it]
+ 58%|█████▊    | 48/83 [06:08&lt;04:14,  7.27s/it]
+ 59%|█████▉    | 49/83 [06:15&lt;04:02,  7.13s/it]
+ 60%|██████    | 50/83 [06:22&lt;03:54,  7.10s/it]
+ 61%|██████▏   | 51/83 [06:30&lt;03:51,  7.24s/it]
+ 63%|██████▎   | 52/83 [06:40&lt;04:07,  7.99s/it]
+ 64%|██████▍   | 53/83 [06:50&lt;04:17,  8.60s/it]
+ 65%|██████▌   | 54/83 [06:59&lt;04:17,  8.88s/it]
+ 66%|██████▋   | 55/83 [07:08&lt;04:08,  8.88s/it]
+ 67%|██████▋   | 56/83 [07:17&lt;03:56,  8.77s/it]
+ 69%|██████▊   | 57/83 [07:25&lt;03:43,  8.61s/it]
+ 70%|██████▉   | 58/83 [07:33&lt;03:34,  8.58s/it]
+ 71%|███████   | 59/83 [07:42&lt;03:27,  8.66s/it]
+ 72%|███████▏  | 60/83 [07:51&lt;03:17,  8.58s/it]
+ 73%|███████▎  | 61/83 [07:58&lt;03:02,  8.31s/it]
+ 75%|███████▍  | 62/83 [08:06&lt;02:49,  8.05s/it]
+ 76%|███████▌  | 63/83 [08:13&lt;02:36,  7.80s/it]
+ 77%|███████▋  | 64/83 [08:20&lt;02:24,  7.60s/it]
+ 78%|███████▊  | 65/83 [08:28&lt;02:16,  7.58s/it]
+ 80%|███████▉  | 66/83 [08:36&lt;02:12,  7.82s/it]
+ 81%|████████  | 67/83 [08:45&lt;02:10,  8.13s/it]
+ 82%|████████▏ | 68/83 [08:53&lt;02:03,  8.24s/it]
+ 83%|████████▎ | 69/83 [09:01&lt;01:54,  8.21s/it]
+ 84%|████████▍ | 70/83 [09:10&lt;01:46,  8.18s/it]
+ 86%|████████▌ | 71/83 [09:17&lt;01:37,  8.11s/it]
+ 87%|████████▋ | 72/83 [09:25&lt;01:27,  7.98s/it]
+ 88%|████████▊ | 73/83 [09:33&lt;01:18,  7.86s/it]
+ 89%|████████▉ | 74/83 [09:41&lt;01:10,  7.86s/it]
+ 90%|█████████ | 75/83 [09:48&lt;01:02,  7.83s/it]
+ 92%|█████████▏| 76/83 [09:56&lt;00:54,  7.73s/it]
+ 93%|█████████▎| 77/83 [10:03&lt;00:45,  7.65s/it]
+ 94%|█████████▍| 78/83 [10:11&lt;00:38,  7.63s/it]
+ 95%|█████████▌| 79/83 [10:18&lt;00:29,  7.46s/it]
+ 96%|█████████▋| 80/83 [10:25&lt;00:22,  7.36s/it]
+ 98%|█████████▊| 81/83 [10:32&lt;00:14,  7.34s/it]
+ 99%|█████████▉| 82/83 [10:40&lt;00:07,  7.49s/it]
+100%|██████████| 83/83 [10:48&lt;00:00,  7.59s/it]
+84it [10:48,  7.72s/it]
+</pre></div></div>
+</div>
+<p>Let’s check out the results. We should see several balanced pathways stored in the <strong>paths</strong> list object.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">num</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Path 1:
+Li2CO3 + 0.3333 MnO -&gt; CO2 + 0.3333 Li6MnO4 (dG = 0.265 eV/atom)
+2 Mn2O3 -&gt; O2 + 4 MnO (dG = 0.264 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+O2 + 2 Li6MnO4 + 4 YCl3 -&gt; Y2Mn2O7 + Y2O3 + 12 LiCl (dG = -0.314 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.236 | Average Cost: 0.047
+
+
+Path 2:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+
+Total Cost: 0.241 | Average Cost: 0.121
+
+
+Path 3:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+0.5 O2 + 2 Li3MnO3 + 2 YCl3 -&gt; Y2Mn2O7 + 6 LiCl (dG = -0.232 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+
+Total Cost: 0.242 | Average Cost: 0.06
+
+
+Path 4:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+0.5 O2 + 2 Li3MnO3 + 2 YCl3 -&gt; Y2Mn2O7 + 6 LiCl (dG = -0.232 eV/atom)
+
+Total Cost: 0.242 | Average Cost: 0.081
+
+
+Path 5:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.245 | Average Cost: 0.049
+
+
+Path 6:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.249 | Average Cost: 0.083
+
+
+Path 7:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+
+Total Cost: 0.253 | Average Cost: 0.051
+
+
+Path 8:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.26 | Average Cost: 0.052
+
+
+Path 9:
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+0.5 O2 + 2 YClO + 2 LiMnO2 -&gt; Y2Mn2O7 + 2 LiCl (dG = -0.102 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+
+Total Cost: 0.26 | Average Cost: 0.065
+
+
+Path 10:
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+0.5 O2 + 2 YClO + 2 LiMnO2 -&gt; Y2Mn2O7 + 2 LiCl (dG = -0.102 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.261 | Average Cost: 0.052
+
+
+Path 11:
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.261 | Average Cost: 0.087
+
+
+Path 12:
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + Li2MnO3 -&gt; CO2 + 2 LiMnO2 (dG = 0.033 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+0.5 O2 + 2 YClO + 2 LiMnO2 -&gt; Y2Mn2O7 + 2 LiCl (dG = -0.102 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+
+Total Cost: 0.261 | Average Cost: 0.052
+
+
+Path 13:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+0.5 O2 + 2 Li3MnO3 + 2 YCl3 -&gt; Y2Mn2O7 + 6 LiCl (dG = -0.232 eV/atom)
+
+Total Cost: 0.261 | Average Cost: 0.065
+
+
+Path 14:
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+MnCO3 + Li2MnO3 -&gt; CO2 + 2 LiMnO2 (dG = 0.033 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.261 | Average Cost: 0.052
+
+
+Path 15:
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + Li2MnO3 -&gt; CO2 + 2 LiMnO2 (dG = 0.033 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.261 | Average Cost: 0.065
+
+
+Path 16:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.146 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.262 | Average Cost: 0.065
+
+
+Path 17:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+0.5 O2 + 2 Li3MnO3 + 2 YCl3 -&gt; Y2Mn2O7 + 6 LiCl (dG = -0.232 eV/atom)
+
+Total Cost: 0.263 | Average Cost: 0.066
+
+
+Path 18:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.146 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.264 | Average Cost: 0.053
+
+
+Path 19:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+
+Total Cost: 0.265 | Average Cost: 0.133
+
+
+Path 20:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.039 eV/atom)
+0.5 O2 + 2 YClO + 2 LiMnO2 -&gt; Y2Mn2O7 + 2 LiCl (dG = -0.102 eV/atom)
+
+Total Cost: 0.268 | Average Cost: 0.054
+
+
+Path 21:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+
+Total Cost: 0.268 | Average Cost: 0.134
+
+
+Path 22:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.146 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.268 | Average Cost: 0.067
+
+
+Path 23:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + Li2MnO3 -&gt; CO2 + 2 LiMnO2 (dG = 0.033 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.268 | Average Cost: 0.054
+
+
+Path 24:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.269 | Average Cost: 0.067
+
+
+Path 25:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+2 Li2O + YCl3 -&gt; LiYO2 + 3 LiCl (dG = -0.271 eV/atom)
+1.5 LiYO2 + 0.5 YCl3 -&gt; Y2O3 + 1.5 LiCl (dG = -0.157 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.27 | Average Cost: 0.054
+
+
+Path 26:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.274 | Average Cost: 0.055
+
+
+Path 27:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+2 Li2O + YCl3 -&gt; LiYO2 + 3 LiCl (dG = -0.271 eV/atom)
+1.5 LiYO2 + 0.5 YCl3 -&gt; Y2O3 + 1.5 LiCl (dG = -0.157 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.274 | Average Cost: 0.069
+
+
+Path 28:
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.193 eV/atom)
+Li3MnO3 + YCl3 -&gt; YMnO3 + 3 LiCl (dG = -0.223 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.276 | Average Cost: 0.055
+
+
+Path 29:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.146 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.279 | Average Cost: 0.056
+
+
+Path 30:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+2 Li2O + YCl3 -&gt; LiYO2 + 3 LiCl (dG = -0.271 eV/atom)
+1.5 LiYO2 + 0.5 YCl3 -&gt; Y2O3 + 1.5 LiCl (dG = -0.157 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.286 | Average Cost: 0.057
+
+
+Path 31:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.146 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.286 | Average Cost: 0.057
+
+
+Path 32:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.289 | Average Cost: 0.096
+
+
+Path 33:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.308 | Average Cost: 0.103
+
+
+</pre></div></div>
+</div>
+<p>In case this didn’t work (or was taking too long), feel free to load the pre-computed path results from the paper, which also used a larger energy cutoff):</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># with open(&quot;results/ymno3_paths.json&quot;) as f:</span>
+<span class="c1">#     paths = json.load(f, cls=MontyDecoder)</span>
+</pre></div>
+</div>
+</div>
+<section id="Filtering/ranking-the-candidates">
+<h2>Filtering/ranking the candidates<a class="headerlink" href="#Filtering/ranking-the-candidates" title="Link to this heading">#</a></h2>
+<p>As discussed in the paper, several of these reaction pathways either involve interdependent steps or form hypothetical compounds that are like unsynthesizable. Hence it becomes advantageous to construct some filters to reduce the set of pathways down to the most reasonable candidates. We do that here:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cleaned_paths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+    <span class="n">interdependent</span><span class="p">,</span> <span class="n">consolidated_rxn</span> <span class="o">=</span> <span class="n">find_interdependent_rxns</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">interdependent</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> removed&quot;</span><span class="p">)</span>
+        <span class="k">continue</span>
+    <span class="n">cleaned_paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Path 1 removed
+Path 3 removed
+Path 4 removed
+Path 9 removed
+Path 10 removed
+Path 12 removed
+Path 13 removed
+Path 17 removed
+Path 20 removed
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hypothetical_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Li3MnO3&quot;</span><span class="p">,</span><span class="s2">&quot;Li2MnCO5&quot;</span><span class="p">,</span><span class="s2">&quot;Li2MnCO4&quot;</span><span class="p">]</span>
+<span class="n">hypothetical_phases</span> <span class="o">=</span> <span class="p">{</span><span class="n">Composition</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">hypothetical_phases</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="o">.</span><span class="n">copy</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">all_comp</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">hypothetical_phases</span><span class="p">:</span>
+        <span class="n">cleaned_paths</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="n">cleaned_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">total_cost</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The final, filtered set of candidate reaction pathways is below:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">num</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Path 1:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.249 | Average Cost: 0.083
+
+
+Path 2:
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.261 | Average Cost: 0.087
+
+
+Path 3:
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+MnCO3 + Li2MnO3 -&gt; CO2 + 2 LiMnO2 (dG = 0.033 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.261 | Average Cost: 0.052
+
+
+Path 4:
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + Li2MnO3 -&gt; CO2 + 2 LiMnO2 (dG = 0.033 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.261 | Average Cost: 0.065
+
+
+Path 5:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.146 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.262 | Average Cost: 0.065
+
+
+Path 6:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.146 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.264 | Average Cost: 0.053
+
+
+Path 7:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.146 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.268 | Average Cost: 0.067
+
+
+Path 8:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Li2CO3 + Mn2O3 -&gt; MnCO3 + Li2MnO3 (dG = 0.053 eV/atom)
+MnCO3 + Li2MnO3 -&gt; CO2 + 2 LiMnO2 (dG = 0.033 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.268 | Average Cost: 0.054
+
+
+Path 9:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.286 eV/atom)
+Li2CO3 + Mn2O3 -&gt; CO2 + 2 LiMnO2 (dG = 0.086 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.078 eV/atom)
+
+Total Cost: 0.269 | Average Cost: 0.067
+
+
+Path 10:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+2 Li2O + YCl3 -&gt; LiYO2 + 3 LiCl (dG = -0.271 eV/atom)
+1.5 LiYO2 + 0.5 YCl3 -&gt; Y2O3 + 1.5 LiCl (dG = -0.157 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.27 | Average Cost: 0.054
+
+
+Path 11:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+2 Li2O + YCl3 -&gt; LiYO2 + 3 LiCl (dG = -0.271 eV/atom)
+1.5 LiYO2 + 0.5 YCl3 -&gt; Y2O3 + 1.5 LiCl (dG = -0.157 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.274 | Average Cost: 0.069
+
+
+Path 12:
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.308 eV/atom)
+3 Li2O + 2 YCl3 -&gt; Y2O3 + 6 LiCl (dG = -0.313 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.146 eV/atom)
+Li2CO3 + YCl3 -&gt; YClO + CO2 + 2 LiCl (dG = -0.016 eV/atom)
+0.5 Y2O3 + 0.5 Mn2O3 -&gt; YMnO3 (dG = -0.069 eV/atom)
+
+Total Cost: 0.279 | Average Cost: 0.056
+
+
+</pre></div></div>
+</div>
+<section id="Plotting-the-network">
+<h3>Plotting the network<a class="headerlink" href="#Plotting-the-network" title="Link to this heading">#</a></h3>
+<p>There are many, many tools for plotting large graphs. One of the more useful approaches is to use an interactive interface such as the one provided by <strong>Graphistry Hub</strong>, which was also used to create the illustations in the paper.</p>
+<p>If you wish to use Graphistry Hub, you may sign up for an account and use their Python API (pygraphistry).</p>
+<p>Another option is to use the built-in drawing in graph-tool, atlhough it often requires more wrangling to get insightful results. For example, this might look like the following, where we generate and then draw a filtered graph where zero-weight edges have been removed. This essentially just shows the “sub-networks” of chemical reactions broken down by smaller systems within the bigger chemical system. These sub-networks are connceted to each other via the zero-weight edges.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;zero_cost&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rn</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">s</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">weight</span> <span class="ow">in</span> <span class="n">rn</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">iter_edges</span><span class="p">(</span><span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">rn</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]]):</span>
+    <span class="n">rn</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="p">[</span><span class="s2">&quot;zero_cost&quot;</span><span class="p">][</span><span class="n">rn</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">t</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">weight</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">filtered_graph</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">GraphView</span><span class="p">(</span><span class="n">rn</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="n">efilt</span><span class="o">=</span><span class="n">rn</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">ep</span><span class="o">.</span><span class="n">zero_cost</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt</span><span class="o">.</span><span class="n">graph_draw</span><span class="p">(</span><span class="n">filtered_graph</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/notebooks_archived_demo_v1_46_0.png" class="no-scaled-link" src="../../_images/notebooks_archived_demo_v1_46_0.png" style="width: 600px; height: 598px;" />
+</div>
+</div>
+<p>There are many more insightful plots (e.g. histograms) you can make simply by using the built-in property maps of the graph-tool object. For example, you can plot the relative counts of the different sub-chemical systems represented in the graph (requires seaborn):</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">12</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rn</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;chemsys&quot;</span><span class="p">])),</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;v&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/notebooks_archived_demo_v1_48_0.png" src="../../_images/notebooks_archived_demo_v1_48_0.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="Example-2:-Y_2Mn_2O_7-assisted-metathesis">
+<h1>Example 2: Y<span class="math notranslate nohighlight">\(_2\)</span>Mn<span class="math notranslate nohighlight">\(_2\)</span>O<span class="math notranslate nohighlight">\(_7\)</span> assisted metathesis<a class="headerlink" href="#Example-2:-Y_2Mn_2O_7-assisted-metathesis" title="Link to this heading">#</a></h1>
+<p>Now that we have shown step-by-step how the process works for the YMnO<span class="math notranslate nohighlight">\(_3\)</span> system, we will no longer walk through each step of the process for the other examples. Instead, see below for how to recreate the results presented in the manuscript.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chemsys</span> <span class="o">=</span> <span class="s2">&quot;C-Cl-Mn-Na-O-Y&quot;</span>
+
+<span class="n">precursors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Mn2O3&quot;</span><span class="p">,</span> <span class="s2">&quot;YCl3&quot;</span><span class="p">,</span><span class="s2">&quot;Na2CO3&quot;</span><span class="p">,</span> <span class="s2">&quot;O2&quot;</span><span class="p">]</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Y2Mn2O7&quot;</span><span class="p">,</span><span class="s2">&quot;CO2&quot;</span><span class="p">,</span><span class="s2">&quot;NaCl&quot;</span><span class="p">]</span>
+
+<span class="n">hypothetical_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Na3MnO3&quot;</span><span class="p">,</span> <span class="s2">&quot;Mn8Cl3O10&quot;</span><span class="p">,</span> <span class="s2">&quot;Na2MnO3&quot;</span><span class="p">]</span>
+
+<span class="n">temp</span> <span class="o">=</span> <span class="mi">900</span>
+<span class="n">include_metastable</span> <span class="o">=</span> <span class="mf">0.03</span>
+<span class="n">k</span><span class="o">=</span><span class="mi">20</span>
+<span class="n">chempots</span><span class="o">=</span><span class="p">{</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">):</span><span class="mi">0</span><span class="p">}</span>
+<span class="n">max_num_combos</span><span class="o">=</span><span class="mi">5</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">MPRester</span><span class="p">()</span> <span class="k">as</span> <span class="n">mpr</span><span class="p">:</span>  <span class="c1"># requires API key from Materials Project</span>
+    <span class="n">all_entries</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_entries_in_chemsys</span><span class="p">(</span><span class="n">chemsys</span><span class="p">,</span> <span class="n">inc_structure</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span><span class="p">,</span> <span class="n">paths</span> <span class="o">=</span> <span class="n">run_reaction_network_analysis</span><span class="p">(</span><span class="n">all_entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">include_metastable</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span>  <span class="n">chempots</span><span class="p">,</span> <span class="n">max_num_combos</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>This analysis – particularly path postprocessing – can take a considerable amount of time to complete (3-4 hours depending on your setup). Instead, you can load the pre-computed results from the paper and process them:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;results/y2mn2o7_paths.json&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">MontyDecoder</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cleaned_paths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+    <span class="n">interdependent</span><span class="p">,</span> <span class="n">consolidated_rxn</span> <span class="o">=</span> <span class="n">find_interdependent_rxns</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">interdependent</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> removed&quot;</span><span class="p">)</span>
+        <span class="k">continue</span>
+    <span class="n">cleaned_paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Path 4 removed
+Path 10 removed
+Path 18 removed
+Path 19 removed
+Path 20 removed
+Path 32 removed
+Path 34 removed
+Path 36 removed
+Path 37 removed
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hypothetical_phases</span> <span class="o">=</span> <span class="p">{</span><span class="n">Composition</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">hypothetical_phases</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="o">.</span><span class="n">copy</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">all_comp</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">hypothetical_phases</span><span class="p">:</span>
+        <span class="n">cleaned_paths</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="n">cleaned_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">total_cost</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">num</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Path 1:
+Mn2O3 + Na2CO3 -&gt; CO2 + 2 NaMnO2 (dG = 0.069 eV/atom)
+0.5 O2 + 2 YClO + 2 NaMnO2 -&gt; Y2Mn2O7 + 2 NaCl (dG = -0.101 eV/atom)
+Na2CO3 + YCl3 -&gt; CO2 + YClO + 2 NaCl (dG = -0.034 eV/atom)
+
+Total Cost: 0.238 | Average Cost: 0.079
+
+
+Path 2:
+0.5 Mn2O3 + Na2CO3 -&gt; CO2 + 0.5 Na4Mn2O5 (dG = 0.178 eV/atom)
+1.308 Mn2O3 + 1.026 Y2O3 -&gt; Y2Mn2O7 + 0.05128 YMn12 (dG = 0.144 eV/atom)
+0.5 O2 + Na4Mn2O5 + 4 YClO -&gt; Y2Mn2O7 + Y2O3 + 4 NaCl (dG = -0.143 eV/atom)
+2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7 (dG = -0.926 eV/atom)
+Na2CO3 + YCl3 -&gt; CO2 + YClO + 2 NaCl (dG = -0.034 eV/atom)
+
+Total Cost: 0.246 | Average Cost: 0.049
+
+
+Path 3:
+0.5 Mn2O3 + Na2CO3 -&gt; CO2 + 0.5 Na4Mn2O5 (dG = 0.178 eV/atom)
+0.25 O2 + 0.5 Mn2O3 -&gt; MnO2 (dG = -0.058 eV/atom)
+0.5 O2 + Na4Mn2O5 + 4 YClO -&gt; Y2Mn2O7 + Y2O3 + 4 NaCl (dG = -0.143 eV/atom)
+Na2CO3 + YCl3 -&gt; CO2 + YClO + 2 NaCl (dG = -0.034 eV/atom)
+2 MnO2 + Y2O3 -&gt; Y2Mn2O7 (dG = -0.07 eV/atom)
+
+Total Cost: 0.246 | Average Cost: 0.049
+
+
+Path 4:
+Mn2O3 + Na2CO3 -&gt; CO2 + 2 NaMnO2 (dG = 0.069 eV/atom)
+4 Na2CO3 + YCl3 -&gt; Na5Y(CO3)4 + 3 NaCl (dG = -0.072 eV/atom)
+0.25 Na5Y(CO3)4 + 0.75 YCl3 -&gt; CO2 + YClO + 1.25 NaCl (dG = 0.02 eV/atom)
+0.5 O2 + 2 YClO + 2 NaMnO2 -&gt; Y2Mn2O7 + 2 NaCl (dG = -0.101 eV/atom)
+
+Total Cost: 0.248 | Average Cost: 0.062
+
+
+Path 5:
+Mn2O3 + Na2CO3 -&gt; CO2 + 2 NaMnO2 (dG = 0.069 eV/atom)
+3 Na2CO3 + YCl3 -&gt; Na3Y(CO3)3 + 3 NaCl (dG = -0.074 eV/atom)
+0.3333 Na3Y(CO3)3 + 0.6667 YCl3 -&gt; CO2 + YClO + NaCl (dG = 0.026 eV/atom)
+0.5 O2 + 2 YClO + 2 NaMnO2 -&gt; Y2Mn2O7 + 2 NaCl (dG = -0.101 eV/atom)
+
+Total Cost: 0.249 | Average Cost: 0.062
+
+
+Path 6:
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+0.25 O2 + 0.5 Mn2O3 -&gt; MnO2 (dG = -0.058 eV/atom)
+2 YClO + Na2O -&gt; Y2O3 + 2 NaCl (dG = -0.264 eV/atom)
+Na2CO3 + YCl3 -&gt; CO2 + YClO + 2 NaCl (dG = -0.034 eV/atom)
+2 MnO2 + Y2O3 -&gt; Y2Mn2O7 (dG = -0.07 eV/atom)
+
+Total Cost: 0.25 | Average Cost: 0.05
+
+
+Path 7:
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+1.308 Mn2O3 + 1.026 Y2O3 -&gt; Y2Mn2O7 + 0.05128 YMn12 (dG = 0.144 eV/atom)
+2 YClO + Na2O -&gt; Y2O3 + 2 NaCl (dG = -0.264 eV/atom)
+2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7 (dG = -0.926 eV/atom)
+Na2CO3 + YCl3 -&gt; CO2 + YClO + 2 NaCl (dG = -0.034 eV/atom)
+
+Total Cost: 0.251 | Average Cost: 0.05
+
+
+Path 8:
+0.2 Mn2O3 + Na2CO3 -&gt; CO2 + 0.4 Na5MnO4 (dG = 0.304 eV/atom)
+0.25 O2 + 0.5 Mn2O3 -&gt; MnO2 (dG = -0.058 eV/atom)
+0.5 O2 + 2 Na5MnO4 + 10 YClO -&gt; Y2Mn2O7 + 4 Y2O3 + 10 NaCl (dG = -0.196 eV/atom)
+Na2CO3 + YCl3 -&gt; CO2 + YClO + 2 NaCl (dG = -0.034 eV/atom)
+2 MnO2 + Y2O3 -&gt; Y2Mn2O7 (dG = -0.07 eV/atom)
+
+Total Cost: 0.254 | Average Cost: 0.051
+
+
+Path 9:
+Mn2O3 + Na2CO3 -&gt; CO2 + 2 NaMnO2 (dG = 0.069 eV/atom)
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+Na2O + YCl3 -&gt; YClO + 2 NaCl (dG = -0.438 eV/atom)
+0.5 O2 + 2 YClO + 2 NaMnO2 -&gt; Y2Mn2O7 + 2 NaCl (dG = -0.101 eV/atom)
+
+Total Cost: 0.255 | Average Cost: 0.064
+
+
+Path 10:
+0.2 Mn2O3 + Na2CO3 -&gt; CO2 + 0.4 Na5MnO4 (dG = 0.304 eV/atom)
+1.308 Mn2O3 + 1.026 Y2O3 -&gt; Y2Mn2O7 + 0.05128 YMn12 (dG = 0.144 eV/atom)
+0.5 O2 + 2 Na5MnO4 + 10 YClO -&gt; Y2Mn2O7 + 4 Y2O3 + 10 NaCl (dG = -0.196 eV/atom)
+2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7 (dG = -0.926 eV/atom)
+Na2CO3 + YCl3 -&gt; CO2 + YClO + 2 NaCl (dG = -0.034 eV/atom)
+
+Total Cost: 0.256 | Average Cost: 0.051
+
+
+Path 11:
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+0.25 O2 + 0.5 Mn2O3 -&gt; MnO2 (dG = -0.058 eV/atom)
+Na2O + YCl3 -&gt; YClO + 2 NaCl (dG = -0.438 eV/atom)
+2 YClO + Na2O -&gt; Y2O3 + 2 NaCl (dG = -0.264 eV/atom)
+2 MnO2 + Y2O3 -&gt; Y2Mn2O7 (dG = -0.07 eV/atom)
+
+Total Cost: 0.259 | Average Cost: 0.052
+
+
+Path 12:
+0.5 Mn2O3 + Na2CO3 -&gt; CO2 + 0.5 Na4Mn2O5 (dG = 0.178 eV/atom)
+0.5 O2 + Na4Mn2O5 + 4 YClO -&gt; Y2Mn2O7 + Y2O3 + 4 NaCl (dG = -0.143 eV/atom)
+O2 + 3 Na4Mn2O5 + 4 YCl3 -&gt; Y2Mn2O7 + 2 YMn2O5 + 12 NaCl (dG = -0.248 eV/atom)
+0.25 O2 + YMn2O5 + 0.5 Y2O3 -&gt; Y2Mn2O7 (dG = -0.019 eV/atom)
+Na2CO3 + YCl3 -&gt; CO2 + YClO + 2 NaCl (dG = -0.034 eV/atom)
+
+Total Cost: 0.262 | Average Cost: 0.052
+
+
+Path 13:
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+1.308 Mn2O3 + 1.026 Y2O3 -&gt; Y2Mn2O7 + 0.05128 YMn12 (dG = 0.144 eV/atom)
+Na2O + YCl3 -&gt; YClO + 2 NaCl (dG = -0.438 eV/atom)
+2 YClO + Na2O -&gt; Y2O3 + 2 NaCl (dG = -0.264 eV/atom)
+2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7 (dG = -0.926 eV/atom)
+
+Total Cost: 0.262 | Average Cost: 0.052
+
+
+Path 14:
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+0.25 O2 + 0.5 Mn2O3 -&gt; MnO2 (dG = -0.058 eV/atom)
+2 Na2O + YCl3 -&gt; NaYO2 + 3 NaCl (dG = -0.477 eV/atom)
+1.5 NaYO2 + 0.5 YCl3 -&gt; Y2O3 + 1.5 NaCl (dG = -0.169 eV/atom)
+2 MnO2 + Y2O3 -&gt; Y2Mn2O7 (dG = -0.07 eV/atom)
+
+Total Cost: 0.265 | Average Cost: 0.053
+
+
+Path 15:
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+1.308 Mn2O3 + 1.026 Y2O3 -&gt; Y2Mn2O7 + 0.05128 YMn12 (dG = 0.144 eV/atom)
+2 Na2O + YCl3 -&gt; NaYO2 + 3 NaCl (dG = -0.477 eV/atom)
+1.5 NaYO2 + 0.5 YCl3 -&gt; Y2O3 + 1.5 NaCl (dG = -0.169 eV/atom)
+2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7 (dG = -0.926 eV/atom)
+
+Total Cost: 0.271 | Average Cost: 0.054
+
+
+Path 16:
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+0.25 O2 + 0.5 Mn2O3 -&gt; MnO2 (dG = -0.058 eV/atom)
+3 Na2O + 2 YCl3 -&gt; Y2O3 + 6 NaCl (dG = -0.5 eV/atom)
+2 MnO2 + Y2O3 -&gt; Y2Mn2O7 (dG = -0.07 eV/atom)
+
+Total Cost: 0.28 | Average Cost: 0.07
+
+
+Path 17:
+0.5 Mn2O3 + Na2CO3 -&gt; CO2 + 0.5 Na4Mn2O5 (dG = 0.178 eV/atom)
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+3 Na2O + 2 YCl3 -&gt; Y2O3 + 6 NaCl (dG = -0.5 eV/atom)
+O2 + 3 Na4Mn2O5 + 4 YCl3 -&gt; Y2Mn2O7 + 2 YMn2O5 + 12 NaCl (dG = -0.248 eV/atom)
+0.25 O2 + YMn2O5 + 0.5 Y2O3 -&gt; Y2Mn2O7 (dG = -0.019 eV/atom)
+
+Total Cost: 0.283 | Average Cost: 0.057
+
+
+Path 18:
+0.2 Mn2O3 + Na2CO3 -&gt; CO2 + 0.4 Na5MnO4 (dG = 0.304 eV/atom)
+0.25 O2 + 0.5 Mn2O3 -&gt; MnO2 (dG = -0.058 eV/atom)
+0.5 O2 + 2 Na5MnO4 + 3.333 YCl3 -&gt; Y2Mn2O7 + 0.6667 Y2O3 + 10 NaCl (dG = -0.358 eV/atom)
+2 MnO2 + Y2O3 -&gt; Y2Mn2O7 (dG = -0.07 eV/atom)
+
+Total Cost: 0.287 | Average Cost: 0.072
+
+
+Path 19:
+0.5 Mn2O3 + Na2CO3 -&gt; CO2 + 0.5 Na4Mn2O5 (dG = 0.178 eV/atom)
+0.2 Mn2O3 + Na2CO3 -&gt; CO2 + 0.4 Na5MnO4 (dG = 0.304 eV/atom)
+O2 + 3 Na4Mn2O5 + 4 YCl3 -&gt; Y2Mn2O7 + 2 YMn2O5 + 12 NaCl (dG = -0.248 eV/atom)
+0.25 O2 + YMn2O5 + 0.5 Y2O3 -&gt; Y2Mn2O7 (dG = -0.019 eV/atom)
+0.5 O2 + 2 Na5MnO4 + 3.333 YCl3 -&gt; Y2Mn2O7 + 0.6667 Y2O3 + 10 NaCl (dG = -0.358 eV/atom)
+
+Total Cost: 0.287 | Average Cost: 0.057
+
+
+Path 20:
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+1.154 Mn2O3 + 0.5128 Y2O3 -&gt; YMn2O5 + 0.02564 YMn12 (dG = 0.059 eV/atom)
+3 Na2O + 2 YCl3 -&gt; Y2O3 + 6 NaCl (dG = -0.5 eV/atom)
+0.25 O2 + YMn2O5 + 0.5 Y2O3 -&gt; Y2Mn2O7 (dG = -0.019 eV/atom)
+2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7 (dG = -0.926 eV/atom)
+
+Total Cost: 0.288 | Average Cost: 0.058
+
+
+Path 21:
+0.2 Mn2O3 + Na2CO3 -&gt; CO2 + 0.4 Na5MnO4 (dG = 0.304 eV/atom)
+1.154 Mn2O3 + 0.5128 Y2O3 -&gt; YMn2O5 + 0.02564 YMn12 (dG = 0.059 eV/atom)
+0.25 O2 + YMn2O5 + 0.5 Y2O3 -&gt; Y2Mn2O7 (dG = -0.019 eV/atom)
+0.5 O2 + 2 Na5MnO4 + 3.333 YCl3 -&gt; Y2Mn2O7 + 0.6667 Y2O3 + 10 NaCl (dG = -0.358 eV/atom)
+2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7 (dG = -0.926 eV/atom)
+
+Total Cost: 0.292 | Average Cost: 0.058
+
+
+Path 22:
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+1.308 Mn2O3 + 1.026 Y2O3 -&gt; Y2Mn2O7 + 0.05128 YMn12 (dG = 0.144 eV/atom)
+3 Na2O + 2 YCl3 -&gt; Y2O3 + 6 NaCl (dG = -0.5 eV/atom)
+2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7 (dG = -0.926 eV/atom)
+
+Total Cost: 0.292 | Average Cost: 0.073
+
+
+Path 23:
+Mn2O3 + Na2CO3 -&gt; CO2 + 2 NaMnO2 (dG = 0.069 eV/atom)
+Na2CO3 -&gt; CO2 + Na2O (dG = 0.454 eV/atom)
+4 Na2O + 3 YCl3 -&gt; Y3ClO4 + 8 NaCl (dG = -0.48 eV/atom)
+0.5 O2 + Mn2O3 + Y3ClO4 -&gt; Y2Mn2O7 + YClO (dG = -0.083 eV/atom)
+0.5 O2 + 2 YClO + 2 NaMnO2 -&gt; Y2Mn2O7 + 2 NaCl (dG = -0.101 eV/atom)
+
+Total Cost: 0.294 | Average Cost: 0.059
+
+
+Path 24:
+0.2 Mn2O3 + Na2CO3 -&gt; CO2 + 0.4 Na5MnO4 (dG = 0.304 eV/atom)
+1.308 Mn2O3 + 1.026 Y2O3 -&gt; Y2Mn2O7 + 0.05128 YMn12 (dG = 0.144 eV/atom)
+0.5 O2 + 2 Na5MnO4 + 3.333 YCl3 -&gt; Y2Mn2O7 + 0.6667 Y2O3 + 10 NaCl (dG = -0.358 eV/atom)
+2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7 (dG = -0.926 eV/atom)
+
+Total Cost: 0.294 | Average Cost: 0.074
+
+
+</pre></div></div>
+</div>
+<section id="Pandas-view">
+<h2>Pandas view<a class="headerlink" href="#Pandas-view" title="Link to this heading">#</a></h2>
+<p>The function below (<em>create_total_path_df</em>), is useful for transforming the pathway results to a Pandas DataFrame for convenience.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+
+<span class="k">def</span> <span class="nf">create_total_path_df</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">path_dict</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+        <span class="n">rxn_dict_items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">rxn_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">rxn</span><span class="p">,</span><span class="n">cost</span> <span class="ow">in</span> <span class="n">rxn_dict_items</span><span class="p">:</span>
+            <span class="n">dG</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">calculated_reaction_energy</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">rxn</span><span class="o">.</span><span class="n">get_el_amount</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">elements</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">latex</span><span class="p">:</span>
+                <span class="n">path_dict</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;Path&quot;</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;Reactions&quot;</span><span class="p">:</span><span class="sa">rf</span><span class="s2">&quot;\ce</span><span class="se">{{</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                  <span class="sa">r</span><span class="s2">&quot;$\Delta$G$_</span><span class="si">{rxn}</span><span class="s2">$ (eV/atom)&quot;</span><span class="p">:</span><span class="n">dG</span><span class="p">,</span><span class="s2">&quot;Cost&quot;</span><span class="p">:</span><span class="n">cost</span><span class="p">,</span><span class="s2">&quot;Total Cost&quot;</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">total_cost</span><span class="p">,</span><span class="mi">3</span><span class="p">)})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">path_dict</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;path&quot;</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;rxn&quot;</span><span class="p">:</span><span class="n">rxn</span><span class="p">,</span><span class="s2">&quot;dG&quot;</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">dG</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span><span class="s2">&quot;cost&quot;</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="s2">&quot;total_cost&quot;</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">total_cost</span><span class="p">,</span><span class="mi">3</span><span class="p">)})</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">path_dict</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">latex</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;Path&quot;</span><span class="p">,</span><span class="s2">&quot;Total Cost&quot;</span><span class="p">,</span><span class="s2">&quot;Reactions&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;path&quot;</span><span class="p">,</span><span class="s2">&quot;total_cost&quot;</span><span class="p">,</span><span class="s2">&quot;rxn&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">create_total_path_df</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>dG</th>
+      <th>cost</th>
+    </tr>
+    <tr>
+      <th>path</th>
+      <th>total_cost</th>
+      <th>rxn</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="3" valign="top">1</th>
+      <th rowspan="3" valign="top">0.238</th>
+      <th>Na2CO3 + YCl3 -&gt; CO2 + YClO + 2 NaCl</th>
+      <td>-0.0338</td>
+      <td>0.2263</td>
+    </tr>
+    <tr>
+      <th>0.5 O2 + 2 YClO + 2 NaMnO2 -&gt; Y2Mn2O7 + 2 NaCl</th>
+      <td>-0.1013</td>
+      <td>0.2290</td>
+    </tr>
+    <tr>
+      <th>Mn2O3 + Na2CO3 -&gt; CO2 + 2 NaMnO2</th>
+      <td>0.0686</td>
+      <td>0.2706</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2</th>
+      <th rowspan="2" valign="top">0.246</th>
+      <th>2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7</th>
+      <td>-0.9265</td>
+      <td>0.1134</td>
+    </tr>
+    <tr>
+      <th>0.5 O2 + Na4Mn2O5 + 4 YClO -&gt; Y2Mn2O7 + Y2O3 + 4 NaCl</th>
+      <td>-0.1431</td>
+      <td>0.2175</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <th>0.294</th>
+      <th>Na2CO3 -&gt; CO2 + Na2O</th>
+      <td>0.4544</td>
+      <td>0.3514</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">24</th>
+      <th rowspan="4" valign="top">0.294</th>
+      <th>2.125 O2 + 0.1667 YMn12 + 0.9167 Y2O3 -&gt; Y2Mn2O7</th>
+      <td>-0.9265</td>
+      <td>0.1134</td>
+    </tr>
+    <tr>
+      <th>0.5 O2 + 2 Na5MnO4 + 3.333 YCl3 -&gt; Y2Mn2O7 + 0.6667 Y2O3 + 10 NaCl</th>
+      <td>-0.3580</td>
+      <td>0.1695</td>
+    </tr>
+    <tr>
+      <th>1.308 Mn2O3 + 1.026 Y2O3 -&gt; Y2Mn2O7 + 0.05128 YMn12</th>
+      <td>0.1436</td>
+      <td>0.3002</td>
+    </tr>
+    <tr>
+      <th>0.2 Mn2O3 + Na2CO3 -&gt; CO2 + 0.4 Na5MnO4</th>
+      <td>0.3039</td>
+      <td>0.3244</td>
+    </tr>
+  </tbody>
+</table>
+<p>111 rows × 2 columns</p>
+</div></div>
+</div>
+</section>
+</section>
+<section id="Example-3:-Fe_2SiS_4-synthesis-from-iron-silicide-precursors">
+<h1>Example 3: Fe<span class="math notranslate nohighlight">\(_2\)</span>SiS<span class="math notranslate nohighlight">\(_4\)</span> synthesis from iron silicide precursors<a class="headerlink" href="#Example-3:-Fe_2SiS_4-synthesis-from-iron-silicide-precursors" title="Link to this heading">#</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chemsys</span> <span class="o">=</span> <span class="s2">&quot;Fe-S-Si&quot;</span>
+
+<span class="n">precursors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Fe3Si&quot;</span><span class="p">,</span> <span class="s2">&quot;Fe5Si3&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">]</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Fe2SiS4&quot;</span><span class="p">]</span>
+
+<span class="n">hypothetical_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SiS&quot;</span><span class="p">,</span><span class="s2">&quot;SiS4&quot;</span><span class="p">]</span>
+
+<span class="n">temp</span> <span class="o">=</span> <span class="mi">900</span>
+<span class="n">include_metastable</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">k</span><span class="o">=</span><span class="mi">75</span>
+<span class="n">max_num_combos</span><span class="o">=</span><span class="mi">6</span>
+<span class="n">chempots</span><span class="o">=</span><span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">MPRester</span><span class="p">()</span> <span class="k">as</span> <span class="n">mpr</span><span class="p">:</span>  <span class="c1"># requires API key from Materials Project</span>
+    <span class="n">all_entries</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_entries_in_chemsys</span><span class="p">(</span><span class="n">chemsys</span><span class="p">,</span> <span class="n">inc_structure</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span><span class="p">,</span> <span class="n">paths</span> <span class="o">=</span> <span class="n">run_reaction_network_analysis</span><span class="p">(</span><span class="n">all_entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">include_metastable</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span>  <span class="n">chempots</span><span class="p">,</span> <span class="n">max_num_combos</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;results/fe2sis4_paths.json&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">MontyDecoder</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cleaned_paths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+    <span class="n">interdependent</span><span class="p">,</span> <span class="n">consolidated_rxn</span> <span class="o">=</span> <span class="n">find_interdependent_rxns</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">interdependent</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> removed&quot;</span><span class="p">)</span>
+        <span class="k">continue</span>
+    <span class="n">cleaned_paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hypothetical_phases</span> <span class="o">=</span> <span class="p">{</span><span class="n">Composition</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">hypothetical_phases</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="o">.</span><span class="n">copy</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">all_comp</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">hypothetical_phases</span><span class="p">:</span>
+        <span class="n">cleaned_paths</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="n">cleaned_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">total_cost</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">num</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Path 1:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.177 | Average Cost: 0.044
+
+
+Path 2:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.177 | Average Cost: 0.035
+
+
+Path 3:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.179 | Average Cost: 0.03
+
+
+Path 4:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.18 | Average Cost: 0.03
+
+
+Path 5:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.182 | Average Cost: 0.046
+
+
+Path 6:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.183 | Average Cost: 0.031
+
+
+Path 7:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.184 | Average Cost: 0.037
+
+
+Path 8:
+6 S + Fe3Si -&gt; Fe2SiS4 + FeS2 (dG = -0.628 eV/atom)
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+
+Total Cost: 0.185 | Average Cost: 0.062
+
+
+Path 9:
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.186 | Average Cost: 0.047
+
+
+Path 10:
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.187 | Average Cost: 0.031
+
+
+Path 11:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+0.2857 Fe5Si3 + S -&gt; FeS + 0.4286 FeSi2 (dG = -0.467 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.187 | Average Cost: 0.031
+
+
+Path 12:
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.188 | Average Cost: 0.038
+
+
+Path 13:
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.188 | Average Cost: 0.031
+
+
+Path 14:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+2 S + 0.5 Fe3Si -&gt; FeS2 + 0.5 FeSi (dG = -0.635 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.189 | Average Cost: 0.032
+
+
+Path 15:
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.189 | Average Cost: 0.038
+
+
+Path 16:
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.19 | Average Cost: 0.032
+
+
+Path 17:
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.191 | Average Cost: 0.032
+
+
+Path 18:
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.192 | Average Cost: 0.048
+
+
+Path 19:
+6 S + Fe3Si -&gt; Fe2SiS4 + FeS2 (dG = -0.628 eV/atom)
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.193 | Average Cost: 0.032
+
+
+Path 20:
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+2 S + 0.5 Fe3Si -&gt; FeS2 + 0.5 FeSi (dG = -0.635 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.195 | Average Cost: 0.032
+
+
+Path 21:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+0.6667 Fe5Si3 + 4.667 S -&gt; FeSi2 + 2.333 FeS2 (dG = -0.595 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.196 | Average Cost: 0.033
+
+
+Path 22:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+0.5 Fe5Si3 + 2 S -&gt; FeS2 + 1.5 FeSi (dG = -0.495 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.197 | Average Cost: 0.033
+
+
+Path 23:
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+0.6667 Fe5Si3 + 4.667 S -&gt; FeSi2 + 2.333 FeS2 (dG = -0.595 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.198 | Average Cost: 0.033
+
+
+Path 24:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.198 | Average Cost: 0.04
+
+
+Path 25:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.198 | Average Cost: 0.04
+
+
+Path 26:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.198 | Average Cost: 0.033
+
+
+Path 27:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.199 | Average Cost: 0.033
+
+
+Path 28:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.199 | Average Cost: 0.05
+
+
+Path 29:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.5 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.5 FeSi (dG = -0.521 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.2 | Average Cost: 0.033
+
+
+Path 30:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.2 | Average Cost: 0.04
+
+
+Path 31:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.2 | Average Cost: 0.067
+
+
+Path 32:
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+10 S + 2 Fe3Si -&gt; FeSi2 + 5 FeS2 (dG = -0.675 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.2 | Average Cost: 0.033
+
+
+Path 33:
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+0.2857 Fe5Si3 + S -&gt; FeS + 0.4286 FeSi2 (dG = -0.467 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.201 | Average Cost: 0.05
+
+
+Path 34:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+10 S + 2 Fe3Si -&gt; FeSi2 + 5 FeS2 (dG = -0.675 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.201 | Average Cost: 0.033
+
+
+Path 35:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+0.2857 Fe5Si3 + S -&gt; FeS + 0.4286 FeSi2 (dG = -0.467 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.201 | Average Cost: 0.05
+
+
+Path 36:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.201 | Average Cost: 0.04
+
+
+Path 37:
+2 Fe5Si3 + 20 S -&gt; Si + 5 Fe2SiS4 (dG = -0.541 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+0.5 Fe5Si3 + 2 S -&gt; FeS2 + 1.5 FeSi (dG = -0.495 eV/atom)
+Si + 2 FeS2 -&gt; Fe2SiS4 (dG = 0.055 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.202 | Average Cost: 0.034
+
+
+Path 38:
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+0.2857 Fe5Si3 + S -&gt; FeS + 0.4286 FeSi2 (dG = -0.467 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.202 | Average Cost: 0.034
+
+
+Path 39:
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+0.2857 Fe5Si3 + S -&gt; FeS + 0.4286 FeSi2 (dG = -0.467 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.203 | Average Cost: 0.041
+
+
+Path 40:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.203 | Average Cost: 0.034
+
+
+Path 41:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2 (dG = -0.543 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.204 | Average Cost: 0.034
+
+
+Path 42:
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+0.2857 Fe5Si3 + S -&gt; FeS + 0.4286 FeSi2 (dG = -0.467 eV/atom)
+0.5 Fe5Si3 + S -&gt; FeS + 1.5 FeSi (dG = -0.391 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.205 | Average Cost: 0.034
+
+
+Path 43:
+2 Fe5Si3 + 22 S -&gt; SiS2 + 5 Fe2SiS4 (dG = -0.605 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.205 | Average Cost: 0.051
+
+
+Path 44:
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+0.5 Fe5Si3 + S -&gt; FeS + 1.5 FeSi (dG = -0.391 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.206 | Average Cost: 0.041
+
+
+Path 45:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+0.2857 Fe5Si3 + S -&gt; FeS + 0.4286 FeSi2 (dG = -0.467 eV/atom)
+0.5 Fe5Si3 + S -&gt; FeS + 1.5 FeSi (dG = -0.391 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.207 | Average Cost: 0.034
+
+
+Path 46:
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+0.2857 Fe5Si3 + S -&gt; FeS + 0.4286 FeSi2 (dG = -0.467 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+0.5 Fe5Si3 + S -&gt; FeS + 1.5 FeSi (dG = -0.391 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.208 | Average Cost: 0.035
+
+
+Path 47:
+0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4 (dG = -0.787 eV/atom)
+S + 0.4 Fe3Si -&gt; FeS + 0.2 FeSi2 (dG = -0.545 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+0.5 Fe5Si3 + S -&gt; FeS + 1.5 FeSi (dG = -0.391 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.208 | Average Cost: 0.035
+
+
+Path 48:
+5 S + Fe3Si -&gt; Fe2SiS4 + FeS (dG = -0.586 eV/atom)
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+0.5 Fe5Si3 + S -&gt; FeS + 1.5 FeSi (dG = -0.391 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.209 | Average Cost: 0.052
+
+
+Path 49:
+2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4 (dG = -0.632 eV/atom)
+S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi (dG = -0.509 eV/atom)
+0.5 Fe5Si3 + S -&gt; FeS + 1.5 FeSi (dG = -0.391 eV/atom)
+SiS2 + 2 FeS -&gt; Fe2SiS4 (dG = 0.27 eV/atom)
+
+Total Cost: 0.21 | Average Cost: 0.052
+
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">create_total_path_df</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>dG</th>
+      <th>cost</th>
+    </tr>
+    <tr>
+      <th>path</th>
+      <th>total_cost</th>
+      <th>rxn</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="4" valign="top">1</th>
+      <th rowspan="4" valign="top">0.177</th>
+      <th>0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4</th>
+      <td>-0.7870</td>
+      <td>0.1293</td>
+    </tr>
+    <tr>
+      <th>5 S + Fe3Si -&gt; Fe2SiS4 + FeS</th>
+      <td>-0.5856</td>
+      <td>0.1561</td>
+    </tr>
+    <tr>
+      <th>0.4286 Fe5Si3 + 4 S -&gt; Fe2SiS4 + 0.1429 FeSi2</th>
+      <td>-0.5426</td>
+      <td>0.1624</td>
+    </tr>
+    <tr>
+      <th>SiS2 + 2 FeS -&gt; Fe2SiS4</th>
+      <td>0.2703</td>
+      <td>0.3347</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <th>0.177</th>
+      <th>0.6667 FeSi2 + 3.333 S -&gt; SiS2 + 0.3333 Fe2SiS4</th>
+      <td>-0.7870</td>
+      <td>0.1293</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <th>0.209</th>
+      <th>SiS2 + 2 FeS -&gt; Fe2SiS4</th>
+      <td>0.2703</td>
+      <td>0.3347</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">49</th>
+      <th rowspan="4" valign="top">0.210</th>
+      <th>2 FeSi + 6 S -&gt; SiS2 + Fe2SiS4</th>
+      <td>-0.6324</td>
+      <td>0.1494</td>
+    </tr>
+    <tr>
+      <th>S + 0.5 Fe3Si -&gt; FeS + 0.5 FeSi</th>
+      <td>-0.5090</td>
+      <td>0.1675</td>
+    </tr>
+    <tr>
+      <th>0.5 Fe5Si3 + S -&gt; FeS + 1.5 FeSi</th>
+      <td>-0.3910</td>
+      <td>0.1866</td>
+    </tr>
+    <tr>
+      <th>SiS2 + 2 FeS -&gt; Fe2SiS4</th>
+      <td>0.2703</td>
+      <td>0.3347</td>
+    </tr>
+  </tbody>
+</table>
+<p>258 rows × 2 columns</p>
+</div></div>
+</div>
+</section>
+<section id="Example-4:-YBCO-synthesis-from-barium-peroxide">
+<h1>Example 4: YBCO synthesis from barium peroxide<a class="headerlink" href="#Example-4:-YBCO-synthesis-from-barium-peroxide" title="Link to this heading">#</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chemsys</span> <span class="o">=</span> <span class="s2">&quot;Ba-Cu-O-Y&quot;</span>
+
+<span class="n">precursors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Y2O3&quot;</span><span class="p">,</span> <span class="s2">&quot;BaO2&quot;</span><span class="p">,</span> <span class="s2">&quot;CuO&quot;</span><span class="p">]</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Y2Ba4Cu6O13&quot;</span><span class="p">,</span> <span class="s2">&quot;O2&quot;</span><span class="p">]</span>
+
+<span class="n">hypothetical_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Cu8O7&quot;</span><span class="p">,</span><span class="s2">&quot;Ba8Cu8O19&quot;</span><span class="p">,</span><span class="s2">&quot;Ba3Y2O6&quot;</span><span class="p">]</span>
+
+<span class="n">temp</span> <span class="o">=</span> <span class="mi">1200</span>
+<span class="n">include_metastable</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">k</span><span class="o">=</span><span class="mi">20</span>
+<span class="n">chempots</span><span class="o">=</span><span class="p">{</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">):</span><span class="mi">0</span><span class="p">}</span>
+<span class="n">max_num_combos</span><span class="o">=</span><span class="mi">5</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span><span class="p">,</span> <span class="n">paths</span> <span class="o">=</span> <span class="n">run_reaction_network_analysis</span><span class="p">(</span><span class="n">all_entries</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">include_metastable</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span>  <span class="n">chempots</span><span class="p">,</span> <span class="n">max_num_combos</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;results/ybco_paths.json&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">MontyDecoder</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cleaned_paths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+    <span class="n">interdependent</span><span class="p">,</span> <span class="n">consolidated_rxn</span> <span class="o">=</span> <span class="n">find_interdependent_rxns</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">interdependent</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> removed&quot;</span><span class="p">)</span>
+        <span class="k">continue</span>
+    <span class="n">cleaned_paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hypothetical_phases</span> <span class="o">=</span> <span class="p">{</span><span class="n">Composition</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">hypothetical_phases</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="o">.</span><span class="n">copy</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">all_comp</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">hypothetical_phases</span><span class="p">:</span>
+        <span class="n">cleaned_paths</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="n">cleaned_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">total_cost</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">num</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Path 1:
+BaO2 + CuO -&gt; BaCuO2 + 0.5 O2 (dG = -0.16 eV/atom)
+Ba4Y2O7 + 6 CuO -&gt; Ba4Y2Cu6O13 (dG = -0.137 eV/atom)
+3 Y2O3 + 12 BaCuO2 -&gt; Ba4Y2O7 + 2 Ba4Y2Cu6O13 (dG = 0.039 eV/atom)
+
+Total Cost: 0.18 | Average Cost: 0.06
+
+
+Path 2:
+BaO2 + CuO -&gt; BaCuO2 + 0.5 O2 (dG = -0.16 eV/atom)
+3.5 Y2O3 + 9 BaCuO2 -&gt; Ba3Y4O9 + 1.5 Ba4Y2Cu6O13 (dG = 0.014 eV/atom)
+0.8 Ba3Y4O9 + 5.6 CuO -&gt; Y2Cu2O5 + 0.6 Ba4Y2Cu6O13 (dG = -0.053 eV/atom)
+2 BaO2 + 2 CuO -&gt; Ba2Cu2O5 + 0.5 O2 (dG = -0.225 eV/atom)
+2 Ba2Cu2O5 + Y2Cu2O5 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.039 eV/atom)
+
+Total Cost: 0.182 | Average Cost: 0.036
+
+
+Path 3:
+BaO2 + CuO -&gt; BaCuO2 + 0.5 O2 (dG = -0.16 eV/atom)
+3.5 Y2O3 + 9 BaCuO2 -&gt; Ba3Y4O9 + 1.5 Ba4Y2Cu6O13 (dG = 0.014 eV/atom)
+0.8 Ba3Y4O9 + 5.6 CuO -&gt; Y2Cu2O5 + 0.6 Ba4Y2Cu6O13 (dG = -0.053 eV/atom)
+Y2Cu2O5 + 4 BaCuO2 -&gt; Ba4Y2Cu6O13 (dG = -0.01 eV/atom)
+
+Total Cost: 0.182 | Average Cost: 0.046
+
+
+Path 4:
+BaO2 + CuO -&gt; BaCuO2 + 0.5 O2 (dG = -0.16 eV/atom)
+2.25 Ba2CuO3 + 2.375 Y2O3 -&gt; Ba3Y4O9 + 0.375 Ba4Y2Cu6O13 (dG = -0.007 eV/atom)
+0.5 Y2O3 + 4 BaCuO2 -&gt; Ba2CuO3 + 0.5 Ba4Y2Cu6O13 (dG = 0.022 eV/atom)
+0.8 Ba3Y4O9 + 5.6 CuO -&gt; Y2Cu2O5 + 0.6 Ba4Y2Cu6O13 (dG = -0.053 eV/atom)
+Y2Cu2O5 + 4 BaCuO2 -&gt; Ba4Y2Cu6O13 (dG = -0.01 eV/atom)
+
+Total Cost: 0.185 | Average Cost: 0.037
+
+
+Path 5:
+BaO2 + CuO -&gt; BaCuO2 + 0.5 O2 (dG = -0.16 eV/atom)
+2 Y2O3 + 3 BaO2 -&gt; Ba3Y4O9 + 1.5 O2 (dG = -0.061 eV/atom)
+0.8 Ba3Y4O9 + 5.6 CuO -&gt; Y2Cu2O5 + 0.6 Ba4Y2Cu6O13 (dG = -0.053 eV/atom)
+Y2Cu2O5 + 4 BaCuO2 -&gt; Ba4Y2Cu6O13 (dG = -0.01 eV/atom)
+
+Total Cost: 0.186 | Average Cost: 0.046
+
+
+Path 6:
+BaO2 + CuO -&gt; BaCuO2 + 0.5 O2 (dG = -0.16 eV/atom)
+2 BaO2 + CuO -&gt; Ba2CuO3 + O2 (dG = -0.128 eV/atom)
+2.25 Ba2CuO3 + 2.375 Y2O3 -&gt; Ba3Y4O9 + 0.375 Ba4Y2Cu6O13 (dG = -0.007 eV/atom)
+0.8 Ba3Y4O9 + 5.6 CuO -&gt; Y2Cu2O5 + 0.6 Ba4Y2Cu6O13 (dG = -0.053 eV/atom)
+Y2Cu2O5 + 4 BaCuO2 -&gt; Ba4Y2Cu6O13 (dG = -0.01 eV/atom)
+
+Total Cost: 0.186 | Average Cost: 0.037
+
+
+Path 7:
+2 BaO2 + CuO -&gt; Ba2CuO3 + O2 (dG = -0.128 eV/atom)
+2.25 Ba2CuO3 + 2.375 Y2O3 -&gt; Ba3Y4O9 + 0.375 Ba4Y2Cu6O13 (dG = -0.007 eV/atom)
+0.8 Ba3Y4O9 + 5.6 CuO -&gt; Y2Cu2O5 + 0.6 Ba4Y2Cu6O13 (dG = -0.053 eV/atom)
+2 BaO2 + 2 CuO -&gt; Ba2Cu2O5 + 0.5 O2 (dG = -0.225 eV/atom)
+2 Ba2Cu2O5 + Y2Cu2O5 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.039 eV/atom)
+
+Total Cost: 0.187 | Average Cost: 0.037
+
+
+Path 8:
+2 Y2O3 + 3 BaO2 -&gt; Ba3Y4O9 + 1.5 O2 (dG = -0.061 eV/atom)
+0.8 Ba3Y4O9 + 5.6 CuO -&gt; Y2Cu2O5 + 0.6 Ba4Y2Cu6O13 (dG = -0.053 eV/atom)
+2 BaO2 + 2 CuO -&gt; Ba2Cu2O5 + 0.5 O2 (dG = -0.225 eV/atom)
+2 Ba2Cu2O5 + Y2Cu2O5 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.039 eV/atom)
+
+Total Cost: 0.187 | Average Cost: 0.047
+
+
+Path 9:
+2 Y2O3 + 3 BaO2 -&gt; Ba3Y4O9 + 1.5 O2 (dG = -0.061 eV/atom)
+0.8 Ba3Y4O9 + 5.6 CuO -&gt; Y2Cu2O5 + 0.6 Ba4Y2Cu6O13 (dG = -0.053 eV/atom)
+BaO2 + 3 CuO -&gt; BaCu3O4 + 0.5 O2 (dG = -0.126 eV/atom)
+0.6667 BaCu3O4 + 1.333 BaO2 -&gt; Ba2Cu2O5 + 0.1667 O2 (dG = -0.16 eV/atom)
+2 Ba2Cu2O5 + Y2Cu2O5 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.039 eV/atom)
+
+Total Cost: 0.189 | Average Cost: 0.038
+
+
+Path 10:
+BaO2 + CuO -&gt; BaCuO2 + 0.5 O2 (dG = -0.16 eV/atom)
+Ba4Y2O7 + 6 CuO -&gt; Ba4Y2Cu6O13 (dG = -0.137 eV/atom)
+Y2O3 + 2 Ba2(CuO2)3 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.075 eV/atom)
+3 Y2O3 + 12 BaCuO2 -&gt; Ba4Y2O7 + 2 Ba4Y2Cu6O13 (dG = 0.039 eV/atom)
+4 BaO2 + 6 CuO -&gt; O2 + 2 Ba2(CuO2)3 (dG = -0.231 eV/atom)
+
+Total Cost: 0.19 | Average Cost: 0.038
+
+
+Path 11:
+BaO2 + CuO -&gt; BaCuO2 + 0.5 O2 (dG = -0.16 eV/atom)
+0.5 Y2O3 + 2 BaO2 -&gt; O2 + 0.5 Ba4Y2O7 (dG = -0.007 eV/atom)
+Ba4Y2O7 + 6 CuO -&gt; Ba4Y2Cu6O13 (dG = -0.137 eV/atom)
+3 Y2O3 + 12 BaCuO2 -&gt; Ba4Y2O7 + 2 Ba4Y2Cu6O13 (dG = 0.039 eV/atom)
+
+Total Cost: 0.191 | Average Cost: 0.048
+
+
+Path 12:
+2 BaO2 + 2 CuO -&gt; Ba2Cu2O5 + 0.5 O2 (dG = -0.225 eV/atom)
+0.5 Y2O3 + CuO -&gt; YCuO2 + 0.25 O2 (dG = 0.038 eV/atom)
+4 Ba2Cu2O5 + 4 YCuO2 -&gt; O2 + 2 Ba4Y2Cu6O13 (dG = 0.024 eV/atom)
+
+Total Cost: 0.192 | Average Cost: 0.064
+
+
+Path 13:
+Y2O3 + 2 Ba2(CuO2)3 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.075 eV/atom)
+2 BaO2 + 2 CuO -&gt; Ba2Cu2O5 + 0.5 O2 (dG = -0.225 eV/atom)
+0.5 Y2O3 + CuO -&gt; YCuO2 + 0.25 O2 (dG = 0.038 eV/atom)
+4 BaO2 + 6 CuO -&gt; O2 + 2 Ba2(CuO2)3 (dG = -0.231 eV/atom)
+4 Ba2Cu2O5 + 4 YCuO2 -&gt; O2 + 2 Ba4Y2Cu6O13 (dG = 0.024 eV/atom)
+
+Total Cost: 0.192 | Average Cost: 0.038
+
+
+Path 14:
+2 BaO2 + 2 CuO -&gt; Ba2Cu2O5 + 0.5 O2 (dG = -0.225 eV/atom)
+BaO2 + 3 CuO -&gt; BaCu3O4 + 0.5 O2 (dG = -0.126 eV/atom)
+0.5 Y2O3 + CuO -&gt; YCuO2 + 0.25 O2 (dG = 0.038 eV/atom)
+0.6667 BaCu3O4 + 1.333 BaO2 -&gt; Ba2Cu2O5 + 0.1667 O2 (dG = -0.16 eV/atom)
+4 Ba2Cu2O5 + 4 YCuO2 -&gt; O2 + 2 Ba4Y2Cu6O13 (dG = 0.024 eV/atom)
+
+Total Cost: 0.192 | Average Cost: 0.038
+
+
+Path 15:
+4 BaO2 + 6 CuO -&gt; O2 + 2 Ba2(CuO2)3 (dG = -0.231 eV/atom)
+Y2O3 + 2 Ba2(CuO2)3 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.075 eV/atom)
+
+Total Cost: 0.193 | Average Cost: 0.096
+
+
+Path 16:
+BaO2 + 3 CuO -&gt; BaCu3O4 + 0.5 O2 (dG = -0.126 eV/atom)
+0.5 Y2O3 + CuO -&gt; YCuO2 + 0.25 O2 (dG = 0.038 eV/atom)
+0.6667 BaCu3O4 + 1.333 BaO2 -&gt; Ba2Cu2O5 + 0.1667 O2 (dG = -0.16 eV/atom)
+4 Ba2Cu2O5 + 4 YCuO2 -&gt; O2 + 2 Ba4Y2Cu6O13 (dG = 0.024 eV/atom)
+
+Total Cost: 0.193 | Average Cost: 0.048
+
+
+Path 17:
+0.5 Y2O3 + 2 BaO2 -&gt; O2 + 0.5 Ba4Y2O7 (dG = -0.007 eV/atom)
+Ba4Y2O7 + 6 CuO -&gt; Ba4Y2Cu6O13 (dG = -0.137 eV/atom)
+4 BaO2 + 6 CuO -&gt; O2 + 2 Ba2(CuO2)3 (dG = -0.231 eV/atom)
+Y2O3 + 2 Ba2(CuO2)3 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.075 eV/atom)
+
+Total Cost: 0.194 | Average Cost: 0.048
+
+
+Path 18:
+0.5 Y2O3 + 2 BaO2 -&gt; O2 + 0.5 Ba4Y2O7 (dG = -0.007 eV/atom)
+Ba4Y2O7 + 6 CuO -&gt; Ba4Y2Cu6O13 (dG = -0.137 eV/atom)
+2 BaO2 + 2 CuO -&gt; Ba2Cu2O5 + 0.5 O2 (dG = -0.225 eV/atom)
+0.5 Y2O3 + CuO -&gt; YCuO2 + 0.25 O2 (dG = 0.038 eV/atom)
+4 Ba2Cu2O5 + 4 YCuO2 -&gt; O2 + 2 Ba4Y2Cu6O13 (dG = 0.024 eV/atom)
+
+Total Cost: 0.194 | Average Cost: 0.039
+
+
+Path 19:
+0.5 Y2O3 + 2 BaO2 -&gt; O2 + 0.5 Ba4Y2O7 (dG = -0.007 eV/atom)
+Ba4Y2O7 + 6 CuO -&gt; Ba4Y2Cu6O13 (dG = -0.137 eV/atom)
+
+Total Cost: 0.196 | Average Cost: 0.098
+
+
+Path 20:
+4 BaO2 + 6 CuO -&gt; O2 + 2 Ba2(CuO2)3 (dG = -0.231 eV/atom)
+Y2O3 + 2 Ba2(CuO2)3 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.075 eV/atom)
+4 CuO -&gt; Cu4O3 + 0.5 O2 (dG = 0.105 eV/atom)
+16 BaO2 + 6 Cu4O3 -&gt; O2 + 8 Ba2(CuO2)3 (dG = -0.303 eV/atom)
+
+Total Cost: 0.202 | Average Cost: 0.05
+
+
+Path 21:
+0.5 Y2O3 + 2 BaO2 -&gt; O2 + 0.5 Ba4Y2O7 (dG = -0.007 eV/atom)
+Ba4Y2O7 + 6 CuO -&gt; Ba4Y2Cu6O13 (dG = -0.137 eV/atom)
+Y2O3 + 2 Ba2(CuO2)3 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.075 eV/atom)
+4 CuO -&gt; Cu4O3 + 0.5 O2 (dG = 0.105 eV/atom)
+16 BaO2 + 6 Cu4O3 -&gt; O2 + 8 Ba2(CuO2)3 (dG = -0.303 eV/atom)
+
+Total Cost: 0.208 | Average Cost: 0.042
+
+
+Path 22:
+Y2O3 + 2 Ba2(CuO2)3 -&gt; O2 + Ba4Y2Cu6O13 (dG = 0.075 eV/atom)
+4 CuO -&gt; Cu4O3 + 0.5 O2 (dG = 0.105 eV/atom)
+16 BaO2 + 6 Cu4O3 -&gt; O2 + 8 Ba2(CuO2)3 (dG = -0.303 eV/atom)
+
+Total Cost: 0.217 | Average Cost: 0.072
+
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">create_total_path_df</span><span class="p">(</span><span class="n">cleaned_paths</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>dG</th>
+      <th>cost</th>
+    </tr>
+    <tr>
+      <th>path</th>
+      <th>total_cost</th>
+      <th>rxn</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="3" valign="top">1</th>
+      <th rowspan="3" valign="top">0.180</th>
+      <th>BaO2 + CuO -&gt; BaCuO2 + 0.5 O2</th>
+      <td>-0.1599</td>
+      <td>0.1772</td>
+    </tr>
+    <tr>
+      <th>Ba4Y2O7 + 6 CuO -&gt; Ba4Y2Cu6O13</th>
+      <td>-0.1367</td>
+      <td>0.1810</td>
+    </tr>
+    <tr>
+      <th>3 Y2O3 + 12 BaCuO2 -&gt; Ba4Y2O7 + 2 Ba4Y2Cu6O13</th>
+      <td>0.0385</td>
+      <td>0.2122</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2</th>
+      <th rowspan="2" valign="top">0.182</th>
+      <th>2 BaO2 + 2 CuO -&gt; Ba2Cu2O5 + 0.5 O2</th>
+      <td>-0.2245</td>
+      <td>0.1670</td>
+    </tr>
+    <tr>
+      <th>BaO2 + CuO -&gt; BaCuO2 + 0.5 O2</th>
+      <td>-0.1599</td>
+      <td>0.1772</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">21</th>
+      <th rowspan="2" valign="top">0.208</th>
+      <th>Y2O3 + 2 Ba2(CuO2)3 -&gt; O2 + Ba4Y2Cu6O13</th>
+      <td>0.0749</td>
+      <td>0.2193</td>
+    </tr>
+    <tr>
+      <th>4 CuO -&gt; Cu4O3 + 0.5 O2</th>
+      <td>0.1051</td>
+      <td>0.2253</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">22</th>
+      <th rowspan="3" valign="top">0.217</th>
+      <th>16 BaO2 + 6 Cu4O3 -&gt; O2 + 8 Ba2(CuO2)3</th>
+      <td>-0.3028</td>
+      <td>0.1554</td>
+    </tr>
+    <tr>
+      <th>Y2O3 + 2 Ba2(CuO2)3 -&gt; O2 + Ba4Y2Cu6O13</th>
+      <td>0.0749</td>
+      <td>0.2193</td>
+    </tr>
+    <tr>
+      <th>4 CuO -&gt; Cu4O3 + 0.5 O2</th>
+      <td>0.1051</td>
+      <td>0.2253</td>
+    </tr>
+  </tbody>
+</table>
+<p>91 rows × 2 columns</p>
+</div></div>
+</div>
+<section id="Questions?">
+<h2>Questions?<a class="headerlink" href="#Questions?" title="Link to this heading">#</a></h2>
+<p>That’s it! For any questions/issues, please feel free to post an <em>Issue</em> on the Github repository: <a class="reference external" href="https://github.com/GENESIS-EFRC/reaction-network">https://github.com/GENESIS-EFRC/reaction-network</a></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ARCHIVED: reaction-network (Demo Notebook)</a><ul>
+<li><a class="reference internal" href="#Author:-Matthew-McDermott">Author: Matthew McDermott</a></li>
+<li><a class="reference internal" href="#Updated:-April-12,-2021">Updated: April 12, 2021</a><ul>
+<li><a class="reference internal" href="#Imports">Imports</a></li>
+<li><a class="reference internal" href="#Main-script">Main script</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Example-1:-YMnO_3-assisted-metathesis">Example 1: YMnO<span class="math notranslate nohighlight">\(_3\)</span> assisted metathesis</a><ul>
+<li><a class="reference internal" href="#Filtering/ranking-the-candidates">Filtering/ranking the candidates</a><ul>
+<li><a class="reference internal" href="#Plotting-the-network">Plotting the network</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Example-2:-Y_2Mn_2O_7-assisted-metathesis">Example 2: Y<span class="math notranslate nohighlight">\(_2\)</span>Mn<span class="math notranslate nohighlight">\(_2\)</span>O<span class="math notranslate nohighlight">\(_7\)</span> assisted metathesis</a><ul>
+<li><a class="reference internal" href="#Pandas-view">Pandas view</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Example-3:-Fe_2SiS_4-synthesis-from-iron-silicide-precursors">Example 3: Fe<span class="math notranslate nohighlight">\(_2\)</span>SiS<span class="math notranslate nohighlight">\(_4\)</span> synthesis from iron silicide precursors</a></li>
+<li><a class="reference internal" href="#Example-4:-YBCO-synthesis-from-barium-peroxide">Example 4: YBCO synthesis from barium peroxide</a><ul>
+<li><a class="reference internal" href="#Questions?">Questions?</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=c19b6120"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

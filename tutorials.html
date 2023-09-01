@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Changelog" href="changelog.html" /><link rel="prev" title="Introduction" href="index.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="1) Enumerators" href="notebooks/1_enumerators.html" /><link rel="prev" title="Introduction" href="index.html" />
 
     <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
         <title>Tutorials - reaction-network</title>
@@ -181,7 +181,9 @@
   <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Notebooks</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Notebooks</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/1_enumerators.html">1) Enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/2_networks.html">2) Networks</a></li>
 </ul>
 </li>
 </ul>
@@ -247,6 +249,39 @@
           <section id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Link to this heading">#</a></h1>
 <div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/1_enumerators.html">1) Enumerators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/1_enumerators.html#1.-Imports">1. Imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/1_enumerators.html#2.-Downloading-and-modifying-entries">2. Downloading and modifying entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/1_enumerators.html#3.-Running-enumerators">3. Running enumerators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/1_enumerators.html#a)-Basic-enumerators">a) Basic enumerators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/1_enumerators.html#What-about-open-gases,-liquids,-etc.??">What about open gases, liquids, etc.??</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/1_enumerators.html#b)-Minimize-enumerators">b) Minimize enumerators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/1_enumerators.html#Open-entries">Open entries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/1_enumerators.html#4.-Running-enumerators-with-the-jobflow-package">4. Running enumerators with the <em>jobflow</em> package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/1_enumerators.html#5.-Conclusion">5. Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/2_networks.html">2) Networks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/2_networks.html#1.-Imports">1. Imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/2_networks.html#Case-Study:-YMnO3-assisted-metathesis">Case Study: YMnO3 assisted metathesis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/2_networks.html#Background">Background</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/2_networks.html#2.-Acquiring-thermodynamic-data-from-the-Materials-Project">2. Acquiring thermodynamic data from the Materials Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/2_networks.html#3.-Building-the-reaction-network">3. Building the reaction network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/2_networks.html#4.-Identifying-reaction-pathways-using-pathfinding-and-balancing/solving">4. Identifying reaction pathways using pathfinding and balancing/solving</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/2_networks.html#5.-Running-networks-with-jobflow">5. Running networks with jobflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/2_networks.html#6.-Conclusion">6. Conclusion</a></li>
+</ul>
+</li>
+</ul>
 </div>
 </section>
 
@@ -255,12 +290,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="changelog.html">
+          <a class="next-page" href="notebooks/1_enumerators.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Changelog</div>
+                <div class="title">1) Enumerators</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -298,7 +333,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=65e3e539"></script>
+</div><script src="_static/documentation_options.js?v=c19b6120"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

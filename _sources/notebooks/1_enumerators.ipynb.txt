@@ -1,0 +1,1803 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "d263f580",
+   "metadata": {},
+   "source": [
+    "# 1) Enumerators\n",
+    "\n",
+    "#### <u> Author:</u> Matthew McDermott (_U.C. Berkeley / Lawerence Berkeley National Laboratory_)\n",
+    "Last Updated: 08/31/23\n",
+    "\n",
+    "In this notebook, we cover reaction enumeration in the _reaction-network_ package. The reaction enumerators are the core of the package and supply all reaction data to be used in reaction network construction and downstream analyses. This is the recommended starting point for working with the codebase. Please see the next notebook(s) for further applications (such as network construction).\n",
+    "\n",
+    "If you use this package in your work, please consider citing the following paper:\n",
+    "\n",
+    "    McDermott, M. J., Dwaraknath, S. S., and Persson, K. A. (2021). A graph-based network for predicting chemical reaction pathways in solid-state materials synthesis. Nature Communications, 12(1). https://doi.org/10.1038/s41467-021-23339-x\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "529c0d4d",
+   "metadata": {},
+   "source": [
+    "## 1. Imports\n",
+    "First, make sure the reaction-network package and Materials Project API package are installed. Run these commands:\n",
+    "\n",
+    "`pip install --upgrade reaction-network` \n",
+    "\n",
+    "`pip install --upgrade mp-api` \n",
+    "\n",
+    "in your terminal. You may need to restart/reconfigure your Jupyter kernel after you do this."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "4f283fcf",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import logging\n",
+    "from pprint import pprint\n",
+    "\n",
+    "from mp_api.client import MPRester\n",
+    "from pymatgen.core.periodic_table import Element\n",
+    "\n",
+    "from rxn_network.core import Composition\n",
+    "from rxn_network.costs.functions import Softplus\n",
+    "from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator\n",
+    "from rxn_network.enumerators.minimize import MinimizeGibbsEnumerator, MinimizeGrandPotentialEnumerator\n",
+    "from rxn_network.entries.entry_set import GibbsEntrySet\n",
+    "from rxn_network.reactions.reaction_set import ReactionSet\n",
+    "\n",
+    "# this is useful if you are editing your code locally!\n",
+    "%load_ext autoreload\n",
+    "%autoreload 2"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7b999074",
+   "metadata": {},
+   "source": [
+    "## 2. Downloading and modifying entries"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8f5db570",
+   "metadata": {},
+   "source": [
+    "We will work with an example chemical system: yttrium (Y), manganese (Mn), and oxygen (o).\n",
+    "\n",
+    "First, we need to acquire thermodynamic data for phases in this system from the Materials Project (MP), a computed materials database containing calculations for 150,000+ materials."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "7e48b3d9",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "d1e04de2a53c41ff8f613e663cd7eac9",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "Retrieving ThermoDoc documents:   0%|          | 0/137 [00:00<?, ?it/s]"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "with MPRester() as mpr:  # insert your Materials Project API key if it's not stored as an environment variable\n",
+    "    entries = mpr.get_entries_in_chemsys(\"Y-Mn-O\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "825b675b",
+   "metadata": {},
+   "source": [
+    "A unique feature of the `reaction-network` package is the `GibbsEntrySet` class.\n",
+    "\n",
+    "This class allows us to automatically convert `ComputedStructureEntry` objects downloaded from the MP database into `GibbsComputedEntry` objects, where DFT-calculated energies have been converted to an AI-estimated equivalent values of the Gibbs free energies of formation, $\\Delta G_f$ for all entries at the specified temperature.\n",
+    "\n",
+    "This will also include some experimental thermochemistry data (e.g., NIST-JANAF). For more information, check out the citation in the documentation for `GibbsComputedEntry`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "2df768d6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "temp = 900  # units: Kelvin\n",
+    "gibbs_entries = GibbsEntrySet.from_computed_entries(entries, temperature=temp, include_nist_data=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "29089129",
+   "metadata": {},
+   "source": [
+    "We can print the entries by calling `.entries` or `.entries_list`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "2aabaca9",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[GibbsComputedEntry | mp-723285-GGA | O8 (O2)\n",
+       " Gibbs Energy (900 K) = 0.0000,\n",
+       " GibbsComputedEntry | mp-1238773-GGA+U | Mn1 O1 (MnO)\n",
+       " Gibbs Energy (900 K) = -2.6169,\n",
+       " GibbsComputedEntry | mp-1238899-GGA+U | Mn1 O1 (MnO)\n",
+       " Gibbs Energy (900 K) = -2.9922,\n",
+       " GibbsComputedEntry | mp-25223-GGA+U | Mn1 O2 (MnO2)\n",
+       " Gibbs Energy (900 K) = -3.7579,\n",
+       " GibbsComputedEntry | mp-796077-GGA+U | Mn1 O2 (MnO2)\n",
+       " Gibbs Energy (900 K) = 0.6017]"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "gibbs_entries.entries_list[:5]  # the first five entries in the Y-Mn-O system (in alphabetical order)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5ecbdd74",
+   "metadata": {},
+   "source": [
+    "The `GibbsEntrySet` class has many helpful functions, such as the following `filter_by_stability()` function, which automatically removes entries which are a specified energy per atom above the convex hull of stability:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "afe4de87",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "filtered_entries = gibbs_entries.filter_by_stability(0.025)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ac4142dd",
+   "metadata": {},
+   "source": [
+    "You should now see a much shorter list of entries within the Y-Mn-O system (< 25 meV/atom below the hull):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "905bbbea",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "108 (unfiltered) -> 13 (filtered)\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"{len(gibbs_entries)} (unfiltered) -> {len(filtered_entries)} (filtered)\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "37c703b9-1bde-4762-acd5-c509f0654f08",
+   "metadata": {},
+   "source": [
+    "Another useful function is the `get_min_entry_by_formula` function. This automatically finds the entry with the lowest energy matching the provided formula (composition). This is useful for querying the ground-state polymorph when there are many entries for a particular composition."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "dae38970-eeea-4fb8-b054-2143706ca53a",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "GibbsComputedEntry | mp-1172875-GGA+U | Mn32 O48 (Mn2O3)\n",
+       "Gibbs Energy (900 K) = -121.1202"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "gibbs_entries.get_min_entry_by_formula(\"Mn2O3\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3a810f32",
+   "metadata": {},
+   "source": [
+    "## 3. Running enumerators\n",
+    "\n",
+    "Now that we've discussed creating a set of entries, we will learn how to enumerate reactions from those entries. \n",
+    "\n",
+    "There are four distinct enumerator classes contained within `rxn_network.enumerators`: These are:\n",
+    "\n",
+    "**(basic)**\n",
+    "1. `BasicEnumerator`: uses a _combinatorial_ approach to identify all possible (closed) reactions within a set of entries.\n",
+    "2. `BasicOpenEnumerator`: uses a _combinatorial_ approach to identify all **open** reactions within a set of entries and a list of specified open entries/elements.\n",
+    "   \n",
+    "**(minimize)**\n",
+    "\n",
+    "3. `MinimizeGibbsEnumerator`: uses a _thermodynamic_ approach to identify all reactions within a set of entries that are predicted by minimizing Gibbs free energy between a set of two reacting phases touching at an interface.\n",
+    "4. `MinimizeGrandPotentialEnumerator`: uses a _thermodynamic_ approach to identify all reactions within a set of entries that are predicted by minimizing the grand potential energy between a set of two reacting phases touching at an interface with an **open** element at a specified chemical potential.\n",
+    "\n",
+    "There is no \"correct\" enumerator to use; while the thermodynamic (i.e., minimize) enumerators may seem more logical, our thermodynamic data is not always exaclty correct -- this means that some reactions will not be enumerated.\n",
+    "\n",
+    "### a) Basic enumerators\n",
+    "We first create a basic enumerator object by initializing one from the `BasicEnumerator` class. Let's initialize it with only default arguments:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "e92e7cb2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "be = BasicEnumerator()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "edcc5636",
+   "metadata": {},
+   "source": [
+    "The `BasicEnumerator` class, as is true for all other enumerator classes, has many arguments that will customize its output. To view helpful documentation for these arguments, press Shift+Tab with your cursor inside the parentheses in the cell above.\n",
+    "\n",
+    "A key argument to the basic enumerators is the maximum reactant/product cardinality, $n$. The default is $n=2$. This setting suffices for capturing many of the reactions that make up a solid-state reaction pathway according to the pairwise interface reaction hypothesis (most powder reactions proceed through reactions of interfacial pairs). Note that it is possible to set $n=3$, however this dramatically increases the combinatorial complexity and can take a long time for more complex systems.\n",
+    "\n",
+    "In general, the default arguments are good for generating a list of simple (unconstrained) reactions, as we might build for a reaction network. Run the following cell:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "102063fc",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2023-08-31 11:22:12,439 INFO rxn_network.utils.ray Ray is not initialized. Checking for existing cluster...\n",
+      "2023-08-31 11:22:12,439 INFO rxn_network.utils.ray Could not identify existing Ray instance. Creating a new one...\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "2023-08-31 11:22:14,123\tINFO worker.py:1627 -- Started a local Ray instance. View the dashboard at \u001b[1m\u001b[32m127.0.0.1:8266 \u001b[39m\u001b[22m\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2023-08-31 11:22:14,616 INFO rxn_network.utils.ray HOST: Matts-MBP.local, Num CPUs: 12.0, Total Memory: 37544088372.0\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 1570.46it/s]\n",
+      "Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:01<00:00,  1.54s/it]\n"
+     ]
+    }
+   ],
+   "source": [
+    "all_rxns = be.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "afc844ff",
+   "metadata": {},
+   "source": [
+    "You may notice that something called `Ray` is initialized. This is a python library for parallelizing functions and is used by the `reaction-network` code to parallelize enumeration. \n",
+    "\n",
+    "The cell above should have completed somewhat quickly -- ideally within a second or two. As a result, a list of 692 generated reactions will be stored within the `all_rxns` object. Note: this number may change in the future if the MP database changes..."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "3c67e9ee",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "692\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(len(all_rxns))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6b9ef1b4",
+   "metadata": {},
+   "source": [
+    "Every time `enumerate()` is called, a `ReactionSet` will be returned. This is a memory-efficient object that can be used to store large sets of reactions.\n",
+    "\n",
+    "The `ReactionSet` class stores sets of reactions as arrays. Note that the actual reaction objects can only be accessed by **iterating** through the reaction set. Lets print the \"first\" 10 reactions. These may be different on your side; the reactions are generated in no particualr order."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "0eae80ef",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2 Y2Mn2O7 -> O2 + 4 YMnO3\n",
+      "O2 + 4 YMnO3 -> 2 Y2Mn2O7\n",
+      "Y2Mn2O7 -> Y2O3 + 2 MnO2\n",
+      "Y2O3 + 2 MnO2 -> Y2Mn2O7\n",
+      "2 YMnO3 -> Mn2O3 + Y2O3\n",
+      "Mn2O3 + Y2O3 -> 2 YMnO3\n",
+      "2 YMn2O5 -> Y2Mn2O7 + Mn2O3\n",
+      "Y2Mn2O7 + Mn2O3 -> 2 YMn2O5\n",
+      "YMn2O5 -> YMnO3 + MnO2\n",
+      "YMnO3 + MnO2 -> YMn2O5\n",
+      "6 Mn2O3 -> O2 + 4 Mn3O4\n",
+      "O2 + 4 Mn3O4 -> 6 Mn2O3\n"
+     ]
+    }
+   ],
+   "source": [
+    "for count, r in enumerate(all_rxns):\n",
+    "    print(r)\n",
+    "    if count>10:\n",
+    "        break"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "42e1e246",
+   "metadata": {},
+   "source": [
+    "Looking at the list of reactions above, we see that all reactions are stoichiometrically balanced. If we look at any particular reaction object, we find that the reaction energy and uncertainty are properties which can be easily accessed:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "138fa836",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2 Y2Mn2O7 -> O2 + 4 YMnO3\n",
+      "0.038 ± 0.07 eV/atom\n"
+     ]
+    }
+   ],
+   "source": [
+    "r = list(all_rxns)[0]\n",
+    "print(r)\n",
+    "print(f\"{round(r.energy_per_atom, 4)} ± {round(r.energy_uncertainty_per_atom, 2)} eV/atom\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8d74e8bc",
+   "metadata": {},
+   "source": [
+    "What if you want to enumerate all reactions from a known set of precursors? An inefficient way to do so might be to filter the previous reaction set by your phases of interest...\n",
+    "\n",
+    "However, a more efficient solution has been provided. We can supply our precursor formulas when we initialize the `BasicEnumerator` object. This will reduce the number of calculations required significantly. Lets say we have Y2O3 as a precursor:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "c0ccf3bc",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building chunks...: 100%|████████████████████| 1/1 [00:00<00:00, 1792.44it/s]\n",
+      "Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00<00:00, 521.42it/s\n"
+     ]
+    }
+   ],
+   "source": [
+    "be_precursors = BasicEnumerator(precursors=[\"Y2O3\"])\n",
+    "y2o3_rxns_exclusive = be_precursors.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "551da08b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0.6667 Y2O3 -> O2 + 1.333 Y\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in y2o3_rxns_exclusive:\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1c40612e",
+   "metadata": {},
+   "source": [
+    "Note that by default, this only produces reactions which **exclusively** have the provided precursor(s). \n",
+    "\n",
+    "To include reactions that contain this precursor (and possibly others) set the `exclusive_precursors=False`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "d7a90c39",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 2344.82it/s]\n",
+      "Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00<00:00,  4.25it/s]\n"
+     ]
+    }
+   ],
+   "source": [
+    "be_precursors = BasicEnumerator(precursors=[\"Y2O3\"], exclusive_precursors=False)\n",
+    "y2o3_rxns = be_precursors.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c697190c",
+   "metadata": {},
+   "source": [
+    "We now get a much larger list of reactions, all of which contain Y2O3 as a precursor (and often another phase such as a manganese oxide):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "3254e746",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[Y2O3 + 2 MnO2 -> Y2Mn2O7,\n",
+      " Mn2O3 + Y2O3 -> 2 YMnO3,\n",
+      " 0.6667 Y2O3 -> O2 + 1.333 Y,\n",
+      " Mn5O8 + 0.5 Y2O3 -> 0.5 Y2Mn2O7 + 2 Mn2O3,\n",
+      " Mn5O8 + 2.5 Y2O3 -> 0.5 Y2Mn2O7 + 4 YMnO3,\n",
+      " Y2O3 + 2 YMn2O5 -> Y2Mn2O7 + 2 YMnO3,\n",
+      " Mn2O3 + 0.25 Y2O3 -> 0.25 Y2Mn2O7 + 0.5 Mn3O4,\n",
+      " Mn5O8 + Y2O3 -> Y2Mn2O7 + Mn3O4,\n",
+      " Y2O3 + 8 YMn2O5 -> 5 Y2Mn2O7 + 2 Mn3O4,\n",
+      " Mn2O3 + 0.75 Y2O3 -> 0.75 Y2Mn2O7 + 0.5 Mn]\n"
+     ]
+    }
+   ],
+   "source": [
+    "pprint(list(y2o3_rxns)[:10])  # a sample of just 10 reactions"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "26eef136",
+   "metadata": {},
+   "source": [
+    "This same approach can be used for the target phase(s) as well.\n",
+    "\n",
+    "With `exclusive_targets=True`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "0e0be703",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 2158.95it/s]\n",
+      "Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00<00:00, 28.38it/s]\n"
+     ]
+    }
+   ],
+   "source": [
+    "be_target = BasicEnumerator(targets=[\"YMnO3\"], exclusive_targets=True)\n",
+    "ymno3_rxns_exclusive = be_target.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "c6263834",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Mn2O3 + Y2O3 -> 2 YMnO3\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in ymno3_rxns_exclusive:\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "27452d91",
+   "metadata": {},
+   "source": [
+    "Due to the fact that the right side of the reaction can _only_ contain YMnO3, we get just **one** reaction above! \n",
+    "\n",
+    "Now, with `exclusive_targets=False` (the default):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "89dbc356",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 2322.75it/s]\n",
+      "Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00<00:00,  4.16it/s]\n"
+     ]
+    }
+   ],
+   "source": [
+    "be_target = BasicEnumerator(targets=[\"YMnO3\"])\n",
+    "ymno3_rxns = be_target.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "ede95782",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[2 Y2Mn2O7 -> O2 + 4 YMnO3,\n",
+      " Mn2O3 + Y2O3 -> 2 YMnO3,\n",
+      " YMn2O5 -> YMnO3 + MnO2,\n",
+      " 0.5 Y2Mn2O7 + 0.5 Mn2O3 -> YMnO3 + MnO2,\n",
+      " 0.5 Y2Mn2O7 + 2.5 Mn2O3 -> Mn5O8 + YMnO3,\n",
+      " Mn5O8 + 2.5 Y2O3 -> 0.5 Y2Mn2O7 + 4 YMnO3,\n",
+      " Y2O3 + 2 YMn2O5 -> Y2Mn2O7 + 2 YMnO3,\n",
+      " 0.3333 Y2Mn2O7 + 0.6667 Mn3O4 -> Mn2O3 + 0.6667 YMnO3,\n",
+      " 0.5 Y2Mn2O7 + 0.25 Mn3O4 -> YMnO3 + 0.75 MnO2,\n",
+      " 1.333 Y2Mn2O7 + 1.667 Mn3O4 -> Mn5O8 + 2.667 YMnO3]\n"
+     ]
+    }
+   ],
+   "source": [
+    "pprint(list(ymno3_rxns)[:10])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c2aa527e",
+   "metadata": {},
+   "source": [
+    "And finally, with multiple targets specified (e.g., YMnO3 and O2):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "74d8cd84",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 2457.12it/s]\n",
+      "Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00<00:00, 13.44it/s]\n"
+     ]
+    }
+   ],
+   "source": [
+    "be_targets = BasicEnumerator(targets=[\"YMnO3\", \"O2\"], exclusive_targets=True)\n",
+    "ymno3_rxns_o2 = be_targets.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "7ac11b74",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2 Y2Mn2O7 -> O2 + 4 YMnO3\n",
+      "Mn2O3 + Y2O3 -> 2 YMnO3\n",
+      "Y2O3 + 2 MnO2 -> 0.5 O2 + 2 YMnO3\n",
+      "Mn5O8 + 2.5 Y2O3 -> 0.25 O2 + 5 YMnO3\n",
+      "Y2O3 + 2 YMn2O5 -> 0.5 O2 + 4 YMnO3\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in ymno3_rxns_o2:\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6c399338",
+   "metadata": {},
+   "source": [
+    "#### What about open gases, liquids, etc.??"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ded84ba9",
+   "metadata": {},
+   "source": [
+    "In the previous cell, we showed that it was possible to specify YMnO$_3$ as a target, along with O$_2$. However, because O$_2$ is a gas, it is often desirable to include it as an **open entry** in addition to the 2 possible precursors or targets. For example, we may want to specify a reaction as follows:\n",
+    "\n",
+    "$$ A + B ~ +~\\textrm{O}_2 \\rightarrow C + D $$\n",
+    "$$ \\textrm{or} $$\n",
+    "$$ A + B \\rightarrow C + D ~ +~\\textrm{O}_2 $$\n",
+    "\n",
+    "To do this, we use the `BasicOpenEnumerator` class, which is an extension to the original basic enumerator. All of the lessons learned above also apply to this class, although now a list of open entry formulas (e.g., `[\"O2\"]`) must be specified:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "ee20fdee",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building chunks...: 100%|████████████████████| 3/3 [00:00<00:00, 1811.79it/s]\n",
+      "Enumerating reactions (BasicOpenEnumerator): 100%|█| 2/2 [00:01<00:00,  1.82i\n"
+     ]
+    }
+   ],
+   "source": [
+    "be_target_open = BasicOpenEnumerator(open_phases=[\"O2\"], targets=[\"YMnO3\"])\n",
+    "ymno3_rxns_open = be_target_open.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a012a55e",
+   "metadata": {},
+   "source": [
+    "The `BasicOpenEnumerator` generally requires more time to run as it considers a larger combinatorial space.\n",
+    "\n",
+    "You will now see that the reactions from before are included in this new list, along with many other open-O$_2$ reactions -- some which even have a total of 3 reactants or 3 products. In other words, the open entry/entries do not count towards the specified maximum cardinality, $n$."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "c24a9909",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2 Y2Mn2O7 -> O2 + 4 YMnO3\n",
+      "O2 + 0.6667 Mn2O3 + 1.333 Y -> 1.333 YMnO3\n",
+      "O2 + 4 Mn3O4 + 6 Y2O3 -> 12 YMnO3\n",
+      "O2 + 0.4 Mn3O4 + 1.2 Y -> 1.2 YMnO3\n",
+      "O2 + 1.333 Mn + 0.6667 Y2O3 -> 1.333 YMnO3\n",
+      "O2 + 0.6667 Mn + 0.6667 Y -> 0.6667 YMnO3\n",
+      "O2 + 4 MnO + 2 Y2O3 -> 4 YMnO3\n",
+      "O2 + MnO + Y -> YMnO3\n",
+      "O2 + 2 MnO2 + 2 Y -> 2 YMnO3\n",
+      "O2 + 0.2857 Mn5O8 + 1.429 Y -> 1.429 YMnO3\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in list(ymno3_rxns_open)[:10]:  # first 10 reactions\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b2ca2f70",
+   "metadata": {},
+   "source": [
+    "It is even possible to specify multiple open entries, allowing for more complex reactions. For example, specifiyng Y2O3 and O2 as both being open:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "364b7e48",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building chunks...: 100%|██████████████████████| 2/2 [00:00<00:00, 28.43it/s]\n",
+      "Enumerating reactions (BasicOpenEnumerator): 100%|█| 6/6 [00:01<00:00,  3.15i\n"
+     ]
+    }
+   ],
+   "source": [
+    "be_target_open2 = BasicOpenEnumerator(open_phases=[\"Y2O3\", \"O2\"],targets=[\"YMnO3\"])\n",
+    "ymno3_rxns_open2 = be_target_open2.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "cd48333b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0.5 Y2Mn2O7 + 0.3333 Y -> YMnO3 + 0.1667 Y2O3\n",
+      "O2 + 0.1026 YMn12 -> 0.5641 Mn2O3 + 0.1026 YMnO3\n",
+      "Y2O3 + 0.6667 Mn3O4 + 0.1667 O2 -> 2 YMnO3\n",
+      "Mn + 0.5 Y2O3 + 0.75 O2 -> YMnO3\n",
+      "Y2O3 + 2 MnO + 0.5 O2 -> 2 YMnO3\n",
+      "Y2O3 + 0.1818 YMn12 + 1.773 O2 -> 2.182 YMnO3\n",
+      "Y2O3 + 0.6667 Mn3O4 + 0.3333 Y2Mn2O7 -> 2.667 YMnO3\n",
+      "Mn + 0.5 Y2O3 + 1.5 Y2Mn2O7 -> 4 YMnO3\n",
+      "Y2O3 + 2 MnO + Y2Mn2O7 -> 4 YMnO3\n",
+      "Y2O3 + 0.1818 YMn12 + 3.545 Y2Mn2O7 -> 9.273 YMnO3\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in list(ymno3_rxns_open2)[:10]:  # first 10 reactions\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "48507bd1",
+   "metadata": {},
+   "source": [
+    "This may be useful for modeling systems with 2 or more gaseous, liquid, or molten phases, such as $O_2$ and a molten salt (e.g. $LiCl$).\n",
+    "\n",
+    "If the system is open to a particular element such as $O_2$, then it is generally a goood idea to model the thermodynamics of the system with the grand potential energy, $\\Phi$. This can be easily done by providing the open element and chemical potential to the `ReactionSet` class. In this case, we will reinitialize the reactions:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "447920cf-b9e0-4396-829a-3a53289dbf7a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[0.5 Y2Mn2O7 + 0.3333 Y -> YMnO3 + 0.1667 Y2O3 (mu_O=0.0),\n",
+      " O2 + 0.1026 YMn12 -> 0.5641 Mn2O3 + 0.1026 YMnO3 (mu_O=0.0),\n",
+      " Y2O3 + 0.6667 Mn3O4 + 0.1667 O2 -> 2 YMnO3 (mu_O=0.0),\n",
+      " Mn + 0.5 Y2O3 + 0.75 O2 -> YMnO3 (mu_O=0.0),\n",
+      " Y2O3 + 2 MnO + 0.5 O2 -> 2 YMnO3 (mu_O=0.0),\n",
+      " Y2O3 + 0.1818 YMn12 + 1.773 O2 -> 2.182 YMnO3 (mu_O=0.0),\n",
+      " Y2O3 + 0.6667 Mn3O4 + 0.3333 Y2Mn2O7 -> 2.667 YMnO3 (mu_O=0.0),\n",
+      " Mn + 0.5 Y2O3 + 1.5 Y2Mn2O7 -> 4 YMnO3 (mu_O=0.0),\n",
+      " Y2O3 + 2 MnO + Y2Mn2O7 -> 4 YMnO3 (mu_O=0.0),\n",
+      " Y2O3 + 0.1818 YMn12 + 3.545 Y2Mn2O7 -> 9.273 YMnO3 (mu_O=0.0)]\n"
+     ]
+    }
+   ],
+   "source": [
+    "grand_potential_rxns = ymno3_rxns_open2.set_chempot(open_el=Element(\"O\"), chempot=0.0)\n",
+    "pprint(list(grand_potential_rxns)[:10])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "27bbe9d2-14c0-4d87-89ab-7736f2419577",
+   "metadata": {},
+   "source": [
+    "Each of these reactions is a new class: `OpenComputedReaction` and its energy (per atom) is calculated assumning oxygen is an open element with the defined chemical potential. We will discuss this further later in the notebook."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "677201f1",
+   "metadata": {},
+   "source": [
+    "### b) Minimize enumerators\n",
+    "\n",
+    "The \"minimize\" enumerators produce reactions via a thermodynamic free energy minimization approach, rather than a purely combinatorial one. This means that reactions are produced directly from the compositional phase diagram, where a new convex hull is drawn connecting two compositions within a closed (Gibbs) or open (Grand Potential) system. See the `InterfacialReactivity` class within the _pymatgen_ package for more information.\n",
+    "\n",
+    "**It is important to note that reactions produced with the minimize enumerators may overlap some with the basic enumerators, but the minimize enumerators have the restriction that all reactions they originally produce must have a negative reaction energy and result in a set of product phases which are stable with respect to each other (i.e. they share a facet of the phase diagram).** That being said, these enumerators (when unrestricted) will also supply the reverse (i.e. positive energy) reaction as well.\n",
+    "\n",
+    "In general, this means that the basic enumerators and minimize enumerators do not perfectly overlap in their outputs, and may be used in tandem. This is recommended! Let's initialize the `MinimizeGibbsEnumerator` with all default arguments (press Shift+Tab to view documentation)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "11a5f33d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mge = MinimizeGibbsEnumerator()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4d3aa769",
+   "metadata": {},
+   "source": [
+    "The default arguments, as before, help produce all reactions in a set of entries, given minimal constraints."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "194c29f1",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00<00:00, \n",
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 1240.73it/s]\n",
+      "Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00<00:00,  4\n"
+     ]
+    }
+   ],
+   "source": [
+    "rxns = mge.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "3cb8c511",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0.5 Mn2O3 + 0.5 Y2Mn2O7 -> YMn2O5\n",
+      "0.5 Mn5O8 -> Mn2O3 + 0.5 MnO2\n",
+      "0.5 Mn2O3 + 0.5 Y2O3 -> YMnO3\n",
+      "0.5 O2 + 2 YMnO3 -> Y2Mn2O7\n",
+      "MnO2 + YMnO3 -> YMn2O5\n",
+      "0.5 Mn5O8 -> Mn2O3 + 0.5 MnO2\n",
+      "2 MnO2 + Y2O3 -> Y2Mn2O7\n",
+      "0.5 Mn5O8 -> Mn2O3 + 0.5 MnO2\n",
+      "0.5 Mn5O8 -> Mn2O3 + 0.5 MnO2\n",
+      "0.5 Mn5O8 -> Mn2O3 + 0.5 MnO2\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in list(rxns)[0:10]:  # first 10 reactions\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "889437d2",
+   "metadata": {},
+   "source": [
+    "And as before, we can specify various combinations of precursors and targets, as well as whether or not they should be \"exclusive\". Here we specify Y2O3 as a required, but non-exclusive precursor):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "aee5a933",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00<00:00, \n",
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 1344.54it/s]\n",
+      "Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00<00:00, 34\n"
+     ]
+    }
+   ],
+   "source": [
+    "mge_precursors = MinimizeGibbsEnumerator(precursors=[\"Y2O3\"], exclusive_precursors=False)\n",
+    "rxns = mge_precursors.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "id": "bd95a67e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2.5 Mn2O3 + 0.5 Y2O3 -> YMn2O5 + Mn3O4\n",
+      "0.5 Mn3O4 + 0.5 Y2O3 -> YMnO3 + 0.5 MnO\n",
+      "2 MnO2 + 0.5 Y2O3 -> YMn2O5 + 0.25 O2\n",
+      "0.3333 Mn5O8 + 0.6667 Y2O3 -> YMnO3 + 0.3333 YMn2O5\n",
+      "0.625 Mn5O8 + 0.5 Y2O3 -> YMn2O5 + 0.375 Mn3O4\n",
+      "0.6667 Mn5O8 + 0.3333 Y2O3 -> Mn2O3 + 0.6667 YMn2O5\n",
+      "0.5 Mn2O3 + 0.5 Y2O3 -> YMnO3\n",
+      "2 MnO2 + Y2O3 -> Y2Mn2O7\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in rxns:\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "43ebdeb6-962c-42a2-8194-26e61d151d48",
+   "metadata": {},
+   "source": [
+    "And here we specify both Y2O3 and Mn2O3 as the exclusive precursors of the reaction:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "id": "c1e26790",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00<00:00, \n",
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 1110.27it/s]\n",
+      "Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00<00:00, 81\n"
+     ]
+    }
+   ],
+   "source": [
+    "mge_precursors = MinimizeGibbsEnumerator(precursors=[\"Y2O3\", \"Mn2O3\"])\n",
+    "rxns = mge_precursors.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "id": "77cadadb",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2.5 Mn2O3 + 0.5 Y2O3 -> YMn2O5 + Mn3O4\n",
+      "0.5 Mn2O3 + 0.5 Y2O3 -> YMnO3\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in rxns:\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0775b3a7-a33c-4ac5-bafa-1013522a7cbb",
+   "metadata": {},
+   "source": [
+    "Now we specify YMnO3 as the exclusive target of the reaction."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "id": "b61398c4",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00<00:00, \n",
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 1311.03it/s]\n",
+      "Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00<00:00,  5\n"
+     ]
+    }
+   ],
+   "source": [
+    "mge_targets = MinimizeGibbsEnumerator(targets=[\"YMnO3\"], exclusive_targets=True)\n",
+    "rxns = mge_targets.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0f62fe81-2226-4148-80cc-58cd5043ec9b",
+   "metadata": {},
+   "source": [
+    "This only identifies one reaction!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "id": "f4a639ac",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0.5 Mn2O3 + 0.5 Y2O3 -> YMnO3\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in rxns:\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "28a279aa-a072-4a86-80ff-9cbf8d2f22c7",
+   "metadata": {},
+   "source": [
+    "Lastly, we identify YMnO3 as a required target, with any number of byproducts (i.e., non-exclusive target):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "id": "50cab6a4",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00<00:00, \n",
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 1345.41it/s]\n",
+      "Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00<00:00,  4\n"
+     ]
+    }
+   ],
+   "source": [
+    "mge_targets = MinimizeGibbsEnumerator(targets=[\"YMnO3\"], exclusive_targets=False)\n",
+    "rxns = mge_targets.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "id": "a8359687",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Mn3O4 + 2 Y2Mn2O7 -> YMnO3 + 3 YMn2O5 -0.039591749392732606\n",
+      "0.5 Mn + 0.5 Y2Mn2O7 -> YMnO3 + 0.5 MnO -0.22628212150322882\n",
+      "0.375 Mn + 0.5 Y2Mn2O7 -> YMnO3 + 0.125 Mn3O4 -0.19916896885873445\n",
+      "0.3333 Mn + 0.6667 Y2Mn2O7 -> YMnO3 + 0.3333 YMn2O5 -0.15230582998188094\n",
+      "1.5 MnO + 0.5 Y2Mn2O7 -> YMnO3 + 0.5 Mn3O4 -0.07145795072025463\n",
+      "MnO + Y2Mn2O7 -> YMnO3 + YMn2O5 -0.06058835627265508\n",
+      "0.3333 Y + 0.5 Y2Mn2O7 -> YMnO3 + 0.1667 Y2O3 -0.4614723709416988\n",
+      "0.03448 YMn12 + 0.4828 Y2Mn2O7 -> YMnO3 + 0.3793 MnO -0.2475633372715506\n",
+      "0.02752 YMn12 + 0.4862 Y2Mn2O7 -> YMnO3 + 0.1009 Mn3O4 -0.22088724880664687\n",
+      "0.025 YMn12 + 0.625 Y2Mn2O7 -> YMnO3 + 0.275 YMn2O5 -0.17363615371992666\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in list(rxns)[:10]:  # first 10 reactions\n",
+    "    print(r, r.energy_per_atom)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "66276bd3-c313-480d-aa25-c5f7af3329a3",
+   "metadata": {},
+   "source": [
+    "Notice that there are many more complex reactions here -- all but the previous one we identified feature a byproduct phase that is required to balance the reaction."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c8d2739f",
+   "metadata": {},
+   "source": [
+    "#### Open entries\n",
+    "\n",
+    "Once again, as before, we can do all the same analysis with open entries. As previously mentioned, the grand potential is used as the thermodynamic free energy which is minimized:\n",
+    "\n",
+    "$$ \\Phi = G - \\mu_iN_i $$\n",
+    "\n",
+    "Where $i$ is the open species with chemical potential $\\mu_i$. The amount of the open species in a particular phase, $N_i$, is used to adjust the energy of that phase.\n",
+    "\n",
+    "Let's create a `MinimizeGrandPotentialEnumerator` with default arguments and oxygen as the open element with chemical potential $\\mu=0$. Note that this is equivalent to $\\mu=\\mu_O^0$ due to the fact that we are working with Gibbs free energies of formation:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "id": "ed9d72f2",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0\n",
+      "Building chunks...: 100%|█████████████████████| 3/3 [00:00<00:00, 902.78it/s]\n",
+      "Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00<\n"
+     ]
+    }
+   ],
+   "source": [
+    "mgpe = MinimizeGrandPotentialEnumerator(open_elem=Element(\"O\"), mu=0)\n",
+    "open_rxns = mgpe.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "d71bbdb6",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2 YMnO3 + 0.5 O2 -> Y2Mn2O7\n",
+      "2 YMnO3 + 0.5 O2 -> Y2Mn2O7\n",
+      "0.5 Mn2O3 + 0.25 O2 -> MnO2\n",
+      "2 YMnO3 + 0.5 O2 -> Y2Mn2O7\n",
+      "0.3333 Mn3O4 + 0.3333 O2 -> MnO2\n",
+      "Mn + O2 -> MnO2\n",
+      "MnO + 0.5 O2 -> MnO2\n",
+      "0.2 Mn5O8 + 0.2 O2 -> MnO2\n",
+      "2 Y + 1.5 O2 -> Y2O3\n",
+      "0.5 Mn2O3 + 0.25 O2 -> MnO2\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in list(open_rxns)[:10]:  # first 10 reactions\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3a487f9d",
+   "metadata": {},
+   "source": [
+    "Note that this enumerator often returns duplicates particularly with terminal reactions.\n",
+    "\n",
+    "To ensure that duplicates are not returned, we can initialize the enumerator with a different flag:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "id": "f26e0189-8d33-4778-b2d1-f6c11d489c67",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0\n",
+      "Building chunks...: 100%|█████████████████████| 3/3 [00:00<00:00, 894.44it/s]\n",
+      "Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00<\n",
+      "Filtering duplicates: 100%|████████████████████| 8/8 [00:00<00:00, 22.67it/s]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0.3333 Mn3O4 + 0.3333 O2 -> MnO2\n",
+      "0.5 Mn2O3 + 0.25 O2 -> MnO2\n",
+      "0.2 Mn5O8 + 0.2 O2 -> MnO2\n",
+      "2 Y + 1.5 O2 -> Y2O3\n",
+      "Mn + O2 -> MnO2\n",
+      "MnO + 0.5 O2 -> MnO2\n",
+      "2 YMnO3 + 0.5 O2 -> Y2Mn2O7\n",
+      "2 MnO2 + 2 Y + 1.5 O2 -> Y2Mn2O7\n",
+      "2 MnO2 + Y + 0.5 O2 -> YMn2O5\n",
+      "4 MnO2 + 2 Y2Mn2O7 -> O2 + 4 YMn2O5\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "mgpe = MinimizeGrandPotentialEnumerator(open_elem=Element(\"O\"), mu=0, filter_duplicates=True)\n",
+    "open_rxns = mgpe.enumerate(filtered_entries)\n",
+    "\n",
+    "for r in list(open_rxns)[:10]:  # first 10 reactions\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2da8cd10-1ac4-49f3-834f-ac5a0dfb8063",
+   "metadata": {},
+   "source": [
+    "Also note that the reaction objects returned are **NOT** (by default) configured to report their energy as a change in the grand potential. To configure this, we need to transform these reactions to `OpenComputedReaction` objects. This class allows for easy specification of reactions where one of the elements is assigned a chemical potential.\n",
+    "\n",
+    "We did this earlier through a convenience constructor method:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "id": "c1b9757a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_open_rxns = open_rxns.set_chempot(Element(\"O\"), chempot=0.0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1ad06d42",
+   "metadata": {},
+   "source": [
+    "We should now see that `(mu_O=0.0)` appears in the repr of the object:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "id": "cc8c2fc0",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "OpenComputedReaction\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "0.3333 Mn3O4 + 0.3333 O2 -> MnO2 (mu_O=0.0)"
+      ]
+     },
+     "execution_count": 43,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "sample_open_rxn = list(new_open_rxns)[0]\n",
+    "print(sample_open_rxn.__class__.__name__)\n",
+    "\n",
+    "sample_open_rxn"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8f6ff7b4",
+   "metadata": {},
+   "source": [
+    "We can also, as before, customize which precursors and targets are specified:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "id": "d28a8606",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0\n",
+      "Building chunks...: 100%|█████████████████████| 3/3 [00:00<00:00, 883.38it/s]\n",
+      "Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00<\n",
+      "Filtering duplicates: 0it [00:00, ?it/s]\n"
+     ]
+    }
+   ],
+   "source": [
+    "mgpe_precursors = MinimizeGrandPotentialEnumerator(open_elem=Element(\"O\"), mu=0,\n",
+    "                                                   precursors=[\"Y2O3\"], exclusive_precursors=False, filter_duplicates=True)\n",
+    "open_rxns_precursors = mgpe_precursors.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "id": "41f31a0e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "8 MnO2 + 2 Y2O3 -> O2 + 4 YMn2O5\n",
+      "2 MnO + Y2O3 + O2 -> Y2Mn2O7\n",
+      "2 MnO + 0.5 Y2O3 + 0.75 O2 -> YMn2O5\n",
+      "0.4 Mn5O8 + Y2O3 + 0.4 O2 -> Y2Mn2O7\n",
+      "0.4 Mn5O8 + 0.5 Y2O3 + 0.15 O2 -> YMn2O5\n",
+      "0.6667 Mn3O4 + Y2O3 + 0.6667 O2 -> Y2Mn2O7\n",
+      "0.6667 Mn3O4 + 0.5 Y2O3 + 0.4167 O2 -> YMn2O5\n",
+      "2 Mn + Y2O3 + 2 O2 -> Y2Mn2O7\n",
+      "2 Mn + 0.5 Y2O3 + 1.75 O2 -> YMn2O5\n",
+      "Mn2O3 + Y2O3 + 0.5 O2 -> Y2Mn2O7\n",
+      "Mn2O3 + 0.5 Y2O3 + 0.25 O2 -> YMn2O5\n",
+      "0.1667 YMn12 + 0.9167 Y2O3 + 2.125 O2 -> Y2Mn2O7\n",
+      "0.1667 YMn12 + 0.4167 Y2O3 + 1.875 O2 -> YMn2O5\n",
+      "0.5 Y2O3 + YMn2O5 + 0.25 O2 -> Y2Mn2O7\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in open_rxns_precursors:\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "id": "f859e421",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0\n",
+      "Building chunks...: 100%|█████████████████████| 3/3 [00:00<00:00, 915.79it/s]\n",
+      "Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00<\n",
+      "Filtering duplicates: 100%|██████████████████| 1/1 [00:00<00:00, 1811.79it/s]\n"
+     ]
+    }
+   ],
+   "source": [
+    "mgpe_precursors = MinimizeGrandPotentialEnumerator(open_elem=Element(\"O\"), mu=0,\n",
+    "                                                   targets=[\"Y2Mn2O7\"], filter_duplicates=True)\n",
+    "open_rxns_targets = mgpe_precursors.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "id": "9ef3c55b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2 YMnO3 + 0.5 O2 -> Y2Mn2O7\n",
+      "2 MnO2 + 2 Y + 1.5 O2 -> Y2Mn2O7\n",
+      "2 MnO + 2 Y + 2.5 O2 -> Y2Mn2O7\n",
+      "2 MnO + Y2O3 + O2 -> Y2Mn2O7\n",
+      "0.4 Mn5O8 + 2 Y + 1.9 O2 -> Y2Mn2O7\n",
+      "0.4 Mn5O8 + Y2O3 + 0.4 O2 -> Y2Mn2O7\n",
+      "0.6667 Mn3O4 + 2 Y + 2.167 O2 -> Y2Mn2O7\n",
+      "0.6667 Mn3O4 + Y2O3 + 0.6667 O2 -> Y2Mn2O7\n",
+      "2 Mn + 2 Y + 3.5 O2 -> Y2Mn2O7\n",
+      "2 Mn + Y2O3 + 2 O2 -> Y2Mn2O7\n",
+      "Mn2O3 + 2 Y + 2 O2 -> Y2Mn2O7\n",
+      "Mn2O3 + Y2O3 + 0.5 O2 -> Y2Mn2O7\n",
+      "0.1667 YMn12 + 1.833 Y + 3.5 O2 -> Y2Mn2O7\n",
+      "0.1667 YMn12 + 0.9167 Y2O3 + 2.125 O2 -> Y2Mn2O7\n",
+      "Y + YMn2O5 + O2 -> Y2Mn2O7\n",
+      "0.5 Y2O3 + YMn2O5 + 0.25 O2 -> Y2Mn2O7\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in open_rxns_targets:\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a89b08c0",
+   "metadata": {},
+   "source": [
+    "Note that setting the chemical potential to a value outside of the range of stability of the target (e.g., `mu_O = -3`, causes the enumerator to yield no reactions:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "id": "6faafecf",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0\n",
+      "Building chunks...: 100%|█████████████████████| 3/3 [00:00<00:00, 929.04it/s]\n",
+      "Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00<\n"
+     ]
+    }
+   ],
+   "source": [
+    "mgpe_precursors = MinimizeGrandPotentialEnumerator(open_elem=Element(\"O\"), mu=-3,\n",
+    "                                                   targets=[\"Y2Mn2O7\"])\n",
+    "open_rxns_targets = mgpe_precursors.enumerate(filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "id": "2e982b33",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(len(open_rxns_targets))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5c50f106",
+   "metadata": {},
+   "source": [
+    "This concludes the introduction of the four enumerator classes. In general, the configurations we showed are all that you will really need to use the `reaction-network` package. You are free to explore the other enumerator arguments; note that many of these often do not need to be changed.\n",
+    "\n",
+    "It is encouraged for you to try out what you have learned above on your own system of interest!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f04bd0fe",
+   "metadata": {},
+   "source": [
+    "## 4. Running enumerators with the _jobflow_ package\n",
+    "\n",
+    "Running reaction enumeration calculations in high-throughput can be challenging. Often, we want to be able to enumerate reactions as part of some workflow and keep track of them using a database structure.\n",
+    "\n",
+    "For this reason, we turn to the _jobflow_ package, which is a fantastic toolit for developing and running computational workflows. The _reaction-network_ package has several jobs (and flows) written using jobflow that can be either run directly or strung together as part of custom workflows.\n",
+    "\n",
+    "Let's run one of the jobs via `ReactionEnumerationMaker` locally on your computer. This job does exactly what we were doing above -- run a list of enumerators on a provided entry set and collect the reactions in a `ReactionSet`. First, we import the job maker and run function:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "id": "eb27b96a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from jobflow.managers.local import run_locally\n",
+    "from rxn_network.jobs.core import ReactionEnumerationMaker"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4d79cb62-a2e9-4e10-a827-994542e86217",
+   "metadata": {},
+   "source": [
+    "Now, all we need to do is initialize the `Maker` and use the `make()` function with a list of enumerators and our entry set. The enumerators can be customized when they are created and this will be passed to the jbo:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "id": "55d1e274",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "be = BasicEnumerator()  # put your desired settings here\n",
+    "boe = BasicOpenEnumerator(open_phases=[\"O2\"])\n",
+    "\n",
+    "maker = ReactionEnumerationMaker()\n",
+    "job = maker.make([be, boe], filtered_entries)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2cb84f20",
+   "metadata": {},
+   "source": [
+    "The job can now be run either locally (as shown here) or launched on a remote workstation using the _fireworks_ package. \n",
+    "\n",
+    "Ti configure launching these jobs on other machines, or how the data is stored in various databases, then please see the `jobflow` documentation here: https://materialsproject.github.io/jobflow/.\n",
+    "\n",
+    "**WARNING:** You must have jobflow properly configured in order to run this successfully (see link above). This means configuring your `jobflow.yaml` file and having a working connection to the database specified. For this particular job, you should also specify an additional data store called _\"rxns\"_ in your jobflow.yaml file. I typically make this a `GridFSStore` as the outputs can get quite large."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "id": "470d992a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2023-08-31 11:22:25,150 INFO Started executing jobs locally\n",
+      "2023-08-31 11:22:25,152 INFO Starting job - enumerate_reactions (9471b6cb-ace1-40db-bb96-75dc155c00bd)\n",
+      "2023-08-31 11:22:25,154 INFO rxn_network.jobs.core Running enumerators...\n",
+      "2023-08-31 11:22:25,154 INFO rxn_network.enumerators.utils Running BasicEnumerator\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Building chunks...: 100%|████████████████████| 4/4 [00:00<00:00, 1892.95it/s]\n",
+      "Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00<00:00,  1.96it/s]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2023-08-31 11:22:25,677 INFO rxn_network.enumerators.utils Adding 692 reactions to reaction set\n",
+      "2023-08-31 11:22:25,678 INFO rxn_network.enumerators.utils Running BasicOpenEnumerator\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Building chunks...: 100%|████████████████████| 3/3 [00:00<00:00, 1213.63it/s]\n",
+      "Enumerating reactions (BasicOpenEnumerator): 100%|█| 2/2 [00:00<00:00,  2.16i"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2023-08-31 11:22:26,627 INFO rxn_network.enumerators.utils Adding 204 reactions to reaction set\n",
+      "2023-08-31 11:22:26,628 INFO rxn_network.enumerators.utils Completed reaction enumeration. Filtering duplicates...\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Filtering duplicates: 100%|██████████████████| 22/22 [00:00<00:00, 61.66it/s]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2023-08-31 11:22:26,999 INFO rxn_network.enumerators.utils Completed duplicate filtering.\n",
+      "2023-08-31 11:22:26,999 INFO rxn_network.jobs.core Building task document...\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2023-08-31 11:22:27,501 INFO Finished job - enumerate_reactions (9471b6cb-ace1-40db-bb96-75dc155c00bd)\n",
+      "2023-08-31 11:22:27,502 INFO Finished executing jobs locally\n"
+     ]
+    }
+   ],
+   "source": [
+    "output = run_locally(job)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "46242cba",
+   "metadata": {},
+   "source": [
+    "When the job completes, it will store its data in the `JobStore` database. However, the output reactions can also be accessed locally here in the notebook. To do this, access the `rxns` property of the output `EnumeratorTaskDocument`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "id": "24192ccd",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'task_label': 'enumerate_reactions',\n",
+       " 'last_updated': '2023-08-31 18:22:26.999828',\n",
+       " 'rxns': <rxn_network.reactions.reaction_set.ReactionSet at 0x34617bdf0>,\n",
+       " 'targets': [],\n",
+       " 'elements': [Element Y, Element Mn, Element O],\n",
+       " 'chemsys': 'Y-Mn-O',\n",
+       " 'added_elements': None,\n",
+       " 'added_chemsys': None,\n",
+       " 'enumerators': [<rxn_network.enumerators.basic.BasicEnumerator at 0x3410e38e0>,\n",
+       "  <rxn_network.enumerators.basic.BasicOpenEnumerator at 0x3410e23e0>]}"
+      ]
+     },
+     "execution_count": 53,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "response = output[job.uuid][1].output\n",
+    "response.dict()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "id": "16744a75-0272-4cd9-9ffb-cf817c60d38b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0.5 Mn2O3 -> MnO + 0.25 O2\n",
+      "MnO + 0.25 O2 -> 0.5 Mn2O3\n",
+      "0.6 Mn5O8 -> Mn3O4 + 0.4 O2\n",
+      "Mn3O4 + 0.4 O2 -> 0.6 Mn5O8\n",
+      "Mn + 0.8 O2 -> 0.2 Mn5O8\n",
+      "0.2 Mn5O8 -> Mn + 0.8 O2\n",
+      "0.4 Mn5O8 -> Mn2O3 + 0.1 O2\n",
+      "Mn2O3 + 0.1 O2 -> 0.4 Mn5O8\n",
+      "0.5 Y2Mn2O7 -> YMnO3 + 0.25 O2\n",
+      "YMnO3 + 0.25 O2 -> 0.5 Y2Mn2O7\n"
+     ]
+    }
+   ],
+   "source": [
+    "for r in list(response.rxns)[0:10]:\n",
+    "    print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3fc8c940",
+   "metadata": {},
+   "source": [
+    "## 5. Conclusion"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "aa8a228a",
+   "metadata": {},
+   "source": [
+    "That's it! We hope this notebook was helpful in introducing the enumerator classes found in the _reaction-network_ package. If any significant errors are encountered, please first double-check that your settings are configured properly (e.g., proper installation of all dependencies, configuration of Materials Project API key, etc.). \n",
+    "\n",
+    "If the error persists, then please raise an Issue here: https://github.com/materialsproject/reaction-network/issues.\n",
+    "\n",
+    "Happy enumerating!"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "rn_dev",
+   "language": "python",
+   "name": "rn_dev"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.11"
+  },
+  "vscode": {
+   "interpreter": {
+    "hash": "5d5292815e8c21b9811b09f4fe6fb9adaf69c51506b184e6b5ace51a90d68f4f"
+   }
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

@@ -1,0 +1,1668 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="2) Networks" href="2_networks.html" /><link rel="prev" title="Tutorials" href="../tutorials.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+        <title>1) Enumerators - reaction-network</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../tutorials.html">Notebooks</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">1) Enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2_networks.html">2) Networks</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../rxn_network.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.entries.html">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.jobs.html">rxn_network.jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.network.html">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="1)-Enumerators">
+<h1>1) Enumerators<a class="headerlink" href="#1)-Enumerators" title="Link to this heading">#</a></h1>
+<blockquote>
+<div><p>Author: Matthew McDermott (<em>U.C. Berkeley / Lawerence Berkeley National Laboratory</em>)</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>Last Updated: 08/31/23</p>
+<p>In this notebook, we cover reaction enumeration in the <em>reaction-network</em> package. The reaction enumerators are the core of the package and supply all reaction data to be used in reaction network construction and downstream analyses. This is the recommended starting point for working with the codebase. Please see the next notebook(s) for further applications (such as network construction).</p>
+<p>If you use this package in your work, please consider citing the following paper:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>McDermott, M. J., Dwaraknath, S. S., and Persson, K. A. (2021). A graph-based network for predicting chemical reaction pathways in solid-state materials synthesis. Nature Communications, 12(1). https://doi.org/10.1038/s41467-021-23339-x
+</pre></div>
+</div>
+<section id="1.-Imports">
+<h2>1. Imports<a class="headerlink" href="#1.-Imports" title="Link to this heading">#</a></h2>
+<p>First, make sure the reaction-network package and Materials Project API package are installed. Run these commands:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">reaction-network</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">mp-api</span></code></p>
+<p>in your terminal. You may need to restart/reconfigure your Jupyter kernel after you do this.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="kn">from</span> <span class="nn">mp_api.client</span> <span class="kn">import</span> <span class="n">MPRester</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span>
+
+<span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">rxn_network.costs.functions</span> <span class="kn">import</span> <span class="n">Softplus</span>
+<span class="kn">from</span> <span class="nn">rxn_network.enumerators.basic</span> <span class="kn">import</span> <span class="n">BasicEnumerator</span><span class="p">,</span> <span class="n">BasicOpenEnumerator</span>
+<span class="kn">from</span> <span class="nn">rxn_network.enumerators.minimize</span> <span class="kn">import</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">,</span> <span class="n">MinimizeGrandPotentialEnumerator</span>
+<span class="kn">from</span> <span class="nn">rxn_network.entries.entry_set</span> <span class="kn">import</span> <span class="n">GibbsEntrySet</span>
+<span class="kn">from</span> <span class="nn">rxn_network.reactions.reaction_set</span> <span class="kn">import</span> <span class="n">ReactionSet</span>
+
+<span class="c1"># this is useful if you are editing your code locally!</span>
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+</section>
+<section id="2.-Downloading-and-modifying-entries">
+<h2>2. Downloading and modifying entries<a class="headerlink" href="#2.-Downloading-and-modifying-entries" title="Link to this heading">#</a></h2>
+<p>We will work with an example chemical system: yttrium (Y), manganese (Mn), and oxygen (o).</p>
+<p>First, we need to acquire thermodynamic data for phases in this system from the Materials Project (MP), a computed materials database containing calculations for 150,000+ materials.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">MPRester</span><span class="p">()</span> <span class="k">as</span> <span class="n">mpr</span><span class="p">:</span>  <span class="c1"># insert your Materials Project API key if it&#39;s not stored as an environment variable</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_entries_in_chemsys</span><span class="p">(</span><span class="s2">&quot;Y-Mn-O&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d1e04de2a53c41ff8f613e663cd7eac9", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<p>A unique feature of the <code class="docutils literal notranslate"><span class="pre">reaction-network</span></code> package is the <code class="docutils literal notranslate"><span class="pre">GibbsEntrySet</span></code> class.</p>
+<p>This class allows us to automatically convert <code class="docutils literal notranslate"><span class="pre">ComputedStructureEntry</span></code> objects downloaded from the MP database into <code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry</span></code> objects, where DFT-calculated energies have been converted to an AI-estimated equivalent values of the Gibbs free energies of formation, <span class="math notranslate nohighlight">\(\Delta G_f\)</span> for all entries at the specified temperature.</p>
+<p>This will also include some experimental thermochemistry data (e.g., NIST-JANAF). For more information, check out the citation in the documentation for <code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">temp</span> <span class="o">=</span> <span class="mi">900</span>  <span class="c1"># units: Kelvin</span>
+<span class="n">gibbs_entries</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="o">.</span><span class="n">from_computed_entries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span> <span class="n">include_nist_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We can print the entries by calling <code class="docutils literal notranslate"><span class="pre">.entries</span></code> or <code class="docutils literal notranslate"><span class="pre">.entries_list</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gibbs_entries</span><span class="o">.</span><span class="n">entries_list</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>  <span class="c1"># the first five entries in the Y-Mn-O system (in alphabetical order)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[GibbsComputedEntry | mp-723285-GGA | O8 (O2)
+ Gibbs Energy (900 K) = 0.0000,
+ GibbsComputedEntry | mp-1238773-GGA+U | Mn1 O1 (MnO)
+ Gibbs Energy (900 K) = -2.6169,
+ GibbsComputedEntry | mp-1238899-GGA+U | Mn1 O1 (MnO)
+ Gibbs Energy (900 K) = -2.9922,
+ GibbsComputedEntry | mp-25223-GGA+U | Mn1 O2 (MnO2)
+ Gibbs Energy (900 K) = -3.7579,
+ GibbsComputedEntry | mp-796077-GGA+U | Mn1 O2 (MnO2)
+ Gibbs Energy (900 K) = 0.6017]
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">GibbsEntrySet</span></code> class has many helpful functions, such as the following <code class="docutils literal notranslate"><span class="pre">filter_by_stability()</span></code> function, which automatically removes entries which are a specified energy per atom above the convex hull of stability:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_entries</span> <span class="o">=</span> <span class="n">gibbs_entries</span><span class="o">.</span><span class="n">filter_by_stability</span><span class="p">(</span><span class="mf">0.025</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>You should now see a much shorter list of entries within the Y-Mn-O system (&lt; 25 meV/atom below the hull):</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gibbs_entries</span><span class="p">)</span><span class="si">}</span><span class="s2"> (unfiltered) -&gt; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span><span class="si">}</span><span class="s2"> (filtered)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+108 (unfiltered) -&gt; 13 (filtered)
+</pre></div></div>
+</div>
+<p>Another useful function is the <code class="docutils literal notranslate"><span class="pre">get_min_entry_by_formula</span></code> function. This automatically finds the entry with the lowest energy matching the provided formula (composition). This is useful for querying the ground-state polymorph when there are many entries for a particular composition.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gibbs_entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="s2">&quot;Mn2O3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+GibbsComputedEntry | mp-1172875-GGA+U | Mn32 O48 (Mn2O3)
+Gibbs Energy (900 K) = -121.1202
+</pre></div></div>
+</div>
+</section>
+<section id="3.-Running-enumerators">
+<h2>3. Running enumerators<a class="headerlink" href="#3.-Running-enumerators" title="Link to this heading">#</a></h2>
+<p>Now that we’ve discussed creating a set of entries, we will learn how to enumerate reactions from those entries.</p>
+<p>There are four distinct enumerator classes contained within <code class="docutils literal notranslate"><span class="pre">rxn_network.enumerators</span></code>: These are:</p>
+<p><strong>(basic)</strong> 1. <code class="docutils literal notranslate"><span class="pre">BasicEnumerator</span></code>: uses a <em>combinatorial</em> approach to identify all possible (closed) reactions within a set of entries. 2. <code class="docutils literal notranslate"><span class="pre">BasicOpenEnumerator</span></code>: uses a <em>combinatorial</em> approach to identify all <strong>open</strong> reactions within a set of entries and a list of specified open entries/elements.</p>
+<p><strong>(minimize)</strong></p>
+<ol class="arabic simple" start="3">
+<li><p><code class="docutils literal notranslate"><span class="pre">MinimizeGibbsEnumerator</span></code>: uses a <em>thermodynamic</em> approach to identify all reactions within a set of entries that are predicted by minimizing Gibbs free energy between a set of two reacting phases touching at an interface.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MinimizeGrandPotentialEnumerator</span></code>: uses a <em>thermodynamic</em> approach to identify all reactions within a set of entries that are predicted by minimizing the grand potential energy between a set of two reacting phases touching at an interface with an <strong>open</strong> element at a specified chemical potential.</p></li>
+</ol>
+<p>There is no “correct” enumerator to use; while the thermodynamic (i.e., minimize) enumerators may seem more logical, our thermodynamic data is not always exaclty correct – this means that some reactions will not be enumerated.</p>
+<section id="a)-Basic-enumerators">
+<h3>a) Basic enumerators<a class="headerlink" href="#a)-Basic-enumerators" title="Link to this heading">#</a></h3>
+<p>We first create a basic enumerator object by initializing one from the <code class="docutils literal notranslate"><span class="pre">BasicEnumerator</span></code> class. Let’s initialize it with only default arguments:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be</span> <span class="o">=</span> <span class="n">BasicEnumerator</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">BasicEnumerator</span></code> class, as is true for all other enumerator classes, has many arguments that will customize its output. To view helpful documentation for these arguments, press Shift+Tab with your cursor inside the parentheses in the cell above.</p>
+<p>A key argument to the basic enumerators is the maximum reactant/product cardinality, <span class="math notranslate nohighlight">\(n\)</span>. The default is <span class="math notranslate nohighlight">\(n=2\)</span>. This setting suffices for capturing many of the reactions that make up a solid-state reaction pathway according to the pairwise interface reaction hypothesis (most powder reactions proceed through reactions of interfacial pairs). Note that it is possible to set <span class="math notranslate nohighlight">\(n=3\)</span>, however this dramatically increases the combinatorial complexity and can take a long time for more
+complex systems.</p>
+<p>In general, the default arguments are good for generating a list of simple (unconstrained) reactions, as we might build for a reaction network. Run the following cell:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_rxns</span> <span class="o">=</span> <span class="n">be</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 11:22:12,439 INFO rxn_network.utils.ray Ray is not initialized. Checking for existing cluster...
+2023-08-31 11:22:12,439 INFO rxn_network.utils.ray Could not identify existing Ray instance. Creating a new one...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023-08-31 11:22:14,123 INFO worker.py:1627 -- Started a local Ray instance. View the dashboard at <span class="ansi-green-intense-fg ansi-bold">127.0.0.1:8266 </span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 11:22:14,616 INFO rxn_network.utils.ray HOST: Matts-MBP.local, Num CPUs: 12.0, Total Memory: 37544088372.0
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 1570.46it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:01&lt;00:00,  1.54s/it]
+</pre></div></div>
+</div>
+<p>You may notice that something called <code class="docutils literal notranslate"><span class="pre">Ray</span></code> is initialized. This is a python library for parallelizing functions and is used by the <code class="docutils literal notranslate"><span class="pre">reaction-network</span></code> code to parallelize enumeration.</p>
+<p>The cell above should have completed somewhat quickly – ideally within a second or two. As a result, a list of 692 generated reactions will be stored within the <code class="docutils literal notranslate"><span class="pre">all_rxns</span></code> object. Note: this number may change in the future if the MP database changes…</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_rxns</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+692
+</pre></div></div>
+</div>
+<p>Every time <code class="docutils literal notranslate"><span class="pre">enumerate()</span></code> is called, a <code class="docutils literal notranslate"><span class="pre">ReactionSet</span></code> will be returned. This is a memory-efficient object that can be used to store large sets of reactions.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ReactionSet</span></code> class stores sets of reactions as arrays. Note that the actual reaction objects can only be accessed by <strong>iterating</strong> through the reaction set. Lets print the “first” 10 reactions. These may be different on your side; the reactions are generated in no particualr order.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_rxns</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">count</span><span class="o">&gt;</span><span class="mi">10</span><span class="p">:</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3
+O2 + 4 YMnO3 -&gt; 2 Y2Mn2O7
+Y2Mn2O7 -&gt; Y2O3 + 2 MnO2
+Y2O3 + 2 MnO2 -&gt; Y2Mn2O7
+2 YMnO3 -&gt; Mn2O3 + Y2O3
+Mn2O3 + Y2O3 -&gt; 2 YMnO3
+2 YMn2O5 -&gt; Y2Mn2O7 + Mn2O3
+Y2Mn2O7 + Mn2O3 -&gt; 2 YMn2O5
+YMn2O5 -&gt; YMnO3 + MnO2
+YMnO3 + MnO2 -&gt; YMn2O5
+6 Mn2O3 -&gt; O2 + 4 Mn3O4
+O2 + 4 Mn3O4 -&gt; 6 Mn2O3
+</pre></div></div>
+</div>
+<p>Looking at the list of reactions above, we see that all reactions are stoichiometrically balanced. If we look at any particular reaction object, we find that the reaction energy and uncertainty are properties which can be easily accessed:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">all_rxns</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">energy_uncertainty_per_atom</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2"> eV/atom&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3
+0.038 ± 0.07 eV/atom
+</pre></div></div>
+</div>
+<p>What if you want to enumerate all reactions from a known set of precursors? An inefficient way to do so might be to filter the previous reaction set by your phases of interest…</p>
+<p>However, a more efficient solution has been provided. We can supply our precursor formulas when we initialize the <code class="docutils literal notranslate"><span class="pre">BasicEnumerator</span></code> object. This will reduce the number of calculations required significantly. Lets say we have Y2O3 as a precursor:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be_precursors</span> <span class="o">=</span> <span class="n">BasicEnumerator</span><span class="p">(</span><span class="n">precursors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Y2O3&quot;</span><span class="p">])</span>
+<span class="n">y2o3_rxns_exclusive</span> <span class="o">=</span> <span class="n">be_precursors</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|████████████████████| 1/1 [00:00&lt;00:00, 1792.44it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00&lt;00:00, 521.42it/s
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">y2o3_rxns_exclusive</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.6667 Y2O3 -&gt; O2 + 1.333 Y
+</pre></div></div>
+</div>
+<p>Note that by default, this only produces reactions which <strong>exclusively</strong> have the provided precursor(s).</p>
+<p>To include reactions that contain this precursor (and possibly others) set the <code class="docutils literal notranslate"><span class="pre">exclusive_precursors=False</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be_precursors</span> <span class="o">=</span> <span class="n">BasicEnumerator</span><span class="p">(</span><span class="n">precursors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Y2O3&quot;</span><span class="p">],</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">y2o3_rxns</span> <span class="o">=</span> <span class="n">be_precursors</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 2344.82it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00&lt;00:00,  4.25it/s]
+</pre></div></div>
+</div>
+<p>We now get a much larger list of reactions, all of which contain Y2O3 as a precursor (and often another phase such as a manganese oxide):</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pprint</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">y2o3_rxns</span><span class="p">)[:</span><span class="mi">10</span><span class="p">])</span>  <span class="c1"># a sample of just 10 reactions</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[Y2O3 + 2 MnO2 -&gt; Y2Mn2O7,
+ Mn2O3 + Y2O3 -&gt; 2 YMnO3,
+ 0.6667 Y2O3 -&gt; O2 + 1.333 Y,
+ Mn5O8 + 0.5 Y2O3 -&gt; 0.5 Y2Mn2O7 + 2 Mn2O3,
+ Mn5O8 + 2.5 Y2O3 -&gt; 0.5 Y2Mn2O7 + 4 YMnO3,
+ Y2O3 + 2 YMn2O5 -&gt; Y2Mn2O7 + 2 YMnO3,
+ Mn2O3 + 0.25 Y2O3 -&gt; 0.25 Y2Mn2O7 + 0.5 Mn3O4,
+ Mn5O8 + Y2O3 -&gt; Y2Mn2O7 + Mn3O4,
+ Y2O3 + 8 YMn2O5 -&gt; 5 Y2Mn2O7 + 2 Mn3O4,
+ Mn2O3 + 0.75 Y2O3 -&gt; 0.75 Y2Mn2O7 + 0.5 Mn]
+</pre></div></div>
+</div>
+<p>This same approach can be used for the target phase(s) as well.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">exclusive_targets=True</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be_target</span> <span class="o">=</span> <span class="n">BasicEnumerator</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">],</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ymno3_rxns_exclusive</span> <span class="o">=</span> <span class="n">be_target</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 2158.95it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00&lt;00:00, 28.38it/s]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ymno3_rxns_exclusive</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Mn2O3 + Y2O3 -&gt; 2 YMnO3
+</pre></div></div>
+</div>
+<p>Due to the fact that the right side of the reaction can <em>only</em> contain YMnO3, we get just <strong>one</strong> reaction above!</p>
+<p>Now, with <code class="docutils literal notranslate"><span class="pre">exclusive_targets=False</span></code> (the default):</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be_target</span> <span class="o">=</span> <span class="n">BasicEnumerator</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">])</span>
+<span class="n">ymno3_rxns</span> <span class="o">=</span> <span class="n">be_target</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 2322.75it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00&lt;00:00,  4.16it/s]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pprint</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ymno3_rxns</span><span class="p">)[:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2 Y2Mn2O7 -&gt; O2 + 4 YMnO3,
+ Mn2O3 + Y2O3 -&gt; 2 YMnO3,
+ YMn2O5 -&gt; YMnO3 + MnO2,
+ 0.5 Y2Mn2O7 + 0.5 Mn2O3 -&gt; YMnO3 + MnO2,
+ 0.5 Y2Mn2O7 + 2.5 Mn2O3 -&gt; Mn5O8 + YMnO3,
+ Mn5O8 + 2.5 Y2O3 -&gt; 0.5 Y2Mn2O7 + 4 YMnO3,
+ Y2O3 + 2 YMn2O5 -&gt; Y2Mn2O7 + 2 YMnO3,
+ 0.3333 Y2Mn2O7 + 0.6667 Mn3O4 -&gt; Mn2O3 + 0.6667 YMnO3,
+ 0.5 Y2Mn2O7 + 0.25 Mn3O4 -&gt; YMnO3 + 0.75 MnO2,
+ 1.333 Y2Mn2O7 + 1.667 Mn3O4 -&gt; Mn5O8 + 2.667 YMnO3]
+</pre></div></div>
+</div>
+<p>And finally, with multiple targets specified (e.g., YMnO3 and O2):</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be_targets</span> <span class="o">=</span> <span class="n">BasicEnumerator</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">,</span> <span class="s2">&quot;O2&quot;</span><span class="p">],</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ymno3_rxns_o2</span> <span class="o">=</span> <span class="n">be_targets</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 2457.12it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00&lt;00:00, 13.44it/s]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ymno3_rxns_o2</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3
+Mn2O3 + Y2O3 -&gt; 2 YMnO3
+Y2O3 + 2 MnO2 -&gt; 0.5 O2 + 2 YMnO3
+Mn5O8 + 2.5 Y2O3 -&gt; 0.25 O2 + 5 YMnO3
+Y2O3 + 2 YMn2O5 -&gt; 0.5 O2 + 4 YMnO3
+</pre></div></div>
+</div>
+<section id="What-about-open-gases,-liquids,-etc.??">
+<h4>What about open gases, liquids, etc.??<a class="headerlink" href="#What-about-open-gases,-liquids,-etc.??" title="Link to this heading">#</a></h4>
+<p>In the previous cell, we showed that it was possible to specify YMnO<span class="math notranslate nohighlight">\(_3\)</span> as a target, along with O<span class="math notranslate nohighlight">\(_2\)</span>. However, because O<span class="math notranslate nohighlight">\(_2\)</span> is a gas, it is often desirable to include it as an <strong>open entry</strong> in addition to the 2 possible precursors or targets. For example, we may want to specify a reaction as follows:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[A + B ~ +~\textrm{O}_2 \rightarrow C + D\]</div>
+</div>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\textrm{or}\]</div>
+</div>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[A + B \rightarrow C + D ~ +~\textrm{O}_2\]</div>
+</div>
+<p>To do this, we use the <code class="docutils literal notranslate"><span class="pre">BasicOpenEnumerator</span></code> class, which is an extension to the original basic enumerator. All of the lessons learned above also apply to this class, although now a list of open entry formulas (e.g., <code class="docutils literal notranslate"><span class="pre">[&quot;O2&quot;]</span></code>) must be specified:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be_target_open</span> <span class="o">=</span> <span class="n">BasicOpenEnumerator</span><span class="p">(</span><span class="n">open_phases</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;O2&quot;</span><span class="p">],</span> <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">])</span>
+<span class="n">ymno3_rxns_open</span> <span class="o">=</span> <span class="n">be_target_open</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|████████████████████| 3/3 [00:00&lt;00:00, 1811.79it/s]
+Enumerating reactions (BasicOpenEnumerator): 100%|█| 2/2 [00:01&lt;00:00,  1.82i
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">BasicOpenEnumerator</span></code> generally requires more time to run as it considers a larger combinatorial space.</p>
+<p>You will now see that the reactions from before are included in this new list, along with many other open-O<span class="math notranslate nohighlight">\(_2\)</span> reactions – some which even have a total of 3 reactants or 3 products. In other words, the open entry/entries do not count towards the specified maximum cardinality, <span class="math notranslate nohighlight">\(n\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">ymno3_rxns_open</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]:</span>  <span class="c1"># first 10 reactions</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3
+O2 + 0.6667 Mn2O3 + 1.333 Y -&gt; 1.333 YMnO3
+O2 + 4 Mn3O4 + 6 Y2O3 -&gt; 12 YMnO3
+O2 + 0.4 Mn3O4 + 1.2 Y -&gt; 1.2 YMnO3
+O2 + 1.333 Mn + 0.6667 Y2O3 -&gt; 1.333 YMnO3
+O2 + 0.6667 Mn + 0.6667 Y -&gt; 0.6667 YMnO3
+O2 + 4 MnO + 2 Y2O3 -&gt; 4 YMnO3
+O2 + MnO + Y -&gt; YMnO3
+O2 + 2 MnO2 + 2 Y -&gt; 2 YMnO3
+O2 + 0.2857 Mn5O8 + 1.429 Y -&gt; 1.429 YMnO3
+</pre></div></div>
+</div>
+<p>It is even possible to specify multiple open entries, allowing for more complex reactions. For example, specifiyng Y2O3 and O2 as both being open:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be_target_open2</span> <span class="o">=</span> <span class="n">BasicOpenEnumerator</span><span class="p">(</span><span class="n">open_phases</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Y2O3&quot;</span><span class="p">,</span> <span class="s2">&quot;O2&quot;</span><span class="p">],</span><span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">])</span>
+<span class="n">ymno3_rxns_open2</span> <span class="o">=</span> <span class="n">be_target_open2</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|██████████████████████| 2/2 [00:00&lt;00:00, 28.43it/s]
+Enumerating reactions (BasicOpenEnumerator): 100%|█| 6/6 [00:01&lt;00:00,  3.15i
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">ymno3_rxns_open2</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]:</span>  <span class="c1"># first 10 reactions</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.5 Y2Mn2O7 + 0.3333 Y -&gt; YMnO3 + 0.1667 Y2O3
+O2 + 0.1026 YMn12 -&gt; 0.5641 Mn2O3 + 0.1026 YMnO3
+Y2O3 + 0.6667 Mn3O4 + 0.1667 O2 -&gt; 2 YMnO3
+Mn + 0.5 Y2O3 + 0.75 O2 -&gt; YMnO3
+Y2O3 + 2 MnO + 0.5 O2 -&gt; 2 YMnO3
+Y2O3 + 0.1818 YMn12 + 1.773 O2 -&gt; 2.182 YMnO3
+Y2O3 + 0.6667 Mn3O4 + 0.3333 Y2Mn2O7 -&gt; 2.667 YMnO3
+Mn + 0.5 Y2O3 + 1.5 Y2Mn2O7 -&gt; 4 YMnO3
+Y2O3 + 2 MnO + Y2Mn2O7 -&gt; 4 YMnO3
+Y2O3 + 0.1818 YMn12 + 3.545 Y2Mn2O7 -&gt; 9.273 YMnO3
+</pre></div></div>
+</div>
+<p>This may be useful for modeling systems with 2 or more gaseous, liquid, or molten phases, such as <span class="math notranslate nohighlight">\(O_2\)</span> and a molten salt (e.g. <span class="math notranslate nohighlight">\(LiCl\)</span>).</p>
+<p>If the system is open to a particular element such as <span class="math notranslate nohighlight">\(O_2\)</span>, then it is generally a goood idea to model the thermodynamics of the system with the grand potential energy, <span class="math notranslate nohighlight">\(\Phi\)</span>. This can be easily done by providing the open element and chemical potential to the <code class="docutils literal notranslate"><span class="pre">ReactionSet</span></code> class. In this case, we will reinitialize the reactions:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grand_potential_rxns</span> <span class="o">=</span> <span class="n">ymno3_rxns_open2</span><span class="o">.</span><span class="n">set_chempot</span><span class="p">(</span><span class="n">open_el</span><span class="o">=</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">),</span> <span class="n">chempot</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">grand_potential_rxns</span><span class="p">)[:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[0.5 Y2Mn2O7 + 0.3333 Y -&gt; YMnO3 + 0.1667 Y2O3 (mu_O=0.0),
+ O2 + 0.1026 YMn12 -&gt; 0.5641 Mn2O3 + 0.1026 YMnO3 (mu_O=0.0),
+ Y2O3 + 0.6667 Mn3O4 + 0.1667 O2 -&gt; 2 YMnO3 (mu_O=0.0),
+ Mn + 0.5 Y2O3 + 0.75 O2 -&gt; YMnO3 (mu_O=0.0),
+ Y2O3 + 2 MnO + 0.5 O2 -&gt; 2 YMnO3 (mu_O=0.0),
+ Y2O3 + 0.1818 YMn12 + 1.773 O2 -&gt; 2.182 YMnO3 (mu_O=0.0),
+ Y2O3 + 0.6667 Mn3O4 + 0.3333 Y2Mn2O7 -&gt; 2.667 YMnO3 (mu_O=0.0),
+ Mn + 0.5 Y2O3 + 1.5 Y2Mn2O7 -&gt; 4 YMnO3 (mu_O=0.0),
+ Y2O3 + 2 MnO + Y2Mn2O7 -&gt; 4 YMnO3 (mu_O=0.0),
+ Y2O3 + 0.1818 YMn12 + 3.545 Y2Mn2O7 -&gt; 9.273 YMnO3 (mu_O=0.0)]
+</pre></div></div>
+</div>
+<p>Each of these reactions is a new class: <code class="docutils literal notranslate"><span class="pre">OpenComputedReaction</span></code> and its energy (per atom) is calculated assumning oxygen is an open element with the defined chemical potential. We will discuss this further later in the notebook.</p>
+</section>
+</section>
+<section id="b)-Minimize-enumerators">
+<h3>b) Minimize enumerators<a class="headerlink" href="#b)-Minimize-enumerators" title="Link to this heading">#</a></h3>
+<p>The “minimize” enumerators produce reactions via a thermodynamic free energy minimization approach, rather than a purely combinatorial one. This means that reactions are produced directly from the compositional phase diagram, where a new convex hull is drawn connecting two compositions within a closed (Gibbs) or open (Grand Potential) system. See the <code class="docutils literal notranslate"><span class="pre">InterfacialReactivity</span></code> class within the <em>pymatgen</em> package for more information.</p>
+<p><strong>It is important to note that reactions produced with the minimize enumerators may overlap some with the basic enumerators, but the minimize enumerators have the restriction that all reactions they originally produce must have a negative reaction energy and result in a set of product phases which are stable with respect to each other (i.e. they share a facet of the phase diagram).</strong> That being said, these enumerators (when unrestricted) will also supply the reverse (i.e. positive energy)
+reaction as well.</p>
+<p>In general, this means that the basic enumerators and minimize enumerators do not perfectly overlap in their outputs, and may be used in tandem. This is recommended! Let’s initialize the <code class="docutils literal notranslate"><span class="pre">MinimizeGibbsEnumerator</span></code> with all default arguments (press Shift+Tab to view documentation).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mge</span> <span class="o">=</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>The default arguments, as before, help produce all reactions in a set of entries, given minimal constraints.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rxns</span> <span class="o">=</span> <span class="n">mge</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00&lt;00:00,
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 1240.73it/s]
+Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00&lt;00:00,  4
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">rxns</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]:</span>  <span class="c1"># first 10 reactions</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.5 Mn2O3 + 0.5 Y2Mn2O7 -&gt; YMn2O5
+0.5 Mn5O8 -&gt; Mn2O3 + 0.5 MnO2
+0.5 Mn2O3 + 0.5 Y2O3 -&gt; YMnO3
+0.5 O2 + 2 YMnO3 -&gt; Y2Mn2O7
+MnO2 + YMnO3 -&gt; YMn2O5
+0.5 Mn5O8 -&gt; Mn2O3 + 0.5 MnO2
+2 MnO2 + Y2O3 -&gt; Y2Mn2O7
+0.5 Mn5O8 -&gt; Mn2O3 + 0.5 MnO2
+0.5 Mn5O8 -&gt; Mn2O3 + 0.5 MnO2
+0.5 Mn5O8 -&gt; Mn2O3 + 0.5 MnO2
+</pre></div></div>
+</div>
+<p>And as before, we can specify various combinations of precursors and targets, as well as whether or not they should be “exclusive”. Here we specify Y2O3 as a required, but non-exclusive precursor):</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mge_precursors</span> <span class="o">=</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">(</span><span class="n">precursors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Y2O3&quot;</span><span class="p">],</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">rxns</span> <span class="o">=</span> <span class="n">mge_precursors</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00&lt;00:00,
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 1344.54it/s]
+Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00&lt;00:00, 34
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.5 Mn2O3 + 0.5 Y2O3 -&gt; YMn2O5 + Mn3O4
+0.5 Mn3O4 + 0.5 Y2O3 -&gt; YMnO3 + 0.5 MnO
+2 MnO2 + 0.5 Y2O3 -&gt; YMn2O5 + 0.25 O2
+0.3333 Mn5O8 + 0.6667 Y2O3 -&gt; YMnO3 + 0.3333 YMn2O5
+0.625 Mn5O8 + 0.5 Y2O3 -&gt; YMn2O5 + 0.375 Mn3O4
+0.6667 Mn5O8 + 0.3333 Y2O3 -&gt; Mn2O3 + 0.6667 YMn2O5
+0.5 Mn2O3 + 0.5 Y2O3 -&gt; YMnO3
+2 MnO2 + Y2O3 -&gt; Y2Mn2O7
+</pre></div></div>
+</div>
+<p>And here we specify both Y2O3 and Mn2O3 as the exclusive precursors of the reaction:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mge_precursors</span> <span class="o">=</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">(</span><span class="n">precursors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Y2O3&quot;</span><span class="p">,</span> <span class="s2">&quot;Mn2O3&quot;</span><span class="p">])</span>
+<span class="n">rxns</span> <span class="o">=</span> <span class="n">mge_precursors</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00&lt;00:00,
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 1110.27it/s]
+Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00&lt;00:00, 81
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.5 Mn2O3 + 0.5 Y2O3 -&gt; YMn2O5 + Mn3O4
+0.5 Mn2O3 + 0.5 Y2O3 -&gt; YMnO3
+</pre></div></div>
+</div>
+<p>Now we specify YMnO3 as the exclusive target of the reaction.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mge_targets</span> <span class="o">=</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">],</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">rxns</span> <span class="o">=</span> <span class="n">mge_targets</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00&lt;00:00,
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 1311.03it/s]
+Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00&lt;00:00,  5
+</pre></div></div>
+</div>
+<p>This only identifies one reaction!</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.5 Mn2O3 + 0.5 Y2O3 -&gt; YMnO3
+</pre></div></div>
+</div>
+<p>Lastly, we identify YMnO3 as a required target, with any number of byproducts (i.e., non-exclusive target):</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mge_targets</span> <span class="o">=</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">],</span> <span class="n">exclusive_targets</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">rxns</span> <span class="o">=</span> <span class="n">mge_targets</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGibbsEnumerator): 100%|█| 4/4 [00:00&lt;00:00,
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 1345.41it/s]
+Enumerating reactions (MinimizeGibbsEnumerator): 100%|█| 1/1 [00:00&lt;00:00,  4
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">rxns</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]:</span>  <span class="c1"># first 10 reactions</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Mn3O4 + 2 Y2Mn2O7 -&gt; YMnO3 + 3 YMn2O5 -0.039591749392732606
+0.5 Mn + 0.5 Y2Mn2O7 -&gt; YMnO3 + 0.5 MnO -0.22628212150322882
+0.375 Mn + 0.5 Y2Mn2O7 -&gt; YMnO3 + 0.125 Mn3O4 -0.19916896885873445
+0.3333 Mn + 0.6667 Y2Mn2O7 -&gt; YMnO3 + 0.3333 YMn2O5 -0.15230582998188094
+1.5 MnO + 0.5 Y2Mn2O7 -&gt; YMnO3 + 0.5 Mn3O4 -0.07145795072025463
+MnO + Y2Mn2O7 -&gt; YMnO3 + YMn2O5 -0.06058835627265508
+0.3333 Y + 0.5 Y2Mn2O7 -&gt; YMnO3 + 0.1667 Y2O3 -0.4614723709416988
+0.03448 YMn12 + 0.4828 Y2Mn2O7 -&gt; YMnO3 + 0.3793 MnO -0.2475633372715506
+0.02752 YMn12 + 0.4862 Y2Mn2O7 -&gt; YMnO3 + 0.1009 Mn3O4 -0.22088724880664687
+0.025 YMn12 + 0.625 Y2Mn2O7 -&gt; YMnO3 + 0.275 YMn2O5 -0.17363615371992666
+</pre></div></div>
+</div>
+<p>Notice that there are many more complex reactions here – all but the previous one we identified feature a byproduct phase that is required to balance the reaction.</p>
+<section id="Open-entries">
+<h4>Open entries<a class="headerlink" href="#Open-entries" title="Link to this heading">#</a></h4>
+<p>Once again, as before, we can do all the same analysis with open entries. As previously mentioned, the grand potential is used as the thermodynamic free energy which is minimized:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\Phi = G - \mu_iN_i\]</div>
+</div>
+<p>Where <span class="math notranslate nohighlight">\(i\)</span> is the open species with chemical potential <span class="math notranslate nohighlight">\(\mu_i\)</span>. The amount of the open species in a particular phase, <span class="math notranslate nohighlight">\(N_i\)</span>, is used to adjust the energy of that phase.</p>
+<p>Let’s create a <code class="docutils literal notranslate"><span class="pre">MinimizeGrandPotentialEnumerator</span></code> with default arguments and oxygen as the open element with chemical potential <span class="math notranslate nohighlight">\(\mu=0\)</span>. Note that this is equivalent to <span class="math notranslate nohighlight">\(\mu=\mu_O^0\)</span> due to the fact that we are working with Gibbs free energies of formation:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mgpe</span> <span class="o">=</span> <span class="n">MinimizeGrandPotentialEnumerator</span><span class="p">(</span><span class="n">open_elem</span><span class="o">=</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">),</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">open_rxns</span> <span class="o">=</span> <span class="n">mgpe</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0
+Building chunks...: 100%|█████████████████████| 3/3 [00:00&lt;00:00, 902.78it/s]
+Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00&lt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">open_rxns</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]:</span>  <span class="c1"># first 10 reactions</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2 YMnO3 + 0.5 O2 -&gt; Y2Mn2O7
+2 YMnO3 + 0.5 O2 -&gt; Y2Mn2O7
+0.5 Mn2O3 + 0.25 O2 -&gt; MnO2
+2 YMnO3 + 0.5 O2 -&gt; Y2Mn2O7
+0.3333 Mn3O4 + 0.3333 O2 -&gt; MnO2
+Mn + O2 -&gt; MnO2
+MnO + 0.5 O2 -&gt; MnO2
+0.2 Mn5O8 + 0.2 O2 -&gt; MnO2
+2 Y + 1.5 O2 -&gt; Y2O3
+0.5 Mn2O3 + 0.25 O2 -&gt; MnO2
+</pre></div></div>
+</div>
+<p>Note that this enumerator often returns duplicates particularly with terminal reactions.</p>
+<p>To ensure that duplicates are not returned, we can initialize the enumerator with a different flag:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mgpe</span> <span class="o">=</span> <span class="n">MinimizeGrandPotentialEnumerator</span><span class="p">(</span><span class="n">open_elem</span><span class="o">=</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">),</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">filter_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">open_rxns</span> <span class="o">=</span> <span class="n">mgpe</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">open_rxns</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]:</span>  <span class="c1"># first 10 reactions</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0
+Building chunks...: 100%|█████████████████████| 3/3 [00:00&lt;00:00, 894.44it/s]
+Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00&lt;
+Filtering duplicates: 100%|████████████████████| 8/8 [00:00&lt;00:00, 22.67it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.3333 Mn3O4 + 0.3333 O2 -&gt; MnO2
+0.5 Mn2O3 + 0.25 O2 -&gt; MnO2
+0.2 Mn5O8 + 0.2 O2 -&gt; MnO2
+2 Y + 1.5 O2 -&gt; Y2O3
+Mn + O2 -&gt; MnO2
+MnO + 0.5 O2 -&gt; MnO2
+2 YMnO3 + 0.5 O2 -&gt; Y2Mn2O7
+2 MnO2 + 2 Y + 1.5 O2 -&gt; Y2Mn2O7
+2 MnO2 + Y + 0.5 O2 -&gt; YMn2O5
+4 MnO2 + 2 Y2Mn2O7 -&gt; O2 + 4 YMn2O5
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<p>Also note that the reaction objects returned are <strong>NOT</strong> (by default) configured to report their energy as a change in the grand potential. To configure this, we need to transform these reactions to <code class="docutils literal notranslate"><span class="pre">OpenComputedReaction</span></code> objects. This class allows for easy specification of reactions where one of the elements is assigned a chemical potential.</p>
+<p>We did this earlier through a convenience constructor method:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_open_rxns</span> <span class="o">=</span> <span class="n">open_rxns</span><span class="o">.</span><span class="n">set_chempot</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">),</span> <span class="n">chempot</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We should now see that <code class="docutils literal notranslate"><span class="pre">(mu_O=0.0)</span></code> appears in the repr of the object:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sample_open_rxn</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_open_rxns</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sample_open_rxn</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">sample_open_rxn</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+OpenComputedReaction
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.3333 Mn3O4 + 0.3333 O2 -&gt; MnO2 (mu_O=0.0)
+</pre></div></div>
+</div>
+<p>We can also, as before, customize which precursors and targets are specified:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mgpe_precursors</span> <span class="o">=</span> <span class="n">MinimizeGrandPotentialEnumerator</span><span class="p">(</span><span class="n">open_elem</span><span class="o">=</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">),</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                   <span class="n">precursors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Y2O3&quot;</span><span class="p">],</span> <span class="n">exclusive_precursors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filter_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">open_rxns_precursors</span> <span class="o">=</span> <span class="n">mgpe_precursors</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0
+Building chunks...: 100%|█████████████████████| 3/3 [00:00&lt;00:00, 883.38it/s]
+Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00&lt;
+Filtering duplicates: 0it [00:00, ?it/s]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">open_rxns_precursors</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+8 MnO2 + 2 Y2O3 -&gt; O2 + 4 YMn2O5
+2 MnO + Y2O3 + O2 -&gt; Y2Mn2O7
+2 MnO + 0.5 Y2O3 + 0.75 O2 -&gt; YMn2O5
+0.4 Mn5O8 + Y2O3 + 0.4 O2 -&gt; Y2Mn2O7
+0.4 Mn5O8 + 0.5 Y2O3 + 0.15 O2 -&gt; YMn2O5
+0.6667 Mn3O4 + Y2O3 + 0.6667 O2 -&gt; Y2Mn2O7
+0.6667 Mn3O4 + 0.5 Y2O3 + 0.4167 O2 -&gt; YMn2O5
+2 Mn + Y2O3 + 2 O2 -&gt; Y2Mn2O7
+2 Mn + 0.5 Y2O3 + 1.75 O2 -&gt; YMn2O5
+Mn2O3 + Y2O3 + 0.5 O2 -&gt; Y2Mn2O7
+Mn2O3 + 0.5 Y2O3 + 0.25 O2 -&gt; YMn2O5
+0.1667 YMn12 + 0.9167 Y2O3 + 2.125 O2 -&gt; Y2Mn2O7
+0.1667 YMn12 + 0.4167 Y2O3 + 1.875 O2 -&gt; YMn2O5
+0.5 Y2O3 + YMn2O5 + 0.25 O2 -&gt; Y2Mn2O7
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mgpe_precursors</span> <span class="o">=</span> <span class="n">MinimizeGrandPotentialEnumerator</span><span class="p">(</span><span class="n">open_elem</span><span class="o">=</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">),</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                   <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Y2Mn2O7&quot;</span><span class="p">],</span> <span class="n">filter_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">open_rxns_targets</span> <span class="o">=</span> <span class="n">mgpe_precursors</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0
+Building chunks...: 100%|█████████████████████| 3/3 [00:00&lt;00:00, 915.79it/s]
+Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00&lt;
+Filtering duplicates: 100%|██████████████████| 1/1 [00:00&lt;00:00, 1811.79it/s]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">open_rxns_targets</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2 YMnO3 + 0.5 O2 -&gt; Y2Mn2O7
+2 MnO2 + 2 Y + 1.5 O2 -&gt; Y2Mn2O7
+2 MnO + 2 Y + 2.5 O2 -&gt; Y2Mn2O7
+2 MnO + Y2O3 + O2 -&gt; Y2Mn2O7
+0.4 Mn5O8 + 2 Y + 1.9 O2 -&gt; Y2Mn2O7
+0.4 Mn5O8 + Y2O3 + 0.4 O2 -&gt; Y2Mn2O7
+0.6667 Mn3O4 + 2 Y + 2.167 O2 -&gt; Y2Mn2O7
+0.6667 Mn3O4 + Y2O3 + 0.6667 O2 -&gt; Y2Mn2O7
+2 Mn + 2 Y + 3.5 O2 -&gt; Y2Mn2O7
+2 Mn + Y2O3 + 2 O2 -&gt; Y2Mn2O7
+Mn2O3 + 2 Y + 2 O2 -&gt; Y2Mn2O7
+Mn2O3 + Y2O3 + 0.5 O2 -&gt; Y2Mn2O7
+0.1667 YMn12 + 1.833 Y + 3.5 O2 -&gt; Y2Mn2O7
+0.1667 YMn12 + 0.9167 Y2O3 + 2.125 O2 -&gt; Y2Mn2O7
+Y + YMn2O5 + O2 -&gt; Y2Mn2O7
+0.5 Y2O3 + YMn2O5 + 0.25 O2 -&gt; Y2Mn2O7
+</pre></div></div>
+</div>
+<p>Note that setting the chemical potential to a value outside of the range of stability of the target (e.g., <code class="docutils literal notranslate"><span class="pre">mu_O</span> <span class="pre">=</span> <span class="pre">-3</span></code>, causes the enumerator to yield no reactions:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mgpe_precursors</span> <span class="o">=</span> <span class="n">MinimizeGrandPotentialEnumerator</span><span class="p">(</span><span class="n">open_elem</span><span class="o">=</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">),</span> <span class="n">mu</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span>
+                                                   <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Y2Mn2O7&quot;</span><span class="p">])</span>
+<span class="n">open_rxns_targets</span> <span class="o">=</span> <span class="n">mgpe_precursors</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building phase diagrams (MinimizeGrandPotentialEnumerator): 100%|█| 3/3 [00:0
+Building chunks...: 100%|█████████████████████| 3/3 [00:00&lt;00:00, 929.04it/s]
+Enumerating reactions (MinimizeGrandPotentialEnumerator): 100%|█| 1/1 [00:00&lt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">open_rxns_targets</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0
+</pre></div></div>
+</div>
+<p>This concludes the introduction of the four enumerator classes. In general, the configurations we showed are all that you will really need to use the <code class="docutils literal notranslate"><span class="pre">reaction-network</span></code> package. You are free to explore the other enumerator arguments; note that many of these often do not need to be changed.</p>
+<p>It is encouraged for you to try out what you have learned above on your own system of interest!</p>
+</section>
+</section>
+</section>
+<section id="4.-Running-enumerators-with-the-jobflow-package">
+<h2>4. Running enumerators with the <em>jobflow</em> package<a class="headerlink" href="#4.-Running-enumerators-with-the-jobflow-package" title="Link to this heading">#</a></h2>
+<p>Running reaction enumeration calculations in high-throughput can be challenging. Often, we want to be able to enumerate reactions as part of some workflow and keep track of them using a database structure.</p>
+<p>For this reason, we turn to the <em>jobflow</em> package, which is a fantastic toolit for developing and running computational workflows. The <em>reaction-network</em> package has several jobs (and flows) written using jobflow that can be either run directly or strung together as part of custom workflows.</p>
+<p>Let’s run one of the jobs via <code class="docutils literal notranslate"><span class="pre">ReactionEnumerationMaker</span></code> locally on your computer. This job does exactly what we were doing above – run a list of enumerators on a provided entry set and collect the reactions in a <code class="docutils literal notranslate"><span class="pre">ReactionSet</span></code>. First, we import the job maker and run function:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">jobflow.managers.local</span> <span class="kn">import</span> <span class="n">run_locally</span>
+<span class="kn">from</span> <span class="nn">rxn_network.jobs.core</span> <span class="kn">import</span> <span class="n">ReactionEnumerationMaker</span>
+</pre></div>
+</div>
+</div>
+<p>Now, all we need to do is initialize the <code class="docutils literal notranslate"><span class="pre">Maker</span></code> and use the <code class="docutils literal notranslate"><span class="pre">make()</span></code> function with a list of enumerators and our entry set. The enumerators can be customized when they are created and this will be passed to the jbo:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be</span> <span class="o">=</span> <span class="n">BasicEnumerator</span><span class="p">()</span>  <span class="c1"># put your desired settings here</span>
+<span class="n">boe</span> <span class="o">=</span> <span class="n">BasicOpenEnumerator</span><span class="p">(</span><span class="n">open_phases</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;O2&quot;</span><span class="p">])</span>
+
+<span class="n">maker</span> <span class="o">=</span> <span class="n">ReactionEnumerationMaker</span><span class="p">()</span>
+<span class="n">job</span> <span class="o">=</span> <span class="n">maker</span><span class="o">.</span><span class="n">make</span><span class="p">([</span><span class="n">be</span><span class="p">,</span> <span class="n">boe</span><span class="p">],</span> <span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The job can now be run either locally (as shown here) or launched on a remote workstation using the <em>fireworks</em> package.</p>
+<p>Ti configure launching these jobs on other machines, or how the data is stored in various databases, then please see the <code class="docutils literal notranslate"><span class="pre">jobflow</span></code> documentation here: <a class="reference external" href="https://materialsproject.github.io/jobflow/">https://materialsproject.github.io/jobflow/</a>.</p>
+<p><strong>WARNING:</strong> You must have jobflow properly configured in order to run this successfully (see link above). This means configuring your <code class="docutils literal notranslate"><span class="pre">jobflow.yaml</span></code> file and having a working connection to the database specified. For this particular job, you should also specify an additional data store called <em>“rxns”</em> in your jobflow.yaml file. I typically make this a <code class="docutils literal notranslate"><span class="pre">GridFSStore</span></code> as the outputs can get quite large.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">run_locally</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 11:22:25,150 INFO Started executing jobs locally
+2023-08-31 11:22:25,152 INFO Starting job - enumerate_reactions (9471b6cb-ace1-40db-bb96-75dc155c00bd)
+2023-08-31 11:22:25,154 INFO rxn_network.jobs.core Running enumerators...
+2023-08-31 11:22:25,154 INFO rxn_network.enumerators.utils Running BasicEnumerator
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|████████████████████| 4/4 [00:00&lt;00:00, 1892.95it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00&lt;00:00,  1.96it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 11:22:25,677 INFO rxn_network.enumerators.utils Adding 692 reactions to reaction set
+2023-08-31 11:22:25,678 INFO rxn_network.enumerators.utils Running BasicOpenEnumerator
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+Building chunks...: 100%|████████████████████| 3/3 [00:00&lt;00:00, 1213.63it/s]
+Enumerating reactions (BasicOpenEnumerator): 100%|█| 2/2 [00:00&lt;00:00,  2.16i
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 11:22:26,627 INFO rxn_network.enumerators.utils Adding 204 reactions to reaction set
+2023-08-31 11:22:26,628 INFO rxn_network.enumerators.utils Completed reaction enumeration. Filtering duplicates...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+Filtering duplicates: 100%|██████████████████| 22/22 [00:00&lt;00:00, 61.66it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 11:22:26,999 INFO rxn_network.enumerators.utils Completed duplicate filtering.
+2023-08-31 11:22:26,999 INFO rxn_network.jobs.core Building task document...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 11:22:27,501 INFO Finished job - enumerate_reactions (9471b6cb-ace1-40db-bb96-75dc155c00bd)
+2023-08-31 11:22:27,502 INFO Finished executing jobs locally
+</pre></div></div>
+</div>
+<p>When the job completes, it will store its data in the <code class="docutils literal notranslate"><span class="pre">JobStore</span></code> database. However, the output reactions can also be accessed locally here in the notebook. To do this, access the <code class="docutils literal notranslate"><span class="pre">rxns</span></code> property of the output <code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">uuid</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">output</span>
+<span class="n">response</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;task_label&#39;: &#39;enumerate_reactions&#39;,
+ &#39;last_updated&#39;: &#39;2023-08-31 18:22:26.999828&#39;,
+ &#39;rxns&#39;: &lt;rxn_network.reactions.reaction_set.ReactionSet at 0x34617bdf0&gt;,
+ &#39;targets&#39;: [],
+ &#39;elements&#39;: [Element Y, Element Mn, Element O],
+ &#39;chemsys&#39;: &#39;Y-Mn-O&#39;,
+ &#39;added_elements&#39;: None,
+ &#39;added_chemsys&#39;: None,
+ &#39;enumerators&#39;: [&lt;rxn_network.enumerators.basic.BasicEnumerator at 0x3410e38e0&gt;,
+  &lt;rxn_network.enumerators.basic.BasicOpenEnumerator at 0x3410e23e0&gt;]}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">rxns</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.5 Mn2O3 -&gt; MnO + 0.25 O2
+MnO + 0.25 O2 -&gt; 0.5 Mn2O3
+0.6 Mn5O8 -&gt; Mn3O4 + 0.4 O2
+Mn3O4 + 0.4 O2 -&gt; 0.6 Mn5O8
+Mn + 0.8 O2 -&gt; 0.2 Mn5O8
+0.2 Mn5O8 -&gt; Mn + 0.8 O2
+0.4 Mn5O8 -&gt; Mn2O3 + 0.1 O2
+Mn2O3 + 0.1 O2 -&gt; 0.4 Mn5O8
+0.5 Y2Mn2O7 -&gt; YMnO3 + 0.25 O2
+YMnO3 + 0.25 O2 -&gt; 0.5 Y2Mn2O7
+</pre></div></div>
+</div>
+</section>
+<section id="5.-Conclusion">
+<h2>5. Conclusion<a class="headerlink" href="#5.-Conclusion" title="Link to this heading">#</a></h2>
+<p>That’s it! We hope this notebook was helpful in introducing the enumerator classes found in the <em>reaction-network</em> package. If any significant errors are encountered, please first double-check that your settings are configured properly (e.g., proper installation of all dependencies, configuration of Materials Project API key, etc.).</p>
+<p>If the error persists, then please raise an Issue here: <a class="reference external" href="https://github.com/materialsproject/reaction-network/issues">https://github.com/materialsproject/reaction-network/issues</a>.</p>
+<p>Happy enumerating!</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="2_networks.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">2) Networks</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../tutorials.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Tutorials</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">1) Enumerators</a><ul>
+<li><a class="reference internal" href="#1.-Imports">1. Imports</a></li>
+<li><a class="reference internal" href="#2.-Downloading-and-modifying-entries">2. Downloading and modifying entries</a></li>
+<li><a class="reference internal" href="#3.-Running-enumerators">3. Running enumerators</a><ul>
+<li><a class="reference internal" href="#a)-Basic-enumerators">a) Basic enumerators</a><ul>
+<li><a class="reference internal" href="#What-about-open-gases,-liquids,-etc.??">What about open gases, liquids, etc.??</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#b)-Minimize-enumerators">b) Minimize enumerators</a><ul>
+<li><a class="reference internal" href="#Open-entries">Open entries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#4.-Running-enumerators-with-the-jobflow-package">4. Running enumerators with the <em>jobflow</em> package</a></li>
+<li><a class="reference internal" href="#5.-Conclusion">5. Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=c19b6120"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

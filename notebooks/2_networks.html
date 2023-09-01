@@ -1,0 +1,1394 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Changelog" href="../changelog.html" /><link rel="prev" title="1) Enumerators" href="1_enumerators.html" />
+
+    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+        <title>2) Networks - reaction-network</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ec9c98e4" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --admonition-font-size: 92%;
+  --admonition-title-font-size: 92%;
+  --font-stack: Lato,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  --font-size--small: 92%;
+  --font-size--small--2: 87.5%;
+  --font-size--small--3: 87.5%;
+  --font-size--small--4: 87.5%;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">reaction-network</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">reaction-network</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../tutorials.html">Notebooks</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Notebooks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="1_enumerators.html">1) Enumerators</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">2) Networks</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to reaction-network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/materialsproject/reaction-network">reaction-network on GitHub</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../rxn_network.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.core.html">rxn_network.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.costs.html">rxn_network.costs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.data.html">rxn_network.data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.entries.html">rxn_network.entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.enumerators.html">rxn_network.enumerators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.flows.html">rxn_network.flows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.jobs.html">rxn_network.jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.network.html">rxn_network.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.pathways.html">rxn_network.pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.reactions.html">rxn_network.reactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.thermo.html">rxn_network.thermo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rxn_network.utils.html">rxn_network.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="2)-Networks">
+<h1>2) Networks<a class="headerlink" href="#2)-Networks" title="Link to this heading">#</a></h1>
+<blockquote>
+<div><p>Author: Matthew McDermott (<em>U.C. Berkeley / Lawerence Berkeley National Laboratory</em>)</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>Last Updated: 08/31/23</p>
+<p>This notebook serves as a walkthrough for <strong>reaction network construction and pathfinding analysis</strong>. If you haven’t first explored the enumerator notebook <code class="docutils literal notranslate"><span class="pre">1_enumerators.ipynb</span></code>, we strongly recommend starting there, as it will cover the foundation for how reaction networks are constructed.</p>
+<p>The code provided in this notebook is an updated walkthrough of a case study (YMnO<span class="math notranslate nohighlight">\(_3\)</span> synthesis) in the manuscript below. The current version of the <code class="docutils literal notranslate"><span class="pre">reaction-network</span></code> package contains similar functionality as what was originally released with the manuscript; however, much of the code has been drastically improved. If you arrived here looking for the specific results that went into the manuscript, then look at the archived demo notebook in the <em>archived</em> folder or an older Release of
+the package on Github.</p>
+<p>Lastly, if you use this code or Python package in your work, please consider citing the following paper:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>McDermott, M. J., Dwaraknath, S. S., and Persson, K. A. (2021). A graph-based network for predicting chemical reaction pathways in solid-state materials synthesis. Nature Communications, 12(1). https://doi.org/10.1038/s41467-021-23339-x
+</pre></div>
+</div>
+<section id="1.-Imports">
+<h2>1. Imports<a class="headerlink" href="#1.-Imports" title="Link to this heading">#</a></h2>
+<p>We first import the classes and functions we will need throughout the notebook. If you get an error importing any of these, please make sure you run:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">reaction-network</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">mp-api</span></code></p>
+<p>in your terminal to ensure that you have successfully installed the package/dependencies. You may need to restart and reconfigure your Jupyter kernel as well.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">mp_api.client</span> <span class="kn">import</span> <span class="n">MPRester</span>
+
+<span class="kn">from</span> <span class="nn">rxn_network.costs.functions</span> <span class="kn">import</span> <span class="n">Softplus</span>
+<span class="kn">from</span> <span class="nn">rxn_network.entries.entry_set</span> <span class="kn">import</span> <span class="n">GibbsEntrySet</span>
+<span class="kn">from</span> <span class="nn">rxn_network.enumerators.basic</span> <span class="kn">import</span> <span class="n">BasicEnumerator</span><span class="p">,</span> <span class="n">BasicOpenEnumerator</span>
+<span class="kn">from</span> <span class="nn">rxn_network.enumerators.minimize</span> <span class="kn">import</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">,</span> <span class="n">MinimizeGrandPotentialEnumerator</span>
+<span class="kn">from</span> <span class="nn">rxn_network.network.visualize</span> <span class="kn">import</span> <span class="n">plot_network</span>
+<span class="kn">from</span> <span class="nn">rxn_network.network.network</span> <span class="kn">import</span> <span class="n">ReactionNetwork</span>
+<span class="kn">from</span> <span class="nn">rxn_network.pathways.solver</span> <span class="kn">import</span> <span class="n">PathwaySolver</span>
+<span class="kn">from</span> <span class="nn">rxn_network.reactions.computed</span> <span class="kn">import</span> <span class="n">ComputedReaction</span>
+
+<span class="c1"># this is useful if you are editing the code locally!</span>
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Case-Study:-YMnO3-assisted-metathesis">
+<h2>Case Study: YMnO3 assisted metathesis<a class="headerlink" href="#Case-Study:-YMnO3-assisted-metathesis" title="Link to this heading">#</a></h2>
+<section id="Background">
+<h3>Background<a class="headerlink" href="#Background" title="Link to this heading">#</a></h3>
+<p>We will be using the assisted metathesis synthesis of YMnO<span class="math notranslate nohighlight">\(_3\)</span> as a case study for the reaction network code. This is the first example discussed in the original manuscript. The assisted metathesis reaction reported by <a class="reference external" href="https://pubs.acs.org/doi/full/10.1021/jacs.8b10123">Todd &amp; Neilson (JACS, 2019)</a> corresponds to a net reaction of:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\text{Mn}_2\text{O}_3 + 2\ \text{YCl}_3 + 3\ \text{Li}_2\text{CO}_3 \to 2\ \text{YMnO}_3 + 6\ \text{LiCl} + 3\ \text{CO}_2\]</div>
+</div>
+<p>This is a powder reaction involving three solid precursors, which suggests there might be some intermediate reactions here worth identifying. This is seen experimentally.</p>
+<p>In the paper, they report a reaction pathway involving the formation of key intermediates LiMnO<span class="math notranslate nohighlight">\(_2\)</span> and YOCl. These react to form YMnO<span class="math notranslate nohighlight">\(_3\)</span> product and LiCl byproduct. The pathway seen experimentally looks something like this:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\ce{Li2CO3 + Mn2O3 -&gt; 2\ LiMnO2 + CO2}\]</div>
+</div>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\ce{YCl3 + Li2CO3 -&gt; YOCl + 2\ LiCl + CO2}\]</div>
+</div>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\ce{LiMnO2 + YOCl -&gt; YMnO3 + LiCl}\]</div>
+</div>
+<p>Due to carbonate decomposition, <span class="math notranslate nohighlight">\(\ce{Li2O}\)</span> may exist in place of <span class="math notranslate nohighlight">\(\ce{Li2CO3}\)</span>.</p>
+</section>
+</section>
+<section id="2.-Acquiring-thermodynamic-data-from-the-Materials-Project">
+<h2>2. Acquiring thermodynamic data from the Materials Project<a class="headerlink" href="#2.-Acquiring-thermodynamic-data-from-the-Materials-Project" title="Link to this heading">#</a></h2>
+<p>As we did in the previous notebook, we first acquire entries for phases in the system of interest (Y-Mn-O-Li-Cl-C). We do this by querying the Materials Project (MP), a computed materials database containing calculations for over 150,000 materials:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">MPRester</span><span class="p">()</span> <span class="k">as</span> <span class="n">mpr</span><span class="p">:</span>  <span class="c1"># insert your Materials Project API key in the parentheses or configure elsewhere; see mp-api for more info.</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_entries_in_chemsys</span><span class="p">(</span><span class="s2">&quot;Y-Mn-O-Li-Cl-C&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "266e27680baa45439090e4f2567fbce5", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<p>Previously we showed that the <code class="docutils literal notranslate"><span class="pre">GibbsEntrySet</span></code> class allows us to automatically convert <code class="docutils literal notranslate"><span class="pre">ComputedStructureEntry</span></code> objects downloaded from the MP database into <code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry</span></code> objects, where DFT-calculated energies have been converted to machine learning (ML)-estimated equivalent values of the Gibbs free energies of formation, <span class="math notranslate nohighlight">\(\Delta G_f\)</span>, for all entries at the specified temperature. This also mixes in experimental thermochemistry data (e.g., from NIST-JANAF).</p>
+<p>For more information, check out the citation in the documentation for <code class="docutils literal notranslate"><span class="pre">GibbsComputedEntry</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">temp</span> <span class="o">=</span> <span class="mi">900</span>  <span class="c1"># synthesis temperature of interest in Kelvin</span>
+<span class="n">entry_set</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="o">.</span><span class="n">from_computed_entries</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We can use the <code class="docutils literal notranslate"><span class="pre">filter_by_stability()</span></code> function to automatically remove metastable entries above a certain energy threshold. This will dramatically decrease the combinatorial complexity of our space.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_entries</span> <span class="o">=</span> <span class="n">entry_set</span><span class="o">.</span><span class="n">filter_by_stability</span><span class="p">(</span><span class="mf">0.00</span><span class="p">)</span>  <span class="c1"># use only stable phases (i.e., 0 eV/atom threshold)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">entry_set</span><span class="p">)</span><span class="si">}</span><span class="s2"> (unfiltered) -&gt; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span><span class="si">}</span><span class="s2"> (filtered)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+798 (unfiltered) -&gt; 46 (filtered)
+</pre></div></div>
+</div>
+<p>In this case, we remove all entries which are unstable (above an energy cutoff of 0.0 meV/atom). Typically, you will want this number to be greater than zero. A good range is somewhere between 0.0 to 0.100 eV/atom. See <a class="reference external" href="https://www.science.org/doi/10.1126/sciadv.aaq0148">this paper</a> for more information on energy thresholds for metastability.</p>
+</section>
+<section id="3.-Building-the-reaction-network">
+<h2>3. Building the reaction network<a class="headerlink" href="#3.-Building-the-reaction-network" title="Link to this heading">#</a></h2>
+<p>To build a reaction network, we need to first enumerate a set of reactions. Please see the first notebook (<code class="docutils literal notranslate"><span class="pre">1_enumerators.ipynb</span></code>) for more information on reaction enumeration.</p>
+<p>We will use a BasicEnumerator to get all reactions in the Y-Mn-O-C-Li-Cl system up to &lt;=2 reactants or products:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">be</span> <span class="o">=</span> <span class="n">BasicEnumerator</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rxns</span> <span class="o">=</span> <span class="n">be</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">)</span>  <span class="c1"># this will take a few seconds</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:07:47,118 INFO rxn_network.utils.ray Ray is not initialized. Checking for existing cluster...
+2023-08-31 14:07:47,118 INFO rxn_network.utils.ray Could not identify existing Ray instance. Creating a new one...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:07:49,031 INFO worker.py:1612 -- Started a local Ray instance. View the dashboard at <span class="ansi-green-intense-fg ansi-bold">127.0.0.1:8267 </span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:07:49,669 INFO rxn_network.utils.ray HOST: matts-mbp.lan.vpn-dhcp.lbl.gov, Num CPUs: 12.0, Total Memory: 41729258292.0
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|██████████████████| 57/57 [00:00&lt;00:00, 1903.48it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 12/12 [00:03&lt;00:00,  3.50it/
+</pre></div></div>
+</div>
+<p>We identified a few thousand reactions:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rxns</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2914
+</pre></div></div>
+</div>
+<p>Finally, before we can create a reaction network, we must specify how to assign weights to the edge of the network.</p>
+<p>The “cost function” is a monotonic function used to assign edge weights. In this case, we will use the softplus function (as in the original paper), assigned a temperature scaling of <span class="math notranslate nohighlight">\(T=900\)</span> K with default arguments. This automatically converts the <code class="docutils literal notranslate"><span class="pre">energy_per_atom</span></code> of the reactions to positive cost values:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cf</span> <span class="o">=</span> <span class="n">Softplus</span><span class="p">(</span><span class="n">temp</span><span class="o">=</span><span class="mi">900</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>For example, here is how it transforms the energies to costs for a few reactions:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rxns</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="s2">&quot; |  &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s2">&quot;eV/atom -&gt;&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span> <span class="s2">&quot;(cost, a.u.)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+YCCl + 0.5 CO2 -&gt; YClO + 1.5 C  |   -0.7298 eV/atom -&gt; 0.1365 (cost, a.u.)
+YClO + 1.5 C -&gt; YCCl + 0.5 CO2  |   0.7298 eV/atom -&gt; 0.4882 (cost, a.u.)
+YClO + CO2 -&gt; YCCl + 1.5 O2  |   1.5728 eV/atom -&gt; 0.901 (cost, a.u.)
+YCCl + 1.5 O2 -&gt; YClO + CO2  |   -1.5728 eV/atom -&gt; 0.061 (cost, a.u.)
+</pre></div></div>
+</div>
+<p>We are now ready to build a reaction network from our reactions. To do this, we first initialize a <code class="docutils literal notranslate"><span class="pre">ReactionNetwork</span></code> object:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span> <span class="o">=</span> <span class="n">ReactionNetwork</span><span class="p">(</span><span class="n">rxns</span><span class="p">,</span> <span class="n">cf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Initialization does not build the network graph. To do so, we must call the <code class="docutils literal notranslate"><span class="pre">.build()</span></code> function, which runs in-place:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:07:53,412 INFO rxn_network.network.network Building graph from reactions...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████████████████████████████| 2914/2914 [00:01&lt;00:00, 2176.43it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:07:55,031 INFO rxn_network.network.network Built graph with 1194 nodes and 3511 edges
+</pre></div></div>
+</div>
+<p>This should have completed within a few seconds. A weighted graph object is built using the <code class="docutils literal notranslate"><span class="pre">rustworkx</span></code> and stored under the <code class="docutils literal notranslate"><span class="pre">graph</span></code> attribute of the reaction network object.</p>
+<p>We can access this graph object by using the <code class="docutils literal notranslate"><span class="pre">graph</span></code> attribute:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span><span class="o">.</span><span class="n">graph</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;rxn_network.network.network.Graph object at 0x2b94106c0&gt; with 1194 nodes and 3511 edges
+</pre></div></div>
+</div>
+<p><strong>Plotting:</strong> There are many ways to plot reaction networks. The easiest is to use the built in <code class="docutils literal notranslate"><span class="pre">mpl_draw</span></code> function from rustworkx, which has been provided in a wrapper function.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_network</span><span class="p">(</span><span class="n">rn</span><span class="o">.</span><span class="n">graph</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_2_networks_28_0.png" src="../_images/notebooks_2_networks_28_0.png" />
+</div>
+</div>
+<p>You’ll notice that at this stage, the reaction network graph is a collection of “sub”-networks, i.e. a collection of smaller reaction networks for smaller chemical subsystems. This configuration will change once we set up for pathfinding in the next section.</p>
+<p>Alternative ways of plotting networks will not be covered in this notebook; however, any graph plotting tool that takes in Python network objects should theoretically work with the right customization settings.</p>
+</section>
+<section id="4.-Identifying-reaction-pathways-using-pathfinding-and-balancing/solving">
+<h2>4. Identifying reaction pathways using pathfinding and balancing/solving<a class="headerlink" href="#4.-Identifying-reaction-pathways-using-pathfinding-and-balancing/solving" title="Link to this heading">#</a></h2>
+<p>To identify reaction pathways, we must first set the starting point (precursor phases) and ending point (target) phase.</p>
+<p>This will automatically build all the required “zero-cost” edges which connect the different chemical subsystems. Please see the original manuscript for more details on how this is completed.</p>
+<p>In summary, zero-cost “loopback” edges are drawn from a product node to any reactant node that contains a subset of the set consisting of the {precursors + products} phases.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span><span class="o">.</span><span class="n">set_precursors</span><span class="p">([</span><span class="s2">&quot;Li2CO3&quot;</span><span class="p">,</span> <span class="s2">&quot;Mn2O3&quot;</span><span class="p">,</span> <span class="s2">&quot;YCl3&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<p>We can only set one target node at a time. However, this does not prohibit finding paths to multiple targets (see a few cells below).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rn</span><span class="o">.</span><span class="n">set_target</span><span class="p">(</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We can see how this changes the network by re-drawing it:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_network</span><span class="p">(</span><span class="n">rn</span><span class="o">.</span><span class="n">graph</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_2_networks_35_0.png" src="../_images/notebooks_2_networks_35_0.png" />
+</div>
+</div>
+<p>You should now see that the chemical subsystems have been linked together with the zero-cost edges that we just described. This will probably look messy! This is where pathfinding comes in handy.</p>
+<p>To get reaction pathways, we simply call the <code class="docutils literal notranslate"><span class="pre">find_pathways()</span></code> method. This automatically handles finding pathways to multiple targets, by calling the internal shortest paths method. The <em>k</em> parameter specifies the number of shortest paths to find to each target. This uses Yen’s k-shortest paths algorithm. Here, we use <span class="math notranslate nohighlight">\(k=5\)</span> paths per target, however you may want to add more (e.g., 10 or even 15).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">rn</span><span class="o">.</span><span class="n">find_pathways</span><span class="p">([</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">,</span> <span class="s2">&quot;LiCl&quot;</span><span class="p">,</span> <span class="s2">&quot;CO2&quot;</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Paths to YMnO3
+
+---------------------------------------
+
+Li2CO3 + 0.6667 Mn2O3 -&gt; LiMnCO4 + 0.3333 Li3MnO3 (dG = 0.013 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+Total Cost: 0.484
+
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.082 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+Total Cost: 0.501
+
+4.5 Mn2O3 + YCl3 -&gt; Mn8Cl3O10 + 0.5 Y2Mn2O7 (dG = -0.015 eV/atom)
+0.5 Mn2O3 + 0.5 Y2Mn2O7 -&gt; MnO2 + YMnO3 (dG = 0.005 eV/atom)
+Total Cost: 0.528
+
+4.5 Mn2O3 + YCl3 -&gt; Mn8Cl3O10 + 0.5 Y2Mn2O7 (dG = -0.015 eV/atom)
+2 Y2Mn2O7 -&gt; O2 + 4 YMnO3 (dG = 0.038 eV/atom)
+Total Cost: 0.535
+
+5 Mn2O3 + YCl3 -&gt; Mn8Cl3O10 + YMn2O5 (dG = -0.025 eV/atom)
+YMn2O5 -&gt; MnO2 + YMnO3 (dG = 0.048 eV/atom)
+Total Cost: 0.535
+
+Paths to LiCl
+
+---------------------------------------
+
+2 Li2CO3 + Mn2O3 -&gt; Li2O + 2 LiMnCO4 (dG = 0.036 eV/atom)
+YCl3 + 1.5 Li2O -&gt; 0.5 Y2O3 + 3 LiCl (dG = -0.319 eV/atom)
+Total Cost: 0.473
+
+2 Li2CO3 + Mn2O3 -&gt; Li2O + 2 LiMnCO4 (dG = 0.036 eV/atom)
+YCl3 + Li2O -&gt; YClO + 2 LiCl (dG = -0.291 eV/atom)
+Total Cost: 0.478
+
+2 Li2CO3 + Mn2O3 -&gt; Li2O + 2 LiMnCO4 (dG = 0.036 eV/atom)
+0.3333 YCl3 + 0.6667 Li2O -&gt; LiCl + 0.3333 LiYO2 (dG = -0.276 eV/atom)
+Total Cost: 0.48
+
+Li2CO3 + 0.6667 Mn2O3 -&gt; LiMnCO4 + 0.3333 Li3MnO3 (dG = 0.013 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+Total Cost: 0.484
+
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.082 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+Total Cost: 0.501
+
+Paths to CO2
+
+---------------------------------------
+
+0.5 Li2CO3 + 0.5 Mn2O3 -&gt; LiMnO2 + 0.5 CO2 (dG = 0.009 eV/atom)
+Total Cost: 0.267
+
+2 Li2CO3 -&gt; Li4CO4 + CO2 (dG = 0.055 eV/atom)
+Total Cost: 0.278
+
+Li2CO3 + 0.3333 Mn2O3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.082 eV/atom)
+Total Cost: 0.285
+
+Li2CO3 -&gt; Li2O + CO2 (dG = 0.166 eV/atom)
+Total Cost: 0.306
+
+Li2CO3 + 0.5 Mn2O3 -&gt; Li2MnCO4 + 0.25 O2 (dG = 0.054 eV/atom)
+Li2MnCO4 + 0.5 O2 -&gt; Li2MnO3 + CO2 (dG = -0.092 eV/atom)
+Total Cost: 0.522
+
+</pre></div></div>
+</div>
+<p>The output of this method is a <code class="docutils literal notranslate"><span class="pre">PathwaySet</span></code> object. The set of pathways is composed of individual <code class="docutils literal notranslate"><span class="pre">BasicPathway</span></code> objects.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">example_path</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">example_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Li2CO3 + 0.6667 Mn2O3 -&gt; LiMnCO4 + 0.3333 Li3MnO3 (dG = 0.013 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+Total Cost: 0.484
+</pre></div></div>
+</div>
+<p><strong>Note: these objects contain a list of reactions and associated costs, but the actual pathway is typically not balanced (i.e. some intermediates are made and never consumed).</strong></p>
+<p>This also means that the reactions you see above do not necessarily include all reactants, nor do they form all desired products. They are simply a series of reactions extracted from the reaction network that may be encountered as the system traverses phase space on its way from precursor(s) to target(s).</p>
+<p>To get the balanced reaction pathways, we can use the <code class="docutils literal notranslate"><span class="pre">PathwaySolver</span></code> class. This class takes a <code class="docutils literal notranslate"><span class="pre">PathwaySet</span></code>, the set of entries used in the reaction network, and a cost function. It can be used to solve for balanced pathways given a net reaction. First we initialize the class:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span> <span class="o">=</span> <span class="n">PathwaySolver</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">rn</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="n">cf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>To balance the pathways, we must provide a net reaction representing the total conversion of precursors to final products. This corresponds to the assisted metathesis reaction we defined in the beginning.</p>
+<p>Note: for your own systems where you do not know a net reaction <em>a priori</em>, it is logical to make the net reaction’s products equal to the set of phases which minimize free energy at the total composition of your system. To do this, one can make a compositional phase diagram and determine the net reaction from there (this is not covered in the notebook here).</p>
+<p>We initialize our net reaction here as a <code class="docutils literal notranslate"><span class="pre">ComputedReaction</span></code> object from the corresponding entries. This can be done using the <code class="docutils literal notranslate"><span class="pre">balance()</span></code> constructor and should match the stoichiometry of the overall reaction equation at the top of this notebook.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">product_entries</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">,</span><span class="s2">&quot;LiCl&quot;</span><span class="p">,</span><span class="s2">&quot;CO2&quot;</span><span class="p">]:</span>
+    <span class="n">product_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rn</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+<span class="n">net_rxn</span> <span class="o">=</span> <span class="n">ComputedReaction</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="n">rn</span><span class="o">.</span><span class="n">precursors</span><span class="p">,</span> <span class="n">product_entries</span><span class="p">)</span>
+<span class="n">net_rxn</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.5 Li2CO3 + 0.5 Mn2O3 + YCl3 -&gt; YMnO3 + 3 LiCl + 1.5 CO2
+</pre></div></div>
+</div>
+<p>Finally, we provide the net reaction to the <code class="docutils literal notranslate"><span class="pre">PathwaySolver</span></code> object. The <em>intermediate_rxn_energy_cutoff</em> helps to limit which intermediate reactions are considered (this can substantially decrease the combinatorial complexity), and the <em>filter_interdependent</em> flag verifies that suggested pathways do not contain interdependent reactions. An interdependent pathway is one where 1) the reactants of reaction A depend on the products of the reaction B, and 2) the reactants of reaction B depend on
+the products of reaction A.</p>
+<p><strong>WARNING</strong>: Even though the code for pathway solving been optimized and parallelized, this is often the most time-intensive step in the reaction network analysis. Consider limiting the value of the maximum number of combos to 5 or less, as well as the value of the intermediate reaction energy cutoff (i.e. &lt; 0.0).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">balanced_paths</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">net_rxn</span><span class="p">,</span> <span class="n">max_num_combos</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                          <span class="n">intermediate_rxn_energy_cutoff</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                          <span class="n">use_minimize_enumerator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                          <span class="n">filter_interdependent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:17,138 INFO rxn_network.pathways.solver Net reaction: 1.5 Li2CO3 + 0.5 Mn2O3 + YCl3 -&gt; YMnO3 + 3 LiCl + 1.5 CO2
+
+2023-08-31 14:08:17,139 INFO rxn_network.pathways.solver Identifying reactions between intermediates...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|██████████████████| 45/45 [00:00&lt;00:00, 2178.96it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 2/2 [00:00&lt;00:00, 10.59it/s]
+Filtering duplicates: 0it [00:00, ?it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:17,633 INFO rxn_network.pathways.solver Found 47 intermediate reactions!
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+Filtering duplicates: 100%|██████████████████| 3/3 [00:00&lt;00:00, 2462.89it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:17,947 INFO rxn_network.pathways.solver Building comp matrices...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████████████████████████████████████| 8/8 [00:00&lt;00:00,  9.45it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:18,796 INFO rxn_network.pathways.solver Comp matrices done...
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+PathwaySolver (Batch 1/1): 100%|███████████████| 3/3 [00:02&lt;00:00,  1.35it/s]
+</pre></div></div>
+</div>
+<p>We can now print the suggested, balanced reaction pathways. These are ordered by an average cost of the total pathway, which is effectively a sum of the indiviudal reaction step costs weighted by their multiplicities (how much of each is required to balance the pathway).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">balanced_paths</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Path 1
+
+0.3333 YCl3 + 0.6667 Li2O -&gt; LiCl + 0.3333 LiYO2 (dG = -0.276 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+Mn2O3 + Y2O3 -&gt; 2 YMnO3 (dG = -0.069 eV/atom)
+0.3333 YCl3 + LiYO2 -&gt; 0.6667 Y2O3 + LiCl (dG = -0.16 eV/atom)
+Average Cost: 0.244
+
+
+Path 2
+
+Mn2O3 + 2 Li2CO3 -&gt; Li2O + 2 LiMnCO4 (dG = 0.036 eV/atom)
+0.3333 YCl3 + 0.6667 Li2O -&gt; LiCl + 0.3333 LiYO2 (dG = -0.276 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+LiMnCO4 + LiYO2 -&gt; YMnO3 + Li2CO3 (dG = -0.054 eV/atom)
+Average Cost: 0.245
+
+
+Path 3
+
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+0.3333 YCl3 + 0.6667 Li2O -&gt; LiCl + 0.3333 LiYO2 (dG = -0.276 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+2 Mn2O3 + 3 LiYO2 -&gt; 3 YMnO3 + Li3MnO3 (dG = -0.065 eV/atom)
+Average Cost: 0.245
+
+
+Path 4
+
+0.5 Mn2O3 + 0.5 Li2CO3 -&gt; 0.5 CO2 + LiMnO2 (dG = 0.009 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+0.5 YCl3 + 0.5 Li2O -&gt; 0.5 YClO + LiCl (dG = -0.291 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.081 eV/atom)
+Average Cost: 0.246
+
+
+Path 5
+
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+Mn2O3 + Y2O3 -&gt; 2 YMnO3 (dG = -0.069 eV/atom)
+0.5 YCl3 + 0.5 Li2O -&gt; 0.5 YClO + LiCl (dG = -0.291 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.15 eV/atom)
+Average Cost: 0.246
+
+
+Path 6
+
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+Mn2O3 + Y2O3 -&gt; 2 YMnO3 (dG = -0.069 eV/atom)
+0.6667 YCl3 + Li2O -&gt; 0.3333 Y2O3 + 2 LiCl (dG = -0.319 eV/atom)
+Average Cost: 0.252
+
+
+Path 7
+
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+0.3333 Mn2O3 + Li2CO3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.082 eV/atom)
+Average Cost: 0.257
+
+
+</pre></div></div>
+</div>
+<p><strong>It appears that Pathway 2 most closely matches the experimentally observed reaction pathway</strong>. Note that the ordering subject to change in the future with updates to the data / code.</p>
+<p>Often times, the suggested pathways will include hypothetical (never-before-synthesized) materials. Here we see this with Li<span class="math notranslate nohighlight">\(_3\)</span>MnO<span class="math notranslate nohighlight">\(_3\)</span> in Pathway 1.</p>
+<p>The top-ranked pathway may not necessarily match what is experimentally observed; if a certain phase is not accessible (perhaps due to kinetic reasons), this may effectively rule out a top pathway from being physically possible. One should also explore different pathway ranking approaches.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#rn.as_dict()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="5.-Running-networks-with-jobflow">
+<h2>5. Running networks with jobflow<a class="headerlink" href="#5.-Running-networks-with-jobflow" title="Link to this heading">#</a></h2>
+<p>As was demonstrated in the previous notebook on reaction enumeration, the <em>reaction-network</em> package includes workflows implemented using <em>jobflow</em>.</p>
+<p>Below we will briefly demonstrate constructing and running the same analysis as above using the <code class="docutils literal notranslate"><span class="pre">NetworkFlowMaker</span></code>. Reminder: you must have properly configured your jobflow settings in order for this to work. Read more here: <a class="reference external" href="https://materialsproject.github.io/jobflow/">https://materialsproject.github.io/jobflow/</a></p>
+<p><strong>NOTE: if you have set this up such that your ``JobStore`` lives on a MongoDB (or similar) database, make sure you specify the additional databases ``rxns``, ``entries``, ``paths``, and ``network`` in your ``jobflow.yaml`` file!</strong></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rxn_network.flows.core</span> <span class="kn">import</span> <span class="n">NetworkFlowMaker</span>
+<span class="kn">from</span> <span class="nn">rxn_network.jobs.core</span> <span class="kn">import</span> <span class="n">NetworkMaker</span><span class="p">,</span> <span class="n">PathwaySolverMaker</span>
+<span class="kn">from</span> <span class="nn">jobflow.managers.local</span> <span class="kn">import</span> <span class="n">run_locally</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">precursors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;YCl3&quot;</span><span class="p">,</span> <span class="s2">&quot;Mn2O3&quot;</span><span class="p">,</span> <span class="s2">&quot;Li2CO3&quot;</span><span class="p">]</span>
+<span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;YMnO3&quot;</span><span class="p">,</span> <span class="s2">&quot;LiCl&quot;</span><span class="p">,</span> <span class="s2">&quot;CO2&quot;</span><span class="p">]</span>
+<span class="n">k</span><span class="o">=</span><span class="mi">4</span>
+<span class="n">temp</span> <span class="o">=</span> <span class="mi">650</span><span class="o">+</span><span class="mi">273</span>
+<span class="n">cf</span> <span class="o">=</span> <span class="n">Softplus</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+
+<span class="n">network_maker</span> <span class="o">=</span> <span class="n">NetworkMaker</span><span class="p">(</span><span class="n">cost_function</span><span class="o">=</span><span class="n">cf</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span> <span class="n">calculate_pathways</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+<span class="n">solver_maker</span> <span class="o">=</span> <span class="n">PathwaySolverMaker</span><span class="p">(</span><span class="n">cost_function</span><span class="o">=</span><span class="n">cf</span><span class="p">,</span> <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flow</span> <span class="o">=</span> <span class="n">NetworkFlowMaker</span><span class="p">(</span><span class="n">network_maker</span><span class="o">=</span><span class="n">network_maker</span><span class="p">,</span>
+                        <span class="n">solver_maker</span><span class="o">=</span><span class="n">solver_maker</span><span class="p">,</span>
+                        <span class="n">use_minimize_enumerators</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span>
+                                                             <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
+                                                             <span class="n">entries</span><span class="o">=</span><span class="n">filtered_entries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flow</span><span class="o">.</span><span class="n">draw_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;module &#39;matplotlib.pyplot&#39; from &#39;/Users/mcdermott/miniconda3/envs/rn_dev/lib/python3.10/site-packages/matplotlib/pyplot.py&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_2_networks_54_1.png" src="../_images/notebooks_2_networks_54_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">run_locally</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:21,625 INFO Started executing jobs locally
+2023-08-31 14:08:21,630 INFO Starting job - enumerate_reactions (edd22034-67ac-495d-8a7d-47f126501edd)
+2023-08-31 14:08:21,634 INFO rxn_network.jobs.core Running enumerators...
+2023-08-31 14:08:21,634 INFO rxn_network.enumerators.utils Running BasicEnumerator
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|██████████████████| 57/57 [00:00&lt;00:00, 1651.69it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 12/12 [00:01&lt;00:00, 11.50it/
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:22,816 INFO rxn_network.enumerators.utils Adding 2914 reactions to reaction set
+2023-08-31 14:08:22,817 INFO rxn_network.enumerators.utils Completed reaction enumeration. Filtering duplicates...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+Filtering duplicates: 100%|████████████████| 22/22 [00:00&lt;00:00, 2105.86it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:22,850 INFO rxn_network.enumerators.utils Completed duplicate filtering.
+2023-08-31 14:08:22,850 INFO rxn_network.jobs.core Building task document...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:23,429 INFO Finished job - enumerate_reactions (edd22034-67ac-495d-8a7d-47f126501edd)
+2023-08-31 14:08:23,430 INFO Starting job - build_and_analyze_network (3e258c4d-040a-40bb-b234-6a18957f20c1)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Filtering duplicates: 100%|████████████████| 22/22 [00:00&lt;00:00, 1201.13it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:24,321 INFO rxn_network.network.network Building graph from reactions...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+100%|██████████████████████████████████| 2914/2914 [00:01&lt;00:00, 2071.62it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:08:26,004 INFO rxn_network.network.network Built graph with 1194 nodes and 3511 edges
+Paths to YMnO3
+
+---------------------------------------
+
+3 Li2CO3 + 2 Mn2O3 -&gt; Li3MnO3 + 3 LiMnCO4 (dG = 0.013 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+Total Cost: 0.474
+
+1.5 Li2CO3 + 0.5 Mn2O3 -&gt; Li3MnO3 + 1.5 CO2 (dG = 0.082 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+Total Cost: 0.49
+
+4.5 Mn2O3 + YCl3 -&gt; Mn8Cl3O10 + 0.5 Y2Mn2O7 (dG = -0.015 eV/atom)
+0.5 Mn2O3 + 0.5 Y2Mn2O7 -&gt; MnO2 + YMnO3 (dG = 0.005 eV/atom)
+Total Cost: 0.516
+
+4.5 Mn2O3 + YCl3 -&gt; Mn8Cl3O10 + 0.5 Y2Mn2O7 (dG = -0.015 eV/atom)
+0.5 Y2Mn2O7 -&gt; YMnO3 + 0.25 O2 (dG = 0.038 eV/atom)
+Total Cost: 0.524
+
+Paths to LiCl
+
+---------------------------------------
+
+2 Li2CO3 + Mn2O3 -&gt; Li2O + 2 LiMnCO4 (dG = 0.036 eV/atom)
+Li2O + 0.6667 YCl3 -&gt; 0.3333 Y2O3 + 2 LiCl (dG = -0.319 eV/atom)
+Total Cost: 0.462
+
+2 Li2CO3 + Mn2O3 -&gt; Li2O + 2 LiMnCO4 (dG = 0.036 eV/atom)
+Li2O + YCl3 -&gt; YClO + 2 LiCl (dG = -0.291 eV/atom)
+Total Cost: 0.467
+
+2 Li2CO3 + Mn2O3 -&gt; Li2O + 2 LiMnCO4 (dG = 0.036 eV/atom)
+2 Li2O + YCl3 -&gt; LiYO2 + 3 LiCl (dG = -0.276 eV/atom)
+Total Cost: 0.47
+
+3 Li2CO3 + 2 Mn2O3 -&gt; Li3MnO3 + 3 LiMnCO4 (dG = 0.013 eV/atom)
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+Total Cost: 0.474
+
+Paths to CO2
+
+---------------------------------------
+
+0.5 Li2CO3 + 0.5 Mn2O3 -&gt; LiMnO2 + 0.5 CO2 (dG = 0.009 eV/atom)
+Total Cost: 0.261
+
+2 Li2CO3 -&gt; Li4CO4 + CO2 (dG = 0.055 eV/atom)
+Total Cost: 0.272
+
+1.5 Li2CO3 + 0.5 Mn2O3 -&gt; Li3MnO3 + 1.5 CO2 (dG = 0.082 eV/atom)
+Total Cost: 0.278
+
+Li2CO3 -&gt; Li2O + CO2 (dG = 0.166 eV/atom)
+Total Cost: 0.3
+
+2023-08-31 14:08:50,663 INFO Finished job - build_and_analyze_network (3e258c4d-040a-40bb-b234-6a18957f20c1)
+2023-08-31 14:08:50,702 INFO Starting job - solve pathways (0da59023-d118-4cb8-904d-118de64aca94)
+2023-08-31 14:09:06,254 INFO rxn_network.pathways.solver Net reaction: YCl3 + 0.5 Mn2O3 + 1.5 Li2CO3 -&gt; YMnO3 + 3 LiCl + 1.5 CO2
+
+2023-08-31 14:09:06,255 INFO rxn_network.pathways.solver Identifying reactions between intermediates...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Building chunks...: 100%|██████████████████| 45/45 [00:00&lt;00:00, 1736.71it/s]
+Enumerating reactions (BasicEnumerator): 100%|█| 1/1 [00:00&lt;00:00,  3.70it/s]
+Filtering duplicates: 0it [00:00, ?it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:09:06,588 INFO rxn_network.pathways.solver Found 33 intermediate reactions!
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+Filtering duplicates: 100%|██████████████████| 1/1 [00:00&lt;00:00, 1200.43it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:09:06,762 INFO rxn_network.pathways.solver Building comp matrices...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+100%|██████████████████████████████████████████| 5/5 [00:00&lt;00:00,  6.22it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:09:07,568 INFO rxn_network.pathways.solver Comp matrices done...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+PathwaySolver (Batch 1/1): 100%|███████████████| 3/3 [00:01&lt;00:00,  1.55it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2023-08-31 14:09:09,639 INFO Finished job - solve pathways (0da59023-d118-4cb8-904d-118de64aca94)
+2023-08-31 14:09:09,639 INFO Finished executing jobs locally
+</pre></div></div>
+</div>
+<p>Finally, the output from the flow can be accessed as follows:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="n">flow</span><span class="o">.</span><span class="n">job_uuids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">balanced_paths</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">balanced_paths</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Path 1
+
+0.3333 YCl3 + 0.6667 Li2O -&gt; LiCl + 0.3333 LiYO2 (dG = -0.276 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+Mn2O3 + Y2O3 -&gt; 2 YMnO3 (dG = -0.069 eV/atom)
+0.3333 YCl3 + LiYO2 -&gt; 0.6667 Y2O3 + LiCl (dG = -0.16 eV/atom)
+Average Cost: 0.244
+
+
+Path 2
+
+Mn2O3 + 2 Li2CO3 -&gt; Li2O + 2 LiMnCO4 (dG = 0.036 eV/atom)
+0.3333 YCl3 + 0.6667 Li2O -&gt; LiCl + 0.3333 LiYO2 (dG = -0.276 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+LiMnCO4 + LiYO2 -&gt; YMnO3 + Li2CO3 (dG = -0.054 eV/atom)
+Average Cost: 0.245
+
+
+Path 3
+
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+0.3333 YCl3 + 0.6667 Li2O -&gt; LiCl + 0.3333 LiYO2 (dG = -0.276 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+2 Mn2O3 + 3 LiYO2 -&gt; 3 YMnO3 + Li3MnO3 (dG = -0.065 eV/atom)
+Average Cost: 0.245
+
+
+Path 4
+
+0.5 Mn2O3 + 0.5 Li2CO3 -&gt; 0.5 CO2 + LiMnO2 (dG = 0.009 eV/atom)
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+0.5 YCl3 + 0.5 Li2O -&gt; 0.5 YClO + LiCl (dG = -0.291 eV/atom)
+YClO + LiMnO2 -&gt; YMnO3 + LiCl (dG = -0.081 eV/atom)
+Average Cost: 0.246
+
+
+Path 5
+
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+Mn2O3 + Y2O3 -&gt; 2 YMnO3 (dG = -0.069 eV/atom)
+0.5 YCl3 + 0.5 Li2O -&gt; 0.5 YClO + LiCl (dG = -0.291 eV/atom)
+2 YClO + Li2O -&gt; Y2O3 + 2 LiCl (dG = -0.15 eV/atom)
+Average Cost: 0.246
+
+
+Path 6
+
+Li2CO3 -&gt; CO2 + Li2O (dG = 0.166 eV/atom)
+Mn2O3 + Y2O3 -&gt; 2 YMnO3 (dG = -0.069 eV/atom)
+0.6667 YCl3 + Li2O -&gt; 0.3333 Y2O3 + 2 LiCl (dG = -0.319 eV/atom)
+Average Cost: 0.252
+
+
+Path 7
+
+YCl3 + Li3MnO3 -&gt; YMnO3 + 3 LiCl (dG = -0.228 eV/atom)
+0.3333 Mn2O3 + Li2CO3 -&gt; CO2 + 0.6667 Li3MnO3 (dG = 0.082 eV/atom)
+Average Cost: 0.257
+
+
+</pre></div></div>
+</div>
+</section>
+<section id="6.-Conclusion">
+<h2>6. Conclusion<a class="headerlink" href="#6.-Conclusion" title="Link to this heading">#</a></h2>
+<p>We hope this notebook was helpful in introducing the <code class="docutils literal notranslate"><span class="pre">ReactionNetwork</span></code> class found in the <em>reaction-network</em> package. If any significant errors are encountered, please first double-check that your settings are configured properly (e.g., proper installation of all dependencies, configuration of your Materials Project API key, etc.).</p>
+<p>If the error persists, then please raise an Issue here: <a class="reference external" href="https://github.com/materialsproject/reaction-network/issues">https://github.com/materialsproject/reaction-network/issues</a></p>
+<p>Happy networking!</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../changelog.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Changelog</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="1_enumerators.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">1) Enumerators</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">2) Networks</a><ul>
+<li><a class="reference internal" href="#1.-Imports">1. Imports</a></li>
+<li><a class="reference internal" href="#Case-Study:-YMnO3-assisted-metathesis">Case Study: YMnO3 assisted metathesis</a><ul>
+<li><a class="reference internal" href="#Background">Background</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#2.-Acquiring-thermodynamic-data-from-the-Materials-Project">2. Acquiring thermodynamic data from the Materials Project</a></li>
+<li><a class="reference internal" href="#3.-Building-the-reaction-network">3. Building the reaction network</a></li>
+<li><a class="reference internal" href="#4.-Identifying-reaction-pathways-using-pathfinding-and-balancing/solving">4. Identifying reaction pathways using pathfinding and balancing/solving</a></li>
+<li><a class="reference internal" href="#5.-Running-networks-with-jobflow">5. Running networks with jobflow</a></li>
+<li><a class="reference internal" href="#6.-Conclusion">6. Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=c19b6120"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>
