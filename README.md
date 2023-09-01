@@ -1,16 +1,14 @@
 # ![Reaction Network](docs/_static/img/logo.png)
 
-![GitHub Workflow
-Status](https://img.shields.io/github/workflow/status/materialsproject/reaction-network/testing.yml?branch=main?style=for-the-badge)  https://img.shields.io/github/actions/workflow/status/<user>/<repo>/test.yml?branch=main
 ![Codecov](https://img.shields.io/codecov/c/github/materialsproject/reaction-network?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/materialsproject/reaction-network/testing.yml?style=for-the-badge)
 
 ![PyPI - Python
 Version](https://img.shields.io/pypi/pyversions/reaction-network?style=for-the-badge)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/reaction-network?style=for-the-badge)
 ![PyPI - License](https://img.shields.io/pypi/l/reaction-network?style=for-the-badge)
 
-Reaction Network (`rxn_network`) is a Python package for predicting likely inorganic
-chemical reaction pathways using combinatorial and graph theoretical methods.
+Reaction Network (`rxn_network`) is a Python package for synthesis planning and predicting chemical reaction pathways in inorganic materials synthesis.
 
 ## Installation
 
