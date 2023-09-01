@@ -8,22 +8,12 @@ on:
       - "testing"
 
 jobs:
-  merge-me:
-    name: Merge me!
-    runs-on: ubuntu-latest
-    steps:
-      - if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        name: Merge me!
-        uses: ridedott/merge-me-action@v2
-        with:
-          GITHUB_TOKEN: ${{ secrets.SEMVER_BUMP_TOKEN}}
-
   auto-gen-release:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.SEMVER_BUMP_TOKEN }}
     steps:
       - if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        uses: rymndhng/release-on-push-action@v0.27.0
+        uses: rymndhng/release-on-push-action@v0.28.0
         with:
           bump_version_scheme: norelease
