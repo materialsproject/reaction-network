@@ -1,8 +1,6 @@
 """Core definition for various task and synthesis recipe documents"""
-from __future__ import annotations
-
 from datetime import datetime
-from typing import Any
+from typing import Any, Dict, List  # avoids pydantic issues
 
 from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element
@@ -32,7 +30,7 @@ class EntrySetDocument(BaseModel):
     include_polymorphs: bool = Field(
         False, description="Whether to include metastable polymorphs in the entry set."
     )
-    formulas_to_include: list[str] | None = Field(
+    formulas_to_include: List[str] = Field(
         None, description="The required formulas to include during construciton."
     )
 
@@ -48,22 +46,22 @@ class EnumeratorTaskDocument(BaseModel):
         description="Timestamp of when the document was last updated.",
     )
     rxns: ReactionSet = Field(description="The reaction set.")
-    targets: list[str] = Field(
+    targets: List[str] = Field(
         None, description="The target formulas used in the enumerator(s)."
     )
-    elements: list[Element] = Field(
+    elements: List[Element] = Field(
         None, description="The elements of the total chemical system"
     )
     chemsys: str = Field(
         None, description="The total chemical system string (e.g., Fe-Li-O)."
     )
-    added_elements: list[Element] = Field(
+    added_elements: List[Element] = Field(
         None, description="The elements added beyond the elements of the target(s)."
     )
     added_chemsys: str = Field(
         None, description="The chemical system of the added elements"
     )
-    enumerators: list[Enumerator] = Field(
+    enumerators: List[Enumerator] = Field(
         None,
         description="A list of the enumerator objects used to calculate the reactions.",
     )
@@ -93,7 +91,7 @@ class CompetitionTaskDocument(BaseModel):
     chempot: float = Field(
         None, description="The chemical potential of the open element."
     )
-    added_elements: list[Element] = Field(
+    added_elements: List[Element] = Field(
         None, description="The elements added beyond the elements of the target(s)."
     )
     added_chemsys: str = Field(
@@ -112,7 +110,7 @@ class CompetitionTaskDocument(BaseModel):
         ),
     )
     batch_size: int = Field(None, description="The batch size for the reaction set")
-    cpd_kwargs: dict[str, Any] = Field(
+    cpd_kwargs: Dict[str, Any] = Field(
         None, description="The kwargs for ChempotDistanceCalculator."
     )
 
@@ -134,8 +132,8 @@ class NetworkTaskDocument(BaseModel):
         None, description="The (simple/unbalanced) reaction pathways"
     )
     k: int = Field(None, description="The number of paths solved for, if any.")
-    precursors: list[str] = Field(None, description="The precursor formulas.")
-    targets: list[str] = Field(None, description="The target formulas.")
+    precursors: List[str] = Field(None, description="The precursor formulas.")
+    targets: List[str] = Field(None, description="The target formulas.")
 
 
 class PathwaySolverTaskDocument(BaseModel):
@@ -151,8 +149,8 @@ class PathwaySolverTaskDocument(BaseModel):
     )
     solver: Solver = Field(description="The pathway solver used to calculate pathways.")
     balanced_paths: PathwaySet = Field(description="The balanced reaction pathways.")
-    precursors: list[str] = Field(description="The precursor compositions.")
-    targets: list[str] = Field(description="The target compositions.")
+    precursors: List[str] = Field(description="The precursor compositions.")
+    targets: List[str] = Field(description="The target compositions.")
     net_rxn: ComputedReaction = Field(
         description="The net reaction used for pathway solving."
     )
