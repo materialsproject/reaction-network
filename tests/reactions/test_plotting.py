@@ -2,7 +2,7 @@
 import pytest
 from rxn_network.costs.functions import Softplus
 from rxn_network.reactions.plotting import plot_reaction_scatter
-from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.reactions.set import ReactionSet
 
 
 @pytest.fixture(scope="module")

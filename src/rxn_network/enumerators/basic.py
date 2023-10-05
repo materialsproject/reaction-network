@@ -15,7 +15,7 @@ from rxn_network.entries.utils import initialize_entry
 from rxn_network.enumerators.base import Enumerator
 from rxn_network.enumerators.utils import group_by_chemsys
 from rxn_network.reactions.computed import ComputedReaction
-from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.reactions.set import ReactionSet
 from rxn_network.utils.funcs import get_logger, grouper, limited_powerset
 from rxn_network.utils.ray import initialize_ray, to_iterator
 

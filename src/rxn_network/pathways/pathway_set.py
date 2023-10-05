@@ -10,7 +10,7 @@ from monty.json import MSONable
 
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.basic import BasicPathway
-from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.reactions.set import ReactionSet
 
 if TYPE_CHECKING:
     import numpy as np

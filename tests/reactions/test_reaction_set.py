@@ -5,7 +5,7 @@ from pymatgen.core.composition import Element
 from rxn_network.costs.functions import Softplus
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
-from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.reactions.set import ReactionSet
 
 
 @pytest.fixture(scope="module")

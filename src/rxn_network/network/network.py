@@ -16,6 +16,7 @@ from rxn_network.pathways.basic import BasicPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
+from rxn_network.reactions.set import ReactionSet
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:

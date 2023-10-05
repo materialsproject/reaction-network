@@ -32,7 +32,7 @@ from rxn_network.network.network import ReactionNetwork
 from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.basic import BasicReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
-from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.reactions.set import ReactionSet
 from rxn_network.utils.funcs import get_logger, grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
 

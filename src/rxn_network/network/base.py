@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
     from rxn_network.costs.base import CostFunction
     from rxn_network.pathways.base import Pathway
-    from rxn_network.reactions.reaction_set import ReactionSet
+    from rxn_network.reactions.set import ReactionSet
 
 
 class Network(MSONable, metaclass=ABCMeta):

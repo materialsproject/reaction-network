@@ -10,7 +10,7 @@ from rxn_network.jobs.core import (
     PathwaySolverMaker,
     ReactionEnumerationMaker,
 )
-from rxn_network.reactions.reaction_set import ReactionSet
+from rxn_network.reactions.set import ReactionSet
 
 
 @pytest.fixture()
