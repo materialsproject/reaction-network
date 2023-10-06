@@ -232,7 +232,7 @@ class PathwaySolver(Solver):
                 if not comp_matrices[n].any():  # type: ignore
                     del comp_matrices[n]
 
-        logger.info("Comp matrices done...")
+        logger.info("Comp matrices done.")
 
         num_cpu_jobs = 0
 
