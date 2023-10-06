@@ -3,11 +3,13 @@ from __future__ import annotations
 
 import warnings
 from functools import cached_property
+from itertools import combinations
 from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
 from rxn_network.pathways.basic import BasicPathway
+from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.set import ReactionSet
 from rxn_network.utils.funcs import limited_powerset
 
@@ -154,7 +156,7 @@ class BalancedPathway(BasicPathway):
             v[indices] = rxn.coefficients
             return v
 
-        rxn_set = ReactionSet.from_rxns(reactions)
+        rxn_set = ReactionSet.from_rxns(reactions + [net_rxn])
         entry_idxs = {entry: i for i, entry in enumerate(rxn_set.entries)}
 
         comp_matrix = np.vstack(
@@ -175,7 +177,9 @@ class BalancedPathway(BasicPathway):
             np.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * np.abs(net_coeffs))
         ).all():
             balanced = False
-            warnings.warn("A balanced pathway cannot be found!")
+            warnings.warn(
+                "A balanced pathway cannot be found! Setting balanced = False."
+            )
 
         costs = [cost_function.evaluate(rxn) for rxn in reactions]
         return cls(
@@ -185,10 +189,23 @@ class BalancedPathway(BasicPathway):
             balanced=balanced,
         )
 
-    @cached_property
-    def net_rxn(self) -> Reaction:
-        """Returns the net reaction of the pathway"""
-        return self.reactions[0]
+    def _get_tertiary_competition(self, rxn_set: ReactionSet):
+        """
+        Returns the tertiary competition (C3) for the pathway. This is the summation of
+        the maximum driving forces for all "nonreacting" pairwise interfaces and is a
+        measure of the likelihood that the pathway will deviate from its predicted
+        reaction steps (i.e., due to competition among unplanned interfacial reactions).
+        """
+        c3 = 0
+        for interface in self.all_nonreacting_pairwise_interfaces:
+            reactants = [c.reduced_formula for c in interface]
+            competing_rxns = list(rxn_set.get_rxns_by_reactants(reactants))
+
+            competing_rxn_energies = [r.energy_per_atom for r in competing_rxns]
+            min_energy = min(*competing_rxn_energies, 0)  # must be <= 0
+
+            c3 += -min_energy
+        return c3
 
     @property
     def average_cost(self) -> float:
@@ -196,16 +213,66 @@ class BalancedPathway(BasicPathway):
         return np.dot(self.coefficients, self.costs) / sum(self.coefficients)
 
     @property
-    def all_pairwise_interfaces(self) -> list[tuple[Composition]]:
-        pass
+    def all_pairwise_interfaces(self) -> set[tuple[Composition]]:
+        """Returns a list of all pairwise interfaces, given as tuples of compositions
+        that may react during the pathway."""
+        return set(
+            tuple(sorted(interface)) for interface in combinations(self.compositions, 2)
+        )
 
     @property
-    def all_reacting_pairwise_interfaces(self) -> list[tuple[Composition]]:
-        pass
+    def all_reacting_pairwise_interfaces(self) -> set[tuple[Composition]]:
+        return {
+            tuple(sorted(combo))
+            for r in self.reactions
+            for combo in combinations(r.reactants, 2)
+        }
 
     @property
-    def all_nonreacting_pairwise_interfaces(self) -> list[tuple[Composition]]:
-        pass
+    def all_nonreacting_pairwise_interfaces(self) -> set[tuple[Composition]]:
+        unique_reaction_interfaces = {
+            tuple(sorted(interface))
+            for r in self.reactions
+            for interface in combinations(r.compositions, 2)
+        }  # remove interfaces within same reaction step
+
+        return self.all_pairwise_interfaces - unique_reaction_interfaces
+
+    @property
+    def primary_competition(self) -> float | None:
+        """Aggregate primary competition (C1) value for pathway."""
+        all_c1: list[float] = []
+        for r in self.reactions:
+            c1 = r.data.get("primary_competition")
+
+            if c1 is None:
+                warnings.warn(f"primary_competition not found for {r}!")
+                continue
+
+            all_c1.append(c1)
+
+        if not all_c1:
+            return None
+
+        return self.aggregate_function(all_c1)
+
+    @property
+    def secondary_competition(self) -> float | None:
+        """Aggregate secondary competition (C2) value for pathway."""
+        all_c2: list[float] = []
+        for r in self.reactions:
+            c2 = r.data.get("secondary_competition")
+
+            if c2 is None:
+                warnings.warn(f"secondary_competition not found for {r}!")
+                continue
+
+            all_c2.append(c2)
+
+        if not all_c2:
+            return None
+
+        return self.aggregate_function(all_c2)
 
     def __eq__(self, other) -> bool:
         if super().__eq__(other):
