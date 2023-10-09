@@ -270,7 +270,7 @@ class GibbsComputedEntry(ComputedEntry):
         Returns:
             A new GibbsComputedEntry object
         """
-        composition = Composition(structure.composition)
+        composition = Composition(structure.composition).element_composition
         volume_per_atom = structure.volume / structure.num_sites
         entry = cls(
             composition=composition,
