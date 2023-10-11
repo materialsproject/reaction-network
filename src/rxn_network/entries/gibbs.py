@@ -55,7 +55,6 @@ class GibbsComputedEntry(ComputedEntry):
         entry_id: object | None = None,
     ):
         """
-
         A new computed entry object is returned with a supplied energy correction
         representing the difference between the formation enthalpy at T=0K and the
         Gibbs formation energy at the specified temperature.
@@ -74,7 +73,11 @@ class GibbsComputedEntry(ComputedEntry):
             energy_adjustments: Optional list of energy adjustments.
             parameters: Optional list of calculation parameters.
             data: Optional dictionary containing entry data.
-            entry_id: Optional entry id, such as the entry's mpid.
+            entry_id: An identifying string for the entry, such as the entry's mpid
+                (e.g., "mp-25025"). While optional, this is recommended to set as
+                several downstream classes depend on its use. If an entry_id is not
+                provided, a combination of the composition and volume will be used
+                (e.g., "Li2O_8.4266").
         """
         composition = Composition(composition)
         self._composition = composition
@@ -102,6 +105,9 @@ class GibbsComputedEntry(ComputedEntry):
         )
 
         formation_energy = num_atoms * formation_energy_per_atom
+
+        if entry_id is None:  # should set an entry_id for downstream processing
+            entry_id = f"{composition.reduced_formula}_{volume_per_atom:.4f}"
 
         super().__init__(
             composition=composition,
@@ -156,7 +162,7 @@ class GibbsComputedEntry(ComputedEntry):
             self.volume_per_atom, reduced_mass, temperature
         ) - self._sum_g_i(self._composition, temperature)
 
-    def to_grand_entry(self, chempots: dict[Element, float]):
+    def to_grand_entry(self, chempots: dict[Element, float]) -> GrandPotPDEntry:
         """
         Convert a GibbsComputedEntry to a GrandComputedEntry.
 
@@ -168,7 +174,8 @@ class GibbsComputedEntry(ComputedEntry):
         """
         return GrandPotPDEntry(self, chempots)
 
-    def copy(self):
+    def copy(self) -> GibbsComputedEntry:
+        """Returns a deepcopy of the GibbsComputedEntry object."""
         return deepcopy(self)
 
     @staticmethod
@@ -265,7 +272,8 @@ class GibbsComputedEntry(ComputedEntry):
             formation_energy_per_atom: Formation enthalpy at T = 298 K associated
                 with structure
             temperature: Desired temperature [K] for acquiring dGf(T)
-            **kwargs: Optional kwargs to be passed to GibbsComputedEntry.__init__
+            **kwargs: Optional kwargs to be passed to GibbsComputedEntry.__init__, such
+                as entry_id, energy_adjustments, parameters, and data.
 
         Returns:
             A new GibbsComputedEntry object
