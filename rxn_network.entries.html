@@ -974,7 +974,11 @@ of [300, 400, 500, … 2000 K], then free energies will be interpolated.</p></li
 <li><p><strong>energy_adjustments</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>EnergyAdjustment</em><em>] </em><em>| </em><em>None</em>) – Optional list of energy adjustments.</p></li>
 <li><p><strong>parameters</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional list of calculation parameters.</p></li>
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dictionary containing entry data.</p></li>
-<li><p><strong>entry_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a><em> | </em><em>None</em>) – Optional entry id, such as the entry’s mpid.</p></li>
+<li><p><strong>entry_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a><em> | </em><em>None</em>) – An identifying string for the entry, such as the entry’s mpid
+(e.g., “mp-25025”). While optional, this is recommended to set as
+several downstream classes depend on its use. If an entry_id is not
+provided, a combination of the composition and volume will be used
+(e.g., “Li2O_8.4266”).</p></li>
 </ul>
 </dd>
 </dl>
@@ -1028,13 +1032,21 @@ SISSO descriptor from Bartel et al. (2018) and elemental chemical potentials
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A GrandComputedEntry.</p>
 </dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GrandPotPDEntry</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.entries.gibbs.GibbsComputedEntry.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/gibbs.html#GibbsComputedEntry.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.gibbs.GibbsComputedEntry.copy" title="Link to this definition">#</a></dt>
-<dd><p>Returns a copy of the ComputedEntry.</p>
+<dd><p>Returns a deepcopy of the GibbsComputedEntry object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.gibbs.GibbsComputedEntry" title="rxn_network.entries.gibbs.GibbsComputedEntry"><em>GibbsComputedEntry</em></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1049,7 +1061,8 @@ formation enthalpy, and temperature.</p>
 <li><p><strong>formation_energy_per_atom</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Formation enthalpy at T = 298 K associated
 with structure</p></li>
 <li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Desired temperature [K] for acquiring dGf(T)</p></li>
-<li><p><strong>**kwargs</strong> – Optional kwargs to be passed to GibbsComputedEntry.__init__</p></li>
+<li><p><strong>**kwargs</strong> – Optional kwargs to be passed to GibbsComputedEntry.__init__, such
+as entry_id, energy_adjustments, parameters, and data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1550,7 +1563,7 @@ reduced formula FeO or with materials_id mp-1234.</p>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=c19b6120"></script>
+</div><script src="_static/documentation_options.js?v=0a12f1ed"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

@@ -304,7 +304,6 @@
         <span class="n">entry_id</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        A new computed entry object is returned with a supplied energy correction</span>
 <span class="sd">        representing the difference between the formation enthalpy at T=0K and the</span>
 <span class="sd">        Gibbs formation energy at the specified temperature.</span>
@@ -323,7 +322,11 @@
 <span class="sd">            energy_adjustments: Optional list of energy adjustments.</span>
 <span class="sd">            parameters: Optional list of calculation parameters.</span>
 <span class="sd">            data: Optional dictionary containing entry data.</span>
-<span class="sd">            entry_id: Optional entry id, such as the entry&#39;s mpid.</span>
+<span class="sd">            entry_id: An identifying string for the entry, such as the entry&#39;s mpid</span>
+<span class="sd">                (e.g., &quot;mp-25025&quot;). While optional, this is recommended to set as</span>
+<span class="sd">                several downstream classes depend on its use. If an entry_id is not</span>
+<span class="sd">                provided, a combination of the composition and volume will be used</span>
+<span class="sd">                (e.g., &quot;Li2O_8.4266&quot;).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">composition</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">composition</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_composition</span> <span class="o">=</span> <span class="n">composition</span>
@@ -351,6 +354,9 @@
         <span class="p">)</span>
 
         <span class="n">formation_energy</span> <span class="o">=</span> <span class="n">num_atoms</span> <span class="o">*</span> <span class="n">formation_energy_per_atom</span>
+
+        <span class="k">if</span> <span class="n">entry_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># should set an entry_id for downstream processing</span>
+            <span class="n">entry_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">volume_per_atom</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">composition</span><span class="o">=</span><span class="n">composition</span><span class="p">,</span>
@@ -413,7 +419,7 @@
 
 <div class="viewcode-block" id="GibbsComputedEntry.to_grand_entry">
 <a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.to_grand_entry">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_grand_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chempots</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Element</span><span class="p">,</span> <span class="nb">float</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">to_grand_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chempots</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Element</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GrandPotPDEntry</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a GibbsComputedEntry to a GrandComputedEntry.</span>
 
@@ -428,7 +434,8 @@
 
 <div class="viewcode-block" id="GibbsComputedEntry.copy">
 <a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.gibbs.GibbsComputedEntry.copy">[docs]</a>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsComputedEntry</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a deepcopy of the GibbsComputedEntry object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
@@ -528,12 +535,13 @@
 <span class="sd">            formation_energy_per_atom: Formation enthalpy at T = 298 K associated</span>
 <span class="sd">                with structure</span>
 <span class="sd">            temperature: Desired temperature [K] for acquiring dGf(T)</span>
-<span class="sd">            **kwargs: Optional kwargs to be passed to GibbsComputedEntry.__init__</span>
+<span class="sd">            **kwargs: Optional kwargs to be passed to GibbsComputedEntry.__init__, such</span>
+<span class="sd">                as entry_id, energy_adjustments, parameters, and data.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A new GibbsComputedEntry object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">composition</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">structure</span><span class="o">.</span><span class="n">composition</span><span class="p">)</span>
+        <span class="n">composition</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">structure</span><span class="o">.</span><span class="n">composition</span><span class="p">)</span><span class="o">.</span><span class="n">element_composition</span>
         <span class="n">volume_per_atom</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">volume</span> <span class="o">/</span> <span class="n">structure</span><span class="o">.</span><span class="n">num_sites</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">composition</span><span class="o">=</span><span class="n">composition</span><span class="p">,</span>
@@ -667,7 +675,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=c19b6120"></script>
+</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
