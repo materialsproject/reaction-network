@@ -36,36 +36,36 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "pymatgen>=2023.5.31",
-    "numba>=0.57.0",
-    "jobflow>=0.1.13",
-    "ray>=2.5.0",
-    "rustworkx>=0.12.1",
+    "pymatgen>=2023.10.11",
+    "numba>=0.58.1",
+    "jobflow>=0.1.14",
+    "ray>=2.7.1",
+    "rustworkx>=0.13.2",
 ]
 
 [project.optional-dependencies]
 docs = [
-    "autodoc_pydantic==1.9.0",
-    "furo==2023.8.19",
-    "ipython==8.14.0",
+    "autodoc_pydantic==2.0.1",
+    "furo==2023.9.10",
+    "ipython==8.16.1",
     "myst_parser==2.0.0",
     "nbsphinx==0.9.3",
     "sphinx-copybutton==0.5.2",
-    "sphinx==7.2.4",
+    "sphinx==7.2.6",
 
 ]
 tests = [
-    "mp-api==0.35.1",
-    "pytest==7.4.0",
+    "mp-api==0.37.5",
+    "pytest==7.4.3",
     "pytest-cov==4.1.0",
     "pytest-xdist==3.3.1",
 ]
 strict = [
-    "numba==0.57.0",
-    "pymatgen==2023.08.10",
-    "jobflow==0.1.13",
-    "ray==2.6.3",
-    "rustworkx==0.12.1",
+    "pymatgen==2023.10.11",
+    "numba==0.58.1",
+    "jobflow==0.1.14",
+    "ray==2.7.1",
+    "rustworkx==0.13.2",
 ]
 
 [project.urls]
