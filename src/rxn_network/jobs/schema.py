@@ -1,6 +1,6 @@
 """Core definition for various task and synthesis recipe documents"""
 from datetime import datetime
-from typing import Any, Dict, List  # avoids pydantic issues
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element
@@ -20,17 +20,17 @@ class EntrySetDocument(BaseModel):
     A single entry set object as produced by the GetEntrySet job.
     """
 
-    task_label: str = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
     entries: GibbsEntrySet = Field(description="The entry set object.")
-    e_above_hull: float = Field(None, description="The e_above_hull cutoff.")
+    e_above_hull: Optional[float] = Field(None, description="The e_above_hull cutoff.")
     include_polymorphs: bool = Field(
         False, description="Whether to include metastable polymorphs in the entry set."
     )
-    formulas_to_include: List[str] = Field(
+    formulas_to_include: Optional[List[str]] = Field(
         None, description="The required formulas to include during construciton."
     )
 
@@ -40,28 +40,28 @@ class EnumeratorTaskDocument(BaseModel):
     A single task object from the reaction enumerator workflow.
     """
 
-    task_label: str = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
     rxns: ReactionSet = Field(description="The reaction set.")
-    targets: List[str] = Field(
+    targets: Optional[List[str]] = Field(
         None, description="The target formulas used in the enumerator(s)."
     )
-    elements: List[Element] = Field(
+    elements: Optional[List[Element]] = Field(
         None, description="The elements of the total chemical system"
     )
-    chemsys: str = Field(
+    chemsys: Optional[str] = Field(
         None, description="The total chemical system string (e.g., Fe-Li-O)."
     )
-    added_elements: List[Element] = Field(
+    added_elements: Optional[List[Element]] = Field(
         None, description="The elements added beyond the elements of the target(s)."
     )
-    added_chemsys: str = Field(
+    added_chemsys: Optional[str] = Field(
         None, description="The chemical system of the added elements"
     )
-    enumerators: List[Enumerator] = Field(
+    enumerators: Optional[List[Enumerator]] = Field(
         None,
         description="A list of the enumerator objects used to calculate the reactions.",
     )
@@ -73,7 +73,7 @@ class CompetitionTaskDocument(BaseModel):
     CalculateCompetitionMaker job.
     """
 
-    task_label: str = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
@@ -87,30 +87,32 @@ class CompetitionTaskDocument(BaseModel):
     target_formula: str = Field(
         description="The reduced chemical formula of the target material."
     )
-    open_elem: Element = Field(None, description="The open element (if any).")
-    chempot: float = Field(
+    open_elem: Optional[Element] = Field(None, description="The open element (if any).")
+    chempot: Optional[float] = Field(
         None, description="The chemical potential of the open element."
     )
-    added_elements: List[Element] = Field(
+    added_elements: Optional[List[Element]] = Field(
         None, description="The elements added beyond the elements of the target(s)."
     )
-    added_chemsys: str = Field(
+    added_chemsys: Optional[str] = Field(
         None, description="The chemical system of the added elements."
     )
-    calculate_competition: bool = Field(
+    calculate_competition: Optional[bool] = Field(
         None, description="Whether to calculate competition scores."
     )
-    calculate_chempot_distances: bool = Field(
+    calculate_chempot_distances: Optional[bool] = Field(
         None, description="Whether to calculate chemical potential distances."
     )
-    temp: float = Field(
+    temp: Optional[float] = Field(
         None,
         description=(
             "The temperature in K used to determine the primary competition weightings."
         ),
     )
-    batch_size: int = Field(None, description="The batch size for the reaction set")
-    cpd_kwargs: Dict[str, Any] = Field(
+    batch_size: Optional[int] = Field(
+        None, description="The batch size for the reaction set"
+    )
+    cpd_kwargs: Optional[Dict[str, Any]] = Field(
         None, description="The kwargs for ChempotDistanceCalculator."
     )
 
@@ -122,18 +124,20 @@ class NetworkTaskDocument(BaseModel):
     Optionally includes unbalanced paths found during pathfinding.
     """
 
-    task_label: str = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
     network: Network = Field(description="The reaction network")
-    paths: PathwaySet = Field(
+    paths: Optional[PathwaySet] = Field(
         None, description="The (simple/unbalanced) reaction pathways"
     )
-    k: int = Field(None, description="The number of paths solved for, if any.")
-    precursors: List[str] = Field(None, description="The precursor formulas.")
-    targets: List[str] = Field(None, description="The target formulas.")
+    k: Optional[int] = Field(
+        None, description="The number of paths solved for, if any."
+    )
+    precursors: Optional[List[str]] = Field(None, description="The precursor formulas.")
+    targets: Optional[List[str]] = Field(None, description="The target formulas.")
 
 
 class PathwaySolverTaskDocument(BaseModel):
@@ -142,7 +146,7 @@ class PathwaySolverTaskDocument(BaseModel):
     solver object and its calculated balanced pathways.
     """
 
-    task_label: str = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
