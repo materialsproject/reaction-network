@@ -52,7 +52,7 @@ class PathwayPlotter(MSONable):
         """
         Returns a plot of the pathway by calling DataFrame.plot().
         """
-        return self.df.plot()
+        return self.df.plot(alpha=0.7)
 
     def plot_energy_cascade(self, entries: list[ComputedEntry] | GibbsEntrySet):
         """
@@ -134,7 +134,7 @@ class PathwayPlotter(MSONable):
             col = self.df.iloc[:, idx]
 
             for el in el_dict.keys():
-                el_dict[el].append((col * comp.get_el_amt_dict()[el]).fillna(0))
+                el_dict[el].append(col * comp.get_el_amt_dict().get(el, 0))
 
         for el in el_dict:
             el_dict[el] = sum(el_dict[el])
