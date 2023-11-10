@@ -1,8 +1,6 @@
 """Core definition for various task and synthesis recipe documents."""
-from __future__ import annotations
-
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element
@@ -20,17 +18,17 @@ from rxn_network.utils.funcs import datetime_str
 class EntrySetDocument(BaseModel):
     """A single entry set object as produced by the GetEntrySet job."""
 
-    task_label: str | None = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
     entries: GibbsEntrySet = Field(description="The entry set object.")
-    e_above_hull: float | None = Field(None, description="The e_above_hull cutoff.")
+    e_above_hull: Optional[float] = Field(None, description="The e_above_hull cutoff.")
     include_polymorphs: bool = Field(
         default=False, description="Whether to include metastable polymorphs in the entry set."
     )
-    formulas_to_include: list[str] | None = Field(
+    formulas_to_include: Optional[str] = Field(
         None, description="The required formulas to include during construciton."
     )
 
@@ -38,20 +36,20 @@ class EntrySetDocument(BaseModel):
 class EnumeratorTaskDocument(BaseModel):
     """A single task object from the reaction enumerator workflow."""
 
-    task_label: str | None = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
     rxns: ReactionSet = Field(description="The reaction set.")
-    targets: list[str] | None = Field(None, description="The target formulas used in the enumerator(s).")
-    elements: list[Element] | None = Field(None, description="The elements of the total chemical system")
-    chemsys: str | None = Field(None, description="The total chemical system string (e.g., Fe-Li-O).")
-    added_elements: list[Element] | None = Field(
+    targets: Optional[list[str]] = Field(None, description="The target formulas used in the enumerator(s).")
+    elements: Optional[list[Element]] = Field(None, description="The elements of the total chemical system")
+    chemsys: Optional[str] = Field(None, description="The total chemical system string (e.g., Fe-Li-O).")
+    added_elements: Optional[list[Element]] = Field(
         None, description="The elements added beyond the elements of the target(s)."
     )
-    added_chemsys: str | None = Field(None, description="The chemical system of the added elements")
-    enumerators: list[Enumerator] | None = Field(
+    added_chemsys: Optional[str] = Field(None, description="The chemical system of the added elements")
+    enumerators: Optional[list[Enumerator]] = Field(
         None,
         description="A list of the enumerator objects used to calculate the reactions.",
     )
@@ -62,7 +60,7 @@ class CompetitionTaskDocument(BaseModel):
     CalculateCompetitionMaker job.
     """
 
-    task_label: str | None = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
@@ -74,22 +72,22 @@ class CompetitionTaskDocument(BaseModel):
         )
     )
     target_formula: str = Field(description="The reduced chemical formula of the target material.")
-    open_elem: Element | None = Field(None, description="The open element (if any).")
-    chempot: float | None = Field(None, description="The chemical potential of the open element.")
-    added_elements: list[Element] | None = Field(
+    open_elem: Optional[Element] = Field(None, description="The open element (if any).")
+    chempot: Optional[float] = Field(None, description="The chemical potential of the open element.")
+    added_elements: Optional[list[Element]] = Field(
         None, description="The elements added beyond the elements of the target(s)."
     )
-    added_chemsys: str | None = Field(None, description="The chemical system of the added elements.")
-    calculate_competition: bool | None = Field(None, description="Whether to calculate competition scores.")
-    calculate_chempot_distances: bool | None = Field(
+    added_chemsys: Optional[str] = Field(None, description="The chemical system of the added elements.")
+    calculate_competition: Optional[bool] = Field(None, description="Whether to calculate competition scores.")
+    calculate_chempot_distances: Optional[bool] = Field(
         None, description="Whether to calculate chemical potential distances."
     )
-    temp: float | None = Field(
+    temp: Optional[float] = Field(
         None,
         description=("The temperature in K used to determine the primary competition weightings."),
     )
-    batch_size: int | None = Field(None, description="The batch size for the reaction set")
-    cpd_kwargs: dict[str, Any] | None = Field(None, description="The kwargs for ChempotDistanceCalculator.")
+    batch_size: Optional[int] = Field(None, description="The batch size for the reaction set")
+    cpd_kwargs: Optional[dict[str, Any]] = Field(None, description="The kwargs for ChempotDistanceCalculator.")
 
 
 class NetworkTaskDocument(BaseModel):
@@ -98,16 +96,16 @@ class NetworkTaskDocument(BaseModel):
     Optionally includes unbalanced paths found during pathfinding.
     """
 
-    task_label: str | None = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
     network: Network = Field(description="The reaction network")
-    paths: PathwaySet | None = Field(None, description="The (simple/unbalanced) reaction pathways")
-    k: int | None = Field(None, description="The number of paths solved for, if any.")
-    precursors: list[str] | None = Field(None, description="The precursor formulas.")
-    targets: list[str] | None = Field(None, description="The target formulas.")
+    paths: Optional[PathwaySet] = Field(None, description="The (simple/unbalanced) reaction pathways")
+    k: Optional[int] = Field(None, description="The number of paths solved for, if any.")
+    precursors: Optional[list[str]] = Field(None, description="The precursor formulas.")
+    targets: Optional[list[str]] = Field(None, description="The target formulas.")
 
 
 class PathwaySolverTaskDocument(BaseModel):
@@ -115,7 +113,7 @@ class PathwaySolverTaskDocument(BaseModel):
     solver object and its calculated balanced pathways.
     """
 
-    task_label: str | None = Field(None, description="The name of the task.")
+    task_label: Optional[str] = Field(None, description="The name of the task.")
     last_updated: datetime = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
