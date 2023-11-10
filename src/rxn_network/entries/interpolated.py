@@ -1,4 +1,4 @@
-"""Class for intepolated entries"""
+"""Class for intepolated entries."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -79,9 +79,7 @@ class InterpolatedEntry(ComputedEntry):
 
     @property
     def unique_id(self) -> str:
-        """
-        Returns a unique ID for the entry.
-        """
+        """Returns a unique ID for the entry."""
         return self.entry_id
 
     @property
@@ -100,7 +98,7 @@ class InterpolatedEntry(ComputedEntry):
         return "\n".join(output)
 
     def __eq__(self, other) -> bool:
-        if not type(other) is type(self):
+        if type(other) is not type(self):
             return False
 
         if not np.isclose(self.energy, other.energy):

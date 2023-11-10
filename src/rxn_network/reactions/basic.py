@@ -95,7 +95,7 @@ class BasicReaction(Reaction):
     ) -> BasicReaction:
         """
         Reactants and products to be specified as list of
-        pymatgen.core.Composition. e.g., [comp1, comp2]
+        pymatgen.core.Composition. e.g., [comp1, comp2].
 
         Args:
             reactants: List of reactants.
@@ -180,20 +180,18 @@ class BasicReaction(Reaction):
         )
 
     def get_coeff(self, comp: Composition):
-        """
-        Returns coefficient for a particular composition
-        """
+        """Returns coefficient for a particular composition."""
         return self.coefficients[self.compositions.index(comp)]
 
     def normalized_repr_and_factor(self):
         """
         Normalized representation for a reaction
-        For example, ``4 Li + 2 O -> 2Li2O`` becomes ``2 Li + O -> Li2O``
+        For example, ``4 Li + 2 O -> 2Li2O`` becomes ``2 Li + O -> Li2O``.
         """
         return self._str_from_comp(self.coefficients, self.compositions, True)
 
     def copy(self) -> BasicReaction:
-        """Returns a copy of the BasicReaction object"""
+        """Returns a copy of the BasicReaction object."""
         return BasicReaction(
             compositions=self.compositions,
             coefficients=self.coefficients.copy(),
@@ -245,15 +243,11 @@ class BasicReaction(Reaction):
             products.remove(t)
 
         separable = [added_elems.issuperset(comp.elements) for comp in products]
-        found = all(separable)
-
-        return found
+        return all(separable)
 
     @cached_property
     def reactant_atomic_fractions(self) -> dict:
-        """
-        Returns the atomic mixing ratio of reactants in the reaction
-        """
+        """Returns the atomic mixing ratio of reactants in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
@@ -264,9 +258,7 @@ class BasicReaction(Reaction):
 
     @cached_property
     def product_atomic_fractions(self) -> dict:
-        """
-        Returns the atomic mixing ratio of reactants in the reaction
-        """
+        """Returns the atomic mixing ratio of reactants in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
@@ -277,9 +269,7 @@ class BasicReaction(Reaction):
 
     @cached_property
     def reactant_molar_fractions(self) -> dict:
-        """
-        Returns the molar mixing ratio of reactants in the reaction
-        """
+        """Returns the molar mixing ratio of reactants in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
@@ -289,9 +279,7 @@ class BasicReaction(Reaction):
 
     @cached_property
     def product_molar_fractions(self) -> dict:
-        """
-        Returns the molar mixing ratio of products in the reaction
-        """
+        """Returns the molar mixing ratio of products in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
@@ -340,36 +328,33 @@ class BasicReaction(Reaction):
         Returns:
             A BasicReaction object
         """
-
         reactant_comps = [Composition(r) for r in reactants]
         product_comps = [Composition(p) for p in products]
-        rxn = cls.balance(reactants=reactant_comps, products=product_comps)
-
-        return rxn
+        return cls.balance(reactants=reactant_comps, products=product_comps)
 
     @property
     def reactants(self) -> list[Composition]:
-        """List of reactants for this reaction"""
+        """List of reactants for this reaction."""
         return list(self.reactant_coeffs.keys())
 
     @property
     def products(self) -> list[Composition]:
-        """List of products for this reaction"""
+        """List of products for this reaction."""
         return list(self.product_coeffs.keys())
 
     @property
     def compositions(self) -> list[Composition]:
-        """List of composition objects for this reaction"""
+        """List of composition objects for this reaction."""
         return self._compositions
 
     @property
     def coefficients(self) -> np.ndarray:
-        """Array of reaction coefficients"""
+        """Array of reaction coefficients."""
         return self._coefficients
 
     @cached_property
     def num_atoms(self) -> float:
-        """Total number of atoms in this reaction"""
+        """Total number of atoms in this reaction."""
         return sum(
             coeff * sum(c[el] for el in self.elements)
             for c, coeff in self.product_coeffs.items()
@@ -377,21 +362,21 @@ class BasicReaction(Reaction):
 
     @cached_property
     def energy(self) -> float:
-        """The energy of this reaction"""
+        """The energy of this reaction."""
         raise ValueError("No energy for a basic reaction!")
 
     @cached_property
     def energy_per_atom(self) -> float:
-        """The energy per atom of this reaction"""
+        """The energy per atom of this reaction."""
         raise ValueError("No energy per atom for a basic reaction!")
 
     @cached_property
     def is_identity(self) -> bool:
-        """Returns True if the reaction has identical reactants and products"""
+        """Returns True if the reaction has identical reactants and products."""
         return self._get_is_identity()
 
     def _get_is_identity(self):
-        """Returns True if the reaction has identical reactants and products"""
+        """Returns True if the reaction has identical reactants and products."""
         if set(self.reactants) != set(self.products):
             return False
         if self.balanced is False:  # if not balanced, can not check coefficients
@@ -418,9 +403,7 @@ class BasicReaction(Reaction):
     def _balance_coeffs(
         cls, reactants: list[Composition], products: list[Composition]
     ) -> tuple[np.ndarray, int | float, int]:
-        """
-        Balances the reaction and returns the new coefficient matrix
-        """
+        """Balances the reaction and returns the new coefficient matrix."""
         compositions = reactants + products
         num_comp = len(compositions)
 
@@ -447,7 +430,7 @@ class BasicReaction(Reaction):
         )
         reactant_constraints = chain.from_iterable(
             [
-                combinations(range(0, first_product_idx), n_constr)
+                combinations(range(first_product_idx), n_constr)
                 for n_constr in range(num_constraints, 0, -1)
             ]
         )

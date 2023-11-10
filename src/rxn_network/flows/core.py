@@ -2,17 +2,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Collection
+from typing import TYPE_CHECKING
 
 from jobflow import Flow, Maker
 from pymatgen.core.composition import Element
 
 from rxn_network.core import Composition
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
-from rxn_network.enumerators.minimize import (
-    MinimizeGibbsEnumerator,
-    MinimizeGrandPotentialEnumerator,
-)
+from rxn_network.enumerators.minimize import MinimizeGibbsEnumerator, MinimizeGrandPotentialEnumerator
 from rxn_network.jobs.core import (
     CalculateCompetitionMaker,
     GetEntrySetMaker,
@@ -23,6 +20,8 @@ from rxn_network.jobs.core import (
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
+    from collections.abc import Collection
+
     from rxn_network.entries.entry_set import GibbsEntrySet
 
 logger = get_logger(__name__)
@@ -151,10 +150,7 @@ class SynthesisPlanningFlowMaker(Maker):
                     + f" ({chemsys}, T={self.get_entry_set_maker.temperature} K,"
                     f" +{round(self.get_entry_set_maker.e_above_hull, 3)} eV)",
                     "formulas_to_include": list(
-                        set(
-                            self.get_entry_set_maker.formulas_to_include
-                            + [target_formula]
-                        )
+                        {*self.get_entry_set_maker.formulas_to_include, target_formula}
                     ),
                 }
             )
@@ -207,7 +203,7 @@ class SynthesisPlanningFlowMaker(Maker):
 
         if self.open_elem and self.chempots:
             for chempot in self.chempots:
-                subname = f"(open {str(self.open_elem)}, mu={chempot})"
+                subname = f"(open {self.open_elem!s}, mu={chempot})"
                 enumeration_maker = self.enumeration_maker.update_kwargs(
                     {"name": self.enumeration_maker.name + subname},
                     nested=False,
@@ -407,7 +403,7 @@ class NetworkFlowMaker(Maker):
 
         if self.use_minimize_enumerators and self.open_elem and self.chempots:
             for chempot in self.chempots:
-                subname = f"(open {str(self.open_elem)}, mu={chempot})"
+                subname = f"(open {self.open_elem!s}, mu={chempot})"
                 enumeration_maker = self.enumeration_maker.update_kwargs(
                     {"name": self.enumeration_maker.name + subname},
                     nested=False,

@@ -8,15 +8,16 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
 
-import numpy as np
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.core.composition import Element
 
-from rxn_network.core import Composition
 from rxn_network.reactions.computed import ComputedReaction
 
 if TYPE_CHECKING:
+    import numpy as np
     from pymatgen.entries.computed_entries import ComputedEntry
+
+    from rxn_network.core import Composition
 
 
 class OpenComputedReaction(ComputedReaction):
@@ -40,7 +41,7 @@ class OpenComputedReaction(ComputedReaction):
             chempots: Dict of chemical potentials corresponding to open elements.
             data: Optional dict of data.
             lowest_num_errors: number of "errors" encountered during reaction
-                balancing
+                balancing.
         """
         super().__init__(
             entries=entries,
@@ -161,27 +162,21 @@ class OpenComputedReaction(ComputedReaction):
 
     @property
     def elements(self) -> list[Element]:
-        """
-        List of elements in the reaction
-        """
+        """List of elements in the reaction."""
         return list(
-            set(el for comp in self.compositions for el in comp.elements)
+            {el for comp in self.compositions for el in comp.elements}
             - set(self.open_elems)
         )
 
     @property
     def total_chemical_system(self) -> str:
-        """
-        Chemical system string, including open elements
-        """
+        """Chemical system string, including open elements."""
         return "-".join(
             sorted([str(e) for e in set(self.elements) | set(self.open_elems)])
         )
 
     def copy(self) -> OpenComputedReaction:
-        """
-        Returns a copy of the OpenComputedReaction object.
-        """
+        """Returns a copy of the OpenComputedReaction object."""
         return OpenComputedReaction(
             self.entries,
             self.coefficients,
@@ -191,9 +186,7 @@ class OpenComputedReaction(ComputedReaction):
         )
 
     def reverse(self):
-        """
-        Returns a copy of reaction with reactants/products swapped
-        """
+        """Returns a copy of reaction with reactants/products swapped."""
         return OpenComputedReaction(
             self.entries,
             -1 * self.coefficients,
@@ -204,9 +197,7 @@ class OpenComputedReaction(ComputedReaction):
 
     @cached_property
     def reactant_atomic_fractions(self) -> dict:
-        """
-        Returns the atomic mixing ratio of reactants in the reaction
-        """
+        """Returns the atomic mixing ratio of reactants in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
@@ -219,9 +210,7 @@ class OpenComputedReaction(ComputedReaction):
 
     @cached_property
     def product_atomic_fractions(self) -> dict:
-        """
-        Returns the atomic mixing ratio of reactants in the reaction
-        """
+        """Returns the atomic mixing ratio of reactants in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
@@ -243,18 +232,14 @@ class OpenComputedReaction(ComputedReaction):
         )
 
     def as_dict(self) -> dict:
-        """
-        Returns a dictionary representation of the reaction.
-        """
+        """Returns a dictionary representation of the reaction."""
         d = super().as_dict()
         d["chempots"] = {el.symbol: u for el, u in self.chempots.items()}
         return d
 
     @classmethod
     def from_dict(cls, d) -> OpenComputedReaction:
-        """
-        Returns an OpenComputedReaction object from a dictionary representation.
-        """
+        """Returns an OpenComputedReaction object from a dictionary representation."""
         d["chempots"] = {Element(symbol): u for symbol, u in d["chempots"].items()}
         return super().from_dict(d)
 

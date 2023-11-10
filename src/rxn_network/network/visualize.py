@@ -1,6 +1,4 @@
-"""
-Functions for visualizing/plotting reaction networks.
-"""
+"""Functions for visualizing/plotting reaction networks."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

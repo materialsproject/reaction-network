@@ -1,18 +1,16 @@
-"""
-Implements a class for storing a balanced reaction pathway.
-"""
+"""Implements a class for storing a balanced reaction pathway."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 import numpy as np
 
-from rxn_network.core import Composition
-from rxn_network.pathways.base import Pathway
 from rxn_network.pathways.basic import BasicPathway
 from rxn_network.utils.funcs import limited_powerset
 
 if TYPE_CHECKING:
+    from rxn_network.core import Composition
+    from rxn_network.pathways.base import Pathway
     from rxn_network.reactions.base import Reaction
 
 
@@ -132,7 +130,6 @@ class BalancedPathway(BasicPathway):
         tol: float = 1e-6,
     ):
         """Not implemented. See PathwaySolver class."""
-
         _, _, _ = pathway_sets, net_reaction, tol
 
         raise NotImplementedError(
@@ -142,7 +139,7 @@ class BalancedPathway(BasicPathway):
 
     @property
     def average_cost(self) -> float:
-        """Returns the mean cost of the pathway"""
+        """Returns the mean cost of the pathway."""
         return np.dot(self.coefficients, self.costs) / sum(self.coefficients)
 
     def __eq__(self, other) -> bool:

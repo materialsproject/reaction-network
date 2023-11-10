@@ -1,6 +1,4 @@
-"""
-Implements an Entry that looks up NIST pre-tabulated Gibbs free energies
-"""
+"""Implements an Entry that looks up NIST pre-tabulated Gibbs free energies."""
 from __future__ import annotations
 
 import hashlib
@@ -40,7 +38,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
                 the range of the reference  data (see self._validate_temperature), then
                 this will raise an error.
             energy_adjustments: A list of EnergyAdjustments to apply to the entry.
-            data: Optional dictionary containing entry data
+            data: Optional dictionary containing entry data.
         """
         formula = composition.reduced_formula
         entry_id = f"{self.__class__.__name__}-{formula}_{temperature}"
@@ -74,8 +72,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
         new_entry_dict = self.as_dict()
         new_entry_dict["temperature"] = new_temperature
 
-        new_entry = self.from_dict(new_entry_dict)
-        return new_entry
+        return self.from_dict(new_entry_dict)
 
     def to_grand_entry(self, chempots: dict[Element, float]):
         """
@@ -124,7 +121,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
 
     @property
     def temperature(self) -> float:
-        """Returns temperature used to calculate entry's energy"""
+        """Returns temperature used to calculate entry's energy."""
         return self._temperature
 
     @property
@@ -165,13 +162,12 @@ class ExperimentalReferenceEntry(ComputedEntry):
     @classmethod
     def from_dict(cls, d) -> ExperimentalReferenceEntry:
         dec = MontyDecoder()
-        entry = cls(
+        return cls(
             composition=Composition(d["composition"]),
             temperature=d["temperature"],
             energy_adjustments=dec.process_decoded(d["energy_adjustments"]),
             data=d["data"],
         )
-        return entry
 
     def __repr__(self) -> str:
         output = [
@@ -191,8 +187,6 @@ class ExperimentalReferenceEntry(ComputedEntry):
 
     def __hash__(self) -> int:
         data_md5 = hashlib.md5(  # nosec
-            f"{self.__class__.__name__}{self.composition}_{self.temperature}".encode(
-                "utf-8"
-            )
+            f"{self.__class__.__name__}{self.composition}_{self.temperature}".encode()
         ).hexdigest()
         return int(data_md5, 16)

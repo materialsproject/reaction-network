@@ -1,11 +1,11 @@
-"""Utility functions for acquiring, processing, or modifiying entries"""
+"""Utility functions for acquiring, processing, or modifiying entries."""
 from __future__ import annotations
 
 import itertools
 import re
 import warnings
 from copy import deepcopy
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 from pymatgen.core.composition import Element
 from pymatgen.core.structure import Structure
@@ -18,6 +18,8 @@ from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from maggma.stores import MongoStore
 
 logger = get_logger(__name__)
@@ -125,7 +127,7 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = F
     return entry
 
 
-def get_entries(  # noqa: MC0001
+def get_entries(
     db: MongoStore,
     chemsys_formula_id_criteria: str | dict,
     compatible_only: bool = True,
@@ -136,7 +138,7 @@ def get_entries(  # noqa: MC0001
     sort_by_e_above_hull: bool = False,
 ):  # pragma: no cover
     """
-    WARNING:
+    Warning:
         This function is legacy code directly adapted from pymatgen.ext.matproj. It is
         not broadly useful or applicable to other databases. It is only used in jobs
         interfaced directly with internal databases at the Materials Project. This code
@@ -167,10 +169,10 @@ def get_entries(  # noqa: MC0001
             conventional unit cell
         sort_by_e_above_hull: Whether to sort the list of entries by
             e_above_hull (will query e_above_hull as a property_data if True).
+
     Returns:
         List of ComputedEntry or ComputedStructureEntry objects.
     """
-
     params = [
         "deprecated",
         "run_type",
@@ -180,7 +182,7 @@ def get_entries(  # noqa: MC0001
         "potcar_symbols",
         "oxide_type",
     ]
-    props = ["final_energy", "unit_cell_formula", "task_id"] + params
+    props = ["final_energy", "unit_cell_formula", "task_id", *params]
     if sort_by_e_above_hull:
         if property_data and "e_above_hull" not in property_data:
             property_data.append("e_above_hull")
@@ -276,9 +278,9 @@ def get_all_entries_in_chemsys(
     use_premade_entries: bool = False,
     conventional_unit_cell: bool = False,
     n: int = 1000,
-) -> list[ComputedEntry]:  # noqa: MC0001  # pragma: no cover
+) -> list[ComputedEntry]:  # pragma: no cover
     """
-    WARNING:
+    Warning:
         This function is legacy code directly adapted from pymatgen.ext.matproj. It is
         not broadly useful or applicable to other databases. It is only used in jobs
         interfaced directly with internal databases at the Materials Project. This code

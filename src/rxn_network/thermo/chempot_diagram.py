@@ -60,15 +60,11 @@ class ChemicalPotentialDiagram(ChempotDiagram):
                 unspecified elements within the "limits" argument. This results in
                 default limits of (-100, 0).
         """
-        self.entries = list(
-            sorted(entries, key=lambda e: e.composition.reduced_formula)
-        )
+        self.entries = sorted(entries, key=lambda e: e.composition.reduced_formula)
         self._entry_set = GibbsEntrySet(self.entries)
         self.limits = limits
         self.default_min_limit = default_min_limit
-        self.elements = list(
-            sorted({els for e in self.entries for els in e.composition.elements})
-        )
+        self.elements = sorted({els for e in self.entries for els in e.composition.elements})
         self.dim = len(self.elements)
         self._min_entries, self._el_refs = self._get_min_entries_and_el_refs(
             self.entries
@@ -116,16 +112,9 @@ class ChemicalPotentialDiagram(ChempotDiagram):
             Shortest distance between domain boundaries in the full (hyper)dimensional
             space, calculated using KDTree.
         """
+        pts1 = self.domains[f1] if f1 in self.domains else self._get_metastable_domain(f1)
 
-        if f1 in self.domains:
-            pts1 = self.domains[f1]
-        else:
-            pts1 = self._get_metastable_domain(f1)
-
-        if f2 in self.domains:
-            pts2 = self.domains[f2]
-        else:
-            pts2 = self._get_metastable_domain(f2)
+        pts2 = self.domains[f2] if f2 in self.domains else self._get_metastable_domain(f2)
 
         tree = KDTree(pts1)
 
@@ -181,9 +170,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     @property
     def hs_int(self) -> HalfspaceIntersection:
-        """
-        Returns the scipy HalfSpaceIntersection object used to calculate all domains.
-        """
+        """Returns the scipy HalfSpaceIntersection object used to calculate all domains."""
         return self._hs_int
 
     def _get_halfspace_intersection(self):
@@ -193,7 +180,8 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     def _get_domains(self) -> dict[str, np.ndarray]:
         """Returns a dictionary of chemical potential domains as {formula:
-        np.ndarray}"""
+        np.ndarray}.
+        """
         domains: dict[str, list] = {
             entry.composition.reduced_formula: [] for entry in self._hyperplane_entries
         }
@@ -212,7 +200,8 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     def _get_hyperplanes_and_entries(self) -> tuple[np.ndarray, list[PDEntry]]:
         """Returns both the array of hyperplanes, as well as a list of the minimum
-        entries"""
+        entries.
+        """
         data = np.array([self._get_hyperplane(e) for e in self._min_entries])
         vec = [self.el_refs[el].energy_per_atom for el in self.elements] + [1]
         form_e = -np.dot(data, vec)
@@ -227,15 +216,15 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         return hyperplanes, hyperplane_entries
 
     def _get_hyperplane(self, entry):
-        data = np.array(
+        return np.array(
             [entry.composition.get_atomic_fraction(el) for el in self.elements]
             + [-entry.energy_per_atom]
         )
-        return data
 
     def _get_metastable_domain(self, formula, tol=1e-5):
         """Returns the metastable domain for a given formula. Tol is passed to
-        GibbsEntrySet.get_stabilized_entry and will affect the size of the domain."""
+        GibbsEntrySet.get_stabilized_entry and will affect the size of the domain.
+        """
         if formula in self._metastable_domains:
             return self._metastable_domains[formula]
 
@@ -271,5 +260,5 @@ class ChemicalPotentialDiagram(ChempotDiagram):
 
     @staticmethod
     def _get_distance_between_parallel_hyperplanes(a, delta_b):
-        """Returns the distance between two parallel hyperplanes"""
+        """Returns the distance between two parallel hyperplanes."""
         return np.abs(delta_b) / np.linalg.norm(a)

@@ -1,11 +1,9 @@
-"""
-Implementation of reaction network and graph classes.
-"""
+"""Implementation of reaction network and graph classes."""
 from __future__ import annotations
 
 from dataclasses import field
 from queue import Empty, PriorityQueue
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 import rustworkx as rx
 from pymatgen.entries import Entry
@@ -19,12 +17,14 @@ from rxn_network.pathways.basic import BasicPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
-from rxn_network.reactions.reaction_set import ReactionSet
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from rxn_network.costs.base import CostFunction
     from rxn_network.reactions.base import Reaction
+    from rxn_network.reactions.reaction_set import ReactionSet
 
 logger = get_logger(__name__)
 
@@ -112,9 +112,8 @@ class ReactionNetwork(Network):
             pathways = self._k_shortest_paths(k=k)
             paths.extend(pathways)
 
-        paths = PathwaySet.from_paths(paths)
+        return PathwaySet.from_paths(paths)
 
-        return paths
 
     def set_precursors(self, precursors: Iterable[Entry | str]):
         """
@@ -241,7 +240,8 @@ class ReactionNetwork(Network):
 
     def _k_shortest_paths(self, k: int):
         """Wrapper for finding the k shortest paths using Yen's algorithm. Returns
-        BasicPathway objects"""
+        BasicPathway objects.
+        """
         g = self._g
         if not g:
             raise ValueError("Must call build() before pathfinding!")
@@ -263,7 +263,7 @@ class ReactionNetwork(Network):
 
     @staticmethod
     def _path_from_graph(g, path, cf: CostFunction):
-        """Gets a BasicPathway object from a shortest path found in the network"""
+        """Gets a BasicPathway object from a shortest path found in the network."""
         rxns = []
         costs = []
 
@@ -323,7 +323,7 @@ def get_loopback_edges(
 ) -> list[tuple[int, int, str]]:
     """
     Given a list of nodes to check, this function finds and returns loopback
-    edges (i.e., edges that connect a product node to its equivalent reactant node)
+    edges (i.e., edges that connect a product node to its equivalent reactant node).
 
     Args:
         nodes: List of vertices from which to find loopback edges
@@ -394,14 +394,14 @@ def yens_ksp(
     """
 
     def path_cost(nodes):
-        """Calculates path cost given a list of nodes"""
+        """Calculates path cost given a list of nodes."""
         cost = 0
         for j in range(len(nodes) - 1):
             cost += get_edge_weight(g.get_edge_data(nodes[j], nodes[j + 1]), cf)
         return cost
 
     def get_edge_weight_with_cf(edge_obj):
-        """Includes user-specified cost function in function call"""
+        """Includes user-specified cost function in function call."""
         return get_edge_weight(edge_obj, cf)
 
     g = g.copy()

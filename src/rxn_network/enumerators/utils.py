@@ -1,16 +1,9 @@
-"""
-Utility functions used by the reaction enumerator classes.
-"""
+"""Utility functions used by the reaction enumerator classes."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
-from pymatgen.analysis.interface_reactions import (
-    GrandPotentialInterfacialReactivity,
-    InterfacialReactivity,
-)
-from pymatgen.analysis.phase_diagram import PhaseDiagram
-from pymatgen.core.periodic_table import Element
+from pymatgen.analysis.interface_reactions import GrandPotentialInterfacialReactivity, InterfacialReactivity
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.reactions.computed import ComputedReaction
@@ -18,7 +11,10 @@ from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
-    from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
+    from collections.abc import Iterable
+
+    from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
+    from pymatgen.core.periodic_table import Element
     from pymatgen.entries.computed_entries import Entry
 
     from rxn_network.core import Composition
@@ -199,10 +195,7 @@ def run_enumerators(enumerators: Iterable[Enumerator], entries: GibbsEntrySet):
 
         logger.info(f"Adding {len(rxns)} reactions to reaction set")
 
-        if rxn_set is None:
-            rxn_set = rxns
-        else:
-            rxn_set = rxn_set.add_rxn_set(rxns)
+        rxn_set = rxns if rxn_set is None else rxn_set.add_rxn_set(rxns)
 
     logger.info("Completed reaction enumeration. Filtering duplicates...")
     if rxn_set is not None:

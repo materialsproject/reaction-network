@@ -135,8 +135,7 @@ class GibbsComputedEntry(ComputedEntry):
         new_entry_dict = self.as_dict()
         new_entry_dict["temperature"] = new_temperature
 
-        new_entry = self.from_dict(new_entry_dict)
-        return new_entry
+        return self.from_dict(new_entry_dict)
 
     def gibbs_adjustment(self, temperature: float) -> float:
         """
@@ -149,6 +148,7 @@ class GibbsComputedEntry(ComputedEntry):
 
         Args:
             temperature: The absolute temperature [K].
+
         Returns:
             The correction to Gibbs free energy of formation (eV) from DFT energy.
         """
@@ -194,7 +194,6 @@ class GibbsComputedEntry(ComputedEntry):
         Returns:
             float: G^delta
         """
-
         return (
             (
                 -2.48e-4 * np.log(volume_per_atom)
@@ -217,7 +216,7 @@ class GibbsComputedEntry(ComputedEntry):
             sum_g_i = 0
             for elem, amt in elems.items():
                 g_interp = interp1d(
-                    [float(t) for t in G_ELEMS.keys()],
+                    [float(t) for t in G_ELEMS],
                     [g_dict[elem] for g_dict in G_ELEMS.values()],
                 )
                 sum_g_i += amt * g_interp(temperature)
@@ -251,9 +250,8 @@ class GibbsComputedEntry(ComputedEntry):
 
             mass_sum += (alpha_i + alpha_j) * (m_i * m_j) / (m_i + m_j)
 
-        reduced_mass = (1 / denominator) * mass_sum
+        return (1 / denominator) * mass_sum
 
-        return reduced_mass
 
     @classmethod
     def from_structure(
@@ -280,14 +278,13 @@ class GibbsComputedEntry(ComputedEntry):
         """
         composition = Composition(structure.composition).element_composition
         volume_per_atom = structure.volume / structure.num_sites
-        entry = cls(
+        return cls(
             composition=composition,
             formation_energy_per_atom=formation_energy_per_atom,
             volume_per_atom=volume_per_atom,
             temperature=temperature,
             **kwargs,
         )
-        return entry
 
     @property
     def is_experimental(self) -> bool:
@@ -322,9 +319,9 @@ class GibbsComputedEntry(ComputedEntry):
 
     @classmethod
     def from_dict(cls, d: dict) -> GibbsComputedEntry:
-        """ "Returns a GibbsComputedEntry object from MSONable dictionary"""
+        """ "Returns a GibbsComputedEntry object from MSONable dictionary."""
         dec = MontyDecoder()
-        entry = cls(
+        return cls(
             composition=d["composition"],
             formation_energy_per_atom=d["formation_energy_per_atom"],
             volume_per_atom=d["volume_per_atom"],
@@ -334,7 +331,6 @@ class GibbsComputedEntry(ComputedEntry):
             data=d["data"],
             entry_id=d["entry_id"],
         )
-        return entry
 
     def __repr__(self):
         output = [
@@ -347,7 +343,7 @@ class GibbsComputedEntry(ComputedEntry):
         return "\n".join(output)
 
     def __eq__(self, other):
-        if not type(other) is type(self):
+        if type(other) is not type(self):
             return False
 
         if not np.isclose(self.temperature, other.temperature):

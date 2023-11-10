@@ -1,12 +1,10 @@
-"""
-This module contains functions for plotting experimental reaction pathway data.
-"""
+"""This module contains functions for plotting experimental reaction pathway data."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
-import pandas
+import pandas as pd
 from monty.json import MSONable
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from scipy.ndimage import median_filter
@@ -49,9 +47,7 @@ class PathwayPlotter(MSONable):
         self._num_atoms_df = self._get_num_atoms_df()
 
     def plot_pathway(self):
-        """
-        Returns a plot of the pathway by calling DataFrame.plot().
-        """
+        """Returns a plot of the pathway by calling DataFrame.plot()."""
         return self.df.plot(alpha=0.7)
 
     def plot_energy_cascade(self, entries: list[ComputedEntry] | GibbsEntrySet):
@@ -63,7 +59,7 @@ class PathwayPlotter(MSONable):
 
         """
         energies = self._get_energies(entries)
-        energies_df = pandas.DataFrame(energies).T
+        energies_df = pd.DataFrame(energies).T
         ground_state_energies = energies_df.pop("ground_state")
 
         gibbs_arr = (
@@ -72,7 +68,7 @@ class PathwayPlotter(MSONable):
             / self.num_atoms_df.sum(axis=1).values.reshape(-1, 1)
         )
 
-        g_df = pandas.DataFrame(gibbs_arr, columns=self.df.columns, index=self.df.index)
+        g_df = pd.DataFrame(gibbs_arr, columns=self.df.columns, index=self.df.index)
 
         total_g = g_df.sum(axis=1)
         total_g = total_g - ground_state_energies
@@ -84,9 +80,7 @@ class PathwayPlotter(MSONable):
         return plot
 
     def _get_energies(self, entries):
-        """
-        Interal method: returns a list of energies for each phase
-        """
+        """Interal method: returns a list of energies for each phase."""
         all_energies = {}
         formulas = self.df.columns.to_list()
 
@@ -114,72 +108,57 @@ class PathwayPlotter(MSONable):
         return all_energies
 
     def _get_phase_df(self):
-        """
-        Returns a dataframe of phase amounts
-        """
-        phase_df = pandas.DataFrame(self._phase_amounts, index=self._temps)
+        """Returns a dataframe of phase amounts."""
+        phase_df = pd.DataFrame(self._phase_amounts, index=self._temps)
         if self._apply_smoothing:
             phase_df = phase_df.apply(median_filter, axis=0, size=3)
 
         return phase_df
 
     def _get_num_atoms_df(self):
-        """
-        Returns a dataframe of the number of atoms in each phase
-        """
+        """Returns a dataframe of the number of atoms in each phase."""
         el_dict = {str(e): [] for e in self.elems}
 
         for idx, f in enumerate(self.df.columns):
             comp = Composition(f)
             col = self.df.iloc[:, idx]
 
-            for el in el_dict.keys():
+            for el in el_dict:
                 el_dict[el].append(col * comp.get_el_amt_dict().get(el, 0))
 
         for el in el_dict:
             el_dict[el] = sum(el_dict[el])
 
-        el_df = pandas.DataFrame(el_dict)
+        return pd.DataFrame(el_dict)
 
-        return el_df
 
     @property
     def elems(self) -> list[Element]:
-        """
-        Returns a list of elements in the pathway
-        """
+        """Returns a list of elements in the pathway."""
         return list({e for f in self.formulas for e in Composition(f).elements})
 
     @property
-    def num_atoms_df(self) -> pandas.DataFrame:
-        """
-        Returns a dataframe of the number of atoms in each phase
-        """
+    def num_atoms_df(self) -> pd.DataFrame:
+        """Returns a dataframe of the number of atoms in each phase."""
         return self._num_atoms_df
 
     @property
     def formulas(self) -> list[str]:
-        """
-        Returns a list of formulas in the pathway
-        """
+        """Returns a list of formulas in the pathway."""
         return self._formulas
 
     @property
-    def df(self) -> pandas.DataFrame:
-        """
-        Returns a dataframe of the pathway
-        """
+    def df(self) -> pd.DataFrame:
+        """Returns a dataframe of the pathway."""
         return self._df
 
     @property
-    def compositions(self) -> pandas.Series:
-        """
-        Returns the composition of the pathway
-        """
+    def compositions(self) -> pd.Series:
+        """Returns the composition of the pathway."""
         comps = [
             Composition(i).fractional_composition
             for i in self.num_atoms_df.to_dict(  # pylint: disable=not-an-iterable
                 "records"
             )
         ]
-        return pandas.Series(comps, index=self.num_atoms_df.index)
+        return pd.Series(comps, index=self.num_atoms_df.index)

@@ -7,7 +7,6 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
 
-import numpy as np
 from monty.json import MSONable
 
 from rxn_network.pathways.balanced import BalancedPathway
@@ -15,6 +14,8 @@ from rxn_network.pathways.basic import BasicPathway
 from rxn_network.reactions.reaction_set import ReactionSet
 
 if TYPE_CHECKING:
+    import numpy as np
+
     from rxn_network.pathways.base import Pathway
 
 
@@ -60,9 +61,7 @@ class PathwaySet(MSONable):
     def _get_paths(
         self,
     ) -> list[Pathway]:
-        """
-        Returns list of Pathway objects represented by the PathwaySet.
-        """
+        """Returns list of Pathway objects represented by the PathwaySet."""
         paths = []
 
         rxns = list(self.reaction_set.get_rxns())
@@ -117,19 +116,13 @@ class PathwaySet(MSONable):
     def _get_reaction_set(
         paths: list[Pathway],
     ) -> ReactionSet:
-        """
-        Returns a reaction set built from a list of paths.
-        """
+        """Returns a reaction set built from a list of paths."""
         return ReactionSet.from_rxns([rxn for path in paths for rxn in path.reactions])
 
     def __iter__(self):
-        """
-        Iterates over the PathwaySet.
-        """
+        """Iterates over the PathwaySet."""
         return iter(self.paths)
 
     def __len__(self) -> int:
-        """
-        Returns the number of pathways in the PathwaySet.
-        """
+        """Returns the number of pathways in the PathwaySet."""
         return len(self.indices)

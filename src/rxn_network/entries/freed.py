@@ -43,7 +43,7 @@ class FREEDReferenceEntry(ExperimentalReferenceEntry):
                 one of [300, 400, 500, ... 2000 K], then free energies will be
                 interpolated. Defaults to 300 K.
             energy_adjustments: A list of EnergyAdjustments to apply to the entry.
-            data: Optional dictionary containing entry data
+            data: Optional dictionary containing entry data.
         """
         super().__init__(
             composition=composition,

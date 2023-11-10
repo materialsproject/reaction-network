@@ -1,10 +1,8 @@
-"""
-Basic interface for a reaction network and its graph.
-"""
+"""Basic interface for a reaction network and its graph."""
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 from monty.json import MontyDecoder, MSONable
 from rustworkx import PyDiGraph
@@ -12,6 +10,8 @@ from rustworkx import PyDiGraph
 from rxn_network.entries.entry_set import GibbsEntrySet
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from pymatgen.entries import Entry
 
     from rxn_network.costs.base import CostFunction
@@ -20,9 +20,7 @@ if TYPE_CHECKING:
 
 
 class Network(MSONable, metaclass=ABCMeta):
-    """
-    Base definition for a reaction network.
-    """
+    """Base definition for a reaction network."""
 
     def __init__(
         self,
@@ -41,23 +39,24 @@ class Network(MSONable, metaclass=ABCMeta):
 
     @abstractmethod
     def build(self) -> None:
-        """Construct the network in-place from the supplied enumerators"""
+        """Construct the network in-place from the supplied enumerators."""
 
     @abstractmethod
     def find_pathways(self, target, k) -> list[Pathway]:
-        """Find reaction pathways"""
+        """Find reaction pathways."""
 
     @abstractmethod
     def set_precursors(self, precursors: Iterable[Entry | str]) -> None:
-        """Set the phases used as precursors in the network (in-place)"""
+        """Set the phases used as precursors in the network (in-place)."""
 
     @abstractmethod
     def set_target(self, target: Entry | str) -> None:
-        """Set the phase used as a target in the network (in-place)"""
+        """Set the phase used as a target in the network (in-place)."""
 
     def as_dict(self) -> dict:
         """Returns MSONable dict for serialization. See monty package for more
-        information."""
+        information.
+        """
         d = super().as_dict()
         d["precursors"] = list(self.precursors) if self.precursors else None
         d["target"] = self.target
@@ -67,7 +66,8 @@ class Network(MSONable, metaclass=ABCMeta):
     @classmethod
     def from_dict(cls, d: dict) -> Network:
         """Instantiate object from MSONable dict. See monty package for more
-        information."""
+        information.
+        """
         precursors = d.pop("precursors", None)
         target = d.pop("target", None)
         graph = d.pop("graph", None)
@@ -83,29 +83,29 @@ class Network(MSONable, metaclass=ABCMeta):
 
     @property
     def precursors(self) -> set[Entry] | None:
-        """The phases used as precursors in the network"""
+        """The phases used as precursors in the network."""
         return self._precursors
 
     @property
     def target(self) -> Entry | None:
-        """The phase used as a target in the network"""
+        """The phase used as a target in the network."""
         return self._target
 
     @property
     def graph(self):
-        """Returns the network's Graph object"""
+        """Returns the network's Graph object."""
         return self._g
 
     @property
     def chemsys(self) -> str:
-        """A string representing the chemical system (elements) of the network"""
+        """A string representing the chemical system (elements) of the network."""
         return "-".join(sorted(self.entries.chemsys))
 
     def __repr__(self) -> str:
         return (
             "Reaction network for chemical system: "
             f"{self.chemsys}, "
-            f"with graph: {str(self.graph)}"
+            f"with graph: {self.graph!s}"
         )
 
     def __str__(self) -> str:

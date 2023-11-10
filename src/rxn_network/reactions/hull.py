@@ -19,7 +19,7 @@ class InterfaceReactionHull(MSONable):
     A class for storing and analyzing a set of reactions at an interface between two
     reactants. This class is more generalized than the InterfacialReactivity class and
     can encompass any set of reactions between two reactants, regardless of whether
-    the reaction products are "stable" (i.e. together on the convex hull)
+    the reaction products are "stable" (i.e. together on the convex hull).
     """
 
     def __init__(
@@ -77,13 +77,11 @@ class InterfaceReactionHull(MSONable):
         self.endpoint_reactions = endpoint_reactions
 
     def plot(self, y_max: float = 0.2) -> Figure:
-        """
-        Plot the reaction hull.
-        """
+        """Plot the reaction hull."""
         pts = self._get_scatter()
         lines = self._get_lines()
 
-        fig = Figure(data=lines + [pts])
+        fig = Figure(data=[*lines, pts])
 
         fig.update_traces(
             hovertemplate=(
@@ -98,18 +96,16 @@ class InterfaceReactionHull(MSONable):
         return fig
 
     def get_energy_above_hull(self, reaction: ComputedReaction) -> float:
-        """
-        Get the energy of a reaction above the reaction hull.
-        """
+        """Get the energy of a reaction above the reaction hull."""
         idx = self.reactions.index(reaction)
         x, y = self.coords[idx]
-        e_above_hull = y - self.get_hull_energy(x)
+        return y - self.get_hull_energy(x)
 
-        return e_above_hull
 
     def get_coordinate(self, reaction: ComputedReaction) -> float:
         """Get coordinate of reaction in reaction hull. This is expressed as the atomic
-        mixing ratio of component 2 in the reaction."""
+        mixing ratio of component 2 in the reaction.
+        """
         amt_c1 = reaction.reactant_atomic_fractions.get(self.c1, 0)
         amt_c2 = reaction.reactant_atomic_fractions.get(self.c2, 0)
         total = amt_c1 + amt_c2  # will add to 1.0 with two-component reactions
@@ -287,7 +283,7 @@ class InterfaceReactionHull(MSONable):
     def get_secondary_competition_area(self, reaction: ComputedReaction) -> float:
         """
         Calculates the score for a given reaction. This formula is based on a
-        methodology presented in the following paper: (TBD)
+        methodology presented in the following paper: (TBD).
 
         Args:
             reaction: Reaction to calculate the competition score for.
@@ -431,12 +427,8 @@ class InterfaceReactionHull(MSONable):
             24466267020,
             91482563640,
         ]
-        if num <= 22:
-            count = counts[num]
-        else:
-            count = self._count_recursive(num)[0]
+        return counts[num] if num <= 22 else self._count_recursive(num)[0]
 
-        return count
 
     @lru_cache(maxsize=128)
     def get_decomposition_energy_and_num_paths_recursive(
@@ -569,7 +561,7 @@ class InterfaceReactionHull(MSONable):
                 biggest_cache = c2
 
             total += left_divs * right_divs
-        return total, biggest_cache + [total]
+        return total, [*biggest_cache, total]
 
     def _get_scatter(self):
         marker_size = 10

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Collection, Iterable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import ray
@@ -22,6 +22,8 @@ from rxn_network.utils.funcs import get_logger, grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
 
 if TYPE_CHECKING:
+    from collections.abc import Collection, Iterable
+
     from pymatgen.entries.computed_entries import ComputedEntry
 
     from rxn_network.costs.base import CostFunction
@@ -57,7 +59,7 @@ class ReactionSet(MSONable):
             coeffs: Array of all reaction coefficients
             open_elem: Open element, e.g., "O"
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
-            all_data: Optional list of data for each reaction
+            all_data: Optional list of data for each reaction.
         """
         self.entries = entries
         self.indices = indices
@@ -69,21 +71,21 @@ class ReactionSet(MSONable):
         else:
             self.all_data = all_data
 
-        if not all(isinstance(k, int) for k in self.indices.keys()) or not all(
+        if not all(isinstance(k, int) for k in self.indices) or not all(
             isinstance(v, np.ndarray) for v in self.indices.values()
         ):
             self.indices = {
                 int(size): np.array(arr) for size, arr in self.indices.items()
             }
 
-        if not all(isinstance(k, int) for k in self.coeffs.keys()) or not all(
+        if not all(isinstance(k, int) for k in self.coeffs) or not all(
             isinstance(v, np.ndarray) for v in self.coeffs.values()
         ):
             self.coeffs = {
                 int(size): np.array(arr) for size, arr in self.coeffs.items()
             }
 
-        if not all(isinstance(k, int) for k in self.all_data.keys()) or not all(
+        if not all(isinstance(k, int) for k in self.all_data) or not all(
             isinstance(v, np.ndarray) for v in self.all_data.values()
         ):
             self.all_data = {
@@ -128,11 +130,10 @@ class ReactionSet(MSONable):
             open_elem: Open element, e.g. "O2"
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
         """
-
         if not entries:
             entries = cls._get_unique_entries(rxns)
 
-        entries = sorted(list(set(entries)), key=lambda r: r.composition)
+        entries = sorted(set(entries), key=lambda r: r.composition)
 
         # need to index by unique ID in case mixing different temperatures
         all_entry_indices = {}
@@ -260,7 +261,7 @@ class ReactionSet(MSONable):
 
         data["max_num_precursor_elems"] = []
 
-        data.update({k: [] for k in attrs + ["cost"]})
+        data.update({k: [] for k in [*attrs, "cost"]})
 
         for rxn in self.get_rxns():
             data["rxn"].append(rxn)
@@ -302,8 +303,7 @@ class ReactionSet(MSONable):
 
             data["cost"].append(cost_function.evaluate(rxn))
 
-        df = DataFrame(data).sort_values("cost").reset_index(drop=True)
-        return df
+        return DataFrame(data).sort_values("cost").reset_index(drop=True)
 
     def calculate_costs(
         self,
@@ -373,9 +373,7 @@ class ReactionSet(MSONable):
     def get_rxns_by_reactants(
         self, reactants: list[str], return_set: bool = False
     ) -> Iterable[ComputedReaction | OpenComputedReaction]:
-        """
-        Return a list of reactions with the given reactants.
-        """
+        """Return a list of reactions with the given reactants."""
         reactants = [Composition(r).reduced_formula for r in reactants]
 
         reactant_indices = list(
@@ -609,10 +607,7 @@ class ReactionSet(MSONable):
     def _get_rxns_by_indices(
         self, idxs
     ) -> Iterable[ComputedReaction | OpenComputedReaction]:
-        """
-        Return a list of reactions with the given indices.
-        """
-
+        """Return a list of reactions with the given indices."""
         for size, idx_arr in idxs.items():
             if not idx_arr:
                 idx_arr = slice(0, 0)
@@ -679,9 +674,8 @@ class ReactionSet(MSONable):
         added_elems = set(getattr(rxn, chemsys_prop).split("-")) - set(
             target.chemical_system.split("-")
         )
-        added_elems_str = "-".join(sorted(list(added_elems)))
+        return "-".join(sorted(added_elems))
 
-        return added_elems_str
 
     @staticmethod
     def _get_entry_key(entry: ComputedEntry) -> str:
@@ -697,24 +691,18 @@ class ReactionSet(MSONable):
 
     @staticmethod
     def _get_unique_entries(rxns: Collection[ComputedReaction]) -> set[ComputedEntry]:
-        """
-        Return only unique entries from reactions
-        """
+        """Return only unique entries from reactions."""
         entries = set()
         for r in rxns:
             entries.update(r.entries)
         return entries
 
     def __iter__(self):
-        """
-        Iterate over the reactions in the set.
-        """
+        """Iterate over the reactions in the set."""
         return iter(self.get_rxns())
 
     def __len__(self):
-        """
-        Return length of reactions stored in the set.
-        """
+        """Return length of reactions stored in the set."""
         return sum(len(i) for i in self.indices.values())
 
 

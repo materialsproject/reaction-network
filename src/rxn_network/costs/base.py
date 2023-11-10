@@ -1,6 +1,4 @@
-"""
-Basic interface and implementation for a Calculator and CostFunction.
-"""
+"""Basic interface and implementation for a Calculator and CostFunction."""
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
@@ -14,15 +12,11 @@ if TYPE_CHECKING:
 
 
 class Calculator(MSONable, metaclass=ABCMeta):
-    """
-    Base definition for a reaction property calculator.
-    """
+    """Base definition for a reaction property calculator."""
 
     @abstractmethod
     def calculate(self, rxn: Reaction) -> float:
-        """
-        Evaluates a particular property of a reaction relevant to its cost ranking.
-        """
+        """Evaluates a particular property of a reaction relevant to its cost ranking."""
 
     def calculate_many(self, rxns: list[Reaction]) -> list[float]:
         """
@@ -53,7 +47,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
         """
         new_rxn = deepcopy(rxn)
 
-        if not getattr(new_rxn, "data"):
+        if not new_rxn.data:
             new_rxn.data = {}
 
         new_rxn.data[self.name] = self.calculate(new_rxn)
@@ -77,12 +71,8 @@ class Calculator(MSONable, metaclass=ABCMeta):
 
 
 class CostFunction(MSONable, metaclass=ABCMeta):
-    """
-    Base definition for a cost function.
-    """
+    """Base definition for a cost function."""
 
     @abstractmethod
     def evaluate(self, rxn: Reaction) -> float:
-        """
-        Evaluates the specified cost function equation on a reaction object.
-        """
+        """Evaluates the specified cost function equation on a reaction object."""

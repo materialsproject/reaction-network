@@ -106,16 +106,14 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
         reactants, products, filtered_entries=None, pd=None, grand_pd=None, **kwargs
     ):
         """React method for MinimizeGibbsEnumerator, which uses the interfacial reaction
-        approach (see _react_interface())"""
+        approach (see _react_interface()).
+        """
         _ = products, kwargs  # unused
 
         r = list(reactants)
         r0 = r[0]
 
-        if len(r) == 1:
-            r1 = r[0]
-        else:
-            r1 = r[1]
+        r1 = r[0] if len(r) == 1 else r[1]
 
         return react_interface(
             r0.composition,
@@ -127,7 +125,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
 
     @staticmethod
     def _get_rxn_iterable(combos, open_combos):
-        """Gets the iterable used to generate reactions"""
+        """Gets the iterable used to generate reactions."""
         _ = open_combos  # unused
 
         return product(combos, [None])
@@ -214,7 +212,6 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
                 reaction balancing. Defaults to 1 (which is usually advisable).
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
-
         super().__init__(
             precursors=precursors,
             targets=targets,
@@ -240,19 +237,16 @@ class MinimizeGrandPotentialEnumerator(MinimizeGibbsEnumerator):
         reactants, products, filtered_entries=None, pd=None, grand_pd=None, **kwargs
     ):
         """Same as the MinimizeGibbsEnumerator react function, but with ability to
-        specify open element and grand potential phase diagram"""
-
+        specify open element and grand potential phase diagram.
+        """
         _ = products, kwargs  # unused
 
         r = list(reactants)
         r0 = r[0]
 
-        if len(r) == 1:
-            r1 = r[0]
-        else:
-            r1 = r[1]
+        r1 = r[0] if len(r) == 1 else r[1]
 
-        open_elem = list(grand_pd.chempots.keys())[0]
+        open_elem = next(iter(grand_pd.chempots.keys()))
 
         for reactant in r:
             elems = reactant.composition.elements

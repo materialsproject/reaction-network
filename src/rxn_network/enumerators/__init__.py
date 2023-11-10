@@ -1,3 +1,1 @@
-"""
-Reaction enumerator classes and associated utilities.
-"""
+"""Reaction enumerator classes and associated utilities."""

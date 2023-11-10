@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 import numpy as np
 import ray
@@ -37,6 +37,8 @@ from rxn_network.utils.funcs import get_logger, grouper
 from rxn_network.utils.ray import initialize_ray, to_iterator
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from rxn_network.costs.base import CostFunction
     from rxn_network.entries.entry_set import GibbsEntrySet
     from rxn_network.enumerators.base import Enumerator
@@ -263,15 +265,14 @@ class ReactionEnumerationMaker(Maker):
         if targets:
             added_elements, added_chemsys = get_added_elem_data(entries, targets)
 
-        metadata = {
+        return {
             "elements": [Element(e) for e in chemsys.split("-")],
             "chemsys": chemsys,
             "enumerators": [e.as_dict() for e in enumerators],
-            "targets": list(sorted(targets)),
+            "targets": sorted(targets),
             "added_elements": added_elements,
             "added_chemsys": added_chemsys,
         }
-        return metadata
 
 
 @dataclass
@@ -731,7 +732,8 @@ class PathwaySolverMaker(Maker):
 
 def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list):
     """Calculates the primary and secondary competition for a reaction and stores them
-    within the data dict."""
+    within the data dict.
+    """
     if len(precursors_list) == 1:
         energy = rxn.energy_per_atom
         other_energies = np.array(
@@ -769,9 +771,7 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list):
 
 @ray.remote
 def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula):
-    """
-    Performs competition score calculations within a chunk of reactions.
-    """
+    """Performs competition score calculations within a chunk of reactions."""
     decorated_rxns = []
     all_rxns = ReactionSet.from_dict(
         all_rxns
@@ -825,7 +825,7 @@ def _get_chempot_decorated_rxns_by_chunk(
         else:
             if open_elem:
                 filtered_entries = entries.get_subset_in_chemsys(
-                    elems + [str(open_elem)]
+                    [*elems, str(open_elem)]
                 )
                 filtered_entries = [
                     e.to_grand_entry({Element(open_elem): chempot})
@@ -843,5 +843,4 @@ def _get_chempot_decorated_rxns_by_chunk(
         new_rxn = cpd_calc.decorate(rxn)
         new_rxns.append(new_rxn)
 
-    results = ReactionSet.from_rxns(new_rxns, entries=entries)
-    return results
+    return ReactionSet.from_rxns(new_rxns, entries=entries)

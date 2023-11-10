@@ -1,14 +1,14 @@
-"""
-Utility functions used in the thermodynamic analysis classes.
-"""
+"""Utility functions used in the thermodynamic analysis classes."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from tqdm import tqdm
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from pymatgen.entries import Entry
 
 
@@ -27,7 +27,6 @@ def expand_pd(entries: Iterable[Entry], pbar: bool = False) -> dict[str, PhaseDi
         Dictionary of PhaseDiagram objects indexed by chemical subsystem string;
         e.g. {"Li-Mn-O": <PhaseDiagram object>, "C-Y": <PhaseDiagram object>, ...}
     """
-
     pd_dict: dict[str, PhaseDiagram] = {}
 
     sorted_entries = sorted(

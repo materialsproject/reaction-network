@@ -32,17 +32,17 @@ class BasicPathway(Pathway):
 
     @property
     def reactions(self) -> list[Reaction]:
-        """A list of reactions contained in the reaction pathway"""
+        """A list of reactions contained in the reaction pathway."""
         return self._reactions
 
     @property
     def total_cost(self) -> float:
-        """The sum of all costs associated with reactions in the pathway"""
+        """The sum of all costs associated with reactions in the pathway."""
         return sum(self.costs)
 
     @property
     def is_experimental(self) -> bool:
-        """Whether or not all reactions in the pathway are experimental"""
+        """Whether or not all reactions in the pathway are experimental."""
         return all(e.is_experimental for e in self.entries)
 
     def __repr__(self) -> str:

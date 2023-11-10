@@ -1,6 +1,4 @@
-"""
-Implementation of cost functions used in the package (e.g., Softplus, WeightedSum).
-"""
+"""Implementation of cost functions used in the package (e.g., Softplus, WeightedSum)."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -76,7 +74,7 @@ class Softplus(CostFunction):
 
     @staticmethod
     def _softplus(x: float, t: float) -> float:
-        """The mathematical formula for the softplus function"""
+        """The mathematical formula for the softplus function."""
         return np.log(1 + (273 / t) * np.exp(x))
 
     def __repr__(self):
@@ -133,9 +131,8 @@ class WeightedSum(CostFunction):
             values.append(value)
 
         values_arr = np.array(values)
-        total = float(np.dot(values_arr, self.weights))
+        return float(np.dot(values_arr, self.weights))
 
-        return total
 
     def __repr__(self):
         return (

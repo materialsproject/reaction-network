@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from itertools import chain, combinations, product
-from typing import TYPE_CHECKING, Callable, Iterable
+from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
@@ -10,6 +10,8 @@ from rxn_network.costs.base import Calculator
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from pymatgen.analysis.phase_diagram import PDEntry
 
     from rxn_network.reactions.computed import ComputedReaction
@@ -107,8 +109,7 @@ class ChempotDistanceCalculator(Calculator):
             for combo in combos
         ]
 
-        distance = round(float(self.mu_func(distances)), 5)
-        return distance
+        return round(float(self.mu_func(distances)), 5)
 
     @classmethod
     def from_entries(
@@ -133,7 +134,6 @@ class ChempotDistanceCalculator(Calculator):
         Returns:
             A ChempotDistanceCalculator object
         """
-
         cpd = ChemicalPotentialDiagram(entries=entries, **kwargs)
         return cls(cpd, mu_func, name)
 

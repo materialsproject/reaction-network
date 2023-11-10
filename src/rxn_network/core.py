@@ -1,4 +1,6 @@
 """Composition class used to represent a chemical composition."""
+from __future__ import annotations
+
 from functools import cached_property
 
 from pymatgen.core.composition import Composition as PymatgenComposition

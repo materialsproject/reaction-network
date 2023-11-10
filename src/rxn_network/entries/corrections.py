@@ -1,6 +1,5 @@
-"""
-Energy correction classes for entry objects.
-"""
+"""Energy correction classes for entry objects."""
+from __future__ import annotations
 
 from pymatgen.entries.computed_entries import CompositionEnergyAdjustment
 
@@ -22,7 +21,7 @@ class CarbonateCorrection(CompositionEnergyAdjustment):
         self, num_ions: int, carbonate_correction: float = CARBONATE_CORRECTION
     ):
         """
-        Initalizes a carbonate correction object
+        Initalizes a carbonate correction object.
 
         Args:
             num_ions: Number of carbonate ions in the composition object
@@ -42,14 +41,10 @@ class CarbonateCorrection(CompositionEnergyAdjustment):
 
     @property
     def num_ions(self) -> int:
-        """
-        Number of carbonate ions ion the composition object
-        """
+        """Number of carbonate ions ion the composition object."""
         return self._num_ions
 
     @property
     def carbonate_correction(self) -> float:
-        """
-        Energy correction for carbonate ion, eV per (CO3)2- anion
-        """
+        """Energy correction for carbonate ion, eV per (CO3)2- anion."""
         return self._carbonate_correction

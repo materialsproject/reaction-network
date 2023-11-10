@@ -1,11 +1,15 @@
 """Utility functions used throughout the reaction-network package."""
+from __future__ import annotations
 
 import logging
 import sys
 from datetime import datetime
 from itertools import chain, combinations, zip_longest
 from pathlib import Path
-from typing import Any, Iterable
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def limited_powerset(iterable: Iterable, max_size: int) -> Iterable:
@@ -63,7 +67,6 @@ def get_logger(
 
     Helper method for acquiring logger.
     """
-
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
@@ -81,7 +84,5 @@ def get_logger(
 
 
 def datetime_str() -> str:
-    """
-    Get a string representation of the current time. Borrowed from atomate2 package.
-    """
+    """Get a string representation of the current time. Borrowed from atomate2 package."""
     return str(datetime.utcnow())

@@ -1,3 +1,1 @@
-"""
-Entry and entry set classes.
-"""
+"""Entry and entry set classes."""

@@ -1,6 +1,4 @@
-"""
-Utility functions for plotting reaction data & performing analysis.
-"""
+"""Utility functions for plotting reaction data & performing analysis."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -171,7 +169,7 @@ def plot_reaction_scatter(
 
 
 def pretty_df_layout(df: DataFrame):
-    """Improve visibility for a pandas DataFrame with wide column names"""
+    """Improve visibility for a pandas DataFrame with wide column names."""
     return df.style.set_table_styles(
         [
             {
@@ -187,10 +185,10 @@ def pretty_df_layout(df: DataFrame):
 
 
 def filter_df_by_precursors(df: DataFrame, precursors: list[str]):
-    """Filter a reaction DataFrame by available precursors"""
+    """Filter a reaction DataFrame by available precursors."""
     df = df.copy()
     df["precursors"] = [
-        list(sorted([r.reduced_formula for r in rxn.reactants])) for rxn in df["rxn"]
+        sorted([r.reduced_formula for r in rxn.reactants]) for rxn in df["rxn"]
     ]
     selected = df[df["precursors"].apply(lambda x: all(p in precursors for p in x))]
     return selected.drop(columns=["precursors"])

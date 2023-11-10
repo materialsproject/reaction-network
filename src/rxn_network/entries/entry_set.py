@@ -8,7 +8,7 @@ import collections
 import inspect
 from copy import deepcopy
 from functools import cached_property
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 import numpy as np
 from monty.json import MontyDecoder, MSONable
@@ -37,11 +37,9 @@ logger = get_logger(__name__)
 IGNORE_NIST_SOLIDS = loadfn(PATH_TO_NIST / "ignore_solids.json")
 
 if TYPE_CHECKING:
-    from pymatgen.entries.computed_entries import (
-        ComputedEntry,
-        ComputedStructureEntry,
-        EnergyAdjustment,
-    )
+    from collections.abc import Iterable
+
+    from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry, EnergyAdjustment
 
 
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):
@@ -160,7 +158,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         subset = set()
         for e in self.entries:
-            elements = [sp.symbol for sp in e.composition.keys()]
+            elements = [sp.symbol for sp in e.composition]
             if chem_sys.issuperset(elements):
                 subset.add(e)
 
@@ -188,7 +186,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         filtered_entries: set[GibbsComputedEntry | NISTReferenceEntry] = set()
         all_comps: dict[str, GibbsComputedEntry | NISTReferenceEntry] = {}
 
-        for _, pd in pd_dict.items():
+        for pd in pd_dict.values():
             for entry in pd.all_entries:
                 if (
                     entry in filtered_entries
@@ -379,14 +377,12 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         Returns:
             The energy above hull for the entry.
         """
-        e_above_hull = None
         for chemsys, pd in self.pd_dict.items():
             elems_pd = set(chemsys.split("-"))
             elems_entry = set(entry.composition.chemical_system.split("-"))
 
             if elems_entry.issubset(elems_pd):
-                e_above_hull = pd.get_e_above_hull(entry)
-                return e_above_hull
+                return pd.get_e_above_hull(entry)
 
         raise ValueError("Entry not in any of the phase diagrams in pd_dict!")
 
@@ -584,7 +580,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     @cached_property
     def entries_list(self) -> list[ComputedEntry]:
         """Returns a list of all entries in the entry set."""
-        return list(sorted(self.entries, key=lambda e: e.composition))
+        return sorted(self.entries, key=lambda e: e.composition)
 
     @cached_property
     def min_entries_by_formula(self) -> dict[str, ComputedEntry]:
@@ -626,11 +622,11 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         Returns:
             Set of symbols representing the chemical system, e.g., {"Li", "Fe", "P",
-            "O"}
+            "O"}.
         """
         chemsys = set()
         for e in self.entries:
-            chemsys.update([el.symbol for el in e.composition.keys()])
+            chemsys.update([el.symbol for el in e.composition])
         return chemsys
 
     @staticmethod
@@ -646,9 +642,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             energy_adjustments = entry_dict["energy_adjustments"]
 
         energy_adjustments.append(adjustment.as_dict())
-        new_entry = MontyDecoder().process_decoded(entry_dict)
+        return MontyDecoder().process_decoded(entry_dict)
 
-        return new_entry
 
     @staticmethod
     def _check_for_experimental(
@@ -713,7 +708,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     def _clear_cache(self) -> None:
         """
         Clears all cached properties. This method is called whenever the entry set is
-        modified in place (as is done with the add method, etc.)
+        modified in place (as is done with the add method, etc.).
         """
         for name, value in inspect.getmembers(GibbsEntrySet):
             if isinstance(value, cached_property):

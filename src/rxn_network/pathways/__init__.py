@@ -1,1 +1,1 @@
-""" Implementations of the Pathway class. """
+"""Implementations of the Pathway class."""

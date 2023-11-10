@@ -1,4 +1,6 @@
 """Utility functions for interfacing with a reaction database."""
+from __future__ import annotations
+
 from jobflow import SETTINGS
 from monty.json import MontyDecoder
 
@@ -8,9 +10,9 @@ from rxn_network.reactions.reaction_set import ReactionSet
 
 def get_rxns_from_db(
     target: str,
-    open_elem: str = None,
-    chempot: float = 0,
-    fw_id: int = None,
+    open_elem: str | None = None,
+    chempot: float = 0.0,
+    fw_id: int | None = None,
 ):
     """Get a reaction set from the database. This is useful for retrieving synthesis
     planning results.

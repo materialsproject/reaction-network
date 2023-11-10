@@ -8,14 +8,15 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 import numpy as np
-from pymatgen.core.composition import Element
 from uncertainties import ufloat
 
-from rxn_network.core import Composition
 from rxn_network.reactions.basic import BasicReaction
 
 if TYPE_CHECKING:
+    from pymatgen.core.composition import Element
     from pymatgen.entries.computed_entries import ComputedEntry
+
+    from rxn_network.core import Composition
 
 
 class ComputedReaction(BasicReaction):
@@ -144,7 +145,6 @@ class ComputedReaction(BasicReaction):
         Calculates the uncertainty in the reaction energy based on the uncertainty in
         the energies of the reactants/products. Cached for speedup.
         """
-
         calc_energies: dict[Composition, ufloat] = {}
 
         for entry in self._entries:
@@ -171,24 +171,17 @@ class ComputedReaction(BasicReaction):
 
     @property
     def entries(self) -> list[ComputedEntry]:
-        """
-        Returns a copy of the entries
-        """
+        """Returns a copy of the entries."""
         return self._entries
 
     def copy(self) -> ComputedReaction:
-        """
-        Returns a copy of the Reaction object
-        """
+        """Returns a copy of the Reaction object."""
         return ComputedReaction(
             self.entries, self.coefficients, self.data, self.lowest_num_errors
         )
 
     def reverse(self) -> ComputedReaction:
-        """
-        Returns a reversed reaction (i.e. sides flipped)
-
-        """
+        """Returns a reversed reaction (i.e. sides flipped)."""
         return ComputedReaction(
             self.entries, -1 * self.coefficients, self.data, self.lowest_num_errors
         )
@@ -248,7 +241,7 @@ class ComputedReaction(BasicReaction):
         return is_equal
 
     def __hash__(self):
-        """Must be redefined due to overriding __eq__"""
+        """Must be redefined due to overriding __eq__."""
         return hash(
             (self.chemical_system, tuple(sorted(self.coefficients)))
         )  # not checking here for reactions that are multiples (too expensive)
