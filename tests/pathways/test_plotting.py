@@ -1,6 +1,5 @@
 """Tests for pathway plotter"""
 import pytest
-
 from rxn_network.pathways.plotting import PathwayPlotter
 
 

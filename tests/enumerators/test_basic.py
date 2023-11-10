@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 from monty.serialization import loadfn
-
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"

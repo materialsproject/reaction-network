@@ -3,7 +3,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from rxn_network.pathways.solver import _balance_path_arrays_cpu
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"

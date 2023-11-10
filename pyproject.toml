@@ -38,8 +38,9 @@ dependencies = [
     "pymatgen>=2023.10.11",
     "numba>=0.58.1",
     "jobflow>=0.1.14",
-    "ray>=2.7.1",
+    "ray>=2.8.0",
     "rustworkx>=0.13.2",
+    "monty<=2023.9.25"  # latest version of monty not compatible with pymatgen==2023.10.11
 ]
 
 [project.optional-dependencies]
@@ -51,7 +52,6 @@ docs = [
     "nbsphinx==0.9.3",
     "sphinx-copybutton==0.5.2",
     "sphinx==7.2.6",
-
 ]
 tests = [
     "mp-api==0.37.5",
@@ -63,8 +63,9 @@ strict = [
     "pymatgen==2023.10.11",
     "numba==0.58.1",
     "jobflow==0.1.14",
-    "ray==2.7.1",
+    "ray==2.8.0",
     "rustworkx==0.13.2",
+    "monty==2023.9.25"
 ]
 
 [project.urls]

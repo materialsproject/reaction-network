@@ -102,7 +102,6 @@ class OpenComputedReaction(ComputedReaction):
 
         return ComputedReaction(**kwargs) if not chempots else cls(chempots=chempots, **kwargs)
 
-
     def get_new_temperature(self, new_temperature: float) -> OpenComputedReaction:
         """Returns a new reaction with the temperature changed.
 

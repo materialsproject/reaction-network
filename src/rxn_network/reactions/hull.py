@@ -464,11 +464,10 @@ class InterfaceReactionHull(MSONable):
         coords = all_coords[1:-1, :]
 
         if len(coords) == 0:
-            val, total = 0, 1
-            return val, total
+            return 0, 1
         if len(coords) == 1:
             val = self._calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])  # type: ignore
-            return val, total
+            return val, 1
 
         val = 0
         total = 0

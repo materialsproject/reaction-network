@@ -4,7 +4,6 @@ import pytest
 from jobflow.core.store import JobStore
 from maggma.stores import MemoryStore
 from monty.serialization import loadfn
-
 from rxn_network.core import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.entries.interpolated import InterpolatedEntry

@@ -4,7 +4,6 @@ import os
 
 import pytest
 import ray
-
 from rxn_network.utils.ray import initialize_ray
 
 LOGGER = logging.getLogger(__name__)
@@ -42,7 +41,7 @@ def test_initialize_ray_quiet(caplog):
 def test_initialize_ray_with_slurm_cluster(capsys):
     """Test initialize_ray"""
 
-    original_ip_head = os.environ.get("ip_head")
+    original_ip_head = os.environ.get("IP_HEAD")
     os.environ["IP_HEAD"] = "test_ip_head"
 
     if ray.is_initialized():
@@ -51,7 +50,7 @@ def test_initialize_ray_with_slurm_cluster(capsys):
     try:
         initialize_ray()
     except Exception as error:  # if it does fail, make sure it's the right error
-        assert "ConnectionError" in str(error.type)
+        assert "ConnectionError" in str(error.type)  # noqa
 
     if "Connected" in capsys.readouterr().err:
         pytest.skip("Skipping test_initialize_ray_with_slurm_cluster due to existing cluster")
@@ -67,7 +66,7 @@ def test_initialize_ray_with_pbs_cluster(capsys):
     try:
         initialize_ray()
     except Exception as error:  # if it does fail, make sure it's the right error
-        assert "ConnectionError" in str(error.type)
+        assert "ConnectionError" in str(error.type)  # noqa
 
     if "Connected" in capsys.readouterr().err:
         pytest.skip("Skipping test_initialize_ray_with_slurm_cluster due to existing cluster")

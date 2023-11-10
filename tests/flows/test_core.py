@@ -3,7 +3,6 @@
 import pytest
 from jobflow.managers.local import run_locally
 from pymatgen.core.periodic_table import Element
-
 from rxn_network.flows.core import NetworkFlowMaker, SynthesisPlanningFlowMaker
 
 
