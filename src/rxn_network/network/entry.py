@@ -45,22 +45,27 @@ class NetworkEntry(MSONable):
 
     @property
     def entries(self) -> set[Entry]:
+        """Entries contained in this NetworkEntry."""
         return self._entries
 
     @property
     def elements(self) -> list[Element]:
+        """Elements contained in this NetworkEntry."""
         return self._elements
 
     @property
     def chemsys(self) -> str:
+        """Chemical system of this NetworkEntry."""
         return self._chemsys
 
     @property
     def dim(self) -> int:
+        """Number of elements in this NetworkEntry."""
         return self._dim
 
     @property
     def description(self) -> NetworkEntryType:
+        """A description of the NetworkEntry (given as NetworkEntryType)."""
         return self._description
 
     def as_dict(self) -> dict:
@@ -86,9 +91,12 @@ class NetworkEntry(MSONable):
         return f"{self.description.name}: {','.join(formulas)}"
 
     def __eq__(self, other) -> bool:
-        if isinstance(other, self.__class__) and self.description == other.description:
-            if self.chemsys == other.chemsys:
-                return self.entries == other.entries
+        if (
+            isinstance(other, self.__class__)
+            and self.description == other.description
+            and self.chemsys == other.chemsys
+        ):
+            return self.entries == other.entries
         return False
 
     def __hash__(self):

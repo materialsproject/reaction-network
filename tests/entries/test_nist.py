@@ -104,7 +104,7 @@ def test_get_new_temperature(entries):
 def test_as_dict(entries):
     d = entries[300].as_dict()
 
-    assert type(d) == dict
+    assert isinstance(d, dict)
     assert d.get("composition")
     assert d.get("temperature")
 

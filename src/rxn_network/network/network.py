@@ -1,7 +1,6 @@
 """Implementation of reaction network and graph classes."""
 from __future__ import annotations
 
-from dataclasses import field
 from queue import Empty, PriorityQueue
 from typing import TYPE_CHECKING
 
@@ -45,7 +44,7 @@ class ReactionNetwork(Network):
     def __init__(
         self,
         rxns: ReactionSet,
-        cost_function: CostFunction = field(default_factory=Softplus),
+        cost_function: CostFunction | None = None,
     ):
         """Initialize a ReactionNetwork object for a reaction set and cost function.
 
@@ -57,6 +56,9 @@ class ReactionNetwork(Network):
                 edge. Defaults to a Softplus function with default settings (i.e.
                 energy_per_atom only).
         """
+        if cost_function is None:
+            cost_function = Softplus()
+
         super().__init__(rxns=rxns, cost_function=cost_function)
 
     def build(self) -> None:
@@ -327,6 +329,7 @@ def get_edge_weight(edge_obj: object, cf: CostFunction):
 
     Args:
         edge_obj: An edge in the reaction network
+        cf: Cost function for evaluating edge weights
     """
     if isinstance(edge_obj, str) and edge_obj in [
         "loopback_edge",

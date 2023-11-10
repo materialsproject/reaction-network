@@ -132,7 +132,7 @@ def test_cpd_decorate_many(cpd_calculator, rxns):
     actual_costs = [rxn.data[cpd_calculator.name] for rxn in rxns_dec]
     expected_costs = [cpd_calculator.calculate(rxn) for rxn in rxns]
 
-    assert type(rxns_dec) == list
+    assert isinstance(rxns_dec, list)
     assert actual_costs == pytest.approx(expected_costs)
     assert rxns_missing_data_dec == rxns_dec
 

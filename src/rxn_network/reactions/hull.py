@@ -467,8 +467,7 @@ class InterfaceReactionHull(MSONable):
             val, total = 0, 1
             return val, total
         if len(coords) == 1:
-            val = self._calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])
-            total = 1
+            val = self._calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])  # type: ignore
             return val, total
 
         val = 0
@@ -479,7 +478,7 @@ class InterfaceReactionHull(MSONable):
             elif c[0] == 1.0 and not np.isclose(c[1], 0.0):
                 use_x_max_ref = False
 
-            height = self._calculate_altitude([x_min, y_min], c, [x_max, y_max])
+            height = self._calculate_altitude([x_min, y_min], c, [x_max, y_max])  # type: ignore
             (
                 left_decomp,
                 left_total,
@@ -579,6 +578,7 @@ class InterfaceReactionHull(MSONable):
 
     @cached_property
     def hull_vertices(self) -> np.ndarray:
+        """Returns numpy array of indices of the vertices that are on the hull."""
         hull_vertices = [
             i
             for i in self.hull.vertices
@@ -611,9 +611,9 @@ class InterfaceReactionHull(MSONable):
         three points.
 
         Args:
-            x1: point 1
-            x2: point 2
-            x3: point 3
+            c_left: coordinates of point 1
+            c_mid: coordinates of point 2
+            c_right: coordinates point 3
 
         Returns:
             The altitude of the point

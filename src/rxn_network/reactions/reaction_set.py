@@ -116,6 +116,7 @@ class ReactionSet(MSONable):
             entries: Optional list of ComputedEntry objects
             open_elem: Open element, e.g. "O2"
             chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
+            filter_duplicates: Whether to filter duplicate reactions. Defaults to False.
         """
         if not entries:
             entries = cls._get_unique_entries(rxns)
@@ -183,7 +184,7 @@ class ReactionSet(MSONable):
 
         return rxn_set
 
-    @lru_cache(maxsize=1)
+    @lru_cache(maxsize=1)  # noqa: B019
     def to_dataframe(
         self,
         cost_function: CostFunction,
@@ -519,6 +520,8 @@ class ReactionSet(MSONable):
             ReactionSet: A new ReactionSet containing reactions with the recalculated
                 energies.
         """
+        if chempot is None:
+            chempot = 0
         return ReactionSet(self.entries, self.indices, self.coeffs, open_el, chempot, self.all_data)
 
     def set_new_temperature(self, new_temp: float) -> ReactionSet:
@@ -691,10 +694,9 @@ def _process_duplicates(
     """Process a chunk of reactions to find duplicates.
 
     Args:
-        chunk: chunk of reactions to process
+        groups: groups of reactions to process
         coeffs: corresponding coefficients
         ensure_idxs: indices of reactions to ensure are kept
-        size: size of reactions to process
 
     Returns:
         List of indices to keep

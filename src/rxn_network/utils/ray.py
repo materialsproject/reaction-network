@@ -26,7 +26,7 @@ def initialize_ray(quiet: bool = False):
         logger.setLevel("INFO")
     if not ray.is_initialized():
         logger.info("Ray is not initialized. Checking for existing cluster...")
-        if os.environ.get("ip_head") or int(os.environ.get("PBS_NNODES", 0)) > 1:
+        if os.environ.get("IP_HEAD") or int(os.environ.get("PBS_NNODES", 0)) > 1:
             ray.init(
                 address="auto",
             )

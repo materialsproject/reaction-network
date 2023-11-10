@@ -176,7 +176,7 @@ class GibbsComputedEntry(ComputedEntry):
         (2018).
 
         Args:
-            vol_per_atom: volume per atom [Å^3/atom]
+            volume_per_atom: volume per atom [Å^3/atom]
             reduced_mass: reduced mass as calculated with pair-wise sum formula [amu]
             temp: Temperature [K]
 

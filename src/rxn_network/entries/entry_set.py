@@ -89,7 +89,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return len(self.entries)
 
     def add(self, entry: GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry) -> None:
-        """Add an entry to the set in place.
+        """Add an entry to the set. This is an IN-PLACE method.
 
         Args:
             entry: An entry object.
@@ -101,18 +101,19 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         self,
         entries: Iterable[GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry],
     ) -> None:
-        """Add an iterable of entries to the set in place.
+        """Add an iterable of entries to the set. This is an IN-PLACE method.
 
         Args:
-            entry: An iterable of entry objects.
+            entries: Iterable of entry objects to add to the set.
         """
         self.entries.update(entries)
         self._clear_cache()
 
     def discard(self, entry: GibbsComputedEntry | ExperimentalReferenceEntry) -> None:
-        """Discard an entry in place.
+        """Discard an entry. This is an IN-PLACE method.
 
-        :param element: Entry
+        Args:
+            entry: An entry object.
         """
         self.entries.discard(entry)
         self._clear_cache()
@@ -574,6 +575,15 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     @staticmethod
     def get_adjusted_entry(entry: GibbsComputedEntry, adjustment: EnergyAdjustment) -> GibbsComputedEntry:
+        """Gets an entry with an energy adjustment applied.
+
+        Args:
+            entry: A GibbsComputedEntry object.
+            adjustment: An EnergyAdjustment object to apply to the entry.
+
+        Returns:
+            A new GibbsComputedEntry object with the energy adjustment applied.
+        """
         entry_dict = entry.as_dict()
         original_entry = entry_dict.get("entry", None)
 

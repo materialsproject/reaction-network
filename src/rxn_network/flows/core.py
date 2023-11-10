@@ -20,7 +20,7 @@ from rxn_network.jobs.core import (
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
-    from collections.abc import Collection
+    from collections.abc import Collection, Iterable
 
     from rxn_network.entries.entry_set import GibbsEntrySet
 
@@ -30,16 +30,17 @@ logger = get_logger(__name__)
 @dataclass
 class SynthesisPlanningFlowMaker(Maker):
     """Maker to create an inorganic synthesis planning workflow. This flow has three
-    stages:
+    stages.
 
-    1)  Entries are acquired via `GetEntrySetMaker`. This job both gets the computed
-        entries from a databse (e.g., Materials Project) and processes them for use in
-        the reaction network.
-    2)  Reactions are enumerated via the provided `ReactionEnumerationMaker` (and
-        associated enumerators). This computes the full reaction network so that
-        selectivities can be calculated.
-    3)  The competition of all synthesis reactions to the desired target is assessed via
-        the `CalculateCompetitionMaker`.
+    Steps:
+        1)  Entries are acquired via `GetEntrySetMaker`. This job both gets the computed
+            entries from a databse (e.g., Materials Project) and processes them for use in
+            the reaction network.
+        2)  Reactions are enumerated via the provided `ReactionEnumerationMaker` (and
+            associated enumerators). This computes the full reaction network so that
+            selectivities can be calculated.
+        3)  The competition of all synthesis reactions to the desired target is assessed via
+            the `CalculateCompetitionMaker`.
 
     This flow also has the option to include an "open" element and a list of chempots.
     This will enumerate reactions at different conditions and evaluate their
@@ -50,13 +51,10 @@ class SynthesisPlanningFlowMaker(Maker):
     analysis. For the final "results", one should access the reaction set produced by
     the `CalculateCompetitionMaker` at the conditions of interest.
 
-    If you use this code in your work, please consider citing the following work:
+    If you use this code in your work, please cite the following work:
 
-        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
-        A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
-        Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
-        Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
-        August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
+        McDermott, M. J. et al. Assessing Thermodynamic Selectivity of Solid-State Reactions for the Predictive
+        Synthesis of Inorganic Materials. ACS Cent. Sci. (2023) doi:10.1021/acscentsci.3c01051.
 
     Args:
         name: Name of the flow. Automatically generated if not provided.
@@ -301,12 +299,23 @@ class NetworkFlowMaker(Maker):
         self.open_elem = Element(self.open_elem) if self.open_elem else None
         self.open_formula = Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
 
-    def make(self, precursors, targets, entries=None):
+    def make(self, precursors: Iterable[str], targets: Iterable[str], entries: GibbsEntrySet | None = None):
+        """Returns a flow used for finding reaction pathways between precursors and targets.
+
+        Args:
+            precursors: precursor formulas
+            targets: target formulas
+            entries: Optional entry set. If not provided, entries will be automatically acquired from Materials Project.
+                Defaults to None.
+
+        Returns:
+            _description_
+        """
         precursor_formulas = [Composition(f).reduced_formula for f in precursors]
         target_formulas = [Composition(f).reduced_formula for f in targets]
 
         flow_name = (
-            f"Reaction Network analysis: {'-'.join(sorted(precursor_formulas))} ->"
+            f"Reaction network analysis: {'-'.join(sorted(precursor_formulas))} ->"
             f" {'-'.join(sorted(target_formulas))}"
         )
         chemsys = "-".join(

@@ -287,8 +287,8 @@ class PathwaySolver(Solver):
             c_m_mats.append(c_m_mats_ref)  # noqa: PERF402
 
         c_mats, m_mats = zip(*c_m_mats)
-        c_mats = [mat for mats in c_mats for mat in mats if mat is not None]
-        m_mats = [mat for mats in m_mats for mat in mats if mat is not None]
+        c_mats = [mat for mats in c_mats for mat in mats if mat is not None]  # type: ignore
+        m_mats = [mat for mats in m_mats for mat in mats if mat is not None]  # type: ignore
 
         paths = []
         for c_mat, m_mat in zip(c_mats, m_mats):

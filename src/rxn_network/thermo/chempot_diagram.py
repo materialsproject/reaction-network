@@ -217,7 +217,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
                 metastable_domain = cpd.domains[formula]
             except KeyError:
                 raise ValueError(
-                    "Failed even after attempted fix. Metastable domain for" f" {formula} can not be created!"
+                    f"Failed even after attempted fix. Metastable domain for {formula} can not be created!"
                 ) from exc
 
         self._metastable_domains[formula] = metastable_domain

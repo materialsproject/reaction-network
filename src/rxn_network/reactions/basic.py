@@ -16,6 +16,8 @@ from rxn_network.core import Composition
 from rxn_network.reactions.base import Reaction
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from pymatgen.core.periodic_table import Element
 
 TOLERANCE = 1e-6  # Tolerance for determining if a particular component fraction is > 0.
@@ -28,11 +30,11 @@ class BasicReaction(Reaction):
 
     def __init__(
         self,
-        compositions: list[Composition],
-        coefficients: list[float] | np.ndarray,
+        compositions: Iterable[Composition],
+        coefficients: Iterable[float] | np.ndarray,
         balanced: bool | None = None,
         data: dict | None = None,
-        lowest_num_errors: int = 0,
+        lowest_num_errors: float = 0,
     ):
         """A BasicReaction object is defined by a list of compositions and their
         corresponding coefficients, where a negative coefficient refers to a

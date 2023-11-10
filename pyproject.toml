@@ -166,11 +166,8 @@ ignore_missing_imports = true
 namespace_packages = true
 explicit_package_bases = true
 no_implicit_optional = false
+follow_imports = "skip"
 disable_error_code = "annotation-unchecked"
-
-[[tool.mypy.overrides]]
-module = ["requests.*", "tabulate.*"]
-ignore_missing_imports = true
 
 [tool.pytest]
 addopts = "--durations=10"

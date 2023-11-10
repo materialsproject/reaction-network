@@ -27,6 +27,11 @@ def plot_reaction_scatter(
     Args:
         df: DataFrame with columns: rxn, energy, (primary_competition),
             (secondary_competition), (chempot_distance), (added_elems), (dE)
+        x: Column name to plot on x-axis
+        y: Column name to plot on y-axis
+        z: Column name to plot on z-axis
+        color: Column name to color points by. Defaults to None.
+        plot_pareto: Whether to plot the Pareto front. Defaults to True.
 
     Returns:
         Plotly scatter plot
@@ -141,14 +146,14 @@ def plot_reaction_scatter(
 
     hovertemplate = (
         "<b>%{hovertext}</b><br>"
-        + "<br><b>"
-        + f"{x}"
-        + "</b>: %{x:.3f}"
-        + f" {x_units}"
-        + "<br><b>"
-        + f"{y}"
-        + "</b>: %{y:.3f}"
-        + f" {y_units}"
+        "<br><b>"
+        f"{x}"
+        "</b>: %{x:.3f}"
+        f" {x_units}"
+        "<br><b>"
+        f"{y}"
+        "</b>: %{y:.3f}"
+        f" {y_units}"
     )
 
     if z is not None:

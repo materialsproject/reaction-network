@@ -100,12 +100,8 @@ class OpenComputedReaction(ComputedReaction):
             "lowest_num_errors": lowest_num_errors,
         }
 
-        if not chempots:
-            rxn = ComputedReaction(**kwargs)  # type: ignore
-        else:
-            rxn = cls(chempots=chempots, **kwargs)  # type: ignore
+        return ComputedReaction(**kwargs) if not chempots else cls(chempots=chempots, **kwargs)
 
-        return rxn
 
     def get_new_temperature(self, new_temperature: float) -> OpenComputedReaction:
         """Returns a new reaction with the temperature changed.
@@ -201,6 +197,15 @@ class OpenComputedReaction(ComputedReaction):
 
     @classmethod
     def from_computed_rxn(cls, reaction: ComputedReaction, chempots: dict[Element, float]) -> OpenComputedReaction:
+        """Generate an OpenComputedReaction from a ComputedReaction object and chemical potential dict.
+
+        Args:
+            reaction: ComputedReaction object
+            chempots: Dict of chemical potentials corresponding to open element(s)
+
+        Returns:
+            OpenComputedReaction object
+        """
         return cls(
             entries=reaction.entries.copy(),
             coefficients=reaction.coefficients.copy(),

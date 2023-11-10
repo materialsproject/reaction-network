@@ -27,7 +27,9 @@ class EntrySetDocument(BaseModel):
     )
     entries: GibbsEntrySet = Field(description="The entry set object.")
     e_above_hull: float | None = Field(None, description="The e_above_hull cutoff.")
-    include_polymorphs: bool = Field(False, description="Whether to include metastable polymorphs in the entry set.")
+    include_polymorphs: bool = Field(
+        default=False, description="Whether to include metastable polymorphs in the entry set."
+    )
     formulas_to_include: list[str] | None = Field(
         None, description="The required formulas to include during construciton."
     )

@@ -266,13 +266,10 @@ class CalculateCompetitionMaker(Maker):
     """Maker to create job for calculating selectivities of a set of reactions given a
     provided target formula. This is a component of the SynthesisPlanningFlowMaker.
 
-    If you use this code in your work, please consider citing the following work:
+    If you use this code in your work, please cite the following work:
 
-        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
-        A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
-        Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
-        Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
-        August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
+        McDermott, M. J. et al. Assessing Thermodynamic Selectivity of Solid-State Reactions for the Predictive
+        Synthesis of Inorganic Materials. ACS Cent. Sci. (2023) doi:10.1021/acscentsci.3c01051.
 
     Args:
         name: The name of the job. Automatically created if not provided.
@@ -771,8 +768,9 @@ def _get_chempot_decorated_rxns_by_chunk(rxn_chunk, entries, cpd_kwargs, open_el
         chemsys = rxn.chemical_system
         elems = chemsys.split("-")
 
-        for c, cpd_calc in cpd_calc_dict.items():
+        for c, cpd_calculator in cpd_calc_dict.items():
             if set(c.split("-")).issuperset(elems):
+                cpd_calc = cpd_calculator
                 break
         else:
             if open_elem:

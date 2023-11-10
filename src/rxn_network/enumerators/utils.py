@@ -27,13 +27,14 @@ logger = get_logger(__name__)
 
 def get_computed_rxn(
     rxn: Reaction, entries: GibbsEntrySet, chempots: dict[Element, float] | None = None
-) -> ComputedReaction:
+) -> ComputedReaction | OpenComputedReaction:
     """Provided with a Reaction object and a list of possible entries, this function
     returns a new ComputedReaction object containing a selection of those entries.
 
     Args:
         rxn: Reaction object
         entries: Iterable of entries
+        chempots: Optional dictionary of chemical potentials (will return an OpenComputedReaction if supplied).
 
     Returns:
         A ComputedReaction object transformed from a normal Reaction object
@@ -104,7 +105,7 @@ def get_total_chemsys_str(entries: Iterable[Entry], open_elems: Iterable[Element
 
     Args:
         entries: An iterable of entry-like objects
-        open_elem: optional open element to include in chemical system
+        open_elems: optional open elements to include in chemical system
     """
     elements = {elem for entry in entries for elem in entry.composition.elements}
     if open_elems:
@@ -117,7 +118,7 @@ def group_by_chemsys(combos: Iterable[tuple[Entry, ...]], open_elems: Iterable[E
 
     Args:
         combos: Iterable of entry combinations
-        open_elem: optional open element to include in chemical system grouping
+        open_elems: optional open elements to include in chemical system grouping
 
     Returns:
         Dictionary of entry combos grouped by chemical system
@@ -171,13 +172,12 @@ def run_enumerators(enumerators: Iterable[Enumerator], entries: GibbsEntrySet):
         entries: an entry set to provide to the enumerate() function.
     """
     rxn_set = None
-    for enumerator in enumerators:
+    for idx, enumerator in enumerate(enumerators):
         logger.info(f"Running {enumerator.__class__.__name__}")
         rxns = enumerator.enumerate(entries)
 
         logger.info(f"Adding {len(rxns)} reactions to reaction set")
-
-        rxn_set = rxns if rxn_set is None else rxn_set.add_rxn_set(rxns)
+        rxn_set = rxns if idx == 0 else rxn_set.add_rxn_set(rxns)  # type: ignore
 
     logger.info("Completed reaction enumeration. Filtering duplicates...")
     if rxn_set is not None:

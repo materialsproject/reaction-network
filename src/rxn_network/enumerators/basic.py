@@ -58,46 +58,41 @@ class BasicEnumerator(Enumerator):
         max_num_constraints: int = 1,
         quiet: bool = False,
     ):
-        """Args:
-        precursors: Optional list of precursor formulas. The only reactions that
-        will be enumerated are those featuring one or more of these compositions
-        as reactants. The "exclusive_precursors" parameter allows one to tune
-        whether the enumerated reactions should include ALL precursors (the
-        default) or just one.
-        targets: Optional list of target formulas. The only reactions that
-        will be enumerated are those featuring one or more of these compositions
-        as products. The "exclusive_targets" parameter allows one to tune
-        whether the enumerated reactions should include ALL targets or just one
-        (the default).
-        n: Maximum reactant/product cardinality. This it the largest possible number
-        of entries on either side of the reaction. Defaults to 2.
-        exclusive_precursors: Whether enumerated reactions are required to have
-        reactants that are a subset of the provided list of precursors. If True
-        (the default), this only identifies reactions with reactants selected
-        from the provided precursors.
-        exclusive_targets: Whether enumerated reactions are required to have
-        products that are a subset of the provided list of targets. If False,
-        (the default), this identifies all reactions containing at least one
-        composition from the provided list of targets (and any number of
-        byproducts).
-        filter_duplicates: Whether to remove duplicate reactions. Defaults to False.
-        filter_by_chemsys: An optional chemical system for which to filter produced
-        reactions by. This ensures that all output reactions contain at least
-        one element within the provided system.
-        chunk_size: The minimum number of reactions per chunk procssed. Needs to be
-        sufficiently large to make parallelization a cost-effective strategy.
-        Defaults to MIN_CHUNK_SIZE.
-        max_num_jobs: The upper limit for the number of jobs created. Defaults to
-        MAX_NUM_JOBS.
-        remove_unbalanced: Whether to remove reactions which are unbalanced; this is
-        usually advisable. Defaults to True.
-        remove_changed: Whether to remove reactions which can only be balanced by
-        removing a reactant/product or having it change sides. This is also
-        advisable for ensuring that only unique reaction sets are produced.
-        Defaults to True.
-        max_num_constraints: The maximum number of allowable constraints enforced by
-        reaction balancing. Defaults to 1 (which is usually advisable).
-        quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
+        """Initialize a BasicEnumerator object.
+
+        Args:
+            precursors: Optional list of precursor formulas. The only reactions that
+                will be enumerated are those featuring one or more of these compositions as reactants. The
+                "exclusive_precursors" parameter allows one to tune whether the enumerated reactions should include ALL
+                precursors (the default) or just one.
+            targets: Optional list of target formulas. The only reactions that
+                will be enumerated are those featuring one or more of these compositions as products. The
+                "exclusive_targets" parameter allows one to tune whether the enumerated reactions should include ALL
+                targets or just one (the default).
+            n: Maximum reactant/product cardinality. This it the largest possible number
+                of entries on either side of the reaction. Defaults to 2.
+            exclusive_precursors: Whether enumerated reactions are required to have
+                reactants that are a subset of the provided list of precursors. If True (the default), this only
+                identifies reactions with reactants selected from the provided precursors.
+            exclusive_targets: Whether enumerated reactions are required to have
+                products that are a subset of the provided list of targets. If False, (the default), this identifies all
+                reactions containing at least one composition from the provided list of targets (and any number of
+                byproducts).
+            filter_duplicates: Whether to remove duplicate reactions. Defaults to False.
+            filter_by_chemsys: An optional chemical system for which to filter produced reactions by. This ensures that
+                all output reactions contain at least one element within the provided system.
+            chunk_size: The minimum number of reactions per chunk procssed. Needs to be
+                sufficiently large to make parallelization a cost-effective strategy. Defaults to MIN_CHUNK_SIZE.
+            max_num_jobs: The upper limit for the number of jobs created. Defaults to
+                MAX_NUM_JOBS.
+            remove_unbalanced: Whether to remove reactions which are unbalanced; this is usually advisable. Defaults to
+                True.
+            remove_changed: Whether to remove reactions which can only be balanced by
+                removing a reactant/product or having it change sides. This is also advisable for ensuring that only
+                unique reaction sets are produced. Defaults to True.
+            max_num_constraints: The maximum number of allowable constraints enforced by
+                reaction balancing. Defaults to 1 (which is usually advisable).
+            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
         super().__init__(precursors=precursors, targets=targets)
 
@@ -126,24 +121,23 @@ class BasicEnumerator(Enumerator):
         self,
         entries: GibbsEntrySet,
     ) -> ReactionSet:
-        """Calculate all possible reactions given a set of entries. If the enumerator was
-        initialized with specified precursors or target, the reactions will be filtered
-        by these constraints. Every enumerator follows a standard procedure:
+        """Calculate all possible reactions given a set of entries. If the enumerator was initialized with specified
+        precursors or target, the reactions will be filtered by these constraints. Every enumerator follows a standard
+        procedure.
 
-        1) Initialize entries, i.e., ensure that precursors and target are considered
-            stable entries within the entry set.
+        Steps:
+            1) Initialize entries, i.e., ensure that precursors and target are considered stable entries within the
+               entry set.
 
-        2) Get a dictionary representing every possible "node", i.e. phase combination,
-            grouped by chemical system.
+            2) Get a dictionary representing every possible "node", i.e. phase combination, grouped by chemical system.
 
-        3) Filter the combos dictionary for chemical systems which are not relevant;
-            i.e., don't contain elements in precursors and/or target.
+            3) Filter the combos dictionary for chemical systems which are not relevant; i.e., don't contain elements in
+               precursors and/or target.
 
-        4) Iterate through each chemical system, initializing calculators,
-            and computing all possible reactions for reactant/product pair and/or
-            thermodynamically predicted reactions for given reactants.
+            4) Iterate through each chemical system, initializing calculators, and computing all possible reactions for
+               reactant/product pair and/or thermodynamically predicted reactions for given reactants.
 
-        5) Add reactions to growing list, repeat Step 4 until combos dict exhausted.
+            5) Add reactions to growing list, repeat Step 4 until combos dict exhausted.
 
         Args:
             entries: the set of all entries to enumerate from
@@ -414,9 +408,7 @@ class BasicEnumerator(Enumerator):
 
     @property
     def build_pd(self) -> bool:
-        """Whether or not to build a PhaseDiagram object during reaction enumeration (
-        useful for some analyses).
-        """
+        """Whether or not to build a PhaseDiagram object during reaction enumeration (useful for some analyses)."""
         return self._build_pd
 
     @property
