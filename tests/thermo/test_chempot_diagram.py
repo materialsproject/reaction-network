@@ -4,7 +4,7 @@ import pytest
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 
-@pytest.fixture
+@pytest.fixture()
 def cpd(gibbs_entries):
     return ChemicalPotentialDiagram(gibbs_entries)
 

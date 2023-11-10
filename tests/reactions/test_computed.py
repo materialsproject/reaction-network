@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 from monty.serialization import loadfn
-
 from rxn_network.reactions.computed import ComputedReaction
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
@@ -29,11 +28,10 @@ def products(entries):
 def pre_balanced_rxn(reactants, products):
     """Returns a simple, pre-balanced computed reaction."""
     coefficients = [-2, -2, -0.5, 1, 2]
-    rxn = ComputedReaction(
+    return ComputedReaction(
         entries=reactants + products,
         coefficients=coefficients,
     )
-    return rxn
 
 
 @pytest.fixture(scope="module")
@@ -98,8 +96,10 @@ def test_reverse(pre_balanced_rxn):
 
 
 def test_get_new_temperature(pre_balanced_rxn, gibbs_balanced_rxn):
-    with pytest.raises(AttributeError):
-        new_rxn = pre_balanced_rxn.get_new_temperature(1500)  # this reaction only uses ComputedStructureEntry
+    with pytest.raises(
+        AttributeError, match="One or more of the entries in the reaction is not associated with a temperature"
+    ):
+        new_rxn = pre_balanced_rxn.get_new_temperature(1500)
 
     new_rxn = gibbs_balanced_rxn.get_new_temperature(1500)
     for e in new_rxn.entries:

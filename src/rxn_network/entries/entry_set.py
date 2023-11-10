@@ -293,7 +293,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             adj = ConstantEnergyAdjustment(
                 value=jitter[idx] * entry.correction_uncertainty,
                 name="Random jitter",
-                description=("Randomly sampled (Gaussian) noise to account for uncertainty in" " data"),
+                description=("Randomly sampled (Gaussian) noise to account for uncertainty in data"),
             )
             new_entries.append(self.get_adjusted_entry(entry, adj))
 
@@ -602,7 +602,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             try:
                 entry = cl(composition=Composition(formula), temperature=temperature)
             except ValueError as error:
-                logger.debug(f"Compound {formula} is in {cl} tables but at different" f" temperatures!: {error}")
+                logger.debug(f"Compound {formula} is in {cl} tables but at different temperatures!: {error}")
 
         return entry
 

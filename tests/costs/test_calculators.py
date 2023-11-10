@@ -2,7 +2,6 @@
 from pathlib import Path
 
 import pytest
-
 from rxn_network.costs.calculators import (
     ChempotDistanceCalculator,
     PrimaryCompetitionCalculator,
@@ -38,7 +37,7 @@ def rxn(entries, request):
     return ComputedReaction.balance(reactant_entries, product_entries)
 
 
-@pytest.fixture
+@pytest.fixture()
 def rxns(entries):
     return [
         ComputedReaction.balance(
@@ -57,38 +56,40 @@ def mu_func(request):
     return request.param
 
 
-@pytest.fixture
+@pytest.fixture()
 def cpd(entries):
     return ChemicalPotentialDiagram(entries)
 
 
-@pytest.fixture
+@pytest.fixture()
 def cpd_calculator(cpd, mu_func):
     return ChempotDistanceCalculator(cpd=cpd, mu_func=mu_func)
 
 
-@pytest.fixture
+@pytest.fixture()
 def primary_competition_calculator(irh_batio):
     return PrimaryCompetitionCalculator(irh_batio)
 
 
-@pytest.fixture
+@pytest.fixture()
 def secondary_competition_calculator(irh_batio):
     return SecondaryCompetitionCalculator(irh_batio)
 
 
-@pytest.fixture
+@pytest.fixture()
 def stable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 2 BaO -> Ba2TiO4":
             return r
+    return None
 
 
-@pytest.fixture
+@pytest.fixture()
 def unstable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 0.9 BaO -> 0.1 Ti10O11 + 0.9 BaO2":
             return r
+    return None
 
 
 def test_cpd_calculate(cpd_calculator, rxn):

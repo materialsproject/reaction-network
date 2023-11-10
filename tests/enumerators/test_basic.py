@@ -77,7 +77,7 @@ def test_enumerate(filtered_entries, basic_enumerator_default, basic_enumerator_
 
         assert expected_num_rxns == len(rxns)
         assert len(rxns) == len(set(rxns))  # no duplicates
-        assert all([not r.is_identity for r in rxns])
+        assert all(not r.is_identity for r in rxns)
 
 
 def test_enumerate_with_precursors(
@@ -134,4 +134,4 @@ def test_open_enumerate(filtered_entries, basic_open_enumerator):
 
     assert expected_num_rxns == len(rxns)
     assert len(rxns) == len(set(rxns))
-    assert all([not r.is_identity for r in rxns])
+    assert all(not r.is_identity for r in rxns)

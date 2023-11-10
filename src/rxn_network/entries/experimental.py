@@ -151,7 +151,15 @@ class ExperimentalReferenceEntry(ComputedEntry):
         return d
 
     @classmethod
-    def from_dict(cls, d) -> ExperimentalReferenceEntry:
+    def from_dict(cls, d: dict) -> ExperimentalReferenceEntry:
+        """Generate an ExperimentalReferenceEntry object from a dictionary.
+
+        Args:
+            d: dictionary representation of the entry
+
+        Returns:
+            ExperimentalReferenceEntry object initialized with data from the dictionary.
+        """
         dec = MontyDecoder()
         return cls(
             composition=Composition(d["composition"]),

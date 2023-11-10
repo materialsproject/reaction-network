@@ -61,7 +61,7 @@ def net_coeffs():
 
 @pytest.fixture(scope="module")
 def c_mats():
-    arr = np.array(
+    return np.array(
         [
             [
                 [
@@ -297,14 +297,11 @@ def c_mats():
             ],
         ]
     )
-    return arr
 
 
 @pytest.fixture(scope="module")
 def m_mats():
-    arr = np.array([[0.55555556, 0.44444444, 0.11111111], [0.55555556, 0.48888889, 0.11111111]])
-
-    return arr
+    return np.array([[0.55555556, 0.44444444, 0.11111111], [0.55555556, 0.48888889, 0.11111111]])
 
 
 def test_balance_path_arrays_cpu(comp_matrices, net_coeffs, c_mats, m_mats):

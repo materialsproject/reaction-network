@@ -1,10 +1,7 @@
 """ Tests for ReactionSet."""
 import numpy as np
 import pytest
-from monty.serialization import loadfn
 from pymatgen.core.composition import Element
-
-from rxn_network.core import Composition
 from rxn_network.costs.functions import Softplus
 from rxn_network.reactions.computed import ComputedReaction
 from rxn_network.reactions.open import OpenComputedReaction
@@ -31,8 +28,8 @@ def test_get_rxns(ymno3_rxns, rxn_set, open_rxn_set):
     open_rxns = set(open_rxn_set.get_rxns())
     assert set(rxn_set.get_rxns()) == ymno3_rxns_set
     assert open_rxns != ymno3_rxns_set
-    assert all([type(r) == OpenComputedReaction for r in open_rxns])
-    assert all([r.chempots == {Element("O"): 0} for r in open_rxns])
+    assert all(type(r) == OpenComputedReaction for r in open_rxns)
+    assert all(r.chempots == {Element("O"): 0} for r in open_rxns)
 
 
 def test_calculate_costs(ymno3_rxns, rxn_set):
@@ -74,7 +71,7 @@ def test_set_temperature(gibbs_rxn_set: ReactionSet):
 
     new_test_rxn = found[0]
 
-    assert not old_test_rxn.energy_per_atom == new_test_rxn.energy_per_atom
+    assert old_test_rxn.energy_per_atom != new_test_rxn.energy_per_atom
 
 
 def test_set_open_el(rxn_set: ReactionSet):
@@ -88,8 +85,8 @@ def test_set_open_el(rxn_set: ReactionSet):
 
     assert len(new_rxns) == len(old_rxns)
 
-    assert all([type(r) == OpenComputedReaction for r in new_rxns])
-    assert all([r.chempots == {open_el: chempot} for r in new_rxns])
+    assert all(type(r) == OpenComputedReaction for r in new_rxns)
+    assert all(r.chempots == {open_el: chempot} for r in new_rxns)  # type: ignore
 
     old_test_rxn = old_rxns[0]
     found = [
@@ -102,7 +99,7 @@ def test_set_open_el(rxn_set: ReactionSet):
 
     new_test_rxn = found[0]
 
-    assert not old_test_rxn.energy_per_atom == new_test_rxn.energy_per_atom
+    assert old_test_rxn.energy_per_atom != new_test_rxn.energy_per_atom
 
 
 def test_unset_open_el(open_rxn_set: ReactionSet):
@@ -116,4 +113,4 @@ def test_unset_open_el(open_rxn_set: ReactionSet):
 
     assert len(new_rxns) == len(old_rxns)
 
-    assert all([type(r) == ComputedReaction for r in new_rxns])
+    assert all(type(r) == ComputedReaction for r in new_rxns)

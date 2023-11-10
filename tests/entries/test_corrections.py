@@ -1,15 +1,14 @@
 """ Tests for entry corrections. """
 import pytest
-
 from rxn_network.entries.corrections import CARBONATE_CORRECTION, CarbonateCorrection
 
 
-@pytest.fixture
+@pytest.fixture()
 def carbonate_correction_1():
     return CarbonateCorrection(1)
 
 
-@pytest.fixture
+@pytest.fixture()
 def carbonate_correction_3():
     return CarbonateCorrection(3)
 

@@ -27,6 +27,12 @@ class Network(MSONable, metaclass=ABCMeta):
         rxns: ReactionSet,
         cost_function: CostFunction,
     ):
+        """
+        Args:
+            rxns: A ReactionSet object containing the reactions that form the network edges.
+            cost_function: A CostFunction object used to evaluate reaction properties
+                and assign edge weights.
+        """
         self.rxns = rxns
         self.cost_function = cost_function
 
@@ -102,7 +108,7 @@ class Network(MSONable, metaclass=ABCMeta):
         return "-".join(sorted(self.entries.chemsys))
 
     def __repr__(self) -> str:
-        return "Reaction network for chemical system: " f"{self.chemsys}, " f"with graph: {self.graph!s}"
+        return "Reaction network for chemical system: {self.chemsys}, with graph: {self.graph!s}"
 
     def __str__(self) -> str:
         return self.__repr__()

@@ -56,6 +56,8 @@ def process_entries(
         include_freed_data: Whether to include FREED data in the entry set. Defaults
             to False. WARNING: This dataset has not been thoroughly tested. Use at
             your own risk!
+        include_polymorphs: Whether to include non-ground state polymorphs in the entry
+            set. Defaults to False.
         formulas_to_include: An iterable of compositional formulas to ensure are
             included in the processed dataset. Sometimes, entries are filtered out that
             one would like to include, or entries don't exist for those compositions.

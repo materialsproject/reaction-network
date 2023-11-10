@@ -505,7 +505,7 @@ class ReactionSet(MSONable):
 
         return self._get_rxn_set_by_indices(idxs_to_keep)
 
-    def set_chempot(self, open_el: str | Element | None, chempot: float) -> ReactionSet:
+    def set_chempot(self, open_el: str | Element | None, chempot: float | None) -> ReactionSet:
         """Returns a new ReactionSet containing the same reactions as this ReactionSet but
         with a grand potential change recalculated under the constraint defined by the
         provided open element and its chemical potential.

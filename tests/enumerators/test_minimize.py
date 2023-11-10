@@ -2,10 +2,7 @@
 import pytest
 from pymatgen.core.composition import Element
 
-from rxn_network.enumerators.minimize import (
-    MinimizeGibbsEnumerator,
-    MinimizeGrandPotentialEnumerator,
-)
+from rxn_network.enumerators.minimize import MinimizeGibbsEnumerator, MinimizeGrandPotentialEnumerator
 
 
 @pytest.fixture(scope="module")
@@ -73,7 +70,7 @@ def test_enumerate_gibbs(filtered_entries, gibbs_enumerator_default):
 
         assert len(rxns) == expected_num_rxns
         assert len(rxns) == len(set(rxns))
-        assert all([not r.is_identity for r in rxns])
+        assert all(not r.is_identity for r in rxns)
 
 
 def test_enumerate_gibbs_with_precursors(filtered_entries, gibbs_enumerator_with_precursors):
@@ -121,7 +118,7 @@ def test_enumerate_grand_potential(filtered_entries, grand_potential_enumerator)
     rxns = grand_potential_enumerator.enumerate(filtered_entries)
 
     assert len(rxns) == expected_num_rxns
-    assert all([not r.is_identity for r in rxns])
+    assert all(not r.is_identity for r in rxns)
 
 
 def test_enumerate_grand_potential_no_duplicates(filtered_entries, grand_potential_enumerator_no_duplicates):
@@ -130,7 +127,7 @@ def test_enumerate_grand_potential_no_duplicates(filtered_entries, grand_potenti
     rxns = grand_potential_enumerator_no_duplicates.enumerate(filtered_entries)
 
     assert len(rxns) == expected_num_rxns
-    assert all([not r.is_identity for r in rxns])
+    assert all(not r.is_identity for r in rxns)
 
 
 def test_enumerate_grand_potential_precursors(filtered_entries, grand_potential_enumerator_with_precursors):

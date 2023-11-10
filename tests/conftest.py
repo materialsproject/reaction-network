@@ -23,11 +23,10 @@ def mp_entries():
 
 @pytest.fixture(scope="session")
 def gibbs_entries():
-    ents = GibbsEntrySet.from_computed_entries(
+    return GibbsEntrySet.from_computed_entries(
         ENTRIES_LIST,
         temperature=1000,
     )
-    return ents
 
 
 @pytest.fixture(scope="session")
@@ -43,21 +42,19 @@ def gibbs_entries_with_na_cl(entries):
 
 @pytest.fixture(scope="session")
 def filtered_entries():
-    filtered_entries = GibbsEntrySet.from_computed_entries(
+    return GibbsEntrySet.from_computed_entries(
         ENTRIES_LIST,
         temperature=1000,
     ).filter_by_stability(0.0)
-    return filtered_entries
 
 
-@pytest.fixture
+@pytest.fixture()
 def interpolated_entry():
     """Create entry"""
-    entry = InterpolatedEntry(
+    return InterpolatedEntry(
         composition="Y3O8",
         energy=-1.0,
     )
-    return entry
 
 
 @pytest.fixture(scope="session")

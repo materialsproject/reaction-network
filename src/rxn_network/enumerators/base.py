@@ -22,6 +22,11 @@ class Enumerator(MSONable, metaclass=ABCMeta):
         precursors: Collection[str | Composition] | None,
         targets: Collection[str | Composition] | None,
     ):
+        """
+        Args:
+            precursors: Precursor compositions or formulas.
+            targets: Target compositions or formulas.
+        """
         self.logger = logging.getLogger(str(self.__class__.__name__))
         self.logger.setLevel("INFO")
         self.precursors = precursors or []

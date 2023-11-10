@@ -39,6 +39,10 @@ class Solver(MSONable, metaclass=ABCMeta):
     """Base definition for a pathway solver class."""
 
     def __init__(self, pathways: PathwaySet):
+        """
+        Args:
+            pathways: A PathwaySet object containing the pathways to be combined/balanced.
+        """
         self._pathways = pathways
 
         rxns = []
@@ -265,9 +269,9 @@ class PathwaySolver(Solver):
                     for c_m_mats_ref in tqdm(
                         to_iterator(c_m_mats_refs),
                         total=len(c_m_mats_refs),
-                        desc=(f"{self.__class__.__name__} (Batch" f" {batch_count}/{num_batches})"),
+                        desc=(f"{self.__class__.__name__} (Batch {batch_count}/{num_batches})"),
                     ):
-                        c_m_mats.append(c_m_mats_ref)
+                        c_m_mats.append(c_m_mats_ref)  # noqa: PERF402
 
                     batch_count += 1
 
@@ -280,7 +284,7 @@ class PathwaySolver(Solver):
             total=len(c_m_mats_refs),
             desc=f"{self.__class__.__name__} (Batch {batch_count}/{num_batches})",
         ):
-            c_m_mats.append(c_m_mats_ref)
+            c_m_mats.append(c_m_mats_ref)  # noqa: PERF402
 
         c_mats, m_mats = zip(*c_m_mats)
         c_mats = [mat for mats in c_mats for mat in mats if mat is not None]
@@ -418,7 +422,7 @@ def _balance_path_arrays_cpu(
     net_coeff_filter = np.argwhere(net_coeffs != 0).flatten()
     len_net_coeff_filter = len(net_coeff_filter)
     all_multiplicities = np.zeros((shape[0], shape[1]), np.float64)
-    indices = np.full(shape[0], False)
+    indices = np.full(shape[0], fill_value=False)
 
     for i in range(shape[0]):
         correct = True

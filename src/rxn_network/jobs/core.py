@@ -134,9 +134,7 @@ class GetEntrySetMaker(Maker):
             try:
                 from mp_api.client import MPRester
             except ImportError as err:
-                raise ImportError(
-                    "You may need to install the Materials Project API: pip install -U" " mp-api"
-                ) from err
+                raise ImportError("You may need to install the Materials Project API: pip install -U mp-api") from err
 
             kwargs = {}
             if self.MP_API_KEY:
@@ -359,7 +357,7 @@ class CalculateCompetitionMaker(Maker):
 
         target_rxns = all_rxns.get_rxns_by_product(target_formula, return_set=True)
 
-        logger.info(f"Identified {len(target_rxns)} target reactions out of" f" {size} total reactions.")
+        logger.info(f"Identified {len(target_rxns)} target reactions out of {size} total reactions.")
 
         logger.info("Removing unnecessary reactions from total reactions to save memory...")
 

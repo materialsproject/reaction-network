@@ -2,7 +2,6 @@
 import pytest
 from pymatgen.core.periodic_table import Element
 from pymatgen.entries.computed_entries import ManualEnergyAdjustment
-
 from rxn_network.core import Composition
 from rxn_network.entries.nist import NISTReferenceEntry
 
@@ -15,19 +14,16 @@ def entries():
 
 
 def test_invalid_formula():
-    with pytest.raises(ValueError) as error:
-        assert NISTReferenceEntry(Composition("AX"), temperature=300)
-    assert str(error.value) == "AX not in reference data!"
+    with pytest.raises(ValueError, match="AX not in reference data"):
+        NISTReferenceEntry(Composition("AX"), temperature=300)
 
 
 def test_invalid_temperature():
-    with pytest.raises(ValueError) as error:
-        assert NISTReferenceEntry(Composition("K2CO3"), temperature=200)
-    assert str(error.value) == "Temperature must be selected from range: 300.0 K to 2000.0 K"
+    with pytest.raises(ValueError, match="Temperature must be selected from range"):
+        NISTReferenceEntry(Composition("K2CO3"), temperature=200)
 
-    with pytest.raises(ValueError) as error:
-        assert NISTReferenceEntry(Composition("K2CO3"), temperature=2300)
-    assert str(error.value) == "Temperature must be selected from range: 300.0 K to 2000.0 K"
+    with pytest.raises(ValueError, match="Temperature must be selected from range"):
+        NISTReferenceEntry(Composition("K2CO3"), temperature=2300)
 
 
 def test_energy(entries):
@@ -59,15 +55,15 @@ def test_energy_per_atom(entries):
 
 
 def test_correction_uncertainty(entries):
-    assert all([e.correction_uncertainty == 0 for e in entries.values()])
+    assert all(e.correction_uncertainty == 0 for e in entries.values())
 
 
 def test_correction_uncertainty_per_atom(entries):
-    assert all([e.correction_uncertainty_per_atom == 0 for e in entries.values()])
+    assert all(e.correction_uncertainty_per_atom == 0 for e in entries.values())
 
 
 def test_is_experimental(entries):
-    assert all([e.is_experimental for e in entries.values()])
+    assert all(e.is_experimental for e in entries.values())
 
 
 def test_is_element():

@@ -1,5 +1,4 @@
 """ Tests for thermo/utils.py"""
-import pytest
 
 from rxn_network.thermo.utils import expand_pd
 

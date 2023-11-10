@@ -1,7 +1,6 @@
 """ Tests for InterfaceReactionHull. """
 import numpy as np
 import pytest
-
 from rxn_network.reactions.hull import InterfaceReactionHull
 
 
@@ -10,6 +9,7 @@ def stable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 2 BaO -> Ba2TiO4":
             return r
+    return None
 
 
 @pytest.fixture(scope="module")
@@ -17,6 +17,7 @@ def unstable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 0.9 BaO -> 0.1 Ti10O11 + 0.9 BaO2":
             return r
+    return None
 
 
 def test_stable_reactions(irh_batio):

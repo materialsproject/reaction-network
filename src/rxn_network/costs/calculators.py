@@ -59,7 +59,7 @@ class ChempotDistanceCalculator(Calculator):
         elif mu_func == "sum":
             self.mu_func = sum  # type: ignore
         elif isinstance(mu_func, str):
-            raise ValueError("Provided mu_func name is not a known function; please provide the" " function directly.")
+            raise ValueError("Provided mu_func name is not a known function; please provide the function directly.")
 
         self._open_elems = set()
         if cpd.entries[0].__class__.__name__ == "GrandPotPDEntry":

@@ -1,6 +1,5 @@
-""" Tests for Softplus """
+"""Tests for Softplus"""
 import pytest
-
 from rxn_network.costs.functions import Softplus
 
 
@@ -26,9 +25,8 @@ def test_evaluate(softplus_with_attr, softplus_with_attr_and_param, computed_rxn
 
 
 def test_missing_parameter(softplus_with_attr_and_param, computed_rxn):
-    with pytest.raises(ValueError) as error:
-        assert softplus_with_attr_and_param.evaluate(computed_rxn)
-    assert str(error.value) == "Reaction is missing parameter test_param!"
+    with pytest.raises(ValueError, match="Reaction is missing parameter test_param!"):
+        softplus_with_attr_and_param.evaluate(computed_rxn)
 
 
 def test_repr(softplus_with_attr, softplus_with_attr_and_param):

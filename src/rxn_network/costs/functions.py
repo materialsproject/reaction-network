@@ -75,7 +75,7 @@ class Softplus(CostFunction):
         return np.log(1 + (273 / t) * np.exp(x))
 
     def __repr__(self):
-        return "Softplus with parameters: " f"{' '.join([f'{k} ({v})' for k, v in zip(self.params, self.weights)])}"
+        return f"Softplus with parameters: {' '.join([f'{k} ({v})' for k, v in zip(self.params, self.weights)])}"
 
 
 class WeightedSum(CostFunction):
@@ -125,4 +125,4 @@ class WeightedSum(CostFunction):
         return float(np.dot(values_arr, self.weights))
 
     def __repr__(self):
-        return "Weighted sum with parameters: " f"{' '.join([f'{k} ({v})' for k, v in zip(self.params, self.weights)])}"
+        return f"Weighted sum with parameters: {' '.join([f'{k} ({v})' for k, v in zip(self.params, self.weights)])}"

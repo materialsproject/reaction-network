@@ -2,7 +2,6 @@
 
 import pytest
 from jobflow.managers.local import run_locally
-
 from rxn_network.enumerators.basic import BasicEnumerator
 from rxn_network.jobs.core import (
     CalculateCompetitionMaker,
@@ -14,68 +13,56 @@ from rxn_network.jobs.core import (
 from rxn_network.reactions.reaction_set import ReactionSet
 
 
-@pytest.fixture
+@pytest.fixture()
 def entry_set_maker():
-    entry_set_maker = GetEntrySetMaker(entry_db_name=None)
-    return entry_set_maker
+    return GetEntrySetMaker(entry_db_name=None)
 
 
-@pytest.fixture
+@pytest.fixture()
 def entry_job(entry_set_maker):
-    job = entry_set_maker.make("Mn-O-Y")
-    return job
+    return entry_set_maker.make("Mn-O-Y")
 
 
-@pytest.fixture
+@pytest.fixture()
 def reaction_enumeration_maker():
-    reaction_enumeration_maker = ReactionEnumerationMaker()
-    return reaction_enumeration_maker
+    return ReactionEnumerationMaker()
 
 
-@pytest.fixture
+@pytest.fixture()
 def enumeration_job(reaction_enumeration_maker, filtered_entries):
     enumerators = [BasicEnumerator(precursors=["Y2O3", "MnO2"])]
-    job = reaction_enumeration_maker.make(enumerators, filtered_entries)
-    return job
+    return reaction_enumeration_maker.make(enumerators, filtered_entries)
 
 
-@pytest.fixture
+@pytest.fixture()
 def calculate_competition_maker():
-    calculate_competition_maker = CalculateCompetitionMaker()
-    return calculate_competition_maker
+    return CalculateCompetitionMaker()
 
 
-@pytest.fixture
+@pytest.fixture()
 def competition_job(calculate_competition_maker, all_ymno_rxns, filtered_entries):
     target_formula = "YMnO3"
-    job = calculate_competition_maker.make([ReactionSet.from_rxns(all_ymno_rxns)], filtered_entries, target_formula)
-    return job
+    return calculate_competition_maker.make([ReactionSet.from_rxns(all_ymno_rxns)], filtered_entries, target_formula)
 
 
-@pytest.fixture
+@pytest.fixture()
 def network_maker():
-    network_maker = NetworkMaker(precursors=["Y2O3", "Mn2O3"], targets=["YMn2O5", "Mn3O4"], calculate_pathways=10)
-    return network_maker
+    return NetworkMaker(precursors=["Y2O3", "Mn2O3"], targets=["YMn2O5", "Mn3O4"], calculate_pathways=10)
 
 
-@pytest.fixture
+@pytest.fixture()
 def network_job(network_maker, all_ymno_rxns):
-    job = network_maker.make([all_ymno_rxns])
-    return job
+    return network_maker.make([all_ymno_rxns])
 
 
-@pytest.fixture
+@pytest.fixture()
 def pathway_solver_maker():
-    pathway_solver_maker = PathwaySolverMaker(
-        precursors=["Y2O3", "Mn2O3"], targets=["YMn2O5", "Mn3O4"], max_num_combos=2
-    )
-    return pathway_solver_maker
+    return PathwaySolverMaker(precursors=["Y2O3", "Mn2O3"], targets=["YMn2O5", "Mn3O4"], max_num_combos=2)
 
 
-@pytest.fixture
+@pytest.fixture()
 def pathway_solver_job(pathway_solver_maker, ymn2o5_mn3o4_paths, mn_o_y_network_entries):
-    job = pathway_solver_maker.make(ymn2o5_mn3o4_paths, mn_o_y_network_entries)
-    return job
+    return pathway_solver_maker.make(ymn2o5_mn3o4_paths, mn_o_y_network_entries)
 
 
 def test_entry_job(entry_job, job_store):

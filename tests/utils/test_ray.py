@@ -43,7 +43,7 @@ def test_initialize_ray_with_slurm_cluster(capsys):
     """Test initialize_ray"""
 
     original_ip_head = os.environ.get("ip_head")
-    os.environ["ip_head"] = "test_ip_head"
+    os.environ["IP_HEAD"] = "test_ip_head"
 
     if ray.is_initialized():
         ray.shutdown()
@@ -57,7 +57,7 @@ def test_initialize_ray_with_slurm_cluster(capsys):
         pytest.skip("Skipping test_initialize_ray_with_slurm_cluster due to existing cluster")
 
     if original_ip_head is not None:
-        os.environ["ip_head"] = original_ip_head  # tear down
+        os.environ["IP_HEAD"] = original_ip_head  # tear down
 
 
 def test_initialize_ray_with_pbs_cluster(capsys):

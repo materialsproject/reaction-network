@@ -4,7 +4,6 @@ test module for pymatgen.analysis.reaction_calculator
 """
 import pytest
 from pymatgen.core.composition import Element
-
 from rxn_network.core import Composition
 from rxn_network.reactions.basic import BasicReaction
 
@@ -16,8 +15,7 @@ def pre_balanced_rxn():
     products = [Composition("Fe2O3")]
     coefficients = [-2, -1.5, 1]
 
-    rxn = BasicReaction(compositions=reactants + products, coefficients=coefficients, balanced=True)
-    return rxn
+    return BasicReaction(compositions=reactants + products, coefficients=coefficients, balanced=True)
 
 
 @pytest.fixture(scope="module")
@@ -202,15 +200,13 @@ def test_get_coeff(pre_balanced_rxn):
 
 
 def test_energy(pre_balanced_rxn):
-    with pytest.raises(ValueError) as error:
+    with pytest.raises(ValueError, match="No energy for a basic reaction"):
         assert pre_balanced_rxn.energy
-    assert str(error.value) == "No energy for a basic reaction!"
 
 
 def test_energy_per_atom(pre_balanced_rxn):
-    with pytest.raises(ValueError) as error:
+    with pytest.raises(ValueError, match="No energy per atom for a basic reaction"):
         assert pre_balanced_rxn.energy_per_atom
-    assert str(error.value) == "No energy per atom for a basic reaction!"
 
 
 def test_reactants_products(pre_balanced_rxn):

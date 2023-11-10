@@ -32,7 +32,7 @@ class BasicReaction(Reaction):
         coefficients: list[float] | np.ndarray,
         balanced: bool | None = None,
         data: dict | None = None,
-        lowest_num_errors: int | float = 0,
+        lowest_num_errors: int = 0,
     ):
         """A BasicReaction object is defined by a list of compositions and their
         corresponding coefficients, where a negative coefficient refers to a
@@ -156,7 +156,7 @@ class BasicReaction(Reaction):
         """Normalized representation for a reaction
         For example, ``4 Li + 2 O -> 2Li2O`` becomes ``2 Li + O -> Li2O``.
         """
-        return self._str_from_comp(self.coefficients, self.compositions, True)
+        return self._str_from_comp(self.coefficients, self.compositions, reduce=True)
 
     def copy(self) -> BasicReaction:
         """Returns a copy of the BasicReaction object."""

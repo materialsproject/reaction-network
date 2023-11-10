@@ -277,21 +277,6 @@ class InterfaceReactionHull(MSONable):
 
         return left_area + right_area
 
-    def get_max_decomposition_energy(self, x1: float, x2: float) -> float:
-        coords = self.get_coords_in_range(x1, x2)
-
-        max_energy = 0
-
-        for c in combinations(range(len(coords)), 3):
-            i_left, i_mid, i_right = sorted(c)
-            c_left, c_mid, c_right = coords[[i_left, i_mid, i_right]]
-
-            energy = self._calculate_altitude(c_left, c_mid, c_right)
-            if energy < max_energy:
-                max_energy = energy
-
-        return max_energy
-
     def get_decomposition_energy(self, x1: float, x2: float) -> float:
         """Calculates the energy of the reaction decomposition between two points.
 
@@ -319,7 +304,44 @@ class InterfaceReactionHull(MSONable):
 
         return energy
 
+    def get_max_decomposition_energy(self, x1: float, x2: float) -> float:
+        """Similar to get_decomposition_energy, but returns only the decomposition
+        energy that is maximum (rather than the sum of all possible decompositions).
+
+        Args:
+            x1: Coordinate of first point.
+            x2: Coordinate of second point.
+
+        Returns:
+            The maximum energy of the reaction decomposition between the two points.
+        """
+        coords = self.get_coords_in_range(x1, x2)
+
+        max_energy = 0
+
+        for c in combinations(range(len(coords)), 3):
+            i_left, i_mid, i_right = sorted(c)
+            c_left, c_mid, c_right = coords[[i_left, i_mid, i_right]]
+
+            energy = self._calculate_altitude(c_left, c_mid, c_right)
+            if energy < max_energy:
+                max_energy = energy
+
+        return max_energy
+
     def get_decomposition_area(self, x1: float, x2: float) -> float:
+        """Similar to get_decomposition_energy, but returns the area enclosed instead of
+        an energy.
+
+        **WARNING**: This may be numerically unstable.
+
+        Args:
+            x1: Coordinate of first point.
+            x2: Coordinate of second point.
+
+        Returns:
+            The area of reaction decomposition between the two points.
+        """
         coords = self.get_coords_in_range(x1, x2)
         if len(coords) == 2:
             return 0
@@ -402,7 +424,7 @@ class InterfaceReactionHull(MSONable):
         ]
         return counts[num] if num <= 22 else self._count_recursive(num)[0]
 
-    @lru_cache(maxsize=128)
+    @lru_cache(maxsize=128)  # noqa: B019
     def get_decomposition_energy_and_num_paths_recursive(
         self,
         x1: float,
@@ -472,7 +494,7 @@ class InterfaceReactionHull(MSONable):
 
         return val, total
 
-    @lru_cache(maxsize=128)
+    @lru_cache(maxsize=128)  # noqa: B019
     def _altitude_multiplicity(self, n_left, n_right, n):
         """This function is used in the non-recursive implementation of the
         get_decomposition_energy function. It allows for rapid computation of the number

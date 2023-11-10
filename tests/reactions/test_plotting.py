@@ -1,6 +1,5 @@
 """ Tests for reaction plotting functions."""
 import pytest
-
 from rxn_network.costs.functions import Softplus
 from rxn_network.reactions.plotting import plot_reaction_scatter
 from rxn_network.reactions.reaction_set import ReactionSet
@@ -13,4 +12,4 @@ def df(ymno3_rxns):
 
 
 def test_plot_reaction_scatter(df):
-    plot = plot_reaction_scatter(df, x="energy", y="dE", color="dE")
+    plot_reaction_scatter(df, x="energy", y="dE", color="dE")

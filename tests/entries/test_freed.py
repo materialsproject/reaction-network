@@ -1,12 +1,11 @@
 """Tests for FreedReferenceEntry"""
 
 import pytest
-
 from rxn_network.core import Composition
 from rxn_network.entries.freed import FREEDReferenceEntry
 
 
-@pytest.fixture
+@pytest.fixture()
 def freed_entry():
     return FREEDReferenceEntry(Composition("H2O"), 300)
 

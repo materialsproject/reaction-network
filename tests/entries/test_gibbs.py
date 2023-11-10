@@ -4,36 +4,33 @@ from pathlib import Path
 import pytest
 from monty.serialization import loadfn
 from pymatgen.core.composition import Element
-
 from rxn_network.entries.gibbs import GibbsComputedEntry
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
 
 
-@pytest.fixture
+@pytest.fixture()
 def structure():
-    struct = loadfn(TEST_FILES_PATH / "structure_LiFe4P4O16.json")
-    return struct
+    return loadfn(TEST_FILES_PATH / "structure_LiFe4P4O16.json")
 
 
-@pytest.fixture
+@pytest.fixture()
 def entry(structure):
-    entry = GibbsComputedEntry.from_structure(
+    return GibbsComputedEntry.from_structure(
         structure=structure,
         formation_energy_per_atom=-2.436,
         temperature=300,
         parameters=None,
         entry_id="LiFe4P4O16 test structure",
     )
-    return entry
 
 
-@pytest.fixture
+@pytest.fixture()
 def entries_temps_dict(structure):
     struct = structure
 
     temps = [300, 600, 900, 1200, 1500, 1800]
-    entries_with_temps = {
+    return {
         temp: GibbsComputedEntry.from_structure(
             structure=struct,
             formation_energy_per_atom=-2.436,
@@ -43,7 +40,6 @@ def entries_temps_dict(structure):
         )
         for temp in temps
     }
-    return entries_with_temps
 
 
 def test_gf_sisso(entries_temps_dict):
@@ -139,9 +135,9 @@ def test_eq_no_entry_id(entry):
 
 
 def test_invalid_temperature(entry):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Temperature must be selected from range"):
         entry.get_new_temperature(299)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Temperature must be selected from range"):
         entry.get_new_temperature(2001)
 
 

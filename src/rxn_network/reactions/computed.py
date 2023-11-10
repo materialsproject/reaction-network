@@ -29,7 +29,7 @@ class ComputedReaction(BasicReaction):
         entries: list[ComputedEntry],
         coefficients: np.ndarray | list[float],
         data: dict | None = None,
-        lowest_num_errors: int | float = 0,
+        lowest_num_errors: int = 0,
     ):
         """Args:
         entries: List of ComputedEntry objects.
@@ -186,7 +186,15 @@ class ComputedReaction(BasicReaction):
         coeffs *= scale_factor
         return ComputedReaction(self.entries, coeffs, self.data, self.lowest_num_errors)
 
-    def get_entry_idx_vector(self, n) -> np.ndarray:
+    def get_entry_idx_vector(self, n: int) -> np.ndarray:
+        """Maps coefficients to a vector of length n on corresponding entry indices.
+
+        Args:
+            n: Total number of entries (determines length of vector)
+
+        Returns:
+            Vector containing reaction coefficients on the corresponding entry indices.
+        """
         indices = [e.data["idx"] for e in self.entries]
 
         v = np.zeros(n)

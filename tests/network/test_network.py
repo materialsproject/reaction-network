@@ -1,5 +1,4 @@
 """ Tests for ReactionNetwork """
-import pytest
 
 
 def test_from_dict(ymno_rn):

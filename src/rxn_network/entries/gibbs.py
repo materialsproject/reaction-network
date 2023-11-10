@@ -296,7 +296,7 @@ class GibbsComputedEntry(ComputedEntry):
 
     @classmethod
     def from_dict(cls, d: dict) -> GibbsComputedEntry:
-        """ "Returns a GibbsComputedEntry object from MSONable dictionary."""
+        """Returns a GibbsComputedEntry object from MSONable dictionary."""
         dec = MontyDecoder()
         return cls(
             composition=d["composition"],

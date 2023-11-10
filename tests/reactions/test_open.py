@@ -1,7 +1,5 @@
 """ Tests for OpenComputedReaction. """
 import pytest
-
-from rxn_network.core import Composition
 from pymatgen.core.composition import Element
 from rxn_network.reactions.open import OpenComputedReaction
 
@@ -30,8 +28,8 @@ def open_computed_rxn(computed_rxn, element, chempot):
 
 
 def test_energy(open_computed_rxn):
-    open_elem = list(open_computed_rxn.chempots.keys())[0]
-    chempot = list(open_computed_rxn.chempots.values())[0]
+    open_elem = next(iter(open_computed_rxn.chempots.keys()))
+    chempot = next(iter(open_computed_rxn.chempots.values()))
 
     expected = {
         "Na": {
@@ -58,14 +56,14 @@ def test_energy(open_computed_rxn):
 
 
 def test_num_atoms(open_computed_rxn):
-    open_elem = list(open_computed_rxn.chempots.keys())[0]
+    open_elem = next(iter(open_computed_rxn.chempots.keys()))
 
     expected = {"Na": 13, "Mn": 13, "O": 8}
     assert open_computed_rxn.num_atoms == pytest.approx(expected[open_elem.name])
 
 
 def test_elements(open_computed_rxn):
-    open_elem = list(open_computed_rxn.chempots.keys())[0]
+    open_elem = next(iter(open_computed_rxn.chempots.keys()))
 
     expected = {
         "Na": {Element(e) for e in ["Mn", "O", "Y", "Cl"]},
@@ -98,7 +96,7 @@ def test_balance(open_computed_rxn):
 
 
 def test_total_chemical_system(open_computed_rxn):
-    open_elem = list(open_computed_rxn.chempots.keys())[0].name
+    open_elem = next(iter(open_computed_rxn.chempots.keys())).name
 
     elems = [e.name for e in open_computed_rxn.elements]
     elems.append(open_elem)

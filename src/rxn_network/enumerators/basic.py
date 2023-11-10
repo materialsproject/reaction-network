@@ -208,7 +208,7 @@ class BasicEnumerator(Enumerator):
 
         if total / chunk_size > self.max_num_jobs:
             chunk_size = int(total // self.max_num_jobs) + 1
-            logger.info(f"Increasing chunk size to {chunk_size} due to max job limit of" f" {self.max_num_jobs}")
+            logger.info(f"Increasing chunk size to {chunk_size} due to max job limit of {self.max_num_jobs}")
 
         to_run, current_chunk = [], []  # type: ignore
         for item in tqdm(
