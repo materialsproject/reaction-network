@@ -49,8 +49,7 @@ logger = get_logger(__name__)
 
 @dataclass
 class GetEntrySetMaker(Maker):
-    """
-    Maker to create job for acquiring and processing entries to be used in reaction
+    """Maker to create job for acquiring and processing entries to be used in reaction
     enumeration or network building. See GibbsEntrySet for more information about how
     these are constructed.
 
@@ -105,8 +104,7 @@ class GetEntrySetMaker(Maker):
 
     @job(entries="entries", output_schema=EntrySetDocument)
     def make(self, chemsys: str):
-        """
-        Returns a job that acquires a GibbsEntrySet for the desired chemical system.
+        """Returns a job that acquires a GibbsEntrySet for the desired chemical system.
 
         NOTE: This job stores the entry set in an additional store called
         "entries". This needs to be configured through a user's jobflow.yaml file. See
@@ -137,8 +135,7 @@ class GetEntrySetMaker(Maker):
                 from mp_api.client import MPRester
             except ImportError as err:
                 raise ImportError(
-                    "You may need to install the Materials Project API: pip install -U"
-                    " mp-api"
+                    "You may need to install the Materials Project API: pip install -U" " mp-api"
                 ) from err
 
             kwargs = {}
@@ -157,15 +154,11 @@ class GetEntrySetMaker(Maker):
                 other_elems = self._get_exclude_elems(elems)
 
                 with MPRester(**kwargs) as mpr:
-                    docs = mpr.summary.search(
-                        exclude_elements=other_elems, all_fields=False, deprecated=False
-                    )
+                    docs = mpr.summary.search(exclude_elements=other_elems, all_fields=False, deprecated=False)
                 mpids = [d.material_id for d in docs]
 
                 with MPRester(**kwargs) as mpr:
-                    entries = mpr.get_entries(
-                        mpids, additional_criteria={"thermo_types": ["GGA_GGA+U"]}
-                    )
+                    entries = mpr.get_entries(mpids, additional_criteria={"thermo_types": ["GGA_GGA+U"]})
 
         if self.custom_entries:
             entries.extend(self.custom_entries)
@@ -195,8 +188,7 @@ class GetEntrySetMaker(Maker):
 
     @staticmethod
     def _get_exclude_elems(elems):
-        """
-        Get the inverse element selection. Helpful for faster querying of very large
+        """Get the inverse element selection. Helpful for faster querying of very large
         chemical systems).
         """
         exclude_elems = []
@@ -210,8 +202,7 @@ class GetEntrySetMaker(Maker):
 
 @dataclass
 class ReactionEnumerationMaker(Maker):
-    """
-    Maker to create a job for enumerating reactions from a set of entries. This is
+    """Maker to create a job for enumerating reactions from a set of entries. This is
     effectively a wrapper to the run_enumerators() function (see enumerators.utils) with
     a defined output document.
 
@@ -229,8 +220,7 @@ class ReactionEnumerationMaker(Maker):
 
     @job(rxns="rxns", output_schema=EnumeratorTaskDocument)
     def make(self, enumerators: Iterable[Enumerator], entries: GibbsEntrySet):
-        """
-        Returns a job that enumerates reactions from a set of entries.
+        """Returns a job that enumerates reactions from a set of entries.
 
         NOTE: This job stores the reaction set in an additional store called
         "rxns". This needs to be configured through a user's jobflow.yaml file. See
@@ -255,9 +245,7 @@ class ReactionEnumerationMaker(Maker):
     def _get_metadata(self, enumerators: Iterable[Enumerator], entries: GibbsEntrySet):
         """Acquires common metadata provided to output document."""
         chemsys = "-".join(entries.chemsys)
-        targets = {
-            target for enumerator in enumerators for target in enumerator.targets
-        }
+        targets = {target for enumerator in enumerators for target in enumerator.targets}
 
         added_elements = None
         added_chemsys = None
@@ -277,8 +265,7 @@ class ReactionEnumerationMaker(Maker):
 
 @dataclass
 class CalculateCompetitionMaker(Maker):
-    """
-    Maker to create job for calculating selectivities of a set of reactions given a
+    """Maker to create job for calculating selectivities of a set of reactions given a
     provided target formula. This is a component of the SynthesisPlanningFlowMaker.
 
     If you use this code in your work, please consider citing the following work:
@@ -317,16 +304,11 @@ class CalculateCompetitionMaker(Maker):
 
     def __post_init__(self):
         self.open_elem = Element(self.open_elem) if self.open_elem else None
-        self.open_formula = (
-            Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
-        )
+        self.open_formula = Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
 
     @job(rxns="rxns", output_schema=CompetitionTaskDocument)
-    def make(
-        self, rxn_sets: list[ReactionSet], entries: GibbsEntrySet, target_formula: str
-    ):
-        """
-        Returns a job that calculates competition scores and/or chemical potential
+    def make(self, rxn_sets: list[ReactionSet], entries: GibbsEntrySet, target_formula: str):
+        """Returns a job that calculates competition scores and/or chemical potential
         distances for all synthesis reactions to a target phase given a provided list of
         reaction sets.
 
@@ -377,20 +359,14 @@ class CalculateCompetitionMaker(Maker):
 
         target_rxns = all_rxns.get_rxns_by_product(target_formula, return_set=True)
 
-        logger.info(
-            f"Identified {len(target_rxns)} target reactions out of"
-            f" {size} total reactions."
-        )
+        logger.info(f"Identified {len(target_rxns)} target reactions out of" f" {size} total reactions.")
 
-        logger.info(
-            "Removing unnecessary reactions from total reactions to save memory..."
-        )
+        logger.info("Removing unnecessary reactions from total reactions to save memory...")
 
-        all_target_reactants = {
-            reactant.reduced_formula for r in target_rxns for reactant in r.reactants
-        }
+        all_target_reactants = {reactant.reduced_formula for r in target_rxns for reactant in r.reactants}
         all_rxns = all_rxns.get_rxns_by_reactants(
-            all_target_reactants, return_set=True  # type: ignore
+            all_target_reactants,
+            return_set=True,  # type: ignore
         )
 
         logger.info(f"Keeping {len(all_rxns)} out of {size} total reactions...")
@@ -405,9 +381,7 @@ class CalculateCompetitionMaker(Maker):
         decorated_rxns = target_rxns
 
         if self.calculate_competition:
-            decorated_rxns = self._get_competition_decorated_rxns(
-                target_rxns, all_rxns, size
-            )
+            decorated_rxns = self._get_competition_decorated_rxns(target_rxns, all_rxns, size)
 
         logger.info("Calculating chemical potential distances...")
 
@@ -446,12 +420,8 @@ class CalculateCompetitionMaker(Maker):
         needed_memory_per_cpu = memory_per_rxn * num_rxns
 
         if num_cpus * needed_memory_per_cpu > available_memory:
-            logger.info(
-                "Not enough memory to use all CPUs simultaneously. Adjusting...."
-            )
-            chunk_size = (
-                int(len(target_rxns) // (available_memory // needed_memory_per_cpu)) + 1
-            )
+            logger.info("Not enough memory to use all CPUs simultaneously. Adjusting....")
+            chunk_size = int(len(target_rxns) // (available_memory // needed_memory_per_cpu)) + 1
             logger.info(f"Setting new chunk size to {chunk_size}.")
 
         for chunk in grouper(
@@ -460,9 +430,9 @@ class CalculateCompetitionMaker(Maker):
             fillvalue=None,
         ):
             rxn_chunk_refs.append(
-                _get_competition_decorated_rxns_by_chunk.options(
-                    memory=num_rxns * memory_per_rxn
-                ).remote(chunk, all_rxns, self.open_formula)
+                _get_competition_decorated_rxns_by_chunk.options(memory=num_rxns * memory_per_rxn).remote(
+                    chunk, all_rxns, self.open_formula
+                )
             )
 
         decorated_rxns = []
@@ -496,9 +466,7 @@ class CalculateCompetitionMaker(Maker):
             fillvalue=None,
         ):
             rxn_chunk_refs.append(
-                _get_chempot_decorated_rxns_by_chunk.remote(
-                    chunk, entries, cpd_kwargs, open_elem, chempot
-                )
+                _get_chempot_decorated_rxns_by_chunk.remote(chunk, entries, cpd_kwargs, open_elem, chempot)
             )
 
         size = len(rxn_chunk_refs)
@@ -515,8 +483,7 @@ class CalculateCompetitionMaker(Maker):
 
 @dataclass
 class NetworkMaker(Maker):
-    """
-    Maker for generating reaction networks and performing pathfinding from a set of
+    """Maker for generating reaction networks and performing pathfinding from a set of
     previously enumerated reactions. This is a component of the NetworkFlowMaker.
 
     If you use this code in your own work, please consider citing this paper:
@@ -555,8 +522,7 @@ class NetworkMaker(Maker):
         self,
         rxn_sets: Iterable[ReactionSet],
     ):
-        """
-        Returns a job that creates a reaction network from an iterable of reaction sets
+        """Returns a job that creates a reaction network from an iterable of reaction sets
         (coming from reaction enumeration).
 
         NOTE: This job stores the network object in an additional store called
@@ -605,8 +571,7 @@ class NetworkMaker(Maker):
 
 @dataclass
 class PathwaySolverMaker(Maker):
-    """
-    Maker for solving balanced reaction pathways from a set of (unbalanced) pathways
+    """Maker for solving balanced reaction pathways from a set of (unbalanced) pathways
     returned as part of reaction network analysis.
 
     If you use this code in your own work, please consider citing this paper:
@@ -674,8 +639,7 @@ class PathwaySolverMaker(Maker):
         pathways: PathwaySet,
         entries: GibbsEntrySet,
     ):
-        """
-        Returns a job that produces balanced pathways from raw pathways coming out of
+        """Returns a job that produces balanced pathways from raw pathways coming out of
         network pathfinding.
 
         NOTE: This job stores the network object in an additional store called
@@ -736,9 +700,7 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list):
     """
     if len(precursors_list) == 1:
         energy = rxn.energy_per_atom
-        other_energies = np.array(
-            [r.energy_per_atom for r in competing_rxns if r != rxn]
-        )
+        other_energies = np.array([r.energy_per_atom for r in competing_rxns if r != rxn])
         if not np.isclose(other_energies, 0.0).any():
             other_energies = np.append(other_energies, 0.0)  # need identity reaction
 
@@ -746,9 +708,7 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list):
 
         energy_diffs = rxn.energy_per_atom - other_energies
         secondary_rxn_energies = energy_diffs[energy_diffs > 0]
-        secondary_competition = (
-            secondary_rxn_energies.max() if secondary_rxn_energies.any() else 0.0
-        )
+        secondary_competition = secondary_rxn_energies.max() if secondary_rxn_energies.any() else 0.0
         rxn.data["primary_competition"] = round(primary_competition, 4)
         rxn.data["secondary_competition"] = round(secondary_competition, 4)
 
@@ -773,9 +733,7 @@ def _get_competition_decorated_rxn(rxn, competing_rxns, precursors_list):
 def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula):
     """Performs competition score calculations within a chunk of reactions."""
     decorated_rxns = []
-    all_rxns = ReactionSet.from_dict(
-        all_rxns
-    )  # stored in Ray as a dict (should be memory efficient)
+    all_rxns = ReactionSet.from_dict(all_rxns)  # stored in Ray as a dict (should be memory efficient)
 
     for rxn in rxn_chunk:
         if not rxn:
@@ -795,17 +753,13 @@ def _get_competition_decorated_rxns_by_chunk(rxn_chunk, all_rxns, open_formula):
             else:
                 raise ValueError("Can only have 2 precursors, excluding open element!")
 
-        decorated_rxns.append(
-            _get_competition_decorated_rxn(rxn, competing_rxns, reactant_formulas)
-        )
+        decorated_rxns.append(_get_competition_decorated_rxn(rxn, competing_rxns, reactant_formulas))
 
     return decorated_rxns
 
 
 @ray.remote
-def _get_chempot_decorated_rxns_by_chunk(
-    rxn_chunk, entries, cpd_kwargs, open_elem, chempot
-):
+def _get_chempot_decorated_rxns_by_chunk(rxn_chunk, entries, cpd_kwargs, open_elem, chempot):
     """Calculates total chemical potential distance for a chunk of reactions."""
     cpd_calc_dict = {}
     new_rxns = []
@@ -824,9 +778,7 @@ def _get_chempot_decorated_rxns_by_chunk(
                 break
         else:
             if open_elem:
-                filtered_entries = entries.get_subset_in_chemsys(
-                    [*elems, str(open_elem)]
-                )
+                filtered_entries = entries.get_subset_in_chemsys([*elems, str(open_elem)])
                 filtered_entries = [
                     e.to_grand_entry({Element(open_elem): chempot})
                     for e in filtered_entries
@@ -835,9 +787,7 @@ def _get_chempot_decorated_rxns_by_chunk(
             else:
                 filtered_entries = entries.get_subset_in_chemsys(elems)
 
-            cpd_calc = ChempotDistanceCalculator.from_entries(
-                filtered_entries, **cpd_kwargs
-            )
+            cpd_calc = ChempotDistanceCalculator.from_entries(filtered_entries, **cpd_kwargs)
             cpd_calc_dict[chemsys] = cpd_calc
 
         new_rxn = cpd_calc.decorate(rxn)

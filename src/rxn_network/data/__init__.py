@@ -1,5 +1,4 @@
-"""
-Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), FREED (all
+"""Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), FREED (all
 compounds), and FactSage (elemental chemical potentials).
 """
 from __future__ import annotations
@@ -18,8 +17,7 @@ G_ELEMS = loadfn(cwd / "mu_elements.json")
 
 
 def load_experimental_data(fn: str | Path) -> dict[str, dict[float, Any]]:
-    """
-    Load experimental data from a json file.
+    """Load experimental data from a json file.
 
     Args:
         fn: The filename of the json file

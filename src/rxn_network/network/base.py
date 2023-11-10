@@ -102,25 +102,19 @@ class Network(MSONable, metaclass=ABCMeta):
         return "-".join(sorted(self.entries.chemsys))
 
     def __repr__(self) -> str:
-        return (
-            "Reaction network for chemical system: "
-            f"{self.chemsys}, "
-            f"with graph: {self.graph!s}"
-        )
+        return "Reaction network for chemical system: " f"{self.chemsys}, " f"with graph: {self.graph!s}"
 
     def __str__(self) -> str:
         return self.__repr__()
 
 
 class Graph(PyDiGraph):
-    """
-    Thin wrapper around rx.PyDiGraph to allow for serialization and optimized database
+    """Thin wrapper around rx.PyDiGraph to allow for serialization and optimized database
     storage.
     """
 
     def as_dict(self) -> dict:
-        """
-        Represents the PyDiGraph object as a serializable dictionary.
+        """Represents the PyDiGraph object as a serializable dictionary.
 
         See monty package (MSONable) for more information.
         """
@@ -137,8 +131,7 @@ class Graph(PyDiGraph):
 
     @classmethod
     def from_dict(cls, d: dict) -> Graph:
-        """
-        Instantiates a Graph object from a dictionary.
+        """Instantiates a Graph object from a dictionary.
 
         See as_dict() and monty package (MSONable) for more information.
         """
@@ -161,7 +154,4 @@ class Graph(PyDiGraph):
         return graph
 
     def __repr__(self) -> str:
-        return (
-            super().__repr__()
-            + f" with {self.num_nodes()} nodes and {self.num_edges()} edges"
-        )
+        return super().__repr__() + f" with {self.num_nodes()} nodes and {self.num_edges()} edges"

@@ -13,8 +13,7 @@ if TYPE_CHECKING:
 
 
 def expand_pd(entries: Iterable[Entry], pbar: bool = False) -> dict[str, PhaseDiagram]:
-    """
-    Helper method for generating a set of smaller phase diagrams for analyzing
+    """Helper method for generating a set of smaller phase diagrams for analyzing
     thermodynamic stability in large chemical systems. This is necessary when
     considering chemical systems which contain 10 or more elements, due to dimensional
     limitations of the Qhull algorithm.
@@ -29,23 +28,17 @@ def expand_pd(entries: Iterable[Entry], pbar: bool = False) -> dict[str, PhaseDi
     """
     pd_dict: dict[str, PhaseDiagram] = {}
 
-    sorted_entries = sorted(
-        entries, key=lambda x: len(x.composition.elements), reverse=True
-    )
+    sorted_entries = sorted(entries, key=lambda x: len(x.composition.elements), reverse=True)
 
     for e in tqdm(sorted_entries, disable=not pbar, desc="Building phase diagrams"):
         for chemsys in pd_dict:
-            if set(e.composition.chemical_system.split("-")).issubset(
-                chemsys.split("-")
-            ):
+            if set(e.composition.chemical_system.split("-")).issubset(chemsys.split("-")):
                 break
         else:
             pd_dict[e.composition.chemical_system] = PhaseDiagram(
                 list(
                     filter(
-                        lambda x: set(x.composition.elements).issubset(
-                            e.composition.elements
-                        ),
+                        lambda x: set(x.composition.elements).issubset(e.composition.elements),
                         entries,
                     )
                 )

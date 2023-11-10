@@ -16,8 +16,7 @@ if TYPE_CHECKING:
 
 
 class ExperimentalReferenceEntry(ComputedEntry):
-    """
-    An Entry class for experimental reference data, to be sub-classed for specific data
+    """An Entry class for experimental reference data, to be sub-classed for specific data
     sources.  Given a composition, automatically finds the Gibbs free energy of
     formation, dGf(T) from tabulated reference values.
     """
@@ -31,14 +30,13 @@ class ExperimentalReferenceEntry(ComputedEntry):
         energy_adjustments: list[EnergyAdjustment] | None = None,
         data: dict | None = None,
     ):
-        """
-        Args:
-            composition: Composition object
-            temperature: Temperature in Kelvin. If temperature is not selected within
-                the range of the reference  data (see self._validate_temperature), then
-                this will raise an error.
-            energy_adjustments: A list of EnergyAdjustments to apply to the entry.
-            data: Optional dictionary containing entry data.
+        """Args:
+        composition: Composition object
+        temperature: Temperature in Kelvin. If temperature is not selected within
+        the range of the reference  data (see self._validate_temperature), then
+        this will raise an error.
+        energy_adjustments: A list of EnergyAdjustments to apply to the entry.
+        data: Optional dictionary containing entry data.
         """
         formula = composition.reduced_formula
         entry_id = f"{self.__class__.__name__}-{formula}_{temperature}"
@@ -60,8 +58,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
         self.name = formula
 
     def get_new_temperature(self, new_temperature: float) -> ExperimentalReferenceEntry:
-        """
-        Return a copy of the NISTReferenceEntry at the new specified temperature.
+        """Return a copy of the NISTReferenceEntry at the new specified temperature.
 
         Args:
             new_temperature: The new temperature to use [K]
@@ -75,8 +72,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
         return self.from_dict(new_entry_dict)
 
     def to_grand_entry(self, chempots: dict[Element, float]):
-        """
-        Convert an ExperimentalReferenceEntry to a GrandComputedEntry.
+        """Convert an ExperimentalReferenceEntry to a GrandComputedEntry.
 
         Args:
             chempots: A dictionary of {element: chempot} pairs.
@@ -95,14 +91,11 @@ class ExperimentalReferenceEntry(ComputedEntry):
         g = cls.REFERENCES[formula]
 
         if temperature < min(g) or temperature > max(g):
-            raise ValueError(
-                f"Temperature must be selected from range: {min(g)} K to {max(g)} K"
-            )
+            raise ValueError(f"Temperature must be selected from range: {min(g)} K to {max(g)} K")
 
     @classmethod
     def _get_energy(cls, formula: str, temperature: float) -> float:
-        """
-        Convenience method for accessing and interpolating experimental data.
+        """Convenience method for accessing and interpolating experimental data.
 
         Args:
             formula: Chemical formula by which to search experimental data.
@@ -136,17 +129,15 @@ class ExperimentalReferenceEntry(ComputedEntry):
 
     @property
     def unique_id(self) -> str:
-        """
-        Returns a unique ID for the entry based on its entry-id and temperature. This is
+        """Returns a unique ID for the entry based on its entry-id and temperature. This is
         useful because the same entry-id can be used for multiple entries at different
         temperatures.
         """
         return self.entry_id
 
     def as_dict(self) -> dict:
-        """
-        Returns:
-            A dict representation of the Entry.
+        """Returns:
+        A dict representation of the Entry.
         """
         d = super().as_dict()
 

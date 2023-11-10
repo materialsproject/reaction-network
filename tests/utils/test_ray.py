@@ -54,9 +54,7 @@ def test_initialize_ray_with_slurm_cluster(capsys):
         assert "ConnectionError" in str(error.type)
 
     if "Connected" in capsys.readouterr().err:
-        pytest.skip(
-            "Skipping test_initialize_ray_with_slurm_cluster due to existing cluster"
-        )
+        pytest.skip("Skipping test_initialize_ray_with_slurm_cluster due to existing cluster")
 
     if original_ip_head is not None:
         os.environ["ip_head"] = original_ip_head  # tear down
@@ -72,9 +70,7 @@ def test_initialize_ray_with_pbs_cluster(capsys):
         assert "ConnectionError" in str(error.type)
 
     if "Connected" in capsys.readouterr().err:
-        pytest.skip(
-            "Skipping test_initialize_ray_with_slurm_cluster due to existing cluster"
-        )
+        pytest.skip("Skipping test_initialize_ray_with_slurm_cluster due to existing cluster")
 
     if original_pbs_nnodes is not None:
         os.environ["PBS_NNODES"] = original_pbs_nnodes

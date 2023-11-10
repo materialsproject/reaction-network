@@ -12,8 +12,7 @@ if TYPE_CHECKING:
 
 
 def plot_network(graph: PyGraph, vertex_cmap_name: str = "jet", **kwargs):
-    """
-    Plots a reaction network using rustworkx visualization tools (i.e., mpl_draw).
+    """Plots a reaction network using rustworkx visualization tools (i.e., mpl_draw).
 
     Args:
         graph: a rustworkx PyGraph object
@@ -39,8 +38,7 @@ def plot_network(graph: PyGraph, vertex_cmap_name: str = "jet", **kwargs):
 
 
 def _get_cmap_string(palette, domain):
-    """
-    Utility function for getting a matplotlib colormap string for a given palette and
+    """Utility function for getting a matplotlib colormap string for a given palette and
     domain.
     """
     domain_unique = np.unique(domain)

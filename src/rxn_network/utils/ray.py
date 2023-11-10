@@ -11,8 +11,7 @@ logger = get_logger(__name__)
 
 
 def initialize_ray(quiet: bool = False):
-    """
-    Simple function to initialize ray. Basic support for running ray on multiple nodes.
+    """Simple function to initialize ray. Basic support for running ray on multiple nodes.
     Currently supports SLURM and PBS job schedulers.
 
     SLURM:
@@ -32,9 +31,7 @@ def initialize_ray(quiet: bool = False):
                 address="auto",
             )
         else:
-            logger.info(
-                "Could not identify existing Ray instance. Creating a new one..."
-            )
+            logger.info("Could not identify existing Ray instance. Creating a new one...")
             ray.init()
 
         logger.info(
@@ -47,8 +44,7 @@ def initialize_ray(quiet: bool = False):
 
 
 def to_iterator(obj_ids, get_obj_ids: bool = False):
-    """
-    Method to convert a list of ray object ids to an iterator that can be used in a for
+    """Method to convert a list of ray object ids to an iterator that can be used in a for
     loop.
     """
     while obj_ids:

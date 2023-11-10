@@ -19,8 +19,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
         """Evaluates a particular property of a reaction relevant to its cost ranking."""
 
     def calculate_many(self, rxns: list[Reaction]) -> list[float]:
-        """
-        Convenience method for performing calculate() on a list of reactions.
+        """Convenience method for performing calculate() on a list of reactions.
 
         Args:
             rxns: the list of Reaction objects to be evaluated
@@ -35,8 +34,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
         return results
 
     def decorate(self, rxn: Reaction) -> Reaction:
-        """
-        Returns a copy of the reaction with the calculated property by
+        """Returns a copy of the reaction with the calculated property by
         storing the value within the reaction's data dictionary.
 
         Args:
@@ -54,8 +52,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
         return new_rxn
 
     def decorate_many(self, rxns: list[Reaction]) -> list[Reaction]:
-        """
-        Convenience method for performing decorate() on a list of reactions.
+        """Convenience method for performing decorate() on a list of reactions.
 
         Args:
             rxns: the list of Reaction objects to be decorated

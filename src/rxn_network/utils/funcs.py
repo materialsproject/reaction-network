@@ -13,8 +13,7 @@ if TYPE_CHECKING:
 
 
 def limited_powerset(iterable: Iterable, max_size: int) -> Iterable:
-    """
-    Helper method for generating subsets ranging from singular
+    """Helper method for generating subsets ranging from singular
     length to maximum length specified by max_size.
 
     Args:
@@ -24,14 +23,11 @@ def limited_powerset(iterable: Iterable, max_size: int) -> Iterable:
     Returns:
         All combination sets up to maximum size
     """
-    return chain.from_iterable(
-        [combinations(iterable, num_combos) for num_combos in range(1, max_size + 1)]
-    )
+    return chain.from_iterable([combinations(iterable, num_combos) for num_combos in range(1, max_size + 1)])
 
 
 def grouper(iterable: Iterable, n: int, fillvalue: Any = None) -> Iterable:
-    """
-    Collects data into fixed-length chunks or blocks.
+    """Collects data into fixed-length chunks or blocks.
 
     Args:
         iterable: An iterable object to group.
@@ -44,8 +40,7 @@ def grouper(iterable: Iterable, n: int, fillvalue: Any = None) -> Iterable:
 
 
 def get_project_root() -> Path:
-    """
-    Gets a Path object for the reaction-network project root directory.
+    """Gets a Path object for the reaction-network project root directory.
 
     Note:
         This is specific to this file and project.
@@ -62,8 +57,7 @@ def get_logger(
     log_format="%(asctime)s %(levelname)s %(name)s %(message)s",
     stream=sys.stdout,
 ):
-    """
-    Code borrowed from the atomate package.
+    """Code borrowed from the atomate package.
 
     Helper method for acquiring logger.
     """

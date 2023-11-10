@@ -124,9 +124,7 @@ def test_get_adjusted_entry(interpolated_entry):
     entry_copy = deepcopy(interpolated_entry)
     entry_copy.energy_adjustments.append(ConstantEnergyAdjustment(0.1))
 
-    assert entry_copy == GibbsEntrySet.get_adjusted_entry(
-        interpolated_entry, ConstantEnergyAdjustment(0.1)
-    )
+    assert entry_copy == GibbsEntrySet.get_adjusted_entry(interpolated_entry, ConstantEnergyAdjustment(0.1))
 
 
 def test_from_pd(mp_entries):
@@ -165,9 +163,7 @@ def test_update(gibbs_entries):
     }
     new_entries = set()
     for e in entry_copies:
-        new_entries.add(
-            GibbsEntrySet.get_adjusted_entry(e, ConstantEnergyAdjustment(0.1))
-        )
+        new_entries.add(GibbsEntrySet.get_adjusted_entry(e, ConstantEnergyAdjustment(0.1)))
 
     gibbs_entries.update(new_entries)
 

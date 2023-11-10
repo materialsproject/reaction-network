@@ -3,25 +3,19 @@ from __future__ import annotations
 
 from pymatgen.entries.computed_entries import CompositionEnergyAdjustment
 
-CARBONATE_CORRECTION = (
-    0.830  # eV per (CO3)2- anion in composition; see Jupyter NB for fitting
-)
+CARBONATE_CORRECTION = 0.830  # eV per (CO3)2- anion in composition; see Jupyter NB for fitting
 
 
 class CarbonateCorrection(CompositionEnergyAdjustment):
-    """
-    Supplies a carbonate correction due to systematic GGA errors in carbonate formation
+    """Supplies a carbonate correction due to systematic GGA errors in carbonate formation
     energies.
 
     See provided jupyter NB for fitting of the correction:
     data/fit_carbonate_correction.ipynb
     """
 
-    def __init__(
-        self, num_ions: int, carbonate_correction: float = CARBONATE_CORRECTION
-    ):
-        """
-        Initalizes a carbonate correction object.
+    def __init__(self, num_ions: int, carbonate_correction: float = CARBONATE_CORRECTION):
+        """Initalizes a carbonate correction object.
 
         Args:
             num_ions: Number of carbonate ions in the composition object
@@ -34,9 +28,7 @@ class CarbonateCorrection(CompositionEnergyAdjustment):
             adj_per_atom=carbonate_correction,
             n_atoms=num_ions,
             name="Carbonate Correction",
-            description=(
-                "Correction for dGf with (CO3)2- anion, as fit to MP data (300 K)."
-            ),
+            description=("Correction for dGf with (CO3)2- anion, as fit to MP data (300 K)."),
         )
 
     @property

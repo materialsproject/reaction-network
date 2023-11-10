@@ -28,8 +28,7 @@ logger = get_logger(__name__)
 def get_computed_rxn(
     rxn: Reaction, entries: GibbsEntrySet, chempots: dict[Element, float] | None = None
 ) -> ComputedReaction:
-    """
-    Provided with a Reaction object and a list of possible entries, this function
+    """Provided with a Reaction object and a list of possible entries, this function
     returns a new ComputedReaction object containing a selection of those entries.
 
     Args:
@@ -39,12 +38,8 @@ def get_computed_rxn(
     Returns:
         A ComputedReaction object transformed from a normal Reaction object
     """
-    reactant_entries = [
-        entries.get_min_entry_by_formula(r.reduced_formula) for r in rxn.reactants
-    ]
-    product_entries = [
-        entries.get_min_entry_by_formula(p.reduced_formula) for p in rxn.products
-    ]
+    reactant_entries = [entries.get_min_entry_by_formula(r.reduced_formula) for r in rxn.reactants]
+    product_entries = [entries.get_min_entry_by_formula(p.reduced_formula) for p in rxn.products]
 
     if chempots:
         rxn = OpenComputedReaction.balance(reactant_entries, product_entries, chempots)
@@ -93,8 +88,7 @@ def react_interface(
 
 
 def get_elems_set(entries: Iterable[Entry]) -> set[str]:
-    """
-    Returns chemical system as a set of element names, for set of entries.
+    """Returns chemical system as a set of element names, for set of entries.
 
     Args:
         entries: An iterable of entry-like objects
@@ -105,11 +99,8 @@ def get_elems_set(entries: Iterable[Entry]) -> set[str]:
     return {str(elem) for e in entries for elem in e.composition.elements}
 
 
-def get_total_chemsys_str(
-    entries: Iterable[Entry], open_elems: Iterable[Element] | None = None
-) -> str:
-    """
-    Returns chemical system string for set of entries, with optional open element.
+def get_total_chemsys_str(entries: Iterable[Entry], open_elems: Iterable[Element] | None = None) -> str:
+    """Returns chemical system string for set of entries, with optional open element.
 
     Args:
         entries: An iterable of entry-like objects
@@ -121,11 +112,8 @@ def get_total_chemsys_str(
     return "-".join(sorted([str(e) for e in elements]))
 
 
-def group_by_chemsys(
-    combos: Iterable[tuple[Entry, ...]], open_elems: Iterable[Element] | None = None
-) -> dict:
-    """
-    Groups entry combinations by chemical system, with optional open element.
+def group_by_chemsys(combos: Iterable[tuple[Entry, ...]], open_elems: Iterable[Element] | None = None) -> dict:
+    """Groups entry combinations by chemical system, with optional open element.
 
     Args:
         combos: Iterable of entry combinations
@@ -145,11 +133,8 @@ def group_by_chemsys(
     return combo_dict
 
 
-def stabilize_entries(
-    pd: PhaseDiagram, entries_to_adjust: Iterable[Entry], tol: float = 1e-6
-) -> list[Entry]:
-    """
-    Simple method for stabilizing entries by decreasing their energy to be on the hull.
+def stabilize_entries(pd: PhaseDiagram, entries_to_adjust: Iterable[Entry], tol: float = 1e-6) -> list[Entry]:
+    """Simple method for stabilizing entries by decreasing their energy to be on the hull.
 
     WARNING: This method is not guaranteed to work *simultaneously* for all entries due
     to the fact that stabilization of one entry may destabilize others. Use with
@@ -170,9 +155,7 @@ def stabilize_entries(
     for _, entry in zip(indices, entries_to_adjust):
         e_above_hull = pd.get_e_above_hull(entry)
         entry_dict = entry.to_dict()
-        entry_dict["energy"] = entry.uncorrected_energy + (
-            e_above_hull * entry.composition.num_atoms - tol
-        )
+        entry_dict["energy"] = entry.uncorrected_energy + (e_above_hull * entry.composition.num_atoms - tol)
         new_entry = ComputedEntry.from_dict(entry_dict)
         new_entries.append(new_entry)
 
@@ -180,8 +163,7 @@ def stabilize_entries(
 
 
 def run_enumerators(enumerators: Iterable[Enumerator], entries: GibbsEntrySet):
-    """
-    Utility method for calling enumerate() for a list of enumerators on a particular set
+    """Utility method for calling enumerate() for a list of enumerators on a particular set
     of entries. Reaction sets are automatically combined and duplicates are filtered.
 
     Args:

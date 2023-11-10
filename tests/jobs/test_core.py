@@ -48,17 +48,13 @@ def calculate_competition_maker():
 @pytest.fixture
 def competition_job(calculate_competition_maker, all_ymno_rxns, filtered_entries):
     target_formula = "YMnO3"
-    job = calculate_competition_maker.make(
-        [ReactionSet.from_rxns(all_ymno_rxns)], filtered_entries, target_formula
-    )
+    job = calculate_competition_maker.make([ReactionSet.from_rxns(all_ymno_rxns)], filtered_entries, target_formula)
     return job
 
 
 @pytest.fixture
 def network_maker():
-    network_maker = NetworkMaker(
-        precursors=["Y2O3", "Mn2O3"], targets=["YMn2O5", "Mn3O4"], calculate_pathways=10
-    )
+    network_maker = NetworkMaker(precursors=["Y2O3", "Mn2O3"], targets=["YMn2O5", "Mn3O4"], calculate_pathways=10)
     return network_maker
 
 
@@ -77,9 +73,7 @@ def pathway_solver_maker():
 
 
 @pytest.fixture
-def pathway_solver_job(
-    pathway_solver_maker, ymn2o5_mn3o4_paths, mn_o_y_network_entries
-):
+def pathway_solver_job(pathway_solver_maker, ymn2o5_mn3o4_paths, mn_o_y_network_entries):
     job = pathway_solver_maker.make(ymn2o5_mn3o4_paths, mn_o_y_network_entries)
     return job
 

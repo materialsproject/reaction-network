@@ -12,9 +12,7 @@ def freed_entry():
 
 
 def test_repr(freed_entry):
-    assert (
-        repr(freed_entry) == "FREEDReferenceEntry | H2O\nGibbs Energy (300 K) = -2.4552"
-    )
+    assert repr(freed_entry) == "FREEDReferenceEntry | H2O\nGibbs Energy (300 K) = -2.4552"
 
 
 def test_eq(freed_entry, mp_entries):

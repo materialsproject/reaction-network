@@ -1,5 +1,4 @@
-"""
-Entry objects used in a Network. These network entry objects hold multiple entries and
+"""Entry objects used in a Network. These network entry objects hold multiple entries and
 can be used as data for a node in the graph.
 """
 from __future__ import annotations
@@ -28,22 +27,18 @@ class NetworkEntryType(Enum):
 
 
 class NetworkEntry(MSONable):
-    """
-    Helper class for describing combinations of ComputedEntry-like objects in context
+    """Helper class for describing combinations of ComputedEntry-like objects in context
     of a reaction network. This entry will represent a node in the network.
     """
 
     def __init__(self, entries: Collection[Entry], description: NetworkEntryType):
-        """
-        Args:
-            entries: Collection of Entry-like objects
-            description: Node type (e.g., Precursors, Target... see NetworkEntryType
-                class).
+        """Args:
+        entries: Collection of Entry-like objects
+        description: Node type (e.g., Precursors, Target... see NetworkEntryType
+        class).
         """
         self._entries = set(entries)
-        self._elements = sorted(
-            {elem for entry in entries for elem in entry.composition.elements}
-        )
+        self._elements = sorted({elem for entry in entries for elem in entry.composition.elements})
         self._chemsys = "-".join([str(e) for e in self.elements])
         self._dim = len(self.chemsys)
         self._description = description
@@ -101,8 +96,7 @@ class NetworkEntry(MSONable):
 
 
 class DummyEntry(NetworkEntry):
-    """
-    A Dummy Entry that doesn't hold any info. This maybe useful for serving as an empty
+    """A Dummy Entry that doesn't hold any info. This maybe useful for serving as an empty
     node to facilitate pathfinding to all nodes, etc.
     """
 

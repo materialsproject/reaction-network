@@ -14,8 +14,7 @@ if TYPE_CHECKING:
 
 
 class InterpolatedEntry(ComputedEntry):
-    """
-    Lightweight Entry object for computed data. Contains facilities
+    """Lightweight Entry object for computed data. Contains facilities
     for applying corrections to the energy attribute and for storing
     calculation parameters.
     """
@@ -30,25 +29,23 @@ class InterpolatedEntry(ComputedEntry):
         data: dict | None = None,
         entry_id: object | None = None,
     ):
-        """
-
-        Args:
-            composition: Composition of the entry. For
-                flexibility, this can take the form of all the typical input
-                taken by a Composition, including a {symbol: amt} dict,
-                a string formula, and others.
-            energy: Energy of the entry. Usually the final calculated
-                energy from VASP or other electronic structure codes.
-            correction: Manually set an energy correction, will ignore
-                energy_adjustments if specified. Defaults to 0.
-            energy_adjustments: An optional list of EnergyAdjustment to
-                be applied to the energy. This is used to modify the energy for
-                certain analyses. Defaults to None.
-            parameters: An optional dict of parameters associated with
-                the entry. Defaults to None.
-            data: An optional dict of any additional data associated
-                with the entry. Defaults to None.
-            entry_id: An optional id to uniquely identify the entry.
+        """Args:
+        composition: Composition of the entry. For
+        flexibility, this can take the form of all the typical input
+        taken by a Composition, including a {symbol: amt} dict,
+        a string formula, and others.
+        energy: Energy of the entry. Usually the final calculated
+        energy from VASP or other electronic structure codes.
+        correction: Manually set an energy correction, will ignore
+        energy_adjustments if specified. Defaults to 0.
+        energy_adjustments: An optional list of EnergyAdjustment to
+        be applied to the energy. This is used to modify the energy for
+        certain analyses. Defaults to None.
+        parameters: An optional dict of parameters associated with
+        the entry. Defaults to None.
+        data: An optional dict of any additional data associated
+        with the entry. Defaults to None.
+        entry_id: An optional id to uniquely identify the entry.
         """
         composition = Composition(composition)
 
@@ -66,8 +63,7 @@ class InterpolatedEntry(ComputedEntry):
         )
 
     def to_grand_entry(self, chempots: dict[Element, float]) -> GrandPotPDEntry:
-        """
-        Convert a GibbsComputedEntry to a GrandComputedEntry.
+        """Convert a GibbsComputedEntry to a GrandComputedEntry.
 
         Args:
             chempots: A dictionary of {element: chempot} pairs.
@@ -89,10 +85,7 @@ class InterpolatedEntry(ComputedEntry):
 
     def __repr__(self):
         output = [
-            (
-                f"InterpolatedEntry | {self.composition.formula} "
-                f"({self.composition.reduced_formula})"
-            ),
+            (f"InterpolatedEntry | {self.composition.formula} " f"({self.composition.reduced_formula})"),
             f"Energy  = {self.energy:.4f}",
         ]
         return "\n".join(output)

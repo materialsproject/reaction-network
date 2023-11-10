@@ -37,8 +37,7 @@ def process_entries(
     calculate_e_above_hulls: bool = False,
     ignore_nist_solids: bool = True,
 ) -> GibbsEntrySet:
-    """
-    Convenience function for processing a set of ComputedStructureEntry objects into a
+    """Convenience function for processing a set of ComputedStructureEntry objects into a
     GibbsEntrySet with specified parameters. This is used when building entries in most
     of the jobs/flows.
 
@@ -80,15 +79,9 @@ def process_entries(
         include_freed_data=include_freed_data,
         ignore_nist_solids=ignore_nist_solids,
     )
-    included_entries = (
-        [initialize_entry(f, entry_set) for f in formulas_to_include]
-        if formulas_to_include
-        else []
-    )
+    included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include] if formulas_to_include else []
 
-    entry_set = entry_set.filter_by_stability(
-        e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
-    )
+    entry_set = entry_set.filter_by_stability(e_above_hull=e_above_hull, include_polymorphs=include_polymorphs)
     entry_set.update(included_entries)  # make sure these aren't filtered out
 
     if filter_at_temperature and (filter_at_temperature != temperature):
@@ -101,8 +94,7 @@ def process_entries(
 
 
 def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = False):
-    """
-    Acquire an entry by user-specified formula. This method attemps to first
+    """Acquire an entry by user-specified formula. This method attemps to first
     get the entry; if it is not included in the set, it will create an interpolated
     entry. Finally, if stabilize=True, the energy will be lowered until it appears on
     teh hull.
@@ -117,9 +109,7 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = F
         entry = entry_set.get_min_entry_by_formula(formula)
     except KeyError:
         entry = entry_set.get_interpolated_entry(formula)
-        warnings.warn(
-            f"Using interpolated entry for {entry.composition.reduced_formula}"
-        )
+        warnings.warn(f"Using interpolated entry for {entry.composition.reduced_formula}")
 
     if stabilize:
         entry = entry_set.get_stabilized_entry(entry)
@@ -137,8 +127,7 @@ def get_entries(
     conventional_unit_cell: bool = False,
     sort_by_e_above_hull: bool = False,
 ):  # pragma: no cover
-    """
-    Warning:
+    """Warning:
         This function is legacy code directly adapted from pymatgen.ext.matproj. It is
         not broadly useful or applicable to other databases. It is only used in jobs
         interfaced directly with internal databases at the Materials Project. This code
@@ -219,8 +208,7 @@ def get_entries(
                 continue
         else:
             d["potcar_symbols"] = [
-                f"{d['pseudo_potential']['functional']} {label}"
-                for label in d["pseudo_potential"].get("labels", [])
+                f"{d['pseudo_potential']['functional']} {label}" for label in d["pseudo_potential"].get("labels", [])
             ]
             data = {"oxide_type": d["oxide_type"]}
             if property_data:
@@ -234,11 +222,7 @@ def get_entries(
                     entry_id=d["task_id"],
                 )
             else:
-                prim = Structure.from_dict(
-                    d["initial_structure"]
-                    if inc_structure == "initial"
-                    else d["structure"]
-                )
+                prim = Structure.from_dict(d["initial_structure"] if inc_structure == "initial" else d["structure"])
                 if conventional_unit_cell:
                     s = SpacegroupAnalyzer(prim).get_conventional_standard_structure()
                     energy = d["final_energy"] * (len(s) / len(prim))
@@ -256,12 +240,8 @@ def get_entries(
 
     if compatible_only:
         with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore", message="Failed to guess oxidation states.*"
-            )
-            entries = MaterialsProject2020Compatibility().process_entries(
-                entries, clean=True
-            )
+            warnings.filterwarnings("ignore", message="Failed to guess oxidation states.*")
+            entries = MaterialsProject2020Compatibility().process_entries(entries, clean=True)
 
     if sort_by_e_above_hull:
         entries = sorted(entries, key=lambda entry: entry.data["e_above_hull"])
@@ -279,8 +259,7 @@ def get_all_entries_in_chemsys(
     conventional_unit_cell: bool = False,
     n: int = 1000,
 ) -> list[ComputedEntry]:  # pragma: no cover
-    """
-    Warning:
+    """Warning:
         This function is legacy code directly adapted from pymatgen.ext.matproj. It is
         not broadly useful or applicable to other databases. It is only used in jobs
         interfaced directly with internal databases at the Materials Project. This code
@@ -359,8 +338,7 @@ def get_all_entries_in_chemsys(
 
 
 def parse_criteria(criteria_string):  # pragma: no cover
-    """
-    Parses a powerful and simple string criteria and generates a proper
+    """Parses a powerful and simple string criteria and generates a proper
     mongo syntax criteria.
 
     Args:

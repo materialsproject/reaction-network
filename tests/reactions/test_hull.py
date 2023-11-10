@@ -31,19 +31,12 @@ def test_stable_reactions(irh_batio):
         "18 TiO2 -> O2 + 2 Ti9O17",
     ]
 
-    stable_rxns = [
-        actual_rxn
-        for r in stable_rxns
-        for actual_rxn in irh_batio.reactions
-        if r == str(actual_rxn)
-    ]
+    stable_rxns = [actual_rxn for r in stable_rxns for actual_rxn in irh_batio.reactions if r == str(actual_rxn)]
     assert irh_batio.stable_reactions == stable_rxns
 
 
 def test_unstable_reactions(irh_batio):
-    assert set(irh_batio.unstable_reactions) | set(irh_batio.stable_reactions) == set(
-        irh_batio.reactions
-    )
+    assert set(irh_batio.unstable_reactions) | set(irh_batio.stable_reactions) == set(irh_batio.reactions)
 
 
 @pytest.mark.parametrize(
@@ -55,9 +48,7 @@ def test_unstable_reactions(irh_batio):
     ],
 )
 def test_calculate_altitude(c1, c2, c3, expected_altitude):
-    assert InterfaceReactionHull._calculate_altitude(c1, c2, c3) == pytest.approx(
-        expected_altitude
-    )
+    assert InterfaceReactionHull._calculate_altitude(c1, c2, c3) == pytest.approx(expected_altitude)
 
 
 @pytest.mark.parametrize(
@@ -72,33 +63,21 @@ def test_get_coords_in_range(x1, x2, expected_length, irh_batio):
 
 
 def test_get_primary_competition(irh_batio, stable_rxn, unstable_rxn):
-    assert irh_batio.get_primary_competition(stable_rxn) == pytest.approx(
-        0.016641117599548783
-    )
-    assert irh_batio.get_primary_competition(unstable_rxn) == pytest.approx(
-        1.0387981452239168
-    )
+    assert irh_batio.get_primary_competition(stable_rxn) == pytest.approx(0.016641117599548783)
+    assert irh_batio.get_primary_competition(unstable_rxn) == pytest.approx(1.0387981452239168)
 
 
 def test_get_secondary_competition(irh_batio, stable_rxn, unstable_rxn):
-    assert irh_batio.get_secondary_competition(stable_rxn) == pytest.approx(
-        0.41705577943708827
-    )
-    assert irh_batio.get_secondary_competition(unstable_rxn) == pytest.approx(
-        0.42985193897860136
-    )
+    assert irh_batio.get_secondary_competition(stable_rxn) == pytest.approx(0.41705577943708827)
+    assert irh_batio.get_secondary_competition(unstable_rxn) == pytest.approx(0.42985193897860136)
 
 
 def test_get_energy_above_hull(irh_batio, stable_rxn, unstable_rxn):
     assert irh_batio.get_energy_above_hull(stable_rxn) == pytest.approx(0.0)
-    assert irh_batio.get_energy_above_hull(unstable_rxn) == pytest.approx(
-        1.0365808689708862
-    )
+    assert irh_batio.get_energy_above_hull(unstable_rxn) == pytest.approx(1.0365808689708862)
 
     for r in irh_batio.unstable_reactions:
-        assert (
-            irh_batio.get_energy_above_hull(r) > -1e-12
-        )  # some numerical error expected here
+        assert irh_batio.get_energy_above_hull(r) > -1e-12  # some numerical error expected here
 
     for r in irh_batio.stable_reactions:
         assert irh_batio.get_energy_above_hull(r) == pytest.approx(0.0)
@@ -126,9 +105,7 @@ def test_get_decomposition_energy_and_num_paths_recursive(irh_batio):
     ) = irh_batio.get_decomposition_energy_and_num_paths_recursive(0, 1)
 
     assert decomp_energy == pytest.approx(irh_batio.get_decomposition_energy(0, 1))
-    assert num_paths == pytest.approx(
-        irh_batio.count(len(irh_batio.get_coords_in_range(0, 1)) - 2)
-    )
+    assert num_paths == pytest.approx(irh_batio.count(len(irh_batio.get_coords_in_range(0, 1)) - 2))
 
 
 @pytest.mark.parametrize(

@@ -23,17 +23,11 @@ def test_invalid_formula():
 def test_invalid_temperature():
     with pytest.raises(ValueError) as error:
         assert NISTReferenceEntry(Composition("K2CO3"), temperature=200)
-    assert (
-        str(error.value)
-        == "Temperature must be selected from range: 300.0 K to 2000.0 K"
-    )
+    assert str(error.value) == "Temperature must be selected from range: 300.0 K to 2000.0 K"
 
     with pytest.raises(ValueError) as error:
         assert NISTReferenceEntry(Composition("K2CO3"), temperature=2300)
-    assert (
-        str(error.value)
-        == "Temperature must be selected from range: 300.0 K to 2000.0 K"
-    )
+    assert str(error.value) == "Temperature must be selected from range: 300.0 K to 2000.0 K"
 
 
 def test_energy(entries):
@@ -98,9 +92,7 @@ def test_interpolate_energy(entries):
     entry2 = NISTReferenceEntry(composition=comp, temperature=400)
 
     interpolated_entry = NISTReferenceEntry(composition=comp, temperature=350)
-    assert interpolated_entry.energy == pytest.approx(
-        0.5 * entry1.energy + 0.5 * entry2.energy
-    )
+    assert interpolated_entry.energy == pytest.approx(0.5 * entry1.energy + 0.5 * entry2.energy)
 
 
 def test_get_new_temperature(entries):

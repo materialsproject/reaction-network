@@ -30,8 +30,7 @@ logger = get_logger(__name__)
 
 
 class ReactionNetwork(Network):
-    """
-    Main reaction network class for building graph networks and performing
+    """Main reaction network class for building graph networks and performing
     pathfinding. Graphs are built using the rustworkx package (a NetworkX equivalent
     implemented in Rust).
 
@@ -48,8 +47,7 @@ class ReactionNetwork(Network):
         rxns: ReactionSet,
         cost_function: CostFunction = field(default_factory=Softplus),
     ):
-        """
-        Initialize a ReactionNetwork object for a reaction set and cost function.
+        """Initialize a ReactionNetwork object for a reaction set and cost function.
 
         To build the graph network, call the build() method in-place.
 
@@ -62,8 +60,7 @@ class ReactionNetwork(Network):
         super().__init__(rxns=rxns, cost_function=cost_function)
 
     def build(self) -> None:
-        """
-        In-place method. Construct the reaction network graph object and store under the
+        """In-place method. Construct the reaction network graph object and store under the
         "graph" attribute.
 
         WARNING: This does NOT initialize the precursors or target attributes; you must
@@ -86,11 +83,8 @@ class ReactionNetwork(Network):
 
         self._g = g  # type: ignore
 
-    def find_pathways(
-        self, targets: list[Entry | str], k: int = 15
-    ) -> list[BasicPathway]:
-        """
-        Find the k-shortest paths to a provided list of one or more targets.
+    def find_pathways(self, targets: list[Entry | str], k: int = 15) -> list[BasicPathway]:
+        """Find the k-shortest paths to a provided list of one or more targets.
 
         Args:
             targets: List of the formulas or entry objects of each target.
@@ -114,10 +108,8 @@ class ReactionNetwork(Network):
 
         return PathwaySet.from_paths(paths)
 
-
     def set_precursors(self, precursors: Iterable[Entry | str]):
-        """
-        In-place method. Sets the precursors of the network. Removes all references to
+        """In-place method. Sets the precursors of the network. Removes all references to
         previous precursors.
 
         If entries are provided, will use the entries to set the precursors. If strings
@@ -135,9 +127,7 @@ class ReactionNetwork(Network):
             raise ValueError("Must call build() before setting precursors!")
 
         precursors = {
-            p
-            if isinstance(p, (Entry, ExperimentalReferenceEntry))
-            else self.entries.get_min_entry_by_formula(p)
+            p if isinstance(p, (Entry, ExperimentalReferenceEntry)) else self.entries.get_min_entry_by_formula(p)
             for p in precursors
         }
 
@@ -149,10 +139,7 @@ class ReactionNetwork(Network):
         precursors_entry = NetworkEntry(precursors, NetworkEntryType.Precursors)
         if self.precursors:  # remove old precursors
             for node in g.node_indices():
-                if (
-                    g.get_node_data(node).description.value
-                    == NetworkEntryType.Precursors.value
-                ):
+                if g.get_node_data(node).description.value == NetworkEntryType.Precursors.value:
                     g.remove_node(node)
                     break
             else:
@@ -181,8 +168,7 @@ class ReactionNetwork(Network):
         self._precursors = precursors
 
     def set_target(self, target: Entry | str) -> None:
-        """
-        In-place method. Can only provide one target entry or formula at a time.
+        """In-place method. Can only provide one target entry or formula at a time.
 
         If entry is provided, will use that entry to set the target. If string is
         provided, will automatically find minimum-energy entry with
@@ -212,10 +198,7 @@ class ReactionNetwork(Network):
 
         if self.target:
             for node in g.node_indices():
-                if (
-                    g.get_node_data(node).description.value
-                    == NetworkEntryType.Target.value
-                ):
+                if g.get_node_data(node).description.value == NetworkEntryType.Target.value:
                     g.remove_node(node)
                     break
             else:
@@ -250,9 +233,7 @@ class ReactionNetwork(Network):
         precursors_node = g.find_node_by_weight(
             NetworkEntry(self.precursors, NetworkEntryType.Precursors)  # type: ignore
         )
-        target_node = g.find_node_by_weight(
-            NetworkEntry([self.target], NetworkEntryType.Target)
-        )
+        target_node = g.find_node_by_weight(NetworkEntry([self.target], NetworkEntryType.Target))
         for path in yens_ksp(g, self.cost_function, k, precursors_node, target_node):
             paths.append(self._path_from_graph(g, path, self.cost_function))
 
@@ -268,10 +249,7 @@ class ReactionNetwork(Network):
         costs = []
 
         for step, node in enumerate(path):
-            if (
-                g.get_node_data(node).description.value
-                == NetworkEntryType.Products.value
-            ):
+            if g.get_node_data(node).description.value == NetworkEntryType.Products.value:
                 e = g.get_edge_data(path[step - 1], node)
 
                 rxns.append(e)
@@ -283,8 +261,7 @@ class ReactionNetwork(Network):
 def get_rxn_nodes_and_edges(
     rxns: ReactionSet,
 ) -> tuple[list[NetworkEntry], list[tuple[int, int, Reaction]]]:
-    """
-    Given a reaction set, return a list of nodes and edges for constructing the
+    """Given a reaction set, return a list of nodes and edges for constructing the
     reaction network.
 
     Args:
@@ -321,8 +298,7 @@ def get_rxn_nodes_and_edges(
 def get_loopback_edges(
     nodes: list[NetworkEntry],
 ) -> list[tuple[int, int, str]]:
-    """
-    Given a list of nodes to check, this function finds and returns loopback
+    """Given a list of nodes to check, this function finds and returns loopback
     edges (i.e., edges that connect a product node to its equivalent reactant node).
 
     Args:
@@ -345,8 +321,7 @@ def get_loopback_edges(
 
 
 def get_edge_weight(edge_obj: object, cf: CostFunction):
-    """
-    Given an edge of a reaction network, calculates the cost/weight of that edge.
+    """Given an edge of a reaction network, calculates the cost/weight of that edge.
     Corresponds to zero for loopback & precursor/target edges. Evaluates cost function
     for all reaction edges.
 
@@ -372,8 +347,7 @@ def yens_ksp(
     precursors_node: int,
     target_node: int,
 ) -> list[list[int]]:
-    """
-    Yen's Algorithm for k-shortest paths, adopted for rustworkx.
+    """Yen's Algorithm for k-shortest paths, adopted for rustworkx.
 
     This implementation was inspired by the igraph implementation by Antonin Lenfant.
 

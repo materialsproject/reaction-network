@@ -62,9 +62,7 @@ def test_gf_sisso(entries_temps_dict):
 
 def test_interpolation(structure):
     temp = 450
-    e = GibbsComputedEntry.from_structure(
-        structure=structure, formation_energy_per_atom=-2.436, temperature=temp
-    )
+    e = GibbsComputedEntry.from_structure(structure=structure, formation_energy_per_atom=-2.436, temperature=temp)
     assert e.energy == pytest.approx(-53.7243542548528)
 
 
@@ -80,9 +78,7 @@ def test_get_new_temperature(entry):
     new_entry = entry.get_new_temperature(new_temp)
 
     assert new_entry.temperature == new_temp
-    assert new_entry.formation_energy_per_atom == pytest.approx(
-        entry.formation_energy_per_atom
-    )
+    assert new_entry.formation_energy_per_atom == pytest.approx(entry.formation_energy_per_atom)
     assert new_entry.energy != entry.energy
 
 
@@ -104,9 +100,7 @@ def test_normalize(entries_temps_dict):
     num_atoms = 25
     for e in entries_temps_dict.values():
         normed_entry = e.normalize(mode="atom")
-        assert e.uncorrected_energy == pytest.approx(
-            normed_entry.uncorrected_energy * num_atoms
-        )
+        assert e.uncorrected_energy == pytest.approx(normed_entry.uncorrected_energy * num_atoms)
 
 
 def test_is_experimental(entry):

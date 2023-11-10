@@ -21,8 +21,7 @@ def plot_reaction_scatter(
     color: str | None = None,
     plot_pareto: bool = True,
 ) -> px.scatter:
-    """
-    Plot a Plotly scatter plot (2D or 3D) of reactions on various thermodynamic metric
+    """Plot a Plotly scatter plot (2D or 3D) of reactions on various thermodynamic metric
     axes. This also constructs the Pareto front on the provided dimensions.
 
     Args:
@@ -37,18 +36,12 @@ def plot_reaction_scatter(
         label, units = "", ""
 
         if name == "energy":
-            label = (
-                r"$\mathsf{Reaction~driving~force} ~"
-                r"\mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
-            )
+            label = r"$\mathsf{Reaction~driving~force} ~\mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
             units = "eV/atom"
             if z is not None:
                 label = "Reaction Driving Force"
         elif name == "chempot_distance":
-            label = (
-                r"$\Sigma \Delta \mu_{\mathrm{min}} ~"
-                r" \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
-            )
+            label = r"$\Sigma \Delta \mu_{\mathrm{min}} ~ \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
             if z is not None:
                 label = "Total chemical potential distance"
             units = "eV/atom"
@@ -159,9 +152,7 @@ def plot_reaction_scatter(
     )
 
     if z is not None:
-        hovertemplate = (
-            hovertemplate + "<br><b>" + f"{z}" + "</b>: %{z:.3f}" + f" {z_units}<br>"
-        )
+        hovertemplate = hovertemplate + "<br><b>" + f"{z}" + "</b>: %{z:.3f}" + f" {z_units}<br>"
 
     fig.update_traces(hovertemplate=hovertemplate)
 
@@ -187,8 +178,6 @@ def pretty_df_layout(df: DataFrame):
 def filter_df_by_precursors(df: DataFrame, precursors: list[str]):
     """Filter a reaction DataFrame by available precursors."""
     df = df.copy()
-    df["precursors"] = [
-        sorted([r.reduced_formula for r in rxn.reactants]) for rxn in df["rxn"]
-    ]
+    df["precursors"] = [sorted([r.reduced_formula for r in rxn.reactants]) for rxn in df["rxn"]]
     selected = df[df["precursors"].apply(lambda x: all(p in precursors for p in x))]
     return selected.drop(columns=["precursors"])

@@ -39,9 +39,7 @@ def pre_balanced_rxn(reactants, products):
 @pytest.fixture(scope="module")
 def auto_balanced_rxn(reactants, products):
     """Returns the same iron oxidation reaction, after automatically balancing"""
-    return ComputedReaction.balance(
-        reactant_entries=reactants, product_entries=products
-    )
+    return ComputedReaction.balance(reactant_entries=reactants, product_entries=products)
 
 
 @pytest.fixture(scope="module")
@@ -73,35 +71,22 @@ def test_energy_per_atom(pre_balanced_rxn, auto_balanced_rxn):
 def test_energy_uncertainty(pre_balanced_rxn, auto_balanced_rxn):
     expected_energy_uncertainty = 0.0229486383
 
-    assert pre_balanced_rxn.energy_uncertainty == pytest.approx(
-        expected_energy_uncertainty
-    )
-    assert auto_balanced_rxn.energy_uncertainty == pytest.approx(
-        expected_energy_uncertainty
-    )
+    assert pre_balanced_rxn.energy_uncertainty == pytest.approx(expected_energy_uncertainty)
+    assert auto_balanced_rxn.energy_uncertainty == pytest.approx(expected_energy_uncertainty)
 
 
 def test_energy_uncertainty_per_atom(pre_balanced_rxn, auto_balanced_rxn):
     expected_energy_uncertainty_per_atom = 0.0015299092
 
-    assert pre_balanced_rxn.energy_uncertainty_per_atom == pytest.approx(
-        expected_energy_uncertainty_per_atom
-    )
-    assert auto_balanced_rxn.energy_uncertainty_per_atom == pytest.approx(
-        expected_energy_uncertainty_per_atom
-    )
+    assert pre_balanced_rxn.energy_uncertainty_per_atom == pytest.approx(expected_energy_uncertainty_per_atom)
+    assert auto_balanced_rxn.energy_uncertainty_per_atom == pytest.approx(expected_energy_uncertainty_per_atom)
 
 
 def test_copy(pre_balanced_rxn, auto_balanced_rxn):
     pre_balanced_rxn_copy = pre_balanced_rxn.copy()
     auto_balanced_rxn_copy = auto_balanced_rxn.copy()
 
-    assert (
-        pre_balanced_rxn
-        == auto_balanced_rxn
-        == pre_balanced_rxn_copy
-        == auto_balanced_rxn_copy
-    )
+    assert pre_balanced_rxn == auto_balanced_rxn == pre_balanced_rxn_copy == auto_balanced_rxn_copy
 
 
 def test_reverse(pre_balanced_rxn):
@@ -114,9 +99,7 @@ def test_reverse(pre_balanced_rxn):
 
 def test_get_new_temperature(pre_balanced_rxn, gibbs_balanced_rxn):
     with pytest.raises(AttributeError):
-        new_rxn = pre_balanced_rxn.get_new_temperature(
-            1500
-        )  # this reaction only uses ComputedStructureEntry
+        new_rxn = pre_balanced_rxn.get_new_temperature(1500)  # this reaction only uses ComputedStructureEntry
 
     new_rxn = gibbs_balanced_rxn.get_new_temperature(1500)
     for e in new_rxn.entries:

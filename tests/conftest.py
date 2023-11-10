@@ -38,9 +38,7 @@ def entries():
 
 @pytest.fixture(scope="session")
 def gibbs_entries_with_na_cl(entries):
-    return GibbsEntrySet.from_computed_entries(
-        list(entries), temperature=1000
-    ).filter_by_stability(0.0)
+    return GibbsEntrySet.from_computed_entries(list(entries), temperature=1000).filter_by_stability(0.0)
 
 
 @pytest.fixture(scope="session")
@@ -90,9 +88,7 @@ def bao_tio2_rxns():
 
 @pytest.fixture(scope="session")
 def irh_batio(bao_tio2_rxns):
-    return InterfaceReactionHull(
-        c1=Composition("BaO"), c2=Composition("TiO2"), reactions=bao_tio2_rxns
-    )
+    return InterfaceReactionHull(c1=Composition("BaO"), c2=Composition("TiO2"), reactions=bao_tio2_rxns)
 
 
 @pytest.fixture(scope="session")

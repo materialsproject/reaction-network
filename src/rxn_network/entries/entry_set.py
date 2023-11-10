@@ -1,5 +1,4 @@
-"""
-An entry set class for automatically building GibbsComputedEntry objects. Some of this
+"""An entry set class for automatically building GibbsComputedEntry objects. Some of this
 code has been adapted from the EntrySet class in pymatgen.
 """
 from __future__ import annotations
@@ -43,8 +42,7 @@ if TYPE_CHECKING:
 
 
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):
-    """
-    This object is based on pymatgen's EntrySet class and includes factory methods for
+    """This object is based on pymatgen's EntrySet class and includes factory methods for
     constructing GibbsComputedEntry objects from "zero-temperature"
     ComputedStructureEntry objects. It also offers convenient methods for acquiring
     entries from the entry set, whether that be using composition, stability, chemical
@@ -53,14 +51,11 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     def __init__(
         self,
-        entries: Iterable[
-            GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry
-        ],
+        entries: Iterable[GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry],
         calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
     ):
-        """
-        The supplied collection of entries will automatically be converted to a set of
+        """The supplied collection of entries will automatically be converted to a set of
         unique entries.
 
         Args:
@@ -93,11 +88,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
     def __len__(self) -> int:
         return len(self.entries)
 
-    def add(
-        self, entry: GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry
-    ) -> None:
-        """
-        Add an entry to the set in place.
+    def add(self, entry: GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry) -> None:
+        """Add an entry to the set in place.
 
         Args:
             entry: An entry object.
@@ -107,12 +99,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     def update(
         self,
-        entries: Iterable[
-            GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry
-        ],
+        entries: Iterable[GibbsComputedEntry | ExperimentalReferenceEntry | InterpolatedEntry],
     ) -> None:
-        """
-        Add an iterable of entries to the set in place.
+        """Add an iterable of entries to the set in place.
 
         Args:
             entry: An iterable of entry objects.
@@ -121,8 +110,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         self._clear_cache()
 
     def discard(self, entry: GibbsComputedEntry | ExperimentalReferenceEntry) -> None:
-        """
-        Discard an entry in place.
+        """Discard an entry in place.
 
         :param element: Entry
         """
@@ -131,16 +119,14 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     @cached_property
     def pd_dict(self) -> dict:
-        """
-        Returns a dictionary of phase diagrams, keyed by the chemical system. This is
+        """Returns a dictionary of phase diagrams, keyed by the chemical system. This is
         acquired using the helper method expand_pd() and represents one of the simplest
         divisions of sub-PDs for large chemical systems. Cached for speed.
         """
         return expand_pd(self.entries)
 
     def get_subset_in_chemsys(self, chemsys: list[str] | str) -> GibbsEntrySet:
-        """
-        Returns a GibbsEntrySet containing only the set of entries belonging to
+        """Returns a GibbsEntrySet containing only the set of entries belonging to
         a particular chemical system (including subsystems). For example, if the entries
         are from the Li-Fe-P-O system, and chemsys=["Li", "O"], only the Li, O, and Li-O
         entries are returned.
@@ -164,11 +150,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         return GibbsEntrySet(subset, calculate_e_above_hulls=False)
 
-    def filter_by_stability(
-        self, e_above_hull: float, include_polymorphs: bool | None = False
-    ) -> GibbsEntrySet:
-        """
-        Filter the entry set by a metastability (energy above hull) cutoff.
+    def filter_by_stability(self, e_above_hull: float, include_polymorphs: bool | None = False) -> GibbsEntrySet:
+        """Filter the entry set by a metastability (energy above hull) cutoff.
 
         Args:
             e_above_hull: Energy above hull, the cutoff describing the allowed
@@ -188,10 +171,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         for pd in pd_dict.values():
             for entry in pd.all_entries:
-                if (
-                    entry in filtered_entries
-                    or pd.get_e_above_hull(entry) > e_above_hull
-                ):
+                if entry in filtered_entries or pd.get_e_above_hull(entry) > e_above_hull:
                     continue
 
                 formula = entry.composition.reduced_formula
@@ -206,8 +186,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return self.__class__(list(filtered_entries))
 
     def build_indices(self) -> None:
-        """
-        Builds the indices for the entry set in place. This method is called whenever an
+        """Builds the indices for the entry set in place. This method is called whenever an
         entry is added/removed the entry set. The entry indices are useful for querying
         the entry set for specific entries.
 
@@ -221,8 +200,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             e.data.update({"idx": idx})
 
     def get_min_entry_by_formula(self, formula: str) -> ComputedEntry:
-        """
-        Helper method for acquiring the ground state entry with the specified formula.
+        """Helper method for acquiring the ground state entry with the specified formula.
 
         Args:
             formula: The chemical formula of the desired entry.
@@ -232,11 +210,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         return self.min_entries_by_formula[Composition(formula).reduced_formula]
 
-    def get_stabilized_entry(
-        self, entry: ComputedEntry, tol: float = 1e-3, force=False
-    ) -> ComputedEntry:
-        """
-        Helper method for lowering the energy of a single entry such that it is just
+    def get_stabilized_entry(self, entry: ComputedEntry, tol: float = 1e-3, force=False) -> ComputedEntry:
+        """Helper method for lowering the energy of a single entry such that it is just
         stable on the phase diagram. If the entry is already stable, it will be
         returned unchanged.
 
@@ -278,8 +253,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return new_entry
 
     def get_entries_with_new_temperature(self, new_temperature: float) -> GibbsEntrySet:
-        """
-        Returns a new GibbsEntrySet with entries that have had their energies
+        """Returns a new GibbsEntrySet with entries that have had their energies
         modified by using a new temperature.
 
         Note: this will clear the "e_above_hull" data for each entry and re-calculate
@@ -297,13 +271,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             new_entry.data["e_above_hull"] = None
             new_entries.append(new_entry)
 
-        return self.__class__(
-            new_entries, calculate_e_above_hulls=self.calculate_e_above_hulls
-        )
+        return self.__class__(new_entries, calculate_e_above_hulls=self.calculate_e_above_hulls)
 
     def get_entries_with_jitter(self) -> GibbsEntrySet:
-        """
-        Returns a new GibbsEntrySet with entries that have had their energies shifted by
+        """Returns a new GibbsEntrySet with entries that have had their energies shifted by
         randomly sampled noise to account for uncertainty in data. This is done by
         sampling from a Gaussian distribution using the entry's "correction_uncertainty"
         attribute as the scale.
@@ -322,20 +293,14 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             adj = ConstantEnergyAdjustment(
                 value=jitter[idx] * entry.correction_uncertainty,
                 name="Random jitter",
-                description=(
-                    "Randomly sampled (Gaussian) noise to account for uncertainty in"
-                    " data"
-                ),
+                description=("Randomly sampled (Gaussian) noise to account for uncertainty in" " data"),
             )
             new_entries.append(self.get_adjusted_entry(entry, adj))
 
         return GibbsEntrySet(new_entries)
 
-    def get_interpolated_entry(
-        self, formula: str, tol_per_atom: float = 1e-3
-    ) -> ComputedEntry:
-        """
-        Helper method for interpolating an entry from the entry set.
+    def get_interpolated_entry(self, formula: str, tol_per_atom: float = 1e-3) -> ComputedEntry:
+        """Helper method for interpolating an entry from the entry set.
 
         Args:
             formula: The chemical formula of the desired entry.
@@ -348,10 +313,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         comp = Composition(formula).reduced_composition
         pd_entries = self.get_subset_in_chemsys([str(e) for e in comp.elements])
 
-        energy = (
-            PhaseDiagram(pd_entries).get_hull_energy(comp)
-            - tol_per_atom * comp.num_atoms
-        )
+        energy = PhaseDiagram(pd_entries).get_hull_energy(comp) - tol_per_atom * comp.num_atoms
 
         adj = ConstantEnergyAdjustment(  # for keeping track of uncertainty
             value=0.0,
@@ -368,8 +330,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         )
 
     def get_e_above_hull(self, entry: ComputedEntry) -> float:
-        """
-        Helper method for calculating the energy above hull for a single entry.
+        """Helper method for calculating the energy above hull for a single entry.
 
         Args:
             entry: A ComputedEntry object.
@@ -398,8 +359,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
     ) -> GibbsEntrySet:
-        """
-        Constructor method for building a GibbsEntrySet from an existing phase diagram.
+        """Constructor method for building a GibbsEntrySet from an existing phase diagram.
 
         Args:
             pd: Phase Diagram object (pymatgen)
@@ -431,26 +391,18 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             composition = entry.composition
             formula = composition.reduced_formula
 
-            if (
-                composition.is_element
-                and entry not in pd.el_refs.values()
-                or formula in experimental_formulas
-            ):
+            if composition.is_element and entry not in pd.el_refs.values() or formula in experimental_formulas:
                 continue
 
             new_entries = []
 
             new_entry = None
             if include_nist_data:
-                new_entry = cls._check_for_experimental(
-                    formula, "nist", temperature, ignore_nist_solids
-                )
+                new_entry = cls._check_for_experimental(formula, "nist", temperature, ignore_nist_solids)
                 if new_entry:
                     new_entries.append(new_entry)
             if include_freed_data:
-                new_entry = cls._check_for_experimental(
-                    formula, "freed", temperature, ignore_nist_solids
-                )
+                new_entry = cls._check_for_experimental(formula, "freed", temperature, ignore_nist_solids)
                 if new_entry:
                     new_entries.append(new_entry)
 
@@ -491,9 +443,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return GibbsEntrySet(entries=self.entries)
 
     def as_dict(self) -> dict:
-        """
-        Returns:
-            JSON serializable dict representation of the entry set.
+        """Returns:
+        JSON serializable dict representation of the entry set.
         """
         d = super().as_dict()
         d["entries"] = [e.as_dict() for e in self.entries]
@@ -512,8 +463,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
     ) -> GibbsEntrySet:
-        """
-        Constructor method for initializing GibbsEntrySet from T = 0 K
+        """Constructor method for initializing GibbsEntrySet from T = 0 K
         ComputedStructureEntry objects, as acquired from a thermochemical database
         (e.g., The Materials Project).
 
@@ -584,27 +534,21 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     @cached_property
     def min_entries_by_formula(self) -> dict[str, ComputedEntry]:
-        """
-        Returns a dict of minimum energy entries in the entry set, indexed by
+        """Returns a dict of minimum energy entries in the entry set, indexed by
         formula.
         """
         min_entries = {}
         for e in self.entries:
             formula = e.composition.reduced_formula
             if formula not in min_entries:
-                entries = filter(
-                    lambda x: x.composition.reduced_formula == formula, self.entries
-                )
-                min_entries[formula] = sorted(entries, key=lambda x: x.energy_per_atom)[
-                    0
-                ]
+                entries = filter(lambda x: x.composition.reduced_formula == formula, self.entries)
+                min_entries[formula] = sorted(entries, key=lambda x: x.energy_per_atom)[0]
 
         return min_entries
 
     @cached_property
     def temperature(self) -> float:
-        """
-        Returns the temperature of entries in the dataset. More precisely, this is the
+        """Returns the temperature of entries in the dataset. More precisely, this is the
         temperature encountered when iterating over the dataset.
 
         Use at your own risk if mixing GibbsComputedEntry objects calculated at
@@ -619,10 +563,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
     @cached_property
     def chemsys(self) -> set[str]:
-        """
-        Returns:
-            Set of symbols representing the chemical system, e.g., {"Li", "Fe", "P",
-            "O"}.
+        """Returns:
+        Set of symbols representing the chemical system, e.g., {"Li", "Fe", "P",
+        "O"}.
         """
         chemsys = set()
         for e in self.entries:
@@ -630,9 +573,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return chemsys
 
     @staticmethod
-    def get_adjusted_entry(
-        entry: GibbsComputedEntry, adjustment: EnergyAdjustment
-    ) -> GibbsComputedEntry:
+    def get_adjusted_entry(entry: GibbsComputedEntry, adjustment: EnergyAdjustment) -> GibbsComputedEntry:
         entry_dict = entry.as_dict()
         original_entry = entry_dict.get("entry", None)
 
@@ -644,11 +585,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         energy_adjustments.append(adjustment.as_dict())
         return MontyDecoder().process_decoded(entry_dict)
 
-
     @staticmethod
-    def _check_for_experimental(
-        formula: str, cls_name: str, temperature: float, ignore_nist_solids: bool
-    ):
+    def _check_for_experimental(formula: str, cls_name: str, temperature: float, ignore_nist_solids: bool):
         cls_name = cls_name.lower()
         if cls_name in ("nist", "nistreferenceentry"):
             cl = NISTReferenceEntry
@@ -659,26 +597,18 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
 
         entry = None
         if formula in cl.REFERENCES:
-            if (
-                cl == NISTReferenceEntry
-                and ignore_nist_solids
-                and formula in IGNORE_NIST_SOLIDS
-            ):
+            if cl == NISTReferenceEntry and ignore_nist_solids and formula in IGNORE_NIST_SOLIDS:
                 return None
             try:
                 entry = cl(composition=Composition(formula), temperature=temperature)
             except ValueError as error:
-                logger.debug(
-                    f"Compound {formula} is in {cl} tables but at different"
-                    f" temperatures!: {error}"
-                )
+                logger.debug(f"Compound {formula} is in {cl} tables but at different" f" temperatures!: {error}")
 
         return entry
 
     @staticmethod
     def _get_carbonate_correction(entry):
-        """
-        Helper method for determining the carbonate correction for an entry.
+        """Helper method for determining the carbonate correction for an entry.
 
         WARNING: The standard correction value provided in this module has been fit only
         to MP-derived entries (i.e., entries calculated with MPRelaxSet and MPStaticSet
@@ -706,8 +636,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return CarbonateCorrection(num_c)
 
     def _clear_cache(self) -> None:
-        """
-        Clears all cached properties. This method is called whenever the entry set is
+        """Clears all cached properties. This method is called whenever the entry set is
         modified in place (as is done with the add method, etc.).
         """
         for name, value in inspect.getmembers(GibbsEntrySet):

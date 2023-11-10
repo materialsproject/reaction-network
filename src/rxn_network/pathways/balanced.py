@@ -15,8 +15,7 @@ if TYPE_CHECKING:
 
 
 class BalancedPathway(BasicPathway):
-    """
-    Helper class for storing multiple ComputedReaction objects which form a single
+    """Helper class for storing multiple ComputedReaction objects which form a single
     reaction pathway as identified via pathfinding methods. Includes costs for each
     reaction.
     """
@@ -28,13 +27,12 @@ class BalancedPathway(BasicPathway):
         costs: list[float],
         balanced: bool = False,
     ):
-        """
-        Args:
-            reactions: list of ComputedReaction objects which occur along path.
-            coefficients: list of coefficients to balance each corresponding reaction.
-            costs: list of corresponding costs for each reaction.
-            balanced: whether or not the reaction pathway is balanced.
-                Defaults to False and should ideally be set through PathwaySolver.
+        """Args:
+        reactions: list of ComputedReaction objects which occur along path.
+        coefficients: list of coefficients to balance each corresponding reaction.
+        costs: list of corresponding costs for each reaction.
+        balanced: whether or not the reaction pathway is balanced.
+        Defaults to False and should ideally be set through PathwaySolver.
         """
         self.coefficients = coefficients
         super().__init__(reactions=reactions, costs=costs)
@@ -42,25 +40,20 @@ class BalancedPathway(BasicPathway):
         self.balanced = balanced
 
     def get_comp_matrix(self) -> np.ndarray:
-        """
-        Gets the composition matrix used in the balancing procedure.
+        """Gets the composition matrix used in the balancing procedure.
 
         Returns:
             An array representing the composition matrix for a reaction
         """
         return np.array(
             [
-                [
-                    rxn.get_coeff(comp) if comp in rxn.all_comp else 0
-                    for comp in self.compositions
-                ]
+                [rxn.get_coeff(comp) if comp in rxn.all_comp else 0 for comp in self.compositions]
                 for rxn in self.reactions
             ]
         )
 
     def get_coeff_vector_for_rxn(self, rxn: Reaction) -> np.ndarray:
-        """
-        Gets the net reaction coefficients vector.
+        """Gets the net reaction coefficients vector.
 
         Args:
             rxn: Reaction object to get coefficients for
@@ -68,16 +61,10 @@ class BalancedPathway(BasicPathway):
         Returns:
             An array representing the reaction coefficients vector
         """
-        return np.array(
-            [
-                rxn.get_coeff(comp) if comp in rxn.compositions else 0
-                for comp in self.compositions
-            ]
-        )
+        return np.array([rxn.get_coeff(comp) if comp in rxn.compositions else 0 for comp in self.compositions])
 
     def contains_interdependent_rxns(self, precursors: list[Composition]) -> bool:
-        """
-        Whether or not the pathway contains interdependent reactions given a list of
+        """Whether or not the pathway contains interdependent reactions given a list of
         provided precursors.
 
         Args:
@@ -94,10 +81,7 @@ class BalancedPathway(BasicPathway):
 
         for combo in limited_powerset(rxns, num_rxns):
             size = len(combo)
-            if (
-                any(set(rxn.reactants).issubset(precursors_set) for rxn in combo)
-                or size == 1
-            ):
+            if any(set(rxn.reactants).issubset(precursors_set) for rxn in combo) or size == 1:
                 continue
 
             other_comp = {c for rxn in (rxns - set(combo)) for c in rxn.compositions}

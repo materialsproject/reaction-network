@@ -1,5 +1,4 @@
-"""
-Implements a class for storing (unbalanced/unconstrained) collection of reactions
+"""Implements a class for storing (unbalanced/unconstrained) collection of reactions
 forming a reaction pathway.
 """
 from __future__ import annotations
@@ -13,8 +12,7 @@ if TYPE_CHECKING:
 
 
 class BasicPathway(Pathway):
-    """
-    Simple pathway class for storing multiple ComputedReaction objects which form a
+    """Simple pathway class for storing multiple ComputedReaction objects which form a
     single reaction pathway.
 
     In this class, there are no constraints on stoichiometry. See BalancedPathway for
@@ -22,10 +20,9 @@ class BasicPathway(Pathway):
     """
 
     def __init__(self, reactions: list[Reaction], costs: list[float] | None = None):
-        """
-        Args:
-            reactions: list of ComputedReaction objects making up the pathway.
-            costs: Optional list of corresponding costs for each reaction.
+        """Args:
+        reactions: list of ComputedReaction objects making up the pathway.
+        costs: Optional list of corresponding costs for each reaction.
         """
         self._reactions = reactions
         self.costs = costs or []
@@ -56,10 +53,7 @@ class BasicPathway(Pathway):
 
     def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
-            return all(
-                other_rxn == rxn
-                for other_rxn, rxn in zip(other.reactions, self.reactions)
-            )
+            return all(other_rxn == rxn for other_rxn, rxn in zip(other.reactions, self.reactions))
 
         return False
 

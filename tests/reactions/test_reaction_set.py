@@ -27,9 +27,7 @@ def gibbs_rxn_set(ymno3_gibbs_rxns):
 
 
 def test_get_rxns(ymno3_rxns, rxn_set, open_rxn_set):
-    ymno3_rxns_set = set(
-        ymno3_rxns
-    )  # order may change when creating ReactionSet object
+    ymno3_rxns_set = set(ymno3_rxns)  # order may change when creating ReactionSet object
     open_rxns = set(open_rxn_set.get_rxns())
     assert set(rxn_set.get_rxns()) == ymno3_rxns_set
     assert open_rxns != ymno3_rxns_set
@@ -46,16 +44,12 @@ def test_calculate_costs(ymno3_rxns, rxn_set):
 
 
 def test_filter_duplicates(computed_rxn):
-    computed_rxn2 = ComputedReaction(
-        computed_rxn.entries, computed_rxn.coefficients * 2
-    )
+    computed_rxn2 = ComputedReaction(computed_rxn.entries, computed_rxn.coefficients * 2)
 
     assert computed_rxn2 != computed_rxn
-    assert list(
-        ReactionSet.from_rxns(
-            [computed_rxn, computed_rxn2], filter_duplicates=True
-        ).get_rxns()
-    ) == [computed_rxn]
+    assert list(ReactionSet.from_rxns([computed_rxn, computed_rxn2], filter_duplicates=True).get_rxns()) == [
+        computed_rxn
+    ]
 
 
 def test_set_temperature(gibbs_rxn_set: ReactionSet):
@@ -73,8 +67,7 @@ def test_set_temperature(gibbs_rxn_set: ReactionSet):
     found = [
         rxn
         for rxn in new_rxns
-        if rxn.reactants == old_test_rxn.reactants
-        and np.all(rxn.coefficients == old_test_rxn.coefficients)
+        if rxn.reactants == old_test_rxn.reactants and np.all(rxn.coefficients == old_test_rxn.coefficients)
     ]
 
     assert len(found) == 1
@@ -102,8 +95,7 @@ def test_set_open_el(rxn_set: ReactionSet):
     found = [
         rxn
         for rxn in new_rxns
-        if rxn.reactants == old_test_rxn.reactants
-        and np.all(rxn.coefficients == old_test_rxn.coefficients)
+        if rxn.reactants == old_test_rxn.reactants and np.all(rxn.coefficients == old_test_rxn.coefficients)
     ]
 
     assert len(found) == 1

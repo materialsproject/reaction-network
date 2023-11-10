@@ -39,16 +39,15 @@ class ChempotDistanceCalculator(Calculator):
         mu_func: Callable | str = "sum",
         name: str = "chempot_distance",
     ):
-        """
-        Args:
-            cpd: the chemical potential diagram for the phase space in which the
-                reaction(s) exist
-            mu_func: the function (or string name of the function) used to aggregate the
-                interfacial chemical potential distances into a single value describing
-                the whole reaction. Current options are 1) max, 2) mean, and 3) sum
-                (default).
-            name: the data dictionary key with which to store the calculated value.
-                Defaults to "chempot_distance".
+        """Args:
+        cpd: the chemical potential diagram for the phase space in which the
+        reaction(s) exist
+        mu_func: the function (or string name of the function) used to aggregate the
+        interfacial chemical potential distances into a single value describing
+        the whole reaction. Current options are 1) max, 2) mean, and 3) sum
+        (default).
+        name: the data dictionary key with which to store the calculated value.
+        Defaults to "chempot_distance".
         """
         self.cpd = cpd
         self.name = name
@@ -60,10 +59,7 @@ class ChempotDistanceCalculator(Calculator):
         elif mu_func == "sum":
             self.mu_func = sum  # type: ignore
         elif isinstance(mu_func, str):
-            raise ValueError(
-                "Provided mu_func name is not a known function; please provide the"
-                " function directly."
-            )
+            raise ValueError("Provided mu_func name is not a known function; please provide the" " function directly.")
 
         self._open_elems = set()
         if cpd.entries[0].__class__.__name__ == "GrandPotPDEntry":
@@ -156,12 +152,11 @@ class PrimaryCompetitionCalculator(Calculator):
         irh: InterfaceReactionHull,
         name: str = "primary_competition",
     ):
-        """
-        Args:
-            irh: the interface reaction hull containing the target reaction and all
-                competing reactions.
-            name: the data dictionary key with which to store the calculated value.
-                Defaults to "primary_competition".
+        """Args:
+        irh: the interface reaction hull containing the target reaction and all
+        competing reactions.
+        name: the data dictionary key with which to store the calculated value.
+        Defaults to "primary_competition".
         """
         self.irh = irh
         self.name = name
@@ -199,12 +194,11 @@ class SecondaryCompetitionCalculator(Calculator):
         irh: InterfaceReactionHull,
         name: str = "secondary_competition",
     ):
-        """
-        Args:
-            irh: the interface reaction hull containing the target reaction and all
-                competing reactions.
-            name: the data dictionary key with which to store the calculated value.
-                Defaults to "secondary_competition".
+        """Args:
+        irh: the interface reaction hull containing the target reaction and all
+        competing reactions.
+        name: the data dictionary key with which to store the calculated value.
+        Defaults to "secondary_competition".
         """
         self.irh = irh
         self.name = name
@@ -223,8 +217,7 @@ class SecondaryCompetitionCalculator(Calculator):
 
 
 class SecondaryCompetitionWithEhullCalculator(Calculator):
-    """
-    WARNING: this is an alternative calculator for secondary competition (C_2) that
+    """WARNING: this is an alternative calculator for secondary competition (C_2) that
     includes the energy above hull of the target reaciton. It should only be used for
     testing purposes.
     """
@@ -234,12 +227,11 @@ class SecondaryCompetitionWithEhullCalculator(Calculator):
         irh: InterfaceReactionHull,
         name: str = "secondary_competition_with_ehull",
     ):
-        """
-        Args:
-            irh: the interface reaction hull containing the target reaction and all
-                competing reactions.
-            name: the data dictionary key with which to store the calculated value.
-                Defaults to "secondary_competition_with_ehull".
+        """Args:
+        irh: the interface reaction hull containing the target reaction and all
+        competing reactions.
+        name: the data dictionary key with which to store the calculated value.
+        Defaults to "secondary_competition_with_ehull".
         """
         self.irh = irh
         self.name = name
@@ -258,8 +250,7 @@ class SecondaryCompetitionWithEhullCalculator(Calculator):
 
 
 class SecondaryCompetitionMaxCalculator(Calculator):
-    """
-    WARNING: this is an alternative calculator for secondary competition (C_2) that
+    """WARNING: this is an alternative calculator for secondary competition (C_2) that
     defaults to calculation of the maximum secondary reaction energy. It should only be
     used for testing purposes.
     """
@@ -269,12 +260,11 @@ class SecondaryCompetitionMaxCalculator(Calculator):
         irh: InterfaceReactionHull,
         name: str = "secondary_competition_max",
     ):
-        """
-        Args:
-            irh: the interface reaction hull containing the target reaction and all
-                competing reactions.
-            name: the data dictionary key with which to store the calculated value.
-                Defaults to "secondary_competition_max".
+        """Args:
+        irh: the interface reaction hull containing the target reaction and all
+        competing reactions.
+        name: the data dictionary key with which to store the calculated value.
+        Defaults to "secondary_competition_max".
         """
         self.irh = irh
         self.name = name
@@ -292,8 +282,7 @@ class SecondaryCompetitionMaxCalculator(Calculator):
 
 
 class SecondaryCompetitionAreaCalculator(Calculator):
-    """
-    WARNING: this is an alternative calculator for secondary competition (C_2) that
+    """WARNING: this is an alternative calculator for secondary competition (C_2) that
     defaults to calculation of the area of the enclosed hull. It should only be used for
     testing purposes and is quite unstable.
     """
@@ -303,12 +292,11 @@ class SecondaryCompetitionAreaCalculator(Calculator):
         irh: InterfaceReactionHull,
         name: str = "secondary_competition_area",
     ):
-        """
-        Args:
-            irh: the interface reaction hull containing the target reaction and all
-                competing reactions.
-            name: the data dictionary key with which to store the calculated value.
-                Defaults to "secondary_competition_area".
+        """Args:
+        irh: the interface reaction hull containing the target reaction and all
+        competing reactions.
+        name: the data dictionary key with which to store the calculated value.
+        Defaults to "secondary_competition_area".
         """
         self.irh = irh
         self.name = name

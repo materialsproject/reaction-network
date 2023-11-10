@@ -302,16 +302,12 @@ def c_mats():
 
 @pytest.fixture(scope="module")
 def m_mats():
-    arr = np.array(
-        [[0.55555556, 0.44444444, 0.11111111], [0.55555556, 0.48888889, 0.11111111]]
-    )
+    arr = np.array([[0.55555556, 0.44444444, 0.11111111], [0.55555556, 0.48888889, 0.11111111]])
 
     return arr
 
 
 def test_balance_path_arrays_cpu(comp_matrices, net_coeffs, c_mats, m_mats):
-    c_mats_actual, m_mats_actual = _balance_path_arrays_cpu(
-        comp_matrices, net_coeffs, tol=1e-6
-    )
+    c_mats_actual, m_mats_actual = _balance_path_arrays_cpu(comp_matrices, net_coeffs, tol=1e-6)
     assert np.allclose(c_mats, c_mats_actual)
     assert np.allclose(m_mats, m_mats_actual)

@@ -19,8 +19,7 @@ if TYPE_CHECKING:
 
 
 class PathwayPlotter(MSONable):
-    """
-    WARNING: This is an EXPERIMENTAL CLASS. Use at your own risk.
+    """WARNING: This is an EXPERIMENTAL CLASS. Use at your own risk.
 
     Helper class for plotting a reaction pathway and the corresponding energy cascade.
     """
@@ -31,11 +30,10 @@ class PathwayPlotter(MSONable):
         temps: list[float],
         apply_smoothing: bool = True,
     ):
-        """
-        Args:
-            phase_amounts: Dicts with format {phase: [amounts]}
-            temps: list of temperatures
-            apply_smoothing: Whether to smooth the data. Default is True.
+        """Args:
+        phase_amounts: Dicts with format {phase: [amounts]}
+        temps: list of temperatures
+        apply_smoothing: Whether to smooth the data. Default is True.
         """
         self._phase_amounts = phase_amounts
         self._temps = temps
@@ -51,8 +49,7 @@ class PathwayPlotter(MSONable):
         return self.df.plot(alpha=0.7)
 
     def plot_energy_cascade(self, entries: list[ComputedEntry] | GibbsEntrySet):
-        """
-        Returns a plot of the energy cascade given a list of entries.
+        """Returns a plot of the energy cascade given a list of entries.
 
         Args:
             entries: List of entries or GibbsEntrySet.
@@ -62,11 +59,7 @@ class PathwayPlotter(MSONable):
         energies_df = pd.DataFrame(energies).T
         ground_state_energies = energies_df.pop("ground_state")
 
-        gibbs_arr = (
-            self.df.values
-            * energies_df.values
-            / self.num_atoms_df.sum(axis=1).values.reshape(-1, 1)
-        )
+        gibbs_arr = self.df.values * energies_df.values / self.num_atoms_df.sum(axis=1).values.reshape(-1, 1)
 
         g_df = pd.DataFrame(gibbs_arr, columns=self.df.columns, index=self.df.index)
 
@@ -98,10 +91,7 @@ class PathwayPlotter(MSONable):
             for f in formulas:
                 comp = Composition(f).reduced_composition
                 energy = (
-                    pd.get_form_energy_per_atom(
-                        gibbs_entries.get_min_entry_by_formula(comp.formula)
-                    )
-                    * comp.num_atoms
+                    pd.get_form_energy_per_atom(gibbs_entries.get_min_entry_by_formula(comp.formula)) * comp.num_atoms
                 )
                 all_energies[temp][f] = energy
 
@@ -130,7 +120,6 @@ class PathwayPlotter(MSONable):
             el_dict[el] = sum(el_dict[el])
 
         return pd.DataFrame(el_dict)
-
 
     @property
     def elems(self) -> list[Element]:
