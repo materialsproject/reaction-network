@@ -28,7 +28,7 @@ class EntrySetDocument(BaseModel):
     include_polymorphs: bool = Field(
         default=False, description="Whether to include metastable polymorphs in the entry set."
     )
-    formulas_to_include: Optional[str] = Field(
+    formulas_to_include: Optional[list[str]] = Field(
         None, description="The required formulas to include during construciton."
     )
 
