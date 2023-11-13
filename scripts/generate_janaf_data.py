@@ -1,25 +1,21 @@
-""" 
-Script for generating file: data/nist/compounds.json.gz. Requires thermochem package. 
-"""
+"""Script for generating file: data/nist/compounds.json.gz. Requires thermochem package."""
 
 import gzip
 import json
 from collections import OrderedDict
-from typing import Dict
 
 import numpy as np
-import pandas
+import pandas as pd
+from rxn_network.core import Composition
 from thermochem.janaf import Janafdb
 from tqdm import tqdm
-
-from rxn_network.core import Composition
 
 JMOL_PER_EV = 96485.307499258
 
 if __name__ == "__main__":
     jdb = Janafdb()
 
-    db = pandas.read_csv(
+    db = pd.read_csv(
         "JANAF_index.txt",
         delimiter="|",
     )
@@ -43,7 +39,7 @@ if __name__ == "__main__":
         cleaned_formulas.append(f)
 
     # Acquire data
-    all_data: Dict[str, Dict[float, float]] = {}
+    all_data: dict[str, dict[float, float]] = {}
 
     for f in tqdm(cleaned_formulas):
         phase_df = db[db["formula"] == f]
@@ -65,13 +61,13 @@ if __name__ == "__main__":
 
         try:
             data = jdb.getphasedata(filename=fn)
-        except pandas.errors.ParserError as e:
+        except pd.errors.ParserError as e:
             print(e)
             continue
 
         max_temp = int((data.rawdata["T"].max() // 100) * 100)
         max_temp = min(max_temp, 2000)
-        temps = [i for i in range(300, max_temp + 100, 100)]
+        temps = list(range(300, max_temp + 100, 100))
 
         dg_f = [data.DeltaG(t) / JMOL_PER_EV for t in temps]
 

@@ -1,5 +1,4 @@
-"""
-A computed entry object for estimating the Gibbs free energy of formation. Note that
+"""A computed entry object for estimating the Gibbs free energy of formation. Note that
 this is similar to the implementation within pymatgen, but has been refactored here to
 add extra functionality.
 """
@@ -25,8 +24,7 @@ if TYPE_CHECKING:
 
 
 class GibbsComputedEntry(ComputedEntry):
-    """
-    An extension to ComputedEntry which estimates the Gibbs free energy of formation
+    """An extension to ComputedEntry which estimates the Gibbs free energy of formation
     of solids using energy adjustments from the machine-learned SISSO descriptor from
     Bartel et al. (2018).  Note that this is similar to the implementation within
     pymatgen, but has been refactored here to add extra functionality.
@@ -54,8 +52,7 @@ class GibbsComputedEntry(ComputedEntry):
         data: dict | None = None,
         entry_id: object | None = None,
     ):
-        """
-        A new computed entry object is returned with a supplied energy correction
+        """A new computed entry object is returned with a supplied energy correction
         representing the difference between the formation enthalpy at T=0K and the
         Gibbs formation energy at the specified temperature.
 
@@ -88,9 +85,7 @@ class GibbsComputedEntry(ComputedEntry):
 
         if energy_adjustments is not None:
             energy_adjustments = [
-                adjustment
-                for adjustment in energy_adjustments
-                if adjustment.name != "Gibbs SISSO Correction"
+                adjustment for adjustment in energy_adjustments if adjustment.name != "Gibbs SISSO Correction"
             ]
         else:
             energy_adjustments = []
@@ -122,8 +117,7 @@ class GibbsComputedEntry(ComputedEntry):
         self.temperature = temperature
 
     def get_new_temperature(self, new_temperature: float) -> GibbsComputedEntry:
-        """
-        Return a copy of the GibbsComputedEntry at the new specified temperature.
+        """Return a copy of the GibbsComputedEntry at the new specified temperature.
 
         Args:
             new_temperature: The new temperature to use [K]
@@ -135,12 +129,10 @@ class GibbsComputedEntry(ComputedEntry):
         new_entry_dict = self.as_dict()
         new_entry_dict["temperature"] = new_temperature
 
-        new_entry = self.from_dict(new_entry_dict)
-        return new_entry
+        return self.from_dict(new_entry_dict)
 
     def gibbs_adjustment(self, temperature: float) -> float:
-        """
-        Returns the difference between the predicted Gibbs formation energy and the
+        """Returns the difference between the predicted Gibbs formation energy and the
         formation enthalpy at 298 K, i.e., dGf(T) - dHf(298 K). Calculated using
         SISSO descriptor from Bartel et al. (2018) and elemental chemical potentials
         (FactSage).
@@ -149,6 +141,7 @@ class GibbsComputedEntry(ComputedEntry):
 
         Args:
             temperature: The absolute temperature [K].
+
         Returns:
             The correction to Gibbs free energy of formation (eV) from DFT energy.
         """
@@ -158,13 +151,12 @@ class GibbsComputedEntry(ComputedEntry):
         num_atoms = self._composition.num_atoms
         reduced_mass = self._reduced_mass(self._composition)
 
-        return num_atoms * self._g_delta_sisso(
-            self.volume_per_atom, reduced_mass, temperature
-        ) - self._sum_g_i(self._composition, temperature)
+        return num_atoms * self._g_delta_sisso(self.volume_per_atom, reduced_mass, temperature) - self._sum_g_i(
+            self._composition, temperature
+        )
 
     def to_grand_entry(self, chempots: dict[Element, float]) -> GrandPotPDEntry:
-        """
-        Convert a GibbsComputedEntry to a GrandComputedEntry.
+        """Convert a GibbsComputedEntry to a GrandComputedEntry.
 
         Args:
             chempots: A dictionary of {element: chempot} pairs.
@@ -179,36 +171,27 @@ class GibbsComputedEntry(ComputedEntry):
         return deepcopy(self)
 
     @staticmethod
-    def _g_delta_sisso(
-        volume_per_atom: float, reduced_mass: float, temp: float
-    ) -> float:
-        """
-        G^delta as predicted by SISSO-learned descriptor from Eq. (4) in Bartel et al.
+    def _g_delta_sisso(volume_per_atom: float, reduced_mass: float, temp: float) -> float:
+        """G^delta as predicted by SISSO-learned descriptor from Eq. (4) in Bartel et al.
         (2018).
 
         Args:
-            vol_per_atom: volume per atom [Å^3/atom]
+            volume_per_atom: volume per atom [Å^3/atom]
             reduced_mass: reduced mass as calculated with pair-wise sum formula [amu]
             temp: Temperature [K]
 
         Returns:
             float: G^delta
         """
-
         return (
-            (
-                -2.48e-4 * np.log(volume_per_atom)
-                - 8.94e-5 * reduced_mass / volume_per_atom
-            )
-            * temp
+            (-2.48e-4 * np.log(volume_per_atom) - 8.94e-5 * reduced_mass / volume_per_atom) * temp
             + 0.181 * np.log(temp)
             - 0.882
         )
 
     @staticmethod
     def _sum_g_i(composition: Composition, temperature: float) -> float:
-        """
-        Sum of the stoichiometrically weighted chemical potentials [eV] of the elements
+        """Sum of the stoichiometrically weighted chemical potentials [eV] of the elements
         at specified temperature, as acquired from data/elements.json.
         """
         elems = composition.get_el_amt_dict()
@@ -217,21 +200,18 @@ class GibbsComputedEntry(ComputedEntry):
             sum_g_i = 0
             for elem, amt in elems.items():
                 g_interp = interp1d(
-                    [float(t) for t in G_ELEMS.keys()],
+                    [float(t) for t in G_ELEMS],
                     [g_dict[elem] for g_dict in G_ELEMS.values()],
                 )
                 sum_g_i += amt * g_interp(temperature)
         else:
-            sum_g_i = sum(
-                amt * G_ELEMS[str(temperature)][elem] for elem, amt in elems.items()
-            )
+            sum_g_i = sum(amt * G_ELEMS[str(temperature)][elem] for elem, amt in elems.items())
 
         return sum_g_i
 
     @staticmethod
     def _reduced_mass(composition: Composition) -> float:
-        """
-        Reduced mass [amu] as calculated via Eq. 6 in Bartel et al. (2018),
+        """Reduced mass [amu] as calculated via Eq. 6 in Bartel et al. (2018),
         to be used in SISSO descriptor equation.
         """
         reduced_comp = composition.reduced_composition
@@ -251,9 +231,7 @@ class GibbsComputedEntry(ComputedEntry):
 
             mass_sum += (alpha_i + alpha_j) * (m_i * m_j) / (m_i + m_j)
 
-        reduced_mass = (1 / denominator) * mass_sum
-
-        return reduced_mass
+        return (1 / denominator) * mass_sum
 
     @classmethod
     def from_structure(
@@ -263,8 +241,7 @@ class GibbsComputedEntry(ComputedEntry):
         temperature: float,
         **kwargs,
     ) -> GibbsComputedEntry:
-        """
-        Constructor method for building a GibbsComputedEntry from a structure,
+        """Constructor method for building a GibbsComputedEntry from a structure,
         formation enthalpy, and temperature.
 
         Args:
@@ -280,19 +257,17 @@ class GibbsComputedEntry(ComputedEntry):
         """
         composition = Composition(structure.composition).element_composition
         volume_per_atom = structure.volume / structure.num_sites
-        entry = cls(
+        return cls(
             composition=composition,
             formation_energy_per_atom=formation_energy_per_atom,
             volume_per_atom=volume_per_atom,
             temperature=temperature,
             **kwargs,
         )
-        return entry
 
     @property
     def is_experimental(self) -> bool:
-        """
-        Returns True if self.data contains {"theoretical": False}. If
+        """Returns True if self.data contains {"theoretical": False}. If
         theoretical is not specified but there is greater than 1 icsd_id provided,
         assumes that the presence of an icsd_id means the entry is experimental.
         """
@@ -305,8 +280,7 @@ class GibbsComputedEntry(ComputedEntry):
 
     @property
     def unique_id(self) -> str:
-        """
-        Returns a unique ID for the entry based on its entry-id and temperature. This is
+        """Returns a unique ID for the entry based on its entry-id and temperature. This is
         useful because the same entry-id can be used for multiple entries at different
         temperatures.
         """
@@ -322,9 +296,9 @@ class GibbsComputedEntry(ComputedEntry):
 
     @classmethod
     def from_dict(cls, d: dict) -> GibbsComputedEntry:
-        """ "Returns a GibbsComputedEntry object from MSONable dictionary"""
+        """Returns a GibbsComputedEntry object from MSONable dictionary."""
         dec = MontyDecoder()
-        entry = cls(
+        return cls(
             composition=d["composition"],
             formation_energy_per_atom=d["formation_energy_per_atom"],
             volume_per_atom=d["volume_per_atom"],
@@ -334,7 +308,6 @@ class GibbsComputedEntry(ComputedEntry):
             data=d["data"],
             entry_id=d["entry_id"],
         )
-        return entry
 
     def __repr__(self):
         output = [
@@ -347,7 +320,7 @@ class GibbsComputedEntry(ComputedEntry):
         return "\n".join(output)
 
     def __eq__(self, other):
-        if not type(other) is type(self):
+        if type(other) is not type(self):
             return False
 
         if not np.isclose(self.temperature, other.temperature):

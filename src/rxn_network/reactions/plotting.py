@@ -1,6 +1,4 @@
-"""
-Utility functions for plotting reaction data & performing analysis.
-"""
+"""Utility functions for plotting reaction data & performing analysis."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -23,13 +21,17 @@ def plot_reaction_scatter(
     color: str | None = None,
     plot_pareto: bool = True,
 ) -> px.scatter:
-    """
-    Plot a Plotly scatter plot (2D or 3D) of reactions on various thermodynamic metric
+    """Plot a Plotly scatter plot (2D or 3D) of reactions on various thermodynamic metric
     axes. This also constructs the Pareto front on the provided dimensions.
 
     Args:
         df: DataFrame with columns: rxn, energy, (primary_competition),
             (secondary_competition), (chempot_distance), (added_elems), (dE)
+        x: Column name to plot on x-axis
+        y: Column name to plot on y-axis
+        z: Column name to plot on z-axis
+        color: Column name to color points by. Defaults to None.
+        plot_pareto: Whether to plot the Pareto front. Defaults to True.
 
     Returns:
         Plotly scatter plot
@@ -39,18 +41,12 @@ def plot_reaction_scatter(
         label, units = "", ""
 
         if name == "energy":
-            label = (
-                r"$\mathsf{Reaction~driving~force} ~"
-                r"\mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
-            )
+            label = r"$\mathsf{Reaction~driving~force} ~\mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
             units = "eV/atom"
             if z is not None:
                 label = "Reaction Driving Force"
         elif name == "chempot_distance":
-            label = (
-                r"$\Sigma \Delta \mu_{\mathrm{min}} ~"
-                r" \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
-            )
+            label = r"$\Sigma \Delta \mu_{\mathrm{min}} ~ \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
             if z is not None:
                 label = "Total chemical potential distance"
             units = "eV/atom"
@@ -150,20 +146,18 @@ def plot_reaction_scatter(
 
     hovertemplate = (
         "<b>%{hovertext}</b><br>"
-        + "<br><b>"
-        + f"{x}"
-        + "</b>: %{x:.3f}"
-        + f" {x_units}"
-        + "<br><b>"
-        + f"{y}"
-        + "</b>: %{y:.3f}"
-        + f" {y_units}"
+        "<br><b>"
+        f"{x}"
+        "</b>: %{x:.3f}"
+        f" {x_units}"
+        "<br><b>"
+        f"{y}"
+        "</b>: %{y:.3f}"
+        f" {y_units}"
     )
 
     if z is not None:
-        hovertemplate = (
-            hovertemplate + "<br><b>" + f"{z}" + "</b>: %{z:.3f}" + f" {z_units}<br>"
-        )
+        hovertemplate = hovertemplate + "<br><b>" + f"{z}" + "</b>: %{z:.3f}" + f" {z_units}<br>"
 
     fig.update_traces(hovertemplate=hovertemplate)
 
@@ -171,7 +165,7 @@ def plot_reaction_scatter(
 
 
 def pretty_df_layout(df: DataFrame):
-    """Improve visibility for a pandas DataFrame with wide column names"""
+    """Improve visibility for a pandas DataFrame with wide column names."""
     return df.style.set_table_styles(
         [
             {
@@ -187,10 +181,8 @@ def pretty_df_layout(df: DataFrame):
 
 
 def filter_df_by_precursors(df: DataFrame, precursors: list[str]):
-    """Filter a reaction DataFrame by available precursors"""
+    """Filter a reaction DataFrame by available precursors."""
     df = df.copy()
-    df["precursors"] = [
-        list(sorted([r.reduced_formula for r in rxn.reactants])) for rxn in df["rxn"]
-    ]
+    df["precursors"] = [sorted([r.reduced_formula for r in rxn.reactants]) for rxn in df["rxn"]]
     selected = df[df["precursors"].apply(lambda x: all(p in precursors for p in x))]
     return selected.drop(columns=["precursors"])

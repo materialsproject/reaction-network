@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 from monty.serialization import loadfn
-
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
 
 TEST_FILES_PATH = Path(__file__).parent.parent / "test_files"
@@ -65,9 +64,7 @@ def basic_open_enumerator_with_precursors_and_target():
     )
 
 
-def test_enumerate(
-    filtered_entries, basic_enumerator_default, basic_enumerator_more_constraints
-):
+def test_enumerate(filtered_entries, basic_enumerator_default, basic_enumerator_more_constraints):
     expected_num_rxns_1 = 496
     expected_num_rxns_2 = 538
 
@@ -79,7 +76,7 @@ def test_enumerate(
 
         assert expected_num_rxns == len(rxns)
         assert len(rxns) == len(set(rxns))  # no duplicates
-        assert all([not r.is_identity for r in rxns])
+        assert all(not r.is_identity for r in rxns)
 
 
 def test_enumerate_with_precursors(
@@ -99,9 +96,7 @@ def test_enumerate_with_precursors(
             assert precursors & reactants
 
 
-def test_enumerate_with_target(
-    filtered_entries, basic_enumerator_with_target, basic_open_enumerator_with_target
-):
+def test_enumerate_with_target(filtered_entries, basic_enumerator_with_target, basic_open_enumerator_with_target):
     for enumerator in [basic_enumerator_with_target, basic_open_enumerator_with_target]:
         rxns = enumerator.enumerate(filtered_entries)
         targets = enumerator.targets
@@ -115,28 +110,16 @@ def test_enumerate_with_target(
                 assert target in products
 
 
-def test_enumerate_with_precursors_and_target(
-    filtered_entries, basic_enumerator_with_precursors_and_target
-):
-    rxns = list(
-        basic_enumerator_with_precursors_and_target.enumerate(
-            filtered_entries
-        ).get_rxns()
-    )
+def test_enumerate_with_precursors_and_target(filtered_entries, basic_enumerator_with_precursors_and_target):
+    rxns = list(basic_enumerator_with_precursors_and_target.enumerate(filtered_entries).get_rxns())
 
     assert len(rxns) == 1
     rxn_str = str(rxns[0])
     assert rxn_str == "Mn2O3 + Y2O3 -> 2 YMnO3" or rxn_str == "Y2O3 + Mn2O3 -> 2 YMnO3"
 
 
-def test_open_enumerate_with_precursors_and_target(
-    filtered_entries, basic_open_enumerator_with_precursors_and_target
-):
-    rxns = list(
-        basic_open_enumerator_with_precursors_and_target.enumerate(
-            filtered_entries
-        ).get_rxns()
-    )
+def test_open_enumerate_with_precursors_and_target(filtered_entries, basic_open_enumerator_with_precursors_and_target):
+    rxns = list(basic_open_enumerator_with_precursors_and_target.enumerate(filtered_entries).get_rxns())
 
     assert len(rxns) == 1
     assert {c.reduced_formula for c in rxns[0].reactants} == {"Y2O3", "Mn2O3", "O2"}
@@ -150,4 +133,4 @@ def test_open_enumerate(filtered_entries, basic_open_enumerator):
 
     assert expected_num_rxns == len(rxns)
     assert len(rxns) == len(set(rxns))
-    assert all([not r.is_identity for r in rxns])
+    assert all(not r.is_identity for r in rxns)

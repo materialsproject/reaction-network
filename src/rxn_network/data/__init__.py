@@ -1,9 +1,10 @@
+"""Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), FREED (all
+compounds), and FactSage (elemental chemical potentials).
 """
-Experimental Gibbs free energy data from NIST-JANAF (compounds, gases), FREED (all
-compounds), and FactSage (elemental chemical potentials)
-"""
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any
 
 from monty.serialization import loadfn
 
@@ -15,9 +16,8 @@ PATH_TO_NIST = cwd / "nist"
 G_ELEMS = loadfn(cwd / "mu_elements.json")
 
 
-def load_experimental_data(fn: Union[str, Path]) -> Dict[str, Dict[float, Any]]:
-    """
-    Load experimental data from a json file.
+def load_experimental_data(fn: str | Path) -> dict[str, dict[float, Any]]:
+    """Load experimental data from a json file.
 
     Args:
         fn: The filename of the json file
@@ -26,8 +26,6 @@ def load_experimental_data(fn: Union[str, Path]) -> Dict[str, Dict[float, Any]]:
     return {comp: make_float_keys(data) for comp, data in d.items()}
 
 
-def make_float_keys(d) -> Dict[float, Any]:
-    """
-    Convert all keys in a dict to floats.
-    """
+def make_float_keys(d) -> dict[float, Any]:
+    """Convert all keys in a dict to floats."""
     return {float(k): v for k, v in d.items()}

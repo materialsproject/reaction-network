@@ -1,16 +1,9 @@
-"""
-Utility functions used by the reaction enumerator classes.
-"""
+"""Utility functions used by the reaction enumerator classes."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
-from pymatgen.analysis.interface_reactions import (
-    GrandPotentialInterfacialReactivity,
-    InterfacialReactivity,
-)
-from pymatgen.analysis.phase_diagram import PhaseDiagram
-from pymatgen.core.periodic_table import Element
+from pymatgen.analysis.interface_reactions import GrandPotentialInterfacialReactivity, InterfacialReactivity
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.reactions.computed import ComputedReaction
@@ -18,7 +11,10 @@ from rxn_network.reactions.open import OpenComputedReaction
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
-    from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram
+    from collections.abc import Iterable
+
+    from pymatgen.analysis.phase_diagram import GrandPotentialPhaseDiagram, PhaseDiagram
+    from pymatgen.core.periodic_table import Element
     from pymatgen.entries.computed_entries import Entry
 
     from rxn_network.core import Composition
@@ -31,24 +27,20 @@ logger = get_logger(__name__)
 
 def get_computed_rxn(
     rxn: Reaction, entries: GibbsEntrySet, chempots: dict[Element, float] | None = None
-) -> ComputedReaction:
-    """
-    Provided with a Reaction object and a list of possible entries, this function
+) -> ComputedReaction | OpenComputedReaction:
+    """Provided with a Reaction object and a list of possible entries, this function
     returns a new ComputedReaction object containing a selection of those entries.
 
     Args:
         rxn: Reaction object
         entries: Iterable of entries
+        chempots: Optional dictionary of chemical potentials (will return an OpenComputedReaction if supplied).
 
     Returns:
         A ComputedReaction object transformed from a normal Reaction object
     """
-    reactant_entries = [
-        entries.get_min_entry_by_formula(r.reduced_formula) for r in rxn.reactants
-    ]
-    product_entries = [
-        entries.get_min_entry_by_formula(p.reduced_formula) for p in rxn.products
-    ]
+    reactant_entries = [entries.get_min_entry_by_formula(r.reduced_formula) for r in rxn.reactants]
+    product_entries = [entries.get_min_entry_by_formula(p.reduced_formula) for p in rxn.products]
 
     if chempots:
         rxn = OpenComputedReaction.balance(reactant_entries, product_entries, chempots)
@@ -97,8 +89,7 @@ def react_interface(
 
 
 def get_elems_set(entries: Iterable[Entry]) -> set[str]:
-    """
-    Returns chemical system as a set of element names, for set of entries.
+    """Returns chemical system as a set of element names, for set of entries.
 
     Args:
         entries: An iterable of entry-like objects
@@ -109,15 +100,12 @@ def get_elems_set(entries: Iterable[Entry]) -> set[str]:
     return {str(elem) for e in entries for elem in e.composition.elements}
 
 
-def get_total_chemsys_str(
-    entries: Iterable[Entry], open_elems: Iterable[Element] | None = None
-) -> str:
-    """
-    Returns chemical system string for set of entries, with optional open element.
+def get_total_chemsys_str(entries: Iterable[Entry], open_elems: Iterable[Element] | None = None) -> str:
+    """Returns chemical system string for set of entries, with optional open element.
 
     Args:
         entries: An iterable of entry-like objects
-        open_elem: optional open element to include in chemical system
+        open_elems: optional open elements to include in chemical system
     """
     elements = {elem for entry in entries for elem in entry.composition.elements}
     if open_elems:
@@ -125,15 +113,12 @@ def get_total_chemsys_str(
     return "-".join(sorted([str(e) for e in elements]))
 
 
-def group_by_chemsys(
-    combos: Iterable[tuple[Entry, ...]], open_elems: Iterable[Element] | None = None
-) -> dict:
-    """
-    Groups entry combinations by chemical system, with optional open element.
+def group_by_chemsys(combos: Iterable[tuple[Entry, ...]], open_elems: Iterable[Element] | None = None) -> dict:
+    """Groups entry combinations by chemical system, with optional open element.
 
     Args:
         combos: Iterable of entry combinations
-        open_elem: optional open element to include in chemical system grouping
+        open_elems: optional open elements to include in chemical system grouping
 
     Returns:
         Dictionary of entry combos grouped by chemical system
@@ -149,11 +134,8 @@ def group_by_chemsys(
     return combo_dict
 
 
-def stabilize_entries(
-    pd: PhaseDiagram, entries_to_adjust: Iterable[Entry], tol: float = 1e-6
-) -> list[Entry]:
-    """
-    Simple method for stabilizing entries by decreasing their energy to be on the hull.
+def stabilize_entries(pd: PhaseDiagram, entries_to_adjust: Iterable[Entry], tol: float = 1e-6) -> list[Entry]:
+    """Simple method for stabilizing entries by decreasing their energy to be on the hull.
 
     WARNING: This method is not guaranteed to work *simultaneously* for all entries due
     to the fact that stabilization of one entry may destabilize others. Use with
@@ -174,9 +156,7 @@ def stabilize_entries(
     for _, entry in zip(indices, entries_to_adjust):
         e_above_hull = pd.get_e_above_hull(entry)
         entry_dict = entry.to_dict()
-        entry_dict["energy"] = entry.uncorrected_energy + (
-            e_above_hull * entry.composition.num_atoms - tol
-        )
+        entry_dict["energy"] = entry.uncorrected_energy + (e_above_hull * entry.composition.num_atoms - tol)
         new_entry = ComputedEntry.from_dict(entry_dict)
         new_entries.append(new_entry)
 
@@ -184,8 +164,7 @@ def stabilize_entries(
 
 
 def run_enumerators(enumerators: Iterable[Enumerator], entries: GibbsEntrySet):
-    """
-    Utility method for calling enumerate() for a list of enumerators on a particular set
+    """Utility method for calling enumerate() for a list of enumerators on a particular set
     of entries. Reaction sets are automatically combined and duplicates are filtered.
 
     Args:
@@ -193,16 +172,12 @@ def run_enumerators(enumerators: Iterable[Enumerator], entries: GibbsEntrySet):
         entries: an entry set to provide to the enumerate() function.
     """
     rxn_set = None
-    for enumerator in enumerators:
+    for idx, enumerator in enumerate(enumerators):
         logger.info(f"Running {enumerator.__class__.__name__}")
         rxns = enumerator.enumerate(entries)
 
         logger.info(f"Adding {len(rxns)} reactions to reaction set")
-
-        if rxn_set is None:
-            rxn_set = rxns
-        else:
-            rxn_set = rxn_set.add_rxn_set(rxns)
+        rxn_set = rxns if idx == 0 else rxn_set.add_rxn_set(rxns)  # type: ignore
 
     logger.info("Completed reaction enumeration. Filtering duplicates...")
     if rxn_set is not None:

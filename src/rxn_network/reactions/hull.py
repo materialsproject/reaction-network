@@ -15,11 +15,10 @@ from rxn_network.reactions.computed import ComputedReaction
 
 
 class InterfaceReactionHull(MSONable):
-    """
-    A class for storing and analyzing a set of reactions at an interface between two
+    """A class for storing and analyzing a set of reactions at an interface between two
     reactants. This class is more generalized than the InterfacialReactivity class and
     can encompass any set of reactions between two reactants, regardless of whether
-    the reaction products are "stable" (i.e. together on the convex hull)
+    the reaction products are "stable" (i.e. together on the convex hull).
     """
 
     def __init__(
@@ -28,13 +27,12 @@ class InterfaceReactionHull(MSONable):
         c2: Composition,
         reactions: list[ComputedReaction],
     ):
-        """
-        Args:
-            c1: Composition of reactant 1
-            c2: Composition of reactant 2
-            reactions: List of reactions containing all enumerated reactions between the
-                two reactants. Note that this list should not include identity reactions
-                of the precursors.
+        """Args:
+        c1: Composition of reactant 1
+        c2: Composition of reactant 2
+        reactions: List of reactions containing all enumerated reactions between the
+        two reactants. Note that this list should not include identity reactions
+        of the precursors.
         """
         self.c1 = Composition(c1).reduced_composition
         self.c2 = Composition(c2).reduced_composition
@@ -64,9 +62,7 @@ class InterfaceReactionHull(MSONable):
 
         reactions_with_endpoints = reactions + endpoint_reactions
 
-        coords = np.array(
-            [(self.get_coordinate(r), r.energy_per_atom) for r in reactions]
-        )
+        coords = np.array([(self.get_coordinate(r), r.energy_per_atom) for r in reactions])
         coords = np.append(coords, [[0, 0], [1, 0]], axis=0)
 
         idx_sort = coords[:, 0].argsort()
@@ -77,18 +73,15 @@ class InterfaceReactionHull(MSONable):
         self.endpoint_reactions = endpoint_reactions
 
     def plot(self, y_max: float = 0.2) -> Figure:
-        """
-        Plot the reaction hull.
-        """
+        """Plot the reaction hull."""
         pts = self._get_scatter()
         lines = self._get_lines()
 
-        fig = Figure(data=lines + [pts])
+        fig = Figure(data=[*lines, pts])
 
         fig.update_traces(
             hovertemplate=(
-                "<b>%{hovertext}</b><br> <br><b>Atomic fraction</b>:"
-                " %{x:.3f}<br><b>Energy</b>: %{y:.3f} (eV/atom)"
+                "<b>%{hovertext}</b><br> <br><b>Atomic fraction</b>: %{x:.3f}<br><b>Energy</b>: %{y:.3f} (eV/atom)"
             )
         )
         fig.update_layout(yaxis_range=[min(self.coords[:, 1]) - 0.01, y_max])
@@ -98,33 +91,27 @@ class InterfaceReactionHull(MSONable):
         return fig
 
     def get_energy_above_hull(self, reaction: ComputedReaction) -> float:
-        """
-        Get the energy of a reaction above the reaction hull.
-        """
+        """Get the energy of a reaction above the reaction hull."""
         idx = self.reactions.index(reaction)
         x, y = self.coords[idx]
-        e_above_hull = y - self.get_hull_energy(x)
-
-        return e_above_hull
+        return y - self.get_hull_energy(x)
 
     def get_coordinate(self, reaction: ComputedReaction) -> float:
         """Get coordinate of reaction in reaction hull. This is expressed as the atomic
-        mixing ratio of component 2 in the reaction."""
+        mixing ratio of component 2 in the reaction.
+        """
         amt_c1 = reaction.reactant_atomic_fractions.get(self.c1, 0)
         amt_c2 = reaction.reactant_atomic_fractions.get(self.c2, 0)
         total = amt_c1 + amt_c2  # will add to 1.0 with two-component reactions
         try:
             coordinate = amt_c2 / total
         except ZeroDivisionError as e:
-            raise ValueError(
-                f"Can't compute coordinate for {reaction} with {self.c1}, {self.c2}"
-            ) from e
+            raise ValueError(f"Can't compute coordinate for {reaction} with {self.c1}, {self.c2}") from e
 
         return round(coordinate, 12)  # avoids numerical issues
 
     def get_hull_energy(self, coordinate: float) -> float:
-        """
-        Get the energy of the reaction at a given coordinate.
+        """Get the energy of the reaction at a given coordinate.
 
         Args:
             coordinate: Coordinate of reaction in reaction hull.
@@ -135,9 +122,7 @@ class InterfaceReactionHull(MSONable):
         reactions = self.get_reactions_by_coordinate(coordinate)
         return sum(weight * r.energy_per_atom for r, weight in reactions.items())
 
-    def get_reactions_by_coordinate(
-        self, coordinate: float
-    ) -> dict[ComputedReaction, float]:
+    def get_reactions_by_coordinate(self, coordinate: float) -> dict[ComputedReaction, float]:
         """Get the reaction(s) at a given coordinate."""
         sorted_vertices = np.sort(self.hull_vertices)
         for i in range(len(sorted_vertices) - 1):
@@ -162,8 +147,7 @@ class InterfaceReactionHull(MSONable):
         raise ValueError("No reactions found!")
 
     def get_primary_competition(self, reaction: ComputedReaction) -> float:
-        """
-        Calculates the primary competition, C_1, for a reaction (in eV/atom).
+        """Calculates the primary competition, C_1, for a reaction (in eV/atom).
 
         If you use this selectivity metric in your work, please cite the following work:
 
@@ -182,16 +166,12 @@ class InterfaceReactionHull(MSONable):
         """
         energy = reaction.energy_per_atom
         coord = self.get_coordinate(reaction)
-        matching = np.where(self.coords[:, 0] == coord)[
-            0
-        ]  # remove all reactions at same coordinate
+        matching = np.where(self.coords[:, 0] == coord)[0]  # remove all reactions at same coordinate
 
         idx_min = matching.min()
         idx_max = matching.max()
 
-        competing_rxns = (
-            self.reactions[:idx_min] + self.reactions[idx_max + 1 :]
-        )  # assumes ordered
+        competing_rxns = self.reactions[:idx_min] + self.reactions[idx_max + 1 :]  # assumes ordered
 
         competing_rxns = self.reactions[:idx_min] + self.reactions[idx_max + 1 :]
         competing_rxn_energies = [r.energy_per_atom for r in competing_rxns]
@@ -206,8 +186,7 @@ class InterfaceReactionHull(MSONable):
         include_e_hull: bool = False,
         recursive: bool = False,
     ) -> float:
-        """
-        Calculates the secondary competition, C_2, for a reaction (in eV/atom).
+        """Calculates the secondary competition, C_2, for a reaction (in eV/atom).
 
         If you use this selectivity metric in your work, please cite the following work:
 
@@ -268,9 +247,7 @@ class InterfaceReactionHull(MSONable):
         return -1 * energy
 
     def get_secondary_competition_max_energy(self, reaction: ComputedReaction) -> float:
-        """
-        Calculates the score for a given reaction. This formula is based on a
-        methodology presented in the following paper:
+        """Calculates the score for a given reaction.
 
         Args:
             reaction: Reaction to calculate the competition score for.
@@ -285,9 +262,8 @@ class InterfaceReactionHull(MSONable):
         return -1 * (left_energy + right_energy)
 
     def get_secondary_competition_area(self, reaction: ComputedReaction) -> float:
-        """
-        Calculates the score for a given reaction. This formula is based on a
-        methodology presented in the following paper: (TBD)
+        """Calculates the score for a given reaction. This formula is based on a
+        methodology presented in the following paper: (TBD).
 
         Args:
             reaction: Reaction to calculate the competition score for.
@@ -301,24 +277,8 @@ class InterfaceReactionHull(MSONable):
 
         return left_area + right_area
 
-    def get_max_decomposition_energy(self, x1: float, x2: float) -> float:
-        coords = self.get_coords_in_range(x1, x2)
-
-        max_energy = 0
-
-        for c in combinations(range(len(coords)), 3):
-            i_left, i_mid, i_right = sorted(c)
-            c_left, c_mid, c_right = coords[[i_left, i_mid, i_right]]
-
-            energy = self._calculate_altitude(c_left, c_mid, c_right)
-            if energy < max_energy:
-                max_energy = energy
-
-        return max_energy
-
     def get_decomposition_energy(self, x1: float, x2: float) -> float:
-        """
-        Calculates the energy of the reaction decomposition between two points.
+        """Calculates the energy of the reaction decomposition between two points.
 
         Args:
             x1: Coordinate of first point.
@@ -344,18 +304,52 @@ class InterfaceReactionHull(MSONable):
 
         return energy
 
+    def get_max_decomposition_energy(self, x1: float, x2: float) -> float:
+        """Similar to get_decomposition_energy, but returns only the decomposition
+        energy that is maximum (rather than the sum of all possible decompositions).
+
+        Args:
+            x1: Coordinate of first point.
+            x2: Coordinate of second point.
+
+        Returns:
+            The maximum energy of the reaction decomposition between the two points.
+        """
+        coords = self.get_coords_in_range(x1, x2)
+
+        max_energy = 0
+
+        for c in combinations(range(len(coords)), 3):
+            i_left, i_mid, i_right = sorted(c)
+            c_left, c_mid, c_right = coords[[i_left, i_mid, i_right]]
+
+            energy = self._calculate_altitude(c_left, c_mid, c_right)
+            if energy < max_energy:
+                max_energy = energy
+
+        return max_energy
+
     def get_decomposition_area(self, x1: float, x2: float) -> float:
+        """Similar to get_decomposition_energy, but returns the area enclosed instead of
+        an energy.
+
+        **WARNING**: This may be numerically unstable.
+
+        Args:
+            x1: Coordinate of first point.
+            x2: Coordinate of second point.
+
+        Returns:
+            The area of reaction decomposition between the two points.
+        """
         coords = self.get_coords_in_range(x1, x2)
         if len(coords) == 2:
             return 0
 
-        return ConvexHull(
-            coords, qhull_options="QJ i"
-        ).volume  # this is how area is defined in scipy
+        return ConvexHull(coords, qhull_options="QJ i").volume  # this is how area is defined in scipy
 
     def get_coords_in_range(self, x1: float, x2: float):
-        """
-        Get the coordinates in the range [x1, x2].
+        """Get the coordinates in the range [x1, x2].
 
         Args:
             x1: Start of range.
@@ -379,9 +373,7 @@ class InterfaceReactionHull(MSONable):
             [
                 self.coords[i]
                 for i in self.hull_vertices
-                if self.coords[i, 0] < x_max
-                and self.coords[i, 0] > x_min
-                and self.coords[i, 1] <= 0
+                if self.coords[i, 0] < x_max and self.coords[i, 0] > x_min and self.coords[i, 1] <= 0
             ]
         )
 
@@ -395,8 +387,7 @@ class InterfaceReactionHull(MSONable):
         return coords[coords[:, 0].argsort()]  # type: ignore
 
     def count(self, num: int) -> int:
-        """
-        Reurns the number of decomposition pathways for the interface reaction hull
+        """Reurns the number of decomposition pathways for the interface reaction hull
         based on the number of **product** vertices (i.e., total # of vertices
         considered - 2 reactant vertices).
 
@@ -431,14 +422,9 @@ class InterfaceReactionHull(MSONable):
             24466267020,
             91482563640,
         ]
-        if num <= 22:
-            count = counts[num]
-        else:
-            count = self._count_recursive(num)[0]
+        return counts[num] if num <= 22 else self._count_recursive(num)[0]
 
-        return count
-
-    @lru_cache(maxsize=128)
+    @lru_cache(maxsize=128)  # noqa: B019
     def get_decomposition_energy_and_num_paths_recursive(
         self,
         x1: float,
@@ -446,8 +432,7 @@ class InterfaceReactionHull(MSONable):
         use_x_min_ref: bool = True,
         use_x_max_ref: bool = True,
     ) -> tuple[float, int]:
-        """
-        This is a recursive implementation of the get_decomposition_energy function. It
+        """This is a recursive implementation of the get_decomposition_energy function. It
         significantly slower than the non-recursive implementation but is more
         straightforward to understand. Both should return the same answer, however the
         refcursive implementation also includes "free" computation of the total number
@@ -479,12 +464,10 @@ class InterfaceReactionHull(MSONable):
         coords = all_coords[1:-1, :]
 
         if len(coords) == 0:
-            val, total = 0, 1
-            return val, total
+            return 0, 1
         if len(coords) == 1:
-            val = self._calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])
-            total = 1
-            return val, total
+            val = self._calculate_altitude([x_min, y_min], coords[0], [x_max, y_max])  # type: ignore
+            return val, 1
 
         val = 0
         total = 0
@@ -494,33 +477,24 @@ class InterfaceReactionHull(MSONable):
             elif c[0] == 1.0 and not np.isclose(c[1], 0.0):
                 use_x_max_ref = False
 
-            height = self._calculate_altitude([x_min, y_min], c, [x_max, y_max])
+            height = self._calculate_altitude([x_min, y_min], c, [x_max, y_max])  # type: ignore
             (
                 left_decomp,
                 left_total,
-            ) = self.get_decomposition_energy_and_num_paths_recursive(
-                x_min, c[0], use_x_min_ref, use_x_max_ref
-            )
+            ) = self.get_decomposition_energy_and_num_paths_recursive(x_min, c[0], use_x_min_ref, use_x_max_ref)
             (
                 right_decomp,
                 right_total,
-            ) = self.get_decomposition_energy_and_num_paths_recursive(
-                c[0], x_max, use_x_min_ref, use_x_max_ref
-            )
+            ) = self.get_decomposition_energy_and_num_paths_recursive(c[0], x_max, use_x_min_ref, use_x_max_ref)
 
-            val += (
-                height * (left_total * right_total)
-                + left_decomp * right_total
-                + right_decomp * left_total
-            )
+            val += height * (left_total * right_total) + left_decomp * right_total + right_decomp * left_total
             total += left_total * right_total
 
         return val, total
 
-    @lru_cache(maxsize=128)
+    @lru_cache(maxsize=128)  # noqa: B019
     def _altitude_multiplicity(self, n_left, n_right, n):
-        """
-        This function is used in the non-recursive implementation of the
+        """This function is used in the non-recursive implementation of the
         get_decomposition_energy function. It allows for rapid computation of the number
         times (multiplicitly) that a particular altitude appears in the decomposition.
 
@@ -539,8 +513,7 @@ class InterfaceReactionHull(MSONable):
         return self.count(n_left) * self.count(n_right) * self.count(remainder)
 
     def _count_recursive(self, n, cache=None):
-        """
-        A recursive implementation of the counting function.
+        """A recursive implementation of the counting function.
 
         This implementation is courtesy of @mcgalcode.
         """
@@ -569,7 +542,7 @@ class InterfaceReactionHull(MSONable):
                 biggest_cache = c2
 
             total += left_divs * right_divs
-        return total, biggest_cache + [total]
+        return total, [*biggest_cache, total]
 
     def _get_scatter(self):
         marker_size = 10
@@ -580,10 +553,7 @@ class InterfaceReactionHull(MSONable):
             hover_name=[str(r) for r in self.reactions],
             labels={
                 "x": "Mixing Ratio",
-                "y": (
-                    r"$\Delta G_{\mathrm{rxn}} ~"
-                    r" \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"
-                ),
+                "y": (r"$\Delta G_{\mathrm{rxn}} ~ \mathrm{\left(\dfrac{\mathsf{eV}}{\mathsf{atom}}\right)}$"),
             },
         )
         pts.update_traces(marker={"size": marker_size})
@@ -596,9 +566,7 @@ class InterfaceReactionHull(MSONable):
         coords = coords[(coords[:, :, 1] <= 0).all(axis=1)]
         coords = coords[~(coords[:, :, 1] == 0).all(axis=1)]
 
-        lines = [
-            px.line(x=c[:, 0], y=c[:, 1]) for c in coords if not (c[:, 1] == 0).all()
-        ]
+        lines = [px.line(x=c[:, 0], y=c[:, 1]) for c in coords if not (c[:, 1] == 0).all()]
 
         line_data = []
         for line in lines:
@@ -609,6 +577,7 @@ class InterfaceReactionHull(MSONable):
 
     @cached_property
     def hull_vertices(self) -> np.ndarray:
+        """Returns numpy array of indices of the vertices that are on the hull."""
         hull_vertices = [
             i
             for i in self.hull.vertices
@@ -623,30 +592,27 @@ class InterfaceReactionHull(MSONable):
 
     @cached_property
     def stable_reactions(self) -> list[ComputedReaction]:
-        """
-        Returns the reactions that are stable (on the convex hull) of the interface
+        """Returns the reactions that are stable (on the convex hull) of the interface
         reaction hull.
         """
         return [r for i, r in enumerate(self.reactions) if i in self.hull_vertices]
 
     @cached_property
     def unstable_reactions(self):
-        """
-        Returns the reactions that are unstable (NOT on the convex hull) of the
+        """Returns the reactions that are unstable (NOT on the convex hull) of the
         interface reaction hull.
         """
         return [r for i, r in enumerate(self.reactions) if i not in self.hull_vertices]
 
     @staticmethod
     def _calculate_altitude(c_left, c_mid, c_right):
-        """
-        Helper geometry method: calculates the altitude of a point on a line defined by
+        """Helper geometry method: calculates the altitude of a point on a line defined by
         three points.
 
         Args:
-            x1: point 1
-            x2: point 2
-            x3: point 3
+            c_left: coordinates of point 1
+            c_mid: coordinates of point 2
+            c_right: coordinates point 3
 
         Returns:
             The altitude of the point

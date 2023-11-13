@@ -1,6 +1,4 @@
-"""
-This module implements two types of basic (combinatorial) reaction enumerators.
-"""
+"""This module implements two types of basic (combinatorial) reaction enumerators."""
 from __future__ import annotations
 
 from copy import deepcopy
@@ -28,8 +26,7 @@ logger = get_logger(__name__)
 
 
 class BasicEnumerator(Enumerator):
-    """
-    Enumerator for finding all simple reactions within a set of entries, up to a maximum
+    """Enumerator for finding all simple reactions within a set of entries, up to a maximum
     reactant/product cardinality (n); i.e., how many phases on either side of the
     reaction. This approach does not explicitly take into account thermodynamic
     stability (i.e. phase diagram). This allows for enumeration of reactions where the
@@ -61,50 +58,42 @@ class BasicEnumerator(Enumerator):
         max_num_constraints: int = 1,
         quiet: bool = False,
     ):
-        """
+        """Initialize a BasicEnumerator object.
 
         Args:
             precursors: Optional list of precursor formulas. The only reactions that
-                will be enumerated are those featuring one or more of these compositions
-                as reactants. The "exclusive_precursors" parameter allows one to tune
-                whether the enumerated reactions should include ALL precursors (the
-                default) or just one.
+                will be enumerated are those featuring one or more of these compositions as reactants. The
+                "exclusive_precursors" parameter allows one to tune whether the enumerated reactions should include ALL
+                precursors (the default) or just one.
             targets: Optional list of target formulas. The only reactions that
-                will be enumerated are those featuring one or more of these compositions
-                as products. The "exclusive_targets" parameter allows one to tune
-                whether the enumerated reactions should include ALL targets or just one
-                (the default).
+                will be enumerated are those featuring one or more of these compositions as products. The
+                "exclusive_targets" parameter allows one to tune whether the enumerated reactions should include ALL
+                targets or just one (the default).
             n: Maximum reactant/product cardinality. This it the largest possible number
                 of entries on either side of the reaction. Defaults to 2.
             exclusive_precursors: Whether enumerated reactions are required to have
-                reactants that are a subset of the provided list of precursors. If True
-                (the default), this only identifies reactions with reactants selected
-                from the provided precursors.
+                reactants that are a subset of the provided list of precursors. If True (the default), this only
+                identifies reactions with reactants selected from the provided precursors.
             exclusive_targets: Whether enumerated reactions are required to have
-                products that are a subset of the provided list of targets. If False,
-                (the default), this identifies all reactions containing at least one
-                composition from the provided list of targets (and any number of
+                products that are a subset of the provided list of targets. If False, (the default), this identifies all
+                reactions containing at least one composition from the provided list of targets (and any number of
                 byproducts).
             filter_duplicates: Whether to remove duplicate reactions. Defaults to False.
-            filter_by_chemsys: An optional chemical system for which to filter produced
-                reactions by. This ensures that all output reactions contain at least
-                one element within the provided system.
+            filter_by_chemsys: An optional chemical system for which to filter produced reactions by. This ensures that
+                all output reactions contain at least one element within the provided system.
             chunk_size: The minimum number of reactions per chunk procssed. Needs to be
-                sufficiently large to make parallelization a cost-effective strategy.
-                Defaults to MIN_CHUNK_SIZE.
+                sufficiently large to make parallelization a cost-effective strategy. Defaults to MIN_CHUNK_SIZE.
             max_num_jobs: The upper limit for the number of jobs created. Defaults to
                 MAX_NUM_JOBS.
-            remove_unbalanced: Whether to remove reactions which are unbalanced; this is
-                usually advisable. Defaults to True.
+            remove_unbalanced: Whether to remove reactions which are unbalanced; this is usually advisable. Defaults to
+                True.
             remove_changed: Whether to remove reactions which can only be balanced by
-                removing a reactant/product or having it change sides. This is also
-                advisable for ensuring that only unique reaction sets are produced.
-                Defaults to True.
+                removing a reactant/product or having it change sides. This is also advisable for ensuring that only
+                unique reaction sets are produced. Defaults to True.
             max_num_constraints: The maximum number of allowable constraints enforced by
                 reaction balancing. Defaults to 1 (which is usually advisable).
             quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
-
         super().__init__(precursors=precursors, targets=targets)
 
         self.n = n
@@ -132,25 +121,23 @@ class BasicEnumerator(Enumerator):
         self,
         entries: GibbsEntrySet,
     ) -> ReactionSet:
-        """
-        Calculate all possible reactions given a set of entries. If the enumerator was
-        initialized with specified precursors or target, the reactions will be filtered
-        by these constraints. Every enumerator follows a standard procedure:
+        """Calculate all possible reactions given a set of entries. If the enumerator was initialized with specified
+        precursors or target, the reactions will be filtered by these constraints. Every enumerator follows a standard
+        procedure.
 
-        1) Initialize entries, i.e., ensure that precursors and target are considered
-            stable entries within the entry set.
+        Steps:
+            1) Initialize entries, i.e., ensure that precursors and target are considered stable entries within the
+               entry set.
 
-        2) Get a dictionary representing every possible "node", i.e. phase combination,
-            grouped by chemical system.
+            2) Get a dictionary representing every possible "node", i.e. phase combination, grouped by chemical system.
 
-        3) Filter the combos dictionary for chemical systems which are not relevant;
-            i.e., don't contain elements in precursors and/or target.
+            3) Filter the combos dictionary for chemical systems which are not relevant; i.e., don't contain elements in
+               precursors and/or target.
 
-        4) Iterate through each chemical system, initializing calculators,
-            and computing all possible reactions for reactant/product pair and/or
-            thermodynamically predicted reactions for given reactants.
+            4) Iterate through each chemical system, initializing calculators, and computing all possible reactions for
+               reactant/product pair and/or thermodynamically predicted reactions for given reactants.
 
-        5) Add reactions to growing list, repeat Step 4 until combos dict exhausted.
+            5) Add reactions to growing list, repeat Step 4 until combos dict exhausted.
 
         Args:
             entries: the set of all entries to enumerate from
@@ -158,9 +145,7 @@ class BasicEnumerator(Enumerator):
         if not ray.is_initialized():
             initialize_ray()
 
-        entries, precursors, targets, open_entries = self._get_initialized_entries(
-            entries
-        )
+        entries, precursors, targets, open_entries = self._get_initialized_entries(entries)
 
         combos_dict = self._get_combos_dict(
             entries,
@@ -217,10 +202,7 @@ class BasicEnumerator(Enumerator):
 
         if total / chunk_size > self.max_num_jobs:
             chunk_size = int(total // self.max_num_jobs) + 1
-            logger.info(
-                f"Increasing chunk size to {chunk_size} due to max job limit of"
-                f" {self.max_num_jobs}"
-            )
+            logger.info(f"Increasing chunk size to {chunk_size} due to max job limit of {self.max_num_jobs}")
 
         to_run, current_chunk = [], []  # type: ignore
         for item in tqdm(
@@ -284,11 +266,7 @@ class BasicEnumerator(Enumerator):
         ):
             results.extend(completed)
 
-        rxn_set = ReactionSet.from_rxns(
-            results, entries=entries, filter_duplicates=self.filter_duplicates
-        )
-
-        return rxn_set
+        return ReactionSet.from_rxns(results, entries=entries, filter_duplicates=self.filter_duplicates)
 
     @classmethod
     def _get_num_chunks(cls, items, open_combos, chunk_size) -> int:
@@ -306,19 +284,12 @@ class BasicEnumerator(Enumerator):
         _ = open_combos  # not used in BasicEnumerator
         return comb(len(combos), 2)
 
-    def _get_combos_dict(
-        self, entries, precursor_entries, target_entries, open_entries
-    ):
-        """
-        Gets all possible entry combinations up to predefined cardinality (n), filtered
+    def _get_combos_dict(self, entries, precursor_entries, target_entries, open_entries):
+        """Gets all possible entry combinations up to predefined cardinality (n), filtered
         and grouped by chemical system.
         """
-        precursor_elems = [
-            [str(el) for el in e.composition.elements] for e in precursor_entries
-        ]
-        target_elems = [
-            [str(el) for el in e.composition.elements] for e in target_entries
-        ]
+        precursor_elems = [[str(el) for el in e.composition.elements] for e in precursor_entries]
+        target_elems = [[str(el) for el in e.composition.elements] for e in target_entries]
         all_open_elems = {el for e in open_entries for el in e.composition.elements}
 
         entries = entries - open_entries
@@ -326,19 +297,17 @@ class BasicEnumerator(Enumerator):
         combos = [set(c) for c in limited_powerset(entries, self.n)]
         combos_dict = group_by_chemsys(combos, all_open_elems)
 
-        filtered_combos = self._filter_dict_by_elems(
+        return self._filter_dict_by_elems(
             combos_dict,
             precursor_elems,
             target_elems,
             all_open_elems,
         )
 
-        return filtered_combos
-
     def _get_open_combos(  # pylint: disable=useless-return
         self, open_entries
     ) -> list[set[ComputedEntry]] | None:
-        """No open entries for BasicEnumerator, returns None"""
+        """No open entries for BasicEnumerator, returns None."""
         _ = (self, open_entries)  # unused
         return None
 
@@ -351,17 +320,16 @@ class BasicEnumerator(Enumerator):
 
     @staticmethod
     def _get_rxn_iterable(combos, open_combos):
-        """Get all reaction/product combinations"""
+        """Get all reaction/product combinations."""
         _ = open_combos  # unused
 
         return combinations(combos, 2)
 
     def _get_initialized_entries(self, entries):
-        """Returns initialized entries, precursors, target, and open entries"""
+        """Returns initialized entries, precursors, target, and open entries."""
 
         def initialize_entries_list(ents):
-            new_ents = {initialize_entry(f, entries, self.stabilize) for f in ents}
-            return new_ents
+            return {initialize_entry(f, entries, self.stabilize) for f in ents}
 
         precursors, targets = set(), set()
 
@@ -377,9 +345,7 @@ class BasicEnumerator(Enumerator):
         for e in precursors | targets:
             if e not in entries_new:
                 try:
-                    old_e = entries_new.get_min_entry_by_formula(
-                        e.composition.reduced_formula
-                    )
+                    old_e = entries_new.get_min_entry_by_formula(e.composition.reduced_formula)
                     entries_new.discard(old_e)
                 except KeyError:
                     pass
@@ -394,11 +360,7 @@ class BasicEnumerator(Enumerator):
 
         open_entries = set()
         if self.open_phases:
-            open_entries = {
-                e
-                for e in entries_new
-                if e.composition.reduced_formula in self.open_phases
-            }
+            open_entries = {e for e in entries_new if e.composition.reduced_formula in self.open_phases}
 
         return entries_new, precursors, targets, open_entries
 
@@ -409,7 +371,7 @@ class BasicEnumerator(Enumerator):
         target_elems,
         all_open_elems,
     ):
-        """Filters the dictionary of combinations by elements"""
+        """Filters the dictionary of combinations by elements."""
         filtered_dict = {}
 
         all_precursor_elems = {el for g in precursor_elems for el in g}
@@ -423,24 +385,17 @@ class BasicEnumerator(Enumerator):
         for chemsys, combos in combos_dict.items():
             elems = set(chemsys.split("-"))
 
-            if filter_elems:
-                if not elems.issuperset(filter_elems):
-                    continue
+            if filter_elems and not elems.issuperset(filter_elems):
+                continue
 
             if len(elems) >= 10 or len(elems) == 1:  # too few or too many elements
                 continue
 
-            if precursor_elems:
-                if not getattr(all_precursor_elems | all_open_elems, self._p_set_func)(
-                    elems
-                ):
-                    continue
+            if precursor_elems and not getattr(all_precursor_elems | all_open_elems, self._p_set_func)(elems):
+                continue
 
-            if target_elems:
-                if not getattr(all_target_elems | all_open_elems, self._t_set_func)(
-                    elems
-                ):
-                    continue
+            if target_elems and not getattr(all_target_elems | all_open_elems, self._t_set_func)(elems):
+                continue
 
             filtered_dict[chemsys] = combos
 
@@ -448,25 +403,24 @@ class BasicEnumerator(Enumerator):
 
     @property
     def stabilize(self) -> bool:
-        """Whether or not to use only stable entries in analysis"""
+        """Whether or not to use only stable entries in analysis."""
         return self._stabilize
 
     @property
     def build_pd(self) -> bool:
-        """Whether or not to build a PhaseDiagram object during reaction enumeration (
-        useful for some analyses)"""
+        """Whether or not to build a PhaseDiagram object during reaction enumeration (useful for some analyses)."""
         return self._build_pd
 
     @property
     def build_grand_pd(self) -> bool:
         """Whether or not to build a GrandPotentialPhaseDiagram object during
-        reaction enumeration (useful for some analyses)"""
+        reaction enumeration (useful for some analyses).
+        """
         return self._build_grand_pd
 
 
 class BasicOpenEnumerator(BasicEnumerator):
-    """
-    Enumerator for finding all simple reactions within a set of entries, up to a
+    """Enumerator for finding all simple reactions within a set of entries, up to a
     maximum reactant/product cardinality (n), with any number of open phases. Note:
     this does not return OpenComputedReaction objects (this can be calculated using
     the ReactionSet class).
@@ -498,8 +452,7 @@ class BasicOpenEnumerator(BasicEnumerator):
         max_num_constraints: int = 1,
         quiet: bool = False,
     ):
-        """
-        Supplied target and calculator parameters are automatically initialized as
+        """Supplied target and calculator parameters are automatically initialized as
         objects during enumeration.
 
         Args:
@@ -563,32 +516,23 @@ class BasicOpenEnumerator(BasicEnumerator):
 
     @staticmethod
     def _rxn_iter_length(combos, open_combos):
-        num_combos_with_open = sum(
-            1 if not i & j else 0 for i in combos for j in open_combos
-        )
+        num_combos_with_open = sum(1 if not i & j else 0 for i in combos for j in open_combos)
 
         return len(combos) * num_combos_with_open
 
     def _get_open_combos(self, open_entries):
         """Get all possible combinations of open entries. For a single entry,
-        this is just the entry itself."""
-        open_combos = [
-            set(c) for c in limited_powerset(open_entries, len(open_entries))
-        ]
-        return open_combos
+        this is just the entry itself.
+        """
+        return [set(c) for c in limited_powerset(open_entries, len(open_entries))]
 
     @staticmethod
     def _get_rxn_iterable(combos, open_combos):
         """Get all reaction/product combinations."""
         combos_with_open = [
-            combo | open_combo
-            for combo in combos
-            for open_combo in open_combos
-            if not combo & open_combo
+            combo | open_combo for combo in combos for open_combo in open_combos if not combo & open_combo
         ]
-        rxn_iter = product(combos, combos_with_open)
-
-        return rxn_iter
+        return product(combos, combos_with_open)
 
 
 @ray.remote
@@ -604,8 +548,7 @@ def _react(
     remove_changed,
     max_num_constraints,
 ):
-    """
-    This function is a wrapper for the specific react function of each enumerator. This
+    """This function is a wrapper for the specific react function of each enumerator. This
     wrapper contains the logic used for filtering out reactions based on the
     user-defined enumerator settings. It can also be called as a remote function using
     ray, allowing for parallel computation during reaction enumeration.
@@ -629,22 +572,10 @@ def _react(
 
             all_phases = r | p
 
-            precursor_func = (
-                getattr(precursors | open_entries, p_set_func)
-                if precursors
-                else lambda e: True
-            )
-            target_func = (
-                getattr(targets | open_entries, t_set_func)
-                if targets
-                else lambda e: True
-            )
+            precursor_func = getattr(precursors | open_entries, p_set_func) if precursors else lambda e: True
+            target_func = getattr(targets | open_entries, t_set_func) if targets else lambda e: True
 
-            if (
-                (r & p)
-                or (precursors and not precursors & all_phases)
-                or (p and targets and not targets & all_phases)
-            ):
+            if (r & p) or (precursors and not precursors & all_phases) or (p and targets and not targets & all_phases):
                 continue
 
             if not (precursor_func(r) or (p and precursor_func(p))):
@@ -652,9 +583,7 @@ def _react(
             if p and not (target_func(r) or target_func(p)):
                 continue
 
-            suggested_rxns = react_function(
-                r, p, filtered_entries=filtered_entries, pd=pd, grand_pd=grand_pd
-            )
+            suggested_rxns = react_function(r, p, filtered_entries=filtered_entries, pd=pd, grand_pd=grand_pd)
 
             rxns = []
             for rxn in suggested_rxns:
@@ -678,9 +607,7 @@ def _react(
 
 
 @ray.remote
-def _get_entries_and_pds(
-    combos_dict_chunk, entries, build_pd, build_grand_pd, chempots
-):
+def _get_entries_and_pds(combos_dict_chunk, entries, build_pd, build_grand_pd, chempots):
     pd_dict = {}
     for item in combos_dict_chunk:
         if item is None:

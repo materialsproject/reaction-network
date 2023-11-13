@@ -38,8 +38,7 @@ def get_pareto_front(
 
 
 def is_pareto_efficient(costs, return_mask=True):
-    """
-    Directly lifted from @Peter's numpy-based solution on stackoverflow. Please
+    """Directly lifted from @Peter's numpy-based solution on stackoverflow. Please
     give him an upvote here: https://stackoverflow.com/a/40239615. Thank you @Peter!
 
     Args:

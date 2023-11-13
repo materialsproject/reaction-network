@@ -4,7 +4,6 @@ from copy import deepcopy
 import pytest
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
-
 from rxn_network.entries.entry_set import GibbsEntrySet
 
 
@@ -17,7 +16,7 @@ def test_get_subset_in_chemsys(chemsys, gibbs_entries):
     assert subset.chemsys == desired_chemsys
 
     for e in gibbs_entries:
-        chemsys = set(sorted([str(e) for e in e.composition.elements]))
+        chemsys = {str(e) for e in e.composition.elements}
         if chemsys.issubset(desired_chemsys):
             assert e in subset
         else:
@@ -117,16 +116,14 @@ def test_get_entries_with_jitter(gibbs_entries):
         if new_ent.is_element:
             assert new_ent.energy == pytest.approx(old_ent.energy)
         else:
-            assert not new_ent.energy == pytest.approx(old_ent.energy)
+            assert new_ent.energy != pytest.approx(old_ent.energy)
 
 
 def test_get_adjusted_entry(interpolated_entry):
     entry_copy = deepcopy(interpolated_entry)
     entry_copy.energy_adjustments.append(ConstantEnergyAdjustment(0.1))
 
-    assert entry_copy == GibbsEntrySet.get_adjusted_entry(
-        interpolated_entry, ConstantEnergyAdjustment(0.1)
-    )
+    assert entry_copy == GibbsEntrySet.get_adjusted_entry(interpolated_entry, ConstantEnergyAdjustment(0.1))
 
 
 def test_from_pd(mp_entries):
@@ -165,9 +162,7 @@ def test_update(gibbs_entries):
     }
     new_entries = set()
     for e in entry_copies:
-        new_entries.add(
-            GibbsEntrySet.get_adjusted_entry(e, ConstantEnergyAdjustment(0.1))
-        )
+        new_entries.add(GibbsEntrySet.get_adjusted_entry(e, ConstantEnergyAdjustment(0.1)))
 
     gibbs_entries.update(new_entries)
 

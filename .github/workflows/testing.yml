@@ -22,27 +22,28 @@ jobs:
           cache: "pip"
           cache-dependency-path: "pyproject.toml"
 
-      - name: Install python dependencies
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .[strict]
-          pip install black prospector[with_mypy]
-          pip install -U prospector
+          pip install --upgrade ruff mypy
 
-      - name: Lint with black
+      - name: ruff
         run: |
-          black --check --diff --color src/rxn_network
+          ruff --version
+          ruff .
+          ruff format --check .
 
-      - name: Lint with prospector
+      - name: mypy
         run: |
-          prospector src/rxn_network
+          mypy --version
+          rm -rf .mypy_cache
+          mypy src/rxn_network
 
   test:
     strategy:
       max-parallel: 6
       matrix:
         os: [ubuntu-latest]
-        python_version: ["3.8", "3.9", "3.10", "3.11"]
+        python_version: ["3.9", "3.10", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3

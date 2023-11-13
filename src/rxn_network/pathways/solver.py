@@ -1,5 +1,4 @@
-"""
-Implements a reaction pathway solver class which efficiently solves mass balance
+"""Implements a reaction pathway solver class which efficiently solves mass balance
 equations using matrix operations.
 """
 from __future__ import annotations
@@ -19,10 +18,7 @@ from tqdm import tqdm
 from rxn_network.core import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
-from rxn_network.enumerators.minimize import (
-    MinimizeGibbsEnumerator,
-    MinimizeGrandPotentialEnumerator,
-)
+from rxn_network.enumerators.minimize import MinimizeGibbsEnumerator, MinimizeGrandPotentialEnumerator
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction
@@ -40,11 +36,13 @@ logger = get_logger(__name__)
 
 
 class Solver(MSONable, metaclass=ABCMeta):
-    """
-    Base definition for a pathway solver class.
-    """
+    """Base definition for a pathway solver class."""
 
     def __init__(self, pathways: PathwaySet):
+        """
+        Args:
+            pathways: A PathwaySet object containing the pathways to be combined/balanced.
+        """
         self._pathways = pathways
 
         rxns = []
@@ -61,33 +59,32 @@ class Solver(MSONable, metaclass=ABCMeta):
 
     @property
     def pathways(self) -> list[Pathway]:
-        """Pathways used in solver class"""
+        """Pathways used in solver class."""
         return self._pathways
 
     @property
     def reactions(self) -> list[Reaction]:
-        """Reactions used in solver class"""
+        """Reactions used in solver class."""
         return self._reactions
 
     @property
     def costs(self) -> list[float]:
-        """Costs used in solver class"""
+        """Costs used in solver class."""
         return self._costs
 
     @property
     def num_rxns(self) -> int:
-        """Length of the reaction list"""
+        """Length of the reaction list."""
         return len(self.reactions)
 
     @property
     def num_entries(self) -> int:
-        """Length of entry list"""
+        """Length of entry list."""
         return len(self._entries)
 
 
 class PathwaySolver(Solver):
-    """
-    Solver that implements an efficient method (using numba) for finding balanced
+    """Solver that implements an efficient method (using numba) for finding balanced
     reaction pathways from a list of graph-derived reaction pathways (i.e. a list of
     lists of reactions).
 
@@ -108,18 +105,17 @@ class PathwaySolver(Solver):
         chunk_size: int = 100000,
         batch_size: int | None = None,
     ):
-        """
-        Args:
-            pathways: List of reaction pathways derived from the network.
-            entries: GibbsEntrySet containing all entries in the network.
-            cost_function: CostFunction object to use for the solver.
-            open_elem: Optional element to use for pathways with an open element.
-            chempot: Chemical potential to use for pathways with an open element.
-                Defaults to 0.0.
-            chunk_size: The number of pathways per chunk to use for balancing. Defaults
-                to 100,000.
-            batch_size: Number of chunks to submit to each CPU at a time. Automatically
-                calculated if not set.
+        """Args:
+        pathways: List of reaction pathways derived from the network.
+        entries: GibbsEntrySet containing all entries in the network.
+        cost_function: CostFunction object to use for the solver.
+        open_elem: Optional element to use for pathways with an open element.
+        chempot: Chemical potential to use for pathways with an open element.
+        Defaults to 0.0.
+        chunk_size: The number of pathways per chunk to use for balancing. Defaults
+        to 100,000.
+        batch_size: Number of chunks to submit to each CPU at a time. Automatically
+        calculated if not set.
 
 
         """
@@ -141,9 +137,7 @@ class PathwaySolver(Solver):
         use_minimize_enumerator: bool = False,
         filter_interdependent: bool = True,
     ) -> PathwaySet:
-        """
-
-        Args:
+        """Args:
             net_rxn: The reaction representing the total reaction from precursors to
                 final targets.
             max_num_combos: The maximum allowable size of the balanced reaction pathway.
@@ -165,11 +159,8 @@ class PathwaySolver(Solver):
         Returns:
             A list of BalancedPathway objects.
         """
-
         if not net_rxn.balanced:
-            raise ValueError(
-                "Net reaction must be balanceable to find all reaction pathways."
-            )
+            raise ValueError("Net reaction must be balanceable to find all reaction pathways.")
 
         if not ray.is_initialized():
             initialize_ray()
@@ -195,9 +186,7 @@ class PathwaySolver(Solver):
                 use_basic_enumerator,
                 use_minimize_enumerator,
             )
-            intermediate_costs = [
-                self.cost_function.evaluate(r) for r in intermediate_rxns.get_rxns()
-            ]
+            intermediate_costs = [self.cost_function.evaluate(r) for r in intermediate_rxns.get_rxns()]
             for r, c in zip(intermediate_rxns, intermediate_costs):
                 if r not in reactions:
                     reactions.append(r)
@@ -205,11 +194,7 @@ class PathwaySolver(Solver):
 
         clean_r_set = ReactionSet.from_rxns(reactions, filter_duplicates=True)
         cleaned_reactions, cleaned_costs = zip(
-            *[
-                (r, c)
-                for r, c in zip(reactions, costs)
-                if r in clean_r_set and r != net_rxn
-            ]
+            *[(r, c) for r, c in zip(reactions, costs) if r in clean_r_set and r != net_rxn]
         )
 
         net_rxn_vector = net_rxn.get_entry_idx_vector(num_entries)
@@ -229,9 +214,7 @@ class PathwaySolver(Solver):
             comp_matrices_refs_dict[n] = []
             for group in grouper(combinations(range(num_rxns), n), self.chunk_size):
                 comp_matrices_refs_dict[n].append(
-                    _create_comp_matrices.remote(
-                        group, cleaned_reactions_ref, num_entries, net_coeff_filter
-                    )
+                    _create_comp_matrices.remote(group, cleaned_reactions_ref, num_entries, net_coeff_filter)
                 )
 
         logger.info("Building comp matrices...")
@@ -256,9 +239,7 @@ class PathwaySolver(Solver):
         c_m_mats = []
         c_m_mats_refs = []
 
-        num_jobs = sum(
-            len(val) // self.chunk_size + 1 for val in comp_matrices.values()
-        )
+        num_jobs = sum(len(val) // self.chunk_size + 1 for val in comp_matrices.values())
         num_batches = int(num_jobs // batch_size + 1)
 
         batch_count = 1
@@ -288,12 +269,9 @@ class PathwaySolver(Solver):
                     for c_m_mats_ref in tqdm(
                         to_iterator(c_m_mats_refs),
                         total=len(c_m_mats_refs),
-                        desc=(
-                            f"{self.__class__.__name__} (Batch"
-                            f" {batch_count}/{num_batches})"
-                        ),
+                        desc=(f"{self.__class__.__name__} (Batch {batch_count}/{num_batches})"),
                     ):
-                        c_m_mats.append(c_m_mats_ref)
+                        c_m_mats.append(c_m_mats_ref)  # noqa: PERF402
 
                     batch_count += 1
 
@@ -306,11 +284,11 @@ class PathwaySolver(Solver):
             total=len(c_m_mats_refs),
             desc=f"{self.__class__.__name__} (Batch {batch_count}/{num_batches})",
         ):
-            c_m_mats.append(c_m_mats_ref)
+            c_m_mats.append(c_m_mats_ref)  # noqa: PERF402
 
         c_mats, m_mats = zip(*c_m_mats)
-        c_mats = [mat for mats in c_mats for mat in mats if mat is not None]
-        m_mats = [mat for mats in m_mats for mat in mats if mat is not None]
+        c_mats = [mat for mats in c_mats for mat in mats if mat is not None]  # type: ignore
+        m_mats = [mat for mats in m_mats for mat in mats if mat is not None]  # type: ignore
 
         paths = []
         for c_mat, m_mat in zip(c_mats, m_mats):
@@ -318,13 +296,7 @@ class PathwaySolver(Solver):
             path_costs = []
 
             for rxn_mat in c_mat:
-                ents, coeffs = zip(
-                    *[
-                        (entries[idx], c)
-                        for idx, c in enumerate(rxn_mat)
-                        if not np.isclose(c, 0.0)
-                    ]
-                )
+                ents, coeffs = zip(*[(entries[idx], c) for idx, c in enumerate(rxn_mat) if not np.isclose(c, 0.0)])
 
                 if self.open_elem is not None:
                     rxn = OpenComputedReaction(
@@ -356,7 +328,7 @@ class PathwaySolver(Solver):
         else:
             filtered_paths = paths
 
-        filtered_paths = sorted(list(set(filtered_paths)), key=lambda p: p.average_cost)
+        filtered_paths = sorted(set(filtered_paths), key=lambda p: p.average_cost)
 
         return PathwaySet.from_paths(filtered_paths)
 
@@ -367,11 +339,9 @@ class PathwaySolver(Solver):
         use_basic_enumerator,
         use_minimize_enumerator,
     ):
-        """
-        Method for finding intermediate reactions using enumerators and
+        """Method for finding intermediate reactions using enumerators and
         specified settings.
         """
-
         intermediates = {e for rxn in self.reactions for e in rxn.entries}
         intermediates = GibbsEntrySet(
             list(intermediates) + targets,
@@ -427,7 +397,7 @@ class PathwaySolver(Solver):
 
     @property
     def entries(self) -> GibbsEntrySet:
-        """Entry set used in solver"""
+        """Entry set used in solver."""
         return self._entries
 
 
@@ -437,10 +407,9 @@ def _balance_path_arrays_cpu(
     net_coeffs: np.ndarray,
     tol: float = 1e-6,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Fast solution for reaction multiplicities via mass balance stochiometric
+    """Fast solution for reaction multiplicities via mass balance stochiometric
     constraints. Parallelized using Numba JIT. Can be applied to large batches (100K-1M
-    sets of reactions at a time.)
+    sets of reactions at a time.).
 
     Args:
         comp_matrices: Array containing stoichiometric coefficients of all
@@ -453,7 +422,7 @@ def _balance_path_arrays_cpu(
     net_coeff_filter = np.argwhere(net_coeffs != 0).flatten()
     len_net_coeff_filter = len(net_coeff_filter)
     all_multiplicities = np.zeros((shape[0], shape[1]), np.float64)
-    indices = np.full(shape[0], False)
+    indices = np.full(shape[0], fill_value=False)
 
     for i in range(shape[0]):
         correct = True
@@ -472,9 +441,7 @@ def _balance_path_arrays_cpu(
         if (multiplicities < tol).any():
             continue
 
-        if not (
-            np.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * np.abs(net_coeffs))
-        ).all():
+        if not (np.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * np.abs(net_coeffs))).all():
             continue
 
         all_multiplicities[i] = multiplicities
@@ -497,18 +464,10 @@ def _balance_path_arrays_cpu(
 def _create_comp_matrices(combos, rxns, num_entries, net_coeff_filter):
     """Create array of stoichiometric coefficients for each reaction."""
     comp_matrices = np.stack(
-        [
-            np.vstack([rxns[r].get_entry_idx_vector(num_entries) for r in combo])
-            for combo in combos
-            if combo
-        ]
+        [np.vstack([rxns[r].get_entry_idx_vector(num_entries) for r in combo]) for combo in combos if combo]
     )
     # filter bad matrices
-    comp_matrices_filtered = comp_matrices[
-        comp_matrices[:, :, net_coeff_filter].any(axis=1).all(axis=1)
-    ]
-
-    return comp_matrices_filtered
+    return comp_matrices[comp_matrices[:, :, net_coeff_filter].any(axis=1).all(axis=1)]
 
 
 @ray.remote
@@ -516,5 +475,5 @@ def _balance_path_arrays_cpu_wrapper(
     comp_matrices,
     net_rxn_vector,
 ):
-    """Wraps pathway balancing method with ray.remote decorator"""
+    """Wraps pathway balancing method with ray.remote decorator."""
     return _balance_path_arrays_cpu(comp_matrices, net_rxn_vector)

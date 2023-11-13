@@ -1,16 +1,19 @@
 """Utility functions used throughout the reaction-network package."""
+from __future__ import annotations
 
 import logging
 import sys
 from datetime import datetime
 from itertools import chain, combinations, zip_longest
 from pathlib import Path
-from typing import Any, Iterable
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def limited_powerset(iterable: Iterable, max_size: int) -> Iterable:
-    """
-    Helper method for generating subsets ranging from singular
+    """Helper method for generating subsets ranging from singular
     length to maximum length specified by max_size.
 
     Args:
@@ -20,14 +23,11 @@ def limited_powerset(iterable: Iterable, max_size: int) -> Iterable:
     Returns:
         All combination sets up to maximum size
     """
-    return chain.from_iterable(
-        [combinations(iterable, num_combos) for num_combos in range(1, max_size + 1)]
-    )
+    return chain.from_iterable([combinations(iterable, num_combos) for num_combos in range(1, max_size + 1)])
 
 
 def grouper(iterable: Iterable, n: int, fillvalue: Any = None) -> Iterable:
-    """
-    Collects data into fixed-length chunks or blocks.
+    """Collects data into fixed-length chunks or blocks.
 
     Args:
         iterable: An iterable object to group.
@@ -40,8 +40,7 @@ def grouper(iterable: Iterable, n: int, fillvalue: Any = None) -> Iterable:
 
 
 def get_project_root() -> Path:
-    """
-    Gets a Path object for the reaction-network project root directory.
+    """Gets a Path object for the reaction-network project root directory.
 
     Note:
         This is specific to this file and project.
@@ -58,12 +57,10 @@ def get_logger(
     log_format="%(asctime)s %(levelname)s %(name)s %(message)s",
     stream=sys.stdout,
 ):
-    """
-    Code borrowed from the atomate package.
+    """Code borrowed from the atomate package.
 
     Helper method for acquiring logger.
     """
-
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
@@ -81,7 +78,5 @@ def get_logger(
 
 
 def datetime_str() -> str:
-    """
-    Get a string representation of the current time. Borrowed from atomate2 package.
-    """
+    """Get a string representation of the current time. Borrowed from atomate2 package."""
     return str(datetime.utcnow())

@@ -1,3 +1,1 @@
-"""
-Calculators and cost functions for determining relative ordering of reactions.
-"""
+"""Calculators and cost functions for determining relative ordering of reactions."""

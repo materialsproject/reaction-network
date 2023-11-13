@@ -1,8 +1,17 @@
 """ Tests for InterfaceReactionHull. """
-import numpy as np
 import pytest
-
 from rxn_network.reactions.hull import InterfaceReactionHull
+
+stable_rxns_str = [
+    "BaO -> BaO",
+    "TiO2 + 2 BaO -> Ba2TiO4",
+    "TiO2 + BaO -> BaTiO3",
+    "TiO2 + 0.5 BaO -> 0.5 BaTi2O5",
+    "TiO2 + 0.3077 BaO -> 0.07692 Ba4Ti13O30",
+    "TiO2 + 0.2 BaO -> 0.2 BaTi5O11",
+    "TiO2 + 0.1667 BaO -> 0.1667 BaTi6O13",
+    "18 TiO2 -> O2 + 2 Ti9O17",
+]
 
 
 @pytest.fixture(scope="module")
@@ -10,6 +19,7 @@ def stable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 2 BaO -> Ba2TiO4":
             return r
+    return None
 
 
 @pytest.fixture(scope="module")
@@ -17,33 +27,16 @@ def unstable_rxn(bao_tio2_rxns):
     for r in bao_tio2_rxns:
         if str(r) == "TiO2 + 0.9 BaO -> 0.1 Ti10O11 + 0.9 BaO2":
             return r
+    return None
 
 
 def test_stable_reactions(irh_batio):
-    stable_rxns = [
-        "BaO -> BaO",
-        "TiO2 + 2 BaO -> Ba2TiO4",
-        "TiO2 + BaO -> BaTiO3",
-        "TiO2 + 0.5 BaO -> 0.5 BaTi2O5",
-        "TiO2 + 0.3077 BaO -> 0.07692 Ba4Ti13O30",
-        "TiO2 + 0.2 BaO -> 0.2 BaTi5O11",
-        "TiO2 + 0.1667 BaO -> 0.1667 BaTi6O13",
-        "18 TiO2 -> O2 + 2 Ti9O17",
-    ]
-
-    stable_rxns = [
-        actual_rxn
-        for r in stable_rxns
-        for actual_rxn in irh_batio.reactions
-        if r == str(actual_rxn)
-    ]
+    stable_rxns = [actual_rxn for r in stable_rxns_str for actual_rxn in irh_batio.reactions if r == str(actual_rxn)]
     assert irh_batio.stable_reactions == stable_rxns
 
 
 def test_unstable_reactions(irh_batio):
-    assert set(irh_batio.unstable_reactions) | set(irh_batio.stable_reactions) == set(
-        irh_batio.reactions
-    )
+    assert set(irh_batio.unstable_reactions) | set(irh_batio.stable_reactions) == set(irh_batio.reactions)
 
 
 @pytest.mark.parametrize(
@@ -55,9 +48,7 @@ def test_unstable_reactions(irh_batio):
     ],
 )
 def test_calculate_altitude(c1, c2, c3, expected_altitude):
-    assert InterfaceReactionHull._calculate_altitude(c1, c2, c3) == pytest.approx(
-        expected_altitude
-    )
+    assert InterfaceReactionHull._calculate_altitude(c1, c2, c3) == pytest.approx(expected_altitude)
 
 
 @pytest.mark.parametrize(
@@ -72,33 +63,21 @@ def test_get_coords_in_range(x1, x2, expected_length, irh_batio):
 
 
 def test_get_primary_competition(irh_batio, stable_rxn, unstable_rxn):
-    assert irh_batio.get_primary_competition(stable_rxn) == pytest.approx(
-        0.016641117599548783
-    )
-    assert irh_batio.get_primary_competition(unstable_rxn) == pytest.approx(
-        1.0387981452239168
-    )
+    assert irh_batio.get_primary_competition(stable_rxn) == pytest.approx(0.016641117599548783)
+    assert irh_batio.get_primary_competition(unstable_rxn) == pytest.approx(1.0387981452239168)
 
 
 def test_get_secondary_competition(irh_batio, stable_rxn, unstable_rxn):
-    assert irh_batio.get_secondary_competition(stable_rxn) == pytest.approx(
-        0.41705577943708827
-    )
-    assert irh_batio.get_secondary_competition(unstable_rxn) == pytest.approx(
-        0.42985193897860136
-    )
+    assert irh_batio.get_secondary_competition(stable_rxn) == pytest.approx(0.41705577943708827)
+    assert irh_batio.get_secondary_competition(unstable_rxn) == pytest.approx(0.42985193897860136)
 
 
 def test_get_energy_above_hull(irh_batio, stable_rxn, unstable_rxn):
     assert irh_batio.get_energy_above_hull(stable_rxn) == pytest.approx(0.0)
-    assert irh_batio.get_energy_above_hull(unstable_rxn) == pytest.approx(
-        1.0365808689708862
-    )
+    assert irh_batio.get_energy_above_hull(unstable_rxn) == pytest.approx(1.0365808689708862)
 
     for r in irh_batio.unstable_reactions:
-        assert (
-            irh_batio.get_energy_above_hull(r) > -1e-12
-        )  # some numerical error expected here
+        assert irh_batio.get_energy_above_hull(r) > -1e-12  # some numerical error expected here
 
     for r in irh_batio.stable_reactions:
         assert irh_batio.get_energy_above_hull(r) == pytest.approx(0.0)
@@ -126,9 +105,7 @@ def test_get_decomposition_energy_and_num_paths_recursive(irh_batio):
     ) = irh_batio.get_decomposition_energy_and_num_paths_recursive(0, 1)
 
     assert decomp_energy == pytest.approx(irh_batio.get_decomposition_energy(0, 1))
-    assert num_paths == pytest.approx(
-        irh_batio.count(len(irh_batio.get_coords_in_range(0, 1)) - 2)
-    )
+    assert num_paths == pytest.approx(irh_batio.count(len(irh_batio.get_coords_in_range(0, 1)) - 2))
 
 
 @pytest.mark.parametrize(
@@ -140,10 +117,9 @@ def test_count(num, answer, irh_batio):
 
 
 def test_hull_vertices(irh_batio):
-    correct = np.array([1, 5, 19, 28, 43, 54, 57, 117])
-    np.testing.assert_almost_equal(irh_batio.hull_vertices, correct)
-
-    assert 89 not in irh_batio.hull_vertices  # 89 is above zero and not relevant
+    for vertex, correct_rxn_str in zip(irh_batio.hull_vertices, stable_rxns_str):
+        rxn = irh_batio.reactions[vertex]
+        assert str(rxn) == correct_rxn_str
 
 
 def test_plot(irh_batio):

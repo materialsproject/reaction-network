@@ -1,5 +1,4 @@
-"""
-This module for defining chemical reaction objects was originally sourced from
+"""This module for defining chemical reaction objects was originally sourced from
 pymatgen and streamlined for the reaction-network code.
 """
 from __future__ import annotations
@@ -17,27 +16,27 @@ from rxn_network.core import Composition
 from rxn_network.reactions.base import Reaction
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from pymatgen.core.periodic_table import Element
 
 TOLERANCE = 1e-6  # Tolerance for determining if a particular component fraction is > 0.
 
 
 class BasicReaction(Reaction):
-    """
-    An object representing a basic chemical reaction: compositions and their
+    """An object representing a basic chemical reaction: compositions and their
     coefficients.
     """
 
     def __init__(
         self,
-        compositions: list[Composition],
-        coefficients: list[float] | np.ndarray,
+        compositions: Iterable[Composition],
+        coefficients: Iterable[float] | np.ndarray,
         balanced: bool | None = None,
         data: dict | None = None,
-        lowest_num_errors: int | float = 0,
+        lowest_num_errors: float = 0,
     ):
-        """
-        A BasicReaction object is defined by a list of compositions and their
+        """A BasicReaction object is defined by a list of compositions and their
         corresponding coefficients, where a negative coefficient refers to a
         reactant, and a positive coefficient refers to a product.
 
@@ -57,26 +56,14 @@ class BasicReaction(Reaction):
         self._compositions = [Composition(c) for c in compositions]
         self._coefficients = np.array(coefficients)
 
-        self.reactant_coeffs = {
-            comp: coeff
-            for comp, coeff in zip(self._compositions, self._coefficients)
-            if coeff < 0
-        }
-        self.product_coeffs = {
-            comp: coeff
-            for comp, coeff in zip(self._compositions, self._coefficients)
-            if coeff > 0
-        }
+        self.reactant_coeffs = {comp: coeff for comp, coeff in zip(self._compositions, self._coefficients) if coeff < 0}
+        self.product_coeffs = {comp: coeff for comp, coeff in zip(self._compositions, self._coefficients) if coeff > 0}
 
         if balanced is not None:
             self.balanced = balanced
         else:
-            sum_reactants = sum(
-                [k * abs(v) for k, v in self.reactant_coeffs.items()], Composition({})
-            )
-            sum_products = sum(
-                [k * abs(v) for k, v in self.product_coeffs.items()], Composition({})
-            )
+            sum_reactants = sum([k * abs(v) for k, v in self.reactant_coeffs.items()], Composition({}))
+            sum_products = sum([k * abs(v) for k, v in self.product_coeffs.items()], Composition({}))
 
             if not sum_reactants.almost_equals(sum_products, rtol=0, atol=TOLERANCE):
                 self.balanced = False
@@ -93,9 +80,8 @@ class BasicReaction(Reaction):
         products: list[Composition],
         data: dict | None = None,
     ) -> BasicReaction:
-        """
-        Reactants and products to be specified as list of
-        pymatgen.core.Composition. e.g., [comp1, comp2]
+        """Reactants and products to be specified as list of
+        pymatgen.core.Composition. e.g., [comp1, comp2].
 
         Args:
             reactants: List of reactants.
@@ -103,9 +89,7 @@ class BasicReaction(Reaction):
             data: Optional dictionary containing extra data about the reaction.
         """
         compositions = list(reactants + products)
-        coeffs, lowest_num_errors, num_constraints = cls._balance_coeffs(
-            reactants, products
-        )
+        coeffs, lowest_num_errors, num_constraints = cls._balance_coeffs(reactants, products)
         if not data:
             data = {}
         data["num_constraints"] = num_constraints
@@ -124,8 +108,7 @@ class BasicReaction(Reaction):
         )
 
     def normalize_to(self, comp: Composition, factor: float = 1) -> BasicReaction:
-        """
-        Normalizes the reaction to one of the compositions via the provided factor.
+        """Normalizes the reaction to one of the compositions via the provided factor.
 
         By default, normalizes such that the composition given has a coefficient of
         1.
@@ -140,11 +123,8 @@ class BasicReaction(Reaction):
         coeffs *= scale_factor
         return BasicReaction(all_comp, coeffs)
 
-    def normalize_to_element(
-        self, element: Element, factor: float = 1
-    ) -> BasicReaction:
-        """
-        Normalizes the reaction to one of the elements.
+    def normalize_to_element(self, element: Element, factor: float = 1) -> BasicReaction:
+        """Normalizes the reaction to one of the elements.
         By default, normalizes such that the amount of the element is 1.
         Another factor can be specified.
 
@@ -154,16 +134,13 @@ class BasicReaction(Reaction):
         """
         all_comp = self.compositions
         coeffs = self.coefficients.copy()
-        current_el_amount = (
-            sum(all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))) / 2
-        )
+        current_el_amount = sum(all_comp[i][element] * abs(coeffs[i]) for i in range(len(all_comp))) / 2
         scale_factor = factor / current_el_amount
         coeffs *= scale_factor
         return BasicReaction(all_comp, coeffs)
 
     def get_el_amount(self, element: Element) -> float:
-        """
-        Returns the amount of the element in the reaction.
+        """Returns the amount of the element in the reaction.
 
         Args:
             element (Element/Species): Element in the reaction
@@ -171,29 +148,20 @@ class BasicReaction(Reaction):
         Returns:
             Amount of that element in the reaction.
         """
-        return (
-            sum(
-                self.compositions[i][element] * abs(self.coefficients[i])
-                for i in range(len(self.compositions))
-            )
-            / 2
-        )
+        return sum(self.compositions[i][element] * abs(self.coefficients[i]) for i in range(len(self.compositions))) / 2
 
     def get_coeff(self, comp: Composition):
-        """
-        Returns coefficient for a particular composition
-        """
+        """Returns coefficient for a particular composition."""
         return self.coefficients[self.compositions.index(comp)]
 
     def normalized_repr_and_factor(self):
+        """Normalized representation for a reaction
+        For example, ``4 Li + 2 O -> 2Li2O`` becomes ``2 Li + O -> Li2O``.
         """
-        Normalized representation for a reaction
-        For example, ``4 Li + 2 O -> 2Li2O`` becomes ``2 Li + O -> Li2O``
-        """
-        return self._str_from_comp(self.coefficients, self.compositions, True)
+        return self._str_from_comp(self.coefficients, self.compositions, reduce=True)
 
     def copy(self) -> BasicReaction:
-        """Returns a copy of the BasicReaction object"""
+        """Returns a copy of the BasicReaction object."""
         return BasicReaction(
             compositions=self.compositions,
             coefficients=self.coefficients.copy(),
@@ -203,8 +171,7 @@ class BasicReaction(Reaction):
         )
 
     def reverse(self) -> BasicReaction:
-        """
-        Returns a copy of the original BasicReaction object where original reactants are
+        """Returns a copy of the original BasicReaction object where original reactants are
         new products, and vice versa.
         """
         return BasicReaction(
@@ -216,8 +183,7 @@ class BasicReaction(Reaction):
         )
 
     def is_separable(self, target: str | Composition) -> bool:
-        """
-        Checks if the reaction forms byproducts which are separable from the target
+        """Checks if the reaction forms byproducts which are separable from the target
         composition; i.e., byproducts do not contain any of the elements in the target
         phase.
 
@@ -229,11 +195,7 @@ class BasicReaction(Reaction):
             True if reaction is separable from target, False otherwise.
         """
         target = Composition(target)
-        identified_targets = [
-            c
-            for c in self.compositions
-            if c.reduced_composition == target.reduced_composition
-        ]
+        identified_targets = [c for c in self.compositions if c.reduced_composition == target.reduced_composition]
 
         if len(identified_targets) == 0:
             raise ValueError(f"Target composition {target} not in reaction {self}")
@@ -245,41 +207,29 @@ class BasicReaction(Reaction):
             products.remove(t)
 
         separable = [added_elems.issuperset(comp.elements) for comp in products]
-        found = all(separable)
-
-        return found
+        return all(separable)
 
     @cached_property
     def reactant_atomic_fractions(self) -> dict:
-        """
-        Returns the atomic mixing ratio of reactants in the reaction
-        """
+        """Returns the atomic mixing ratio of reactants in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
         return {
-            c.reduced_composition: -coeff * c.num_atoms / self.num_atoms
-            for c, coeff in self.reactant_coeffs.items()
+            c.reduced_composition: -coeff * c.num_atoms / self.num_atoms for c, coeff in self.reactant_coeffs.items()
         }
 
     @cached_property
     def product_atomic_fractions(self) -> dict:
-        """
-        Returns the atomic mixing ratio of reactants in the reaction
-        """
+        """Returns the atomic mixing ratio of reactants in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
-        return {
-            c.reduced_composition: coeff * c.num_atoms / self.num_atoms
-            for c, coeff in self.product_coeffs.items()
-        }
+        return {c.reduced_composition: coeff * c.num_atoms / self.num_atoms for c, coeff in self.product_coeffs.items()}
 
     @cached_property
     def reactant_molar_fractions(self) -> dict:
-        """
-        Returns the molar mixing ratio of reactants in the reaction
-        """
+        """Returns the molar mixing ratio of reactants in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
@@ -289,9 +239,7 @@ class BasicReaction(Reaction):
 
     @cached_property
     def product_molar_fractions(self) -> dict:
-        """
-        Returns the molar mixing ratio of products in the reaction
-        """
+        """Returns the molar mixing ratio of products in the reaction."""
         if not self.balanced:
             raise ValueError("Reaction is not balanced")
 
@@ -301,8 +249,7 @@ class BasicReaction(Reaction):
 
     @classmethod
     def from_string(cls, rxn_string: str) -> BasicReaction:
-        """
-        Generates a balanced reaction from a string. The reaction must
+        """Generates a balanced reaction from a string. The reaction must
         already be balanced.
 
         Args:
@@ -317,9 +264,7 @@ class BasicReaction(Reaction):
         def get_comp_amt(comp_str):
             return {
                 Composition(m.group(2)): float(m.group(1) or 1)
-                for m in re.finditer(
-                    r"([\d\.]*(?:[eE]-?[\d\.]+)?)\s*([A-Z][\w\.\(\)]*)", comp_str
-                )
+                for m in re.finditer(r"([\d\.]*(?:[eE]-?[\d\.]+)?)\s*([A-Z][\w\.\(\)]*)", comp_str)
             }
 
         reactant_coeffs = get_comp_amt(rct_str)
@@ -329,8 +274,7 @@ class BasicReaction(Reaction):
 
     @classmethod
     def from_formulas(cls, reactants: list[str], products: list[str]) -> BasicReaction:
-        """
-        Initialize a reaction from a list of 1) reactant formulas and 2) product
+        """Initialize a reaction from a list of 1) reactant formulas and 2) product
         formulas.
 
         Args:
@@ -340,66 +284,57 @@ class BasicReaction(Reaction):
         Returns:
             A BasicReaction object
         """
-
         reactant_comps = [Composition(r) for r in reactants]
         product_comps = [Composition(p) for p in products]
-        rxn = cls.balance(reactants=reactant_comps, products=product_comps)
-
-        return rxn
+        return cls.balance(reactants=reactant_comps, products=product_comps)
 
     @property
     def reactants(self) -> list[Composition]:
-        """List of reactants for this reaction"""
+        """List of reactants for this reaction."""
         return list(self.reactant_coeffs.keys())
 
     @property
     def products(self) -> list[Composition]:
-        """List of products for this reaction"""
+        """List of products for this reaction."""
         return list(self.product_coeffs.keys())
 
     @property
     def compositions(self) -> list[Composition]:
-        """List of composition objects for this reaction"""
+        """List of composition objects for this reaction."""
         return self._compositions
 
     @property
     def coefficients(self) -> np.ndarray:
-        """Array of reaction coefficients"""
+        """Array of reaction coefficients."""
         return self._coefficients
 
     @cached_property
     def num_atoms(self) -> float:
-        """Total number of atoms in this reaction"""
-        return sum(
-            coeff * sum(c[el] for el in self.elements)
-            for c, coeff in self.product_coeffs.items()
-        )
+        """Total number of atoms in this reaction."""
+        return sum(coeff * sum(c[el] for el in self.elements) for c, coeff in self.product_coeffs.items())
 
     @cached_property
     def energy(self) -> float:
-        """The energy of this reaction"""
+        """The energy of this reaction."""
         raise ValueError("No energy for a basic reaction!")
 
     @cached_property
     def energy_per_atom(self) -> float:
-        """The energy per atom of this reaction"""
+        """The energy per atom of this reaction."""
         raise ValueError("No energy per atom for a basic reaction!")
 
     @cached_property
     def is_identity(self) -> bool:
-        """Returns True if the reaction has identical reactants and products"""
+        """Returns True if the reaction has identical reactants and products."""
         return self._get_is_identity()
 
     def _get_is_identity(self):
-        """Returns True if the reaction has identical reactants and products"""
+        """Returns True if the reaction has identical reactants and products."""
         if set(self.reactants) != set(self.products):
             return False
         if self.balanced is False:  # if not balanced, can not check coefficients
             return True
-        return all(
-            np.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c])
-            for c in self.reactant_coeffs
-        )
+        return all(np.isclose(self.reactant_coeffs[c] * -1, self.product_coeffs[c]) for c in self.reactant_coeffs)
 
     @cached_property
     def chemical_system(self) -> str:
@@ -408,8 +343,7 @@ class BasicReaction(Reaction):
 
     @property
     def normalized_repr(self) -> str:
-        """
-        A normalized representation of the reaction. All factors are converted
+        """A normalized representation of the reaction. All factors are converted
         to lowest common factors.
         """
         return self.normalized_repr_and_factor()[0]
@@ -418,9 +352,7 @@ class BasicReaction(Reaction):
     def _balance_coeffs(
         cls, reactants: list[Composition], products: list[Composition]
     ) -> tuple[np.ndarray, int | float, int]:
-        """
-        Balances the reaction and returns the new coefficient matrix
-        """
+        """Balances the reaction and returns the new coefficient matrix."""
         compositions = reactants + products
         num_comp = len(compositions)
 
@@ -440,25 +372,17 @@ class BasicReaction(Reaction):
 
         # start with simplest product constraints, work to more complex constraints
         product_constraints = chain.from_iterable(
-            [
-                combinations(range(first_product_idx, num_comp), n_constr)
-                for n_constr in range(num_constraints, 0, -1)
-            ]
+            [combinations(range(first_product_idx, num_comp), n_constr) for n_constr in range(num_constraints, 0, -1)]
         )
         reactant_constraints = chain.from_iterable(
-            [
-                combinations(range(0, first_product_idx), n_constr)
-                for n_constr in range(num_constraints, 0, -1)
-            ]
+            [combinations(range(first_product_idx), n_constr) for n_constr in range(num_constraints, 0, -1)]
         )
         best_soln = np.zeros(num_comp)
 
         for constraints in chain(product_constraints, reactant_constraints):
             n_constr = len(constraints)
 
-            comp_and_constraints = np.append(
-                comp_matrix, np.zeros((n_constr, num_comp)), axis=0
-            )
+            comp_and_constraints = np.append(comp_matrix, np.zeros((n_constr, num_comp)), axis=0)
             b = np.zeros((num_elems + n_constr, 1))
             b[-n_constr:] = 1 if min(constraints) >= first_product_idx else -1
 
@@ -484,9 +408,7 @@ class BasicReaction(Reaction):
 
     @staticmethod
     def _from_coeff_dicts(reactant_coeffs, product_coeffs) -> BasicReaction:
-        reactant_comps, r_coefs = zip(
-            *[(comp, -1 * coeff) for comp, coeff in reactant_coeffs.items()]
-        )
+        reactant_comps, r_coefs = zip(*[(comp, -1 * coeff) for comp, coeff in reactant_coeffs.items()])
         product_comps, p_coefs = zip(*list(product_coeffs.items()))
         return BasicReaction(reactant_comps + product_comps, r_coefs + p_coefs)
 

@@ -4,7 +4,6 @@ import pytest
 from jobflow.core.store import JobStore
 from maggma.stores import MemoryStore
 from monty.serialization import loadfn
-
 from rxn_network.core import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.entries.interpolated import InterpolatedEntry
@@ -23,11 +22,10 @@ def mp_entries():
 
 @pytest.fixture(scope="session")
 def gibbs_entries():
-    ents = GibbsEntrySet.from_computed_entries(
+    return GibbsEntrySet.from_computed_entries(
         ENTRIES_LIST,
         temperature=1000,
     )
-    return ents
 
 
 @pytest.fixture(scope="session")
@@ -38,28 +36,24 @@ def entries():
 
 @pytest.fixture(scope="session")
 def gibbs_entries_with_na_cl(entries):
-    return GibbsEntrySet.from_computed_entries(
-        list(entries), temperature=1000
-    ).filter_by_stability(0.0)
+    return GibbsEntrySet.from_computed_entries(list(entries), temperature=1000).filter_by_stability(0.0)
 
 
 @pytest.fixture(scope="session")
 def filtered_entries():
-    filtered_entries = GibbsEntrySet.from_computed_entries(
+    return GibbsEntrySet.from_computed_entries(
         ENTRIES_LIST,
         temperature=1000,
     ).filter_by_stability(0.0)
-    return filtered_entries
 
 
-@pytest.fixture
+@pytest.fixture()
 def interpolated_entry():
     """Create entry"""
-    entry = InterpolatedEntry(
+    return InterpolatedEntry(
         composition="Y3O8",
         energy=-1.0,
     )
-    return entry
 
 
 @pytest.fixture(scope="session")
@@ -90,9 +84,7 @@ def bao_tio2_rxns():
 
 @pytest.fixture(scope="session")
 def irh_batio(bao_tio2_rxns):
-    return InterfaceReactionHull(
-        c1=Composition("BaO"), c2=Composition("TiO2"), reactions=bao_tio2_rxns
-    )
+    return InterfaceReactionHull(c1=Composition("BaO"), c2=Composition("TiO2"), reactions=bao_tio2_rxns)
 
 
 @pytest.fixture(scope="session")

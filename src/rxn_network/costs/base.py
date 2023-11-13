@@ -1,6 +1,4 @@
-"""
-Basic interface and implementation for a Calculator and CostFunction.
-"""
+"""Basic interface and implementation for a Calculator and CostFunction."""
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
@@ -14,19 +12,14 @@ if TYPE_CHECKING:
 
 
 class Calculator(MSONable, metaclass=ABCMeta):
-    """
-    Base definition for a reaction property calculator.
-    """
+    """Base definition for a reaction property calculator."""
 
     @abstractmethod
     def calculate(self, rxn: Reaction) -> float:
-        """
-        Evaluates a particular property of a reaction relevant to its cost ranking.
-        """
+        """Evaluates a particular property of a reaction relevant to its cost ranking."""
 
     def calculate_many(self, rxns: list[Reaction]) -> list[float]:
-        """
-        Convenience method for performing calculate() on a list of reactions.
+        """Convenience method for performing calculate() on a list of reactions.
 
         Args:
             rxns: the list of Reaction objects to be evaluated
@@ -41,8 +34,7 @@ class Calculator(MSONable, metaclass=ABCMeta):
         return results
 
     def decorate(self, rxn: Reaction) -> Reaction:
-        """
-        Returns a copy of the reaction with the calculated property by
+        """Returns a copy of the reaction with the calculated property by
         storing the value within the reaction's data dictionary.
 
         Args:
@@ -53,15 +45,14 @@ class Calculator(MSONable, metaclass=ABCMeta):
         """
         new_rxn = deepcopy(rxn)
 
-        if not getattr(new_rxn, "data"):
+        if not new_rxn.data:
             new_rxn.data = {}
 
         new_rxn.data[self.name] = self.calculate(new_rxn)
         return new_rxn
 
     def decorate_many(self, rxns: list[Reaction]) -> list[Reaction]:
-        """
-        Convenience method for performing decorate() on a list of reactions.
+        """Convenience method for performing decorate() on a list of reactions.
 
         Args:
             rxns: the list of Reaction objects to be decorated
@@ -77,12 +68,8 @@ class Calculator(MSONable, metaclass=ABCMeta):
 
 
 class CostFunction(MSONable, metaclass=ABCMeta):
-    """
-    Base definition for a cost function.
-    """
+    """Base definition for a cost function."""
 
     @abstractmethod
     def evaluate(self, rxn: Reaction) -> float:
-        """
-        Evaluates the specified cost function equation on a reaction object.
-        """
+        """Evaluates the specified cost function equation on a reaction object."""

@@ -2,17 +2,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Collection
+from typing import TYPE_CHECKING
 
 from jobflow import Flow, Maker
 from pymatgen.core.composition import Element
 
 from rxn_network.core import Composition
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
-from rxn_network.enumerators.minimize import (
-    MinimizeGibbsEnumerator,
-    MinimizeGrandPotentialEnumerator,
-)
+from rxn_network.enumerators.minimize import MinimizeGibbsEnumerator, MinimizeGrandPotentialEnumerator
 from rxn_network.jobs.core import (
     CalculateCompetitionMaker,
     GetEntrySetMaker,
@@ -23,6 +20,8 @@ from rxn_network.jobs.core import (
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
+    from collections.abc import Collection, Iterable
+
     from rxn_network.entries.entry_set import GibbsEntrySet
 
 logger = get_logger(__name__)
@@ -30,18 +29,18 @@ logger = get_logger(__name__)
 
 @dataclass
 class SynthesisPlanningFlowMaker(Maker):
-    """
-    Maker to create an inorganic synthesis planning workflow. This flow has three
-    stages:
+    """Maker to create an inorganic synthesis planning workflow. This flow has three
+    stages.
 
-    1)  Entries are acquired via `GetEntrySetMaker`. This job both gets the computed
-        entries from a databse (e.g., Materials Project) and processes them for use in
-        the reaction network.
-    2)  Reactions are enumerated via the provided `ReactionEnumerationMaker` (and
-        associated enumerators). This computes the full reaction network so that
-        selectivities can be calculated.
-    3)  The competition of all synthesis reactions to the desired target is assessed via
-        the `CalculateCompetitionMaker`.
+    Steps:
+        1)  Entries are acquired via `GetEntrySetMaker`. This job both gets the computed
+            entries from a databse (e.g., Materials Project) and processes them for use in
+            the reaction network.
+        2)  Reactions are enumerated via the provided `ReactionEnumerationMaker` (and
+            associated enumerators). This computes the full reaction network so that
+            selectivities can be calculated.
+        3)  The competition of all synthesis reactions to the desired target is assessed via
+            the `CalculateCompetitionMaker`.
 
     This flow also has the option to include an "open" element and a list of chempots.
     This will enumerate reactions at different conditions and evaluate their
@@ -52,13 +51,10 @@ class SynthesisPlanningFlowMaker(Maker):
     analysis. For the final "results", one should access the reaction set produced by
     the `CalculateCompetitionMaker` at the conditions of interest.
 
-    If you use this code in your work, please consider citing the following work:
+    If you use this code in your work, please cite the following work:
 
-        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
-        A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
-        Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
-        Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
-        August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.
+        McDermott, M. J. et al. Assessing Thermodynamic Selectivity of Solid-State Reactions for the Predictive
+        Synthesis of Inorganic Materials. ACS Cent. Sci. (2023) doi:10.1021/acscentsci.3c01051.
 
     Args:
         name: Name of the flow. Automatically generated if not provided.
@@ -86,12 +82,8 @@ class SynthesisPlanningFlowMaker(Maker):
 
     name: str = "synthesis_planning"
     get_entry_set_maker: GetEntrySetMaker = field(default_factory=GetEntrySetMaker)
-    enumeration_maker: ReactionEnumerationMaker = field(
-        default_factory=ReactionEnumerationMaker
-    )
-    calculate_competition_maker: CalculateCompetitionMaker = field(
-        default_factory=CalculateCompetitionMaker
-    )
+    enumeration_maker: ReactionEnumerationMaker = field(default_factory=ReactionEnumerationMaker)
+    calculate_competition_maker: CalculateCompetitionMaker = field(default_factory=CalculateCompetitionMaker)
     open_elem: Element | str | None = None
     chempots: list[float] | None = None
     use_basic_enumerators: bool = True
@@ -101,9 +93,7 @@ class SynthesisPlanningFlowMaker(Maker):
 
     def __post_init__(self):
         self.open_elem = Element(self.open_elem) if self.open_elem else None
-        self.open_formula = (
-            Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
-        )
+        self.open_formula = Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
 
     def make(  # type: ignore
         self,
@@ -111,8 +101,7 @@ class SynthesisPlanningFlowMaker(Maker):
         added_elems: Collection[str] | None = None,
         entries: GibbsEntrySet | None = None,
     ):
-        """
-        Returns a flow used for planning optimal synthesis recipes to a specified
+        """Returns a flow used for planning optimal synthesis recipes to a specified
         target.
 
         Args:
@@ -136,10 +125,7 @@ class SynthesisPlanningFlowMaker(Maker):
         flow_name = flow_name + f", T={self.get_entry_set_maker.temperature} K"
 
         chemsys = "-".join(
-            sorted(
-                {str(e) for e in Composition(target_formula).elements}
-                | {str(e) for e in added_elems}
-            )
+            sorted({str(e) for e in Composition(target_formula).elements} | {str(e) for e in added_elems})
         )
 
         jobs = []
@@ -147,15 +133,9 @@ class SynthesisPlanningFlowMaker(Maker):
         if entries is None:
             get_entry_set_maker = self.get_entry_set_maker.update_kwargs(
                 {
-                    "name": self.get_entry_set_maker.name
-                    + f" ({chemsys}, T={self.get_entry_set_maker.temperature} K,"
+                    "name": self.get_entry_set_maker.name + f" ({chemsys}, T={self.get_entry_set_maker.temperature} K,"
                     f" +{round(self.get_entry_set_maker.e_above_hull, 3)} eV)",
-                    "formulas_to_include": list(
-                        set(
-                            self.get_entry_set_maker.formulas_to_include
-                            + [target_formula]
-                        )
-                    ),
+                    "formulas_to_include": list({*self.get_entry_set_maker.formulas_to_include, target_formula}),
                 }
             )
             get_entry_set_job = get_entry_set_maker.make(chemsys)
@@ -190,9 +170,7 @@ class SynthesisPlanningFlowMaker(Maker):
                 )
             )
 
-        enumeration_job = self.enumeration_maker.make(
-            enumerators=enumerators, entries=entries
-        )
+        enumeration_job = self.enumeration_maker.make(enumerators=enumerators, entries=entries)
         jobs.append(enumeration_job)
 
         base_rxn_set = enumeration_job.output.rxns
@@ -207,7 +185,7 @@ class SynthesisPlanningFlowMaker(Maker):
 
         if self.open_elem and self.chempots:
             for chempot in self.chempots:
-                subname = f"(open {str(self.open_elem)}, mu={chempot})"
+                subname = f"(open {self.open_elem!s}, mu={chempot})"
                 enumeration_maker = self.enumeration_maker.update_kwargs(
                     {"name": self.enumeration_maker.name + subname},
                     nested=False,
@@ -258,8 +236,7 @@ class SynthesisPlanningFlowMaker(Maker):
 
 @dataclass
 class NetworkFlowMaker(Maker):
-    """
-    Maker to create a chemical reaction network and perform (balanced) pathfinding on
+    """Maker to create a chemical reaction network and perform (balanced) pathfinding on
     the network.
 
     This flow has four stages:
@@ -308,9 +285,7 @@ class NetworkFlowMaker(Maker):
 
     name: str = "find_reaction_pathways"
     get_entry_set_maker: GetEntrySetMaker = field(default_factory=GetEntrySetMaker)
-    enumeration_maker: ReactionEnumerationMaker = field(
-        default_factory=ReactionEnumerationMaker
-    )
+    enumeration_maker: ReactionEnumerationMaker = field(default_factory=ReactionEnumerationMaker)
     network_maker: NetworkMaker = field(default_factory=NetworkMaker)
     solver_maker: PathwaySolverMaker | None = None
     open_elem: Element | None = None
@@ -322,24 +297,29 @@ class NetworkFlowMaker(Maker):
 
     def __post_init__(self):
         self.open_elem = Element(self.open_elem) if self.open_elem else None
-        self.open_formula = (
-            Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
-        )
+        self.open_formula = Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
 
-    def make(self, precursors, targets, entries=None):
+    def make(self, precursors: Iterable[str], targets: Iterable[str], entries: GibbsEntrySet | None = None):
+        """Returns a flow used for finding reaction pathways between precursors and targets.
+
+        Args:
+            precursors: precursor formulas
+            targets: target formulas
+            entries: Optional entry set. If not provided, entries will be automatically acquired from Materials Project.
+                Defaults to None.
+
+        Returns:
+            _description_
+        """
         precursor_formulas = [Composition(f).reduced_formula for f in precursors]
         target_formulas = [Composition(f).reduced_formula for f in targets]
 
         flow_name = (
-            f"Reaction Network analysis: {'-'.join(sorted(precursor_formulas))} ->"
+            f"Reaction network analysis: {'-'.join(sorted(precursor_formulas))} ->"
             f" {'-'.join(sorted(target_formulas))}"
         )
         chemsys = "-".join(
-            {
-                str(e)
-                for formula in precursor_formulas + target_formulas
-                for e in Composition(formula).elements
-            }
+            {str(e) for formula in precursor_formulas + target_formulas for e in Composition(formula).elements}
         )
 
         jobs = []
@@ -347,15 +327,10 @@ class NetworkFlowMaker(Maker):
         if entries is None:
             get_entry_set_maker = self.get_entry_set_maker.update_kwargs(
                 {
-                    "name": self.get_entry_set_maker.name
-                    + f" ({chemsys}, T={self.get_entry_set_maker.temperature} K,"
+                    "name": self.get_entry_set_maker.name + f" ({chemsys}, T={self.get_entry_set_maker.temperature} K,"
                     f" +{round(self.get_entry_set_maker.e_above_hull, 3)} eV)",
                     "formulas_to_include": list(
-                        set(
-                            self.get_entry_set_maker.formulas_to_include
-                            + precursor_formulas
-                            + target_formulas
-                        )
+                        set(self.get_entry_set_maker.formulas_to_include + precursor_formulas + target_formulas)
                     ),
                 }
             )
@@ -388,9 +363,7 @@ class NetworkFlowMaker(Maker):
                 )
             )
 
-        enumeration_job = self.enumeration_maker.make(
-            enumerators=enumerators, entries=entries
-        )
+        enumeration_job = self.enumeration_maker.make(enumerators=enumerators, entries=entries)
         jobs.append(enumeration_job)
 
         base_rxn_set = enumeration_job.output.rxns
@@ -407,7 +380,7 @@ class NetworkFlowMaker(Maker):
 
         if self.use_minimize_enumerators and self.open_elem and self.chempots:
             for chempot in self.chempots:
-                subname = f"(open {str(self.open_elem)}, mu={chempot})"
+                subname = f"(open {self.open_elem!s}, mu={chempot})"
                 enumeration_maker = self.enumeration_maker.update_kwargs(
                     {"name": self.enumeration_maker.name + subname},
                     nested=False,
@@ -435,12 +408,8 @@ class NetworkFlowMaker(Maker):
                     mu=chempot,
                     **self.minimize_enumerator_kwargs,
                 )
-                enumeration_job = enumeration_maker.make(
-                    enumerators=[enumerator], entries=entries
-                )
-                network_job = network_maker.make(
-                    [base_rxn_set, enumeration_job.output.rxns]
-                )
+                enumeration_job = enumeration_maker.make(enumerators=[enumerator], entries=entries)
+                network_job = network_maker.make([base_rxn_set, enumeration_job.output.rxns])
                 jobs.extend([enumeration_job, network_job])
                 if self.solver_maker:
                     pathway_job = solver_maker.make(

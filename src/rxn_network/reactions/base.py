@@ -1,6 +1,4 @@
-"""
-Basic interface for a (chemical) Reaction
-"""
+"""Basic interface for a (chemical) Reaction."""
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
@@ -16,36 +14,34 @@ if TYPE_CHECKING:
 
 
 class Reaction(MSONable, metaclass=ABCMeta):
-    """
-    Base definition for a reaction class.
-    """
+    """Base definition for a reaction class."""
 
     @property
     @abstractmethod
     def reactants(self) -> list[Composition]:
-        """List of reactants for this reaction"""
+        """List of reactants for this reaction."""
 
     @property
     @abstractmethod
     def products(self) -> list[Composition]:
-        """List of products for this reaction"""
+        """List of products for this reaction."""
 
     @property
     @abstractmethod
     def coefficients(self) -> ndarray:
-        """Coefficients of the reaction"""
+        """Coefficients of the reaction."""
 
     @property
     @abstractmethod
     def energy(self) -> float:
-        """The energy of this reaction in total eV"""
+        """The energy of this reaction in total eV."""
 
     @property
     @abstractmethod
     def compositions(self) -> list[Composition]:
-        """List of all compositions in the reaction"""
+        """List of all compositions in the reaction."""
 
     @property
     def elements(self) -> list[Element]:
-        """List of elements in the reaction"""
-        return list(set(el for comp in self.compositions for el in comp.elements))
+        """List of elements in the reaction."""
+        return list({el for comp in self.compositions for el in comp.elements})

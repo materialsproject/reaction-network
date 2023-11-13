@@ -4,7 +4,6 @@ test module for pymatgen.analysis.reaction_calculator
 """
 import pytest
 from pymatgen.core.composition import Element
-
 from rxn_network.core import Composition
 from rxn_network.reactions.basic import BasicReaction
 
@@ -16,10 +15,7 @@ def pre_balanced_rxn():
     products = [Composition("Fe2O3")]
     coefficients = [-2, -1.5, 1]
 
-    rxn = BasicReaction(
-        compositions=reactants + products, coefficients=coefficients, balanced=True
-    )
-    return rxn
+    return BasicReaction(compositions=reactants + products, coefficients=coefficients, balanced=True)
 
 
 @pytest.fixture(scope="module")
@@ -152,15 +148,10 @@ def test_equals():
 
 
 def test_reverse():
-    rxn = BasicReaction.from_formulas(
-        ["La2O3", "Co2O3", "Li2ZrO3"], ["Li2O", "La2Zr2O7", "Li3CoO3", "Xe"]
-    )
+    rxn = BasicReaction.from_formulas(["La2O3", "Co2O3", "Li2ZrO3"], ["Li2O", "La2Zr2O7", "Li3CoO3", "Xe"])
     rxn_reverse = rxn.reverse()
 
-    assert (
-        str(rxn_reverse)
-        == "Li2O + La2Zr2O7 + 0.6667 Li3CoO3 -> La2O3 + 0.3333 Co2O3 + 2 Li2ZrO3"
-    )
+    assert str(rxn_reverse) == "Li2O + La2Zr2O7 + 0.6667 Li3CoO3 -> La2O3 + 0.3333 Co2O3 + 2 Li2ZrO3"
     assert rxn_reverse.reverse() == rxn
 
 
@@ -186,9 +177,7 @@ def test_from_string(pre_balanced_rxn):
 
 
 def test_chemical_system(pre_balanced_rxn):
-    complex_rxn = BasicReaction.from_formulas(
-        ["LiCoO2", "Be", "Na"], ["La2O3", "Co2O3", "Li2O", "LiF", "CoF3"]
-    )
+    complex_rxn = BasicReaction.from_formulas(["LiCoO2", "Be", "Na"], ["La2O3", "Co2O3", "Li2O", "LiF", "CoF3"])
     assert pre_balanced_rxn.chemical_system == "Fe-O"
     assert complex_rxn.chemical_system == "Be-Co-F-La-Li-Na-O"
 
@@ -196,9 +185,7 @@ def test_chemical_system(pre_balanced_rxn):
 def test_balanced():
     rxn_unbalanced = BasicReaction.from_formulas(["MnO2", "Y2O3"], ["YMn2O5"])
     rxn_balanced = BasicReaction.from_formulas(["YClO", "LiMnO2"], ["YMnO3", "LiCl"])
-    rxn_balanced_2 = BasicReaction.from_formulas(
-        ["Li", "Na2O", "FeCl2", "Y2O3"], ["YCl3", "Fe2O3", "NaCl", "Li2O"]
-    )
+    rxn_balanced_2 = BasicReaction.from_formulas(["Li", "Na2O", "FeCl2", "Y2O3"], ["YCl3", "Fe2O3", "NaCl", "Li2O"])
 
     assert rxn_unbalanced.balanced is False
     assert rxn_balanced.balanced is True
@@ -213,15 +200,13 @@ def test_get_coeff(pre_balanced_rxn):
 
 
 def test_energy(pre_balanced_rxn):
-    with pytest.raises(ValueError) as error:
+    with pytest.raises(ValueError, match="No energy for a basic reaction"):
         assert pre_balanced_rxn.energy
-    assert str(error.value) == "No energy for a basic reaction!"
 
 
 def test_energy_per_atom(pre_balanced_rxn):
-    with pytest.raises(ValueError) as error:
+    with pytest.raises(ValueError, match="No energy per atom for a basic reaction"):
         assert pre_balanced_rxn.energy_per_atom
-    assert str(error.value) == "No energy per atom for a basic reaction!"
 
 
 def test_reactants_products(pre_balanced_rxn):

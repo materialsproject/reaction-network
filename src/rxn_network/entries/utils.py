@@ -1,11 +1,11 @@
-"""Utility functions for acquiring, processing, or modifiying entries"""
+"""Utility functions for acquiring, processing, or modifiying entries."""
 from __future__ import annotations
 
 import itertools
 import re
 import warnings
 from copy import deepcopy
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 from pymatgen.core.composition import Element
 from pymatgen.core.structure import Structure
@@ -18,6 +18,8 @@ from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from maggma.stores import MongoStore
 
 logger = get_logger(__name__)
@@ -35,8 +37,7 @@ def process_entries(
     calculate_e_above_hulls: bool = False,
     ignore_nist_solids: bool = True,
 ) -> GibbsEntrySet:
-    """
-    Convenience function for processing a set of ComputedStructureEntry objects into a
+    """Convenience function for processing a set of ComputedStructureEntry objects into a
     GibbsEntrySet with specified parameters. This is used when building entries in most
     of the jobs/flows.
 
@@ -55,6 +56,8 @@ def process_entries(
         include_freed_data: Whether to include FREED data in the entry set. Defaults
             to False. WARNING: This dataset has not been thoroughly tested. Use at
             your own risk!
+        include_polymorphs: Whether to include non-ground state polymorphs in the entry
+            set. Defaults to False.
         formulas_to_include: An iterable of compositional formulas to ensure are
             included in the processed dataset. Sometimes, entries are filtered out that
             one would like to include, or entries don't exist for those compositions.
@@ -78,15 +81,9 @@ def process_entries(
         include_freed_data=include_freed_data,
         ignore_nist_solids=ignore_nist_solids,
     )
-    included_entries = (
-        [initialize_entry(f, entry_set) for f in formulas_to_include]
-        if formulas_to_include
-        else []
-    )
+    included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include] if formulas_to_include else []
 
-    entry_set = entry_set.filter_by_stability(
-        e_above_hull=e_above_hull, include_polymorphs=include_polymorphs
-    )
+    entry_set = entry_set.filter_by_stability(e_above_hull=e_above_hull, include_polymorphs=include_polymorphs)
     entry_set.update(included_entries)  # make sure these aren't filtered out
 
     if filter_at_temperature and (filter_at_temperature != temperature):
@@ -99,8 +96,7 @@ def process_entries(
 
 
 def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = False):
-    """
-    Acquire an entry by user-specified formula. This method attemps to first
+    """Acquire an entry by user-specified formula. This method attemps to first
     get the entry; if it is not included in the set, it will create an interpolated
     entry. Finally, if stabilize=True, the energy will be lowered until it appears on
     teh hull.
@@ -115,9 +111,7 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = F
         entry = entry_set.get_min_entry_by_formula(formula)
     except KeyError:
         entry = entry_set.get_interpolated_entry(formula)
-        warnings.warn(
-            f"Using interpolated entry for {entry.composition.reduced_formula}"
-        )
+        warnings.warn(f"Using interpolated entry for {entry.composition.reduced_formula}")
 
     if stabilize:
         entry = entry_set.get_stabilized_entry(entry)
@@ -125,7 +119,7 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = F
     return entry
 
 
-def get_entries(  # noqa: MC0001
+def get_entries(
     db: MongoStore,
     chemsys_formula_id_criteria: str | dict,
     compatible_only: bool = True,
@@ -135,8 +129,7 @@ def get_entries(  # noqa: MC0001
     conventional_unit_cell: bool = False,
     sort_by_e_above_hull: bool = False,
 ):  # pragma: no cover
-    """
-    WARNING:
+    """Warning:
         This function is legacy code directly adapted from pymatgen.ext.matproj. It is
         not broadly useful or applicable to other databases. It is only used in jobs
         interfaced directly with internal databases at the Materials Project. This code
@@ -167,10 +160,10 @@ def get_entries(  # noqa: MC0001
             conventional unit cell
         sort_by_e_above_hull: Whether to sort the list of entries by
             e_above_hull (will query e_above_hull as a property_data if True).
+
     Returns:
         List of ComputedEntry or ComputedStructureEntry objects.
     """
-
     params = [
         "deprecated",
         "run_type",
@@ -180,7 +173,7 @@ def get_entries(  # noqa: MC0001
         "potcar_symbols",
         "oxide_type",
     ]
-    props = ["final_energy", "unit_cell_formula", "task_id"] + params
+    props = ["final_energy", "unit_cell_formula", "task_id", *params]
     if sort_by_e_above_hull:
         if property_data and "e_above_hull" not in property_data:
             property_data.append("e_above_hull")
@@ -217,8 +210,7 @@ def get_entries(  # noqa: MC0001
                 continue
         else:
             d["potcar_symbols"] = [
-                f"{d['pseudo_potential']['functional']} {label}"
-                for label in d["pseudo_potential"].get("labels", [])
+                f"{d['pseudo_potential']['functional']} {label}" for label in d["pseudo_potential"].get("labels", [])
             ]
             data = {"oxide_type": d["oxide_type"]}
             if property_data:
@@ -232,11 +224,7 @@ def get_entries(  # noqa: MC0001
                     entry_id=d["task_id"],
                 )
             else:
-                prim = Structure.from_dict(
-                    d["initial_structure"]
-                    if inc_structure == "initial"
-                    else d["structure"]
-                )
+                prim = Structure.from_dict(d["initial_structure"] if inc_structure == "initial" else d["structure"])
                 if conventional_unit_cell:
                     s = SpacegroupAnalyzer(prim).get_conventional_standard_structure()
                     energy = d["final_energy"] * (len(s) / len(prim))
@@ -254,12 +242,8 @@ def get_entries(  # noqa: MC0001
 
     if compatible_only:
         with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore", message="Failed to guess oxidation states.*"
-            )
-            entries = MaterialsProject2020Compatibility().process_entries(
-                entries, clean=True
-            )
+            warnings.filterwarnings("ignore", message="Failed to guess oxidation states.*")
+            entries = MaterialsProject2020Compatibility().process_entries(entries, clean=True)
 
     if sort_by_e_above_hull:
         entries = sorted(entries, key=lambda entry: entry.data["e_above_hull"])
@@ -276,9 +260,8 @@ def get_all_entries_in_chemsys(
     use_premade_entries: bool = False,
     conventional_unit_cell: bool = False,
     n: int = 1000,
-) -> list[ComputedEntry]:  # noqa: MC0001  # pragma: no cover
-    """
-    WARNING:
+) -> list[ComputedEntry]:  # pragma: no cover
+    """Warning:
         This function is legacy code directly adapted from pymatgen.ext.matproj. It is
         not broadly useful or applicable to other databases. It is only used in jobs
         interfaced directly with internal databases at the Materials Project. This code
@@ -357,8 +340,7 @@ def get_all_entries_in_chemsys(
 
 
 def parse_criteria(criteria_string):  # pragma: no cover
-    """
-    Parses a powerful and simple string criteria and generates a proper
+    """Parses a powerful and simple string criteria and generates a proper
     mongo syntax criteria.
 
     Args:
