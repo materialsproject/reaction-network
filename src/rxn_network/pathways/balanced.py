@@ -2,20 +2,19 @@
 from __future__ import annotations
 
 import warnings
-from functools import cached_property
 from itertools import combinations
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from rxn_network.pathways.basic import BasicPathway
-from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.set import ReactionSet
 from rxn_network.utils.funcs import limited_powerset
 
 if TYPE_CHECKING:
+    from typing import Callable
+
     from rxn_network.core import Composition
-    from rxn_network.pathways.base import Pathway
     from rxn_network.costs.base import CostFunction
     from rxn_network.reactions.base import Reaction
 
@@ -32,14 +31,7 @@ class BalancedPathway(BasicPathway):
         coefficients: list[float],
         costs: list[float],
         balanced: bool | None = None,
-        aggregate_function: Callable | str = "sum",
     ):
-        """Args:
-        reactions: list of ComputedReaction objects which occur along path.
-        coefficients: list of coefficients to balance each corresponding reaction.
-        costs: list of corresponding costs for each reaction.
-        balanced: whether or not the reaction pathway is balanced.
-        Defaults to False and should ideally be set through PathwaySolver.
         """
         Args:
             reactions: list of ComputedReaction objects which occur along path.
@@ -47,24 +39,9 @@ class BalancedPathway(BasicPathway):
             costs: list of corresponding costs for each reaction.
             balanced: whether or not the reaction pathway is balanced.
                 Defaults to False and should ideally be set through PathwaySolver.
-            aggregate_function: function to use to aggregate reaction selectivities
-                (e.g., C1 and C2). Defaults to "sum".
         """
         self.coefficients = coefficients
         super().__init__(reactions=reactions, costs=costs)
-
-        if aggregate_function == "max":
-            self.aggregate_function = max
-        elif aggregate_function == "mean":
-            self.aggregate_function = np.mean  # type: ignore
-        elif aggregate_function == "sum":
-            self.aggregate_function = sum  # type: ignore
-        elif isinstance(aggregate_function, str):
-            raise ValueError(
-                "Provided aggregate name is not a known function; please provide the"
-                " function directly."
-            )
-
         self.balanced = balanced
 
     def get_comp_matrix(self) -> np.ndarray:
@@ -159,9 +136,7 @@ class BalancedPathway(BasicPathway):
         rxn_set = ReactionSet.from_rxns(reactions + [net_rxn])
         entry_idxs = {entry: i for i, entry in enumerate(rxn_set.entries)}
 
-        comp_matrix = np.vstack(
-            [get_entry_idx_vector(r, entry_idxs) for r in reactions]
-        )
+        comp_matrix = np.vstack([get_entry_idx_vector(r, entry_idxs) for r in reactions])
         net_coeffs = get_entry_idx_vector(net_rxn, entry_idxs)
 
         comp_pinv = np.linalg.pinv(comp_matrix).T
@@ -173,13 +148,9 @@ class BalancedPathway(BasicPathway):
         if (multiplicities < tol).any():
             warnings.warn("A reaction must be removed to balance!")
 
-        if not (
-            np.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * np.abs(net_coeffs))
-        ).all():
+        if not (np.abs(solved_coeffs - net_coeffs) <= (1e-08 + 1e-05 * np.abs(net_coeffs))).all():
             balanced = False
-            warnings.warn(
-                "A balanced pathway cannot be found! Setting balanced = False."
-            )
+            warnings.warn("A balanced pathway cannot be found! Setting balanced = False.")
 
         costs = [cost_function.evaluate(rxn) for rxn in reactions]
         return cls(
@@ -189,12 +160,56 @@ class BalancedPathway(BasicPathway):
             balanced=balanced,
         )
 
-    def _get_tertiary_competition(self, rxn_set: ReactionSet):
+    def get_primary_competition(self, aggregate_function: str | Callable) -> float | None:
+        """Aggregate primary competition (C1) value for pathway."""
+        all_c1: list[float] = []
+        if isinstance(aggregate_function, str):
+            aggregate_function = self._function_from_name(aggregate_function)
+
+        for r in self.reactions:
+            c1 = r.data.get("primary_competition")
+
+            if c1 is None:
+                warnings.warn(f"primary_competition not found for {r}! Disregarding in aggregation...")
+                continue
+
+            all_c1.append(c1)
+
+        if not all_c1:
+            return None
+
+        return aggregate_function(all_c1)
+
+    def get_secondary_competition(self, aggregate_function: str | Callable) -> float | None:
+        """Aggregate primary competition (C2) value for pathway."""
+        all_c2: list[float] = []
+        if isinstance(aggregate_function, str):
+            aggregate_function = self._function_from_name(aggregate_function)
+
+        for r in self.reactions:
+            c2 = r.data.get("secondary_competition")
+
+            if c2 is None:
+                warnings.warn(f"secondary_competition not found for {r}! Disregarding in aggregation...")
+                continue
+
+            all_c2.append(c2)
+
+        if not all_c2:
+            return None
+
+        return aggregate_function(all_c2)
+
+    def get_tertiary_competition(self, rxn_set: ReactionSet):
         """
         Returns the tertiary competition (C3) for the pathway. This is the summation of
         the maximum driving forces for all "nonreacting" pairwise interfaces and is a
         measure of the likelihood that the pathway will deviate from its predicted
         reaction steps (i.e., due to competition among unplanned interfacial reactions).
+
+        Args:
+            rxn_set: A ReactionSet object containing all possible reactions between every pairwise interface in the
+                system (can be the full reaction network).
         """
         c3 = 0
         for interface in self.all_nonreacting_pairwise_interfaces:
@@ -206,6 +221,10 @@ class BalancedPathway(BasicPathway):
 
             c3 += -min_energy
         return c3
+    
+    def plot(self):
+        """Plots a graph of the pathway using rustworkx."""
+        
 
     @property
     def average_cost(self) -> float:
@@ -214,65 +233,35 @@ class BalancedPathway(BasicPathway):
 
     @property
     def all_pairwise_interfaces(self) -> set[tuple[Composition]]:
-        """Returns a list of all pairwise interfaces, given as tuples of compositions
-        that may react during the pathway."""
-        return set(
-            tuple(sorted(interface)) for interface in combinations(self.compositions, 2)
-        )
+        """Returns a list of all pairwise interfaces, given as tuples of compositions."""
+        return {tuple(sorted(interface)) for interface in combinations(self.compositions, 2)}  # type: ignore
 
     @property
     def all_reacting_pairwise_interfaces(self) -> set[tuple[Composition]]:
-        return {
-            tuple(sorted(combo))
-            for r in self.reactions
-            for combo in combinations(r.reactants, 2)
-        }
+        """Returns a list of all pairwise interfaces react in a pathway."""
+        return {tuple(sorted(combo)) for r in self.reactions for combo in combinations(r.reactants, 2)}  # type: ignore
 
     @property
     def all_nonreacting_pairwise_interfaces(self) -> set[tuple[Composition]]:
+        """Returns a list of all pairwise interfaces that do not (or should not) react during the pathway."""
         unique_reaction_interfaces = {
-            tuple(sorted(interface))
-            for r in self.reactions
-            for interface in combinations(r.compositions, 2)
-        }  # remove interfaces within same reaction step
+            tuple(sorted(interface)) for r in self.reactions for interface in combinations(r.compositions, 2)
+        }  # remove interfaces within same reaction step as these are accounted for in C1 and C2...
 
-        return self.all_pairwise_interfaces - unique_reaction_interfaces
+        return self.all_pairwise_interfaces - unique_reaction_interfaces  # type: ignore
 
-    @property
-    def primary_competition(self) -> float | None:
-        """Aggregate primary competition (C1) value for pathway."""
-        all_c1: list[float] = []
-        for r in self.reactions:
-            c1 = r.data.get("primary_competition")
-
-            if c1 is None:
-                warnings.warn(f"primary_competition not found for {r}!")
-                continue
-
-            all_c1.append(c1)
-
-        if not all_c1:
-            return None
-
-        return self.aggregate_function(all_c1)
-
-    @property
-    def secondary_competition(self) -> float | None:
-        """Aggregate secondary competition (C2) value for pathway."""
-        all_c2: list[float] = []
-        for r in self.reactions:
-            c2 = r.data.get("secondary_competition")
-
-            if c2 is None:
-                warnings.warn(f"secondary_competition not found for {r}!")
-                continue
-
-            all_c2.append(c2)
-
-        if not all_c2:
-            return None
-
-        return self.aggregate_function(all_c2)
+    @staticmethod
+    def _function_from_name(name: str) -> Callable:
+        """Given the name of a common aggregate function, this returns the function."""
+        if name == "max":
+            func = max
+        elif name == "mean":
+            func = np.mean  # type: ignore
+        elif name == "sum":
+            func = sum  # type: ignore
+        else:
+            raise ValueError("Provided aggregate name is not a known function; please provide the function directly.")
+        return func
 
     def __eq__(self, other) -> bool:
         if super().__eq__(other):
