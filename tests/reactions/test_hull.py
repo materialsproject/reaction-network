@@ -1,7 +1,17 @@
 """ Tests for InterfaceReactionHull. """
-import numpy as np
 import pytest
 from rxn_network.reactions.hull import InterfaceReactionHull
+
+stable_rxns_str = [
+    "BaO -> BaO",
+    "TiO2 + 2 BaO -> Ba2TiO4",
+    "TiO2 + BaO -> BaTiO3",
+    "TiO2 + 0.5 BaO -> 0.5 BaTi2O5",
+    "TiO2 + 0.3077 BaO -> 0.07692 Ba4Ti13O30",
+    "TiO2 + 0.2 BaO -> 0.2 BaTi5O11",
+    "TiO2 + 0.1667 BaO -> 0.1667 BaTi6O13",
+    "18 TiO2 -> O2 + 2 Ti9O17",
+]
 
 
 @pytest.fixture(scope="module")
@@ -21,17 +31,6 @@ def unstable_rxn(bao_tio2_rxns):
 
 
 def test_stable_reactions(irh_batio):
-    stable_rxns = [
-        "BaO -> BaO",
-        "TiO2 + 2 BaO -> Ba2TiO4",
-        "TiO2 + BaO -> BaTiO3",
-        "TiO2 + 0.5 BaO -> 0.5 BaTi2O5",
-        "TiO2 + 0.3077 BaO -> 0.07692 Ba4Ti13O30",
-        "TiO2 + 0.2 BaO -> 0.2 BaTi5O11",
-        "TiO2 + 0.1667 BaO -> 0.1667 BaTi6O13",
-        "18 TiO2 -> O2 + 2 Ti9O17",
-    ]
-
     stable_rxns = [actual_rxn for r in stable_rxns for actual_rxn in irh_batio.reactions if r == str(actual_rxn)]
     assert irh_batio.stable_reactions == stable_rxns
 
@@ -118,11 +117,9 @@ def test_count(num, answer, irh_batio):
 
 
 def test_hull_vertices(irh_batio):
-    """This test seems to occasionally fail on CI and appears to possibly be a numerical issue"""
-    correct = np.array([1, 5, 19, 28, 43, 54, 57, 117])
-    np.testing.assert_almost_equal(irh_batio.hull_vertices, correct)
-
-    assert 89 not in irh_batio.hull_vertices  # 89 is above zero and not relevant
+    for vertex, correct_rxn_str in zip(irh_batio.hull_vertices, stable_rxns_str):
+        rxn = irh_batio.reactions[vertex]
+        assert str(rxn) == correct_rxn_str
 
 
 def test_plot(irh_batio):
