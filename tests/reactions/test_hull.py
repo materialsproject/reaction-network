@@ -31,7 +31,7 @@ def unstable_rxn(bao_tio2_rxns):
 
 
 def test_stable_reactions(irh_batio):
-    stable_rxns = [actual_rxn for r in stable_rxns for actual_rxn in irh_batio.reactions if r == str(actual_rxn)]
+    stable_rxns = [actual_rxn for r in stable_rxns_str for actual_rxn in irh_batio.reactions if r == str(actual_rxn)]
     assert irh_batio.stable_reactions == stable_rxns
 
 
