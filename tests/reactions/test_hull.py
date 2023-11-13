@@ -118,6 +118,7 @@ def test_count(num, answer, irh_batio):
 
 
 def test_hull_vertices(irh_batio):
+    """This test seems to occasionally fail on CI and appears to possibly be a numerical issue"""
     correct = np.array([1, 5, 19, 28, 43, 54, 57, 117])
     np.testing.assert_almost_equal(irh_batio.hull_vertices, correct)
 
