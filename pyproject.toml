@@ -35,12 +35,12 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "pymatgen>=2023.10.11",
+    "pymatgen>=2023.11.12",
     "numba>=0.58.1",
     "jobflow>=0.1.14",
     "ray>=2.8.0",
     "rustworkx>=0.13.2",
-    "monty<=2023.9.25"  # latest version of monty not compatible with pymatgen==2023.10.11
+    "pydantic<2.5"  # ray not supporting pydantic 2.5 yet
 ]
 
 [project.optional-dependencies]
@@ -60,12 +60,11 @@ tests = [
     "pytest-xdist==3.3.1",
 ]
 strict = [
-    "pymatgen==2023.10.11",
+    "pymatgen==2023.11.12",
     "numba==0.58.1",
     "jobflow==0.1.14",
     "ray==2.8.0",
     "rustworkx==0.13.2",
-    "monty==2023.9.25"
 ]
 
 [project.urls]
