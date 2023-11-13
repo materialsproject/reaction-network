@@ -39,15 +39,13 @@ class ChempotDistanceCalculator(Calculator):
         mu_func: Callable | str = "sum",
         name: str = "chempot_distance",
     ):
-        """Args:
-        cpd: the chemical potential diagram for the phase space in which the
-        reaction(s) exist
-        mu_func: the function (or string name of the function) used to aggregate the
-        interfacial chemical potential distances into a single value describing
-        the whole reaction. Current options are 1) max, 2) mean, and 3) sum
-        (default).
-        name: the data dictionary key with which to store the calculated value.
-        Defaults to "chempot_distance".
+        """
+        Args:
+            cpd: the chemical potential diagram for the phase space in which the reaction(s) exist
+            mu_func: the function (or string name of the function) used to aggregate the
+                interfacial chemical potential distances into a single value describing the whole reaction. Current
+                options are 1) max, 2) mean, and 3) sum (default).
+            name: the data dictionary key with which to store the calculated value. Defaults to "chempot_distance".
         """
         self.cpd = cpd
         self.name = name
@@ -152,11 +150,12 @@ class PrimaryCompetitionCalculator(Calculator):
         irh: InterfaceReactionHull,
         name: str = "primary_competition",
     ):
-        """Args:
-        irh: the interface reaction hull containing the target reaction and all
-        competing reactions.
-        name: the data dictionary key with which to store the calculated value.
-        Defaults to "primary_competition".
+        """
+        Args:
+            irh: the interface reaction hull containing the target reaction and all
+                competing reactions.
+            name: the data dictionary key with which to store the calculated value.
+                Defaults to "primary_competition".
         """
         self.irh = irh
         self.name = name
@@ -227,11 +226,12 @@ class SecondaryCompetitionWithEhullCalculator(Calculator):
         irh: InterfaceReactionHull,
         name: str = "secondary_competition_with_ehull",
     ):
-        """Args:
+        """
+        Args:
         irh: the interface reaction hull containing the target reaction and all
-        competing reactions.
+            competing reactions.
         name: the data dictionary key with which to store the calculated value.
-        Defaults to "secondary_competition_with_ehull".
+            Defaults to "secondary_competition_with_ehull".
         """
         self.irh = irh
         self.name = name
@@ -260,11 +260,12 @@ class SecondaryCompetitionMaxCalculator(Calculator):
         irh: InterfaceReactionHull,
         name: str = "secondary_competition_max",
     ):
-        """Args:
-        irh: the interface reaction hull containing the target reaction and all
-        competing reactions.
-        name: the data dictionary key with which to store the calculated value.
-        Defaults to "secondary_competition_max".
+        """
+        Args:
+            irh: the interface reaction hull containing the target reaction and all
+                competing reactions.
+            name: the data dictionary key with which to store the calculated value.
+                Defaults to "secondary_competition_max".
         """
         self.irh = irh
         self.name = name
@@ -292,11 +293,12 @@ class SecondaryCompetitionAreaCalculator(Calculator):
         irh: InterfaceReactionHull,
         name: str = "secondary_competition_area",
     ):
-        """Args:
-        irh: the interface reaction hull containing the target reaction and all
-        competing reactions.
-        name: the data dictionary key with which to store the calculated value.
-        Defaults to "secondary_competition_area".
+        """
+        Args:
+            irh: the interface reaction hull containing the target reaction and all
+                competing reactions.
+            name: the data dictionary key with which to store the calculated value.
+                Defaults to "secondary_competition_area".
         """
         self.irh = irh
         self.name = name
