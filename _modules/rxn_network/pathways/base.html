@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.pathways.base - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,9 +245,7 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.pathways.base</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Basic interface for a reaction pathway.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Basic interface for a reaction pathway.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span>
@@ -265,55 +263,53 @@
 <div class="viewcode-block" id="Pathway">
 <a class="viewcode-back" href="../../../rxn_network.pathways.html#rxn_network.pathways.base.Pathway">[docs]</a>
 <span class="k">class</span> <span class="nc">Pathway</span><span class="p">(</span><span class="n">MSONable</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base definition for a reaction pathway.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base definition for a reaction pathway.&quot;&quot;&quot;</span>
 
     <span class="n">_reactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Reaction</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">entries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Entry objects in this pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Entry objects in this pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">entry</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reactions</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">all_reactants</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Composition</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reactant compositions for all reactions in the pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reactant compositions for all reactions in the pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">entry</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reactions</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">all_products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Composition</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Product compositions reaction in the pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Product compositions reaction in the pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">entry</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reactions</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">products</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">compositions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Composition</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;All compositions in the reaction&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;All compositions in the reaction.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_reactants</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_products</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">reactants</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Composition</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The reactant compositions of this whole/net reaction pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The reactant compositions of this whole/net reaction pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_reactants</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_products</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Composition</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The product compositions of this whole/net reaction pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The product compositions of this whole/net reaction pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_products</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_reactants</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">intermediates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Composition</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Intermediate compositions in this reaction pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Intermediate compositions in this reaction pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_products</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_reactants</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Total energy of this reaction pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Total energy of this reaction pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">energy</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reactions</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">energy_per_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Total normalized energy of this reaction pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Total normalized energy of this reaction pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">energy_per_atom</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reactions</span><span class="p">)</span></div>
 
 </pre></div>
@@ -347,7 +343,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

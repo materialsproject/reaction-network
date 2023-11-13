@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.reactions.computed - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,8 +245,7 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.reactions.computed</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">A reaction class that builds reactions based on ComputedEntry objects and provides</span>
+<span></span><span class="sd">&quot;&quot;&quot;A reaction class that builds reactions based on ComputedEntry objects and provides</span>
 <span class="sd">information about reaction thermodynamics.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
@@ -255,21 +254,21 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="kn">import</span> <span class="n">Element</span>
 <span class="kn">from</span> <span class="nn">uncertainties</span> <span class="kn">import</span> <span class="n">ufloat</span>
 
-<span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
 <span class="kn">from</span> <span class="nn">rxn_network.reactions.basic</span> <span class="kn">import</span> <span class="n">BasicReaction</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="kn">import</span> <span class="n">Element</span>
     <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span>
+
+    <span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
 
 
 <div class="viewcode-block" id="ComputedReaction">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction">[docs]</a>
 <span class="k">class</span> <span class="nc">ComputedReaction</span><span class="p">(</span><span class="n">BasicReaction</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convenience class to generate a reaction from ComputedEntry objects, with</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience class to generate a reaction from ComputedEntry objects, with</span>
 <span class="sd">    some additional attributes, such as a reaction energy based on computed</span>
 <span class="sd">    energies. This class also balances the reaction.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -279,27 +278,20 @@
         <span class="n">entries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">],</span>
         <span class="n">coefficients</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">lowest_num_errors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">lowest_num_errors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            entries: List of ComputedEntry objects.</span>
-<span class="sd">            coefficients: List or array of reaction coefficients.</span>
-<span class="sd">            data: Optional dict of data</span>
-<span class="sd">            lowest_num_errors: number of &quot;errors&quot; encountered during reaction balancing.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">        entries: List of ComputedEntry objects.</span>
+<span class="sd">        coefficients: List or array of reaction coefficients.</span>
+<span class="sd">        data: Optional dict of data</span>
+<span class="sd">        lowest_num_errors: number of &quot;errors&quot; encountered during reaction balancing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reactant_entries</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">)</span> <span class="k">if</span> <span class="n">coeff</span> <span class="o">&lt;</span> <span class="mi">0</span>
-        <span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">product_entries</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">)</span> <span class="k">if</span> <span class="n">coeff</span> <span class="o">&gt;</span> <span class="mi">0</span>
-        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reactant_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">)</span> <span class="k">if</span> <span class="n">coeff</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">)</span> <span class="k">if</span> <span class="n">coeff</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">compositions</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">]</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">compositions</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">lowest_num_errors</span><span class="o">=</span><span class="n">lowest_num_errors</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">compositions</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">lowest_num_errors</span><span class="o">=</span><span class="n">lowest_num_errors</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ComputedReaction.balance">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.balance">[docs]</a>
@@ -310,8 +302,7 @@
         <span class="n">product_entries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">],</span>
         <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Balances and returns a new ComputedReaction.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Balances and returns a new ComputedReaction.</span>
 
 <span class="sd">        Reactants and products to be specified as a collection (list, set, etc.) of</span>
 <span class="sd">        ComputedEntry objects.</span>
@@ -323,9 +314,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">reactant_comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">reactant_entries</span><span class="p">]</span>
         <span class="n">product_comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_composition</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">product_entries</span><span class="p">]</span>
-        <span class="n">coefficients</span><span class="p">,</span> <span class="n">lowest_num_errors</span><span class="p">,</span> <span class="n">num_constraints</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_balance_coeffs</span><span class="p">(</span>
-            <span class="n">reactant_comps</span><span class="p">,</span> <span class="n">product_comps</span>
-        <span class="p">)</span>
+        <span class="n">coefficients</span><span class="p">,</span> <span class="n">lowest_num_errors</span><span class="p">,</span> <span class="n">num_constraints</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_balance_coeffs</span><span class="p">(</span><span class="n">reactant_comps</span><span class="p">,</span> <span class="n">product_comps</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
@@ -342,8 +331,7 @@
 <div class="viewcode-block" id="ComputedReaction.get_new_temperature">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.get_new_temperature">[docs]</a>
     <span class="k">def</span> <span class="nf">get_new_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a new reaction with the temperature changed.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new reaction with the temperature changed.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            new_temperature: New temperature in Kelvin</span>
@@ -367,98 +355,71 @@
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns (float):</span>
-<span class="sd">            The calculated reaction energy.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns (float):</span>
+<span class="sd">        The calculated reaction energy.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">calc_energies</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Composition</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="p">:</span>
             <span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">get_reduced_composition_and_factor</span><span class="p">()</span>
-            <span class="n">calc_energies</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-                <span class="n">calc_energies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)),</span> <span class="n">entry</span><span class="o">.</span><span class="n">energy</span> <span class="o">/</span> <span class="n">factor</span>
-            <span class="p">)</span>
+            <span class="n">calc_energies</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">calc_energies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)),</span> <span class="n">entry</span><span class="o">.</span><span class="n">energy</span> <span class="o">/</span> <span class="n">factor</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
-            <span class="n">amt</span> <span class="o">*</span> <span class="n">calc_energies</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">amt</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">amt</span> <span class="o">*</span> <span class="n">calc_energies</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">amt</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">))</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">energy_per_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns (float):</span>
-<span class="sd">            The calculated reaction energy in eV, divided by the total number of atoms</span>
-<span class="sd">            in the reaction. Cached for speedup.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns (float):</span>
+<span class="sd">        The calculated reaction energy in eV, divided by the total number of atoms</span>
+<span class="sd">        in the reaction. Cached for speedup.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">energy_uncertainty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the uncertainty in the reaction energy based on the uncertainty in</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the uncertainty in the reaction energy based on the uncertainty in</span>
 <span class="sd">        the energies of the reactants/products. Cached for speedup.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">calc_energies</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Composition</span><span class="p">,</span> <span class="n">ufloat</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="p">:</span>
             <span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">get_reduced_composition_and_factor</span><span class="p">()</span>
             <span class="n">energy_ufloat</span> <span class="o">=</span> <span class="n">ufloat</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">correction_uncertainty</span><span class="p">)</span>
-            <span class="n">calc_energies</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-                <span class="n">calc_energies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)),</span> <span class="n">energy_ufloat</span> <span class="o">/</span> <span class="n">factor</span>
-            <span class="p">)</span>
+            <span class="n">calc_energies</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">calc_energies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)),</span> <span class="n">energy_ufloat</span> <span class="o">/</span> <span class="n">factor</span><span class="p">)</span>
 
-        <span class="n">energy_with_uncertainty</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
-            <span class="n">amt</span> <span class="o">*</span> <span class="n">calc_energies</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">amt</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">energy_with_uncertainty</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">amt</span> <span class="o">*</span> <span class="n">calc_energies</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">amt</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">energy_with_uncertainty</span><span class="o">.</span><span class="n">s</span>  <span class="c1"># type: ignore</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">energy_uncertainty_per_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the energy_uncertainty divided by the total number of atoms in the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the energy_uncertainty divided by the total number of atoms in the</span>
 <span class="sd">        reaction.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_uncertainty</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">entries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ComputedEntry</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a copy of the entries</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of the entries.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span>
 
 <div class="viewcode-block" id="ComputedReaction.copy">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.copy">[docs]</a>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a copy of the Reaction object</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ComputedReaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowest_num_errors</span>
-        <span class="p">)</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of the Reaction object.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ComputedReaction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowest_num_errors</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ComputedReaction.reverse">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.reverse">[docs]</a>
     <span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a reversed reaction (i.e. sides flipped)</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ComputedReaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowest_num_errors</span>
-        <span class="p">)</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a reversed reaction (i.e. sides flipped).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ComputedReaction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowest_num_errors</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ComputedReaction.normalize_to">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.normalize_to">[docs]</a>
     <span class="k">def</span> <span class="nf">normalize_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp</span><span class="p">:</span> <span class="n">Composition</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Normalizes the reaction to one of the compositions via the provided factor.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalizes the reaction to one of the compositions via the provided factor.</span>
 
 <span class="sd">        By default, normalizes such that the composition given has a coefficient of</span>
 <span class="sd">        1.</span>
@@ -475,11 +436,8 @@
 
 <div class="viewcode-block" id="ComputedReaction.normalize_to_element">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.normalize_to_element">[docs]</a>
-    <span class="k">def</span> <span class="nf">normalize_to_element</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Element</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Normalizes the reaction to one of the elements.</span>
+    <span class="k">def</span> <span class="nf">normalize_to_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Element</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalizes the reaction to one of the elements.</span>
 <span class="sd">        By default, normalizes such that the amount of the element is 1.</span>
 <span class="sd">        Another factor can be specified.</span>
 
@@ -489,20 +447,29 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">all_comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span>
         <span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">current_el_amount</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="nb">sum</span><span class="p">(</span><span class="n">all_comp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">element</span><span class="p">]</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_comp</span><span class="p">)))</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="p">)</span>
+        <span class="n">current_el_amount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">all_comp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">element</span><span class="p">]</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_comp</span><span class="p">)))</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">/</span> <span class="n">current_el_amount</span>
         <span class="n">coeffs</span> <span class="o">*=</span> <span class="n">scale_factor</span>
         <span class="k">return</span> <span class="n">ComputedReaction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowest_num_errors</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">get_entry_idx_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="ComputedReaction.get_entry_idx_vector">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.get_entry_idx_vector">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_entry_idx_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Maps coefficients to a vector of length n on corresponding entry indices.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n: Total number of entries (determines length of vector)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Vector containing reaction coefficients on the corresponding entry indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">]</span>
 
         <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="n">v</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span>
-        <span class="k">return</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">is_equal</span> <span class="o">=</span> <span class="n">BasicReaction</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
@@ -515,7 +482,7 @@
         <span class="k">return</span> <span class="n">is_equal</span>
 
     <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Must be redefined due to overriding __eq__&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Must be redefined due to overriding __eq__.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chemical_system</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">)))</span>
         <span class="p">)</span>  <span class="c1"># not checking here for reactions that are multiples (too expensive)</span></div>
@@ -551,7 +518,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

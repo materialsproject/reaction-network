@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.utils.ray - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -246,6 +246,8 @@
         <article role="main">
           <h1>Source code for rxn_network.utils.ray</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Functions for working with Ray (parallelization library).&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">import</span> <span class="nn">ray</span>
@@ -258,8 +260,7 @@
 <div class="viewcode-block" id="initialize_ray">
 <a class="viewcode-back" href="../../../rxn_network.utils.html#rxn_network.utils.ray.initialize_ray">[docs]</a>
 <span class="k">def</span> <span class="nf">initialize_ray</span><span class="p">(</span><span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Simple function to initialize ray. Basic support for running ray on multiple nodes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple function to initialize ray. Basic support for running ray on multiple nodes.</span>
 <span class="sd">    Currently supports SLURM and PBS job schedulers.</span>
 
 <span class="sd">    SLURM:</span>
@@ -274,14 +275,12 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="s2">&quot;INFO&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Ray is not initialized. Checking for existing cluster...&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ip_head&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PBS_NNODES&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;IP_HEAD&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PBS_NNODES&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
                 <span class="n">address</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s2">&quot;Could not identify existing Ray instance. Creating a new one...&quot;</span>
-            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Could not identify existing Ray instance. Creating a new one...&quot;</span><span class="p">)</span>
             <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -297,8 +296,7 @@
 <div class="viewcode-block" id="to_iterator">
 <a class="viewcode-back" href="../../../rxn_network.utils.html#rxn_network.utils.ray.to_iterator">[docs]</a>
 <span class="k">def</span> <span class="nf">to_iterator</span><span class="p">(</span><span class="n">obj_ids</span><span class="p">,</span> <span class="n">get_obj_ids</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Method to convert a list of ray object ids to an iterator that can be used in a for</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Method to convert a list of ray object ids to an iterator that can be used in a for</span>
 <span class="sd">    loop.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">while</span> <span class="n">obj_ids</span><span class="p">:</span>
@@ -339,7 +337,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

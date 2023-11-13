@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.enumerators.minimize - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,8 +245,7 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.enumerators.minimize</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module implements two types of reaction enumerators using a free energy</span>
+<span></span><span class="sd">&quot;&quot;&quot;This module implements two types of reaction enumerators using a free energy</span>
 <span class="sd">minimization technique, with or without the option of an open entry.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
@@ -263,8 +262,7 @@
 <div class="viewcode-block" id="MinimizeGibbsEnumerator">
 <a class="viewcode-back" href="../../../rxn_network.enumerators.html#rxn_network.enumerators.minimize.MinimizeGibbsEnumerator">[docs]</a>
 <span class="k">class</span> <span class="nc">MinimizeGibbsEnumerator</span><span class="p">(</span><span class="n">BasicEnumerator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enumerator for finding all reactions between two reactants that are predicted by</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enumerator for finding all reactions between two reactants that are predicted by</span>
 <span class="sd">    thermodynamics; i.e., they appear when taking the convex hull along a straight line</span>
 <span class="sd">    connecting any two phases in G-x phase space. Identity reactions are automatically</span>
 <span class="sd">    excluded.</span>
@@ -294,45 +292,38 @@
         <span class="n">max_num_constraints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a MinimizeGibbsEnumerator.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            precursors: Optional list of precursor formulas. The only reactions that</span>
-<span class="sd">                will be enumerated are those featuring one or more of these compositions</span>
-<span class="sd">                as reactants. The &quot;exclusive_precursors&quot; parameter allows one to tune</span>
-<span class="sd">                whether the enumerated reactions should include ALL precursors (the</span>
-<span class="sd">                default) or just one.</span>
+<span class="sd">                will be enumerated are those featuring one or more of these compositions as reactants. The</span>
+<span class="sd">                &quot;exclusive_precursors&quot; parameter allows one to tune whether the enumerated reactions should include ALL</span>
+<span class="sd">                precursors (the default) or just one.</span>
 <span class="sd">            targets: Optional list of target formulas. The only reactions that</span>
-<span class="sd">                will be enumerated are those featuring one or more of these compositions</span>
-<span class="sd">                as products. The &quot;exclusive_targets&quot; parameter allows one to tune</span>
-<span class="sd">                whether the enumerated reactions should include ALL targets or just one</span>
-<span class="sd">                (the default).</span>
+<span class="sd">                will be enumerated are those featuring one or more of these compositions as products. The</span>
+<span class="sd">                &quot;exclusive_targets&quot; parameter allows one to tune whether the enumerated reactions should include ALL</span>
+<span class="sd">                targets or just one (the default).</span>
 <span class="sd">            exclusive_precursors: Whether enumerated reactions are required to have</span>
-<span class="sd">                reactants that are a subset of the provided list of precursors. If True</span>
-<span class="sd">                (the default), this only identifies reactions with reactants selected</span>
-<span class="sd">                from the provided precursors.</span>
-<span class="sd">            exclusive_targets: Whether enumerated reactions are required to have</span>
-<span class="sd">                products that are a subset of the provided list of targets. If False,</span>
-<span class="sd">                (the default), this identifies all reactions containing at least one</span>
-<span class="sd">                composition from the provided list of targets (and any number of</span>
-<span class="sd">                byproducts).</span>
+<span class="sd">                reactants that are a subset of the provided list of precursors. If True (the default), this only</span>
+<span class="sd">                identifies reactions with reactants selected from the provided precursors.</span>
+<span class="sd">            exclusive_targets: Whether enumerated reactions are required to have products that are a subset of the</span>
+<span class="sd">                provided list of targets. If False, (the default), this identifies all reactions containing at least one</span>
+<span class="sd">                composition from the provided list of targets (and any number of byproducts).</span>
 <span class="sd">            filter_duplicates: Whether to remove duplicate reactions. Defaults to False.</span>
-<span class="sd">            filter_by_chemsys: An optional chemical system for which to filter produced</span>
-<span class="sd">                reactions by. This ensures that all output reactions contain at least</span>
-<span class="sd">                one element within the provided system.</span>
-<span class="sd">            chunk_size: The minimum number of reactions per chunk procssed. Needs to be</span>
-<span class="sd">                sufficiently large to make parallelization a cost-effective strategy.</span>
-<span class="sd">                Defaults to MIN_CHUNK_SIZE.</span>
-<span class="sd">            max_num_jobs: The upper limit for the number of jobs created. Defaults to</span>
-<span class="sd">                MAX_NUM_JOBS.</span>
+<span class="sd">            filter_by_chemsys: An optional chemical system for which to filter produced reactions by. This ensures that</span>
+<span class="sd">                all output reactions contain at least one element within the provided system.</span>
+<span class="sd">            chunk_size: The minimum number of reactions per chunk procssed. Needs to be sufficiently large to make</span>
+<span class="sd">                parallelization a cost-effective strategy. Defaults to MIN_CHUNK_SIZE.</span>
+<span class="sd">            max_num_jobs: The upper limit for the number of jobs created. Defaults to MAX_NUM_JOBS.</span>
 <span class="sd">            remove_unbalanced: Whether to remove reactions which are unbalanced; this is</span>
 <span class="sd">                usually advisable. Defaults to True.</span>
-<span class="sd">            remove_changed: Whether to remove reactions which can only be balanced by</span>
-<span class="sd">                removing a reactant/product or having it change sides. This is also</span>
-<span class="sd">                advisable for ensuring that only unique reaction sets are produced.</span>
+<span class="sd">            remove_changed: Whether to remove reactions which can only be balanced by removing a reactant/product or</span>
+<span class="sd">                having it change sides. This is also advisable for ensuring that only unique reaction sets are produced.</span>
 <span class="sd">                Defaults to True.</span>
-<span class="sd">            max_num_constraints: The maximum number of allowable constraints enforced by</span>
-<span class="sd">                reaction balancing. Defaults to 1 (which is usually advisable).</span>
-<span class="sd">            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
+<span class="sd">            max_num_constraints: The maximum number of allowable</span>
+<span class="sd">                constraints enforced by reaction balancing. Defaults to 1 (which is usually advisable).</span>
+<span class="sd">            quiet: Whether to run in quiet mode (no progress bar). Defaults to</span>
+<span class="sd">                False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span>
@@ -351,20 +342,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_pd</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_react_function</span><span class="p">(</span>
-        <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_react_function</span><span class="p">(</span><span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;React method for MinimizeGibbsEnumerator, which uses the interfacial reaction</span>
-<span class="sd">        approach (see _react_interface())&quot;&quot;&quot;</span>
+<span class="sd">        approach (see _react_interface()).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_</span> <span class="o">=</span> <span class="n">products</span><span class="p">,</span> <span class="n">kwargs</span>  <span class="c1"># unused</span>
 
         <span class="n">r</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">reactants</span><span class="p">)</span>
         <span class="n">r0</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">r1</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">r1</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">r1</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">react_interface</span><span class="p">(</span>
             <span class="n">r0</span><span class="o">.</span><span class="n">composition</span><span class="p">,</span>
@@ -376,7 +363,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_get_rxn_iterable</span><span class="p">(</span><span class="n">combos</span><span class="p">,</span> <span class="n">open_combos</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the iterable used to generate reactions&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the iterable used to generate reactions.&quot;&quot;&quot;</span>
         <span class="n">_</span> <span class="o">=</span> <span class="n">open_combos</span>  <span class="c1"># unused</span>
 
         <span class="k">return</span> <span class="n">product</span><span class="p">(</span><span class="n">combos</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
@@ -391,8 +378,7 @@
 <div class="viewcode-block" id="MinimizeGrandPotentialEnumerator">
 <a class="viewcode-back" href="../../../rxn_network.enumerators.html#rxn_network.enumerators.minimize.MinimizeGrandPotentialEnumerator">[docs]</a>
 <span class="k">class</span> <span class="nc">MinimizeGrandPotentialEnumerator</span><span class="p">(</span><span class="n">MinimizeGibbsEnumerator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enumerator for finding all reactions between two reactants and an open element</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enumerator for finding all reactions between two reactants and an open element</span>
 <span class="sd">    that are predicted by thermo; i.e., they appear when taking the</span>
 <span class="sd">    convex hull along a straight line connecting any two phases in Phi-x</span>
 <span class="sd">    phase space. Identity reactions are excluded.</span>
@@ -424,49 +410,47 @@
         <span class="n">max_num_constraints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            open_elem: The element to be considered as open.</span>
-<span class="sd">            mu: The chemical potential of the open element (eV).</span>
-<span class="sd">            precursors: Optional list of precursor formulas. The only reactions that</span>
-<span class="sd">                will be enumerated are those featuring one or more of these compositions</span>
-<span class="sd">                as reactants. The &quot;exclusive_precursors&quot; parameter allows one to tune</span>
-<span class="sd">                whether the enumerated reactions should include ALL precursors (the</span>
-<span class="sd">                default) or just one.</span>
-<span class="sd">            targets: Optional list of target formulas. The only reactions that</span>
-<span class="sd">                will be enumerated are those featuring one or more of these compositions</span>
-<span class="sd">                as products. The &quot;exclusive_targets&quot; parameter allows one to tune</span>
-<span class="sd">                whether the enumerated reactions should include ALL targets or just one</span>
-<span class="sd">                (the default).</span>
-<span class="sd">            exclusive_precursors: Whether enumerated reactions are required to have</span>
-<span class="sd">                reactants that are a subset of the provided list of precursors. If True</span>
-<span class="sd">                (the default), this only identifies reactions with reactants selected</span>
-<span class="sd">                from the provided precursors.</span>
-<span class="sd">            exclusive_targets: Whether enumerated reactions are required to have</span>
-<span class="sd">                products that are a subset of the provided list of targets. If False,</span>
-<span class="sd">                (the default), this identifies all reactions containing at least one</span>
-<span class="sd">                composition from the provided list of targets (and any number of</span>
-<span class="sd">                byproducts).</span>
-<span class="sd">            filter_duplicates: Whether to remove duplicate reactions. Defaults to False.</span>
-<span class="sd">            filter_by_chemsys: An optional chemical system for which to filter produced</span>
-<span class="sd">                reactions by. This ensures that all output reactions contain at least</span>
-<span class="sd">                one element within the provided system.</span>
-<span class="sd">            chunk_size: The minimum number of reactions per chunk procssed. Needs to be</span>
-<span class="sd">                sufficiently large to make parallelization a cost-effective strategy.</span>
-<span class="sd">                Defaults to MIN_CHUNK_SIZE.</span>
-<span class="sd">            max_num_jobs: The upper limit for the number of jobs created. Defaults to</span>
-<span class="sd">                MAX_NUM_JOBS.</span>
-<span class="sd">            remove_unbalanced: Whether to remove reactions which are unbalanced; this is</span>
-<span class="sd">                usually advisable. Defaults to True.</span>
-<span class="sd">            remove_changed: Whether to remove reactions which can only be balanced by</span>
-<span class="sd">                removing a reactant/product or having it change sides. This is also</span>
-<span class="sd">                advisable for ensuring that only unique reaction sets are produced.</span>
-<span class="sd">                Defaults to True.</span>
-<span class="sd">            max_num_constraints: The maximum number of allowable constraints enforced by</span>
-<span class="sd">                reaction balancing. Defaults to 1 (which is usually advisable).</span>
-<span class="sd">            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">        open_elem: The element to be considered as open.</span>
+<span class="sd">        mu: The chemical potential of the open element (eV).</span>
+<span class="sd">        precursors: Optional list of precursor formulas. The only reactions that</span>
+<span class="sd">        will be enumerated are those featuring one or more of these compositions</span>
+<span class="sd">        as reactants. The &quot;exclusive_precursors&quot; parameter allows one to tune</span>
+<span class="sd">        whether the enumerated reactions should include ALL precursors (the</span>
+<span class="sd">        default) or just one.</span>
+<span class="sd">        targets: Optional list of target formulas. The only reactions that</span>
+<span class="sd">        will be enumerated are those featuring one or more of these compositions</span>
+<span class="sd">        as products. The &quot;exclusive_targets&quot; parameter allows one to tune</span>
+<span class="sd">        whether the enumerated reactions should include ALL targets or just one</span>
+<span class="sd">        (the default).</span>
+<span class="sd">        exclusive_precursors: Whether enumerated reactions are required to have</span>
+<span class="sd">        reactants that are a subset of the provided list of precursors. If True</span>
+<span class="sd">        (the default), this only identifies reactions with reactants selected</span>
+<span class="sd">        from the provided precursors.</span>
+<span class="sd">        exclusive_targets: Whether enumerated reactions are required to have</span>
+<span class="sd">        products that are a subset of the provided list of targets. If False,</span>
+<span class="sd">        (the default), this identifies all reactions containing at least one</span>
+<span class="sd">        composition from the provided list of targets (and any number of</span>
+<span class="sd">        byproducts).</span>
+<span class="sd">        filter_duplicates: Whether to remove duplicate reactions. Defaults to False.</span>
+<span class="sd">        filter_by_chemsys: An optional chemical system for which to filter produced</span>
+<span class="sd">        reactions by. This ensures that all output reactions contain at least</span>
+<span class="sd">        one element within the provided system.</span>
+<span class="sd">        chunk_size: The minimum number of reactions per chunk procssed. Needs to be</span>
+<span class="sd">        sufficiently large to make parallelization a cost-effective strategy.</span>
+<span class="sd">        Defaults to MIN_CHUNK_SIZE.</span>
+<span class="sd">        max_num_jobs: The upper limit for the number of jobs created. Defaults to</span>
+<span class="sd">        MAX_NUM_JOBS.</span>
+<span class="sd">        remove_unbalanced: Whether to remove reactions which are unbalanced; this is</span>
+<span class="sd">        usually advisable. Defaults to True.</span>
+<span class="sd">        remove_changed: Whether to remove reactions which can only be balanced by</span>
+<span class="sd">        removing a reactant/product or having it change sides. This is also</span>
+<span class="sd">        advisable for ensuring that only unique reaction sets are produced.</span>
+<span class="sd">        Defaults to True.</span>
+<span class="sd">        max_num_constraints: The maximum number of allowable constraints enforced by</span>
+<span class="sd">        reaction balancing. Defaults to 1 (which is usually advisable).</span>
+<span class="sd">        quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span>
             <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
@@ -488,23 +472,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_grand_pd</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_react_function</span><span class="p">(</span>
-        <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_react_function</span><span class="p">(</span><span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">filtered_entries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grand_pd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Same as the MinimizeGibbsEnumerator react function, but with ability to</span>
-<span class="sd">        specify open element and grand potential phase diagram&quot;&quot;&quot;</span>
-
+<span class="sd">        specify open element and grand potential phase diagram.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_</span> <span class="o">=</span> <span class="n">products</span><span class="p">,</span> <span class="n">kwargs</span>  <span class="c1"># unused</span>
 
         <span class="n">r</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">reactants</span><span class="p">)</span>
         <span class="n">r0</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">r1</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">r1</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">r1</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="n">open_elem</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">grand_pd</span><span class="o">.</span><span class="n">chempots</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">open_elem</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">grand_pd</span><span class="o">.</span><span class="n">chempots</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
         <span class="k">for</span> <span class="n">reactant</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
             <span class="n">elems</span> <span class="o">=</span> <span class="n">reactant</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span>
@@ -550,7 +529,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.thermo.utils - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,25 +245,24 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.thermo.utils</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Utility functions used in the thermodynamic analysis classes.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Utility functions used in the thermodynamic analysis classes.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">from</span> <span class="nn">pymatgen.analysis.phase_diagram</span> <span class="kn">import</span> <span class="n">PhaseDiagram</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+
     <span class="kn">from</span> <span class="nn">pymatgen.entries</span> <span class="kn">import</span> <span class="n">Entry</span>
 
 
 <div class="viewcode-block" id="expand_pd">
 <a class="viewcode-back" href="../../../rxn_network.thermo.html#rxn_network.thermo.utils.expand_pd">[docs]</a>
 <span class="k">def</span> <span class="nf">expand_pd</span><span class="p">(</span><span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span><span class="p">],</span> <span class="n">pbar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PhaseDiagram</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper method for generating a set of smaller phase diagrams for analyzing</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper method for generating a set of smaller phase diagrams for analyzing</span>
 <span class="sd">    thermodynamic stability in large chemical systems. This is necessary when</span>
 <span class="sd">    considering chemical systems which contain 10 or more elements, due to dimensional</span>
 <span class="sd">    limitations of the Qhull algorithm.</span>
@@ -276,26 +275,19 @@
 <span class="sd">        Dictionary of PhaseDiagram objects indexed by chemical subsystem string;</span>
 <span class="sd">        e.g. {&quot;Li-Mn-O&quot;: &lt;PhaseDiagram object&gt;, &quot;C-Y&quot;: &lt;PhaseDiagram object&gt;, ...}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">pd_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PhaseDiagram</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">sorted_entries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-        <span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
+    <span class="n">sorted_entries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">sorted_entries</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">pbar</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Building phase diagrams&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">chemsys</span> <span class="ow">in</span> <span class="n">pd_dict</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">chemical_system</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
-                <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
-            <span class="p">):</span>
+            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">chemical_system</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)):</span>
                 <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">pd_dict</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">chemical_system</span><span class="p">]</span> <span class="o">=</span> <span class="n">PhaseDiagram</span><span class="p">(</span>
                 <span class="nb">list</span><span class="p">(</span>
                     <span class="nb">filter</span><span class="p">(</span>
-                        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
-                            <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span>
-                        <span class="p">),</span>
+                        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">),</span>
                         <span class="n">entries</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
@@ -334,7 +326,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

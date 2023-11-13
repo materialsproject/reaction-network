@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.pathways.balanced - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,29 +245,26 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.pathways.balanced</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Implements a class for storing a balanced reaction pathway.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Implements a class for storing a balanced reaction pathway.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
-<span class="kn">from</span> <span class="nn">rxn_network.pathways.base</span> <span class="kn">import</span> <span class="n">Pathway</span>
 <span class="kn">from</span> <span class="nn">rxn_network.pathways.basic</span> <span class="kn">import</span> <span class="n">BasicPathway</span>
 <span class="kn">from</span> <span class="nn">rxn_network.utils.funcs</span> <span class="kn">import</span> <span class="n">limited_powerset</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
+    <span class="kn">from</span> <span class="nn">rxn_network.pathways.base</span> <span class="kn">import</span> <span class="n">Pathway</span>
     <span class="kn">from</span> <span class="nn">rxn_network.reactions.base</span> <span class="kn">import</span> <span class="n">Reaction</span>
 
 
 <div class="viewcode-block" id="BalancedPathway">
 <a class="viewcode-back" href="../../../rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway">[docs]</a>
 <span class="k">class</span> <span class="nc">BalancedPathway</span><span class="p">(</span><span class="n">BasicPathway</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper class for storing multiple ComputedReaction objects which form a single</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class for storing multiple ComputedReaction objects which form a single</span>
 <span class="sd">    reaction pathway as identified via pathfinding methods. Includes costs for each</span>
 <span class="sd">    reaction.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -279,13 +276,12 @@
         <span class="n">costs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">balanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            reactions: list of ComputedReaction objects which occur along path.</span>
-<span class="sd">            coefficients: list of coefficients to balance each corresponding reaction.</span>
-<span class="sd">            costs: list of corresponding costs for each reaction.</span>
-<span class="sd">            balanced: whether or not the reaction pathway is balanced.</span>
-<span class="sd">                Defaults to False and should ideally be set through PathwaySolver.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">        reactions: list of ComputedReaction objects which occur along path.</span>
+<span class="sd">        coefficients: list of coefficients to balance each corresponding reaction.</span>
+<span class="sd">        costs: list of corresponding costs for each reaction.</span>
+<span class="sd">        balanced: whether or not the reaction pathway is balanced.</span>
+<span class="sd">        Defaults to False and should ideally be set through PathwaySolver.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="o">=</span> <span class="n">coefficients</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">reactions</span><span class="o">=</span><span class="n">reactions</span><span class="p">,</span> <span class="n">costs</span><span class="o">=</span><span class="n">costs</span><span class="p">)</span>
@@ -295,18 +291,14 @@
 <div class="viewcode-block" id="BalancedPathway.get_comp_matrix">
 <a class="viewcode-back" href="../../../rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.get_comp_matrix">[docs]</a>
     <span class="k">def</span> <span class="nf">get_comp_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the composition matrix used in the balancing procedure.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the composition matrix used in the balancing procedure.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An array representing the composition matrix for a reaction</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="p">[</span>
-                    <span class="n">rxn</span><span class="o">.</span><span class="n">get_coeff</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span> <span class="k">if</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">all_comp</span> <span class="k">else</span> <span class="mi">0</span>
-                    <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span>
-                <span class="p">]</span>
+                <span class="p">[</span><span class="n">rxn</span><span class="o">.</span><span class="n">get_coeff</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span> <span class="k">if</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">all_comp</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span>
             <span class="p">]</span>
         <span class="p">)</span></div>
@@ -315,8 +307,7 @@
 <div class="viewcode-block" id="BalancedPathway.get_coeff_vector_for_rxn">
 <a class="viewcode-back" href="../../../rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.get_coeff_vector_for_rxn">[docs]</a>
     <span class="k">def</span> <span class="nf">get_coeff_vector_for_rxn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn</span><span class="p">:</span> <span class="n">Reaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the net reaction coefficients vector.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the net reaction coefficients vector.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            rxn: Reaction object to get coefficients for</span>
@@ -324,19 +315,13 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            An array representing the reaction coefficients vector</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">rxn</span><span class="o">.</span><span class="n">get_coeff</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span> <span class="k">if</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">compositions</span> <span class="k">else</span> <span class="mi">0</span>
-                <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span>
-            <span class="p">]</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">rxn</span><span class="o">.</span><span class="n">get_coeff</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span> <span class="k">if</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">compositions</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compositions</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="BalancedPathway.contains_interdependent_rxns">
 <a class="viewcode-back" href="../../../rxn_network.pathways.html#rxn_network.pathways.balanced.BalancedPathway.contains_interdependent_rxns">[docs]</a>
     <span class="k">def</span> <span class="nf">contains_interdependent_rxns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Composition</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Whether or not the pathway contains interdependent reactions given a list of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether or not the pathway contains interdependent reactions given a list of</span>
 <span class="sd">        provided precursors.</span>
 
 <span class="sd">        Args:</span>
@@ -353,10 +338,7 @@
 
         <span class="k">for</span> <span class="n">combo</span> <span class="ow">in</span> <span class="n">limited_powerset</span><span class="p">(</span><span class="n">rxns</span><span class="p">,</span> <span class="n">num_rxns</span><span class="p">):</span>
             <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">combo</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span>
-                <span class="nb">any</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">precursors_set</span><span class="p">)</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">1</span>
-            <span class="p">):</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">precursors_set</span><span class="p">)</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">)</span> <span class="ow">or</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">continue</span>
 
             <span class="n">other_comp</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="p">(</span><span class="n">rxns</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">combo</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">compositions</span><span class="p">}</span>
@@ -392,7 +374,6 @@
         <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Not implemented. See PathwaySolver class.&quot;&quot;&quot;</span>
-
         <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pathway_sets</span><span class="p">,</span> <span class="n">net_reaction</span><span class="p">,</span> <span class="n">tol</span>
 
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
@@ -403,7 +384,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">average_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the mean cost of the pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the mean cost of the pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">costs</span><span class="p">)</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -455,7 +436,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

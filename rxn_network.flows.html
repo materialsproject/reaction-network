@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="rxn_network.jobs" href="rxn_network.jobs.html" /><link rel="prev" title="rxn_network.enumerators" href="rxn_network.enumerators.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.flows - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -254,8 +254,9 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.flows.core.</span></span><span class="sig-name descname"><span class="pre">SynthesisPlanningFlowMaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name='synthesis_planning'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_entry_set_maker=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enumeration_maker=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_competition_maker=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_elem=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chempots=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_basic_enumerators=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_minimize_enumerators=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basic_enumerator_kwargs=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_enumerator_kwargs=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/flows/core.html#SynthesisPlanningFlowMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.flows.core.SynthesisPlanningFlowMaker" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Maker</span></code></p>
 <p>Maker to create an inorganic synthesis planning workflow. This flow has three
-stages:</p>
-<ol class="arabic simple">
+stages.</p>
+<dl class="simple">
+<dt>Steps:</dt><dd><ol class="arabic simple">
 <li><p>Entries are acquired via <cite>GetEntrySetMaker</cite>. This job both gets the computed
 entries from a databse (e.g., Materials Project) and processes them for use in
 the reaction network.</p></li>
@@ -265,6 +266,8 @@ selectivities can be calculated.</p></li>
 <li><p>The competition of all synthesis reactions to the desired target is assessed via
 the <cite>CalculateCompetitionMaker</cite>.</p></li>
 </ol>
+</dd>
+</dl>
 <p>This flow also has the option to include an “open” element and a list of chempots.
 This will enumerate reactions at different conditions and evaluate their
 selectivities at those conditinons.</p>
@@ -272,13 +275,10 @@ selectivities at those conditinons.</p>
 analyze output documents from each of the jobs in the flow based on the desired
 analysis. For the final “results”, one should access the reaction set produced by
 the <cite>CalculateCompetitionMaker</cite> at the conditions of interest.</p>
-<p>If you use this code in your work, please consider citing the following work:</p>
+<p>If you use this code in your work, please cite the following work:</p>
 <blockquote>
-<div><p>McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.
-A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;
-Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of
-Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv
-August 22, 2023. <a class="reference external" href="https://doi.org/10.48550/arXiv.2308.11816">https://doi.org/10.48550/arXiv.2308.11816</a>.</p>
+<div><p>McDermott, M. J. et al. Assessing Thermodynamic Selectivity of Solid-State Reactions for the Predictive
+Synthesis of Inorganic Materials. ACS Cent. Sci. (2023) doi:10.1021/acscentsci.3c01051.</p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -384,7 +384,20 @@ enumerators.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.flows.core.NetworkFlowMaker.make">
 <span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precursors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/flows/core.html#NetworkFlowMaker.make"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.flows.core.NetworkFlowMaker.make" title="Link to this definition">#</a></dt>
-<dd><p>Make a job or a flow - must be overridden with a concrete implementation.</p>
+<dd><p>Returns a flow used for finding reaction pathways between precursors and targets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>precursors</strong> (<em>Iterable</em><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – precursor formulas</p></li>
+<li><p><strong>targets</strong> (<em>Iterable</em><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – target formulas</p></li>
+<li><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a><em> | </em><em>None</em>) – Optional entry set. If not provided, entries will be automatically acquired from Materials Project.
+Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -465,7 +478,7 @@ enumerators.</p></li>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="_static/documentation_options.js?v=87b6a113"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

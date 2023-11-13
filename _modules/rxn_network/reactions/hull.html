@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.reactions.hull - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -264,11 +264,10 @@
 <div class="viewcode-block" id="InterfaceReactionHull">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull">[docs]</a>
 <span class="k">class</span> <span class="nc">InterfaceReactionHull</span><span class="p">(</span><span class="n">MSONable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class for storing and analyzing a set of reactions at an interface between two</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for storing and analyzing a set of reactions at an interface between two</span>
 <span class="sd">    reactants. This class is more generalized than the InterfacialReactivity class and</span>
 <span class="sd">    can encompass any set of reactions between two reactants, regardless of whether</span>
-<span class="sd">    the reaction products are &quot;stable&quot; (i.e. together on the convex hull)</span>
+<span class="sd">    the reaction products are &quot;stable&quot; (i.e. together on the convex hull).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -277,13 +276,12 @@
         <span class="n">c2</span><span class="p">:</span> <span class="n">Composition</span><span class="p">,</span>
         <span class="n">reactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">],</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            c1: Composition of reactant 1</span>
-<span class="sd">            c2: Composition of reactant 2</span>
-<span class="sd">            reactions: List of reactions containing all enumerated reactions between the</span>
-<span class="sd">                two reactants. Note that this list should not include identity reactions</span>
-<span class="sd">                of the precursors.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">        c1: Composition of reactant 1</span>
+<span class="sd">        c2: Composition of reactant 2</span>
+<span class="sd">        reactions: List of reactions containing all enumerated reactions between the</span>
+<span class="sd">        two reactants. Note that this list should not include identity reactions</span>
+<span class="sd">        of the precursors.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c1</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_composition</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c2</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_composition</span>
@@ -313,9 +311,7 @@
 
         <span class="n">reactions_with_endpoints</span> <span class="o">=</span> <span class="n">reactions</span> <span class="o">+</span> <span class="n">endpoint_reactions</span>
 
-        <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_coordinate</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reactions</span><span class="p">]</span>
-        <span class="p">)</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_coordinate</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reactions</span><span class="p">])</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="n">idx_sort</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
@@ -328,18 +324,15 @@
 <div class="viewcode-block" id="InterfaceReactionHull.plot">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.plot">[docs]</a>
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Plot the reaction hull.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the reaction hull.&quot;&quot;&quot;</span>
         <span class="n">pts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_scatter</span><span class="p">()</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_lines</span><span class="p">()</span>
 
-        <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lines</span> <span class="o">+</span> <span class="p">[</span><span class="n">pts</span><span class="p">])</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">lines</span><span class="p">,</span> <span class="n">pts</span><span class="p">])</span>
 
         <span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span>
             <span class="n">hovertemplate</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;&lt;b&gt;%</span><span class="si">{hovertext}</span><span class="s2">&lt;/b&gt;&lt;br&gt; &lt;br&gt;&lt;b&gt;Atomic fraction&lt;/b&gt;:&quot;</span>
-                <span class="s2">&quot; %</span><span class="si">{x:.3f}</span><span class="s2">&lt;br&gt;&lt;b&gt;Energy&lt;/b&gt;: %</span><span class="si">{y:.3f}</span><span class="s2"> (eV/atom)&quot;</span>
+                <span class="s2">&quot;&lt;b&gt;%</span><span class="si">{hovertext}</span><span class="s2">&lt;/b&gt;&lt;br&gt; &lt;br&gt;&lt;b&gt;Atomic fraction&lt;/b&gt;: %</span><span class="si">{x:.3f}</span><span class="s2">&lt;br&gt;&lt;b&gt;Energy&lt;/b&gt;: %</span><span class="si">{y:.3f}</span><span class="s2"> (eV/atom)&quot;</span>
             <span class="p">)</span>
         <span class="p">)</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">yaxis_range</span><span class="o">=</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">y_max</span><span class="p">])</span>
@@ -352,30 +345,25 @@
 <div class="viewcode-block" id="InterfaceReactionHull.get_energy_above_hull">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_energy_above_hull">[docs]</a>
     <span class="k">def</span> <span class="nf">get_energy_above_hull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reaction</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the energy of a reaction above the reaction hull.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the energy of a reaction above the reaction hull.&quot;&quot;&quot;</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">reaction</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-        <span class="n">e_above_hull</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hull_energy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">e_above_hull</span></div>
+        <span class="k">return</span> <span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hull_energy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="InterfaceReactionHull.get_coordinate">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_coordinate">[docs]</a>
     <span class="k">def</span> <span class="nf">get_coordinate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reaction</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get coordinate of reaction in reaction hull. This is expressed as the atomic</span>
-<span class="sd">        mixing ratio of component 2 in the reaction.&quot;&quot;&quot;</span>
+<span class="sd">        mixing ratio of component 2 in the reaction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">amt_c1</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">reactant_atomic_fractions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">amt_c2</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">reactant_atomic_fractions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">total</span> <span class="o">=</span> <span class="n">amt_c1</span> <span class="o">+</span> <span class="n">amt_c2</span>  <span class="c1"># will add to 1.0 with two-component reactions</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">coordinate</span> <span class="o">=</span> <span class="n">amt_c2</span> <span class="o">/</span> <span class="n">total</span>
         <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Can&#39;t compute coordinate for </span><span class="si">{</span><span class="n">reaction</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can&#39;t compute coordinate for </span><span class="si">{</span><span class="n">reaction</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
         <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">coordinate</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>  <span class="c1"># avoids numerical issues</span></div>
 
@@ -383,8 +371,7 @@
 <div class="viewcode-block" id="InterfaceReactionHull.get_hull_energy">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_hull_energy">[docs]</a>
     <span class="k">def</span> <span class="nf">get_hull_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the energy of the reaction at a given coordinate.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the energy of the reaction at a given coordinate.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            coordinate: Coordinate of reaction in reaction hull.</span>
@@ -398,9 +385,7 @@
 
 <div class="viewcode-block" id="InterfaceReactionHull.get_reactions_by_coordinate">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_reactions_by_coordinate">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_reactions_by_coordinate</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">get_reactions_by_coordinate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the reaction(s) at a given coordinate.&quot;&quot;&quot;</span>
         <span class="n">sorted_vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hull_vertices</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sorted_vertices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
@@ -428,8 +413,7 @@
 <div class="viewcode-block" id="InterfaceReactionHull.get_primary_competition">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_primary_competition">[docs]</a>
     <span class="k">def</span> <span class="nf">get_primary_competition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reaction</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the primary competition, C_1, for a reaction (in eV/atom).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the primary competition, C_1, for a reaction (in eV/atom).</span>
 
 <span class="sd">        If you use this selectivity metric in your work, please cite the following work:</span>
 
@@ -448,16 +432,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">energy</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">energy_per_atom</span>
         <span class="n">coord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coordinate</span><span class="p">(</span><span class="n">reaction</span><span class="p">)</span>
-        <span class="n">matching</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">coord</span><span class="p">)[</span>
-            <span class="mi">0</span>
-        <span class="p">]</span>  <span class="c1"># remove all reactions at same coordinate</span>
+        <span class="n">matching</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">coord</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># remove all reactions at same coordinate</span>
 
         <span class="n">idx_min</span> <span class="o">=</span> <span class="n">matching</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
         <span class="n">idx_max</span> <span class="o">=</span> <span class="n">matching</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
-        <span class="n">competing_rxns</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">[:</span><span class="n">idx_min</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">[</span><span class="n">idx_max</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
-        <span class="p">)</span>  <span class="c1"># assumes ordered</span>
+        <span class="n">competing_rxns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">[:</span><span class="n">idx_min</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">[</span><span class="n">idx_max</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>  <span class="c1"># assumes ordered</span>
 
         <span class="n">competing_rxns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">[:</span><span class="n">idx_min</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">[</span><span class="n">idx_max</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
         <span class="n">competing_rxn_energies</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">energy_per_atom</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">competing_rxns</span><span class="p">]</span>
@@ -475,8 +455,7 @@
         <span class="n">include_e_hull</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the secondary competition, C_2, for a reaction (in eV/atom).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the secondary competition, C_2, for a reaction (in eV/atom).</span>
 
 <span class="sd">        If you use this selectivity metric in your work, please cite the following work:</span>
 
@@ -540,9 +519,7 @@
 <div class="viewcode-block" id="InterfaceReactionHull.get_secondary_competition_max_energy">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_max_energy">[docs]</a>
     <span class="k">def</span> <span class="nf">get_secondary_competition_max_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reaction</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the score for a given reaction. This formula is based on a</span>
-<span class="sd">        methodology presented in the following paper:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the score for a given reaction.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            reaction: Reaction to calculate the competition score for.</span>
@@ -560,9 +537,8 @@
 <div class="viewcode-block" id="InterfaceReactionHull.get_secondary_competition_area">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_area">[docs]</a>
     <span class="k">def</span> <span class="nf">get_secondary_competition_area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reaction</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the score for a given reaction. This formula is based on a</span>
-<span class="sd">        methodology presented in the following paper: (TBD)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the score for a given reaction. This formula is based on a</span>
+<span class="sd">        methodology presented in the following paper: (TBD).</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            reaction: Reaction to calculate the competition score for.</span>
@@ -577,26 +553,10 @@
         <span class="k">return</span> <span class="n">left_area</span> <span class="o">+</span> <span class="n">right_area</span></div>
 
 
-    <span class="k">def</span> <span class="nf">get_max_decomposition_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coords_in_range</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
-
-        <span class="n">max_energy</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)),</span> <span class="mi">3</span><span class="p">):</span>
-            <span class="n">i_left</span><span class="p">,</span> <span class="n">i_mid</span><span class="p">,</span> <span class="n">i_right</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-            <span class="n">c_left</span><span class="p">,</span> <span class="n">c_mid</span><span class="p">,</span> <span class="n">c_right</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[[</span><span class="n">i_left</span><span class="p">,</span> <span class="n">i_mid</span><span class="p">,</span> <span class="n">i_right</span><span class="p">]]</span>
-
-            <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_altitude</span><span class="p">(</span><span class="n">c_left</span><span class="p">,</span> <span class="n">c_mid</span><span class="p">,</span> <span class="n">c_right</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">max_energy</span><span class="p">:</span>
-                <span class="n">max_energy</span> <span class="o">=</span> <span class="n">energy</span>
-
-        <span class="k">return</span> <span class="n">max_energy</span>
-
 <div class="viewcode-block" id="InterfaceReactionHull.get_decomposition_energy">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy">[docs]</a>
     <span class="k">def</span> <span class="nf">get_decomposition_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the energy of the reaction decomposition between two points.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the energy of the reaction decomposition between two points.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x1: Coordinate of first point.</span>
@@ -623,20 +583,60 @@
         <span class="k">return</span> <span class="n">energy</span></div>
 
 
+<div class="viewcode-block" id="InterfaceReactionHull.get_max_decomposition_energy">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_max_decomposition_energy">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_max_decomposition_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Similar to get_decomposition_energy, but returns only the decomposition</span>
+<span class="sd">        energy that is maximum (rather than the sum of all possible decompositions).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x1: Coordinate of first point.</span>
+<span class="sd">            x2: Coordinate of second point.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The maximum energy of the reaction decomposition between the two points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coords_in_range</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+
+        <span class="n">max_energy</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)),</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="n">i_left</span><span class="p">,</span> <span class="n">i_mid</span><span class="p">,</span> <span class="n">i_right</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">c_left</span><span class="p">,</span> <span class="n">c_mid</span><span class="p">,</span> <span class="n">c_right</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[[</span><span class="n">i_left</span><span class="p">,</span> <span class="n">i_mid</span><span class="p">,</span> <span class="n">i_right</span><span class="p">]]</span>
+
+            <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_altitude</span><span class="p">(</span><span class="n">c_left</span><span class="p">,</span> <span class="n">c_mid</span><span class="p">,</span> <span class="n">c_right</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">max_energy</span><span class="p">:</span>
+                <span class="n">max_energy</span> <span class="o">=</span> <span class="n">energy</span>
+
+        <span class="k">return</span> <span class="n">max_energy</span></div>
+
+
+<div class="viewcode-block" id="InterfaceReactionHull.get_decomposition_area">
+<a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_area">[docs]</a>
     <span class="k">def</span> <span class="nf">get_decomposition_area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Similar to get_decomposition_energy, but returns the area enclosed instead of</span>
+<span class="sd">        an energy.</span>
+
+<span class="sd">        **WARNING**: This may be numerically unstable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x1: Coordinate of first point.</span>
+<span class="sd">            x2: Coordinate of second point.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The area of reaction decomposition between the two points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coords_in_range</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
 
-        <span class="k">return</span> <span class="n">ConvexHull</span><span class="p">(</span>
-            <span class="n">coords</span><span class="p">,</span> <span class="n">qhull_options</span><span class="o">=</span><span class="s2">&quot;QJ i&quot;</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">volume</span>  <span class="c1"># this is how area is defined in scipy</span>
+        <span class="k">return</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">qhull_options</span><span class="o">=</span><span class="s2">&quot;QJ i&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">volume</span>  <span class="c1"># this is how area is defined in scipy</span></div>
+
 
 <div class="viewcode-block" id="InterfaceReactionHull.get_coords_in_range">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_coords_in_range">[docs]</a>
     <span class="k">def</span> <span class="nf">get_coords_in_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the coordinates in the range [x1, x2].</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the coordinates in the range [x1, x2].</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x1: Start of range.</span>
@@ -660,9 +660,7 @@
             <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hull_vertices</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">x_max</span>
-                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x_min</span>
-                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">x_max</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x_min</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span>
             <span class="p">]</span>
         <span class="p">)</span>
 
@@ -679,8 +677,7 @@
 <div class="viewcode-block" id="InterfaceReactionHull.count">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.count">[docs]</a>
     <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reurns the number of decomposition pathways for the interface reaction hull</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reurns the number of decomposition pathways for the interface reaction hull</span>
 <span class="sd">        based on the number of **product** vertices (i.e., total # of vertices</span>
 <span class="sd">        considered - 2 reactant vertices).</span>
 
@@ -715,17 +712,12 @@
             <span class="mi">24466267020</span><span class="p">,</span>
             <span class="mi">91482563640</span><span class="p">,</span>
         <span class="p">]</span>
-        <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;=</span> <span class="mi">22</span><span class="p">:</span>
-            <span class="n">count</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">num</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_recursive</span><span class="p">(</span><span class="n">num</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">count</span></div>
+        <span class="k">return</span> <span class="n">counts</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;=</span> <span class="mi">22</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_recursive</span><span class="p">(</span><span class="n">num</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive">
 <a class="viewcode-back" href="../../../rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive">[docs]</a>
-    <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>  <span class="c1"># noqa: B019</span>
     <span class="k">def</span> <span class="nf">get_decomposition_energy_and_num_paths_recursive</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -733,8 +725,7 @@
         <span class="n">use_x_min_ref</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">use_x_max_ref</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This is a recursive implementation of the get_decomposition_energy function. It</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This is a recursive implementation of the get_decomposition_energy function. It</span>
 <span class="sd">        significantly slower than the non-recursive implementation but is more</span>
 <span class="sd">        straightforward to understand. Both should return the same answer, however the</span>
 <span class="sd">        refcursive implementation also includes &quot;free&quot; computation of the total number</span>
@@ -766,12 +757,10 @@
         <span class="n">coords</span> <span class="o">=</span> <span class="n">all_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">val</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
-            <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="n">total</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_altitude</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">])</span>
-            <span class="n">total</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="n">total</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_altitude</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
+            <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="mi">1</span>
 
         <span class="n">val</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
@@ -781,34 +770,25 @@
             <span class="k">elif</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1.0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">):</span>
                 <span class="n">use_x_max_ref</span> <span class="o">=</span> <span class="kc">False</span>
 
-            <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_altitude</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">],</span> <span class="n">c</span><span class="p">,</span> <span class="p">[</span><span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">])</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_altitude</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">],</span> <span class="n">c</span><span class="p">,</span> <span class="p">[</span><span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
             <span class="p">(</span>
                 <span class="n">left_decomp</span><span class="p">,</span>
                 <span class="n">left_total</span><span class="p">,</span>
-            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_decomposition_energy_and_num_paths_recursive</span><span class="p">(</span>
-                <span class="n">x_min</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">use_x_min_ref</span><span class="p">,</span> <span class="n">use_x_max_ref</span>
-            <span class="p">)</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_decomposition_energy_and_num_paths_recursive</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">use_x_min_ref</span><span class="p">,</span> <span class="n">use_x_max_ref</span><span class="p">)</span>
             <span class="p">(</span>
                 <span class="n">right_decomp</span><span class="p">,</span>
                 <span class="n">right_total</span><span class="p">,</span>
-            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_decomposition_energy_and_num_paths_recursive</span><span class="p">(</span>
-                <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">use_x_min_ref</span><span class="p">,</span> <span class="n">use_x_max_ref</span>
-            <span class="p">)</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_decomposition_energy_and_num_paths_recursive</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">use_x_min_ref</span><span class="p">,</span> <span class="n">use_x_max_ref</span><span class="p">)</span>
 
-            <span class="n">val</span> <span class="o">+=</span> <span class="p">(</span>
-                <span class="n">height</span> <span class="o">*</span> <span class="p">(</span><span class="n">left_total</span> <span class="o">*</span> <span class="n">right_total</span><span class="p">)</span>
-                <span class="o">+</span> <span class="n">left_decomp</span> <span class="o">*</span> <span class="n">right_total</span>
-                <span class="o">+</span> <span class="n">right_decomp</span> <span class="o">*</span> <span class="n">left_total</span>
-            <span class="p">)</span>
+            <span class="n">val</span> <span class="o">+=</span> <span class="n">height</span> <span class="o">*</span> <span class="p">(</span><span class="n">left_total</span> <span class="o">*</span> <span class="n">right_total</span><span class="p">)</span> <span class="o">+</span> <span class="n">left_decomp</span> <span class="o">*</span> <span class="n">right_total</span> <span class="o">+</span> <span class="n">right_decomp</span> <span class="o">*</span> <span class="n">left_total</span>
             <span class="n">total</span> <span class="o">+=</span> <span class="n">left_total</span> <span class="o">*</span> <span class="n">right_total</span>
 
         <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="n">total</span></div>
 
 
-    <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>  <span class="c1"># noqa: B019</span>
     <span class="k">def</span> <span class="nf">_altitude_multiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_left</span><span class="p">,</span> <span class="n">n_right</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function is used in the non-recursive implementation of the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This function is used in the non-recursive implementation of the</span>
 <span class="sd">        get_decomposition_energy function. It allows for rapid computation of the number</span>
 <span class="sd">        times (multiplicitly) that a particular altitude appears in the decomposition.</span>
 
@@ -827,8 +807,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">n_left</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">n_right</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">remainder</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_count_recursive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        A recursive implementation of the counting function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A recursive implementation of the counting function.</span>
 
 <span class="sd">        This implementation is courtesy of @mcgalcode.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -857,7 +836,7 @@
                 <span class="n">biggest_cache</span> <span class="o">=</span> <span class="n">c2</span>
 
             <span class="n">total</span> <span class="o">+=</span> <span class="n">left_divs</span> <span class="o">*</span> <span class="n">right_divs</span>
-        <span class="k">return</span> <span class="n">total</span><span class="p">,</span> <span class="n">biggest_cache</span> <span class="o">+</span> <span class="p">[</span><span class="n">total</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">total</span><span class="p">,</span> <span class="p">[</span><span class="o">*</span><span class="n">biggest_cache</span><span class="p">,</span> <span class="n">total</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_get_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">marker_size</span> <span class="o">=</span> <span class="mi">10</span>
@@ -868,10 +847,7 @@
             <span class="n">hover_name</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">],</span>
             <span class="n">labels</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;Mixing Ratio&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">(</span>
-                    <span class="sa">r</span><span class="s2">&quot;$\Delta G_{\mathrm</span><span class="si">{rxn}</span><span class="s2">} ~&quot;</span>
-                    <span class="sa">r</span><span class="s2">&quot; \mathrm{\left(\dfrac{\mathsf</span><span class="si">{eV}</span><span class="s2">}{\mathsf</span><span class="si">{atom}</span><span class="s2">}\right)}$&quot;</span>
-                <span class="p">),</span>
+                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta G_{\mathrm</span><span class="si">{rxn}</span><span class="s2">} ~ \mathrm{\left(\dfrac{\mathsf</span><span class="si">{eV}</span><span class="s2">}{\mathsf</span><span class="si">{atom}</span><span class="s2">}\right)}$&quot;</span><span class="p">),</span>
             <span class="p">},</span>
         <span class="p">)</span>
         <span class="n">pts</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">marker_size</span><span class="p">})</span>
@@ -884,9 +860,7 @@
         <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[(</span><span class="n">coords</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">coords</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
 
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">c</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">c</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">coords</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">c</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-        <span class="p">]</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">c</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">c</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">coords</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">c</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
 
         <span class="n">line_data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
@@ -897,6 +871,7 @@
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">hull_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns numpy array of indices of the vertices that are on the hull.&quot;&quot;&quot;</span>
         <span class="n">hull_vertices</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">i</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hull</span><span class="o">.</span><span class="n">vertices</span>
@@ -911,30 +886,27 @@
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">stable_reactions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ComputedReaction</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the reactions that are stable (on the convex hull) of the interface</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the reactions that are stable (on the convex hull) of the interface</span>
 <span class="sd">        reaction hull.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hull_vertices</span><span class="p">]</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">unstable_reactions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the reactions that are unstable (NOT on the convex hull) of the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the reactions that are unstable (NOT on the convex hull) of the</span>
 <span class="sd">        interface reaction hull.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hull_vertices</span><span class="p">]</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_calculate_altitude</span><span class="p">(</span><span class="n">c_left</span><span class="p">,</span> <span class="n">c_mid</span><span class="p">,</span> <span class="n">c_right</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper geometry method: calculates the altitude of a point on a line defined by</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper geometry method: calculates the altitude of a point on a line defined by</span>
 <span class="sd">        three points.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x1: point 1</span>
-<span class="sd">            x2: point 2</span>
-<span class="sd">            x3: point 3</span>
+<span class="sd">            c_left: coordinates of point 1</span>
+<span class="sd">            c_mid: coordinates of point 2</span>
+<span class="sd">            c_right: coordinates point 3</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            The altitude of the point</span>
@@ -979,7 +951,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

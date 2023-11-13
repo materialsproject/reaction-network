@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="rxn_network.thermo" href="rxn_network.thermo.html" /><link rel="prev" title="rxn_network.pathways" href="rxn_network.pathways.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.reactions - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -250,7 +250,7 @@
 <h1>rxn_network.reactions<a class="headerlink" href="#rxn-network-reactions" title="Link to this heading">#</a></h1>
 <section id="module-rxn_network.reactions.base">
 <span id="rxn-network-reactions-base"></span><h2>rxn_network.reactions.base<a class="headerlink" href="#module-rxn_network.reactions.base" title="Link to this heading">#</a></h2>
-<p>Basic interface for a (chemical) Reaction</p>
+<p>Basic interface for a (chemical) Reaction.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rxn_network.reactions.base.Reaction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rxn_network.reactions.base.</span></span><span class="sig-name descname"><span class="pre">Reaction</span></span><a class="reference internal" href="_modules/rxn_network/reactions/base.html#Reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.base.Reaction" title="Link to this definition">#</a></dt>
@@ -259,37 +259,37 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.base.Reaction.reactants">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reactants</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><span class="pre">Composition</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.base.Reaction.reactants" title="Link to this definition">#</a></dt>
-<dd><p>List of reactants for this reaction</p>
+<dd><p>List of reactants for this reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.base.Reaction.products">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">products</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><span class="pre">Composition</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.base.Reaction.products" title="Link to this definition">#</a></dt>
-<dd><p>List of products for this reaction</p>
+<dd><p>List of products for this reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.base.Reaction.coefficients">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coefficients</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#rxn_network.reactions.base.Reaction.coefficients" title="Link to this definition">#</a></dt>
-<dd><p>Coefficients of the reaction</p>
+<dd><p>Coefficients of the reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.base.Reaction.energy">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><a class="headerlink" href="#rxn_network.reactions.base.Reaction.energy" title="Link to this definition">#</a></dt>
-<dd><p>The energy of this reaction in total eV</p>
+<dd><p>The energy of this reaction in total eV.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.base.Reaction.compositions">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compositions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><span class="pre">Composition</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.base.Reaction.compositions" title="Link to this definition">#</a></dt>
-<dd><p>List of all compositions in the reaction</p>
+<dd><p>List of all compositions in the reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.base.Reaction.elements">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Element</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.base.Reaction.elements" title="Link to this definition">#</a></dt>
-<dd><p>List of elements in the reaction</p>
+<dd><p>List of elements in the reaction.</p>
 </dd></dl>
 
 </dd></dl>
@@ -311,14 +311,14 @@ reactant, and a positive coefficient refers to a product.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>compositions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a><em>]</em>) – List of composition objects (pymatgen).</p></li>
-<li><p><strong>coefficients</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>] </em><em>| </em><em>np.ndarray</em>) – List of coefficients, where negative coeff distinguishes a
+<li><p><strong>compositions</strong> (<em>Iterable</em><em>[</em><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a><em>]</em>) – List of composition objects (pymatgen).</p></li>
+<li><p><strong>coefficients</strong> (<em>Iterable</em><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>] </em><em>| </em><em>np.ndarray</em>) – List of coefficients, where negative coeff distinguishes a
 reactant.</p></li>
 <li><p><strong>balanced</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> | </em><em>None</em>) – Whether the reaction is stoichiometricaly balanced or not
 (see construction via balance() method).</p></li>
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional corresponding data in dictionary format; often used to store
 various calculated parameters.</p></li>
-<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – the minimum number of errors reported by the reaction
+<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – the minimum number of errors reported by the reaction
 balancing algorithm (see the balance() method). A number of errors
 &gt;= 1 means that the reaction may be different than intended (some
 phases may be shuffled or removed entirely).</p></li>
@@ -329,7 +329,7 @@ phases may be shuffled or removed entirely).</p></li>
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.balance">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reactants</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">products</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/basic.html#BasicReaction.balance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.balance" title="Link to this definition">#</a></dt>
 <dd><p>Reactants and products to be specified as list of
-pymatgen.core.Composition. e.g., [comp1, comp2]</p>
+pymatgen.core.Composition. e.g., [comp1, comp2].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -402,7 +402,7 @@ Another factor can be specified.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.get_coeff">
 <span class="sig-name descname"><span class="pre">get_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/basic.html#BasicReaction.get_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.get_coeff" title="Link to this definition">#</a></dt>
-<dd><p>Returns coefficient for a particular composition</p>
+<dd><p>Returns coefficient for a particular composition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>comp</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – </p>
@@ -414,13 +414,13 @@ Another factor can be specified.</p>
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.normalized_repr_and_factor">
 <span class="sig-name descname"><span class="pre">normalized_repr_and_factor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/basic.html#BasicReaction.normalized_repr_and_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.normalized_repr_and_factor" title="Link to this definition">#</a></dt>
 <dd><p>Normalized representation for a reaction
-For example, <code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">Li</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">O</span> <span class="pre">-&gt;</span> <span class="pre">2Li2O</span></code> becomes <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">Li</span> <span class="pre">+</span> <span class="pre">O</span> <span class="pre">-&gt;</span> <span class="pre">Li2O</span></code></p>
+For example, <code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">Li</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">O</span> <span class="pre">-&gt;</span> <span class="pre">2Li2O</span></code> becomes <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">Li</span> <span class="pre">+</span> <span class="pre">O</span> <span class="pre">-&gt;</span> <span class="pre">Li2O</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/basic.html#BasicReaction.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.copy" title="Link to this definition">#</a></dt>
-<dd><p>Returns a copy of the BasicReaction object</p>
+<dd><p>Returns a copy of the BasicReaction object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#rxn_network.reactions.basic.BasicReaction" title="rxn_network.reactions.basic.BasicReaction"><em>BasicReaction</em></a></p>
@@ -463,25 +463,25 @@ determine whether byproducts only contain added elements.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.reactant_atomic_fractions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reactant_atomic_fractions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.reactant_atomic_fractions" title="Link to this definition">#</a></dt>
-<dd><p>Returns the atomic mixing ratio of reactants in the reaction</p>
+<dd><p>Returns the atomic mixing ratio of reactants in the reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.product_atomic_fractions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">product_atomic_fractions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.product_atomic_fractions" title="Link to this definition">#</a></dt>
-<dd><p>Returns the atomic mixing ratio of reactants in the reaction</p>
+<dd><p>Returns the atomic mixing ratio of reactants in the reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.reactant_molar_fractions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reactant_molar_fractions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.reactant_molar_fractions" title="Link to this definition">#</a></dt>
-<dd><p>Returns the molar mixing ratio of reactants in the reaction</p>
+<dd><p>Returns the molar mixing ratio of reactants in the reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.product_molar_fractions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">product_molar_fractions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.product_molar_fractions" title="Link to this definition">#</a></dt>
-<dd><p>Returns the molar mixing ratio of products in the reaction</p>
+<dd><p>Returns the molar mixing ratio of products in the reaction.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -526,49 +526,49 @@ formulas.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.reactants">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reactants</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><span class="pre">Composition</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.reactants" title="Link to this definition">#</a></dt>
-<dd><p>List of reactants for this reaction</p>
+<dd><p>List of reactants for this reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.products">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">products</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><span class="pre">Composition</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.products" title="Link to this definition">#</a></dt>
-<dd><p>List of products for this reaction</p>
+<dd><p>List of products for this reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.compositions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compositions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><span class="pre">Composition</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.compositions" title="Link to this definition">#</a></dt>
-<dd><p>List of composition objects for this reaction</p>
+<dd><p>List of composition objects for this reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.coefficients">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coefficients</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.coefficients" title="Link to this definition">#</a></dt>
-<dd><p>Array of reaction coefficients</p>
+<dd><p>Array of reaction coefficients.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.num_atoms">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_atoms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.num_atoms" title="Link to this definition">#</a></dt>
-<dd><p>Total number of atoms in this reaction</p>
+<dd><p>Total number of atoms in this reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.energy">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.energy" title="Link to this definition">#</a></dt>
-<dd><p>The energy of this reaction</p>
+<dd><p>The energy of this reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.energy_per_atom">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">energy_per_atom</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.energy_per_atom" title="Link to this definition">#</a></dt>
-<dd><p>The energy per atom of this reaction</p>
+<dd><p>The energy per atom of this reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.is_identity">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_identity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.is_identity" title="Link to this definition">#</a></dt>
-<dd><p>Returns True if the reaction has identical reactants and products</p>
+<dd><p>Returns True if the reaction has identical reactants and products.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -598,13 +598,18 @@ information about reaction thermodynamics.</p>
 <p>Convenience class to generate a reaction from ComputedEntry objects, with
 some additional attributes, such as a reaction energy based on computed
 energies. This class also balances the reaction.</p>
+<p>Args:
+entries: List of ComputedEntry objects.
+coefficients: List or array of reaction coefficients.
+data: Optional dict of data
+lowest_num_errors: number of “errors” encountered during reaction balancing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – List of ComputedEntry objects.</p></li>
-<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – List or array of reaction coefficients.</p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dict of data</p></li>
-<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – number of “errors” encountered during reaction balancing.</p></li>
+<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – </p></li>
+<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – </p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -674,13 +679,13 @@ reaction.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.computed.ComputedReaction.entries">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">entries</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ComputedEntry</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.computed.ComputedReaction.entries" title="Link to this definition">#</a></dt>
-<dd><p>Returns a copy of the entries</p>
+<dd><p>Returns a copy of the entries.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.reactions.computed.ComputedReaction.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/computed.html#ComputedReaction.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.computed.ComputedReaction.copy" title="Link to this definition">#</a></dt>
-<dd><p>Returns a copy of the Reaction object</p>
+<dd><p>Returns a copy of the Reaction object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a></p>
@@ -691,7 +696,7 @@ reaction.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.reactions.computed.ComputedReaction.reverse">
 <span class="sig-name descname"><span class="pre">reverse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/computed.html#ComputedReaction.reverse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.computed.ComputedReaction.reverse" title="Link to this definition">#</a></dt>
-<dd><p>Returns a reversed reaction (i.e. sides flipped)</p>
+<dd><p>Returns a reversed reaction (i.e. sides flipped).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a></p>
@@ -713,7 +718,7 @@ reaction.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction">ComputedReaction</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -732,7 +737,24 @@ Another factor can be specified.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction">ComputedReaction</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.reactions.computed.ComputedReaction.get_entry_idx_vector">
+<span class="sig-name descname"><span class="pre">get_entry_idx_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/computed.html#ComputedReaction.get_entry_idx_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.computed.ComputedReaction.get_entry_idx_vector" title="Link to this definition">#</a></dt>
+<dd><p>Maps coefficients to a vector of length n on corresponding entry indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Total number of entries (determines length of vector)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector containing reaction coefficients on the corresponding entry indices.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>ndarray</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -750,15 +772,19 @@ Another factor can be specified.</p>
 <p>A class for storing and analyzing a set of reactions at an interface between two
 reactants. This class is more generalized than the InterfacialReactivity class and
 can encompass any set of reactions between two reactants, regardless of whether
-the reaction products are “stable” (i.e. together on the convex hull)</p>
+the reaction products are “stable” (i.e. together on the convex hull).</p>
+<p>Args:
+c1: Composition of reactant 1
+c2: Composition of reactant 2
+reactions: List of reactions containing all enumerated reactions between the
+two reactants. Note that this list should not include identity reactions
+of the precursors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>c1</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition of reactant 1</p></li>
-<li><p><strong>c2</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition of reactant 2</p></li>
-<li><p><strong>reactions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a><em>]</em>) – List of reactions containing all enumerated reactions between the
-two reactants. Note that this list should not include identity reactions
-of the precursors.</p></li>
+<li><p><strong>c1</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – </p></li>
+<li><p><strong>c2</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – </p></li>
+<li><p><strong>reactions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a><em>]</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -902,8 +928,7 @@ This argument exists for debugging / validation and defaults to False.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_max_energy">
 <span class="sig-name descname"><span class="pre">get_secondary_competition_max_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/hull.html#InterfaceReactionHull.get_secondary_competition_max_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_max_energy" title="Link to this definition">#</a></dt>
-<dd><p>Calculates the score for a given reaction. This formula is based on a
-methodology presented in the following paper:</p>
+<dd><p>Calculates the score for a given reaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>reaction</strong> (<a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a>) – Reaction to calculate the competition score for.</p>
@@ -921,7 +946,7 @@ methodology presented in the following paper:</p>
 <dt class="sig sig-object py" id="rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_area">
 <span class="sig-name descname"><span class="pre">get_secondary_competition_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/hull.html#InterfaceReactionHull.get_secondary_competition_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_area" title="Link to this definition">#</a></dt>
 <dd><p>Calculates the score for a given reaction. This formula is based on a
-methodology presented in the following paper: (TBD)</p>
+methodology presented in the following paper: (TBD).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>reaction</strong> (<a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a>) – Reaction to calculate the competition score for.</p>
@@ -948,6 +973,49 @@ methodology presented in the following paper: (TBD)</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The energy of the reaction decomposition between the two points.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.reactions.hull.InterfaceReactionHull.get_max_decomposition_energy">
+<span class="sig-name descname"><span class="pre">get_max_decomposition_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/hull.html#InterfaceReactionHull.get_max_decomposition_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_max_decomposition_energy" title="Link to this definition">#</a></dt>
+<dd><p>Similar to get_decomposition_energy, but returns only the decomposition
+energy that is maximum (rather than the sum of all possible decompositions).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x1</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Coordinate of first point.</p></li>
+<li><p><strong>x2</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Coordinate of second point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The maximum energy of the reaction decomposition between the two points.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_area">
+<span class="sig-name descname"><span class="pre">get_decomposition_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/hull.html#InterfaceReactionHull.get_decomposition_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_area" title="Link to this definition">#</a></dt>
+<dd><p>Similar to get_decomposition_energy, but returns the area enclosed instead of
+an energy.</p>
+<p><strong>WARNING</strong>: This may be numerically unstable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x1</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Coordinate of first point.</p></li>
+<li><p><strong>x2</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Coordinate of second point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The area of reaction decomposition between the two points.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
@@ -1021,6 +1089,12 @@ the reactant that is lower in energy than the reactant).</p></li>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="rxn_network.reactions.hull.InterfaceReactionHull.hull_vertices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hull_vertices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#rxn_network.reactions.hull.InterfaceReactionHull.hull_vertices" title="Link to this definition">#</a></dt>
+<dd><p>Returns numpy array of indices of the vertices that are on the hull.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.hull.InterfaceReactionHull.stable_reactions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stable_reactions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><span class="pre">ComputedReaction</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.hull.InterfaceReactionHull.stable_reactions" title="Link to this definition">#</a></dt>
 <dd><p>Returns the reactions that are stable (on the convex hull) of the interface
@@ -1048,15 +1122,21 @@ computed as changes in grand potential.</p>
 <dd><p>Bases: <a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputedReaction</span></code></a></p>
 <p>Extends the ComputedReaction class to add support for “open” reactions,
 where the reaction energy is calculated as a change in grand potential.</p>
+<p>Args:
+entries: List of ComputedEntry objects.
+coefficients: List of reaction coefficients.
+chempots: Dict of chemical potentials corresponding to open elements.
+data: Optional dict of data.
+lowest_num_errors: number of “errors” encountered during reaction
+balancing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – List of ComputedEntry objects.</p></li>
-<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – List of reaction coefficients.</p></li>
-<li><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – Dict of chemical potentials corresponding to open elements.</p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dict of data.</p></li>
-<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – number of “errors” encountered during reaction
-balancing</p></li>
+<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – </p></li>
+<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – </p></li>
+<li><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – </p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -1108,13 +1188,13 @@ The calculated reaction energy.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.open.OpenComputedReaction.elements">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Element</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rxn_network.reactions.open.OpenComputedReaction.elements" title="Link to this definition">#</a></dt>
-<dd><p>List of elements in the reaction</p>
+<dd><p>List of elements in the reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.open.OpenComputedReaction.total_chemical_system">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_chemical_system</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></em><a class="headerlink" href="#rxn_network.reactions.open.OpenComputedReaction.total_chemical_system" title="Link to this definition">#</a></dt>
-<dd><p>Chemical system string, including open elements</p>
+<dd><p>Chemical system string, including open elements.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1131,19 +1211,39 @@ The calculated reaction energy.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.reactions.open.OpenComputedReaction.reverse">
 <span class="sig-name descname"><span class="pre">reverse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/open.html#OpenComputedReaction.reverse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.open.OpenComputedReaction.reverse" title="Link to this definition">#</a></dt>
-<dd><p>Returns a copy of reaction with reactants/products swapped</p>
+<dd><p>Returns a copy of reaction with reactants/products swapped.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.open.OpenComputedReaction.reactant_atomic_fractions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reactant_atomic_fractions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a></em><a class="headerlink" href="#rxn_network.reactions.open.OpenComputedReaction.reactant_atomic_fractions" title="Link to this definition">#</a></dt>
-<dd><p>Returns the atomic mixing ratio of reactants in the reaction</p>
+<dd><p>Returns the atomic mixing ratio of reactants in the reaction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.reactions.open.OpenComputedReaction.product_atomic_fractions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">product_atomic_fractions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a></em><a class="headerlink" href="#rxn_network.reactions.open.OpenComputedReaction.product_atomic_fractions" title="Link to this definition">#</a></dt>
-<dd><p>Returns the atomic mixing ratio of reactants in the reaction</p>
+<dd><p>Returns the atomic mixing ratio of reactants in the reaction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.reactions.open.OpenComputedReaction.from_computed_rxn">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_computed_rxn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chempots</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/open.html#OpenComputedReaction.from_computed_rxn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.open.OpenComputedReaction.from_computed_rxn" title="Link to this definition">#</a></dt>
+<dd><p>Generate an OpenComputedReaction from a ComputedReaction object and chemical potential dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reaction</strong> (<a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a>) – ComputedReaction object</p></li>
+<li><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – Dict of chemical potentials corresponding to open element(s)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>OpenComputedReaction object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction" title="rxn_network.reactions.open.OpenComputedReaction"><em>OpenComputedReaction</em></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1184,11 +1284,11 @@ axes. This also constructs the Pareto front on the provided dimensions.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>DataFrame</em>) – DataFrame with columns: rxn, energy, (primary_competition),
 (secondary_competition), (chempot_distance), (added_elems), (dE)</p></li>
-<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
-<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
-<li><p><strong>z</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>plot_pareto</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Column name to plot on x-axis</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Column name to plot on y-axis</p></li>
+<li><p><strong>z</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – Column name to plot on z-axis</p></li>
+<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – Column name to color points by. Defaults to None.</p></li>
+<li><p><strong>plot_pareto</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to plot the Pareto front. Defaults to True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1203,7 +1303,7 @@ axes. This also constructs the Pareto front on the provided dimensions.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="rxn_network.reactions.plotting.pretty_df_layout">
 <span class="sig-prename descclassname"><span class="pre">rxn_network.reactions.plotting.</span></span><span class="sig-name descname"><span class="pre">pretty_df_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/plotting.html#pretty_df_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.plotting.pretty_df_layout" title="Link to this definition">#</a></dt>
-<dd><p>Improve visibility for a pandas DataFrame with wide column names</p>
+<dd><p>Improve visibility for a pandas DataFrame with wide column names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>df</strong> (<em>DataFrame</em>) – </p>
@@ -1214,7 +1314,7 @@ axes. This also constructs the Pareto front on the provided dimensions.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="rxn_network.reactions.plotting.filter_df_by_precursors">
 <span class="sig-prename descclassname"><span class="pre">rxn_network.reactions.plotting.</span></span><span class="sig-name descname"><span class="pre">filter_df_by_precursors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/plotting.html#filter_df_by_precursors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.plotting.filter_df_by_precursors" title="Link to this definition">#</a></dt>
-<dd><p>Filter a reaction DataFrame by available precursors</p>
+<dd><p>Filter a reaction DataFrame by available precursors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1242,16 +1342,23 @@ dumping large amounts of reaction data to a database.</p>
 <dt>Note: this is not a true “set”; there is the option for filtering duplicates but it</dt><dd><p>is not explicitly required.</p>
 </dd>
 </dl>
+<p>Args:
+entries: List of ComputedEntry objects shared by reactions
+indices: Array indexing the entry list; gets entries used by each
+reaction object
+coeffs: Array of all reaction coefficients
+open_elem: Open element, e.g., “O”
+chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
+all_data: Optional list of data for each reaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – List of ComputedEntry objects shared by reactions</p></li>
-<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>]</em>) – Array indexing the entry list; gets entries used by each
-reaction object</p></li>
-<li><p><strong>coeffs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>]</em>) – Array of all reaction coefficients</p></li>
-<li><p><strong>open_elem</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>Element</em><em> | </em><em>None</em>) – Open element, e.g., “O”</p></li>
-<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Chemical potential (mu) of open element in equation: Phi = G - mu*N</p></li>
-<li><p><strong>all_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>] </em><em>| </em><em>None</em>) – Optional list of data for each reaction</p></li>
+<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – </p></li>
+<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>]</em>) – </p></li>
+<li><p><strong>coeffs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>]</em>) – </p></li>
+<li><p><strong>open_elem</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>Element</em><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
+<li><p><strong>all_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>] </em><em>| </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -1262,7 +1369,7 @@ reaction object</p></li>
 open element and chempot are specified) for the reaction set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Iterable" title="(in Python v3.8)"><em>Iterable</em></a>[<a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a> | <a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction" title="rxn_network.reactions.open.OpenComputedReaction"><em>OpenComputedReaction</em></a>]</p>
+<dd class="field-odd"><p>Iterable[<a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction">ComputedReaction</a> | <a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction" title="rxn_network.reactions.open.OpenComputedReaction">OpenComputedReaction</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1279,7 +1386,7 @@ unique entries saves some computation time.</p>
 <li><p><strong>entries</strong> (<em>Collection</em><em>[</em><em>ComputedEntry</em><em>] </em><em>| </em><em>None</em>) – Optional list of ComputedEntry objects</p></li>
 <li><p><strong>open_elem</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>Element</em><em> | </em><em>None</em>) – Open element, e.g. “O2”</p></li>
 <li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Chemical potential (mu) of open element in equation: Phi = G - mu*N</p></li>
-<li><p><strong>filter_duplicates</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>filter_duplicates</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to filter duplicate reactions. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1339,7 +1446,7 @@ other: any other data associated with reaction</p>
 the current reaction set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rxns</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Collection" title="(in Python v3.8)"><em>Collection</em></a><em>[</em><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a><em> | </em><a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction" title="rxn_network.reactions.open.OpenComputedReaction"><em>OpenComputedReaction</em></a><em>]</em>) – </p>
+<dd class="field-odd"><p><strong>rxns</strong> (<em>Collection</em><em>[</em><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a><em> | </em><a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction" title="rxn_network.reactions.open.OpenComputedReaction"><em>OpenComputedReaction</em></a><em>]</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -1372,7 +1479,7 @@ set.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Iterable" title="(in Python v3.8)"><em>Iterable</em></a>[<a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a> | <a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction" title="rxn_network.reactions.open.OpenComputedReaction"><em>OpenComputedReaction</em></a>]</p>
+<dd class="field-even"><p>Iterable[<a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction">ComputedReaction</a> | <a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction" title="rxn_network.reactions.open.OpenComputedReaction">OpenComputedReaction</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1426,7 +1533,7 @@ provided open element and its chemical potential.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>open_el</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>Element</em><em> | </em><em>None</em>) – The element to be considered open.</p></li>
-<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The open element’s chemical potential (for use in energy change
+<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> | </em><em>None</em>) – The open element’s chemical potential (for use in energy change
 calculation)</p></li>
 </ul>
 </dd>
@@ -1579,6 +1686,7 @@ calculated.</p>
 <li><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction.reverse"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.reverse()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction.normalize_to"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.normalize_to()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction.normalize_to_element"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.normalize_to_element()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction.get_entry_idx_vector"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.get_entry_idx_vector()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1595,9 +1703,12 @@ calculated.</p>
 <li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_max_energy"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_secondary_competition_max_energy()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_area"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_secondary_competition_area()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_decomposition_energy()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_max_decomposition_energy"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_max_decomposition_energy()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_area"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_decomposition_area()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_coords_in_range"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_coords_in_range()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.count"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.count()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.hull_vertices"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.hull_vertices</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.stable_reactions"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.stable_reactions</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.hull.InterfaceReactionHull.unstable_reactions"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.unstable_reactions</span></code></a></li>
 </ul>
@@ -1615,6 +1726,7 @@ calculated.</p>
 <li><a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction.reverse"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.reverse()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction.reactant_atomic_fractions"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.reactant_atomic_fractions</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction.product_atomic_fractions"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.product_atomic_fractions</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction.from_computed_rxn"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.from_computed_rxn()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction.as_dict"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.as_dict()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.reactions.open.OpenComputedReaction.from_dict"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.from_dict()</span></code></a></li>
 </ul>
@@ -1655,7 +1767,7 @@ calculated.</p>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="_static/documentation_options.js?v=87b6a113"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

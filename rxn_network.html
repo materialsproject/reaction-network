@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="rxn_network.core" href="rxn_network.core.html" /><link rel="prev" title="License" href="license.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -356,6 +356,7 @@
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.min_entries_by_formula"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.min_entries_by_formula</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.temperature"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.temperature</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.chemsys"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.chemsys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_adjusted_entry"><code class="docutils literal notranslate"><span class="pre">GibbsEntrySet.get_adjusted_entry()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -584,6 +585,11 @@
 <li class="toctree-l2"><a class="reference internal" href="rxn_network.network.html#module-rxn_network.network.entry">rxn_network.network.entry</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntryType"><code class="docutils literal notranslate"><span class="pre">NetworkEntryType</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry"><code class="docutils literal notranslate"><span class="pre">NetworkEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.entries"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.entries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.elements"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.elements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.chemsys"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.chemsys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.dim"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.description"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.description</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.as_dict"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.as_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.network.html#rxn_network.network.entry.NetworkEntry.from_dict"><code class="docutils literal notranslate"><span class="pre">NetworkEntry.from_dict()</span></code></a></li>
 </ul>
@@ -743,6 +749,7 @@
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.reverse"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.reverse()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.normalize_to"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.normalize_to()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.normalize_to_element"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.normalize_to_element()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction.get_entry_idx_vector"><code class="docutils literal notranslate"><span class="pre">ComputedReaction.get_entry_idx_vector()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -759,9 +766,12 @@
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_max_energy"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_secondary_competition_max_energy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_secondary_competition_area"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_secondary_competition_area()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_decomposition_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_max_decomposition_energy"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_max_decomposition_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_area"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_decomposition_area()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_coords_in_range"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_coords_in_range()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.count"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.count()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.hull_vertices"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.hull_vertices</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.stable_reactions"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.stable_reactions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.unstable_reactions"><code class="docutils literal notranslate"><span class="pre">InterfaceReactionHull.unstable_reactions</span></code></a></li>
 </ul>
@@ -779,6 +789,7 @@
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.reverse"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.reverse()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.reactant_atomic_fractions"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.reactant_atomic_fractions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.product_atomic_fractions"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.product_atomic_fractions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.from_computed_rxn"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.from_computed_rxn()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.as_dict"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.as_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction.from_dict"><code class="docutils literal notranslate"><span class="pre">OpenComputedReaction.from_dict()</span></code></a></li>
 </ul>
@@ -896,7 +907,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="_static/documentation_options.js?v=87b6a113"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

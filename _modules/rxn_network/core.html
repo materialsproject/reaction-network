@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.core - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
@@ -246,6 +246,8 @@
         <article role="main">
           <h1>Source code for rxn_network.core</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Composition class used to represent a chemical composition.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cached_property</span>
 
 <span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="kn">import</span> <span class="n">Composition</span> <span class="k">as</span> <span class="n">PymatgenComposition</span>
@@ -254,23 +256,41 @@
 <div class="viewcode-block" id="Composition">
 <a class="viewcode-back" href="../../rxn_network.core.html#rxn_network.core.Composition">[docs]</a>
 <span class="k">class</span> <span class="nc">Composition</span><span class="p">(</span><span class="n">PymatgenComposition</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Modified Composition class adapted from pymatgen.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modified Composition class adapted from pymatgen.</span>
 
 <span class="sd">    The purpose of this is to modify / extend methods for better performance within the</span>
 <span class="sd">    rxn_network package.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>  <span class="c1"># pylint: disable=useless-parent-delegation</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Very flexible Composition construction, similar to the built-in Python</span>
+<span class="sd">        dict(). Also extended to allow simple string init.</span>
+
+<span class="sd">        Takes any inputs supported by the Python built-in dict function.</span>
+
+<span class="sd">        1. A dict of either {Element/Species: amount},</span>
+
+<span class="sd">            {string symbol:amount}, or {atomic number:amount} or any mixture</span>
+<span class="sd">            of these. E.g., {Element(&quot;Li&quot;): 2, Element(&quot;O&quot;): 1},</span>
+<span class="sd">            {&quot;Li&quot;:2, &quot;O&quot;:1}, {3: 2, 8: 1} all result in a Li2O composition.</span>
+<span class="sd">        2. Keyword arg initialization, similar to a dict, e.g.,</span>
+
+<span class="sd">            Composition(Li = 2, O = 1)</span>
+
+<span class="sd">        In addition, the Composition constructor also allows a single</span>
+<span class="sd">        string as an input formula. E.g., Composition(&quot;Li2O&quot;).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Any number of 2-tuples as key-value pairs.</span>
+<span class="sd">            strict (bool): Only allow valid Elements and Species in the Composition. Defaults to False.</span>
+<span class="sd">            allow_negative (bool): Whether to allow negative compositions. Defaults to False.</span>
+<span class="sd">            **kwargs: Additional kwargs supported by the dict() constructor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">reduced_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a pretty normalized formula, i.e., LiFePO4 instead of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a pretty normalized formula, i.e., LiFePO4 instead of</span>
 <span class="sd">        Li4Fe4P4O16.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_reduced_formula_and_factor</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span></div>
@@ -306,7 +326,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>

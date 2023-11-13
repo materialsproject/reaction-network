@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.network.base - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,13 +245,11 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.network.base</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Basic interface for a reaction network and its graph.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Basic interface for a reaction network and its graph.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">from</span> <span class="nn">monty.json</span> <span class="kn">import</span> <span class="n">MontyDecoder</span><span class="p">,</span> <span class="n">MSONable</span>
 <span class="kn">from</span> <span class="nn">rustworkx</span> <span class="kn">import</span> <span class="n">PyDiGraph</span>
@@ -259,6 +257,8 @@
 <span class="kn">from</span> <span class="nn">rxn_network.entries.entry_set</span> <span class="kn">import</span> <span class="n">GibbsEntrySet</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+
     <span class="kn">from</span> <span class="nn">pymatgen.entries</span> <span class="kn">import</span> <span class="n">Entry</span>
 
     <span class="kn">from</span> <span class="nn">rxn_network.costs.base</span> <span class="kn">import</span> <span class="n">CostFunction</span>
@@ -269,15 +269,19 @@
 <div class="viewcode-block" id="Network">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.base.Network">[docs]</a>
 <span class="k">class</span> <span class="nc">Network</span><span class="p">(</span><span class="n">MSONable</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base definition for a reaction network.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base definition for a reaction network.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">rxns</span><span class="p">:</span> <span class="n">ReactionSet</span><span class="p">,</span>
         <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            rxns: A ReactionSet object containing the reactions that form the network edges.</span>
+<span class="sd">            cost_function: A CostFunction object used to evaluate reaction properties</span>
+<span class="sd">                and assign edge weights.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rxns</span> <span class="o">=</span> <span class="n">rxns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cost_function</span> <span class="o">=</span> <span class="n">cost_function</span>
 
@@ -292,35 +296,36 @@
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.base.Network.build">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the network in-place from the supplied enumerators&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the network in-place from the supplied enumerators.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="Network.find_pathways">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.base.Network.find_pathways">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pathway</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find reaction pathways&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find reaction pathways.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="Network.set_precursors">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.base.Network.set_precursors">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span> <span class="o">|</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the phases used as precursors in the network (in-place)&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the phases used as precursors in the network (in-place).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="Network.set_target">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.base.Network.set_target">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Entry</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the phase used as a target in the network (in-place)&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the phase used as a target in the network (in-place).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="Network.as_dict">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.base.Network.as_dict">[docs]</a>
     <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns MSONable dict for serialization. See monty package for more</span>
-<span class="sd">        information.&quot;&quot;&quot;</span>
+<span class="sd">        information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
         <span class="n">d</span><span class="p">[</span><span class="s2">&quot;precursors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">d</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span>
@@ -333,7 +338,8 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Network</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate object from MSONable dict. See monty package for more</span>
-<span class="sd">        information.&quot;&quot;&quot;</span>
+<span class="sd">        information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">precursors</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;precursors&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">graph</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;graph&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -350,30 +356,26 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Entry</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The phases used as precursors in the network&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The phases used as precursors in the network.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precursors</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">target</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Entry</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The phase used as a target in the network&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The phase used as a target in the network.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the network&#39;s Graph object&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the network&#39;s Graph object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">chemsys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A string representing the chemical system (elements) of the network&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A string representing the chemical system (elements) of the network.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">chemsys</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="s2">&quot;Reaction network for chemical system: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;with graph: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;Reaction network for chemical system: </span><span class="si">{self.chemsys}</span><span class="s2">, with graph: </span><span class="si">{self.graph!s}</span><span class="s2">&quot;</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span></div>
@@ -383,16 +385,14 @@
 <div class="viewcode-block" id="Graph">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.base.Graph">[docs]</a>
 <span class="k">class</span> <span class="nc">Graph</span><span class="p">(</span><span class="n">PyDiGraph</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Thin wrapper around rx.PyDiGraph to allow for serialization and optimized database</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Thin wrapper around rx.PyDiGraph to allow for serialization and optimized database</span>
 <span class="sd">    storage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Graph.as_dict">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.base.Graph.as_dict">[docs]</a>
     <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Represents the PyDiGraph object as a serializable dictionary.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Represents the PyDiGraph object as a serializable dictionary.</span>
 
 <span class="sd">        See monty package (MSONable) for more information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -412,8 +412,7 @@
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.base.Graph.from_dict">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Instantiates a Graph object from a dictionary.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiates a Graph object from a dictionary.</span>
 
 <span class="sd">        See as_dict() and monty package (MSONable) for more information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -437,10 +436,7 @@
 
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
-            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">()</span><span class="si">}</span><span class="s2"> nodes and </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_edges</span><span class="p">()</span><span class="si">}</span><span class="s2"> edges&quot;</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">()</span><span class="si">}</span><span class="s2"> nodes and </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_edges</span><span class="p">()</span><span class="si">}</span><span class="s2"> edges&quot;</span></div>
 
 </pre></div>
         </article>
@@ -473,7 +469,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.jobs.core - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -250,7 +250,7 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">ray</span>
@@ -284,6 +284,8 @@
 <span class="kn">from</span> <span class="nn">rxn_network.utils.ray</span> <span class="kn">import</span> <span class="n">initialize_ray</span><span class="p">,</span> <span class="n">to_iterator</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+
     <span class="kn">from</span> <span class="nn">rxn_network.costs.base</span> <span class="kn">import</span> <span class="n">CostFunction</span>
     <span class="kn">from</span> <span class="nn">rxn_network.entries.entry_set</span> <span class="kn">import</span> <span class="n">GibbsEntrySet</span>
     <span class="kn">from</span> <span class="nn">rxn_network.enumerators.base</span> <span class="kn">import</span> <span class="n">Enumerator</span>
@@ -296,8 +298,7 @@
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.core.GetEntrySetMaker">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">GetEntrySetMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Maker to create job for acquiring and processing entries to be used in reaction</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maker to create job for acquiring and processing entries to be used in reaction</span>
 <span class="sd">    enumeration or network building. See GibbsEntrySet for more information about how</span>
 <span class="sd">    these are constructed.</span>
 
@@ -354,8 +355,7 @@
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.core.GetEntrySetMaker.make">[docs]</a>
     <span class="nd">@job</span><span class="p">(</span><span class="n">entries</span><span class="o">=</span><span class="s2">&quot;entries&quot;</span><span class="p">,</span> <span class="n">output_schema</span><span class="o">=</span><span class="n">EntrySetDocument</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chemsys</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a job that acquires a GibbsEntrySet for the desired chemical system.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a job that acquires a GibbsEntrySet for the desired chemical system.</span>
 
 <span class="sd">        NOTE: This job stores the entry set in an additional store called</span>
 <span class="sd">        &quot;entries&quot;. This needs to be configured through a user&#39;s jobflow.yaml file. See</span>
@@ -385,10 +385,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="kn">from</span> <span class="nn">mp_api.client</span> <span class="kn">import</span> <span class="n">MPRester</span>
             <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                    <span class="s2">&quot;You may need to install the Materials Project API: pip install -U&quot;</span>
-                    <span class="s2">&quot; mp-api&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;You may need to install the Materials Project API: pip install -U mp-api&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
 
             <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">MP_API_KEY</span><span class="p">:</span>
@@ -406,15 +403,11 @@
                 <span class="n">other_elems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exclude_elems</span><span class="p">(</span><span class="n">elems</span><span class="p">)</span>
 
                 <span class="k">with</span> <span class="n">MPRester</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">mpr</span><span class="p">:</span>
-                    <span class="n">docs</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-                        <span class="n">exclude_elements</span><span class="o">=</span><span class="n">other_elems</span><span class="p">,</span> <span class="n">all_fields</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">deprecated</span><span class="o">=</span><span class="kc">False</span>
-                    <span class="p">)</span>
+                    <span class="n">docs</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">exclude_elements</span><span class="o">=</span><span class="n">other_elems</span><span class="p">,</span> <span class="n">all_fields</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">deprecated</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">mpids</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">material_id</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
 
                 <span class="k">with</span> <span class="n">MPRester</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">mpr</span><span class="p">:</span>
-                    <span class="n">entries</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_entries</span><span class="p">(</span>
-                        <span class="n">mpids</span><span class="p">,</span> <span class="n">additional_criteria</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;thermo_types&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;GGA_GGA+U&quot;</span><span class="p">]}</span>
-                    <span class="p">)</span>
+                    <span class="n">entries</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_entries</span><span class="p">(</span><span class="n">mpids</span><span class="p">,</span> <span class="n">additional_criteria</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;thermo_types&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;GGA_GGA+U&quot;</span><span class="p">]})</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_entries</span><span class="p">:</span>
             <span class="n">entries</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_entries</span><span class="p">)</span>
@@ -445,8 +438,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_get_exclude_elems</span><span class="p">(</span><span class="n">elems</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the inverse element selection. Helpful for faster querying of very large</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the inverse element selection. Helpful for faster querying of very large</span>
 <span class="sd">        chemical systems).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">exclude_elems</span> <span class="o">=</span> <span class="p">[]</span>
@@ -463,8 +455,7 @@
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.core.ReactionEnumerationMaker">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ReactionEnumerationMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Maker to create a job for enumerating reactions from a set of entries. This is</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maker to create a job for enumerating reactions from a set of entries. This is</span>
 <span class="sd">    effectively a wrapper to the run_enumerators() function (see enumerators.utils) with</span>
 <span class="sd">    a defined output document.</span>
 
@@ -484,8 +475,7 @@
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.core.ReactionEnumerationMaker.make">[docs]</a>
     <span class="nd">@job</span><span class="p">(</span><span class="n">rxns</span><span class="o">=</span><span class="s2">&quot;rxns&quot;</span><span class="p">,</span> <span class="n">output_schema</span><span class="o">=</span><span class="n">EnumeratorTaskDocument</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enumerators</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">],</span> <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a job that enumerates reactions from a set of entries.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a job that enumerates reactions from a set of entries.</span>
 
 <span class="sd">        NOTE: This job stores the reaction set in an additional store called</span>
 <span class="sd">        &quot;rxns&quot;. This needs to be configured through a user&#39;s jobflow.yaml file. See</span>
@@ -511,9 +501,7 @@
     <span class="k">def</span> <span class="nf">_get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enumerators</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">],</span> <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Acquires common metadata provided to output document.&quot;&quot;&quot;</span>
         <span class="n">chemsys</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">entries</span><span class="o">.</span><span class="n">chemsys</span><span class="p">)</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">target</span> <span class="k">for</span> <span class="n">enumerator</span> <span class="ow">in</span> <span class="n">enumerators</span> <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">enumerator</span><span class="o">.</span><span class="n">targets</span>
-        <span class="p">}</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">{</span><span class="n">target</span> <span class="k">for</span> <span class="n">enumerator</span> <span class="ow">in</span> <span class="n">enumerators</span> <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">enumerator</span><span class="o">.</span><span class="n">targets</span><span class="p">}</span>
 
         <span class="n">added_elements</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">added_chemsys</span> <span class="o">=</span> <span class="kc">None</span>
@@ -521,15 +509,14 @@
         <span class="k">if</span> <span class="n">targets</span><span class="p">:</span>
             <span class="n">added_elements</span><span class="p">,</span> <span class="n">added_chemsys</span> <span class="o">=</span> <span class="n">get_added_elem_data</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
-        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Element</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)],</span>
             <span class="s2">&quot;chemsys&quot;</span><span class="p">:</span> <span class="n">chemsys</span><span class="p">,</span>
             <span class="s2">&quot;enumerators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">enumerators</span><span class="p">],</span>
-            <span class="s2">&quot;targets&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">targets</span><span class="p">)),</span>
+            <span class="s2">&quot;targets&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span>
             <span class="s2">&quot;added_elements&quot;</span><span class="p">:</span> <span class="n">added_elements</span><span class="p">,</span>
             <span class="s2">&quot;added_chemsys&quot;</span><span class="p">:</span> <span class="n">added_chemsys</span><span class="p">,</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">metadata</span></div>
+        <span class="p">}</span></div>
 
 
 
@@ -537,17 +524,13 @@
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.core.CalculateCompetitionMaker">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">CalculateCompetitionMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Maker to create job for calculating selectivities of a set of reactions given a</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maker to create job for calculating selectivities of a set of reactions given a</span>
 <span class="sd">    provided target formula. This is a component of the SynthesisPlanningFlowMaker.</span>
 
-<span class="sd">    If you use this code in your work, please consider citing the following work:</span>
+<span class="sd">    If you use this code in your work, please cite the following work:</span>
 
-<span class="sd">        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.</span>
-<span class="sd">        A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;</span>
-<span class="sd">        Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of</span>
-<span class="sd">        Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv</span>
-<span class="sd">        August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.</span>
+<span class="sd">        McDermott, M. J. et al. Assessing Thermodynamic Selectivity of Solid-State Reactions for the Predictive</span>
+<span class="sd">        Synthesis of Inorganic Materials. ACS Cent. Sci. (2023) doi:10.1021/acscentsci.3c01051.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: The name of the job. Automatically created if not provided.</span>
@@ -577,18 +560,13 @@
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">open_formula</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">Composition</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">))</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_formula</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">))</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="k">else</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="CalculateCompetitionMaker.make">
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.core.CalculateCompetitionMaker.make">[docs]</a>
     <span class="nd">@job</span><span class="p">(</span><span class="n">rxns</span><span class="o">=</span><span class="s2">&quot;rxns&quot;</span><span class="p">,</span> <span class="n">output_schema</span><span class="o">=</span><span class="n">CompetitionTaskDocument</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">make</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">rxn_sets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ReactionSet</span><span class="p">],</span> <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span> <span class="n">target_formula</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a job that calculates competition scores and/or chemical potential</span>
+    <span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn_sets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ReactionSet</span><span class="p">],</span> <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span> <span class="n">target_formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a job that calculates competition scores and/or chemical potential</span>
 <span class="sd">        distances for all synthesis reactions to a target phase given a provided list of</span>
 <span class="sd">        reaction sets.</span>
 
@@ -639,20 +617,14 @@
 
         <span class="n">target_rxns</span> <span class="o">=</span> <span class="n">all_rxns</span><span class="o">.</span><span class="n">get_rxns_by_product</span><span class="p">(</span><span class="n">target_formula</span><span class="p">,</span> <span class="n">return_set</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Identified </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">target_rxns</span><span class="p">)</span><span class="si">}</span><span class="s2"> target reactions out of&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> total reactions.&quot;</span>
-        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Identified </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">target_rxns</span><span class="p">)</span><span class="si">}</span><span class="s2"> target reactions out of </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> total reactions.&quot;</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;Removing unnecessary reactions from total reactions to save memory...&quot;</span>
-        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Removing unnecessary reactions from total reactions to save memory...&quot;</span><span class="p">)</span>
 
-        <span class="n">all_target_reactants</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">reactant</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">target_rxns</span> <span class="k">for</span> <span class="n">reactant</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">reactants</span>
-        <span class="p">}</span>
+        <span class="n">all_target_reactants</span> <span class="o">=</span> <span class="p">{</span><span class="n">reactant</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">target_rxns</span> <span class="k">for</span> <span class="n">reactant</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">reactants</span><span class="p">}</span>
         <span class="n">all_rxns</span> <span class="o">=</span> <span class="n">all_rxns</span><span class="o">.</span><span class="n">get_rxns_by_reactants</span><span class="p">(</span>
-            <span class="n">all_target_reactants</span><span class="p">,</span> <span class="n">return_set</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># type: ignore</span>
+            <span class="n">all_target_reactants</span><span class="p">,</span>
+            <span class="n">return_set</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
         <span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keeping </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_rxns</span><span class="p">)</span><span class="si">}</span><span class="s2"> out of </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> total reactions...&quot;</span><span class="p">)</span>
@@ -667,9 +639,7 @@
         <span class="n">decorated_rxns</span> <span class="o">=</span> <span class="n">target_rxns</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_competition</span><span class="p">:</span>
-            <span class="n">decorated_rxns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_competition_decorated_rxns</span><span class="p">(</span>
-                <span class="n">target_rxns</span><span class="p">,</span> <span class="n">all_rxns</span><span class="p">,</span> <span class="n">size</span>
-            <span class="p">)</span>
+            <span class="n">decorated_rxns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_competition_decorated_rxns</span><span class="p">(</span><span class="n">target_rxns</span><span class="p">,</span> <span class="n">all_rxns</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating chemical potential distances...&quot;</span><span class="p">)</span>
 
@@ -709,12 +679,8 @@
         <span class="n">needed_memory_per_cpu</span> <span class="o">=</span> <span class="n">memory_per_rxn</span> <span class="o">*</span> <span class="n">num_rxns</span>
 
         <span class="k">if</span> <span class="n">num_cpus</span> <span class="o">*</span> <span class="n">needed_memory_per_cpu</span> <span class="o">&gt;</span> <span class="n">available_memory</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s2">&quot;Not enough memory to use all CPUs simultaneously. Adjusting....&quot;</span>
-            <span class="p">)</span>
-            <span class="n">chunk_size</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_rxns</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="n">available_memory</span> <span class="o">//</span> <span class="n">needed_memory_per_cpu</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Not enough memory to use all CPUs simultaneously. Adjusting....&quot;</span><span class="p">)</span>
+            <span class="n">chunk_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_rxns</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="n">available_memory</span> <span class="o">//</span> <span class="n">needed_memory_per_cpu</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting new chunk size to </span><span class="si">{</span><span class="n">chunk_size</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">grouper</span><span class="p">(</span>
@@ -723,9 +689,9 @@
             <span class="n">fillvalue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">):</span>
             <span class="n">rxn_chunk_refs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_get_competition_decorated_rxns_by_chunk</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
-                    <span class="n">memory</span><span class="o">=</span><span class="n">num_rxns</span> <span class="o">*</span> <span class="n">memory_per_rxn</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">all_rxns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_formula</span><span class="p">)</span>
+                <span class="n">_get_competition_decorated_rxns_by_chunk</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">memory</span><span class="o">=</span><span class="n">num_rxns</span> <span class="o">*</span> <span class="n">memory_per_rxn</span><span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
+                    <span class="n">chunk</span><span class="p">,</span> <span class="n">all_rxns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_formula</span>
+                <span class="p">)</span>
             <span class="p">)</span>
 
         <span class="n">decorated_rxns</span> <span class="o">=</span> <span class="p">[]</span>
@@ -759,9 +725,7 @@
             <span class="n">fillvalue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">):</span>
             <span class="n">rxn_chunk_refs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_get_chempot_decorated_rxns_by_chunk</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
-                    <span class="n">chunk</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">cpd_kwargs</span><span class="p">,</span> <span class="n">open_elem</span><span class="p">,</span> <span class="n">chempot</span>
-                <span class="p">)</span>
+                <span class="n">_get_chempot_decorated_rxns_by_chunk</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">cpd_kwargs</span><span class="p">,</span> <span class="n">open_elem</span><span class="p">,</span> <span class="n">chempot</span><span class="p">)</span>
             <span class="p">)</span>
 
         <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rxn_chunk_refs</span><span class="p">)</span>
@@ -781,8 +745,7 @@
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.core.NetworkMaker">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">NetworkMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Maker for generating reaction networks and performing pathfinding from a set of</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maker for generating reaction networks and performing pathfinding from a set of</span>
 <span class="sd">    previously enumerated reactions. This is a component of the NetworkFlowMaker.</span>
 
 <span class="sd">    If you use this code in your own work, please consider citing this paper:</span>
@@ -823,8 +786,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">rxn_sets</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ReactionSet</span><span class="p">],</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a job that creates a reaction network from an iterable of reaction sets</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a job that creates a reaction network from an iterable of reaction sets</span>
 <span class="sd">        (coming from reaction enumeration).</span>
 
 <span class="sd">        NOTE: This job stores the network object in an additional store called</span>
@@ -877,8 +839,7 @@
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.core.PathwaySolverMaker">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">PathwaySolverMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Maker for solving balanced reaction pathways from a set of (unbalanced) pathways</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maker for solving balanced reaction pathways from a set of (unbalanced) pathways</span>
 <span class="sd">    returned as part of reaction network analysis.</span>
 
 <span class="sd">    If you use this code in your own work, please consider citing this paper:</span>
@@ -948,8 +909,7 @@
         <span class="n">pathways</span><span class="p">:</span> <span class="n">PathwaySet</span><span class="p">,</span>
         <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a job that produces balanced pathways from raw pathways coming out of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a job that produces balanced pathways from raw pathways coming out of</span>
 <span class="sd">        network pathfinding.</span>
 
 <span class="sd">        NOTE: This job stores the network object in an additional store called</span>
@@ -1008,12 +968,11 @@
 
 <span class="k">def</span> <span class="nf">_get_competition_decorated_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">competing_rxns</span><span class="p">,</span> <span class="n">precursors_list</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the primary and secondary competition for a reaction and stores them</span>
-<span class="sd">    within the data dict.&quot;&quot;&quot;</span>
+<span class="sd">    within the data dict.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">precursors_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">energy</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">energy_per_atom</span>
-        <span class="n">other_energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">energy_per_atom</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">competing_rxns</span> <span class="k">if</span> <span class="n">r</span> <span class="o">!=</span> <span class="n">rxn</span><span class="p">]</span>
-        <span class="p">)</span>
+        <span class="n">other_energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="o">.</span><span class="n">energy_per_atom</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">competing_rxns</span> <span class="k">if</span> <span class="n">r</span> <span class="o">!=</span> <span class="n">rxn</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">other_energies</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="n">other_energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other_energies</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>  <span class="c1"># need identity reaction</span>
 
@@ -1021,9 +980,7 @@
 
         <span class="n">energy_diffs</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">energy_per_atom</span> <span class="o">-</span> <span class="n">other_energies</span>
         <span class="n">secondary_rxn_energies</span> <span class="o">=</span> <span class="n">energy_diffs</span><span class="p">[</span><span class="n">energy_diffs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">secondary_competition</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">secondary_rxn_energies</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">if</span> <span class="n">secondary_rxn_energies</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="k">else</span> <span class="mf">0.0</span>
-        <span class="p">)</span>
+        <span class="n">secondary_competition</span> <span class="o">=</span> <span class="n">secondary_rxn_energies</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">if</span> <span class="n">secondary_rxn_energies</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="k">else</span> <span class="mf">0.0</span>
         <span class="n">rxn</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;primary_competition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">primary_competition</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
         <span class="n">rxn</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;secondary_competition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">secondary_competition</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 
@@ -1046,13 +1003,9 @@
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
 <span class="k">def</span> <span class="nf">_get_competition_decorated_rxns_by_chunk</span><span class="p">(</span><span class="n">rxn_chunk</span><span class="p">,</span> <span class="n">all_rxns</span><span class="p">,</span> <span class="n">open_formula</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Performs competition score calculations within a chunk of reactions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Performs competition score calculations within a chunk of reactions.&quot;&quot;&quot;</span>
     <span class="n">decorated_rxns</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">all_rxns</span> <span class="o">=</span> <span class="n">ReactionSet</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
-        <span class="n">all_rxns</span>
-    <span class="p">)</span>  <span class="c1"># stored in Ray as a dict (should be memory efficient)</span>
+    <span class="n">all_rxns</span> <span class="o">=</span> <span class="n">ReactionSet</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">all_rxns</span><span class="p">)</span>  <span class="c1"># stored in Ray as a dict (should be memory efficient)</span>
 
     <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">rxn_chunk</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">rxn</span><span class="p">:</span>
@@ -1072,17 +1025,13 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only have 2 precursors, excluding open element!&quot;</span><span class="p">)</span>
 
-        <span class="n">decorated_rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_get_competition_decorated_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">competing_rxns</span><span class="p">,</span> <span class="n">reactant_formulas</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">decorated_rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_get_competition_decorated_rxn</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">competing_rxns</span><span class="p">,</span> <span class="n">reactant_formulas</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">decorated_rxns</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">_get_chempot_decorated_rxns_by_chunk</span><span class="p">(</span>
-    <span class="n">rxn_chunk</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">cpd_kwargs</span><span class="p">,</span> <span class="n">open_elem</span><span class="p">,</span> <span class="n">chempot</span>
-<span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_chempot_decorated_rxns_by_chunk</span><span class="p">(</span><span class="n">rxn_chunk</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">cpd_kwargs</span><span class="p">,</span> <span class="n">open_elem</span><span class="p">,</span> <span class="n">chempot</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates total chemical potential distance for a chunk of reactions.&quot;&quot;&quot;</span>
     <span class="n">cpd_calc_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">new_rxns</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1096,14 +1045,13 @@
         <span class="n">chemsys</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">chemical_system</span>
         <span class="n">elems</span> <span class="o">=</span> <span class="n">chemsys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">cpd_calc</span> <span class="ow">in</span> <span class="n">cpd_calc_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">cpd_calculator</span> <span class="ow">in</span> <span class="n">cpd_calc_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">elems</span><span class="p">):</span>
+                <span class="n">cpd_calc</span> <span class="o">=</span> <span class="n">cpd_calculator</span>
                 <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">open_elem</span><span class="p">:</span>
-                <span class="n">filtered_entries</span> <span class="o">=</span> <span class="n">entries</span><span class="o">.</span><span class="n">get_subset_in_chemsys</span><span class="p">(</span>
-                    <span class="n">elems</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">open_elem</span><span class="p">)]</span>
-                <span class="p">)</span>
+                <span class="n">filtered_entries</span> <span class="o">=</span> <span class="n">entries</span><span class="o">.</span><span class="n">get_subset_in_chemsys</span><span class="p">([</span><span class="o">*</span><span class="n">elems</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">open_elem</span><span class="p">)])</span>
                 <span class="n">filtered_entries</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="n">e</span><span class="o">.</span><span class="n">to_grand_entry</span><span class="p">({</span><span class="n">Element</span><span class="p">(</span><span class="n">open_elem</span><span class="p">):</span> <span class="n">chempot</span><span class="p">})</span>
                     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">filtered_entries</span>
@@ -1112,16 +1060,13 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">filtered_entries</span> <span class="o">=</span> <span class="n">entries</span><span class="o">.</span><span class="n">get_subset_in_chemsys</span><span class="p">(</span><span class="n">elems</span><span class="p">)</span>
 
-            <span class="n">cpd_calc</span> <span class="o">=</span> <span class="n">ChempotDistanceCalculator</span><span class="o">.</span><span class="n">from_entries</span><span class="p">(</span>
-                <span class="n">filtered_entries</span><span class="p">,</span> <span class="o">**</span><span class="n">cpd_kwargs</span>
-            <span class="p">)</span>
+            <span class="n">cpd_calc</span> <span class="o">=</span> <span class="n">ChempotDistanceCalculator</span><span class="o">.</span><span class="n">from_entries</span><span class="p">(</span><span class="n">filtered_entries</span><span class="p">,</span> <span class="o">**</span><span class="n">cpd_kwargs</span><span class="p">)</span>
             <span class="n">cpd_calc_dict</span><span class="p">[</span><span class="n">chemsys</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpd_calc</span>
 
         <span class="n">new_rxn</span> <span class="o">=</span> <span class="n">cpd_calc</span><span class="o">.</span><span class="n">decorate</span><span class="p">(</span><span class="n">rxn</span><span class="p">)</span>
         <span class="n">new_rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_rxn</span><span class="p">)</span>
 
-    <span class="n">results</span> <span class="o">=</span> <span class="n">ReactionSet</span><span class="o">.</span><span class="n">from_rxns</span><span class="p">(</span><span class="n">new_rxns</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">results</span>
+    <span class="k">return</span> <span class="n">ReactionSet</span><span class="o">.</span><span class="n">from_rxns</span><span class="p">(</span><span class="n">new_rxns</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">)</span>
 </pre></div>
         </article>
       </div>
@@ -1153,7 +1098,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

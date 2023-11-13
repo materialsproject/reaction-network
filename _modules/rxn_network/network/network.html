@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.network.network - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,14 +245,11 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.network.network</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Implementation of reaction network and graph classes.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Implementation of reaction network and graph classes.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Empty</span><span class="p">,</span> <span class="n">PriorityQueue</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span> <span class="nn">rustworkx</span> <span class="k">as</span> <span class="nn">rx</span>
 <span class="kn">from</span> <span class="nn">pymatgen.entries</span> <span class="kn">import</span> <span class="n">Entry</span>
@@ -266,12 +263,14 @@
 <span class="kn">from</span> <span class="nn">rxn_network.pathways.pathway_set</span> <span class="kn">import</span> <span class="n">PathwaySet</span>
 <span class="kn">from</span> <span class="nn">rxn_network.reactions.computed</span> <span class="kn">import</span> <span class="n">ComputedReaction</span>
 <span class="kn">from</span> <span class="nn">rxn_network.reactions.open</span> <span class="kn">import</span> <span class="n">OpenComputedReaction</span>
-<span class="kn">from</span> <span class="nn">rxn_network.reactions.reaction_set</span> <span class="kn">import</span> <span class="n">ReactionSet</span>
 <span class="kn">from</span> <span class="nn">rxn_network.utils.funcs</span> <span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+
     <span class="kn">from</span> <span class="nn">rxn_network.costs.base</span> <span class="kn">import</span> <span class="n">CostFunction</span>
     <span class="kn">from</span> <span class="nn">rxn_network.reactions.base</span> <span class="kn">import</span> <span class="n">Reaction</span>
+    <span class="kn">from</span> <span class="nn">rxn_network.reactions.reaction_set</span> <span class="kn">import</span> <span class="n">ReactionSet</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -279,8 +278,7 @@
 <div class="viewcode-block" id="ReactionNetwork">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.network.ReactionNetwork">[docs]</a>
 <span class="k">class</span> <span class="nc">ReactionNetwork</span><span class="p">(</span><span class="n">Network</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Main reaction network class for building graph networks and performing</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main reaction network class for building graph networks and performing</span>
 <span class="sd">    pathfinding. Graphs are built using the rustworkx package (a NetworkX equivalent</span>
 <span class="sd">    implemented in Rust).</span>
 
@@ -295,10 +293,9 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">rxns</span><span class="p">:</span> <span class="n">ReactionSet</span><span class="p">,</span>
-        <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Softplus</span><span class="p">),</span>
+        <span class="n">cost_function</span><span class="p">:</span> <span class="n">CostFunction</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize a ReactionNetwork object for a reaction set and cost function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a ReactionNetwork object for a reaction set and cost function.</span>
 
 <span class="sd">        To build the graph network, call the build() method in-place.</span>
 
@@ -308,13 +305,15 @@
 <span class="sd">                edge. Defaults to a Softplus function with default settings (i.e.</span>
 <span class="sd">                energy_per_atom only).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cost_function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cost_function</span> <span class="o">=</span> <span class="n">Softplus</span><span class="p">()</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">rxns</span><span class="o">=</span><span class="n">rxns</span><span class="p">,</span> <span class="n">cost_function</span><span class="o">=</span><span class="n">cost_function</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ReactionNetwork.build">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.network.ReactionNetwork.build">[docs]</a>
     <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        In-place method. Construct the reaction network graph object and store under the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;In-place method. Construct the reaction network graph object and store under the</span>
 <span class="sd">        &quot;graph&quot; attribute.</span>
 
 <span class="sd">        WARNING: This does NOT initialize the precursors or target attributes; you must</span>
@@ -340,11 +339,8 @@
 
 <div class="viewcode-block" id="ReactionNetwork.find_pathways">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.network.ReactionNetwork.find_pathways">[docs]</a>
-    <span class="k">def</span> <span class="nf">find_pathways</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Entry</span> <span class="o">|</span> <span class="nb">str</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">BasicPathway</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Find the k-shortest paths to a provided list of one or more targets.</span>
+    <span class="k">def</span> <span class="nf">find_pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Entry</span> <span class="o">|</span> <span class="nb">str</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">BasicPathway</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the k-shortest paths to a provided list of one or more targets.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            targets: List of the formulas or entry objects of each target.</span>
@@ -366,16 +362,13 @@
             <span class="n">pathways</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_shortest_paths</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
             <span class="n">paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pathways</span><span class="p">)</span>
 
-        <span class="n">paths</span> <span class="o">=</span> <span class="n">PathwaySet</span><span class="o">.</span><span class="n">from_paths</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">paths</span></div>
+        <span class="k">return</span> <span class="n">PathwaySet</span><span class="o">.</span><span class="n">from_paths</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ReactionNetwork.set_precursors">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.network.ReactionNetwork.set_precursors">[docs]</a>
     <span class="k">def</span> <span class="nf">set_precursors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        In-place method. Sets the precursors of the network. Removes all references to</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;In-place method. Sets the precursors of the network. Removes all references to</span>
 <span class="sd">        previous precursors.</span>
 
 <span class="sd">        If entries are provided, will use the entries to set the precursors. If strings</span>
@@ -393,9 +386,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must call build() before setting precursors!&quot;</span><span class="p">)</span>
 
         <span class="n">precursors</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">p</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">))</span>
-            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">p</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="n">ExperimentalReferenceEntry</span><span class="p">))</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">precursors</span>
         <span class="p">}</span>
 
@@ -407,10 +398,7 @@
         <span class="n">precursors_entry</span> <span class="o">=</span> <span class="n">NetworkEntry</span><span class="p">(</span><span class="n">precursors</span><span class="p">,</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">:</span>  <span class="c1"># remove old precursors</span>
             <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">node_indices</span><span class="p">():</span>
-                <span class="k">if</span> <span class="p">(</span>
-                    <span class="n">g</span><span class="o">.</span><span class="n">get_node_data</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span>
-                    <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="o">.</span><span class="n">value</span>
-                <span class="p">):</span>
+                <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">get_node_data</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
                     <span class="n">g</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
                     <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
@@ -442,8 +430,7 @@
 <div class="viewcode-block" id="ReactionNetwork.set_target">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.network.ReactionNetwork.set_target">[docs]</a>
     <span class="k">def</span> <span class="nf">set_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Entry</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        In-place method. Can only provide one target entry or formula at a time.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;In-place method. Can only provide one target entry or formula at a time.</span>
 
 <span class="sd">        If entry is provided, will use that entry to set the target. If string is</span>
 <span class="sd">        provided, will automatically find minimum-energy entry with</span>
@@ -473,10 +460,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">node_indices</span><span class="p">():</span>
-                <span class="k">if</span> <span class="p">(</span>
-                    <span class="n">g</span><span class="o">.</span><span class="n">get_node_data</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span>
-                    <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="o">.</span><span class="n">value</span>
-                <span class="p">):</span>
+                <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">get_node_data</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
                     <span class="n">g</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
                     <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
@@ -502,7 +486,8 @@
 
     <span class="k">def</span> <span class="nf">_k_shortest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wrapper for finding the k shortest paths using Yen&#39;s algorithm. Returns</span>
-<span class="sd">        BasicPathway objects&quot;&quot;&quot;</span>
+<span class="sd">        BasicPathway objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must call build() before pathfinding!&quot;</span><span class="p">)</span>
@@ -511,9 +496,7 @@
         <span class="n">precursors_node</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">find_node_by_weight</span><span class="p">(</span>
             <span class="n">NetworkEntry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursors</span><span class="p">,</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Precursors</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="p">)</span>
-        <span class="n">target_node</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">find_node_by_weight</span><span class="p">(</span>
-            <span class="n">NetworkEntry</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">target_node</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">find_node_by_weight</span><span class="p">(</span><span class="n">NetworkEntry</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">],</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Target</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">yens_ksp</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost_function</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">precursors_node</span><span class="p">,</span> <span class="n">target_node</span><span class="p">):</span>
             <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path_from_graph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost_function</span><span class="p">))</span>
 
@@ -524,15 +507,12 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_path_from_graph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">cf</span><span class="p">:</span> <span class="n">CostFunction</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets a BasicPathway object from a shortest path found in the network&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets a BasicPathway object from a shortest path found in the network.&quot;&quot;&quot;</span>
         <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">costs</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-            <span class="k">if</span> <span class="p">(</span>
-                <span class="n">g</span><span class="o">.</span><span class="n">get_node_data</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span>
-                <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Products</span><span class="o">.</span><span class="n">value</span>
-            <span class="p">):</span>
+            <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">get_node_data</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">NetworkEntryType</span><span class="o">.</span><span class="n">Products</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
                 <span class="n">e</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="n">step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">node</span><span class="p">)</span>
 
                 <span class="n">rxns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
@@ -547,8 +527,7 @@
 <span class="k">def</span> <span class="nf">get_rxn_nodes_and_edges</span><span class="p">(</span>
     <span class="n">rxns</span><span class="p">:</span> <span class="n">ReactionSet</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">NetworkEntry</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Reaction</span><span class="p">]]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given a reaction set, return a list of nodes and edges for constructing the</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a reaction set, return a list of nodes and edges for constructing the</span>
 <span class="sd">    reaction network.</span>
 
 <span class="sd">    Args:</span>
@@ -588,9 +567,8 @@
 <span class="k">def</span> <span class="nf">get_loopback_edges</span><span class="p">(</span>
     <span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NetworkEntry</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given a list of nodes to check, this function finds and returns loopback</span>
-<span class="sd">    edges (i.e., edges that connect a product node to its equivalent reactant node)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a list of nodes to check, this function finds and returns loopback</span>
+<span class="sd">    edges (i.e., edges that connect a product node to its equivalent reactant node).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        nodes: List of vertices from which to find loopback edges</span>
@@ -615,13 +593,13 @@
 <div class="viewcode-block" id="get_edge_weight">
 <a class="viewcode-back" href="../../../rxn_network.network.html#rxn_network.network.network.get_edge_weight">[docs]</a>
 <span class="k">def</span> <span class="nf">get_edge_weight</span><span class="p">(</span><span class="n">edge_obj</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">cf</span><span class="p">:</span> <span class="n">CostFunction</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given an edge of a reaction network, calculates the cost/weight of that edge.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given an edge of a reaction network, calculates the cost/weight of that edge.</span>
 <span class="sd">    Corresponds to zero for loopback &amp; precursor/target edges. Evaluates cost function</span>
 <span class="sd">    for all reaction edges.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        edge_obj: An edge in the reaction network</span>
+<span class="sd">        cf: Cost function for evaluating edge weights</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge_obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">edge_obj</span> <span class="ow">in</span> <span class="p">[</span>
         <span class="s2">&quot;loopback_edge&quot;</span><span class="p">,</span>
@@ -645,8 +623,7 @@
     <span class="n">precursors_node</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">target_node</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Yen&#39;s Algorithm for k-shortest paths, adopted for rustworkx.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yen&#39;s Algorithm for k-shortest paths, adopted for rustworkx.</span>
 
 <span class="sd">    This implementation was inspired by the igraph implementation by Antonin Lenfant.</span>
 
@@ -667,14 +644,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">path_cost</span><span class="p">(</span><span class="n">nodes</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates path cost given a list of nodes&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates path cost given a list of nodes.&quot;&quot;&quot;</span>
         <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
             <span class="n">cost</span> <span class="o">+=</span> <span class="n">get_edge_weight</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">cf</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cost</span>
 
     <span class="k">def</span> <span class="nf">get_edge_weight_with_cf</span><span class="p">(</span><span class="n">edge_obj</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Includes user-specified cost function in function call&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Includes user-specified cost function in function call.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_edge_weight</span><span class="p">(</span><span class="n">edge_obj</span><span class="p">,</span> <span class="n">cf</span><span class="p">)</span>
 
     <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -770,7 +747,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.flows.core - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -249,17 +249,14 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Collection</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">from</span> <span class="nn">jobflow</span> <span class="kn">import</span> <span class="n">Flow</span><span class="p">,</span> <span class="n">Maker</span>
 <span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="kn">import</span> <span class="n">Element</span>
 
 <span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
 <span class="kn">from</span> <span class="nn">rxn_network.enumerators.basic</span> <span class="kn">import</span> <span class="n">BasicEnumerator</span><span class="p">,</span> <span class="n">BasicOpenEnumerator</span>
-<span class="kn">from</span> <span class="nn">rxn_network.enumerators.minimize</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MinimizeGibbsEnumerator</span><span class="p">,</span>
-    <span class="n">MinimizeGrandPotentialEnumerator</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">rxn_network.enumerators.minimize</span> <span class="kn">import</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">,</span> <span class="n">MinimizeGrandPotentialEnumerator</span>
 <span class="kn">from</span> <span class="nn">rxn_network.jobs.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CalculateCompetitionMaker</span><span class="p">,</span>
     <span class="n">GetEntrySetMaker</span><span class="p">,</span>
@@ -270,6 +267,8 @@
 <span class="kn">from</span> <span class="nn">rxn_network.utils.funcs</span> <span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterable</span>
+
     <span class="kn">from</span> <span class="nn">rxn_network.entries.entry_set</span> <span class="kn">import</span> <span class="n">GibbsEntrySet</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -279,18 +278,18 @@
 <a class="viewcode-back" href="../../../rxn_network.flows.html#rxn_network.flows.core.SynthesisPlanningFlowMaker">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SynthesisPlanningFlowMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Maker to create an inorganic synthesis planning workflow. This flow has three</span>
-<span class="sd">    stages:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maker to create an inorganic synthesis planning workflow. This flow has three</span>
+<span class="sd">    stages.</span>
 
-<span class="sd">    1)  Entries are acquired via `GetEntrySetMaker`. This job both gets the computed</span>
-<span class="sd">        entries from a databse (e.g., Materials Project) and processes them for use in</span>
-<span class="sd">        the reaction network.</span>
-<span class="sd">    2)  Reactions are enumerated via the provided `ReactionEnumerationMaker` (and</span>
-<span class="sd">        associated enumerators). This computes the full reaction network so that</span>
-<span class="sd">        selectivities can be calculated.</span>
-<span class="sd">    3)  The competition of all synthesis reactions to the desired target is assessed via</span>
-<span class="sd">        the `CalculateCompetitionMaker`.</span>
+<span class="sd">    Steps:</span>
+<span class="sd">        1)  Entries are acquired via `GetEntrySetMaker`. This job both gets the computed</span>
+<span class="sd">            entries from a databse (e.g., Materials Project) and processes them for use in</span>
+<span class="sd">            the reaction network.</span>
+<span class="sd">        2)  Reactions are enumerated via the provided `ReactionEnumerationMaker` (and</span>
+<span class="sd">            associated enumerators). This computes the full reaction network so that</span>
+<span class="sd">            selectivities can be calculated.</span>
+<span class="sd">        3)  The competition of all synthesis reactions to the desired target is assessed via</span>
+<span class="sd">            the `CalculateCompetitionMaker`.</span>
 
 <span class="sd">    This flow also has the option to include an &quot;open&quot; element and a list of chempots.</span>
 <span class="sd">    This will enumerate reactions at different conditions and evaluate their</span>
@@ -301,13 +300,10 @@
 <span class="sd">    analysis. For the final &quot;results&quot;, one should access the reaction set produced by</span>
 <span class="sd">    the `CalculateCompetitionMaker` at the conditions of interest.</span>
 
-<span class="sd">    If you use this code in your work, please consider citing the following work:</span>
+<span class="sd">    If you use this code in your work, please cite the following work:</span>
 
-<span class="sd">        McDermott, M. J.; McBride, B. C.; Regier, C.; Tran, G. T.; Chen, Y.; Corrao, A.</span>
-<span class="sd">        A.; Gallant, M. C.; Kamm, G. E.; Bartel, C. J.; Chapman, K. W.; Khalifah, P. G.;</span>
-<span class="sd">        Ceder, G.; Neilson, J. R.; Persson, K. A. Assessing Thermodynamic Selectivity of</span>
-<span class="sd">        Solid-State Reactions for the Predictive Synthesis of Inorganic Materials. arXiv</span>
-<span class="sd">        August 22, 2023. https://doi.org/10.48550/arXiv.2308.11816.</span>
+<span class="sd">        McDermott, M. J. et al. Assessing Thermodynamic Selectivity of Solid-State Reactions for the Predictive</span>
+<span class="sd">        Synthesis of Inorganic Materials. ACS Cent. Sci. (2023) doi:10.1021/acscentsci.3c01051.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: Name of the flow. Automatically generated if not provided.</span>
@@ -335,12 +331,8 @@
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;synthesis_planning&quot;</span>
     <span class="n">get_entry_set_maker</span><span class="p">:</span> <span class="n">GetEntrySetMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">GetEntrySetMaker</span><span class="p">)</span>
-    <span class="n">enumeration_maker</span><span class="p">:</span> <span class="n">ReactionEnumerationMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default_factory</span><span class="o">=</span><span class="n">ReactionEnumerationMaker</span>
-    <span class="p">)</span>
-    <span class="n">calculate_competition_maker</span><span class="p">:</span> <span class="n">CalculateCompetitionMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default_factory</span><span class="o">=</span><span class="n">CalculateCompetitionMaker</span>
-    <span class="p">)</span>
+    <span class="n">enumeration_maker</span><span class="p">:</span> <span class="n">ReactionEnumerationMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ReactionEnumerationMaker</span><span class="p">)</span>
+    <span class="n">calculate_competition_maker</span><span class="p">:</span> <span class="n">CalculateCompetitionMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">CalculateCompetitionMaker</span><span class="p">)</span>
     <span class="n">open_elem</span><span class="p">:</span> <span class="n">Element</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">chempots</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">use_basic_enumerators</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
@@ -350,9 +342,7 @@
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">open_formula</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">Composition</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">))</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_formula</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">))</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="k">else</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SynthesisPlanningFlowMaker.make">
 <a class="viewcode-back" href="../../../rxn_network.flows.html#rxn_network.flows.core.SynthesisPlanningFlowMaker.make">[docs]</a>
@@ -362,8 +352,7 @@
         <span class="n">added_elems</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a flow used for planning optimal synthesis recipes to a specified</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a flow used for planning optimal synthesis recipes to a specified</span>
 <span class="sd">        target.</span>
 
 <span class="sd">        Args:</span>
@@ -387,10 +376,7 @@
         <span class="n">flow_name</span> <span class="o">=</span> <span class="n">flow_name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;, T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K&quot;</span>
 
         <span class="n">chemsys</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="nb">sorted</span><span class="p">(</span>
-                <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Composition</span><span class="p">(</span><span class="n">target_formula</span><span class="p">)</span><span class="o">.</span><span class="n">elements</span><span class="p">}</span>
-                <span class="o">|</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">added_elems</span><span class="p">}</span>
-            <span class="p">)</span>
+            <span class="nb">sorted</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Composition</span><span class="p">(</span><span class="n">target_formula</span><span class="p">)</span><span class="o">.</span><span class="n">elements</span><span class="p">}</span> <span class="o">|</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">added_elems</span><span class="p">})</span>
         <span class="p">)</span>
 
         <span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -398,15 +384,9 @@
         <span class="k">if</span> <span class="n">entries</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">get_entry_set_maker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">update_kwargs</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">name</span>
-                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">, T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K,&quot;</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">, T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K,&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot; +</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">e_above_hull</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2"> eV)&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;formulas_to_include&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span>
-                        <span class="nb">set</span><span class="p">(</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">formulas_to_include</span>
-                            <span class="o">+</span> <span class="p">[</span><span class="n">target_formula</span><span class="p">]</span>
-                        <span class="p">)</span>
-                    <span class="p">),</span>
+                    <span class="s2">&quot;formulas_to_include&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">({</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">formulas_to_include</span><span class="p">,</span> <span class="n">target_formula</span><span class="p">}),</span>
                 <span class="p">}</span>
             <span class="p">)</span>
             <span class="n">get_entry_set_job</span> <span class="o">=</span> <span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">chemsys</span><span class="p">)</span>
@@ -441,9 +421,7 @@
                 <span class="p">)</span>
             <span class="p">)</span>
 
-        <span class="n">enumeration_job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enumeration_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
-            <span class="n">enumerators</span><span class="o">=</span><span class="n">enumerators</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span>
-        <span class="p">)</span>
+        <span class="n">enumeration_job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enumeration_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">enumerators</span><span class="o">=</span><span class="n">enumerators</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">)</span>
         <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">enumeration_job</span><span class="p">)</span>
 
         <span class="n">base_rxn_set</span> <span class="o">=</span> <span class="n">enumeration_job</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">rxns</span>
@@ -458,7 +436,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chempots</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">chempot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chempots</span><span class="p">:</span>
-                <span class="n">subname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(open </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">)</span><span class="si">}</span><span class="s2">, mu=</span><span class="si">{</span><span class="n">chempot</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="n">subname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(open </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="si">!s}</span><span class="s2">, mu=</span><span class="si">{</span><span class="n">chempot</span><span class="si">}</span><span class="s2">)&quot;</span>
                 <span class="n">enumeration_maker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enumeration_maker</span><span class="o">.</span><span class="n">update_kwargs</span><span class="p">(</span>
                     <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">enumeration_maker</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="n">subname</span><span class="p">},</span>
                     <span class="n">nested</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -513,8 +491,7 @@
 <a class="viewcode-back" href="../../../rxn_network.flows.html#rxn_network.flows.core.NetworkFlowMaker">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">NetworkFlowMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Maker to create a chemical reaction network and perform (balanced) pathfinding on</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maker to create a chemical reaction network and perform (balanced) pathfinding on</span>
 <span class="sd">    the network.</span>
 
 <span class="sd">    This flow has four stages:</span>
@@ -563,9 +540,7 @@
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;find_reaction_pathways&quot;</span>
     <span class="n">get_entry_set_maker</span><span class="p">:</span> <span class="n">GetEntrySetMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">GetEntrySetMaker</span><span class="p">)</span>
-    <span class="n">enumeration_maker</span><span class="p">:</span> <span class="n">ReactionEnumerationMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default_factory</span><span class="o">=</span><span class="n">ReactionEnumerationMaker</span>
-    <span class="p">)</span>
+    <span class="n">enumeration_maker</span><span class="p">:</span> <span class="n">ReactionEnumerationMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ReactionEnumerationMaker</span><span class="p">)</span>
     <span class="n">network_maker</span><span class="p">:</span> <span class="n">NetworkMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">NetworkMaker</span><span class="p">)</span>
     <span class="n">solver_maker</span><span class="p">:</span> <span class="n">PathwaySolverMaker</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">open_elem</span><span class="p">:</span> <span class="n">Element</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -577,26 +552,31 @@
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">open_formula</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">Composition</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">))</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_formula</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">))</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="k">else</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="NetworkFlowMaker.make">
 <a class="viewcode-back" href="../../../rxn_network.flows.html#rxn_network.flows.core.NetworkFlowMaker.make">[docs]</a>
-    <span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursors</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a flow used for finding reaction pathways between precursors and targets.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            precursors: precursor formulas</span>
+<span class="sd">            targets: target formulas</span>
+<span class="sd">            entries: Optional entry set. If not provided, entries will be automatically acquired from Materials Project.</span>
+<span class="sd">                Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            _description_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">precursor_formulas</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">precursors</span><span class="p">]</span>
         <span class="n">target_formulas</span> <span class="o">=</span> <span class="p">[</span><span class="n">Composition</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">]</span>
 
         <span class="n">flow_name</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Reaction Network analysis: </span><span class="si">{</span><span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">precursor_formulas</span><span class="p">))</span><span class="si">}</span><span class="s2"> -&gt;&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Reaction network analysis: </span><span class="si">{</span><span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">precursor_formulas</span><span class="p">))</span><span class="si">}</span><span class="s2"> -&gt;&quot;</span>
             <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">target_formulas</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
         <span class="n">chemsys</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">formula</span> <span class="ow">in</span> <span class="n">precursor_formulas</span> <span class="o">+</span> <span class="n">target_formulas</span>
-                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">elements</span>
-            <span class="p">}</span>
+            <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">formula</span> <span class="ow">in</span> <span class="n">precursor_formulas</span> <span class="o">+</span> <span class="n">target_formulas</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Composition</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span><span class="o">.</span><span class="n">elements</span><span class="p">}</span>
         <span class="p">)</span>
 
         <span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -604,15 +584,10 @@
         <span class="k">if</span> <span class="n">entries</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">get_entry_set_maker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">update_kwargs</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">name</span>
-                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">, T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K,&quot;</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">, T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K,&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot; +</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">e_above_hull</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2"> eV)&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;formulas_to_include&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span>
-                        <span class="nb">set</span><span class="p">(</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">formulas_to_include</span>
-                            <span class="o">+</span> <span class="n">precursor_formulas</span>
-                            <span class="o">+</span> <span class="n">target_formulas</span>
-                        <span class="p">)</span>
+                        <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_entry_set_maker</span><span class="o">.</span><span class="n">formulas_to_include</span> <span class="o">+</span> <span class="n">precursor_formulas</span> <span class="o">+</span> <span class="n">target_formulas</span><span class="p">)</span>
                     <span class="p">),</span>
                 <span class="p">}</span>
             <span class="p">)</span>
@@ -645,9 +620,7 @@
                 <span class="p">)</span>
             <span class="p">)</span>
 
-        <span class="n">enumeration_job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enumeration_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
-            <span class="n">enumerators</span><span class="o">=</span><span class="n">enumerators</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span>
-        <span class="p">)</span>
+        <span class="n">enumeration_job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enumeration_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">enumerators</span><span class="o">=</span><span class="n">enumerators</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">)</span>
         <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">enumeration_job</span><span class="p">)</span>
 
         <span class="n">base_rxn_set</span> <span class="o">=</span> <span class="n">enumeration_job</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">rxns</span>
@@ -664,7 +637,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_minimize_enumerators</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chempots</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">chempot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chempots</span><span class="p">:</span>
-                <span class="n">subname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(open </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="p">)</span><span class="si">}</span><span class="s2">, mu=</span><span class="si">{</span><span class="n">chempot</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="n">subname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(open </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span><span class="si">!s}</span><span class="s2">, mu=</span><span class="si">{</span><span class="n">chempot</span><span class="si">}</span><span class="s2">)&quot;</span>
                 <span class="n">enumeration_maker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enumeration_maker</span><span class="o">.</span><span class="n">update_kwargs</span><span class="p">(</span>
                     <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">enumeration_maker</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="n">subname</span><span class="p">},</span>
                     <span class="n">nested</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -692,12 +665,8 @@
                     <span class="n">mu</span><span class="o">=</span><span class="n">chempot</span><span class="p">,</span>
                     <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">minimize_enumerator_kwargs</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">enumeration_job</span> <span class="o">=</span> <span class="n">enumeration_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
-                    <span class="n">enumerators</span><span class="o">=</span><span class="p">[</span><span class="n">enumerator</span><span class="p">],</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span>
-                <span class="p">)</span>
-                <span class="n">network_job</span> <span class="o">=</span> <span class="n">network_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">base_rxn_set</span><span class="p">,</span> <span class="n">enumeration_job</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">rxns</span><span class="p">]</span>
-                <span class="p">)</span>
+                <span class="n">enumeration_job</span> <span class="o">=</span> <span class="n">enumeration_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">enumerators</span><span class="o">=</span><span class="p">[</span><span class="n">enumerator</span><span class="p">],</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">)</span>
+                <span class="n">network_job</span> <span class="o">=</span> <span class="n">network_maker</span><span class="o">.</span><span class="n">make</span><span class="p">([</span><span class="n">base_rxn_set</span><span class="p">,</span> <span class="n">enumeration_job</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">rxns</span><span class="p">])</span>
                 <span class="n">jobs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">enumeration_job</span><span class="p">,</span> <span class="n">network_job</span><span class="p">])</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_maker</span><span class="p">:</span>
                     <span class="n">pathway_job</span> <span class="o">=</span> <span class="n">solver_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
@@ -740,7 +709,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

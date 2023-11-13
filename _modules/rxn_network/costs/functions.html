@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.costs.functions - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,9 +245,7 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.costs.functions</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Implementation of cost functions used in the package (e.g., Softplus, WeightedSum).</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Implementation of cost functions used in the package (e.g., Softplus, WeightedSum).&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
@@ -263,8 +261,7 @@
 <div class="viewcode-block" id="Softplus">
 <a class="viewcode-back" href="../../../rxn_network.costs.html#rxn_network.costs.functions.Softplus">[docs]</a>
 <span class="k">class</span> <span class="nc">Softplus</span><span class="p">(</span><span class="n">CostFunction</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The softplus cost function is a smoothed version of the Rectified Linear Unit (ReLU)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The softplus cost function is a smoothed version of the Rectified Linear Unit (ReLU)</span>
 <span class="sd">    function commonly used in neural networks. It has the property that the output goes</span>
 <span class="sd">    to 0 as the input goes to negative infinity, but the output approaches a linear</span>
 <span class="sd">    scaling as the input goes to positive infinity. This is an especially useful mapping</span>
@@ -277,15 +274,14 @@
         <span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            temp: temperature in Kelvin [K]. This serves as a scale factor for the</span>
-<span class="sd">                output of the function. Higher temperatures -&gt; lower costs. Defaults to</span>
-<span class="sd">                300 K.</span>
-<span class="sd">            params: List of data dictionary keys for function parameters used as an</span>
-<span class="sd">                argument to the softplus function. Defaults to [&quot;energy_per_atom&quot;]</span>
-<span class="sd">            weights: List of corresponding values by which to weight the</span>
-<span class="sd">                function parameters. Defaults to [1.0].</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">        temp: temperature in Kelvin [K]. This serves as a scale factor for the</span>
+<span class="sd">        output of the function. Higher temperatures -&gt; lower costs. Defaults to</span>
+<span class="sd">        300 K.</span>
+<span class="sd">        params: List of data dictionary keys for function parameters used as an</span>
+<span class="sd">        argument to the softplus function. Defaults to [&quot;energy_per_atom&quot;]</span>
+<span class="sd">        weights: List of corresponding values by which to weight the</span>
+<span class="sd">        function parameters. Defaults to [1.0].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;energy_per_atom&quot;</span><span class="p">]</span>
@@ -301,8 +297,7 @@
 <div class="viewcode-block" id="Softplus.evaluate">
 <a class="viewcode-back" href="../../../rxn_network.costs.html#rxn_network.costs.functions.Softplus.evaluate">[docs]</a>
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the cost of reaction based on the initialized parameters and weights.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the cost of reaction based on the initialized parameters and weights.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            rxn: A ComputedReaction to evaluate.</span>
@@ -328,23 +323,19 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_softplus</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The mathematical formula for the softplus function&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The mathematical formula for the softplus function.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="mi">273</span> <span class="o">/</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="s2">&quot;Softplus with parameters: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">)&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)])</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Softplus with parameters: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">)&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)])</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="WeightedSum">
 <a class="viewcode-back" href="../../../rxn_network.costs.html#rxn_network.costs.functions.WeightedSum">[docs]</a>
 <span class="k">class</span> <span class="nc">WeightedSum</span><span class="p">(</span><span class="n">CostFunction</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This a weighted sum of user-specified parameters.</span>
-<span class="sd">        cost = param_1*weight_1 + param_2*weight_2 + param_3*weight_3 ...</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This a weighted sum of user-specified parameters.</span>
+<span class="sd">    cost = param_1*weight_1 + param_2*weight_2 + param_3*weight_3 ...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -352,12 +343,11 @@
         <span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            params: List of data dictionary keys for function parameters used as an</span>
-<span class="sd">                argument to the weighted summation. Defaults to [&quot;energy_per_atom&quot;]</span>
-<span class="sd">            weights: List of corresponding values by which to weight the</span>
-<span class="sd">                function parameters. Defaults to [1.0].</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">        params: List of data dictionary keys for function parameters used as an</span>
+<span class="sd">        argument to the weighted summation. Defaults to [&quot;energy_per_atom&quot;]</span>
+<span class="sd">        weights: List of corresponding values by which to weight the</span>
+<span class="sd">        function parameters. Defaults to [1.0].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;energy_per_atom&quot;</span><span class="p">]</span>
@@ -370,8 +360,7 @@
 <div class="viewcode-block" id="WeightedSum.evaluate">
 <a class="viewcode-back" href="../../../rxn_network.costs.html#rxn_network.costs.functions.WeightedSum.evaluate">[docs]</a>
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the cost of reaction based on the initialized parameters and weights.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the cost of reaction based on the initialized parameters and weights.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            rxn: A ComputedReaction to evaluate.</span>
@@ -390,16 +379,11 @@
             <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
         <span class="n">values_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">values_arr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">total</span></div>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">values_arr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">))</span></div>
 
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="s2">&quot;Weighted sum with parameters: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">)&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)])</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Weighted sum with parameters: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">)&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)])</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 </pre></div>
         </article>
@@ -432,7 +416,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.enumerators.utils - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,19 +245,12 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.enumerators.utils</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Utility functions used by the reaction enumerator classes.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Utility functions used by the reaction enumerator classes.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
-<span class="kn">from</span> <span class="nn">pymatgen.analysis.interface_reactions</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">GrandPotentialInterfacialReactivity</span><span class="p">,</span>
-    <span class="n">InterfacialReactivity</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pymatgen.analysis.phase_diagram</span> <span class="kn">import</span> <span class="n">PhaseDiagram</span>
-<span class="kn">from</span> <span class="nn">pymatgen.core.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.interface_reactions</span> <span class="kn">import</span> <span class="n">GrandPotentialInterfacialReactivity</span><span class="p">,</span> <span class="n">InterfacialReactivity</span>
 <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span>
 
 <span class="kn">from</span> <span class="nn">rxn_network.reactions.computed</span> <span class="kn">import</span> <span class="n">ComputedReaction</span>
@@ -265,7 +258,10 @@
 <span class="kn">from</span> <span class="nn">rxn_network.utils.funcs</span> <span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pymatgen.analysis.phase_diagram</span> <span class="kn">import</span> <span class="n">GrandPotentialPhaseDiagram</span>
+    <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+
+    <span class="kn">from</span> <span class="nn">pymatgen.analysis.phase_diagram</span> <span class="kn">import</span> <span class="n">GrandPotentialPhaseDiagram</span><span class="p">,</span> <span class="n">PhaseDiagram</span>
+    <span class="kn">from</span> <span class="nn">pymatgen.core.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span>
     <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">Entry</span>
 
     <span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
@@ -280,24 +276,20 @@
 <a class="viewcode-back" href="../../../rxn_network.enumerators.html#rxn_network.enumerators.utils.get_computed_rxn">[docs]</a>
 <span class="k">def</span> <span class="nf">get_computed_rxn</span><span class="p">(</span>
     <span class="n">rxn</span><span class="p">:</span> <span class="n">Reaction</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">,</span> <span class="n">chempots</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Element</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Provided with a Reaction object and a list of possible entries, this function</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputedReaction</span> <span class="o">|</span> <span class="n">OpenComputedReaction</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provided with a Reaction object and a list of possible entries, this function</span>
 <span class="sd">    returns a new ComputedReaction object containing a selection of those entries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        rxn: Reaction object</span>
 <span class="sd">        entries: Iterable of entries</span>
+<span class="sd">        chempots: Optional dictionary of chemical potentials (will return an OpenComputedReaction if supplied).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A ComputedReaction object transformed from a normal Reaction object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">reactant_entries</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span>
-    <span class="p">]</span>
-    <span class="n">product_entries</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">products</span>
-    <span class="p">]</span>
+    <span class="n">reactant_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="p">]</span>
+    <span class="n">product_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">entries</span><span class="o">.</span><span class="n">get_min_entry_by_formula</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">products</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">chempots</span><span class="p">:</span>
         <span class="n">rxn</span> <span class="o">=</span> <span class="n">OpenComputedReaction</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span><span class="n">reactant_entries</span><span class="p">,</span> <span class="n">product_entries</span><span class="p">,</span> <span class="n">chempots</span><span class="p">)</span>
@@ -352,8 +344,7 @@
 <div class="viewcode-block" id="get_elems_set">
 <a class="viewcode-back" href="../../../rxn_network.enumerators.html#rxn_network.enumerators.utils.get_elems_set">[docs]</a>
 <span class="k">def</span> <span class="nf">get_elems_set</span><span class="p">(</span><span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns chemical system as a set of element names, for set of entries.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns chemical system as a set of element names, for set of entries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        entries: An iterable of entry-like objects</span>
@@ -367,15 +358,12 @@
 
 <div class="viewcode-block" id="get_total_chemsys_str">
 <a class="viewcode-back" href="../../../rxn_network.enumerators.html#rxn_network.enumerators.utils.get_total_chemsys_str">[docs]</a>
-<span class="k">def</span> <span class="nf">get_total_chemsys_str</span><span class="p">(</span>
-    <span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span><span class="p">],</span> <span class="n">open_elems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns chemical system string for set of entries, with optional open element.</span>
+<span class="k">def</span> <span class="nf">get_total_chemsys_str</span><span class="p">(</span><span class="n">entries</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span><span class="p">],</span> <span class="n">open_elems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns chemical system string for set of entries, with optional open element.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        entries: An iterable of entry-like objects</span>
-<span class="sd">        open_elem: optional open element to include in chemical system</span>
+<span class="sd">        open_elems: optional open elements to include in chemical system</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">elements</span> <span class="o">=</span> <span class="p">{</span><span class="n">elem</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">open_elems</span><span class="p">:</span>
@@ -386,15 +374,12 @@
 
 <div class="viewcode-block" id="group_by_chemsys">
 <a class="viewcode-back" href="../../../rxn_network.enumerators.html#rxn_network.enumerators.utils.group_by_chemsys">[docs]</a>
-<span class="k">def</span> <span class="nf">group_by_chemsys</span><span class="p">(</span>
-    <span class="n">combos</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Entry</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="n">open_elems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Groups entry combinations by chemical system, with optional open element.</span>
+<span class="k">def</span> <span class="nf">group_by_chemsys</span><span class="p">(</span><span class="n">combos</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Entry</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="n">open_elems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Groups entry combinations by chemical system, with optional open element.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        combos: Iterable of entry combinations</span>
-<span class="sd">        open_elem: optional open element to include in chemical system grouping</span>
+<span class="sd">        open_elems: optional open elements to include in chemical system grouping</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dictionary of entry combos grouped by chemical system</span>
@@ -413,11 +398,8 @@
 
 <div class="viewcode-block" id="stabilize_entries">
 <a class="viewcode-back" href="../../../rxn_network.enumerators.html#rxn_network.enumerators.utils.stabilize_entries">[docs]</a>
-<span class="k">def</span> <span class="nf">stabilize_entries</span><span class="p">(</span>
-    <span class="n">pd</span><span class="p">:</span> <span class="n">PhaseDiagram</span><span class="p">,</span> <span class="n">entries_to_adjust</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span><span class="p">],</span> <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Entry</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Simple method for stabilizing entries by decreasing their energy to be on the hull.</span>
+<span class="k">def</span> <span class="nf">stabilize_entries</span><span class="p">(</span><span class="n">pd</span><span class="p">:</span> <span class="n">PhaseDiagram</span><span class="p">,</span> <span class="n">entries_to_adjust</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Entry</span><span class="p">],</span> <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Entry</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple method for stabilizing entries by decreasing their energy to be on the hull.</span>
 
 <span class="sd">    WARNING: This method is not guaranteed to work *simultaneously* for all entries due</span>
 <span class="sd">    to the fact that stabilization of one entry may destabilize others. Use with</span>
@@ -438,9 +420,7 @@
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">entries_to_adjust</span><span class="p">):</span>
         <span class="n">e_above_hull</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_e_above_hull</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
         <span class="n">entry_dict</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-        <span class="n">entry_dict</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">uncorrected_energy</span> <span class="o">+</span> <span class="p">(</span>
-            <span class="n">e_above_hull</span> <span class="o">*</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">-</span> <span class="n">tol</span>
-        <span class="p">)</span>
+        <span class="n">entry_dict</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">uncorrected_energy</span> <span class="o">+</span> <span class="p">(</span><span class="n">e_above_hull</span> <span class="o">*</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">-</span> <span class="n">tol</span><span class="p">)</span>
         <span class="n">new_entry</span> <span class="o">=</span> <span class="n">ComputedEntry</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">entry_dict</span><span class="p">)</span>
         <span class="n">new_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
 
@@ -451,8 +431,7 @@
 <div class="viewcode-block" id="run_enumerators">
 <a class="viewcode-back" href="../../../rxn_network.enumerators.html#rxn_network.enumerators.utils.run_enumerators">[docs]</a>
 <span class="k">def</span> <span class="nf">run_enumerators</span><span class="p">(</span><span class="n">enumerators</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">],</span> <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Utility method for calling enumerate() for a list of enumerators on a particular set</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility method for calling enumerate() for a list of enumerators on a particular set</span>
 <span class="sd">    of entries. Reaction sets are automatically combined and duplicates are filtered.</span>
 
 <span class="sd">    Args:</span>
@@ -460,16 +439,12 @@
 <span class="sd">        entries: an entry set to provide to the enumerate() function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rxn_set</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">for</span> <span class="n">enumerator</span> <span class="ow">in</span> <span class="n">enumerators</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">enumerator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">enumerators</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running </span><span class="si">{</span><span class="n">enumerator</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">rxns</span> <span class="o">=</span> <span class="n">enumerator</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adding </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span><span class="si">}</span><span class="s2"> reactions to reaction set&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">rxn_set</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">rxn_set</span> <span class="o">=</span> <span class="n">rxns</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">rxn_set</span> <span class="o">=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">add_rxn_set</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span>
+        <span class="n">rxn_set</span> <span class="o">=</span> <span class="n">rxns</span> <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">add_rxn_set</span><span class="p">(</span><span class="n">rxns</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed reaction enumeration. Filtering duplicates...&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">rxn_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -508,7 +483,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

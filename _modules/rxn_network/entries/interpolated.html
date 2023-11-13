@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.entries.interpolated - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,7 +245,7 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.entries.interpolated</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Class for intepolated entries&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Class for intepolated entries.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
@@ -263,8 +263,7 @@
 <div class="viewcode-block" id="InterpolatedEntry">
 <a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry">[docs]</a>
 <span class="k">class</span> <span class="nc">InterpolatedEntry</span><span class="p">(</span><span class="n">ComputedEntry</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Lightweight Entry object for computed data. Contains facilities</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lightweight Entry object for computed data. Contains facilities</span>
 <span class="sd">    for applying corrections to the energy attribute and for storing</span>
 <span class="sd">    calculation parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -280,19 +279,18 @@
         <span class="n">entry_id</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        Args:</span>
 <span class="sd">            composition: Composition of the entry. For</span>
-<span class="sd">                flexibility, this can take the form of all the typical input</span>
-<span class="sd">                taken by a Composition, including a {symbol: amt} dict,</span>
-<span class="sd">                a string formula, and others.</span>
+<span class="sd">                flexibility, this can take the form of all the typical input taken by a</span>
+<span class="sd">                Composition, including a {symbol: amt} dict, a string formula, and</span>
+<span class="sd">                others.</span>
 <span class="sd">            energy: Energy of the entry. Usually the final calculated</span>
 <span class="sd">                energy from VASP or other electronic structure codes.</span>
 <span class="sd">            correction: Manually set an energy correction, will ignore</span>
 <span class="sd">                energy_adjustments if specified. Defaults to 0.</span>
 <span class="sd">            energy_adjustments: An optional list of EnergyAdjustment to</span>
-<span class="sd">                be applied to the energy. This is used to modify the energy for</span>
-<span class="sd">                certain analyses. Defaults to None.</span>
+<span class="sd">                be applied to the energy. This is used to modify the energy for certain</span>
+<span class="sd">                analyses. Defaults to None.</span>
 <span class="sd">            parameters: An optional dict of parameters associated with</span>
 <span class="sd">                the entry. Defaults to None.</span>
 <span class="sd">            data: An optional dict of any additional data associated</span>
@@ -317,8 +315,7 @@
 <div class="viewcode-block" id="InterpolatedEntry.to_grand_entry">
 <a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.interpolated.InterpolatedEntry.to_grand_entry">[docs]</a>
     <span class="k">def</span> <span class="nf">to_grand_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chempots</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Element</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GrandPotPDEntry</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert a GibbsComputedEntry to a GrandComputedEntry.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a GibbsComputedEntry to a GrandComputedEntry.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            chempots: A dictionary of {element: chempot} pairs.</span>
@@ -331,9 +328,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">unique_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a unique ID for the entry.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a unique ID for the entry.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_id</span>
 
     <span class="nd">@property</span>
@@ -343,16 +338,13 @@
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">output</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;InterpolatedEntry | </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">formula</span><span class="si">}</span><span class="s2"> &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2">)&quot;</span>
-            <span class="p">),</span>
+            <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;InterpolatedEntry | </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">formula</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">),</span>
             <span class="sa">f</span><span class="s2">&quot;Energy  = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">energy</span><span class="p">):</span>
@@ -406,7 +398,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

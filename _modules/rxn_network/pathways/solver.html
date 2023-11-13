@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.pathways.solver - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,8 +245,7 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.pathways.solver</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Implements a reaction pathway solver class which efficiently solves mass balance</span>
+<span></span><span class="sd">&quot;&quot;&quot;Implements a reaction pathway solver class which efficiently solves mass balance</span>
 <span class="sd">equations using matrix operations.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
@@ -266,10 +265,7 @@
 <span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
 <span class="kn">from</span> <span class="nn">rxn_network.entries.entry_set</span> <span class="kn">import</span> <span class="n">GibbsEntrySet</span>
 <span class="kn">from</span> <span class="nn">rxn_network.enumerators.basic</span> <span class="kn">import</span> <span class="n">BasicEnumerator</span><span class="p">,</span> <span class="n">BasicOpenEnumerator</span>
-<span class="kn">from</span> <span class="nn">rxn_network.enumerators.minimize</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MinimizeGibbsEnumerator</span><span class="p">,</span>
-    <span class="n">MinimizeGrandPotentialEnumerator</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">rxn_network.enumerators.minimize</span> <span class="kn">import</span> <span class="n">MinimizeGibbsEnumerator</span><span class="p">,</span> <span class="n">MinimizeGrandPotentialEnumerator</span>
 <span class="kn">from</span> <span class="nn">rxn_network.pathways.balanced</span> <span class="kn">import</span> <span class="n">BalancedPathway</span>
 <span class="kn">from</span> <span class="nn">rxn_network.pathways.pathway_set</span> <span class="kn">import</span> <span class="n">PathwaySet</span>
 <span class="kn">from</span> <span class="nn">rxn_network.reactions.computed</span> <span class="kn">import</span> <span class="n">ComputedReaction</span>
@@ -289,11 +285,13 @@
 <div class="viewcode-block" id="Solver">
 <a class="viewcode-back" href="../../../rxn_network.pathways.html#rxn_network.pathways.solver.Solver">[docs]</a>
 <span class="k">class</span> <span class="nc">Solver</span><span class="p">(</span><span class="n">MSONable</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base definition for a pathway solver class.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base definition for a pathway solver class.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathways</span><span class="p">:</span> <span class="n">PathwaySet</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            pathways: A PathwaySet object containing the pathways to be combined/balanced.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pathways</span> <span class="o">=</span> <span class="n">pathways</span>
 
         <span class="n">rxns</span> <span class="o">=</span> <span class="p">[]</span>
@@ -310,27 +308,27 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pathways</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pathway</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pathways used in solver class&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pathways used in solver class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pathways</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">reactions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Reaction</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reactions used in solver class&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reactions used in solver class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reactions</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">costs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Costs used in solver class&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Costs used in solver class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_costs</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_rxns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Length of the reaction list&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Length of the reaction list.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Length of entry list&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Length of entry list.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="p">)</span></div>
 
 
@@ -338,8 +336,7 @@
 <div class="viewcode-block" id="PathwaySolver">
 <a class="viewcode-back" href="../../../rxn_network.pathways.html#rxn_network.pathways.solver.PathwaySolver">[docs]</a>
 <span class="k">class</span> <span class="nc">PathwaySolver</span><span class="p">(</span><span class="n">Solver</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Solver that implements an efficient method (using numba) for finding balanced</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solver that implements an efficient method (using numba) for finding balanced</span>
 <span class="sd">    reaction pathways from a list of graph-derived reaction pathways (i.e. a list of</span>
 <span class="sd">    lists of reactions).</span>
 
@@ -360,18 +357,17 @@
         <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100000</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            pathways: List of reaction pathways derived from the network.</span>
-<span class="sd">            entries: GibbsEntrySet containing all entries in the network.</span>
-<span class="sd">            cost_function: CostFunction object to use for the solver.</span>
-<span class="sd">            open_elem: Optional element to use for pathways with an open element.</span>
-<span class="sd">            chempot: Chemical potential to use for pathways with an open element.</span>
-<span class="sd">                Defaults to 0.0.</span>
-<span class="sd">            chunk_size: The number of pathways per chunk to use for balancing. Defaults</span>
-<span class="sd">                to 100,000.</span>
-<span class="sd">            batch_size: Number of chunks to submit to each CPU at a time. Automatically</span>
-<span class="sd">                calculated if not set.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">        pathways: List of reaction pathways derived from the network.</span>
+<span class="sd">        entries: GibbsEntrySet containing all entries in the network.</span>
+<span class="sd">        cost_function: CostFunction object to use for the solver.</span>
+<span class="sd">        open_elem: Optional element to use for pathways with an open element.</span>
+<span class="sd">        chempot: Chemical potential to use for pathways with an open element.</span>
+<span class="sd">        Defaults to 0.0.</span>
+<span class="sd">        chunk_size: The number of pathways per chunk to use for balancing. Defaults</span>
+<span class="sd">        to 100,000.</span>
+<span class="sd">        batch_size: Number of chunks to submit to each CPU at a time. Automatically</span>
+<span class="sd">        calculated if not set.</span>
 
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -395,9 +391,7 @@
         <span class="n">use_minimize_enumerator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">filter_interdependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PathwaySet</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        Args:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
 <span class="sd">            net_rxn: The reaction representing the total reaction from precursors to</span>
 <span class="sd">                final targets.</span>
 <span class="sd">            max_num_combos: The maximum allowable size of the balanced reaction pathway.</span>
@@ -419,11 +413,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A list of BalancedPathway objects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="n">net_rxn</span><span class="o">.</span><span class="n">balanced</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Net reaction must be balanceable to find all reaction pathways.&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Net reaction must be balanceable to find all reaction pathways.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
             <span class="n">initialize_ray</span><span class="p">()</span>
@@ -449,9 +440,7 @@
                 <span class="n">use_basic_enumerator</span><span class="p">,</span>
                 <span class="n">use_minimize_enumerator</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">intermediate_costs</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cost_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">intermediate_rxns</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">()</span>
-            <span class="p">]</span>
+            <span class="n">intermediate_costs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cost_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">intermediate_rxns</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">()]</span>
             <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">intermediate_rxns</span><span class="p">,</span> <span class="n">intermediate_costs</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">r</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">reactions</span><span class="p">:</span>
                     <span class="n">reactions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
@@ -459,11 +448,7 @@
 
         <span class="n">clean_r_set</span> <span class="o">=</span> <span class="n">ReactionSet</span><span class="o">.</span><span class="n">from_rxns</span><span class="p">(</span><span class="n">reactions</span><span class="p">,</span> <span class="n">filter_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">cleaned_reactions</span><span class="p">,</span> <span class="n">cleaned_costs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
-            <span class="o">*</span><span class="p">[</span>
-                <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">reactions</span><span class="p">,</span> <span class="n">costs</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">clean_r_set</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">!=</span> <span class="n">net_rxn</span>
-            <span class="p">]</span>
+            <span class="o">*</span><span class="p">[(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">reactions</span><span class="p">,</span> <span class="n">costs</span><span class="p">)</span> <span class="k">if</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">clean_r_set</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">!=</span> <span class="n">net_rxn</span><span class="p">]</span>
         <span class="p">)</span>
 
         <span class="n">net_rxn_vector</span> <span class="o">=</span> <span class="n">net_rxn</span><span class="o">.</span><span class="n">get_entry_idx_vector</span><span class="p">(</span><span class="n">num_entries</span><span class="p">)</span>
@@ -483,9 +468,7 @@
             <span class="n">comp_matrices_refs_dict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">grouper</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_rxns</span><span class="p">),</span> <span class="n">n</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">):</span>
                 <span class="n">comp_matrices_refs_dict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">_create_comp_matrices</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
-                        <span class="n">group</span><span class="p">,</span> <span class="n">cleaned_reactions_ref</span><span class="p">,</span> <span class="n">num_entries</span><span class="p">,</span> <span class="n">net_coeff_filter</span>
-                    <span class="p">)</span>
+                    <span class="n">_create_comp_matrices</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">cleaned_reactions_ref</span><span class="p">,</span> <span class="n">num_entries</span><span class="p">,</span> <span class="n">net_coeff_filter</span><span class="p">)</span>
                 <span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building comp matrices...&quot;</span><span class="p">)</span>
@@ -510,9 +493,7 @@
         <span class="n">c_m_mats</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">c_m_mats_refs</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">num_jobs</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
-            <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">comp_matrices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-        <span class="p">)</span>
+        <span class="n">num_jobs</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">comp_matrices</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="n">num_batches</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_jobs</span> <span class="o">//</span> <span class="n">batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="n">batch_count</span> <span class="o">=</span> <span class="mi">1</span>
@@ -542,12 +523,9 @@
                     <span class="k">for</span> <span class="n">c_m_mats_ref</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
                         <span class="n">to_iterator</span><span class="p">(</span><span class="n">c_m_mats_refs</span><span class="p">),</span>
                         <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">c_m_mats_refs</span><span class="p">),</span>
-                        <span class="n">desc</span><span class="o">=</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> (Batch&quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">batch_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">num_batches</span><span class="si">}</span><span class="s2">)&quot;</span>
-                        <span class="p">),</span>
+                        <span class="n">desc</span><span class="o">=</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> (Batch </span><span class="si">{</span><span class="n">batch_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">num_batches</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">),</span>
                     <span class="p">):</span>
-                        <span class="n">c_m_mats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_m_mats_ref</span><span class="p">)</span>
+                        <span class="n">c_m_mats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_m_mats_ref</span><span class="p">)</span>  <span class="c1"># noqa: PERF402</span>
 
                     <span class="n">batch_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -560,11 +538,11 @@
             <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">c_m_mats_refs</span><span class="p">),</span>
             <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> (Batch </span><span class="si">{</span><span class="n">batch_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">num_batches</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">):</span>
-            <span class="n">c_m_mats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_m_mats_ref</span><span class="p">)</span>
+            <span class="n">c_m_mats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_m_mats_ref</span><span class="p">)</span>  <span class="c1"># noqa: PERF402</span>
 
         <span class="n">c_mats</span><span class="p">,</span> <span class="n">m_mats</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">c_m_mats</span><span class="p">)</span>
-        <span class="n">c_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">mat</span> <span class="k">for</span> <span class="n">mats</span> <span class="ow">in</span> <span class="n">c_mats</span> <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="n">mats</span> <span class="k">if</span> <span class="n">mat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">m_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">mat</span> <span class="k">for</span> <span class="n">mats</span> <span class="ow">in</span> <span class="n">m_mats</span> <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="n">mats</span> <span class="k">if</span> <span class="n">mat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">c_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">mat</span> <span class="k">for</span> <span class="n">mats</span> <span class="ow">in</span> <span class="n">c_mats</span> <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="n">mats</span> <span class="k">if</span> <span class="n">mat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+        <span class="n">m_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">mat</span> <span class="k">for</span> <span class="n">mats</span> <span class="ow">in</span> <span class="n">m_mats</span> <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="n">mats</span> <span class="k">if</span> <span class="n">mat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
 
         <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">c_mat</span><span class="p">,</span> <span class="n">m_mat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">c_mats</span><span class="p">,</span> <span class="n">m_mats</span><span class="p">):</span>
@@ -572,13 +550,7 @@
             <span class="n">path_costs</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="k">for</span> <span class="n">rxn_mat</span> <span class="ow">in</span> <span class="n">c_mat</span><span class="p">:</span>
-                <span class="n">ents</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
-                    <span class="o">*</span><span class="p">[</span>
-                        <span class="p">(</span><span class="n">entries</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">c</span><span class="p">)</span>
-                        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rxn_mat</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-                    <span class="p">]</span>
-                <span class="p">)</span>
+                <span class="n">ents</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[(</span><span class="n">entries</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rxn_mat</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)])</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">rxn</span> <span class="o">=</span> <span class="n">OpenComputedReaction</span><span class="p">(</span>
@@ -610,7 +582,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">filtered_paths</span> <span class="o">=</span> <span class="n">paths</span>
 
-        <span class="n">filtered_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">filtered_paths</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">average_cost</span><span class="p">)</span>
+        <span class="n">filtered_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">filtered_paths</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">average_cost</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">PathwaySet</span><span class="o">.</span><span class="n">from_paths</span><span class="p">(</span><span class="n">filtered_paths</span><span class="p">)</span></div>
 
@@ -622,11 +594,9 @@
         <span class="n">use_basic_enumerator</span><span class="p">,</span>
         <span class="n">use_minimize_enumerator</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Method for finding intermediate reactions using enumerators and</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method for finding intermediate reactions using enumerators and</span>
 <span class="sd">        specified settings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">intermediates</span> <span class="o">=</span> <span class="p">{</span><span class="n">e</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">entries</span><span class="p">}</span>
         <span class="n">intermediates</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span><span class="n">intermediates</span><span class="p">)</span> <span class="o">+</span> <span class="n">targets</span><span class="p">,</span>
@@ -682,7 +652,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">entries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GibbsEntrySet</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Entry set used in solver&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Entry set used in solver.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span></div>
 
 
@@ -693,10 +663,9 @@
     <span class="n">net_coeffs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fast solution for reaction multiplicities via mass balance stochiometric</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fast solution for reaction multiplicities via mass balance stochiometric</span>
 <span class="sd">    constraints. Parallelized using Numba JIT. Can be applied to large batches (100K-1M</span>
-<span class="sd">    sets of reactions at a time.)</span>
+<span class="sd">    sets of reactions at a time.).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        comp_matrices: Array containing stoichiometric coefficients of all</span>
@@ -709,7 +678,7 @@
     <span class="n">net_coeff_filter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">net_coeffs</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="n">len_net_coeff_filter</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">net_coeff_filter</span><span class="p">)</span>
     <span class="n">all_multiplicities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fill_value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="n">correct</span> <span class="o">=</span> <span class="kc">True</span>
@@ -728,9 +697,7 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">multiplicities</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">continue</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">solved_coeffs</span> <span class="o">-</span> <span class="n">net_coeffs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mf">1e-08</span> <span class="o">+</span> <span class="mf">1e-05</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">net_coeffs</span><span class="p">))</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">solved_coeffs</span> <span class="o">-</span> <span class="n">net_coeffs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mf">1e-08</span> <span class="o">+</span> <span class="mf">1e-05</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">net_coeffs</span><span class="p">)))</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
             <span class="k">continue</span>
 
         <span class="n">all_multiplicities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">multiplicities</span>
@@ -753,18 +720,10 @@
 <span class="k">def</span> <span class="nf">_create_comp_matrices</span><span class="p">(</span><span class="n">combos</span><span class="p">,</span> <span class="n">rxns</span><span class="p">,</span> <span class="n">num_entries</span><span class="p">,</span> <span class="n">net_coeff_filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create array of stoichiometric coefficients for each reaction.&quot;&quot;&quot;</span>
     <span class="n">comp_matrices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
-        <span class="p">[</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">rxns</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">get_entry_idx_vector</span><span class="p">(</span><span class="n">num_entries</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">combo</span> <span class="ow">in</span> <span class="n">combos</span>
-            <span class="k">if</span> <span class="n">combo</span>
-        <span class="p">]</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">rxns</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">get_entry_idx_vector</span><span class="p">(</span><span class="n">num_entries</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">])</span> <span class="k">for</span> <span class="n">combo</span> <span class="ow">in</span> <span class="n">combos</span> <span class="k">if</span> <span class="n">combo</span><span class="p">]</span>
     <span class="p">)</span>
     <span class="c1"># filter bad matrices</span>
-    <span class="n">comp_matrices_filtered</span> <span class="o">=</span> <span class="n">comp_matrices</span><span class="p">[</span>
-        <span class="n">comp_matrices</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">net_coeff_filter</span><span class="p">]</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="p">]</span>
-
-    <span class="k">return</span> <span class="n">comp_matrices_filtered</span>
+    <span class="k">return</span> <span class="n">comp_matrices</span><span class="p">[</span><span class="n">comp_matrices</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">net_coeff_filter</span><span class="p">]</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
@@ -772,7 +731,7 @@
     <span class="n">comp_matrices</span><span class="p">,</span>
     <span class="n">net_rxn_vector</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps pathway balancing method with ray.remote decorator&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps pathway balancing method with ray.remote decorator.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_balance_path_arrays_cpu</span><span class="p">(</span><span class="n">comp_matrices</span><span class="p">,</span> <span class="n">net_rxn_vector</span><span class="p">)</span>
 </pre></div>
         </article>
@@ -805,7 +764,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

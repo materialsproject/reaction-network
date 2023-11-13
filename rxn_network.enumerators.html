@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="rxn_network.flows" href="rxn_network.flows.html" /><link rel="prev" title="rxn_network.entries" href="rxn_network.entries.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.enumerators - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -259,15 +259,15 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precursors</strong> (<em>Collection</em><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
-<li><p><strong>targets</strong> (<em>Collection</em><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>precursors</strong> (<em>Collection</em><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a><em>] </em><em>| </em><em>None</em>) – Precursor compositions or formulas.</p></li>
+<li><p><strong>targets</strong> (<em>Collection</em><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a><em>] </em><em>| </em><em>None</em>) – Target compositions or formulas.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.enumerators.base.Enumerator.enumerate">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enumerate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/enumerators/base.html#Enumerator.enumerate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.enumerators.base.Enumerator.enumerate" title="Link to this definition">#</a></dt>
-<dd><p>Enumerates the potential reactions from the list of entries</p>
+<dd><p>Enumerates the potential reactions from the list of entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – </p>
@@ -296,45 +296,39 @@ products may not be stable with respect to each other.</p>
 Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
 Communications 2021, 12 (1), 3097. <a class="reference external" href="https://doi.org/10.1038/s41467-021-23339-x">https://doi.org/10.1038/s41467-021-23339-x</a>.</p>
 </div></blockquote>
+<p>Initialize a BasicEnumerator object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of precursor formulas. The only reactions that
-will be enumerated are those featuring one or more of these compositions
-as reactants. The “exclusive_precursors” parameter allows one to tune
-whether the enumerated reactions should include ALL precursors (the
-default) or just one.</p></li>
+will be enumerated are those featuring one or more of these compositions as reactants. The
+“exclusive_precursors” parameter allows one to tune whether the enumerated reactions should include ALL
+precursors (the default) or just one.</p></li>
 <li><p><strong>targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of target formulas. The only reactions that
-will be enumerated are those featuring one or more of these compositions
-as products. The “exclusive_targets” parameter allows one to tune
-whether the enumerated reactions should include ALL targets or just one
-(the default).</p></li>
+will be enumerated are those featuring one or more of these compositions as products. The
+“exclusive_targets” parameter allows one to tune whether the enumerated reactions should include ALL
+targets or just one (the default).</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Maximum reactant/product cardinality. This it the largest possible number
 of entries on either side of the reaction. Defaults to 2.</p></li>
 <li><p><strong>exclusive_precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether enumerated reactions are required to have
-reactants that are a subset of the provided list of precursors. If True
-(the default), this only identifies reactions with reactants selected
-from the provided precursors.</p></li>
+reactants that are a subset of the provided list of precursors. If True (the default), this only
+identifies reactions with reactants selected from the provided precursors.</p></li>
 <li><p><strong>exclusive_targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether enumerated reactions are required to have
-products that are a subset of the provided list of targets. If False,
-(the default), this identifies all reactions containing at least one
-composition from the provided list of targets (and any number of
+products that are a subset of the provided list of targets. If False, (the default), this identifies all
+reactions containing at least one composition from the provided list of targets (and any number of
 byproducts).</p></li>
 <li><p><strong>filter_duplicates</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove duplicate reactions. Defaults to False.</p></li>
-<li><p><strong>filter_by_chemsys</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – An optional chemical system for which to filter produced
-reactions by. This ensures that all output reactions contain at least
-one element within the provided system.</p></li>
+<li><p><strong>filter_by_chemsys</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – An optional chemical system for which to filter produced reactions by. This ensures that
+all output reactions contain at least one element within the provided system.</p></li>
 <li><p><strong>chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The minimum number of reactions per chunk procssed. Needs to be
-sufficiently large to make parallelization a cost-effective strategy.
-Defaults to MIN_CHUNK_SIZE.</p></li>
+sufficiently large to make parallelization a cost-effective strategy. Defaults to MIN_CHUNK_SIZE.</p></li>
 <li><p><strong>max_num_jobs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The upper limit for the number of jobs created. Defaults to
 MAX_NUM_JOBS.</p></li>
-<li><p><strong>remove_unbalanced</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove reactions which are unbalanced; this is
-usually advisable. Defaults to True.</p></li>
+<li><p><strong>remove_unbalanced</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove reactions which are unbalanced; this is usually advisable. Defaults to
+True.</p></li>
 <li><p><strong>remove_changed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove reactions which can only be balanced by
-removing a reactant/product or having it change sides. This is also
-advisable for ensuring that only unique reaction sets are produced.
-Defaults to True.</p></li>
+removing a reactant/product or having it change sides. This is also advisable for ensuring that only
+unique reaction sets are produced. Defaults to True.</p></li>
 <li><p><strong>max_num_constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of allowable constraints enforced by
 reaction balancing. Defaults to 1 (which is usually advisable).</p></li>
 <li><p><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to run in quiet mode (no progress bar). Defaults to False.</p></li>
@@ -344,33 +338,22 @@ reaction balancing. Defaults to 1 (which is usually advisable).</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="rxn_network.enumerators.basic.BasicEnumerator.enumerate">
 <span class="sig-name descname"><span class="pre">enumerate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/enumerators/basic.html#BasicEnumerator.enumerate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.enumerators.basic.BasicEnumerator.enumerate" title="Link to this definition">#</a></dt>
-<dd><p>Calculate all possible reactions given a set of entries. If the enumerator was
-initialized with specified precursors or target, the reactions will be filtered
-by these constraints. Every enumerator follows a standard procedure:</p>
-<ol class="arabic simple">
-<li><dl class="simple">
-<dt>Initialize entries, i.e., ensure that precursors and target are considered</dt><dd><p>stable entries within the entry set.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Get a dictionary representing every possible “node”, i.e. phase combination,</dt><dd><p>grouped by chemical system.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Filter the combos dictionary for chemical systems which are not relevant;</dt><dd><p>i.e., don’t contain elements in precursors and/or target.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Iterate through each chemical system, initializing calculators,</dt><dd><p>and computing all possible reactions for reactant/product pair and/or
-thermodynamically predicted reactions for given reactants.</p>
-</dd>
-</dl>
-</li>
+<dd><p>Calculate all possible reactions given a set of entries. If the enumerator was initialized with specified
+precursors or target, the reactions will be filtered by these constraints. Every enumerator follows a standard
+procedure.</p>
+<dl class="simple">
+<dt>Steps:</dt><dd><ol class="arabic simple">
+<li><p>Initialize entries, i.e., ensure that precursors and target are considered stable entries within the
+entry set.</p></li>
+<li><p>Get a dictionary representing every possible “node”, i.e. phase combination, grouped by chemical system.</p></li>
+<li><p>Filter the combos dictionary for chemical systems which are not relevant; i.e., don’t contain elements in
+precursors and/or target.</p></li>
+<li><p>Iterate through each chemical system, initializing calculators, and computing all possible reactions for
+reactant/product pair and/or thermodynamically predicted reactions for given reactants.</p></li>
 <li><p>Add reactions to growing list, repeat Step 4 until combos dict exhausted.</p></li>
 </ol>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – the set of all entries to enumerate from</p>
@@ -384,21 +367,20 @@ thermodynamically predicted reactions for given reactants.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.enumerators.basic.BasicEnumerator.stabilize">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stabilize</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><a class="headerlink" href="#rxn_network.enumerators.basic.BasicEnumerator.stabilize" title="Link to this definition">#</a></dt>
-<dd><p>Whether or not to use only stable entries in analysis</p>
+<dd><p>Whether or not to use only stable entries in analysis.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.enumerators.basic.BasicEnumerator.build_pd">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_pd</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><a class="headerlink" href="#rxn_network.enumerators.basic.BasicEnumerator.build_pd" title="Link to this definition">#</a></dt>
-<dd><p>Whether or not to build a PhaseDiagram object during reaction enumeration (
-useful for some analyses)</p>
+<dd><p>Whether or not to build a PhaseDiagram object during reaction enumeration (useful for some analyses).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="rxn_network.enumerators.basic.BasicEnumerator.build_grand_pd">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_grand_pd</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><a class="headerlink" href="#rxn_network.enumerators.basic.BasicEnumerator.build_grand_pd" title="Link to this definition">#</a></dt>
 <dd><p>Whether or not to build a GrandPotentialPhaseDiagram object during
-reaction enumeration (useful for some analyses)</p>
+reaction enumeration (useful for some analyses).</p>
 </dd></dl>
 
 </dd></dl>
@@ -486,46 +468,39 @@ excluded.</p>
 Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
 Communications 2021, 12 (1), 3097. <a class="reference external" href="https://doi.org/10.1038/s41467-021-23339-x">https://doi.org/10.1038/s41467-021-23339-x</a>.</p>
 </div></blockquote>
+<p>Initialize a MinimizeGibbsEnumerator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of precursor formulas. The only reactions that
-will be enumerated are those featuring one or more of these compositions
-as reactants. The “exclusive_precursors” parameter allows one to tune
-whether the enumerated reactions should include ALL precursors (the
-default) or just one.</p></li>
+will be enumerated are those featuring one or more of these compositions as reactants. The
+“exclusive_precursors” parameter allows one to tune whether the enumerated reactions should include ALL
+precursors (the default) or just one.</p></li>
 <li><p><strong>targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of target formulas. The only reactions that
-will be enumerated are those featuring one or more of these compositions
-as products. The “exclusive_targets” parameter allows one to tune
-whether the enumerated reactions should include ALL targets or just one
-(the default).</p></li>
+will be enumerated are those featuring one or more of these compositions as products. The
+“exclusive_targets” parameter allows one to tune whether the enumerated reactions should include ALL
+targets or just one (the default).</p></li>
 <li><p><strong>exclusive_precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether enumerated reactions are required to have
-reactants that are a subset of the provided list of precursors. If True
-(the default), this only identifies reactions with reactants selected
-from the provided precursors.</p></li>
-<li><p><strong>exclusive_targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether enumerated reactions are required to have
-products that are a subset of the provided list of targets. If False,
-(the default), this identifies all reactions containing at least one
-composition from the provided list of targets (and any number of
-byproducts).</p></li>
+reactants that are a subset of the provided list of precursors. If True (the default), this only
+identifies reactions with reactants selected from the provided precursors.</p></li>
+<li><p><strong>exclusive_targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether enumerated reactions are required to have products that are a subset of the
+provided list of targets. If False, (the default), this identifies all reactions containing at least one
+composition from the provided list of targets (and any number of byproducts).</p></li>
 <li><p><strong>filter_duplicates</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove duplicate reactions. Defaults to False.</p></li>
-<li><p><strong>filter_by_chemsys</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – An optional chemical system for which to filter produced
-reactions by. This ensures that all output reactions contain at least
-one element within the provided system.</p></li>
-<li><p><strong>chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The minimum number of reactions per chunk procssed. Needs to be
-sufficiently large to make parallelization a cost-effective strategy.
-Defaults to MIN_CHUNK_SIZE.</p></li>
-<li><p><strong>max_num_jobs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The upper limit for the number of jobs created. Defaults to
-MAX_NUM_JOBS.</p></li>
+<li><p><strong>filter_by_chemsys</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – An optional chemical system for which to filter produced reactions by. This ensures that
+all output reactions contain at least one element within the provided system.</p></li>
+<li><p><strong>chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The minimum number of reactions per chunk procssed. Needs to be sufficiently large to make
+parallelization a cost-effective strategy. Defaults to MIN_CHUNK_SIZE.</p></li>
+<li><p><strong>max_num_jobs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The upper limit for the number of jobs created. Defaults to MAX_NUM_JOBS.</p></li>
 <li><p><strong>remove_unbalanced</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove reactions which are unbalanced; this is
 usually advisable. Defaults to True.</p></li>
-<li><p><strong>remove_changed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove reactions which can only be balanced by
-removing a reactant/product or having it change sides. This is also
-advisable for ensuring that only unique reaction sets are produced.
+<li><p><strong>remove_changed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove reactions which can only be balanced by removing a reactant/product or
+having it change sides. This is also advisable for ensuring that only unique reaction sets are produced.
 Defaults to True.</p></li>
-<li><p><strong>max_num_constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of allowable constraints enforced by
-reaction balancing. Defaults to 1 (which is usually advisable).</p></li>
-<li><p><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to run in quiet mode (no progress bar). Defaults to False.</p></li>
+<li><p><strong>max_num_constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of allowable
+constraints enforced by reaction balancing. Defaults to 1 (which is usually advisable).</p></li>
+<li><p><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to run in quiet mode (no progress bar). Defaults to
+False.</p></li>
 </ul>
 </dd>
 </dl>
@@ -545,48 +520,63 @@ phase space. Identity reactions are excluded.</p>
 Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
 Communications 2021, 12 (1), 3097. <a class="reference external" href="https://doi.org/10.1038/s41467-021-23339-x">https://doi.org/10.1038/s41467-021-23339-x</a>.</p>
 </div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>open_elem</strong> (<em>Element</em>) – The element to be considered as open.</p></li>
-<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The chemical potential of the open element (eV).</p></li>
-<li><p><strong>precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of precursor formulas. The only reactions that
+<p>Args:
+open_elem: The element to be considered as open.
+mu: The chemical potential of the open element (eV).
+precursors: Optional list of precursor formulas. The only reactions that
 will be enumerated are those featuring one or more of these compositions
 as reactants. The “exclusive_precursors” parameter allows one to tune
 whether the enumerated reactions should include ALL precursors (the
-default) or just one.</p></li>
-<li><p><strong>targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of target formulas. The only reactions that
+default) or just one.
+targets: Optional list of target formulas. The only reactions that
 will be enumerated are those featuring one or more of these compositions
 as products. The “exclusive_targets” parameter allows one to tune
 whether the enumerated reactions should include ALL targets or just one
-(the default).</p></li>
-<li><p><strong>exclusive_precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether enumerated reactions are required to have
+(the default).
+exclusive_precursors: Whether enumerated reactions are required to have
 reactants that are a subset of the provided list of precursors. If True
 (the default), this only identifies reactions with reactants selected
-from the provided precursors.</p></li>
-<li><p><strong>exclusive_targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether enumerated reactions are required to have
+from the provided precursors.
+exclusive_targets: Whether enumerated reactions are required to have
 products that are a subset of the provided list of targets. If False,
 (the default), this identifies all reactions containing at least one
 composition from the provided list of targets (and any number of
-byproducts).</p></li>
-<li><p><strong>filter_duplicates</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove duplicate reactions. Defaults to False.</p></li>
-<li><p><strong>filter_by_chemsys</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – An optional chemical system for which to filter produced
+byproducts).
+filter_duplicates: Whether to remove duplicate reactions. Defaults to False.
+filter_by_chemsys: An optional chemical system for which to filter produced
 reactions by. This ensures that all output reactions contain at least
-one element within the provided system.</p></li>
-<li><p><strong>chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The minimum number of reactions per chunk procssed. Needs to be
+one element within the provided system.
+chunk_size: The minimum number of reactions per chunk procssed. Needs to be
 sufficiently large to make parallelization a cost-effective strategy.
-Defaults to MIN_CHUNK_SIZE.</p></li>
-<li><p><strong>max_num_jobs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The upper limit for the number of jobs created. Defaults to
-MAX_NUM_JOBS.</p></li>
-<li><p><strong>remove_unbalanced</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove reactions which are unbalanced; this is
-usually advisable. Defaults to True.</p></li>
-<li><p><strong>remove_changed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to remove reactions which can only be balanced by
+Defaults to MIN_CHUNK_SIZE.
+max_num_jobs: The upper limit for the number of jobs created. Defaults to
+MAX_NUM_JOBS.
+remove_unbalanced: Whether to remove reactions which are unbalanced; this is
+usually advisable. Defaults to True.
+remove_changed: Whether to remove reactions which can only be balanced by
 removing a reactant/product or having it change sides. This is also
 advisable for ensuring that only unique reaction sets are produced.
-Defaults to True.</p></li>
-<li><p><strong>max_num_constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of allowable constraints enforced by
-reaction balancing. Defaults to 1 (which is usually advisable).</p></li>
-<li><p><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to run in quiet mode (no progress bar). Defaults to False.</p></li>
+Defaults to True.
+max_num_constraints: The maximum number of allowable constraints enforced by
+reaction balancing. Defaults to 1 (which is usually advisable).
+quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>open_elem</strong> (<em>Element</em>) – </p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
+<li><p><strong>precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>exclusive_precursors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>exclusive_targets</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>filter_duplicates</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>filter_by_chemsys</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>max_num_jobs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>remove_unbalanced</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>remove_changed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>max_num_constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -606,14 +596,14 @@ returns a new ComputedReaction object containing a selection of those entries.</
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rxn</strong> (<a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction" title="rxn_network.reactions.base.Reaction"><em>Reaction</em></a>) – Reaction object</p></li>
 <li><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – Iterable of entries</p></li>
-<li><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Optional dictionary of chemical potentials (will return an OpenComputedReaction if supplied).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A ComputedReaction object transformed from a normal Reaction object</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction">ComputedReaction</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction">ComputedReaction</a> | <a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.open.OpenComputedReaction" title="rxn_network.reactions.open.OpenComputedReaction">OpenComputedReaction</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -660,8 +650,7 @@ returns a new ComputedReaction object containing a selection of those entries.</
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>entries</strong> (<em>Iterable</em><em>[</em><em>Entry</em><em>]</em>) – An iterable of entry-like objects</p></li>
-<li><p><strong>open_elem</strong> – optional open element to include in chemical system</p></li>
-<li><p><strong>open_elems</strong> (<em>Iterable</em><em>[</em><em>Element</em><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>open_elems</strong> (<em>Iterable</em><em>[</em><em>Element</em><em>] </em><em>| </em><em>None</em>) – optional open elements to include in chemical system</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -678,8 +667,7 @@ returns a new ComputedReaction object containing a selection of those entries.</
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>combos</strong> (<em>Iterable</em><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>[</em><em>Entry</em><em>, </em><em>...</em><em>]</em><em>]</em>) – Iterable of entry combinations</p></li>
-<li><p><strong>open_elem</strong> – optional open element to include in chemical system grouping</p></li>
-<li><p><strong>open_elems</strong> (<em>Iterable</em><em>[</em><em>Element</em><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>open_elems</strong> (<em>Iterable</em><em>[</em><em>Element</em><em>] </em><em>| </em><em>None</em>) – optional open elements to include in chemical system grouping</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -833,7 +821,7 @@ of entries. Reaction sets are automatically combined and duplicates are filtered
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="_static/documentation_options.js?v=87b6a113"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

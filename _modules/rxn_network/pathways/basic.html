@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.pathways.basic - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,8 +245,7 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.pathways.basic</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Implements a class for storing (unbalanced/unconstrained) collection of reactions</span>
+<span></span><span class="sd">&quot;&quot;&quot;Implements a class for storing (unbalanced/unconstrained) collection of reactions</span>
 <span class="sd">forming a reaction pathway.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
@@ -262,8 +261,7 @@
 <div class="viewcode-block" id="BasicPathway">
 <a class="viewcode-back" href="../../../rxn_network.pathways.html#rxn_network.pathways.basic.BasicPathway">[docs]</a>
 <span class="k">class</span> <span class="nc">BasicPathway</span><span class="p">(</span><span class="n">Pathway</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Simple pathway class for storing multiple ComputedReaction objects which form a</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple pathway class for storing multiple ComputedReaction objects which form a</span>
 <span class="sd">    single reaction pathway.</span>
 
 <span class="sd">    In this class, there are no constraints on stoichiometry. See BalancedPathway for</span>
@@ -271,27 +269,26 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Reaction</span><span class="p">],</span> <span class="n">costs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            reactions: list of ComputedReaction objects making up the pathway.</span>
-<span class="sd">            costs: Optional list of corresponding costs for each reaction.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">        reactions: list of ComputedReaction objects making up the pathway.</span>
+<span class="sd">        costs: Optional list of corresponding costs for each reaction.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reactions</span> <span class="o">=</span> <span class="n">reactions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">costs</span> <span class="o">=</span> <span class="n">costs</span> <span class="ow">or</span> <span class="p">[]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">reactions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Reaction</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of reactions contained in the reaction pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of reactions contained in the reaction pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reactions</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">total_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The sum of all costs associated with reactions in the pathway&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The sum of all costs associated with reactions in the pathway.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">costs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_experimental</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether or not all reactions in the pathway are experimental&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether or not all reactions in the pathway are experimental.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">is_experimental</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -305,10 +302,7 @@
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
-                <span class="n">other_rxn</span> <span class="o">==</span> <span class="n">rxn</span>
-                <span class="k">for</span> <span class="n">other_rxn</span><span class="p">,</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">reactions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">)</span>
-            <span class="p">)</span>
+            <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">other_rxn</span> <span class="o">==</span> <span class="n">rxn</span> <span class="k">for</span> <span class="n">other_rxn</span><span class="p">,</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">reactions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="kc">False</span>
 
@@ -346,7 +340,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

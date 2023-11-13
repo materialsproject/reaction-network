@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.jobs.schema - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,9 +245,9 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.jobs.schema</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Core definition for various task and synthesis recipe documents&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Core definition for various task and synthesis recipe documents.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>  <span class="c1"># avoids pydantic issues</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 <span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="kn">import</span> <span class="n">Element</span>
@@ -265,21 +265,19 @@
 <div class="viewcode-block" id="EntrySetDocument">
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument">[docs]</a>
 <span class="k">class</span> <span class="nc">EntrySetDocument</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A single entry set object as produced by the GetEntrySet job.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single entry set object as produced by the GetEntrySet job.&quot;&quot;&quot;</span>
 
-    <span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
+    <span class="n">task_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
     <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime_str</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp of when the document was last updated.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">entries</span><span class="p">:</span> <span class="n">GibbsEntrySet</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The entry set object.&quot;</span><span class="p">)</span>
-    <span class="n">e_above_hull</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The e_above_hull cutoff.&quot;</span><span class="p">)</span>
+    <span class="n">e_above_hull</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The e_above_hull cutoff.&quot;</span><span class="p">)</span>
     <span class="n">include_polymorphs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to include metastable polymorphs in the entry set.&quot;</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to include metastable polymorphs in the entry set.&quot;</span>
     <span class="p">)</span>
-    <span class="n">formulas_to_include</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">formulas_to_include</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The required formulas to include during construciton.&quot;</span>
     <span class="p">)</span></div>
 
@@ -288,32 +286,22 @@
 <div class="viewcode-block" id="EnumeratorTaskDocument">
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument">[docs]</a>
 <span class="k">class</span> <span class="nc">EnumeratorTaskDocument</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A single task object from the reaction enumerator workflow.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single task object from the reaction enumerator workflow.&quot;&quot;&quot;</span>
 
-    <span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
+    <span class="n">task_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
     <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime_str</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp of when the document was last updated.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">rxns</span><span class="p">:</span> <span class="n">ReactionSet</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The reaction set.&quot;</span><span class="p">)</span>
-    <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target formulas used in the enumerator(s).&quot;</span>
-    <span class="p">)</span>
-    <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The elements of the total chemical system&quot;</span>
-    <span class="p">)</span>
-    <span class="n">chemsys</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The total chemical system string (e.g., Fe-Li-O).&quot;</span>
-    <span class="p">)</span>
-    <span class="n">added_elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">targets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target formulas used in the enumerator(s).&quot;</span><span class="p">)</span>
+    <span class="n">elements</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Element</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The elements of the total chemical system&quot;</span><span class="p">)</span>
+    <span class="n">chemsys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The total chemical system string (e.g., Fe-Li-O).&quot;</span><span class="p">)</span>
+    <span class="n">added_elements</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Element</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The elements added beyond the elements of the target(s).&quot;</span>
     <span class="p">)</span>
-    <span class="n">added_chemsys</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The chemical system of the added elements&quot;</span>
-    <span class="p">)</span>
-    <span class="n">enumerators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">added_chemsys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The chemical system of the added elements&quot;</span><span class="p">)</span>
+    <span class="n">enumerators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Enumerator</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A list of the enumerator objects used to calculate the reactions.&quot;</span><span class="p">,</span>
     <span class="p">)</span></div>
@@ -323,12 +311,11 @@
 <div class="viewcode-block" id="CompetitionTaskDocument">
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument">[docs]</a>
 <span class="k">class</span> <span class="nc">CompetitionTaskDocument</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A document containing the reactions and their selectivities as created by the</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A document containing the reactions and their selectivities as created by the</span>
 <span class="sd">    CalculateCompetitionMaker job.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
+    <span class="n">task_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
     <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime_str</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp of when the document was last updated.&quot;</span><span class="p">,</span>
@@ -339,102 +326,72 @@
             <span class="s2">&quot; information stored in their data attribute.&quot;</span>
         <span class="p">)</span>
     <span class="p">)</span>
-    <span class="n">target_formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The reduced chemical formula of the target material.&quot;</span>
-    <span class="p">)</span>
-    <span class="n">open_elem</span><span class="p">:</span> <span class="n">Element</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The open element (if any).&quot;</span><span class="p">)</span>
-    <span class="n">chempot</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The chemical potential of the open element.&quot;</span>
-    <span class="p">)</span>
-    <span class="n">added_elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">target_formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The reduced chemical formula of the target material.&quot;</span><span class="p">)</span>
+    <span class="n">open_elem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Element</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The open element (if any).&quot;</span><span class="p">)</span>
+    <span class="n">chempot</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The chemical potential of the open element.&quot;</span><span class="p">)</span>
+    <span class="n">added_elements</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Element</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The elements added beyond the elements of the target(s).&quot;</span>
     <span class="p">)</span>
-    <span class="n">added_chemsys</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The chemical system of the added elements.&quot;</span>
-    <span class="p">)</span>
-    <span class="n">calculate_competition</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to calculate competition scores.&quot;</span>
-    <span class="p">)</span>
-    <span class="n">calculate_chempot_distances</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">added_chemsys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The chemical system of the added elements.&quot;</span><span class="p">)</span>
+    <span class="n">calculate_competition</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to calculate competition scores.&quot;</span><span class="p">)</span>
+    <span class="n">calculate_chempot_distances</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to calculate chemical potential distances.&quot;</span>
     <span class="p">)</span>
-    <span class="n">temp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="kc">None</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;The temperature in K used to determine the primary competition weightings.&quot;</span>
-        <span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;The temperature in K used to determine the primary competition weightings.&quot;</span><span class="p">),</span>
     <span class="p">)</span>
-    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The batch size for the reaction set&quot;</span><span class="p">)</span>
-    <span class="n">cpd_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The kwargs for ChempotDistanceCalculator.&quot;</span>
-    <span class="p">)</span></div>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The batch size for the reaction set&quot;</span><span class="p">)</span>
+    <span class="n">cpd_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The kwargs for ChempotDistanceCalculator.&quot;</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="NetworkTaskDocument">
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument">[docs]</a>
 <span class="k">class</span> <span class="nc">NetworkTaskDocument</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The calculation output from the NetworkMaker workflow.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The calculation output from the NetworkMaker workflow.</span>
 
 <span class="sd">    Optionally includes unbalanced paths found during pathfinding.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
+    <span class="n">task_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
     <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime_str</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp of when the document was last updated.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">Network</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The reaction network&quot;</span><span class="p">)</span>
-    <span class="n">paths</span><span class="p">:</span> <span class="n">PathwaySet</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The (simple/unbalanced) reaction pathways&quot;</span>
-    <span class="p">)</span>
-    <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The number of paths solved for, if any.&quot;</span><span class="p">)</span>
-    <span class="n">precursors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The precursor formulas.&quot;</span><span class="p">)</span>
-    <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target formulas.&quot;</span><span class="p">)</span></div>
+    <span class="n">paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PathwaySet</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The (simple/unbalanced) reaction pathways&quot;</span><span class="p">)</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The number of paths solved for, if any.&quot;</span><span class="p">)</span>
+    <span class="n">precursors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The precursor formulas.&quot;</span><span class="p">)</span>
+    <span class="n">targets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target formulas.&quot;</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="PathwaySolverTaskDocument">
 <a class="viewcode-back" href="../../../rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument">[docs]</a>
 <span class="k">class</span> <span class="nc">PathwaySolverTaskDocument</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The calculation output from the PathwaySolverMaker workflow. Contains the pathway</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The calculation output from the PathwaySolverMaker workflow. Contains the pathway</span>
 <span class="sd">    solver object and its calculated balanced pathways.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">task_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
+    <span class="n">task_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the task.&quot;</span><span class="p">)</span>
     <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime_str</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp of when the document was last updated.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">solver</span><span class="p">:</span> <span class="n">Solver</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The pathway solver used to calculate pathways.&quot;</span><span class="p">)</span>
     <span class="n">balanced_paths</span><span class="p">:</span> <span class="n">PathwaySet</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The balanced reaction pathways.&quot;</span><span class="p">)</span>
-    <span class="n">precursors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The precursor compositions.&quot;</span><span class="p">)</span>
-    <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target compositions.&quot;</span><span class="p">)</span>
-    <span class="n">net_rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The net reaction used for pathway solving.&quot;</span>
-    <span class="p">)</span>
-    <span class="n">max_num_combos</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;The maximum number of combinations to consider in the pathway solver.&quot;</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
-    <span class="n">find_intermediate_rxns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to find reactions from intermediate compositions.&quot;</span>
-    <span class="p">)</span>
+    <span class="n">precursors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The precursor compositions.&quot;</span><span class="p">)</span>
+    <span class="n">targets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target compositions.&quot;</span><span class="p">)</span>
+    <span class="n">net_rxn</span><span class="p">:</span> <span class="n">ComputedReaction</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The net reaction used for pathway solving.&quot;</span><span class="p">)</span>
+    <span class="n">max_num_combos</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;The maximum number of combinations to consider in the pathway solver.&quot;</span><span class="p">))</span>
+    <span class="n">find_intermediate_rxns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to find reactions from intermediate compositions.&quot;</span><span class="p">)</span>
     <span class="n">intermediate_rxn_energy_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The mximum energy cutoff for filtering intermediate reactions.&quot;</span>
     <span class="p">)</span>
-    <span class="n">use_basic_enumerator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to use the basic enumerators in path solving.&quot;</span>
-    <span class="p">)</span>
-    <span class="n">use_minimize_enumerator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to use the minimize enumerators in path solving.&quot;</span>
-    <span class="p">)</span>
-    <span class="n">filter_interdependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to filter out interdependent pathway.s&quot;</span>
-    <span class="p">)</span></div>
+    <span class="n">use_basic_enumerator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to use the basic enumerators in path solving.&quot;</span><span class="p">)</span>
+    <span class="n">use_minimize_enumerator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to use the minimize enumerators in path solving.&quot;</span><span class="p">)</span>
+    <span class="n">filter_interdependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to filter out interdependent pathway.s&quot;</span><span class="p">)</span></div>
 
 </pre></div>
         </article>
@@ -467,7 +424,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.thermo.chempot_diagram - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,8 +245,7 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.thermo.chempot_diagram</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module implements added features to the ChemicalPotentialDiagram class from</span>
+<span></span><span class="sd">&quot;&quot;&quot;This module implements added features to the ChemicalPotentialDiagram class from</span>
 <span class="sd">pymatgen.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
@@ -269,8 +268,7 @@
 <div class="viewcode-block" id="ChemicalPotentialDiagram">
 <a class="viewcode-back" href="../../../rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram">[docs]</a>
 <span class="k">class</span> <span class="nc">ChemicalPotentialDiagram</span><span class="p">(</span><span class="n">ChempotDiagram</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class is an extension of the ChemicalPotentialDiagram class from pymatgen.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is an extension of the ChemicalPotentialDiagram class from pymatgen.</span>
 <span class="sd">    Several features have been added to the original class for the purpose of</span>
 <span class="sd">    efficiently calculating the shortest distance between two chemical potential</span>
 <span class="sd">    domains.</span>
@@ -291,8 +289,7 @@
         <span class="n">limits</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Element</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">default_min_limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.0</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize a ChemicalPotentialDiagram object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a ChemicalPotentialDiagram object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            entries: List of PDEntry-like objects containing a composition and</span>
@@ -309,19 +306,13 @@
 <span class="sd">                unspecified elements within the &quot;limits&quot; argument. This results in</span>
 <span class="sd">                default limits of (-100, 0).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="nb">sorted</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_entry_set</span> <span class="o">=</span> <span class="n">GibbsEntrySet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">limits</span> <span class="o">=</span> <span class="n">limits</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_min_limit</span> <span class="o">=</span> <span class="n">default_min_limit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="nb">sorted</span><span class="p">({</span><span class="n">els</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="k">for</span> <span class="n">els</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">})</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">els</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="k">for</span> <span class="n">els</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">elements</span><span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_min_entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_el_refs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_min_entries_and_el_refs</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_min_entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_el_refs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_min_entries_and_el_refs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_entry_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">:</span> <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_entries</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplanes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_border_hyperplanes</span><span class="p">()</span>
         <span class="p">(</span>
@@ -330,31 +321,23 @@
         <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_hyperplanes_and_entries</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;ChemicalPotentialDiagram currently requires phase &quot;</span>
-                <span class="s2">&quot;diagrams with 2 or more elements!&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ChemicalPotentialDiagram currently requires phase diagrams with 2 or more elements!&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">el_refs</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">:</span>
             <span class="n">missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">el_refs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;There are no entries for the terminal elements: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There are no entries for the terminal elements: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hs_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_halfspace_intersection</span><span class="p">()</span>
 
         <span class="n">num_hyperplanes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyperplanes</span><span class="p">)</span>
         <span class="n">num_border_hyperplanes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplanes</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplane_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="nb">range</span><span class="p">(</span><span class="n">num_hyperplanes</span><span class="p">,</span> <span class="n">num_hyperplanes</span> <span class="o">+</span> <span class="n">num_border_hyperplanes</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplane_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_hyperplanes</span><span class="p">,</span> <span class="n">num_hyperplanes</span> <span class="o">+</span> <span class="n">num_border_hyperplanes</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metastable_domains</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># for caching</span>
 
 <div class="viewcode-block" id="ChemicalPotentialDiagram.shortest_domain_distance">
 <a class="viewcode-back" href="../../../rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.shortest_domain_distance">[docs]</a>
     <span class="k">def</span> <span class="nf">shortest_domain_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">f2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the chemical potential distance between two phase domains. Also works</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the chemical potential distance between two phase domains. Also works</span>
 <span class="sd">        for metastable phases (see metastable_domains property).</span>
 
 <span class="sd">        Args:</span>
@@ -367,16 +350,9 @@
 <span class="sd">            Shortest distance between domain boundaries in the full (hyper)dimensional</span>
 <span class="sd">            space, calculated using KDTree.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pts1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">f1</span><span class="p">]</span> <span class="k">if</span> <span class="n">f1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_metastable_domain</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">f1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">:</span>
-            <span class="n">pts1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">f1</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">pts1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_metastable_domain</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">f2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">:</span>
-            <span class="n">pts2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">f2</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">pts2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_metastable_domain</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
+        <span class="n">pts2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">f2</span><span class="p">]</span> <span class="k">if</span> <span class="n">f2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_metastable_domain</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
 
         <span class="n">tree</span> <span class="o">=</span> <span class="n">KDTree</span><span class="p">(</span><span class="n">pts1</span><span class="p">)</span>
 
@@ -386,8 +362,7 @@
 <div class="viewcode-block" id="ChemicalPotentialDiagram.get_offset">
 <a class="viewcode-back" href="../../../rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram.get_offset">[docs]</a>
     <span class="k">def</span> <span class="nf">get_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">PDEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        For a given entry, returns the distance between its hyperplane and the surface</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;For a given entry, returns the distance between its hyperplane and the surface</span>
 <span class="sd">        of the chemical potential diagram. This allows one to represent the energy above</span>
 <span class="sd">        hull in chemical potential space. Returns zero for stable entries.</span>
 
@@ -396,49 +371,38 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Offset in chemical potential distance (eV/atom)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_entries</span>
-            <span class="ow">and</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span>
-        <span class="p">):</span>
+        <span class="k">if</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_entries</span> <span class="ow">and</span> <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">:</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">e_above_hull</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_set</span><span class="o">.</span><span class="n">get_e_above_hull</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
             <span class="n">hyperplane</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_hyperplane</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_distance_between_parallel_hyperplanes</span><span class="p">(</span>
-                <span class="n">hyperplane</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">e_above_hull</span>
-            <span class="p">)</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_distance_between_parallel_hyperplanes</span><span class="p">(</span><span class="n">hyperplane</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">e_above_hull</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">offset</span></div>
 
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">domains</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Mapping of formulas to array of domain boundary points. Cached for quicker</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mapping of formulas to array of domain boundary points. Cached for quicker</span>
 <span class="sd">        calculations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_domains</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">metastable_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets a dictionary of the chemical potential domains for metastable chemical</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets a dictionary of the chemical potential domains for metastable chemical</span>
 <span class="sd">        formulas. This corresponds to the domains of the relevant phases if they were</span>
 <span class="sd">        just barely thermodynamically stable (on the hull).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_metastable_domain</span><span class="p">(</span>
-                <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span>
-            <span class="p">)</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_metastable_domain</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_entries</span>
             <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span>
         <span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">hs_int</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HalfspaceIntersection</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the scipy HalfSpaceIntersection object used to calculate all domains.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the scipy HalfSpaceIntersection object used to calculate all domains.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_int</span>
 
     <span class="k">def</span> <span class="nf">_get_halfspace_intersection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -448,15 +412,12 @@
 
     <span class="k">def</span> <span class="nf">_get_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a dictionary of chemical potential domains as {formula:</span>
-<span class="sd">        np.ndarray}&quot;&quot;&quot;</span>
-        <span class="n">domains</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperplane_entries</span>
-        <span class="p">}</span>
+<span class="sd">        np.ndarray}.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">domains</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperplane_entries</span><span class="p">}</span>
         <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperplane_entries</span>
 
-        <span class="k">for</span> <span class="n">intersection</span><span class="p">,</span> <span class="n">facet</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hs_int</span><span class="o">.</span><span class="n">intersections</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hs_int</span><span class="o">.</span><span class="n">dual_facets</span>
-        <span class="p">):</span>
+        <span class="k">for</span> <span class="n">intersection</span><span class="p">,</span> <span class="n">facet</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hs_int</span><span class="o">.</span><span class="n">intersections</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hs_int</span><span class="o">.</span><span class="n">dual_facets</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">facet</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_border_hyperplane_indices</span><span class="p">:</span>
                     <span class="n">this_entry</span> <span class="o">=</span> <span class="n">entries</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
@@ -467,7 +428,8 @@
 
     <span class="k">def</span> <span class="nf">_get_hyperplanes_and_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">PDEntry</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns both the array of hyperplanes, as well as a list of the minimum</span>
-<span class="sd">        entries&quot;&quot;&quot;</span>
+<span class="sd">        entries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_hyperplane</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_entries</span><span class="p">])</span>
         <span class="n">vec</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">el_refs</span><span class="p">[</span><span class="n">el</span><span class="p">]</span><span class="o">.</span><span class="n">energy_per_atom</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">form_e</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">vec</span><span class="p">)</span>
@@ -482,15 +444,12 @@
         <span class="k">return</span> <span class="n">hyperplanes</span><span class="p">,</span> <span class="n">hyperplane_entries</span>
 
     <span class="k">def</span> <span class="nf">_get_hyperplane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">get_atomic_fraction</span><span class="p">(</span><span class="n">el</span><span class="p">)</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="o">-</span><span class="n">entry</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">entry</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">get_atomic_fraction</span><span class="p">(</span><span class="n">el</span><span class="p">)</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="o">-</span><span class="n">entry</span><span class="o">.</span><span class="n">energy_per_atom</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_get_metastable_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formula</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the metastable domain for a given formula. Tol is passed to</span>
-<span class="sd">        GibbsEntrySet.get_stabilized_entry and will affect the size of the domain.&quot;&quot;&quot;</span>
+<span class="sd">        GibbsEntrySet.get_stabilized_entry and will affect the size of the domain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">formula</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metastable_domains</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metastable_domains</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span>
 
@@ -505,9 +464,7 @@
             <span class="c1"># sometimes if the entry is exactly on the hull it fails, so set force=True</span>
             <span class="c1"># and make bigger tolerance</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_entry_set</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
-            <span class="n">new_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_set</span><span class="o">.</span><span class="n">get_stabilized_entry</span><span class="p">(</span>
-                <span class="n">orig_entry</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span>
+            <span class="n">new_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry_set</span><span class="o">.</span><span class="n">get_stabilized_entry</span><span class="p">(</span><span class="n">orig_entry</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_entry_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
             <span class="n">cpd</span> <span class="o">=</span> <span class="n">ChemicalPotentialDiagram</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_entry_set</span><span class="p">,</span> <span class="n">default_min_limit</span><span class="o">=-</span><span class="mi">500</span><span class="p">)</span>
 
@@ -515,8 +472,7 @@
                 <span class="n">metastable_domain</span> <span class="o">=</span> <span class="n">cpd</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Failed even after attempted fix. Metastable domain for&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">formula</span><span class="si">}</span><span class="s2"> can not be created!&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed even after attempted fix. Metastable domain for </span><span class="si">{</span><span class="n">formula</span><span class="si">}</span><span class="s2"> can not be created!&quot;</span>
                 <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_metastable_domains</span><span class="p">[</span><span class="n">formula</span><span class="p">]</span> <span class="o">=</span> <span class="n">metastable_domain</span>
@@ -526,7 +482,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_get_distance_between_parallel_hyperplanes</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">delta_b</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the distance between two parallel hyperplanes&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the distance between two parallel hyperplanes.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">delta_b</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
 
 </pre></div>
@@ -560,7 +516,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

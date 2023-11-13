@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.4 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
         <title>rxn_network.pathways.pathway_set - reaction-network</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
@@ -245,8 +245,7 @@
         </div>
         <article role="main">
           <h1>Source code for rxn_network.pathways.pathway_set</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Implements a class for conveniently and efficiently storing sets of Pathway-based</span>
+<span></span><span class="sd">&quot;&quot;&quot;Implements a class for conveniently and efficiently storing sets of Pathway-based</span>
 <span class="sd">objects which share entries/reactions.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
@@ -254,7 +253,6 @@
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">monty.json</span> <span class="kn">import</span> <span class="n">MSONable</span>
 
 <span class="kn">from</span> <span class="nn">rxn_network.pathways.balanced</span> <span class="kn">import</span> <span class="n">BalancedPathway</span>
@@ -262,14 +260,15 @@
 <span class="kn">from</span> <span class="nn">rxn_network.reactions.reaction_set</span> <span class="kn">import</span> <span class="n">ReactionSet</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
     <span class="kn">from</span> <span class="nn">rxn_network.pathways.base</span> <span class="kn">import</span> <span class="n">Pathway</span>
 
 
 <div class="viewcode-block" id="PathwaySet">
 <a class="viewcode-back" href="../../../rxn_network.pathways.html#rxn_network.pathways.pathway_set.PathwaySet">[docs]</a>
 <span class="k">class</span> <span class="nc">PathwaySet</span><span class="p">(</span><span class="n">MSONable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A lightweight class for storing large sets of Pathway objects. Automatically</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A lightweight class for storing large sets of Pathway objects. Automatically</span>
 <span class="sd">    represents a set of pathways as a (non-rectangular) 2D array of indices</span>
 <span class="sd">    corresponding to reactions within a reaction set. This is useful for dumping</span>
 <span class="sd">    reaction pathway data to a database.</span>
@@ -284,14 +283,13 @@
         <span class="n">coefficients</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span>
         <span class="n">costs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            reaction_set: The reaction set containing all reactions in the pathways.</span>
-<span class="sd">            indices: A list of lists of indices corresponding to reactions in the</span>
-<span class="sd">                reaction set.</span>
-<span class="sd">            coefficients: An array or list of coefficients representing the</span>
-<span class="sd">                multiplicities (i.e., how much of) each reaction in the pathway.</span>
-<span class="sd">            costs: An array or list of costs for each pathway.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">        reaction_set: The reaction set containing all reactions in the pathways.</span>
+<span class="sd">        indices: A list of lists of indices corresponding to reactions in the</span>
+<span class="sd">        reaction set.</span>
+<span class="sd">        coefficients: An array or list of coefficients representing the</span>
+<span class="sd">        multiplicities (i.e., how much of) each reaction in the pathway.</span>
+<span class="sd">        costs: An array or list of costs for each pathway.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reaction_set</span> <span class="o">=</span> <span class="n">reaction_set</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span>
@@ -300,8 +298,7 @@
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">paths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pathway</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns list of Pathway objects represented by the PathwaySet. Cached for</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns list of Pathway objects represented by the PathwaySet. Cached for</span>
 <span class="sd">        efficiency.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_paths</span><span class="p">()</span>
@@ -309,9 +306,7 @@
     <span class="k">def</span> <span class="nf">_get_paths</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pathway</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns list of Pathway objects represented by the PathwaySet.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns list of Pathway objects represented by the PathwaySet.&quot;&quot;&quot;</span>
         <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">rxns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reaction_set</span><span class="o">.</span><span class="n">get_rxns</span><span class="p">())</span>
@@ -323,9 +318,7 @@
         <span class="p">):</span>
             <span class="n">reactions</span> <span class="o">=</span> <span class="p">[</span><span class="n">rxns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">coefficients</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="n">BalancedPathway</span><span class="p">(</span>
-                    <span class="n">reactions</span><span class="o">=</span><span class="n">reactions</span><span class="p">,</span> <span class="n">coefficients</span><span class="o">=</span><span class="n">coefficients</span><span class="p">,</span> <span class="n">costs</span><span class="o">=</span><span class="n">costs</span>
-                <span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">BalancedPathway</span><span class="p">(</span><span class="n">reactions</span><span class="o">=</span><span class="n">reactions</span><span class="p">,</span> <span class="n">coefficients</span><span class="o">=</span><span class="n">coefficients</span><span class="p">,</span> <span class="n">costs</span><span class="o">=</span><span class="n">costs</span><span class="p">)</span>
 
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">path</span> <span class="o">=</span> <span class="n">BasicPathway</span><span class="p">(</span><span class="n">reactions</span><span class="o">=</span><span class="n">reactions</span><span class="p">,</span> <span class="n">costs</span><span class="o">=</span><span class="n">costs</span><span class="p">)</span>
@@ -341,8 +334,7 @@
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pathway</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PathwaySet</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize a PathwaySet object from a list of paths.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a PathwaySet object from a list of paths.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            paths: List of Pathway objects</span>
@@ -369,21 +361,15 @@
     <span class="k">def</span> <span class="nf">_get_reaction_set</span><span class="p">(</span>
         <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pathway</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReactionSet</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a reaction set built from a list of paths.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a reaction set built from a list of paths.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ReactionSet</span><span class="o">.</span><span class="n">from_rxns</span><span class="p">([</span><span class="n">rxn</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span> <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">reactions</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Iterates over the PathwaySet.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterates over the PathwaySet.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the number of pathways in the PathwaySet.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of pathways in the PathwaySet.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span></div>
 
 </pre></div>
@@ -417,7 +403,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=0a12f1ed"></script>
+</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
