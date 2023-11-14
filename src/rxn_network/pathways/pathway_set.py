@@ -34,13 +34,14 @@ class PathwaySet(MSONable):
         coefficients: np.ndarray | list[list[float] | None],
         costs: np.ndarray | list[list[float]],
     ):
-        """Args:
-        reaction_set: The reaction set containing all reactions in the pathways.
-        indices: A list of lists of indices corresponding to reactions in the
-        reaction set.
-        coefficients: An array or list of coefficients representing the
-        multiplicities (i.e., how much of) each reaction in the pathway.
-        costs: An array or list of costs for each pathway.
+        """
+        Args:
+            reaction_set: The reaction set containing all reactions in the pathways.
+            indices: A list of lists of indices corresponding to reactions in the
+                reaction set.
+            coefficients: An array or list of coefficients representing the
+            multiplicities (i.e., how much of) each reaction in the pathway.
+            costs: An array or list of costs for each pathway.
         """
         self.reaction_set = reaction_set
         self.indices = indices

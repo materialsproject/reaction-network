@@ -31,10 +31,8 @@ class InterpolatedEntry(ComputedEntry):
     ):
         """
         Args:
-            composition: Composition of the entry. For
-                flexibility, this can take the form of all the typical input taken by a
-                Composition, including a {symbol: amt} dict, a string formula, and
-                others.
+            composition: Composition of the entry. For flexibility, this can take the form of all the typical input
+                taken by a Composition, including a {symbol: amt} dict, a string formula, and others.
             energy: Energy of the entry. Usually the final calculated
                 energy from VASP or other electronic structure codes.
             correction: Manually set an energy correction, will ignore

@@ -25,14 +25,15 @@ class Softplus(CostFunction):
         params: list[str] | None = None,
         weights: list[float] | None = None,
     ):
-        """Args:
-        temp: temperature in Kelvin [K]. This serves as a scale factor for the
-        output of the function. Higher temperatures -> lower costs. Defaults to
-        300 K.
-        params: List of data dictionary keys for function parameters used as an
-        argument to the softplus function. Defaults to ["energy_per_atom"]
-        weights: List of corresponding values by which to weight the
-        function parameters. Defaults to [1.0].
+        """
+        Args:
+            temp: temperature in Kelvin [K]. This serves as a scale factor for the
+                output of the function. Higher temperatures -> lower costs. Defaults to
+                300 K.
+            params: List of data dictionary keys for function parameters used as an
+                argument to the softplus function. Defaults to ["energy_per_atom"]
+            weights: List of corresponding values by which to weight the
+                function parameters. Defaults to [1.0].
         """
         if params is None:
             params = ["energy_per_atom"]
@@ -88,11 +89,12 @@ class WeightedSum(CostFunction):
         params: list[str] | None = None,
         weights: list[float] | None = None,
     ):
-        """Args:
+        """
+        Args:
         params: List of data dictionary keys for function parameters used as an
-        argument to the weighted summation. Defaults to ["energy_per_atom"]
+            argument to the weighted summation. Defaults to ["energy_per_atom"].
         weights: List of corresponding values by which to weight the
-        function parameters. Defaults to [1.0].
+            function parameters. Defaults to [1.0].
         """
         if params is None:
             params = ["energy_per_atom"]

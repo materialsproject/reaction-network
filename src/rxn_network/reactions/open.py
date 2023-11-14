@@ -32,13 +32,14 @@ class OpenComputedReaction(ComputedReaction):
         data: dict | None = None,
         lowest_num_errors: int = 0,
     ):
-        """Args:
-        entries: List of ComputedEntry objects.
-        coefficients: List of reaction coefficients.
-        chempots: Dict of chemical potentials corresponding to open elements.
-        data: Optional dict of data.
-        lowest_num_errors: number of "errors" encountered during reaction
-        balancing.
+        """
+        Args:
+            entries: List of ComputedEntry objects.
+            coefficients: List of reaction coefficients.
+            chempots: Dict of chemical potentials corresponding to open elements.
+            data: Optional dict of data.
+            lowest_num_errors: number of "errors" encountered during reaction
+                balancing.
         """
         super().__init__(
             entries=entries,

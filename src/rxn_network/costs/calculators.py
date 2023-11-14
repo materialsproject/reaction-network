@@ -228,10 +228,10 @@ class SecondaryCompetitionWithEhullCalculator(Calculator):
     ):
         """
         Args:
-        irh: the interface reaction hull containing the target reaction and all
-            competing reactions.
-        name: the data dictionary key with which to store the calculated value.
-            Defaults to "secondary_competition_with_ehull".
+            irh: the interface reaction hull containing the target reaction and all
+                competing reactions.
+            name: the data dictionary key with which to store the calculated value.
+                Defaults to "secondary_competition_with_ehull".
         """
         self.irh = irh
         self.name = name

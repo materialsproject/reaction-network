@@ -31,11 +31,12 @@ class ComputedReaction(BasicReaction):
         data: dict | None = None,
         lowest_num_errors: int = 0,
     ):
-        """Args:
-        entries: List of ComputedEntry objects.
-        coefficients: List or array of reaction coefficients.
-        data: Optional dict of data
-        lowest_num_errors: number of "errors" encountered during reaction balancing.
+        """
+        Args:
+            entries: List of ComputedEntry objects.
+            coefficients: List or array of reaction coefficients.
+            data: Optional dict of data
+            lowest_num_errors: number of "errors" encountered during reaction balancing.
         """
         self._entries = list(entries)
         self.reactant_entries = [entry for entry, coeff in zip(entries, coefficients) if coeff < 0]

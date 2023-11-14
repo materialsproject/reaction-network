@@ -49,14 +49,15 @@ class ReactionSet(MSONable):
         chempot: float = 0.0,
         all_data: dict[int, np.ndarray] | None = None,
     ):
-        """Args:
-        entries: List of ComputedEntry objects shared by reactions
-        indices: Array indexing the entry list; gets entries used by each
-        reaction object
-        coeffs: Array of all reaction coefficients
-        open_elem: Open element, e.g., "O"
-        chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
-        all_data: Optional list of data for each reaction.
+        """
+        Args:
+            entries: List of ComputedEntry objects shared by reactions
+            indices: Array indexing the entry list; gets entries used by each
+                reaction object
+            coeffs: Array of all reaction coefficients
+            open_elem: Open element, e.g., "O"
+            chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
+            all_data: Optional list of data for each reaction.
         """
         self.entries = entries
         self.indices = indices

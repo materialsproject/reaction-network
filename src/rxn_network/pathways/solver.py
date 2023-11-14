@@ -105,17 +105,18 @@ class PathwaySolver(Solver):
         chunk_size: int = 100000,
         batch_size: int | None = None,
     ):
-        """Args:
-        pathways: List of reaction pathways derived from the network.
-        entries: GibbsEntrySet containing all entries in the network.
-        cost_function: CostFunction object to use for the solver.
-        open_elem: Optional element to use for pathways with an open element.
-        chempot: Chemical potential to use for pathways with an open element.
-        Defaults to 0.0.
-        chunk_size: The number of pathways per chunk to use for balancing. Defaults
-        to 100,000.
-        batch_size: Number of chunks to submit to each CPU at a time. Automatically
-        calculated if not set.
+        """
+        Args:
+            pathways: List of reaction pathways derived from the network.
+            entries: GibbsEntrySet containing all entries in the network.
+            cost_function: CostFunction object to use for the solver.
+            open_elem: Optional element to use for pathways with an open element.
+            chempot: Chemical potential to use for pathways with an open element.
+                Defaults to 0.0.
+            chunk_size: The number of pathways per chunk to use for balancing. Defaults
+                to 100,000.
+            batch_size: Number of chunks to submit to each CPU at a time. Automatically
+                calculated if not set.
 
 
         """

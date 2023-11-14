@@ -27,12 +27,13 @@ class InterfaceReactionHull(MSONable):
         c2: Composition,
         reactions: list[ComputedReaction],
     ):
-        """Args:
-        c1: Composition of reactant 1
-        c2: Composition of reactant 2
-        reactions: List of reactions containing all enumerated reactions between the
-        two reactants. Note that this list should not include identity reactions
-        of the precursors.
+        """
+        Args:
+            c1: Composition of reactant 1
+            c2: Composition of reactant 2
+            reactions: List of reactions containing all enumerated reactions between the
+                two reactants. Note that this list should not include identity reactions
+                of the precursors.
         """
         self.c1 = Composition(c1).reduced_composition
         self.c2 = Composition(c2).reduced_composition
