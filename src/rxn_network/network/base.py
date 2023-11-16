@@ -108,7 +108,7 @@ class Network(MSONable, metaclass=ABCMeta):
         return "-".join(sorted(self.entries.chemsys))
 
     def __repr__(self) -> str:
-        return "Reaction network for chemical system: {self.chemsys}, with graph: {self.graph!s}"
+        return f"Reaction network for chemical system: {self.chemsys}, with {self.graph!s}"
 
     def __str__(self) -> str:
         return self.__repr__()
@@ -160,4 +160,4 @@ class Graph(PyDiGraph):
         return graph
 
     def __repr__(self) -> str:
-        return super().__repr__() + f" with {self.num_nodes()} nodes and {self.num_edges()} edges"
+        return f"Graph with {self.num_nodes()} nodes and {self.num_edges()} edges"
