@@ -13,6 +13,7 @@ import numpy as np
 from monty.fractions import gcd_float
 
 from rxn_network.core import Composition
+from rxn_network.data import COMMON_GASES
 from rxn_network.reactions.base import Reaction
 
 if TYPE_CHECKING:
@@ -184,8 +185,10 @@ class BasicReaction(Reaction):
 
     def is_separable(self, target: str | Composition) -> bool:
         """Checks if the reaction forms byproducts which are separable from the target
-        composition; i.e., byproducts do not contain any of the elements in the target
-        phase.
+        composition.
+
+        Separable byproducts are those that are common gases (e.g., CO2), or other phases that do not contain any of the
+        elements in the target phase.
 
         Args:
             target: Composition of target; elements in this phase will be used to
@@ -206,8 +209,14 @@ class BasicReaction(Reaction):
         for t in identified_targets:
             products.remove(t)
 
-        separable = [added_elems.issuperset(comp.elements) for comp in products]
-        return all(separable)
+        are_separable = []
+        for comp in products:
+            if comp in COMMON_GASES or added_elems.issuperset(comp.elements):
+                are_separable.append(True)
+            else:
+                are_separable.append(False)
+
+        return all(are_separable)
 
     @cached_property
     def reactant_atomic_fractions(self) -> dict:

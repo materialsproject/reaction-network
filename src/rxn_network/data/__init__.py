@@ -13,6 +13,7 @@ cwd = Path(__file__).parent.resolve()
 PATH_TO_FREED = cwd / "freed"
 PATH_TO_NIST = cwd / "nist"
 
+COMMON_GASES = loadfn(cwd / "common_gases.json")
 G_ELEMS = loadfn(cwd / "mu_elements.json")
 
 

@@ -142,7 +142,7 @@ class GetEntrySetMaker(Maker):
 
             elems = {Element(i) for i in chemsys.split("-")}
 
-            if len(elems) <= 5:
+            if len(elems) <= 25:
                 with MPRester(**kwargs) as mpr:
                     entries = mpr.get_entries_in_chemsys(
                         elements=chemsys,
