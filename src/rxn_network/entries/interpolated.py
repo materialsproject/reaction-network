@@ -8,6 +8,9 @@ from pymatgen.analysis.phase_diagram import GrandPotPDEntry
 from pymatgen.entries.computed_entries import ComputedEntry
 
 from rxn_network.core import Composition
+from rxn_network.utils.funcs import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from pymatgen.core.periodic_table import Element
@@ -71,6 +74,24 @@ class InterpolatedEntry(ComputedEntry):
             A GrandComputedEntry.
         """
         return GrandPotPDEntry(self, chempots)
+
+    def get_new_temperature(self, new_temperature: float) -> InterpolatedEntry:
+        """Return a copy of the InterpolatedEntry at the new specified temperature.
+
+        WARNING: This is not possible for interpolated entries. Instead, this returns a copy of the original entry.
+
+        Args:
+            new_temperature: The new temperature to use [K]
+
+        Returns:
+            A copy of the entry.
+        """
+        _ = new_temperature
+        logger.warning(
+            "It is not possible to get a new temperature for interpolated entries"
+            "(one must recalculate from the phase diagram). Instead, this returns a copy of the opriginal entry."
+        )
+        return self.copy()
 
     @property
     def unique_id(self) -> str:
