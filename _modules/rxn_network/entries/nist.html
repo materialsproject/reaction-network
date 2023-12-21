@@ -252,6 +252,8 @@
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
+<span class="kn">from</span> <span class="nn">monty.serialization</span> <span class="kn">import</span> <span class="n">loadfn</span>
+
 <span class="kn">from</span> <span class="nn">rxn_network.data</span> <span class="kn">import</span> <span class="n">PATH_TO_NIST</span><span class="p">,</span> <span class="n">load_experimental_data</span>
 <span class="kn">from</span> <span class="nn">rxn_network.entries.experimental</span> <span class="kn">import</span> <span class="n">ExperimentalReferenceEntry</span>
 
@@ -261,6 +263,7 @@
     <span class="kn">from</span> <span class="nn">rxn_network.core</span> <span class="kn">import</span> <span class="n">Composition</span>
 
 <span class="n">G_COMPOUNDS</span> <span class="o">=</span> <span class="n">load_experimental_data</span><span class="p">(</span><span class="n">PATH_TO_NIST</span> <span class="o">/</span> <span class="s2">&quot;compounds.json.gz&quot;</span><span class="p">)</span>
+<span class="n">DEPRECATED_COMPOUNDS</span> <span class="o">=</span> <span class="n">loadfn</span><span class="p">(</span><span class="n">PATH_TO_NIST</span> <span class="o">/</span> <span class="s2">&quot;deprecated_compounds.json&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="NISTReferenceEntry">
@@ -277,6 +280,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">REFERENCES</span> <span class="o">=</span> <span class="n">G_COMPOUNDS</span>
+    <span class="n">DEPRECATED</span> <span class="o">=</span> <span class="n">DEPRECATED_COMPOUNDS</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -288,8 +292,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
 <span class="sd">        composition: Composition object (within pymatgen).</span>
 <span class="sd">        temperature: Temperature in Kelvin. If temperature is not selected from</span>
-<span class="sd">        one of [300, 400, 500, ... 2000 K], then free energies will be</span>
-<span class="sd">        interpolated. Defaults to 300 K.</span>
+<span class="sd">            one of [300, 400, 500, ... 2000 K], then free energies will be</span>
+<span class="sd">            interpolated. Defaults to 300 K.</span>
 <span class="sd">        energy_adjustments: A list of EnergyAdjustments to apply to the entry.</span>
 <span class="sd">        data: Optional dictionary containing entry data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -331,7 +335,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
+</div><script src="../../../_static/documentation_options.js?v=15c97ff8"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

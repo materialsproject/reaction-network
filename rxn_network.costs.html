@@ -526,20 +526,13 @@ InterfaceReactionHull class.</p>
 <p>WARNING: this is an alternative calculator for secondary competition (C_2) that
 includes the energy above hull of the target reaciton. It should only be used for
 testing purposes.</p>
-<p>Args:
-irh: the interface reaction hull containing the target reaction and all</p>
-<blockquote>
-<div><p>competing reactions.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>name: the data dictionary key with which to store the calculated value.</dt><dd><p>Defaults to “secondary_competition_with_ehull”.</p>
-</dd>
-</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>irh</strong> (<a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull" title="rxn_network.reactions.hull.InterfaceReactionHull"><em>InterfaceReactionHull</em></a>) – </p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
+<li><p><strong>irh</strong> (<a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull" title="rxn_network.reactions.hull.InterfaceReactionHull"><em>InterfaceReactionHull</em></a>) – the interface reaction hull containing the target reaction and all
+competing reactions.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the data dictionary key with which to store the calculated value.
+Defaults to “secondary_competition_with_ehull”.</p></li>
 </ul>
 </dd>
 </dl>
@@ -648,20 +641,16 @@ function commonly used in neural networks. It has the property that the output g
 to 0 as the input goes to negative infinity, but the output approaches a linear
 scaling as the input goes to positive infinity. This is an especially useful mapping
 for determining a cost ranking of a reaction.</p>
-<p>Args:
-temp: temperature in Kelvin [K]. This serves as a scale factor for the
-output of the function. Higher temperatures -&gt; lower costs. Defaults to
-300 K.
-params: List of data dictionary keys for function parameters used as an
-argument to the softplus function. Defaults to [“energy_per_atom”]
-weights: List of corresponding values by which to weight the
-function parameters. Defaults to [1.0].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>temp</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
-<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>temp</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – temperature in Kelvin [K]. This serves as a scale factor for the
+output of the function. Higher temperatures -&gt; lower costs. Defaults to
+300 K.</p></li>
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – List of data dictionary keys for function parameters used as an
+argument to the softplus function. Defaults to [“energy_per_atom”]</p></li>
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – List of corresponding values by which to weight the
+function parameters. Defaults to [1.0].</p></li>
 </ul>
 </dd>
 </dl>
@@ -691,10 +680,14 @@ function parameters. Defaults to [1.0].</p>
 <p>This a weighted sum of user-specified parameters.
 cost = param_1*weight_1 + param_2*weight_2 + param_3*weight_3 …</p>
 <p>Args:
-params: List of data dictionary keys for function parameters used as an
-argument to the weighted summation. Defaults to [“energy_per_atom”]
-weights: List of corresponding values by which to weight the
-function parameters. Defaults to [1.0].</p>
+params: List of data dictionary keys for function parameters used as an</p>
+<blockquote>
+<div><p>argument to the weighted summation. Defaults to [“energy_per_atom”].</p>
+</div></blockquote>
+<dl class="simple">
+<dt>weights: List of corresponding values by which to weight the</dt><dd><p>function parameters. Defaults to [1.0].</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -889,7 +882,7 @@ will be an (n_points, ) boolean array. Otherwise it will be a
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=87b6a113"></script>
+</div><script src="_static/documentation_options.js?v=15c97ff8"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

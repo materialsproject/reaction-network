@@ -814,20 +814,15 @@ Set of symbols representing the chemical system, e.g., {“Li”, “Fe”, “P
 <p>An Entry class for experimental reference data, to be sub-classed for specific data
 sources.  Given a composition, automatically finds the Gibbs free energy of
 formation, dGf(T) from tabulated reference values.</p>
-<p>Args:
-composition: Composition object
-temperature: Temperature in Kelvin. If temperature is not selected within
-the range of the reference  data (see self._validate_temperature), then
-this will raise an error.
-energy_adjustments: A list of EnergyAdjustments to apply to the entry.
-data: Optional dictionary containing entry data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>composition</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – </p></li>
-<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>energy_adjustments</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>EnergyAdjustment</em><em>] </em><em>| </em><em>None</em>) – </p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>composition</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition object</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Temperature in Kelvin. If temperature is not selected within
+the range of the reference  data (see self._validate_temperature), then
+this will raise an error.</p></li>
+<li><p><strong>energy_adjustments</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>EnergyAdjustment</em><em>] </em><em>| </em><em>None</em>) – A list of EnergyAdjustments to apply to the entry.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dictionary containing entry data.</p></li>
 </ul>
 </dd>
 </dl>
@@ -937,10 +932,12 @@ reference values.</p>
 </dl>
 <p>Args:
 composition: Composition object
-temperature: Temperature in Kelvin. If temperature is not selected from
-one of [300, 400, 500, … 2000 K], then free energies will be
-interpolated. Defaults to 300 K.
-energy_adjustments: A list of EnergyAdjustments to apply to the entry.
+temperature: Temperature in Kelvin. If temperature is not selected from</p>
+<blockquote>
+<div><p>one of [300, 400, 500, … 2000 K], then free energies will be
+interpolated. Defaults to 300 K.</p>
+</div></blockquote>
+<p>energy_adjustments: A list of EnergyAdjustments to apply to the entry.
 data: Optional dictionary containing entry data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1159,10 +1156,8 @@ calculation parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>composition</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition of the entry. For
-flexibility, this can take the form of all the typical input taken by a
-Composition, including a {symbol: amt} dict, a string formula, and
-others.</p></li>
+<li><p><strong>composition</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition of the entry. For flexibility, this can take the form of all the typical input
+taken by a Composition, including a {symbol: amt} dict, a string formula, and others.</p></li>
 <li><p><strong>energy</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Energy of the entry. Usually the final calculated
 energy from VASP or other electronic structure codes.</p></li>
 <li><p><strong>correction</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Manually set an energy correction, will ignore
@@ -1191,6 +1186,24 @@ with the entry. Defaults to None.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>GrandPotPDEntry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rxn_network.entries.interpolated.InterpolatedEntry.get_new_temperature">
+<span class="sig-name descname"><span class="pre">get_new_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_temperature</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/entries/interpolated.html#InterpolatedEntry.get_new_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.entries.interpolated.InterpolatedEntry.get_new_temperature" title="Link to this definition">#</a></dt>
+<dd><p>Return a copy of the InterpolatedEntry at the new specified temperature.</p>
+<p>WARNING: This is not possible for interpolated entries. Instead, this returns a copy of the original entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_temperature</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The new temperature to use [K]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the entry.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry" title="rxn_network.entries.interpolated.InterpolatedEntry"><em>InterpolatedEntry</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1229,10 +1242,12 @@ Physics for the National Institute of Standards and Technology, 1998.</p>
 </dl>
 <p>Args:
 composition: Composition object (within pymatgen).
-temperature: Temperature in Kelvin. If temperature is not selected from
-one of [300, 400, 500, … 2000 K], then free energies will be
-interpolated. Defaults to 300 K.
-energy_adjustments: A list of EnergyAdjustments to apply to the entry.
+temperature: Temperature in Kelvin. If temperature is not selected from</p>
+<blockquote>
+<div><p>one of [300, 400, 500, … 2000 K], then free energies will be
+interpolated. Defaults to 300 K.</p>
+</div></blockquote>
+<p>energy_adjustments: A list of EnergyAdjustments to apply to the entry.
 data: Optional dictionary containing entry data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1564,6 +1579,7 @@ reduced formula FeO or with materials_id mp-1234.</p>
 <li><a class="reference internal" href="#module-rxn_network.entries.interpolated">rxn_network.entries.interpolated</a><ul>
 <li><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry</span></code></a><ul>
 <li><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry.to_grand_entry"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.to_grand_entry()</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry.get_new_temperature"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.get_new_temperature()</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry.unique_id"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.unique_id</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.entries.interpolated.InterpolatedEntry.is_experimental"><code class="docutils literal notranslate"><span class="pre">InterpolatedEntry.is_experimental</span></code></a></li>
 </ul>
@@ -1593,7 +1609,7 @@ reduced formula FeO or with materials_id mp-1234.</p>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=87b6a113"></script>
+</div><script src="_static/documentation_options.js?v=15c97ff8"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

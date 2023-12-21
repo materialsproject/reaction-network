@@ -410,46 +410,47 @@
         <span class="n">max_num_constraints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
-<span class="sd">        open_elem: The element to be considered as open.</span>
-<span class="sd">        mu: The chemical potential of the open element (eV).</span>
-<span class="sd">        precursors: Optional list of precursor formulas. The only reactions that</span>
-<span class="sd">        will be enumerated are those featuring one or more of these compositions</span>
-<span class="sd">        as reactants. The &quot;exclusive_precursors&quot; parameter allows one to tune</span>
-<span class="sd">        whether the enumerated reactions should include ALL precursors (the</span>
-<span class="sd">        default) or just one.</span>
-<span class="sd">        targets: Optional list of target formulas. The only reactions that</span>
-<span class="sd">        will be enumerated are those featuring one or more of these compositions</span>
-<span class="sd">        as products. The &quot;exclusive_targets&quot; parameter allows one to tune</span>
-<span class="sd">        whether the enumerated reactions should include ALL targets or just one</span>
-<span class="sd">        (the default).</span>
-<span class="sd">        exclusive_precursors: Whether enumerated reactions are required to have</span>
-<span class="sd">        reactants that are a subset of the provided list of precursors. If True</span>
-<span class="sd">        (the default), this only identifies reactions with reactants selected</span>
-<span class="sd">        from the provided precursors.</span>
-<span class="sd">        exclusive_targets: Whether enumerated reactions are required to have</span>
-<span class="sd">        products that are a subset of the provided list of targets. If False,</span>
-<span class="sd">        (the default), this identifies all reactions containing at least one</span>
-<span class="sd">        composition from the provided list of targets (and any number of</span>
-<span class="sd">        byproducts).</span>
-<span class="sd">        filter_duplicates: Whether to remove duplicate reactions. Defaults to False.</span>
-<span class="sd">        filter_by_chemsys: An optional chemical system for which to filter produced</span>
-<span class="sd">        reactions by. This ensures that all output reactions contain at least</span>
-<span class="sd">        one element within the provided system.</span>
-<span class="sd">        chunk_size: The minimum number of reactions per chunk procssed. Needs to be</span>
-<span class="sd">        sufficiently large to make parallelization a cost-effective strategy.</span>
-<span class="sd">        Defaults to MIN_CHUNK_SIZE.</span>
-<span class="sd">        max_num_jobs: The upper limit for the number of jobs created. Defaults to</span>
-<span class="sd">        MAX_NUM_JOBS.</span>
-<span class="sd">        remove_unbalanced: Whether to remove reactions which are unbalanced; this is</span>
-<span class="sd">        usually advisable. Defaults to True.</span>
-<span class="sd">        remove_changed: Whether to remove reactions which can only be balanced by</span>
-<span class="sd">        removing a reactant/product or having it change sides. This is also</span>
-<span class="sd">        advisable for ensuring that only unique reaction sets are produced.</span>
-<span class="sd">        Defaults to True.</span>
-<span class="sd">        max_num_constraints: The maximum number of allowable constraints enforced by</span>
-<span class="sd">        reaction balancing. Defaults to 1 (which is usually advisable).</span>
-<span class="sd">        quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            open_elem: The element to be considered as open.</span>
+<span class="sd">            mu: The chemical potential of the open element (eV).</span>
+<span class="sd">            precursors: Optional list of precursor formulas. The only reactions that</span>
+<span class="sd">                will be enumerated are those featuring one or more of these compositions</span>
+<span class="sd">                as reactants. The &quot;exclusive_precursors&quot; parameter allows one to tune</span>
+<span class="sd">                whether the enumerated reactions should include ALL precursors (the</span>
+<span class="sd">                default) or just one.</span>
+<span class="sd">            targets: Optional list of target formulas. The only reactions that</span>
+<span class="sd">                will be enumerated are those featuring one or more of these compositions</span>
+<span class="sd">                as products. The &quot;exclusive_targets&quot; parameter allows one to tune</span>
+<span class="sd">                whether the enumerated reactions should include ALL targets or just one</span>
+<span class="sd">                (the default).</span>
+<span class="sd">            exclusive_precursors: Whether enumerated reactions are required to have</span>
+<span class="sd">                reactants that are a subset of the provided list of precursors. If True</span>
+<span class="sd">                (the default), this only identifies reactions with reactants selected</span>
+<span class="sd">                from the provided precursors.</span>
+<span class="sd">            exclusive_targets: Whether enumerated reactions are required to have</span>
+<span class="sd">                products that are a subset of the provided list of targets. If False,</span>
+<span class="sd">                (the default), this identifies all reactions containing at least one</span>
+<span class="sd">                composition from the provided list of targets (and any number of</span>
+<span class="sd">                byproducts).</span>
+<span class="sd">            filter_duplicates: Whether to remove duplicate reactions. Defaults to False.</span>
+<span class="sd">            filter_by_chemsys: An optional chemical system for which to filter produced</span>
+<span class="sd">                reactions by. This ensures that all output reactions contain at least</span>
+<span class="sd">                one element within the provided system.</span>
+<span class="sd">            chunk_size: The minimum number of reactions per chunk procssed. Needs to be</span>
+<span class="sd">                sufficiently large to make parallelization a cost-effective strategy.</span>
+<span class="sd">                Defaults to MIN_CHUNK_SIZE.</span>
+<span class="sd">            max_num_jobs: The upper limit for the number of jobs created. Defaults to</span>
+<span class="sd">                MAX_NUM_JOBS.</span>
+<span class="sd">            remove_unbalanced: Whether to remove reactions which are unbalanced; this is</span>
+<span class="sd">                usually advisable. Defaults to True.</span>
+<span class="sd">            remove_changed: Whether to remove reactions which can only be balanced by</span>
+<span class="sd">                removing a reactant/product or having it change sides. This is also</span>
+<span class="sd">                advisable for ensuring that only unique reaction sets are produced.</span>
+<span class="sd">                Defaults to True.</span>
+<span class="sd">            max_num_constraints: The maximum number of allowable constraints enforced by</span>
+<span class="sd">                reaction balancing. Defaults to 1 (which is usually advisable).</span>
+<span class="sd">            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">precursors</span><span class="o">=</span><span class="n">precursors</span><span class="p">,</span>
@@ -529,7 +530,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
+</div><script src="../../../_static/documentation_options.js?v=15c97ff8"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

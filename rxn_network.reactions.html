@@ -444,8 +444,9 @@ new products, and vice versa.</p>
 <dt class="sig sig-object py" id="rxn_network.reactions.basic.BasicReaction.is_separable">
 <span class="sig-name descname"><span class="pre">is_separable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rxn_network/reactions/basic.html#BasicReaction.is_separable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rxn_network.reactions.basic.BasicReaction.is_separable" title="Link to this definition">#</a></dt>
 <dd><p>Checks if the reaction forms byproducts which are separable from the target
-composition; i.e., byproducts do not contain any of the elements in the target
-phase.</p>
+composition.</p>
+<p>Separable byproducts are those that are common gases (e.g., CO2), or other phases that do not contain any of the
+elements in the target phase.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition of target; elements in this phase will be used to
@@ -598,18 +599,13 @@ information about reaction thermodynamics.</p>
 <p>Convenience class to generate a reaction from ComputedEntry objects, with
 some additional attributes, such as a reaction energy based on computed
 energies. This class also balances the reaction.</p>
-<p>Args:
-entries: List of ComputedEntry objects.
-coefficients: List or array of reaction coefficients.
-data: Optional dict of data
-lowest_num_errors: number of “errors” encountered during reaction balancing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – </p></li>
-<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – </p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – List of ComputedEntry objects.</p></li>
+<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – List or array of reaction coefficients.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dict of data</p></li>
+<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – number of “errors” encountered during reaction balancing.</p></li>
 </ul>
 </dd>
 </dl>
@@ -773,18 +769,14 @@ Another factor can be specified.</p>
 reactants. This class is more generalized than the InterfacialReactivity class and
 can encompass any set of reactions between two reactants, regardless of whether
 the reaction products are “stable” (i.e. together on the convex hull).</p>
-<p>Args:
-c1: Composition of reactant 1
-c2: Composition of reactant 2
-reactions: List of reactions containing all enumerated reactions between the
-two reactants. Note that this list should not include identity reactions
-of the precursors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>c1</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – </p></li>
-<li><p><strong>c2</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – </p></li>
-<li><p><strong>reactions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a><em>]</em>) – </p></li>
+<li><p><strong>c1</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition of reactant 1</p></li>
+<li><p><strong>c2</strong> (<a class="reference internal" href="rxn_network.core.html#rxn_network.core.Composition" title="rxn_network.core.Composition"><em>Composition</em></a>) – Composition of reactant 2</p></li>
+<li><p><strong>reactions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><em>ComputedReaction</em></a><em>]</em>) – List of reactions containing all enumerated reactions between the
+two reactants. Note that this list should not include identity reactions
+of the precursors.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1122,21 +1114,15 @@ computed as changes in grand potential.</p>
 <dd><p>Bases: <a class="reference internal" href="#rxn_network.reactions.computed.ComputedReaction" title="rxn_network.reactions.computed.ComputedReaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputedReaction</span></code></a></p>
 <p>Extends the ComputedReaction class to add support for “open” reactions,
 where the reaction energy is calculated as a change in grand potential.</p>
-<p>Args:
-entries: List of ComputedEntry objects.
-coefficients: List of reaction coefficients.
-chempots: Dict of chemical potentials corresponding to open elements.
-data: Optional dict of data.
-lowest_num_errors: number of “errors” encountered during reaction
-balancing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – </p></li>
-<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – </p></li>
-<li><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – </p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – List of ComputedEntry objects.</p></li>
+<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – List of reaction coefficients.</p></li>
+<li><p><strong>chempots</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Element</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – Dict of chemical potentials corresponding to open elements.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> | </em><em>None</em>) – Optional dict of data.</p></li>
+<li><p><strong>lowest_num_errors</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – number of “errors” encountered during reaction
+balancing.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1342,23 +1328,16 @@ dumping large amounts of reaction data to a database.</p>
 <dt>Note: this is not a true “set”; there is the option for filtering duplicates but it</dt><dd><p>is not explicitly required.</p>
 </dd>
 </dl>
-<p>Args:
-entries: List of ComputedEntry objects shared by reactions
-indices: Array indexing the entry list; gets entries used by each
-reaction object
-coeffs: Array of all reaction coefficients
-open_elem: Open element, e.g., “O”
-chempot: Chemical potential (mu) of open element in equation: Phi = G - mu*N
-all_data: Optional list of data for each reaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – </p></li>
-<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>]</em>) – </p></li>
-<li><p><strong>coeffs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>]</em>) – </p></li>
-<li><p><strong>open_elem</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>Element</em><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>all_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>entries</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>ComputedEntry</em><em>]</em>) – List of ComputedEntry objects shared by reactions</p></li>
+<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>]</em>) – Array indexing the entry list; gets entries used by each
+reaction object</p></li>
+<li><p><strong>coeffs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>]</em>) – Array of all reaction coefficients</p></li>
+<li><p><strong>open_elem</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>Element</em><em> | </em><em>None</em>) – Open element, e.g., “O”</p></li>
+<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Chemical potential (mu) of open element in equation: Phi = G - mu*N</p></li>
+<li><p><strong>all_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>np.ndarray</em><em>] </em><em>| </em><em>None</em>) – Optional list of data for each reaction.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1767,7 +1746,7 @@ calculated.</p>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=87b6a113"></script>
+</div><script src="_static/documentation_options.js?v=15c97ff8"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

@@ -375,7 +375,7 @@
         <span class="k">return</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">chemsys</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;Reaction network for chemical system: </span><span class="si">{self.chemsys}</span><span class="s2">, with graph: </span><span class="si">{self.graph!s}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Reaction network for chemical system: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chemsys</span><span class="si">}</span><span class="s2">, with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="si">!s}</span><span class="s2">&quot;</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span></div>
@@ -436,7 +436,7 @@
 
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">()</span><span class="si">}</span><span class="s2"> nodes and </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_edges</span><span class="p">()</span><span class="si">}</span><span class="s2"> edges&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Graph with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">()</span><span class="si">}</span><span class="s2"> nodes and </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_edges</span><span class="p">()</span><span class="si">}</span><span class="s2"> edges&quot;</span></div>
 
 </pre></div>
         </article>
@@ -469,7 +469,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=87b6a113"></script>
+</div><script src="../../../_static/documentation_options.js?v=15c97ff8"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

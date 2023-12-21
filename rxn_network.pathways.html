@@ -258,19 +258,14 @@
 <p>Helper class for storing multiple ComputedReaction objects which form a single
 reaction pathway as identified via pathfinding methods. Includes costs for each
 reaction.</p>
-<p>Args:
-reactions: list of ComputedReaction objects which occur along path.
-coefficients: list of coefficients to balance each corresponding reaction.
-costs: list of corresponding costs for each reaction.
-balanced: whether or not the reaction pathway is balanced.
-Defaults to False and should ideally be set through PathwaySolver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>reactions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction" title="rxn_network.reactions.base.Reaction"><em>Reaction</em></a><em>]</em>) – </p></li>
-<li><p><strong>coefficients</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – </p></li>
-<li><p><strong>costs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – </p></li>
-<li><p><strong>balanced</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>reactions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.base.Reaction" title="rxn_network.reactions.base.Reaction"><em>Reaction</em></a><em>]</em>) – list of ComputedReaction objects which occur along path.</p></li>
+<li><p><strong>coefficients</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – list of coefficients to balance each corresponding reaction.</p></li>
+<li><p><strong>costs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – list of corresponding costs for each reaction.</p></li>
+<li><p><strong>balanced</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – whether or not the reaction pathway is balanced.
+Defaults to False and should ideally be set through PathwaySolver.</p></li>
 </ul>
 </dd>
 </dl>
@@ -466,20 +461,15 @@ represents a set of pathways as a (non-rectangular) 2D array of indices
 corresponding to reactions within a reaction set. This is useful for dumping
 reaction pathway data to a database.</p>
 <p>This object can easily be initialized through the from_paths() constructor.</p>
-<p>Args:
-reaction_set: The reaction set containing all reactions in the pathways.
-indices: A list of lists of indices corresponding to reactions in the
-reaction set.
-coefficients: An array or list of coefficients representing the
-multiplicities (i.e., how much of) each reaction in the pathway.
-costs: An array or list of costs for each pathway.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>reaction_set</strong> (<a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet" title="rxn_network.reactions.reaction_set.ReactionSet"><em>ReactionSet</em></a>) – </p></li>
-<li><p><strong>indices</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>]</em><em>]</em>) – </p></li>
-<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>] </em><em>| </em><em>None</em><em>]</em>) – </p></li>
-<li><p><strong>costs</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>reaction_set</strong> (<a class="reference internal" href="rxn_network.reactions.html#rxn_network.reactions.reaction_set.ReactionSet" title="rxn_network.reactions.reaction_set.ReactionSet"><em>ReactionSet</em></a>) – The reaction set containing all reactions in the pathways.</p></li>
+<li><p><strong>indices</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>]</em><em>]</em>) – A list of lists of indices corresponding to reactions in the
+reaction set.</p></li>
+<li><p><strong>coefficients</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>] </em><em>| </em><em>None</em><em>]</em>) – An array or list of coefficients representing the</p></li>
+<li><p><strong>multiplicities</strong> (<em>i.e.</em><em>, </em><em>how much of</em>) – </p></li>
+<li><p><strong>costs</strong> (<em>np.ndarray</em><em> | </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em><em>]</em>) – An array or list of costs for each pathway.</p></li>
 </ul>
 </dd>
 </dl>
@@ -638,27 +628,19 @@ lists of reactions).</p>
 Predicting Chemical Reaction Pathways in Solid-State Materials Synthesis. Nature
 Communications 2021, 12 (1), 3097. <a class="reference external" href="https://doi.org/10.1038/s41467-021-23339-x">https://doi.org/10.1038/s41467-021-23339-x</a>.</p>
 </div></blockquote>
-<p>Args:
-pathways: List of reaction pathways derived from the network.
-entries: GibbsEntrySet containing all entries in the network.
-cost_function: CostFunction object to use for the solver.
-open_elem: Optional element to use for pathways with an open element.
-chempot: Chemical potential to use for pathways with an open element.
-Defaults to 0.0.
-chunk_size: The number of pathways per chunk to use for balancing. Defaults
-to 100,000.
-batch_size: Number of chunks to submit to each CPU at a time. Automatically
-calculated if not set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pathways</strong> (<a class="reference internal" href="#rxn_network.pathways.pathway_set.PathwaySet" title="rxn_network.pathways.pathway_set.PathwaySet"><em>PathwaySet</em></a>) – </p></li>
-<li><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – </p></li>
-<li><p><strong>cost_function</strong> (<a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction" title="rxn_network.costs.base.CostFunction"><em>CostFunction</em></a>) – </p></li>
-<li><p><strong>open_elem</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>Element</em><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>pathways</strong> (<a class="reference internal" href="#rxn_network.pathways.pathway_set.PathwaySet" title="rxn_network.pathways.pathway_set.PathwaySet"><em>PathwaySet</em></a>) – List of reaction pathways derived from the network.</p></li>
+<li><p><strong>entries</strong> (<a class="reference internal" href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet" title="rxn_network.entries.entry_set.GibbsEntrySet"><em>GibbsEntrySet</em></a>) – GibbsEntrySet containing all entries in the network.</p></li>
+<li><p><strong>cost_function</strong> (<a class="reference internal" href="rxn_network.costs.html#rxn_network.costs.base.CostFunction" title="rxn_network.costs.base.CostFunction"><em>CostFunction</em></a>) – CostFunction object to use for the solver.</p></li>
+<li><p><strong>open_elem</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> | </em><em>Element</em><em> | </em><em>None</em>) – Optional element to use for pathways with an open element.</p></li>
+<li><p><strong>chempot</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Chemical potential to use for pathways with an open element.
+Defaults to 0.0.</p></li>
+<li><p><strong>chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of pathways per chunk to use for balancing. Defaults
+to 100,000.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> | </em><em>None</em>) – Number of chunks to submit to each CPU at a time. Automatically
+calculated if not set.</p></li>
 </ul>
 </dd>
 </dl>
@@ -845,7 +827,7 @@ steps are interdependent. Defaults to True.</p></li>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=87b6a113"></script>
+</div><script src="_static/documentation_options.js?v=15c97ff8"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
