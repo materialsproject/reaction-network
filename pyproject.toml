@@ -37,10 +37,9 @@ requires-python = ">=3.9"
 dependencies = [
     "pymatgen>=2023.11.12",
     "numba>=0.58.1",
-    "jobflow>=0.1.14",
-    "ray>=2.8.0",
+    "jobflow>=0.1.15",
+    "ray>=2.9.0",
     "rustworkx>=0.13.2",
-    "pydantic<2.5"  # ray not supporting pydantic 2.5 yet
 ]
 
 [project.optional-dependencies]
@@ -54,16 +53,16 @@ docs = [
     "sphinx==7.2.6",
 ]
 tests = [
-    "mp-api==0.37.5",  # required for testing get_entry_set job
+    "mp-api==0.39.4",  # required for testing get_entry_set job
     "pytest==7.4.3",
     "pytest-cov==4.1.0",
-    "pytest-xdist==3.3.1",
+    "pytest-xdist==3.5.0",
 ]
 strict = [
-    "pymatgen==2023.11.12",
+    "pymatgen==2023.12.18",
     "numba==0.58.1",
     "jobflow==0.1.14",
-    "ray==2.8.0",
+    "ray==2.9.0",
     "rustworkx==0.13.2",
 ]
 

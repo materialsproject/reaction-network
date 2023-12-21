@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from monty.serialization import loadfn
+
 from rxn_network.data import PATH_TO_NIST, load_experimental_data
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 
@@ -14,6 +16,7 @@ if TYPE_CHECKING:
     from rxn_network.core import Composition
 
 G_COMPOUNDS = load_experimental_data(PATH_TO_NIST / "compounds.json.gz")
+DEPRECATED_COMPOUNDS = loadfn(PATH_TO_NIST / "deprecated_compounds.json")
 
 
 class NISTReferenceEntry(ExperimentalReferenceEntry):
@@ -28,6 +31,7 @@ class NISTReferenceEntry(ExperimentalReferenceEntry):
     """
 
     REFERENCES = G_COMPOUNDS
+    DEPRECATED = DEPRECATED_COMPOUNDS
 
     def __init__(
         self,

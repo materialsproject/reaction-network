@@ -10,6 +10,10 @@ from pymatgen.entries.computed_entries import ComputedEntry, EnergyAdjustment
 from scipy.interpolate import interp1d
 
 from rxn_network.core import Composition
+from rxn_network.utils.funcs import get_logger
+
+logger = get_logger(__name__)
+
 
 if TYPE_CHECKING:
     from pymatgen.core.periodic_table import Element
@@ -22,6 +26,7 @@ class ExperimentalReferenceEntry(ComputedEntry):
     """
 
     REFERENCES: dict = {}
+    DEPRECATED: list = []
 
     def __init__(
         self,
@@ -30,19 +35,23 @@ class ExperimentalReferenceEntry(ComputedEntry):
         energy_adjustments: list[EnergyAdjustment] | None = None,
         data: dict | None = None,
     ):
-        """Args:
-        composition: Composition object
-        temperature: Temperature in Kelvin. If temperature is not selected within
-        the range of the reference  data (see self._validate_temperature), then
-        this will raise an error.
-        energy_adjustments: A list of EnergyAdjustments to apply to the entry.
-        data: Optional dictionary containing entry data.
         """
+        Args:
+            composition: Composition object
+            temperature: Temperature in Kelvin. If temperature is not selected within
+                the range of the reference  data (see self._validate_temperature), then
+                this will raise an error.
+            energy_adjustments: A list of EnergyAdjustments to apply to the entry.
+            data: Optional dictionary containing entry data.
+        """
+        self.is_deprecated = composition.reduced_formula in self.DEPRECATED
+
         formula = composition.reduced_formula
+
         entry_id = f"{self.__class__.__name__}-{formula}_{temperature}"
 
-        self._temperature = temperature
         self._validate_temperature(formula, temperature)
+        self._temperature = temperature
 
         energy = self._get_energy(formula, temperature)
 
@@ -54,8 +63,9 @@ class ExperimentalReferenceEntry(ComputedEntry):
             entry_id=entry_id,
         )
         self._composition = composition
-
         self.name = formula
+        if self.is_deprecated:
+            self.name += " (deprecated)"
 
     def get_new_temperature(self, new_temperature: float) -> ExperimentalReferenceEntry:
         """Return a copy of the NISTReferenceEntry at the new specified temperature.
@@ -82,19 +92,20 @@ class ExperimentalReferenceEntry(ComputedEntry):
         """
         return GrandPotPDEntry(self, chempots)
 
-    @classmethod
-    def _validate_temperature(cls, formula: str, temperature: float) -> None:
+    def _validate_temperature(self, formula: str, temperature: float) -> None:
         """Ensure that the temperature is from a valid range."""
-        if formula not in cls.REFERENCES:
+        if self.is_deprecated:
+            logger.warning(f"{formula} is deprecated! Using a formation energy of 0.0 eV.")
+            return  # skip validation
+
+        if formula not in self.REFERENCES:
             raise ValueError(f"{formula} not in reference data!")
 
-        g = cls.REFERENCES[formula]
-
+        g = self.REFERENCES[formula]
         if temperature < min(g) or temperature > max(g):
             raise ValueError(f"Temperature must be selected from range: {min(g)} K to {max(g)} K")
 
-    @classmethod
-    def _get_energy(cls, formula: str, temperature: float) -> float:
+    def _get_energy(self, formula: str, temperature: float) -> float:
         """Convenience method for accessing and interpolating experimental data.
 
         Args:
@@ -104,7 +115,10 @@ class ExperimentalReferenceEntry(ComputedEntry):
         Returns:
             Gibbs free energy of formation of formula at specified temperature [eV]
         """
-        data = cls.REFERENCES[formula]
+        if self.is_deprecated:
+            return 0.0
+
+        data = self.REFERENCES[formula]
 
         if temperature % 100 > 0:
             g_interp = interp1d(list(data.keys()), list(data.values()))
@@ -169,10 +183,16 @@ class ExperimentalReferenceEntry(ComputedEntry):
         )
 
     def __repr__(self) -> str:
-        output = [
-            f"{self.__class__.__name__} | {self.composition.reduced_formula}",
-            f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
-        ]
+        output = []
+        if self.is_deprecated:
+            output.append("DEPRECATED")
+
+        output.extend(
+            [
+                f"{self.__class__.__name__} | {self.composition.reduced_formula}",
+                f"Gibbs Energy ({self.temperature} K) = {self.energy:.4f}",
+            ]
+        )
         return "\n".join(output)
 
     def __eq__(self, other) -> bool:

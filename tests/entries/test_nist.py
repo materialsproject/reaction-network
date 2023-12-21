@@ -26,6 +26,11 @@ def test_invalid_temperature():
         NISTReferenceEntry(Composition("K2CO3"), temperature=2300)
 
 
+def test_deprecated():
+    entry = NISTReferenceEntry(Composition("NaCO3"), temperature=300)
+    assert entry.is_deprecated
+
+
 def test_energy(entries):
     expected_energies = [
         -4.087606831162386,
