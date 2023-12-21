@@ -61,7 +61,7 @@ tests = [
 strict = [
     "pymatgen==2023.12.18",
     "numba==0.58.1",
-    "jobflow==0.1.14",
+    "jobflow==0.1.15",
     "ray==2.9.0",
     "rustworkx==0.13.2",
 ]
