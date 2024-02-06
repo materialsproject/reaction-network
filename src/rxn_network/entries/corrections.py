@@ -1,9 +1,12 @@
 """Energy correction classes for entry objects."""
 from __future__ import annotations
 
+import math
+
 from pymatgen.entries.computed_entries import CompositionEnergyAdjustment
 
 CARBONATE_CORRECTION = 0.830  # eV per (CO3)2- anion in composition; see Jupyter NB for fitting
+PCO2 = 0.0004  # partial pressure of CO2 in the atmosphere
 
 
 class CarbonateCorrection(CompositionEnergyAdjustment):
@@ -40,3 +43,46 @@ class CarbonateCorrection(CompositionEnergyAdjustment):
     def carbonate_correction(self) -> float:
         """Energy correction for carbonate ion, eV per (CO3)2- anion."""
         return self._carbonate_correction
+
+
+class CarbonDioxideAtmosphericCorrection(CompositionEnergyAdjustment):
+    """Supplies a correction to the energy of CO2 due to its low partial pressure in the
+    standard atmosphere (0.04%).
+
+    See provided jupyter NB for fitting of the correction:
+    data/fit_carbonate_correction.ipynb
+    """
+
+    def __init__(self, n_atoms: int, temp: float, pco2: float = PCO2):
+        """Initalizes a carbonate correction object.
+
+        Args:
+            n_atoms: Number of atoms in the composition object
+            temp: Temperature at which the correction is applied, in K
+            pco2: Partial pressure of CO2 in the atmosphere, in atm
+        """
+        self._pco2 = pco2
+        self._temp = temp
+
+        super().__init__(
+            adj_per_atom=self.get_dmu(),
+            n_atoms=n_atoms,
+            name="Atmospheric CO2 Correction",
+            description=("Correction for CO2 energy based on partial pressure in the atmosphere"),
+        )
+
+    def get_dmu(self) -> float:
+        """Returns the chemical potential of CO2 in the atmosphere at a given
+        temperature: dmu = kTlnP(CO2).
+        """
+        return 8.617e-5 * self.temp * math.log(self.pco2)
+
+    @property
+    def temp(self) -> float:
+        """Temperature at which the correction is applied, in K."""
+        return self._temp
+
+    @property
+    def pco2(self) -> float:
+        """Partial pressure of CO2 in the atmosphere, in atm."""
+        return self._pco2
