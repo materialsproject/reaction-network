@@ -21,7 +21,7 @@ from tqdm import tqdm
 
 from rxn_network.core import Composition
 from rxn_network.data import PATH_TO_NIST
-from rxn_network.entries.corrections import CarbonateCorrection
+from rxn_network.entries.corrections import CarbonateCorrection, CarbonDioxideAtmosphericCorrection
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.freed import FREEDReferenceEntry
 from rxn_network.entries.gibbs import GibbsComputedEntry
@@ -356,6 +356,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_nist_data: bool = True,
         include_freed_data: bool = False,
         apply_carbonate_correction: bool = True,
+        apply_atmospheric_co2_correction: bool = True,
         ignore_nist_solids: bool = True,
         calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
@@ -372,6 +373,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 to False. Use at your own risk!
             apply_carbonate_correction: Whether to apply the fit energy
                 correction for carbonates. Defaults to True.
+            apply_atmospheric_co2_correction: Whether to modify the chemical potential
+                of CO2 by its partial pressure in the atmosphere (0.04%). Defaults to True.
             ignore_nist_solids: Whether to ignore NIST data for the solids specified in
                 the "data/nist/ignore_solids.json" file; these all have melting points
                 Tm >= 1500 ºC. Defaults to Ture.
@@ -396,25 +399,33 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 continue
 
             new_entries = []
-
             new_entry = None
             if include_nist_data:
-                new_entry = cls._check_for_experimental(formula, "nist", temperature, ignore_nist_solids)
+                new_entry = cls._check_for_experimental(
+                    formula, "nist", temperature, ignore_nist_solids, apply_atmospheric_co2_correction
+                )
                 if new_entry:
                     new_entries.append(new_entry)
+
             if include_freed_data:
-                new_entry = cls._check_for_experimental(formula, "freed", temperature, ignore_nist_solids)
+                new_entry = cls._check_for_experimental(
+                    formula, "freed", temperature, ignore_nist_solids, apply_atmospheric_co2_correction
+                )
                 if new_entry:
                     new_entries.append(new_entry)
 
             if new_entry:
                 experimental_formulas.append(formula)
             else:
-                corr = None
+                energy_adjustments = []
                 if apply_carbonate_correction:
                     corr = cls._get_carbonate_correction(entry)
-
-                energy_adjustments = [corr] if corr else None
+                    if corr is not None:
+                        energy_adjustments.append(corr)
+                if apply_atmospheric_co2_correction and formula == "CO2":
+                    energy_adjustments.append(
+                        CarbonDioxideAtmosphericCorrection(entry.composition.num_atoms, temperature)
+                    )
 
                 structure = entry.structure
                 formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
@@ -460,6 +471,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_nist_data: bool = True,
         include_freed_data: bool = False,
         apply_carbonate_correction: bool = True,
+        apply_atmospheric_co2_correction: bool = True,
         ignore_nist_solids: bool = True,
         calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
@@ -483,6 +495,8 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 your own risk!
             apply_carbonate_correction: Whether to apply the fit GGA energy correction
                 for carbonates. Defaults to True.
+            apply_atmospheric_co2_correction: Whether to modify the chemical potential
+                of CO2 by its partial pressure in the atmosphere (). Defaults to True.
             ignore_nist_solids: Whether to ignore NIST data for the solids specified in
                 the "data/nist/ignore_solids.json" file; these all have melting points
                 Tm >= 1500 ºC. Defaults to True.
@@ -506,6 +520,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_nist_data=include_nist_data,
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
+                apply_atmospheric_co2_correction=apply_atmospheric_co2_correction,
                 ignore_nist_solids=ignore_nist_solids,
                 calculate_e_above_hulls=calculate_e_above_hulls,
                 minimize_obj_size=minimize_obj_size,
@@ -520,6 +535,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_nist_data=include_nist_data,
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
+                apply_atmospheric_co2_correction=apply_atmospheric_co2_correction,
                 ignore_nist_solids=ignore_nist_solids,
                 calculate_e_above_hulls=calculate_e_above_hulls,
                 minimize_obj_size=minimize_obj_size,
@@ -596,7 +612,13 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return MontyDecoder().process_decoded(entry_dict)
 
     @staticmethod
-    def _check_for_experimental(formula: str, cls_name: str, temperature: float, ignore_nist_solids: bool):
+    def _check_for_experimental(
+        formula: str,
+        cls_name: str,
+        temperature: float,
+        ignore_nist_solids: bool,
+        apply_atmospheric_co2_correction: bool,
+    ):
         cls_name = cls_name.lower()
         if cls_name in ("nist", "nistreferenceentry"):
             cl = NISTReferenceEntry
@@ -609,8 +631,15 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         if formula in cl.REFERENCES:
             if cl == NISTReferenceEntry and ignore_nist_solids and formula in IGNORE_NIST_SOLIDS:
                 return None
+
+            energy_adjustments = None
+            if apply_atmospheric_co2_correction and formula == "CO2":
+                energy_adjustments = [CarbonDioxideAtmosphericCorrection(3, temperature)]
+
             try:
-                entry = cl(composition=Composition(formula), temperature=temperature)
+                entry = cl(
+                    composition=Composition(formula), temperature=temperature, energy_adjustments=energy_adjustments
+                )
             except ValueError as error:
                 logger.debug(f"Compound {formula} is in {cl} tables but at different temperatures!: {error}")
 
