@@ -248,9 +248,12 @@
 <span></span><span class="sd">&quot;&quot;&quot;Energy correction classes for entry objects.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span> <span class="nn">math</span>
+
 <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">CompositionEnergyAdjustment</span>
 
 <span class="n">CARBONATE_CORRECTION</span> <span class="o">=</span> <span class="mf">0.830</span>  <span class="c1"># eV per (CO3)2- anion in composition; see Jupyter NB for fitting</span>
+<span class="n">PCO2</span> <span class="o">=</span> <span class="mf">0.0004</span>  <span class="c1"># partial pressure of CO2 in the atmosphere (it&#39;s around 0.04%)</span>
 
 
 <div class="viewcode-block" id="CarbonateCorrection">
@@ -290,6 +293,57 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Energy correction for carbonate ion, eV per (CO3)2- anion.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_carbonate_correction</span></div>
 
+
+
+<div class="viewcode-block" id="CarbonDioxideAtmosphericCorrection">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.corrections.CarbonDioxideAtmosphericCorrection">[docs]</a>
+<span class="k">class</span> <span class="nc">CarbonDioxideAtmosphericCorrection</span><span class="p">(</span><span class="n">CompositionEnergyAdjustment</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Supplies a correction to the energy of CO2 due to its low partial pressure in the</span>
+<span class="sd">    standard atmosphere (0.04%).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pco2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">PCO2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initalizes a carbon dioxide correction object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n_atoms: Number of atoms in the composition object</span>
+<span class="sd">            temp: Temperature at which the correction is applied, in K</span>
+<span class="sd">            pco2: Partial pressure of CO2 in the atmosphere, in atm</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pco2</span> <span class="o">=</span> <span class="n">pco2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temp</span> <span class="o">=</span> <span class="n">temp</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">adj_per_atom</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dmu</span><span class="p">(),</span>
+            <span class="n">n_atoms</span><span class="o">=</span><span class="n">n_atoms</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Atmospheric CO2 Correction&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Correction for CO2 energy based on partial pressure in the atmosphere&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="CarbonDioxideAtmosphericCorrection.get_dmu">
+<a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.corrections.CarbonDioxideAtmosphericCorrection.get_dmu">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_dmu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the change in chemical potential of CO2 due to the atmospheric pCO2 at a given</span>
+<span class="sd">        temperature.</span>
+
+<span class="sd">        This is calculated by the formula: dmu = (1/3)*kTlnP(CO2).</span>
+
+<span class="sd">        The factor of 1/3 accounts for the number of atoms in one formula unit of CO2,</span>
+<span class="sd">        since the correction must be in eV/atom.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mf">8.617e-5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pco2</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">temp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Temperature at which the correction is applied, in K.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pco2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Partial pressure of CO2 in the atmosphere, in atm.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pco2</span></div>
+
 </pre></div>
         </article>
       </div>
@@ -321,7 +375,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=15c97ff8"></script>
+</div><script src="../../../_static/documentation_options.js?v=b1b1fbe1"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

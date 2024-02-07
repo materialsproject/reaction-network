@@ -542,8 +542,7 @@ network pathfinding.</p>
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
-<p><cite>__init__</cite> uses <cite>__pydantic_self__</cite> instead of the more common <cite>self</cite> for the first arg to
-allow <cite>self</cite> as a field name.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="rxn_network.jobs.schema.EntrySetDocument.task_label">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EntrySetDocument.task_label" title="Link to this definition">#</a></dt>
@@ -580,6 +579,12 @@ allow <cite>self</cite> as a field name.</p>
 <dd><p>The required formulas to include during construciton.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EntrySetDocument.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EntrySetDocument.model_computed_fields" title="Link to this definition">#</a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class pydantic_model">
@@ -590,8 +595,7 @@ allow <cite>self</cite> as a field name.</p>
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
-<p><cite>__init__</cite> uses <cite>__pydantic_self__</cite> instead of the more common <cite>self</cite> for the first arg to
-allow <cite>self</cite> as a field name.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.task_label">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.task_label" title="Link to this definition">#</a></dt>
@@ -646,6 +650,12 @@ allow <cite>self</cite> as a field name.</p>
 <dd><p>A list of the enumerator objects used to calculate the reactions.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.EnumeratorTaskDocument.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.model_computed_fields" title="Link to this definition">#</a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class pydantic_model">
@@ -657,8 +667,7 @@ CalculateCompetitionMaker job.</p>
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
-<p><cite>__init__</cite> uses <cite>__pydantic_self__</cite> instead of the more common <cite>self</cite> for the first arg to
-allow <cite>self</cite> as a field name.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.task_label">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.task_label" title="Link to this definition">#</a></dt>
@@ -737,6 +746,12 @@ allow <cite>self</cite> as a field name.</p>
 <dd><p>The kwargs for ChempotDistanceCalculator.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.CompetitionTaskDocument.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rxn_network.jobs.schema.CompetitionTaskDocument.model_computed_fields" title="Link to this definition">#</a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class pydantic_model">
@@ -748,8 +763,7 @@ allow <cite>self</cite> as a field name.</p>
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
-<p><cite>__init__</cite> uses <cite>__pydantic_self__</cite> instead of the more common <cite>self</cite> for the first arg to
-allow <cite>self</cite> as a field name.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument.task_label">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument.task_label" title="Link to this definition">#</a></dt>
@@ -792,6 +806,12 @@ allow <cite>self</cite> as a field name.</p>
 <dd><p>The target formulas.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.NetworkTaskDocument.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rxn_network.jobs.schema.NetworkTaskDocument.model_computed_fields" title="Link to this definition">#</a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class pydantic_model">
@@ -803,8 +823,7 @@ solver object and its calculated balanced pathways.</p>
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
-<p><cite>__init__</cite> uses <cite>__pydantic_self__</cite> instead of the more common <cite>self</cite> for the first arg to
-allow <cite>self</cite> as a field name.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.task_label">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.task_label" title="Link to this definition">#</a></dt>
@@ -881,6 +900,12 @@ allow <cite>self</cite> as a field name.</p>
 <dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.filter_interdependent">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_interdependent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><em class="property"> <span class="pre">[Required]</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.filter_interdependent" title="Link to this definition">#</a></dt>
 <dd><p>Whether to filter out interdependent pathway.s</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rxn_network.jobs.schema.PathwaySolverTaskDocument.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.model_computed_fields" title="Link to this definition">#</a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
 </dd></dl>
 
 </dd></dl>
@@ -999,6 +1024,7 @@ set are “additional” (not found in the target).</p>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.e_above_hull"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.e_above_hull</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.include_polymorphs"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.include_polymorphs</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.formulas_to_include"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.formulas_to_include</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EntrySetDocument.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">EntrySetDocument.model_computed_fields</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument</span></code></a><ul>
@@ -1011,6 +1037,7 @@ set are “additional” (not found in the target).</p>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.added_elements"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.added_elements</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.added_chemsys"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.added_chemsys</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.enumerators"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.enumerators</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.EnumeratorTaskDocument.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">EnumeratorTaskDocument.model_computed_fields</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument</span></code></a><ul>
@@ -1027,6 +1054,7 @@ set are “additional” (not found in the target).</p>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.temp"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.temp</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.batch_size"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.batch_size</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.cpd_kwargs"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.cpd_kwargs</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.CompetitionTaskDocument.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">CompetitionTaskDocument.model_computed_fields</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument</span></code></a><ul>
@@ -1037,6 +1065,7 @@ set are “additional” (not found in the target).</p>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.k"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.k</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.precursors"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.precursors</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.targets"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.targets</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.NetworkTaskDocument.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">NetworkTaskDocument.model_computed_fields</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument</span></code></a><ul>
@@ -1053,6 +1082,7 @@ set are “additional” (not found in the target).</p>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_basic_enumerator"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.use_basic_enumerator</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.use_minimize_enumerator"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.use_minimize_enumerator</span></code></a></li>
 <li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.filter_interdependent"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.filter_interdependent</span></code></a></li>
+<li><a class="reference internal" href="#rxn_network.jobs.schema.PathwaySolverTaskDocument.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">PathwaySolverTaskDocument.model_computed_fields</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1072,7 +1102,7 @@ set are “additional” (not found in the target).</p>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=15c97ff8"></script>
+</div><script src="_static/documentation_options.js?v=b1b1fbe1"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

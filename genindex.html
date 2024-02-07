@@ -380,6 +380,8 @@
 </li>
         <li><a href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonateCorrection">CarbonateCorrection (class in rxn_network.entries.corrections)</a>
 </li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonDioxideAtmosphericCorrection">CarbonDioxideAtmosphericCorrection (class in rxn_network.entries.corrections)</a>
+</li>
         <li><a href="rxn_network.reactions.html#rxn_network.reactions.basic.BasicReaction.chemical_system">chemical_system (rxn_network.reactions.basic.BasicReaction property)</a>
 </li>
         <li><a href="rxn_network.thermo.html#rxn_network.thermo.chempot_diagram.ChemicalPotentialDiagram">ChemicalPotentialDiagram (class in rxn_network.thermo.chempot_diagram)</a>
@@ -650,6 +652,8 @@
 </li>
         <li><a href="rxn_network.reactions.html#rxn_network.reactions.hull.InterfaceReactionHull.get_decomposition_energy_and_num_paths_recursive">get_decomposition_energy_and_num_paths_recursive() (rxn_network.reactions.hull.InterfaceReactionHull method)</a>
 </li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonDioxideAtmosphericCorrection.get_dmu">get_dmu() (rxn_network.entries.corrections.CarbonDioxideAtmosphericCorrection method)</a>
+</li>
         <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.get_e_above_hull">get_e_above_hull() (rxn_network.entries.entry_set.GibbsEntrySet method)</a>
 </li>
         <li><a href="rxn_network.network.html#rxn_network.network.network.get_edge_weight">get_edge_weight() (in module rxn_network.network.network)</a>
@@ -868,6 +872,18 @@
 </li>
         <li><a href="rxn_network.enumerators.html#rxn_network.enumerators.minimize.MinimizeGrandPotentialEnumerator">MinimizeGrandPotentialEnumerator (class in rxn_network.enumerators.minimize)</a>
 </li>
+        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.model_computed_fields">model_computed_fields (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EntrySetDocument.model_computed_fields">(rxn_network.jobs.schema.EntrySetDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.EnumeratorTaskDocument.model_computed_fields">(rxn_network.jobs.schema.EnumeratorTaskDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.NetworkTaskDocument.model_computed_fields">(rxn_network.jobs.schema.NetworkTaskDocument attribute)</a>
+</li>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.PathwaySolverTaskDocument.model_computed_fields">(rxn_network.jobs.schema.PathwaySolverTaskDocument attribute)</a>
+</li>
+        </ul></li>
         <li>
     module
 
@@ -1054,6 +1070,8 @@
         <li><a href="rxn_network.pathways.html#rxn_network.pathways.solver.PathwaySolver">PathwaySolver (class in rxn_network.pathways.solver)</a>
 </li>
         <li><a href="rxn_network.jobs.html#rxn_network.jobs.core.PathwaySolverMaker">PathwaySolverMaker (class in rxn_network.jobs.core)</a>
+</li>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonDioxideAtmosphericCorrection.pco2">pco2 (rxn_network.entries.corrections.CarbonDioxideAtmosphericCorrection property)</a>
 </li>
         <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.pd_dict">pd_dict (rxn_network.entries.entry_set.GibbsEntrySet property)</a>
 </li>
@@ -1546,8 +1564,12 @@
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.temp">temp (rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
+        <li><a href="rxn_network.entries.html#rxn_network.entries.corrections.CarbonDioxideAtmosphericCorrection.temp">temp (rxn_network.entries.corrections.CarbonDioxideAtmosphericCorrection property)</a>
+
+        <ul>
+          <li><a href="rxn_network.jobs.html#rxn_network.jobs.schema.CompetitionTaskDocument.temp">(rxn_network.jobs.schema.CompetitionTaskDocument attribute)</a>
 </li>
+        </ul></li>
         <li><a href="rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.temperature">temperature (rxn_network.entries.entry_set.GibbsEntrySet property)</a>
 
         <ul>
@@ -1651,7 +1673,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=15c97ff8"></script>
+</div><script src="_static/documentation_options.js?v=b1b1fbe1"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
