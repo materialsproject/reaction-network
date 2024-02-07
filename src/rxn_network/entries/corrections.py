@@ -6,7 +6,7 @@ import math
 from pymatgen.entries.computed_entries import CompositionEnergyAdjustment
 
 CARBONATE_CORRECTION = 0.830  # eV per (CO3)2- anion in composition; see Jupyter NB for fitting
-PCO2 = 0.0004  # partial pressure of CO2 in the atmosphere
+PCO2 = 0.0004  # partial pressure of CO2 in the atmosphere (it's around 0.04%)
 
 
 class CarbonateCorrection(CompositionEnergyAdjustment):
@@ -48,13 +48,10 @@ class CarbonateCorrection(CompositionEnergyAdjustment):
 class CarbonDioxideAtmosphericCorrection(CompositionEnergyAdjustment):
     """Supplies a correction to the energy of CO2 due to its low partial pressure in the
     standard atmosphere (0.04%).
-
-    See provided jupyter NB for fitting of the correction:
-    data/fit_carbonate_correction.ipynb
     """
 
     def __init__(self, n_atoms: int, temp: float, pco2: float = PCO2):
-        """Initalizes a carbonate correction object.
+        """Initalizes a carbon dioxide correction object.
 
         Args:
             n_atoms: Number of atoms in the composition object
@@ -72,10 +69,15 @@ class CarbonDioxideAtmosphericCorrection(CompositionEnergyAdjustment):
         )
 
     def get_dmu(self) -> float:
-        """Returns the chemical potential of CO2 in the atmosphere at a given
-        temperature: dmu = kTlnP(CO2).
+        """Returns the change in chemical potential of CO2 due to the atmospheric pCO2 at a given
+        temperature.
+
+        This is calculated by the formula: dmu = (1/3)*kTlnP(CO2).
+
+        The factor of 1/3 accounts for the number of atoms in one formula unit of CO2,
+        since the correction must be in eV/atom.
         """
-        return 8.617e-5 * self.temp * math.log(self.pco2)
+        return (1 / 3) * 8.617e-5 * self.temp * math.log(self.pco2)
 
     @property
     def temp(self) -> float:
