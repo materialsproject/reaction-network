@@ -1,5 +1,4 @@
 """Core definition for various task and synthesis recipe documents."""
-from datetime import datetime
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
@@ -19,7 +18,7 @@ class EntrySetDocument(BaseModel):
     """A single entry set object as produced by the GetEntrySet job."""
 
     task_label: Optional[str] = Field(None, description="The name of the task.")
-    last_updated: datetime = Field(
+    last_updated: str = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
@@ -37,7 +36,7 @@ class EnumeratorTaskDocument(BaseModel):
     """A single task object from the reaction enumerator workflow."""
 
     task_label: Optional[str] = Field(None, description="The name of the task.")
-    last_updated: datetime = Field(
+    last_updated: str = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
@@ -61,7 +60,7 @@ class CompetitionTaskDocument(BaseModel):
     """
 
     task_label: Optional[str] = Field(None, description="The name of the task.")
-    last_updated: datetime = Field(
+    last_updated: str = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
@@ -97,7 +96,7 @@ class NetworkTaskDocument(BaseModel):
     """
 
     task_label: Optional[str] = Field(None, description="The name of the task.")
-    last_updated: datetime = Field(
+    last_updated: str = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
@@ -114,7 +113,7 @@ class PathwaySolverTaskDocument(BaseModel):
     """
 
     task_label: Optional[str] = Field(None, description="The name of the task.")
-    last_updated: datetime = Field(
+    last_updated: str = Field(
         default_factory=datetime_str,
         description="Timestamp of when the document was last updated.",
     )
