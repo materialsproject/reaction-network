@@ -134,6 +134,13 @@ def test_equals(entries):
 
     assert entry1 != entry2
 
+    entry2_copy = NISTReferenceEntry(
+        composition=comp,
+        temperature=300,
+        energy_adjustments=[ManualEnergyAdjustment(0.1)],
+    )
+    assert entry2 == entry2_copy  # ensure identical energy_adjustments are compared correctly
+
 
 def test_unique_id(entries):
     entry = entries[300]

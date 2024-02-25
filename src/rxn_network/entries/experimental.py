@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import math
 from typing import TYPE_CHECKING
 
 from monty.json import MontyDecoder
@@ -196,11 +197,14 @@ class ExperimentalReferenceEntry(ComputedEntry):
         return "\n".join(output)
 
     def __eq__(self, other) -> bool:
+        """Note: the value of the energy correction must be compared rather than
+        the object due to equality checking in EnergyAdjustment.
+        """
         if isinstance(other, self.__class__):
             return (
                 (self.composition.reduced_formula == other.composition.reduced_formula)
                 and (self.temperature == other.temperature)
-                and (set(self.energy_adjustments) == set(other.energy_adjustments))
+                and math.isclose(self.correction_per_atom, other.correction_per_atom)
             )
         return False
 

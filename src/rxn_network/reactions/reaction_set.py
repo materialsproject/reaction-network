@@ -308,6 +308,7 @@ class ReactionSet(MSONable):
         """
         if self.entries != rxn_set.entries:
             raise ValueError("Reaction sets must have identical entries property to combine.")
+
         open_elem = self.open_elem
         chempot = self.chempot
 
