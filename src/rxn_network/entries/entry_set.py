@@ -455,9 +455,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return GibbsEntrySet(entries=self.entries)
 
     def as_dict(self) -> dict:
-        """Returns:
-        JSON serializable dict representation of the entry set.
-        """
+        """Returns a JSON serializable dict representation of the entry set."""
         d = super().as_dict()
         d["entries"] = [e.as_dict() for e in self.entries]
         d["calculate_e_above_hulls"] = self.calculate_e_above_hulls
