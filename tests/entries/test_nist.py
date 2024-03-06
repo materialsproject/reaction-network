@@ -1,4 +1,5 @@
-""" Tests for NISTReferenceEntry. """
+"""Tests for NISTReferenceEntry."""
+
 import pytest
 from pymatgen.core.periodic_table import Element
 from pymatgen.entries.computed_entries import ManualEnergyAdjustment

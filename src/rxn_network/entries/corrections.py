@@ -1,4 +1,5 @@
 """Energy correction classes for entry objects."""
+
 from __future__ import annotations
 
 import math

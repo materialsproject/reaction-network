@@ -1,6 +1,7 @@
 """Implements a reaction pathway solver class which efficiently solves mass balance
 equations using matrix operations.
 """
+
 from __future__ import annotations
 
 from abc import ABCMeta

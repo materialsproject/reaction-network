@@ -2,6 +2,7 @@
 Test for BasicReaction. Several tests adapted from
 test module for pymatgen.analysis.reaction_calculator
 """
+
 import pytest
 from pymatgen.core.composition import Element
 from rxn_network.core import Composition

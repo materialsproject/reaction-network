@@ -1,6 +1,7 @@
 """This module implements added features to the ChemicalPotentialDiagram class from
 pymatgen.
 """
+
 from __future__ import annotations
 
 from functools import cached_property

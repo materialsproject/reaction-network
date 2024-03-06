@@ -1,4 +1,5 @@
 """Basic interface for a reaction pathway."""
+
 from __future__ import annotations
 
 from abc import ABCMeta

@@ -1,4 +1,5 @@
 """Core definition for various task and synthesis recipe documents."""
+
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field

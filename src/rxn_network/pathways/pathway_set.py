@@ -1,6 +1,7 @@
 """Implements a class for conveniently and efficiently storing sets of Pathway-based
 objects which share entries/reactions.
 """
+
 from __future__ import annotations
 
 from functools import cached_property

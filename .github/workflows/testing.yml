@@ -29,8 +29,7 @@ jobs:
       - name: ruff
         run: |
           ruff --version
-          ruff .
-          ruff format --check .
+          ruff check
 
       - name: mypy
         run: |

@@ -1,4 +1,5 @@
 """Implementation of cost functions used in the package (e.g., Softplus, WeightedSum)."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

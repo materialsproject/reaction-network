@@ -1,4 +1,5 @@
-""" Tests for GibbsEntrySet. """
+"""Tests for GibbsEntrySet."""
+
 from copy import deepcopy
 
 import pytest

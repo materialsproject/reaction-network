@@ -1,1 +1,1 @@
-""" Tests for NetworkEntry """
+"""Tests for NetworkEntry"""

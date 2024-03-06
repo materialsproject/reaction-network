@@ -1,6 +1,7 @@
 """Implements a class for storing (unbalanced/unconstrained) collection of reactions
 forming a reaction pathway.
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

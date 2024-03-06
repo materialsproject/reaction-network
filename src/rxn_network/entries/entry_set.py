@@ -1,6 +1,7 @@
 """An entry set class for automatically building GibbsComputedEntry objects. Some of this
 code has been adapted from the EntrySet class in pymatgen.
 """
+
 from __future__ import annotations
 
 import collections
@@ -455,9 +456,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         return GibbsEntrySet(entries=self.entries)
 
     def as_dict(self) -> dict:
-        """Returns:
-        JSON serializable dict representation of the entry set.
-        """
+        """Returns a JSON serializable dict representation of the entry set."""
         d = super().as_dict()
         d["entries"] = [e.as_dict() for e in self.entries]
         d["calculate_e_above_hulls"] = self.calculate_e_above_hulls

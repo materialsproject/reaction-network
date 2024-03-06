@@ -1,4 +1,5 @@
-""" Tests for PathwaySolver"""
+"""Tests for PathwaySolver"""
+
 from pathlib import Path
 
 import numpy as np

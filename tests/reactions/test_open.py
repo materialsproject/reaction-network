@@ -1,4 +1,5 @@
-""" Tests for OpenComputedReaction. """
+"""Tests for OpenComputedReaction."""
+
 import pytest
 from pymatgen.core.composition import Element
 from rxn_network.reactions.open import OpenComputedReaction

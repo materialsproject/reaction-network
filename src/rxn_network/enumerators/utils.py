@@ -1,4 +1,5 @@
 """Utility functions used by the reaction enumerator classes."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

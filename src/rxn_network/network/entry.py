@@ -1,6 +1,7 @@
 """Entry objects used in a Network. These network entry objects hold multiple entries and
 can be used as data for a node in the graph.
 """
+
 from __future__ import annotations
 
 from enum import Enum, auto

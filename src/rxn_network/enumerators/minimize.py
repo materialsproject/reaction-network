@@ -1,6 +1,7 @@
 """This module implements two types of reaction enumerators using a free energy
 minimization technique, with or without the option of an open entry.
 """
+
 from __future__ import annotations
 
 from itertools import product

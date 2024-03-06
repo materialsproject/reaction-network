@@ -1,4 +1,5 @@
-""" Tests for GibbsComputedEntry. Some tests adapted from pymatgen."""
+"""Tests for GibbsComputedEntry. Some tests adapted from pymatgen."""
+
 from pathlib import Path
 
 import pytest

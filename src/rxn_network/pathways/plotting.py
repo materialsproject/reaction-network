@@ -1,4 +1,5 @@
 """This module contains functions for plotting experimental reaction pathway data."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

@@ -1,6 +1,7 @@
 """A reaction class that builds reactions based on ComputedEntry objects and provides
 information about reaction thermodynamics.
 """
+
 from __future__ import annotations
 
 from functools import cached_property

@@ -1,6 +1,7 @@
 """Implements an Entry that looks up pre-tabulated Gibbs free energies from the NIST-JANAF
 tables.
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

@@ -1,4 +1,5 @@
-""" Tests for ChempotDistanceCalculator """
+"""Tests for ChempotDistanceCalculator"""
+
 from pathlib import Path
 
 import pytest
