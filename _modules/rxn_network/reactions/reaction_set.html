@@ -248,6 +248,7 @@
 <span></span><span class="sd">&quot;&quot;&quot;Implements a class for conveniently and efficiently storing sets of ComputedReaction</span>
 <span class="sd">objects which share entries.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
@@ -574,6 +575,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">!=</span> <span class="n">rxn_set</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Reaction sets must have identical entries property to combine.&quot;</span><span class="p">)</span>
+
         <span class="n">open_elem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_elem</span>
         <span class="n">chempot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chempot</span>
 
@@ -1029,7 +1031,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=b1b1fbe1"></script>
+</div><script src="../../../_static/documentation_options.js?v=641c35a1"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

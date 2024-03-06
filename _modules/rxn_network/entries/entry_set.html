@@ -248,6 +248,7 @@
 <span></span><span class="sd">&quot;&quot;&quot;An entry set class for automatically building GibbsComputedEntry objects. Some of this</span>
 <span class="sd">code has been adapted from the EntrySet class in pymatgen.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">collections</span>
@@ -748,9 +749,7 @@
 <div class="viewcode-block" id="GibbsEntrySet.as_dict">
 <a class="viewcode-back" href="../../../rxn_network.entries.html#rxn_network.entries.entry_set.GibbsEntrySet.as_dict">[docs]</a>
     <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
-<span class="sd">        JSON serializable dict representation of the entry set.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a JSON serializable dict representation of the entry set.&quot;&quot;&quot;</span>
         <span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
         <span class="n">d</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">]</span>
         <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculate_e_above_hulls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_e_above_hulls</span>
@@ -1016,7 +1015,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=b1b1fbe1"></script>
+</div><script src="../../../_static/documentation_options.js?v=641c35a1"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
