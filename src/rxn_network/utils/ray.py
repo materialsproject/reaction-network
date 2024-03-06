@@ -1,4 +1,5 @@
 """Functions for working with Ray (parallelization library)."""
+
 from __future__ import annotations
 
 import os

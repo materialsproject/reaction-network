@@ -1,4 +1,4 @@
-""" Tests for ReactionNetwork """
+"""Tests for ReactionNetwork"""
 
 
 def test_from_dict(ymno_rn):

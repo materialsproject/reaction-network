@@ -2,6 +2,7 @@
 of an open entry (e.g. O2), and provides information about reaction thermodynamics
 computed as changes in grand potential.
 """
+
 from __future__ import annotations
 
 from functools import cached_property

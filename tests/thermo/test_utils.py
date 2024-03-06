@@ -1,4 +1,4 @@
-""" Tests for thermo/utils.py"""
+"""Tests for thermo/utils.py"""
 
 from rxn_network.thermo.utils import expand_pd
 

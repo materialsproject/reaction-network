@@ -1,4 +1,5 @@
 """Implements an Entry that looks up NIST pre-tabulated Gibbs free energies."""
+
 from __future__ import annotations
 
 import hashlib

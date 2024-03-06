@@ -1,4 +1,5 @@
-""" Tests for reaction plotting functions."""
+"""Tests for reaction plotting functions."""
+
 import pytest
 from rxn_network.costs.functions import Softplus
 from rxn_network.reactions.plotting import plot_reaction_scatter

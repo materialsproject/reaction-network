@@ -1,1 +1,1 @@
-""" Tests for BasicPathway """
+"""Tests for BasicPathway"""

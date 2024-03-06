@@ -1,6 +1,7 @@
 """Implements a class for conveniently and efficiently storing sets of ComputedReaction
 objects which share entries.
 """
+
 from __future__ import annotations
 
 from collections import OrderedDict

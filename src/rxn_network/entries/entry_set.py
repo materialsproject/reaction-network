@@ -1,6 +1,7 @@
 """An entry set class for automatically building GibbsComputedEntry objects. Some of this
 code has been adapted from the EntrySet class in pymatgen.
 """
+
 from __future__ import annotations
 
 import collections

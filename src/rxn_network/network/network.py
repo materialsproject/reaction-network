@@ -1,4 +1,5 @@
 """Implementation of reaction network and graph classes."""
+
 from __future__ import annotations
 
 from queue import Empty, PriorityQueue

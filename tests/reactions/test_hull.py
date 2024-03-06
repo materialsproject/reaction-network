@@ -1,4 +1,5 @@
-""" Tests for InterfaceReactionHull. """
+"""Tests for InterfaceReactionHull."""
+
 import pytest
 from rxn_network.reactions.hull import InterfaceReactionHull
 

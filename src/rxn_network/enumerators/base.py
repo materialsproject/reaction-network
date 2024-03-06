@@ -1,4 +1,5 @@
 """Basic interface for a reaction Enumerator."""
+
 from __future__ import annotations
 
 import logging

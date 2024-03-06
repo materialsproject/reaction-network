@@ -1,4 +1,5 @@
-""" Tests for ChemicalPotentialDiagram"""
+"""Tests for ChemicalPotentialDiagram"""
+
 import pytest
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 

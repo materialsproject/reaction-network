@@ -1,4 +1,5 @@
 """Utility functions for interfacing with a reaction database."""
+
 from __future__ import annotations
 
 from jobflow import SETTINGS

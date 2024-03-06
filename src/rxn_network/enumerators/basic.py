@@ -1,4 +1,5 @@
 """This module implements two types of basic (combinatorial) reaction enumerators."""
+
 from __future__ import annotations
 
 from copy import deepcopy

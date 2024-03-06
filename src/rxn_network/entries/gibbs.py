@@ -2,6 +2,7 @@
 this is similar to the implementation within pymatgen, but has been refactored here to
 add extra functionality.
 """
+
 from __future__ import annotations
 
 from copy import deepcopy

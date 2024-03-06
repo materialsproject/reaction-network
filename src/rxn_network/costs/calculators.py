@@ -1,4 +1,5 @@
 """A calculator class for determining chemical potential distance of reactions."""
+
 from __future__ import annotations
 
 from itertools import chain, combinations, product

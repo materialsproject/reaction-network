@@ -1,4 +1,5 @@
 """Basic interface for a (chemical) Reaction."""
+
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod

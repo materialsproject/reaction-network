@@ -1,4 +1,5 @@
-""" Tests for ReactionSet."""
+"""Tests for ReactionSet."""
+
 import numpy as np
 import pytest
 from pymatgen.core.composition import Element

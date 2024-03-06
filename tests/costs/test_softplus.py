@@ -1,4 +1,5 @@
 """Tests for Softplus"""
+
 import pytest
 from rxn_network.costs.functions import Softplus
 
