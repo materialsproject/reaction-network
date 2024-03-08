@@ -22,8 +22,8 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install uv
-          uv pip install build --user
-
+          uv venv
+          source .venv/bin/activate
       - name: Build a binary wheel and a source tarball
         run: |
           python -m build --sdist --wheel --outdir dist/ .
@@ -53,6 +53,8 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install uv
+          uv venv
+          source .venv/bin/activate
           uv pip install -e .[strict,docs]
           uv pip install auto-changelog
 
