@@ -18,6 +18,21 @@ jobs:
           cache: "pip"
           cache-dependency-path: "pyproject.toml"
 
+      - name: Install uv
+        run: |
+          pip install --upgrade pip
+          pip install uv
+
+      - name: Activate virtualenv
+        run: |
+          uv venv
+          . .venv/bin/activate
+          echo PATH=$PATH >> $GITHUB_ENV
+
+      - name: Install python dependencies
+        run: |
+          uv pip install -e .[strict,tests]
+
       - name: Install pypa/build
         run: |
           pip install --upgrade pip
