@@ -22,12 +22,18 @@ jobs:
           cache: "pip"
           cache-dependency-path: "pyproject.toml"
 
-      - name: Install dependencies
+      - name: Install uv
         run: |
           pip install --upgrade pip
           pip install uv
-          uv venv
-          source .venv/bin/activate
+
+      - name: Activate virtualenv
+        run: |
+          . .venv/bin/activate
+          echo PATH=$PATH >> $GITHUB_ENV
+
+      - name: Install python dependencies
+        run: |
           uv pip install --upgrade ruff mypy
 
       - name: ruff
