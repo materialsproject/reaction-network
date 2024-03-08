@@ -29,6 +29,7 @@ jobs:
 
       - name: Activate virtualenv
         run: |
+          uv venv
           . .venv/bin/activate
           echo PATH=$PATH >> $GITHUB_ENV
 
