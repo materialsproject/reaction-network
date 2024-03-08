@@ -33,12 +33,6 @@ jobs:
         run: |
           uv pip install -e .[strict,tests]
 
-      - name: Install pypa/build
-        run: |
-          pip install --upgrade pip
-          pip install uv
-          uv venv
-          source .venv/bin/activate
       - name: Build a binary wheel and a source tarball
         run: |
           python -m build --sdist --wheel --outdir dist/ .
@@ -64,12 +58,19 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install python dependencies
+      - name: Install uv
         run: |
           pip install --upgrade pip
           pip install uv
+
+      - name: Activate virtualenv
+        run: |
           uv venv
-          source .venv/bin/activate
+          . .venv/bin/activate
+          echo PATH=$PATH >> $GITHUB_ENV
+
+      - name: Install python dependencies
+        run: |
           uv pip install -e .[strict,docs]
           uv pip install auto-changelog
 

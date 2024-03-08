@@ -120,7 +120,7 @@ jobs:
 
       - name: Install python dependencies
         run: |
-          uv pip install -e .[strict,tests]
+          uv pip install -e .[strict,docs]
 
       - name: Build
         run: sphinx-build docs docs_build
