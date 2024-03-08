@@ -26,6 +26,8 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install uv
+          uv venv
+          python --version
           uv pip install --upgrade ruff mypy
 
       - name: ruff
