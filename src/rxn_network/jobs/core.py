@@ -18,7 +18,7 @@ from rxn_network.costs.calculators import (
     SecondaryCompetitionCalculator,
 )
 from rxn_network.costs.functions import Softplus
-from rxn_network.entries.utils import get_all_entries_in_chemsys, process_entries
+from rxn_network.entries.utils import get_all_entries_in_chemsys_from_entry_db, process_entries
 from rxn_network.enumerators.utils import get_computed_rxn, run_enumerators
 from rxn_network.jobs.schema import (
     CompetitionTaskDocument,
@@ -113,7 +113,7 @@ class GetEntrySetMaker(Maker):
         Args:
             chemsys: The chemical system of the entry set to be acquired.
         """
-        entry_db = SETTINGS.JOB_STORE.additional_stores.get(self.entry_db_name)
+        entry_db = SETTINGS.JOB_STORE.additional_stores.get(self.entry_db_name)  # pylint: disable=no-member
 
         if entry_db:
             logger.info(f"Using user-specified Entry DB: {self.entry_db_name}")
@@ -123,12 +123,9 @@ class GetEntrySetMaker(Maker):
             elif "theoretical" not in property_data:
                 property_data.append("theoretical")
 
-            entries = get_all_entries_in_chemsys(
+            entries = get_all_entries_in_chemsys_from_entry_db(
                 entry_db,
                 chemsys,
-                compatible_only=True,
-                property_data=property_data,
-                use_premade_entries=False,
             )
         else:
             try:
