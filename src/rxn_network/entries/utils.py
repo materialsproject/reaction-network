@@ -120,6 +120,101 @@ def initialize_entry(formula: str, entry_set: GibbsEntrySet, stabilize: bool = F
     return entry
 
 
+def get_entries_from_entry_db(
+    db: MongoStore,
+    chemsys_formula_id_criteria: str | dict,
+):
+    """
+    Warning:
+        This function is meant for interacting with custom MongoDBs containing
+        MP-compatible entries and is not broadly useful or applicable to other
+        databases.
+
+    Get a list of entries corresponding to a
+    chemical system, formula, or materials_id or full criteria.
+
+    Args:
+        db: MongoStore object with database connection
+        chemsys_formula_id_criteria: A chemical system
+            (e.g., Li-Fe-O), or formula (e.g., Fe2O3) or materials_id (e.g., mp-1234) or
+            full Mongo-style dict criteria.
+    """
+    if not isinstance(chemsys_formula_id_criteria, dict):
+        criteria = parse_criteria(chemsys_formula_id_criteria)
+    else:
+        criteria = chemsys_formula_id_criteria
+
+    entries = []
+    for d in db.query(criteria):
+        ents = d["entries"]
+        if not ents:
+            continue
+
+        if ents.get("GGA+U"):
+            e = ComputedStructureEntry.from_dict(ents["GGA+U"])
+        elif ents.get("GGA"):
+            e = ComputedStructureEntry.from_dict(ents["GGA"])
+        else:
+            logger.warning(f"Missing entry for {d['_id']}")
+            continue
+        entries.append(e)
+
+    return entries
+
+
+def get_all_entries_in_chemsys_from_entry_db(
+    db: MongoStore,
+    elements: str | list[str],
+):
+    """
+    Warning:
+        This function is meant for interacting with custom MongoDBs containing
+        MP-compatible entries and is not broadly useful or applicable to other
+        databases.
+
+    Helper method for getting all entries in a total chemical system by querying
+    database for all sub-chemical systems. Code adadpted from pymatgen.ext.matproj and
+    modified to support very large chemical systems.
+
+    Args:
+        db: MongoStore object with database connection
+        elements (str or [str]): Chemical system string comprising element
+            symbols separated by dashes, e.g., "Li-Fe-O" or List of element symbols,
+            e.g., ["Li", "Fe", "O"].
+    """
+
+    def divide_chunks(my_list, n):
+        for i in range(0, len(my_list), n):
+            yield my_list[i : i + n]
+
+    if isinstance(elements, str):
+        elements = elements.split("-")
+
+    if len(elements) <= 13:
+        all_chemsyses = []
+        for i in range(len(elements)):
+            for els in itertools.combinations(elements, i + 1):
+                all_chemsyses.append("-".join(sorted(els)))
+
+        all_chemsyses = list(divide_chunks(all_chemsyses, 1000))
+
+        entries = []
+        for chemsys_group in all_chemsyses:
+            entries.extend(
+                get_entries_from_entry_db(
+                    db,
+                    {"chemsys": {"$in": chemsys_group}},
+                )
+            )
+    else:  # for very large chemical systems, use a different approach
+        entries = get_entries_from_entry_db(
+            db,
+            {"elements": {"$not": {"$elemMatch": {"$nin": elements}}}},
+        )
+
+    return entries
+
+
 def get_entries(
     db: MongoStore,
     chemsys_formula_id_criteria: str | dict,
@@ -305,7 +400,7 @@ def get_all_entries_in_chemsys(
     if isinstance(elements, str):
         elements = elements.split("-")
 
-    if len(elements) < 13:
+    if len(elements) <= 13:
         all_chemsyses = []
         for i in range(len(elements)):
             for els in itertools.combinations(elements, i + 1):
