@@ -60,7 +60,8 @@ tests = [
 ]
 strict = [
     "pymatgen==2024.6.10",
-    "numba==0.60.0",
+    "numba==0.59.1",
+    "numpy==1.26.4",
     "jobflow==0.1.17",
     "ray==2.32.0",
     "rustworkx==0.15.1",
