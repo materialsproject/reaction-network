@@ -53,17 +53,18 @@ docs = [
     "sphinx==7.2.6",
 ]
 tests = [
-    "mp-api==0.39.4",  # required for testing get_entry_set job
-    "pytest==7.4.3",
-    "pytest-cov==4.1.0",
-    "pytest-xdist==3.5.0",
+    "mp-api==0.41.2",  # required for testing get_entry_set job
+    "pytest==8.2.2",
+    "pytest-cov==5.0.0",
+    "pytest-xdist==3.6.1",
 ]
 strict = [
-    "pymatgen==2023.12.18",
-    "numba==0.58.1",
-    "jobflow==0.1.15",
-    "ray==2.9.0",
-    "rustworkx==0.13.2",
+    "pymatgen==2024.6.10",
+    "numba==0.59.1",
+    "numpy==1.26.4",
+    "jobflow==0.1.17",
+    "ray==2.32.0",
+    "rustworkx==0.15.1",
 ]
 
 [project.urls]

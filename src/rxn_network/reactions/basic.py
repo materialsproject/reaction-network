@@ -472,10 +472,7 @@ class BasicReaction(Reaction):
         if not set(self.reactants) == set(other.reactants):
             return False
 
-        if not set(self.products) == set(other.products):
-            return False
-
-        return True
+        return set(self.products) == set(other.products)
 
     def __hash__(self):
         return hash(
