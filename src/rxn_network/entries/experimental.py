@@ -79,6 +79,8 @@ class ExperimentalReferenceEntry(ComputedEntry):
             A copy of the NISTReferenceEntry at the new specified temperature.
         """
         new_entry_dict = self.as_dict()
+        for adj in new_entry_dict["energy_adjustments"]:
+            adj["temp"] = new_temperature
         new_entry_dict["temperature"] = new_temperature
 
         return self.from_dict(new_entry_dict)
