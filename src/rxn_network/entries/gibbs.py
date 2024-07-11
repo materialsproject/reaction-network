@@ -333,10 +333,7 @@ class GibbsComputedEntry(ComputedEntry):
         if getattr(self, "entry_id", None) and getattr(other, "entry_id", None):
             return self.entry_id == other.entry_id
 
-        if self.composition != other.composition:
-            return False
-
-        return True
+        return not self.composition != other.composition
 
     def __hash__(self):
         return hash(
