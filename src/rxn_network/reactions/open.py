@@ -104,21 +104,23 @@ class OpenComputedReaction(ComputedReaction):
 
         return ComputedReaction(**kwargs) if not chempots else cls(chempots=chempots, **kwargs)
 
-    def get_new_temperature(self, new_temperature: float) -> OpenComputedReaction:
+    def get_new_temperature(self, new_temperature: float, entries_at_temp) -> OpenComputedReaction:
         """Returns a new reaction with the temperature changed.
 
         Args:
             new_temperature: New temperature in Kelvin
         """
         try:
-            new_entries = [e.get_new_temperature(new_temperature) for e in self.entries]
+            if entries_at_temp is None:
+                new_entries = [e.get_new_temperature(new_temperature) for e in self.entries]
+            else:
+                new_entries = [entries_at_temp.get(e.composition) for e in self.entries]
         except AttributeError as e:
             raise AttributeError(
                 "One or more of the entries in the reaction is not associated with a"
                 " temperature. Please use the GibbsComputedEntry class for all entries"
                 " in the reaction."
             ) from e
-
         return OpenComputedReaction(
             new_entries,
             self.coefficients,

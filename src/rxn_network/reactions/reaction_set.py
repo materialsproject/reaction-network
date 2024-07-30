@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, List, Dict
 
 import numpy as np
 import ray
@@ -540,10 +540,34 @@ class ReactionSet(MSONable):
             The new ReactionSet containing the recalculated reactions.
         """
         new_rxns = []
-        for rxn in self.get_rxns():
-            new_rxns.append(rxn.get_new_temperature(new_temp))
+        entries = { e.composition: e.get_new_temperature(new_temp) for e in self.entries }
+        for rxn in tqdm(list(self.get_rxns())):
+            new_rxns.append(rxn.get_new_temperature(new_temp, entries))
 
         return ReactionSet.from_rxns(new_rxns, open_elem=self.open_elem, chempot=self.chempot)
+
+    def compute_at_temperatures(self, temp_list: List[int]) -> Dict[int, ReactionSet]:
+        """Recomputes reaction energies at each temperature in a list of temperatures.
+
+        Args:
+            temp_list : List[int]
+                The list of temperatures at which new `ReactionSet`s should be generated.``
+
+        Returns:
+            Dict[int, ReactionSet]
+                A mapping of temperature to `ReactionSet` with reaction energies computed at
+                that temperature.
+        """
+        all_rxns = list(self.get_rxns())
+        result = {}
+        for t in tqdm(temp_list, desc="Computing reaction energies..."):
+            new_rxns = []
+            entries = { e.composition: e.get_new_temperature(t) for e in self.entries }
+            for rxn in all_rxns:
+                new_rxns.append(rxn.get_new_temperature(t, entries))
+
+            result[t] = ReactionSet.from_rxns(new_rxns, open_elem=self.open_elem, chempot=self.chempot)        
+        return result
 
     def _get_rxns_by_indices(self, idxs) -> Iterable[ComputedReaction | OpenComputedReaction]:
         """Return a list of reactions with the given indices."""
