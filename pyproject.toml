@@ -100,7 +100,7 @@ omit = [
 [tool.ruff]
 target-version = "py39"
 line-length = 120
-exclude = [".ipynb", "tests/**"]
+exclude = [".ipynb", "tests/**", "scripts/**"]
 
 [tool.ruff.lint]
 select = [
