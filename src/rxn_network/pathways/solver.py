@@ -19,7 +19,10 @@ from tqdm import tqdm
 from rxn_network.core import Composition
 from rxn_network.entries.entry_set import GibbsEntrySet
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
-from rxn_network.enumerators.minimize import MinimizeGibbsEnumerator, MinimizeGrandPotentialEnumerator
+from rxn_network.enumerators.minimize import (
+    MinimizeGibbsEnumerator,
+    MinimizeGrandPotentialEnumerator,
+)
 from rxn_network.pathways.balanced import BalancedPathway
 from rxn_network.pathways.pathway_set import PathwaySet
 from rxn_network.reactions.computed import ComputedReaction

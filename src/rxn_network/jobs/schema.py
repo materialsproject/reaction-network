@@ -1,6 +1,6 @@
 """Core definition for various task and synthesis recipe documents."""
 
-from typing import Any, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element
@@ -53,41 +53,6 @@ class EnumeratorTaskDocument(BaseModel):
         None,
         description="A list of the enumerator objects used to calculate the reactions.",
     )
-
-
-class CompetitionTaskDocument(BaseModel):
-    """A document containing the reactions and their selectivities as created by the
-    CalculateCompetitionMaker job.
-    """
-
-    task_label: Optional[str] = Field(None, description="The name of the task.")
-    last_updated: str = Field(
-        default_factory=datetime_str,
-        description="Timestamp of when the document was last updated.",
-    )
-    rxns: ReactionSet = Field(
-        description=(
-            "The reaction set, where thereactions have calculated competition"
-            " information stored in their data attribute."
-        )
-    )
-    target_formula: str = Field(description="The reduced chemical formula of the target material.")
-    open_elem: Optional[Element] = Field(None, description="The open element (if any).")
-    chempot: Optional[float] = Field(None, description="The chemical potential of the open element.")
-    added_elements: Optional[list[Element]] = Field(
-        None, description="The elements added beyond the elements of the target(s)."
-    )
-    added_chemsys: Optional[str] = Field(None, description="The chemical system of the added elements.")
-    calculate_competition: Optional[bool] = Field(None, description="Whether to calculate competition scores.")
-    calculate_chempot_distances: Optional[bool] = Field(
-        None, description="Whether to calculate chemical potential distances."
-    )
-    temp: Optional[float] = Field(
-        None,
-        description=("The temperature in K used to determine the primary competition weightings."),
-    )
-    batch_size: Optional[int] = Field(None, description="The batch size for the reaction set")
-    cpd_kwargs: Optional[dict[str, Any]] = Field(None, description="The kwargs for ChempotDistanceCalculator.")
 
 
 class NetworkTaskDocument(BaseModel):

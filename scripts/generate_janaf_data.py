@@ -6,9 +6,10 @@ from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
-from rxn_network.core import Composition
 from thermochem.janaf import Janafdb
 from tqdm import tqdm
+
+from rxn_network.core import Composition
 
 JMOL_PER_EV = 96485.307499258
 
