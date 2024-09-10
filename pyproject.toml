@@ -100,6 +100,7 @@ omit = [
 [tool.ruff]
 target-version = "py39"
 line-length = 120
+exclude= [".iypnb"]
 
 [tool.ruff.lint]
 select = [
@@ -159,9 +160,6 @@ pydocstyle.convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-"**/tests/*" = ["D"]
-"**/schemas/*" = ["FA", "TCH", "UP007"]
-"**/schema.py" = ["FA", "TCH", "UP007"]
 
 [tool.mypy]
 ignore_missing_imports = true

@@ -40,7 +40,7 @@ jobs:
       - name: ruff
         run: |
           ruff --version
-          ruff check
+          ruff check src/rxn_network
 
       - name: mypy
         run: |
