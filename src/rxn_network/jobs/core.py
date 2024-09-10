@@ -9,7 +9,6 @@ import numpy as np
 import ray
 from jobflow import SETTINGS, Maker, job
 from pymatgen.core.composition import Element
-from tqdm import tqdm
 
 from rxn_network.core import Composition
 from rxn_network.costs.calculators import (
@@ -21,7 +20,6 @@ from rxn_network.costs.functions import Softplus
 from rxn_network.entries.utils import get_all_entries_in_chemsys_from_entry_db, process_entries
 from rxn_network.enumerators.utils import get_computed_rxn, run_enumerators
 from rxn_network.jobs.schema import (
-    CompetitionTaskDocument,
     EntrySetDocument,
     EnumeratorTaskDocument,
     NetworkTaskDocument,
@@ -33,8 +31,7 @@ from rxn_network.pathways.solver import PathwaySolver
 from rxn_network.reactions.basic import BasicReaction
 from rxn_network.reactions.hull import InterfaceReactionHull
 from rxn_network.reactions.reaction_set import ReactionSet
-from rxn_network.utils.funcs import get_logger, grouper
-from rxn_network.utils.ray import initialize_ray, to_iterator
+from rxn_network.utils.funcs import get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -256,221 +253,6 @@ class ReactionEnumerationMaker(Maker):
             "added_elements": added_elements,
             "added_chemsys": added_chemsys,
         }
-
-
-@dataclass
-class CalculateCompetitionMaker(Maker):
-    """Maker to create job for calculating selectivities of a set of reactions given a
-    provided target formula. This is a component of the SynthesisPlanningFlowMaker.
-
-    If you use this code in your work, please cite the following work:
-
-        McDermott, M. J. et al. Assessing Thermodynamic Selectivity of Solid-State Reactions for the Predictive
-        Synthesis of Inorganic Materials. ACS Cent. Sci. (2023) doi:10.1021/acscentsci.3c01051.
-
-    Args:
-        name: The name of the job. Automatically created if not provided.
-        open_elem: An optional open element for performing selectivity calculations
-        chempot: A (relative) chemical potential of the open element, if any. Defaults
-            to 0 eV/atom.
-        calculate_competition: Whether or not to calculate competition scores for
-            reactions. See PrimaryCompetitionCalculator and
-            SecondaryCompetitionCalculator. Defaults to True.
-        calculate_chempot_distances: Whether or not to calculate chemical potential
-            distances for reactions. See ChempotDistanceCalculator. Defaults to True.
-        chunk_size: The number of reactions to put into each parallelized chunk. See
-            class variable, CHUNK_SIZE. This will automatically be re-computed if
-            out-of-memory issues are anticipated.
-        cpd_kwargs: Optional keyword arguments passed to ChempotDistanceCalculator.
-    """
-
-    CHUNK_SIZE = 100
-
-    name: str = "calculate_competition"
-    open_elem: Element | None = None
-    chempot: float = 0.0
-    calculate_competition: bool = True
-    calculate_chempot_distances: bool = True
-    chunk_size: int = CHUNK_SIZE
-    cpd_kwargs: dict = field(default_factory=dict)
-
-    def __post_init__(self):
-        self.open_elem = Element(self.open_elem) if self.open_elem else None
-        self.open_formula = Composition(str(self.open_elem)).reduced_formula if self.open_elem else None
-
-    @job(rxns="rxns", output_schema=CompetitionTaskDocument)
-    def make(self, rxn_sets: list[ReactionSet], entries: GibbsEntrySet, target_formula: str):
-        """Returns a job that calculates competition scores and/or chemical potential
-        distances for all synthesis reactions to a target phase given a provided list of
-        reaction sets.
-
-        NOTE: This job stores the reaction set in an additional store called
-        "rxns". This needs to be configured through a user's jobflow.yaml file. See
-        "additional_stores".
-
-        Args:
-            rxn_sets: a list of reaction sets making up all enumerated reactions in the
-                chemical reaction network of interest. These will automatically be
-                combined and reprocessed to match the specified conditions (open_elem +
-                chempot).
-            entries: The entry set used to enumerate all provided reactions. This will
-                be used to facilitate selectivity calculations and ensure all reaction
-                sets can be easily combined.
-            target_formula: The formula of the desired target phase. This will be used
-                to identify all synthesis reactions (i.e., those that produce the
-                target).
-
-        Returns:
-            A job that returns synthesis reactions to the target phase, decorated with
-            the relevant selectivity metrics.
-        """
-        if not ray.is_initialized():
-            initialize_ray()
-
-        target_formula = Composition(target_formula).reduced_formula
-        added_elements, added_chemsys = get_added_elem_data(entries, [target_formula])
-
-        logger.info("Loading reactions..")
-        all_rxns = rxn_sets[0]
-        for rxn_set in rxn_sets[1:]:
-            all_rxns = all_rxns.add_rxn_set(rxn_set)
-
-        if self.open_elem:  # reinitialize with open element
-            all_rxns = ReactionSet(
-                all_rxns.entries,
-                all_rxns.indices,
-                all_rxns.coeffs,
-                self.open_elem,
-                self.chempot,
-                all_rxns.all_data,
-            )
-
-        size = len(all_rxns)  # need to get size before storing in ray
-
-        logger.info("Identifying target reactions...")
-
-        target_rxns = all_rxns.get_rxns_by_product(target_formula, return_set=True)
-
-        logger.info(f"Identified {len(target_rxns)} target reactions out of {size} total reactions.")
-
-        logger.info("Removing unnecessary reactions from total reactions to save memory...")
-
-        all_target_reactants = {reactant.reduced_formula for r in target_rxns for reactant in r.reactants}
-        all_rxns = all_rxns.get_rxns_by_reactants(
-            all_target_reactants,
-            return_set=True,  # type: ignore
-        )
-
-        logger.info(f"Keeping {len(all_rxns)} out of {size} total reactions...")
-
-        size = len(all_rxns)
-
-        logger.info("Placing reactions in ray object store...")
-
-        all_rxns = ray.put(all_rxns.as_dict())
-        logger.info("Beginning competition calculations...")
-
-        decorated_rxns = target_rxns
-
-        if self.calculate_competition:
-            decorated_rxns = self._get_competition_decorated_rxns(target_rxns, all_rxns, size)
-
-        logger.info("Calculating chemical potential distances...")
-
-        if self.calculate_chempot_distances:
-            decorated_rxns = self._get_chempot_decorated_rxns(decorated_rxns, entries)
-
-        logger.info("Saving decorated reactions.")
-        results = ReactionSet.from_rxns(decorated_rxns, entries=entries)
-
-        data = {
-            "rxns": results,
-            "target_formula": target_formula,
-            "open_elem": self.open_elem,
-            "chempot": self.chempot,
-            "added_elements": added_elements,
-            "added_chemsys": added_chemsys,
-            "calculate_competition": self.calculate_competition,
-            "calculate_chempot_distances": self.calculate_chempot_distances,
-            "cpd_kwargs": self.cpd_kwargs,
-        }
-
-        doc = CompetitionTaskDocument(**data)
-        doc.task_label = self.name
-        return doc
-
-    def _get_competition_decorated_rxns(self, target_rxns, all_rxns, num_rxns):
-        """Parallelized calculation of competition scores."""
-        rxn_chunk_refs = []
-
-        memory_per_rxn = 350  # approx 300 bytes overhead per rxn (conservative)
-
-        num_cpus = ray.cluster_resources()["CPU"]
-        available_memory = ray.cluster_resources()["memory"]
-
-        chunk_size = self.chunk_size
-        needed_memory_per_cpu = memory_per_rxn * num_rxns
-
-        if num_cpus * needed_memory_per_cpu > available_memory:
-            logger.info("Not enough memory to use all CPUs simultaneously. Adjusting....")
-            chunk_size = int(len(target_rxns) // (available_memory // needed_memory_per_cpu)) + 1
-            logger.info(f"Setting new chunk size to {chunk_size}.")
-
-        for chunk in grouper(
-            target_rxns,
-            chunk_size,
-            fillvalue=None,
-        ):
-            rxn_chunk_refs.append(
-                _get_competition_decorated_rxns_by_chunk.options(memory=num_rxns * memory_per_rxn).remote(
-                    chunk, all_rxns, self.open_formula
-                )
-            )
-
-        decorated_rxns = []
-        size = len(rxn_chunk_refs)
-
-        for r_set in tqdm(
-            to_iterator(rxn_chunk_refs),
-            desc="Calculating competition...",
-            total=size,
-        ):
-            decorated_rxns.extend(r_set)
-
-        return ReactionSet.from_rxns(decorated_rxns)
-
-    def _get_chempot_decorated_rxns(self, target_rxns, entries):
-        """Parallelized calculation of chemical potential distances."""
-        if not ray.is_initialized():
-            initialize_ray()
-
-        rxn_chunk_refs = []
-
-        open_elem = target_rxns.open_elem
-        chempot = target_rxns.chempot
-
-        entries = ray.put(entries)
-        cpd_kwargs = ray.put(self.cpd_kwargs)
-
-        for chunk in grouper(
-            sorted(target_rxns, key=lambda r: r.chemical_system),
-            self.chunk_size,
-            fillvalue=None,
-        ):
-            rxn_chunk_refs.append(
-                _get_chempot_decorated_rxns_by_chunk.remote(chunk, entries, cpd_kwargs, open_elem, chempot)
-            )
-
-        size = len(rxn_chunk_refs)
-        decorated_rxns = []
-        for r_set in tqdm(
-            to_iterator(rxn_chunk_refs),
-            desc="Calculating chemical potential distances...",
-            total=size,
-        ):
-            decorated_rxns.extend(r_set)
-
-        return ReactionSet.from_rxns(decorated_rxns)
 
 
 @dataclass
