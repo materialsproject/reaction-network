@@ -10,7 +10,10 @@ from pymatgen.core.composition import Element
 
 from rxn_network.core import Composition
 from rxn_network.enumerators.basic import BasicEnumerator, BasicOpenEnumerator
-from rxn_network.enumerators.minimize import MinimizeGibbsEnumerator, MinimizeGrandPotentialEnumerator
+from rxn_network.enumerators.minimize import (
+    MinimizeGibbsEnumerator,
+    MinimizeGrandPotentialEnumerator,
+)
 from rxn_network.jobs.core import (
     GetEntrySetMaker,
     NetworkMaker,

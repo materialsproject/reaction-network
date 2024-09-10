@@ -22,7 +22,10 @@ from tqdm import tqdm
 
 from rxn_network.core import Composition
 from rxn_network.data import PATH_TO_NIST
-from rxn_network.entries.corrections import CarbonateCorrection, CarbonDioxideAtmosphericCorrection
+from rxn_network.entries.corrections import (
+    CarbonateCorrection,
+    CarbonDioxideAtmosphericCorrection,
+)
 from rxn_network.entries.experimental import ExperimentalReferenceEntry
 from rxn_network.entries.freed import FREEDReferenceEntry
 from rxn_network.entries.gibbs import GibbsComputedEntry
@@ -39,7 +42,11 @@ IGNORE_NIST_SOLIDS = loadfn(PATH_TO_NIST / "ignore_solids.json")
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry, EnergyAdjustment
+    from pymatgen.entries.computed_entries import (
+        ComputedEntry,
+        ComputedStructureEntry,
+        EnergyAdjustment,
+    )
 
 
 class GibbsEntrySet(collections.abc.MutableSet, MSONable):

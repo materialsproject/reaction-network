@@ -17,7 +17,10 @@ from rxn_network.costs.calculators import (
     SecondaryCompetitionCalculator,
 )
 from rxn_network.costs.functions import Softplus
-from rxn_network.entries.utils import get_all_entries_in_chemsys_from_entry_db, process_entries
+from rxn_network.entries.utils import (
+    get_all_entries_in_chemsys_from_entry_db,
+    process_entries,
+)
 from rxn_network.enumerators.utils import get_computed_rxn, run_enumerators
 from rxn_network.jobs.schema import (
     EntrySetDocument,
