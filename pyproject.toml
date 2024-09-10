@@ -160,6 +160,8 @@ pydocstyle.convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
+"**/schemas/*" = ["FA", "TCH", "UP007"]
+"**/schema.py" = ["FA", "TCH", "UP007"]
 
 [tool.mypy]
 ignore_missing_imports = true
