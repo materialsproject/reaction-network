@@ -74,8 +74,7 @@ class MinimizeGibbsEnumerator(BasicEnumerator):
                 Defaults to True.
             max_num_constraints: The maximum number of allowable
                 constraints enforced by reaction balancing. Defaults to 1 (which is usually advisable).
-            quiet: Whether to run in quiet mode (no progress bar). Defaults to
-                False.
+            quiet: Whether to run in quiet mode (no progress bar). Defaults to False.
         """
         super().__init__(
             precursors=precursors,
