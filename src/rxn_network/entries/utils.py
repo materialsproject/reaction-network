@@ -34,6 +34,7 @@ def process_entries(
     include_nist_data: bool = True,
     include_freed_data: bool = False,
     include_polymorphs: bool = False,
+    include_icsd_entropy: bool = True,
     formulas_to_include: Iterable[str] | None = None,
     calculate_e_above_hulls: bool = False,
     ignore_nist_solids: bool = True,
@@ -80,6 +81,7 @@ def process_entries(
         temperature=temp,
         include_nist_data=include_nist_data,
         include_freed_data=include_freed_data,
+        include_icsd_entropy=include_icsd_entropy,
         ignore_nist_solids=ignore_nist_solids,
     )
     included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include] if formulas_to_include else []

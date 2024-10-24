@@ -16,12 +16,12 @@ from monty.serialization import loadfn
 from numpy.random import normal
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
+from pymatgen.entries.computed_entries import ConstantEnergyAdjustment, TemperatureEnergyAdjustment
 from pymatgen.entries.entry_tools import EntrySet
 from tqdm import tqdm
 
 from rxn_network.core import Composition
-from rxn_network.data import PATH_TO_NIST
+from rxn_network.data import PATH_TO_NIST, CONFIG_ENTROPY
 from rxn_network.entries.corrections import (
     CarbonateCorrection,
     CarbonDioxideAtmosphericCorrection,
@@ -367,6 +367,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         temperature: float,
         include_nist_data: bool = True,
         include_freed_data: bool = False,
+        include_icsd_entropy: bool = False,
         apply_carbonate_correction: bool = True,
         apply_atmospheric_co2_correction: bool = True,
         ignore_nist_solids: bool = True,
@@ -438,6 +439,15 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     energy_adjustments.append(
                         CarbonDioxideAtmosphericCorrection(entry.composition.num_atoms, temperature)
                     )
+                if include_icsd_entropy:
+                    if formula in CONFIG_ENTROPY.keys():
+                        energy_adjustments.append(
+                            TemperatureEnergyAdjustment(adj_per_deg= -CONFIG_ENTROPY[formula], 
+                                                        name="ICSD Entropy Adjustment", 
+                                                        temp=temperature, 
+                                                        n_atoms=entry.composition.num_atoms,
+                                                        uncertainty_per_deg = CONFIG_ENTROPY[formula])
+                        )
 
                 structure = entry.structure
                 formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
@@ -480,6 +490,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         temperature: float,
         include_nist_data: bool = True,
         include_freed_data: bool = False,
+        include_icsd_entropy: bool = False,
         apply_carbonate_correction: bool = True,
         apply_atmospheric_co2_correction: bool = True,
         ignore_nist_solids: bool = True,
@@ -529,6 +540,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 temperature,
                 include_nist_data=include_nist_data,
                 include_freed_data=include_freed_data,
+                include_icsd_entropy=include_icsd_entropy,
                 apply_carbonate_correction=apply_carbonate_correction,
                 apply_atmospheric_co2_correction=apply_atmospheric_co2_correction,
                 ignore_nist_solids=ignore_nist_solids,
