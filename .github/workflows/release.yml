@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2.4.0
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v4.3.0
+        uses: actions/setup-python@v5.4.0
         with:
           python-version: "3.11"
           cache: "pip"
@@ -54,7 +54,7 @@ jobs:
         run: sudo apt-get install pandoc
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v4.3.0
+        uses: actions/setup-python@v5.4.0
         with:
           python-version: "3.11"
 
