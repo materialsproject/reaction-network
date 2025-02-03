@@ -18,7 +18,7 @@ keywords = [
     "planning",
 ]
 license = { text = "modified BSD" }
-authors = [{ name = "Matthew McDermott", email = "mcdermott@lbl.gov" }]
+authors = [{ name = "Matthew McDermott", email = "mcdermott@berkeley.edu" }]
 dynamic = ["version"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -40,6 +40,7 @@ dependencies = [
     "jobflow>=0.1.15",
     "ray>=2.9.0",
     "rustworkx>=0.13.2",
+    "pymongo<=4.10.1", # TODO: remove this temporary fix due to `sort` kwarg required by pymongo>=4.11
 ]
 
 [project.optional-dependencies]
