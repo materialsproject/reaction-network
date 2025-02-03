@@ -403,7 +403,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             composition = entry.composition
             formula = composition.reduced_formula
 
-            if composition.is_element and entry not in pd.el_refs.values() or formula in experimental_formulas:
+            if (composition.is_element and entry not in pd.el_refs.values()) or formula in experimental_formulas:
                 continue
 
             new_entries = []

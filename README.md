@@ -12,7 +12,7 @@ Reaction Network (`rxn_network`) is a Python package for synthesis planning and 
 
 ## Installation
 
-We recommend installing using pip:
+We recommend installing the latest release using pip:
 
 ```properties
 pip install -U reaction-network
@@ -20,6 +20,11 @@ pip install -U reaction-network
 
 The package will then be installed under the name `rxn_network`. The Materials Project
 API is not installed by default; to install it, run: `pip install -U mp-api`.
+
+For developers, you can clone the repository and install the package in editable mode by
+running `pip install -e .` in the root directory.
+
+```properties
 
 > **Note**
 > As of version 7.0 and beyond, the `reaction-network` package no longer uses `graph-tool`. All network functionality is now implemented using `rustworkx`. This means it is no longer required to complete any extra installations.

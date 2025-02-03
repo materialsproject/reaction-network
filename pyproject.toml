@@ -35,11 +35,11 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "pymatgen>=2023.11.12",
-    "numba>=0.58.1",
-    "jobflow>=0.1.15",
-    "ray>=2.9.0",
-    "rustworkx>=0.13.2",
+    "pymatgen>=2024.11.13",
+    "numba>=0.60.0",
+    "jobflow>=0.1.18",
+    "ray>=2.36.0",
+    "rustworkx>=0.15.1",
     "pymongo<=4.10.1", # TODO: remove this temporary fix due to `sort` kwarg required by pymongo>=4.11
 ]
 
@@ -54,17 +54,16 @@ docs = [
     "sphinx==7.2.6",
 ]
 tests = [
-    "mp-api==0.42.1",  # required for testing get_entry_set job
+    "mp-api==0.45.0",  # required for testing get_entry_set job
     "pytest==8.3.3",
     "pytest-cov==5.0.0",
     "pytest-xdist==3.6.1",
 ]
 strict = [
-    "pymatgen==2024.6.10",
-    "numba==0.59.1",
-    "numpy==1.26.4",
+    "pymatgen==2024.11.13",
+    "numba==0.60.0",
     "jobflow==0.1.18",
-    "ray==2.35.0",
+    "ray==2.36.0",
     "rustworkx==0.15.1",
 ]
 
@@ -149,7 +148,6 @@ ignore = [
     "PERF401", # manual-list-comprehension (TODO fix these or wait for autofix)
     "PLR",     # pylint-refactor
     "PLW2901", # Outer for loop variable overwritten by inner assignment target
-    "PT004",   # pytest-missing-fixture-name-underscore
     "PT006",   # pytest-parametrize-names-wrong-type
     "PT013",   # pytest-incorrect-pytest-import
     "PYI024",  # collections-named-tuple (TODO should maybe fix these)
