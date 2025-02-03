@@ -542,7 +542,7 @@ def _get_chempot_decorated_rxns_by_chunk(rxn_chunk, entries, cpd_kwargs, open_el
     new_rxns = []
 
     if open_elem:
-        open_elem_set = {open_elem}
+        open_elem_set = {Element(open_elem)}
 
     rxn_chunk = [r for r in rxn_chunk if r is not None]
 
