@@ -40,8 +40,8 @@ class ComputedReaction(BasicReaction):
             lowest_num_errors: number of "errors" encountered during reaction balancing.
         """
         self._entries = list(entries)
-        self.reactant_entries = [entry for entry, coeff in zip(entries, coefficients) if coeff < 0]
-        self.product_entries = [entry for entry, coeff in zip(entries, coefficients) if coeff > 0]
+        self.reactant_entries = [entry for entry, coeff in zip(entries, coefficients, strict=False) if coeff < 0]
+        self.product_entries = [entry for entry, coeff in zip(entries, coefficients, strict=False) if coeff > 0]
         compositions = [e.composition.reduced_composition for e in entries]
 
         super().__init__(compositions, coefficients, data=data, lowest_num_errors=lowest_num_errors)
@@ -111,7 +111,7 @@ class ComputedReaction(BasicReaction):
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()
             calc_energies[comp] = min(calc_energies.get(comp, float("inf")), entry.energy / factor)
 
-        return sum(amt * calc_energies[c] for amt, c in zip(self.coefficients, self.compositions))
+        return sum(amt * calc_energies[c] for amt, c in zip(self.coefficients, self.compositions, strict=False))
 
     @cached_property
     def energy_per_atom(self) -> float:
@@ -133,7 +133,9 @@ class ComputedReaction(BasicReaction):
             energy_ufloat = ufloat(entry.energy, entry.correction_uncertainty)
             calc_energies[comp] = min(calc_energies.get(comp, float("inf")), energy_ufloat / factor)
 
-        energy_with_uncertainty = sum(amt * calc_energies[c] for amt, c in zip(self.coefficients, self.compositions))
+        energy_with_uncertainty = sum(
+            amt * calc_energies[c] for amt, c in zip(self.coefficients, self.compositions, strict=False)
+        )
 
         return energy_with_uncertainty.s  # type: ignore
 

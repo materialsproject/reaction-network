@@ -131,7 +131,7 @@ class Graph(PyDiGraph):
         d["node_indices"] = list(self.node_indices())  # type: ignore
         d["edges"] = [
             (*e, obj.as_dict() if hasattr(obj, "as_dict") else obj)  # type: ignore
-            for e, obj in zip(self.edge_list(), self.edges())
+            for e, obj in zip(self.edge_list(), self.edges(), strict=False)
         ]
 
         return d
@@ -146,11 +146,11 @@ class Graph(PyDiGraph):
         node_indices = MontyDecoder().process_decoded(d["node_indices"])
         edges = [(e[0], e[1], MontyDecoder().process_decoded(e[2])) for e in d["edges"]]
 
-        nodes = dict(zip(nodes, node_indices))
+        nodes = dict(zip(nodes, node_indices, strict=False))
 
         graph = cls()
         new_indices = graph.add_nodes_from(list(nodes.keys()))
-        mapping = {nodes[node]: idx for idx, node in zip(new_indices, nodes.keys())}
+        mapping = {nodes[node]: idx for idx, node in zip(new_indices, nodes.keys(), strict=False)}
 
         new_mapping = []
         for edge in edges:

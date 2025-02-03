@@ -163,7 +163,7 @@ class ChemicalPotentialDiagram(ChempotDiagram):
         domains: dict[str, list] = {entry.composition.reduced_formula: [] for entry in self._hyperplane_entries}
         entries = self._hyperplane_entries
 
-        for intersection, facet in zip(self.hs_int.intersections, self.hs_int.dual_facets):
+        for intersection, facet in zip(self.hs_int.intersections, self.hs_int.dual_facets, strict=False):
             for v in facet:
                 if v not in self._border_hyperplane_indices:
                     this_entry = entries[v]

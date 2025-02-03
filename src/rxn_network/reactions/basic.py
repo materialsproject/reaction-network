@@ -58,8 +58,12 @@ class BasicReaction(Reaction):
         self._compositions = [Composition(c) for c in compositions]
         self._coefficients = np.array(coefficients)
 
-        self.reactant_coeffs = {comp: coeff for comp, coeff in zip(self._compositions, self._coefficients) if coeff < 0}
-        self.product_coeffs = {comp: coeff for comp, coeff in zip(self._compositions, self._coefficients) if coeff > 0}
+        self.reactant_coeffs = {
+            comp: coeff for comp, coeff in zip(self._compositions, self._coefficients, strict=False) if coeff < 0
+        }
+        self.product_coeffs = {
+            comp: coeff for comp, coeff in zip(self._compositions, self._coefficients, strict=False) if coeff > 0
+        }
 
         if balanced is not None:
             self.balanced = balanced
@@ -418,15 +422,15 @@ class BasicReaction(Reaction):
 
     @staticmethod
     def _from_coeff_dicts(reactant_coeffs, product_coeffs) -> BasicReaction:
-        reactant_comps, r_coefs = zip(*[(comp, -1 * coeff) for comp, coeff in reactant_coeffs.items()])
-        product_comps, p_coefs = zip(*list(product_coeffs.items()))
+        reactant_comps, r_coefs = zip(*[(comp, -1 * coeff) for comp, coeff in reactant_coeffs.items()], strict=False)
+        product_comps, p_coefs = zip(*list(product_coeffs.items()), strict=False)
         return BasicReaction(reactant_comps + product_comps, r_coefs + p_coefs)
 
     @staticmethod
     def _str_from_formulas(coeffs, formulas, tol=TOLERANCE) -> str:
         reactant_str = []
         product_str = []
-        for amt, formula in zip(coeffs, formulas):
+        for amt, formula in zip(coeffs, formulas, strict=False):
             if abs(amt + 1) < tol:
                 reactant_str.append(formula)
             elif abs(amt - 1) < tol:
@@ -442,7 +446,7 @@ class BasicReaction(Reaction):
     def _str_from_comp(cls, coeffs, compositions, reduce=False) -> tuple[str, float]:
         r_coeffs = np.zeros(len(coeffs))
         r_formulas = []
-        for i, (amt, comp) in enumerate(zip(coeffs, compositions)):
+        for i, (amt, comp) in enumerate(zip(coeffs, compositions, strict=False)):
             formula, factor = comp.get_reduced_formula_and_factor()
             r_coeffs[i] = amt * factor
             r_formulas.append(formula)

@@ -142,7 +142,7 @@ class OpenComputedReaction(ComputedReaction):
             comp, factor = getattr(entry, attr).get_reduced_composition_and_factor()
             calc_energies[comp] = min(calc_energies.get(comp, float("inf")), entry.energy / factor)
 
-        return sum(amt * calc_energies[c] for amt, c in zip(self.coefficients, self.compositions))
+        return sum(amt * calc_energies[c] for amt, c in zip(self.coefficients, self.compositions, strict=False))
 
     @property
     def elements(self) -> list[Element]:

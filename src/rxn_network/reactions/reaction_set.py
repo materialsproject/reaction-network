@@ -353,9 +353,9 @@ class ReactionSet(MSONable):
             for idx, coeffs, indices in zip(
                 np.argwhere(contains_reactants).flatten(),
                 self.coeffs[size][contains_reactants],
-                self.indices[size][contains_reactants],
+                self.indices[size][contains_reactants], strict=False,
             ):
-                r_indices = {i for c, i in zip(coeffs, indices) if c < 1e-12}
+                r_indices = {i for c, i in zip(coeffs, indices, strict=False) if c < 1e-12}
                 if r_indices.issubset(reactant_indices):
                     idxs[size].append(idx)
 
@@ -392,9 +392,9 @@ class ReactionSet(MSONable):
             for idx, coeffs, indices in zip(
                 np.argwhere(contains_product).flatten(),
                 self.coeffs[size][contains_product],
-                self.indices[size][contains_product],
+                self.indices[size][contains_product], strict=False,
             ):
-                p_indices = {i for c, i in zip(coeffs, indices) if c > -1e-12}
+                p_indices = {i for c, i in zip(coeffs, indices, strict=False) if c > -1e-12}
                 if product_index in p_indices:
                     idxs[size].append(idx)
 
@@ -444,7 +444,7 @@ class ReactionSet(MSONable):
             for i, idxs, coeffs in zip(
                 quick_filter,
                 self.indices[size][quick_filter],
-                self.coeffs[size][quick_filter],
+                self.coeffs[size][quick_filter], strict=False,
             ):
                 if (idxs == rxn_idxs).all() and (coeffs == rxn_coeffs).all():
                     ensure_idxs[size].append(i)
@@ -556,7 +556,7 @@ class ReactionSet(MSONable):
             for indices, coeffs, data in zip(
                 self.indices[size][idx_arr],
                 self.coeffs[size][idx_arr],
-                self.all_data[size][idx_arr],
+                self.all_data[size][idx_arr], strict=False,
             ):
                 entries = [self.entries[i] for i in indices]
                 if self.mu_dict:
@@ -637,7 +637,7 @@ def _get_idxs_to_keep(rows, ensure_idxs=None):
         ensure_idxs = set(ensure_idxs)
 
     to_keep, to_remove = [], []
-    for idx, row in zip(sorted_indices, sorted_rows):
+    for idx, row in zip(sorted_indices, sorted_rows, strict=False):
         if idx in to_remove:
             continue
 

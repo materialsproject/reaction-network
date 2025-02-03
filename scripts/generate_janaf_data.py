@@ -73,7 +73,7 @@ if __name__ == "__main__":
         dg_f = [data.DeltaG(t) / JMOL_PER_EV for t in temps]
 
         formula, factor = Composition(f).get_integer_formula_and_factor()
-        energies = {temp: g / factor for temp, g in zip(temps, dg_f)}
+        energies = {temp: g / factor for temp, g in zip(temps, dg_f, strict=False)}
 
         existing_data = all_data.get(formula)
         if not existing_data:

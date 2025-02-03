@@ -130,7 +130,7 @@ class ReactionNetwork(Network):
             raise ValueError("Must call build() before setting precursors!")
 
         precursors = {
-            p if isinstance(p, (Entry, ExperimentalReferenceEntry)) else self.entries.get_min_entry_by_formula(p)
+            p if isinstance(p, (Entry | ExperimentalReferenceEntry)) else self.entries.get_min_entry_by_formula(p)
             for p in precursors
         }
 
@@ -189,7 +189,7 @@ class ReactionNetwork(Network):
 
         target = (
             target
-            if isinstance(target, (Entry, ExperimentalReferenceEntry))
+            if isinstance(target, (Entry | ExperimentalReferenceEntry))
             else self.entries.get_min_entry_by_formula(target)
         )
 
@@ -338,7 +338,7 @@ def get_edge_weight(edge_obj: object, cf: CostFunction):
         "target_edge",
     ]:
         return 0.0
-    if isinstance(edge_obj, (ComputedReaction, OpenComputedReaction)):
+    if isinstance(edge_obj, (ComputedReaction | OpenComputedReaction)):
         return cf.evaluate(edge_obj)
 
     raise ValueError("Unknown edge type")

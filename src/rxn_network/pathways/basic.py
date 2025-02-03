@@ -54,7 +54,7 @@ class BasicPathway(Pathway):
 
     def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
-            return all(other_rxn == rxn for other_rxn, rxn in zip(other.reactions, self.reactions))
+            return all(other_rxn == rxn for other_rxn, rxn in zip(other.reactions, self.reactions, strict=False))
 
         return False
 

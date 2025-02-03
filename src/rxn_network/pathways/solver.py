@@ -53,7 +53,7 @@ class Solver(MSONable, metaclass=ABCMeta):
         costs = []
 
         for path in self._pathways.paths:
-            for rxn, cost in zip(path.reactions, path.costs):
+            for rxn, cost in zip(path.reactions, path.costs, strict=False):
                 if rxn not in rxns:
                     rxns.append(rxn)
                     costs.append(cost)
@@ -192,14 +192,14 @@ class PathwaySolver(Solver):
                 use_minimize_enumerator,
             )
             intermediate_costs = [self.cost_function.evaluate(r) for r in intermediate_rxns.get_rxns()]
-            for r, c in zip(intermediate_rxns, intermediate_costs):
+            for r, c in zip(intermediate_rxns, intermediate_costs, strict=False):
                 if r not in reactions:
                     reactions.append(r)
                     costs.append(c)
 
         clean_r_set = ReactionSet.from_rxns(reactions, filter_duplicates=True)
         cleaned_reactions, cleaned_costs = zip(
-            *[(r, c) for r, c in zip(reactions, costs) if r in clean_r_set and r != net_rxn]
+            *[(r, c) for r, c in zip(reactions, costs, strict=False) if r in clean_r_set and r != net_rxn], strict=False
         )
 
         net_rxn_vector = net_rxn.get_entry_idx_vector(num_entries)
@@ -291,17 +291,19 @@ class PathwaySolver(Solver):
         ):
             c_m_mats.append(c_m_mats_ref)  # noqa: PERF402
 
-        c_mats, m_mats = zip(*c_m_mats)
+        c_mats, m_mats = zip(*c_m_mats, strict=False)
         c_mats = [mat for mats in c_mats for mat in mats if mat is not None]  # type: ignore
         m_mats = [mat for mats in m_mats for mat in mats if mat is not None]  # type: ignore
 
         paths = []
-        for c_mat, m_mat in zip(c_mats, m_mats):
+        for c_mat, m_mat in zip(c_mats, m_mats, strict=False):
             path_rxns = []
             path_costs = []
 
             for rxn_mat in c_mat:
-                ents, coeffs = zip(*[(entries[idx], c) for idx, c in enumerate(rxn_mat) if not np.isclose(c, 0.0)])
+                ents, coeffs = zip(
+                    *[(entries[idx], c) for idx, c in enumerate(rxn_mat) if not np.isclose(c, 0.0)], strict=False
+                )
 
                 if self.open_elem is not None:
                     rxn = OpenComputedReaction(

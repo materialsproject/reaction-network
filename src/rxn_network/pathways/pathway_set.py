@@ -67,7 +67,7 @@ class PathwaySet(MSONable):
         for indices, coefficients, costs in zip(
             self.indices,
             self.coefficients,
-            self.costs,
+            self.costs, strict=False,
         ):
             reactions = [rxns[i] for i in indices]
             if coefficients is not None:

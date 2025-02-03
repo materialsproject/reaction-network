@@ -157,7 +157,7 @@ def stabilize_entries(pd: PhaseDiagram, entries_to_adjust: Iterable[Entry], tol:
     indices = [pd.all_entries.index(entry) for entry in entries_to_adjust]
 
     new_entries = []
-    for _, entry in zip(indices, entries_to_adjust):
+    for _, entry in zip(indices, entries_to_adjust, strict=False):
         e_above_hull = pd.get_e_above_hull(entry)
         entry_dict = entry.to_dict()
         entry_dict["energy"] = entry.uncorrected_energy + (e_above_hull * entry.composition.num_atoms - tol)

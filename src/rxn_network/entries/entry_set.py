@@ -579,7 +579,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         """
         temp = 0.0
         for e in self.entries:
-            if isinstance(e, (ExperimentalReferenceEntry, GibbsComputedEntry)):
+            if isinstance(e, (ExperimentalReferenceEntry | GibbsComputedEntry)):
                 temp = e.temperature  # get temperature from any entry
                 break
         return temp

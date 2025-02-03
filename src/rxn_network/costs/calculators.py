@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from itertools import chain, combinations, product
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -11,7 +11,7 @@ from rxn_network.costs.base import Calculator
 from rxn_network.thermo.chempot_diagram import ChemicalPotentialDiagram
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
 
     from pymatgen.analysis.phase_diagram import PDEntry
 
@@ -83,12 +83,12 @@ class ChempotDistanceCalculator(Calculator):
         if hasattr(rxn, "grand_entries"):
             reactant_entries = [
                 e
-                for e, c in zip(rxn.grand_entries, rxn.coefficients)
+                for e, c in zip(rxn.grand_entries, rxn.coefficients, strict=False)
                 if c < 0 and e.__class__.__name__ == "GrandPotPDEntry"
             ]
             product_entries = [
                 e
-                for e, c in zip(rxn.grand_entries, rxn.coefficients)
+                for e, c in zip(rxn.grand_entries, rxn.coefficients, strict=False)
                 if c > 0 and e.__class__.__name__ == "GrandPotPDEntry"
             ]
         combos = chain(
