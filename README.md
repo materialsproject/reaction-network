@@ -24,10 +24,8 @@ API is not installed by default; to install it, run: `pip install -U mp-api`.
 For developers, you can clone the repository and install the package in editable mode by
 running `pip install -e .` in the root directory.
 
-```properties
-
 > **Note**
-> As of version 7.0 and beyond, the `reaction-network` package no longer uses `graph-tool`. All network functionality is now implemented using `rustworkx`. This means it is no longer required to complete any extra installations.
+> As of version 7.0 and beyond, the `reaction-network` package no longer uses `graph-tool`. All network functionality is now implemented using `rustworkx`. This means it is no longer required to complete any extra installation.
 
 ## Tutorials
 
