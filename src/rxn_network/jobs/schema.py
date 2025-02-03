@@ -1,8 +1,8 @@
 """Core definition for various task and synthesis recipe documents."""
 
-from typing import Optional
+from typing import Any, Optional
 
-from pydantic import Any, BaseModel, Field
+from pydantic import BaseModel, Field
 from pymatgen.core.composition import Element
 
 from rxn_network.entries.entry_set import GibbsEntrySet
