@@ -78,11 +78,15 @@ class ComputedReaction(BasicReaction):
             lowest_num_errors=lowest_num_errors,
         )
 
-    def get_new_temperature(self, new_temperature: float, entries_at_temp: Dict[Composition, ComputedEntry] = None) -> ComputedReaction:
+    def get_new_temperature(
+        self, new_temperature: float, entries_at_temp: dict[Composition, ComputedEntry] = None
+    ) -> ComputedReaction:
         """Returns a new reaction with the temperature changed.
 
         Args:
             new_temperature: New temperature in Kelvin
+            entries_at_temp: A map of precomputed entries to draw from when recalculating this
+                entry at a new temperature
         """
         try:
             if entries_at_temp is None:
