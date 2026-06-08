@@ -104,11 +104,14 @@ class OpenComputedReaction(ComputedReaction):
 
         return ComputedReaction(**kwargs) if not chempots else cls(chempots=chempots, **kwargs)
 
-    def get_new_temperature(self, new_temperature: float, entries_at_temp) -> OpenComputedReaction:
+    def get_new_temperature(self, new_temperature: float, entries_at_temp: dict | None) -> OpenComputedReaction:
         """Returns a new reaction with the temperature changed.
 
         Args:
             new_temperature: New temperature in Kelvin
+            entries_at_temp: A dictionary mapping entry compositions to Entry objects with energies
+                computed at the new temperature. Use this to avoid recomputing entries if you are
+                applying this method to many reactions.
         """
         try:
             if entries_at_temp is None:
