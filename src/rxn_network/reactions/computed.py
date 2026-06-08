@@ -78,14 +78,21 @@ class ComputedReaction(BasicReaction):
             lowest_num_errors=lowest_num_errors,
         )
 
-    def get_new_temperature(self, new_temperature: float) -> ComputedReaction:
+    def get_new_temperature(
+        self, new_temperature: float, entries_at_temp: dict[Composition, ComputedEntry] = None
+    ) -> ComputedReaction:
         """Returns a new reaction with the temperature changed.
 
         Args:
             new_temperature: New temperature in Kelvin
+            entries_at_temp: A map of precomputed entries to draw from when recalculating this
+                entry at a new temperature
         """
         try:
-            new_entries = [e.get_new_temperature(new_temperature) for e in self.entries]
+            if entries_at_temp is None:
+                new_entries = [e.get_new_temperature(new_temperature) for e in self.entries]
+            else:
+                new_entries = [entries_at_temp.get(e.composition) for e in self.entries]
         except AttributeError as e:
             raise AttributeError(
                 "One or more of the entries in the reaction is not associated with a"

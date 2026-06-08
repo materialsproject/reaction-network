@@ -145,17 +145,7 @@ def plot_reaction_scatter(
     if plot_pareto:
         fig.add_trace(scatter)
 
-    hovertemplate = (
-        "<b>%{hovertext}</b><br>"
-        "<br><b>"
-        f"{x}"
-        "</b>: %{x:.3f}"
-        f" {x_units}"
-        "<br><b>"
-        f"{y}"
-        "</b>: %{y:.3f}"
-        f" {y_units}"
-    )
+    hovertemplate = f"<b>%{{hovertext}}</b><br><br><b>{x}</b>: %{{x:.3f}} {x_units}<br><b>{y}</b>: %{{y:.3f}} {y_units}"
 
     if z is not None:
         hovertemplate = hovertemplate + "<br><b>" + f"{z}" + "</b>: %{z:.3f}" + f" {z_units}<br>"
