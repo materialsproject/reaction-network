@@ -51,7 +51,7 @@ def test_initialize_ray_with_slurm_cluster(capsys):
     try:
         initialize_ray()
     except Exception as error:  # if it does fail, make sure it's the right error
-        assert "ConnectionError" in str(error.type)  # noqa
+        assert "ConnectionError" in type(error).__name__
 
     if "Connected" in capsys.readouterr().err:
         pytest.skip("Skipping test_initialize_ray_with_slurm_cluster due to existing cluster")
@@ -67,7 +67,7 @@ def test_initialize_ray_with_pbs_cluster(capsys):
     try:
         initialize_ray()
     except Exception as error:  # if it does fail, make sure it's the right error
-        assert "ConnectionError" in str(error.type)  # noqa
+        assert "ConnectionError" in type(error).__name__
 
     if "Connected" in capsys.readouterr().err:
         pytest.skip("Skipping test_initialize_ray_with_slurm_cluster due to existing cluster")

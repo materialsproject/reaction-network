@@ -129,7 +129,7 @@ class GetEntrySetMaker(Maker):
             )
         else:
             try:
-                from mp_api.client import MPRester
+                from mp_api.client import MPRester  # noqa: PLC0415
             except ImportError as err:
                 raise ImportError("You may need to install the Materials Project API: pip install -U mp-api") from err
 
