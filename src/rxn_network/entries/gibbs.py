@@ -42,6 +42,8 @@ class GibbsComputedEntry(ComputedEntry):
         Nature Communications, 9(1), 4168. https://doi.org/10.1038/s41467-018-06682-4.
     """
 
+    data: dict  # Type annotation for parent class attribute
+
     def __init__(
         self,
         composition: Composition,
@@ -296,12 +298,12 @@ class GibbsComputedEntry(ComputedEntry):
         # sanitized data as an argument.
         original_data = self.data
         self.data = self._sanitize_data(original_data)
-        data = super().as_dict()
+        result = super().as_dict()
         self.data = original_data
-        data["volume_per_atom"] = self.volume_per_atom
-        data["formation_energy_per_atom"] = self.formation_energy_per_atom
-        data["temperature"] = self.temperature
-        return data
+        result["volume_per_atom"] = self.volume_per_atom
+        result["formation_energy_per_atom"] = self.formation_energy_per_atom
+        result["temperature"] = self.temperature
+        return result
 
     @staticmethod
     def _sanitize_data(data: dict) -> dict:
