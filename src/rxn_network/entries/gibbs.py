@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from monty.json import MontyDecoder
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
+from pymatgen.core.periodic_table import Element
 from pymatgen.entries.computed_entries import ComputedEntry, ConstantEnergyAdjustment
 from scipy.interpolate import interp1d
 
@@ -19,7 +20,6 @@ from rxn_network.core import Composition
 from rxn_network.data import G_ELEMS
 
 if TYPE_CHECKING:
-    from pymatgen.core.periodic_table import Element
     from pymatgen.core.structure import Structure
     from pymatgen.entries.computed_entries import EnergyAdjustment
 
@@ -306,8 +306,6 @@ class GibbsComputedEntry(ComputedEntry):
     @staticmethod
     def _sanitize_data(data: dict) -> dict:
         """Convert Element keys in nested dicts to strings for JSON serialization."""
-        from pymatgen.core.periodic_table import Element
-
         sanitized = {}
         for k, v in data.items():
             if isinstance(v, dict):
