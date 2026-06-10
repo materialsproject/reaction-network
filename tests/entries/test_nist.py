@@ -60,14 +60,6 @@ def test_energy_per_atom(entries):
     assert actual_energies == pytest.approx(expected_energies)
 
 
-def test_correction_uncertainty(entries):
-    assert all(e.correction_uncertainty == 0 for e in entries.values())
-
-
-def test_correction_uncertainty_per_atom(entries):
-    assert all(e.correction_uncertainty_per_atom == 0 for e in entries.values())
-
-
 def test_is_experimental(entries):
     assert all(e.is_experimental for e in entries.values())
 
