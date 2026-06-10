@@ -384,17 +384,17 @@ def yens_ksp(
 
     g = g.copy()
 
-    path = rx.dijkstra_shortest_paths(  # type: ignore
+    shortest_paths = rx.dijkstra_shortest_paths(
         g, precursors_node, target_node, weight_fn=get_edge_weight_with_cf
     )
 
-    if not path:
+    if not shortest_paths:
         return []
 
-    path = list(path[target_node])
+    first_path: list[int] = list(shortest_paths[target_node])
 
-    a = [path]
-    a_costs = [path_cost(path)]
+    a: list[list[int]] = [first_path]
+    a_costs = [path_cost(first_path)]
 
     b = PriorityQueue()  # type: ignore
 
