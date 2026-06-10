@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from monty.json import MontyDecoder
 from pymatgen.analysis.phase_diagram import GrandPotPDEntry
+from pymatgen.core.periodic_table import Element
 from pymatgen.entries.computed_entries import ComputedEntry, ConstantEnergyAdjustment
 from scipy.interpolate import interp1d
 
@@ -19,7 +20,6 @@ from rxn_network.core import Composition
 from rxn_network.data import G_ELEMS
 
 if TYPE_CHECKING:
-    from pymatgen.core.periodic_table import Element
     from pymatgen.core.structure import Structure
     from pymatgen.entries.computed_entries import EnergyAdjustment
 
@@ -41,6 +41,8 @@ class GibbsComputedEntry(ComputedEntry):
         inorganic crystalline solids and temperature-dependent materials chemistry.
         Nature Communications, 9(1), 4168. https://doi.org/10.1038/s41467-018-06682-4.
     """
+
+    data: dict  # Type annotation for parent class attribute
 
     def __init__(
         self,
@@ -289,11 +291,29 @@ class GibbsComputedEntry(ComputedEntry):
 
     def as_dict(self) -> dict:
         """Returns an MSONable dict."""
-        data = super().as_dict()
-        data["volume_per_atom"] = self.volume_per_atom
-        data["formation_energy_per_atom"] = self.formation_energy_per_atom
-        data["temperature"] = self.temperature
-        return data
+        # Temporarily swap self.data to sanitize Element keys for JSON serialization.
+        # MP API returns oxidation_states with Element keys (e.g., {Element('Li'): 1.0})
+        # which aren't valid JSON keys. We must swap the attribute because pymatgen's
+        # ComputedEntry.as_dict() directly accesses self.data - there's no way to pass
+        # sanitized data as an argument.
+        original_data = self.data
+        self.data = self._sanitize_data(original_data)
+        result = super().as_dict()
+        self.data = original_data
+        result["volume_per_atom"] = self.volume_per_atom
+        result["formation_energy_per_atom"] = self.formation_energy_per_atom
+        result["temperature"] = self.temperature
+        return result
+
+    @staticmethod
+    def _sanitize_data(data: dict) -> dict:
+        """Convert Element keys in nested dicts to strings for JSON serialization."""
+        sanitized = {}
+        for k, v in data.items():
+            if isinstance(v, dict):
+                v = {(str(dk) if isinstance(dk, Element) else dk): dv for dk, dv in v.items()}
+            sanitized[k] = v
+        return sanitized
 
     @classmethod
     def from_dict(cls, d: dict) -> GibbsComputedEntry:

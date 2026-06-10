@@ -70,6 +70,22 @@ def test_to_from_dict(entry):
     assert e.energy == pytest.approx(entry.energy)
 
 
+def test_as_dict_with_element_keys_in_data(entry):
+    """Test that as_dict works when entry.data contains Element keys.
+
+    The Materials Project API returns oxidation_states with Element keys
+    (e.g., {Element('Li'): 1.0}), which are not JSON-serializable.
+    This test ensures as_dict handles this case.
+    """
+    # Simulate data from MP API with Element keys
+    entry.data["oxidation_states"] = {Element("Li"): 1.0, Element("Fe"): 2.0}
+
+    # This should not raise TypeError: keys must be str, int, float, bool or None, not Element
+    d = entry.as_dict()
+    e = GibbsComputedEntry.from_dict(d)
+    assert e.energy == pytest.approx(entry.energy)
+
+
 def test_get_new_temperature(entry):
     new_temp = 600  # != original temp of 450
     new_entry = entry.get_new_temperature(new_temp)
