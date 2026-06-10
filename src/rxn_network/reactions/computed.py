@@ -137,7 +137,11 @@ class ComputedReaction(BasicReaction):
 
         for entry in self._entries:
             (comp, factor) = entry.composition.get_reduced_composition_and_factor()
-            energy_ufloat = ufloat(entry.energy, entry.correction_uncertainty)
+            # Handle nan uncertainty (pymatgen returns nan when there are no energy adjustments)
+            uncertainty = entry.correction_uncertainty
+            if np.isnan(uncertainty):
+                uncertainty = 0.0
+            energy_ufloat = ufloat(entry.energy, uncertainty)
             calc_energies[comp] = min(calc_energies.get(comp, float("inf")), energy_ufloat / factor)
 
         energy_with_uncertainty = sum(

@@ -299,8 +299,12 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         for idx, entry in enumerate(entries):
             if entry.is_element:
                 continue
+            # Handle nan uncertainty (pymatgen returns nan when there are no energy adjustments)
+            uncertainty = entry.correction_uncertainty
+            if np.isnan(uncertainty):
+                uncertainty = 0.0
             adj = ConstantEnergyAdjustment(
-                value=jitter[idx] * entry.correction_uncertainty,
+                value=jitter[idx] * uncertainty,
                 name="Random jitter",
                 description=("Randomly sampled (Gaussian) noise to account for uncertainty in data"),
             )

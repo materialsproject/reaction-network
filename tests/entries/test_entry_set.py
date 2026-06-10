@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 
+import numpy as np
 import pytest
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
@@ -118,6 +119,35 @@ def test_get_entries_with_jitter(gibbs_entries):
             assert new_ent.energy == pytest.approx(old_ent.energy)
         else:
             assert new_ent.energy != pytest.approx(old_ent.energy)
+
+
+def test_get_entries_with_jitter_nan_uncertainty(gibbs_entries):
+    """Test that get_entries_with_jitter handles entries with nan correction_uncertainty.
+
+    pymatgen returns nan for correction_uncertainty when there are no energy adjustments.
+    This test ensures the jitter calculation doesn't produce nan values.
+    """
+    # Create a copy of entries and clear their energy adjustments to trigger nan uncertainty
+    entries_no_adjustments = []
+    for entry in gibbs_entries:
+        entry_copy = entry.copy()
+        entry_copy.energy_adjustments.clear()
+        entries_no_adjustments.append(entry_copy)
+
+    entry_set = GibbsEntrySet(entries_no_adjustments)
+
+    # Verify that entries now have nan correction_uncertainty
+    for entry in entry_set:
+        if not entry.is_element:
+            assert np.isnan(entry.correction_uncertainty), (
+                f"Expected nan correction_uncertainty for {entry.composition}"
+            )
+
+    new_entries = entry_set.get_entries_with_jitter()
+
+    # Ensure no nan energies were produced
+    for entry in new_entries:
+        assert not np.isnan(entry.energy), f"Got nan energy for {entry.composition}"
 
 
 def test_get_adjusted_entry(interpolated_entry):
