@@ -289,11 +289,31 @@ class GibbsComputedEntry(ComputedEntry):
 
     def as_dict(self) -> dict:
         """Returns an MSONable dict."""
+        # Temporarily swap self.data to sanitize Element keys for JSON serialization.
+        # MP API returns oxidation_states with Element keys (e.g., {Element('Li'): 1.0})
+        # which aren't valid JSON keys. We must swap the attribute because pymatgen's
+        # ComputedEntry.as_dict() directly accesses self.data - there's no way to pass
+        # sanitized data as an argument.
+        original_data = self.data
+        self.data = self._sanitize_data(original_data)
         data = super().as_dict()
+        self.data = original_data
         data["volume_per_atom"] = self.volume_per_atom
         data["formation_energy_per_atom"] = self.formation_energy_per_atom
         data["temperature"] = self.temperature
         return data
+
+    @staticmethod
+    def _sanitize_data(data: dict) -> dict:
+        """Convert Element keys in nested dicts to strings for JSON serialization."""
+        from pymatgen.core.periodic_table import Element
+
+        sanitized = {}
+        for k, v in data.items():
+            if isinstance(v, dict):
+                v = {(str(dk) if isinstance(dk, Element) else dk): dv for dk, dv in v.items()}
+            sanitized[k] = v
+        return sanitized
 
     @classmethod
     def from_dict(cls, d: dict) -> GibbsComputedEntry:
