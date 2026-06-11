@@ -34,7 +34,7 @@ def process_entries(
     include_nist_data: bool = True,
     include_freed_data: bool = False,
     include_polymorphs: bool = False,
-    include_icsd_entropy: bool = True,
+    include_icsd_entropy: bool = False,
     formulas_to_include: Iterable[str] | None = None,
     calculate_e_above_hulls: bool = False,
     ignore_nist_solids: bool = True,
@@ -60,6 +60,9 @@ def process_entries(
             your own risk!
         include_polymorphs: Whether to include non-ground state polymorphs in the entry
             set. Defaults to False.
+        include_icsd_entropy: Whether to include entropy data for ICSD solids. This is
+            based on a fit to ideal mixing entropy, which is usually a good guess for
+            disordered sites in the structure. Use with caution! Defaults to False.
         formulas_to_include: An iterable of compositional formulas to ensure are
             included in the processed dataset. Sometimes, entries are filtered out that
             one would like to include, or entries don't exist for those compositions.
@@ -81,7 +84,7 @@ def process_entries(
         temperature=temp,
         include_nist_data=include_nist_data,
         include_freed_data=include_freed_data,
-        include_icsd_entropy=include_icsd_entropy,
+        apply_icsd_entropy_correction=include_icsd_entropy,
         ignore_nist_solids=ignore_nist_solids,
     )
     included_entries = [initialize_entry(f, entry_set) for f in formulas_to_include] if formulas_to_include else []
