@@ -5,8 +5,10 @@ from copy import deepcopy
 import numpy as np
 import pytest
 from pymatgen.analysis.phase_diagram import PhaseDiagram
-from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
+from pymatgen.core import Composition
+from pymatgen.entries.computed_entries import ConstantEnergyAdjustment, TemperatureEnergyAdjustment
 from rxn_network.entries.entry_set import GibbsEntrySet
+from rxn_network.entries.gibbs import GibbsComputedEntry
 
 
 @pytest.mark.parametrize("chemsys", [["Mn", "O", "Y"], "Mn-O", ["Y", "O"], "O", ["O"]])
@@ -199,3 +201,56 @@ def test_update(gibbs_entries):
 
     assert len(gibbs_entries) == original_len + 2
     assert new_entries.issubset(gibbs_entries)
+
+
+def _gibbs_entry(formula, temperature=1000):
+    return GibbsComputedEntry(
+        composition=Composition(formula),
+        formation_energy_per_atom=-1.0,
+        volume_per_atom=10.0,
+        temperature=temperature,
+    )
+
+
+def test_icsd_entropy_correction_unknown_formula():
+    assert GibbsEntrySet._get_icsd_entropy_correction(_gibbs_entry("AuPt3"), 1000) is None
+
+
+def test_icsd_entropy_correction_zero_value():
+    # YMnO3 is in CONFIG_ENTROPY with value 0
+    corr = GibbsEntrySet._get_icsd_entropy_correction(_gibbs_entry("YMnO3"), 1000)
+    assert isinstance(corr, TemperatureEnergyAdjustment)
+    assert corr.value == pytest.approx(0.0)
+
+
+def test_icsd_entropy_correction_nonzero_value():
+    # AgSO3F has a non-zero CONFIG_ENTROPY value (~5.97e-05 eV/K/atom)
+    corr = GibbsEntrySet._get_icsd_entropy_correction(_gibbs_entry("AgSO3F"), 1000)
+    assert isinstance(corr, TemperatureEnergyAdjustment)
+    assert corr.value < 0  # entropy stabilizes, so correction is negative
+
+
+def test_icsd_entropy_correction_scales_with_temperature():
+    corr_1000 = GibbsEntrySet._get_icsd_entropy_correction(_gibbs_entry("AgSO3F"), 1000)
+    corr_2000 = GibbsEntrySet._get_icsd_entropy_correction(_gibbs_entry("AgSO3F"), 2000)
+    assert corr_2000.value == pytest.approx(2 * corr_1000.value, rel=1e-6)
+
+
+def test_from_computed_entries_applies_icsd_entropy(mp_entries):
+    """Entries with apply_icsd_entropy_correction=True should have the adjustment present."""
+    entries_with = GibbsEntrySet.from_computed_entries(mp_entries, temperature=1000, apply_icsd_entropy_correction=True)
+    entries_without = GibbsEntrySet.from_computed_entries(mp_entries, temperature=1000, apply_icsd_entropy_correction=False)
+
+    adj_names_with = {
+        adj.name
+        for e in entries_with
+        for adj in e.energy_adjustments
+    }
+    adj_names_without = {
+        adj.name
+        for e in entries_without
+        for adj in e.energy_adjustments
+    }
+
+    assert "ICSD Entropy Adjustment" in adj_names_with
+    assert "ICSD Entropy Adjustment" not in adj_names_without

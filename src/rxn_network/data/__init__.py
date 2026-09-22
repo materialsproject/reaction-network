@@ -15,7 +15,7 @@ PATH_TO_NIST = cwd / "nist"
 
 COMMON_GASES = loadfn(cwd / "common_gases.json")
 G_ELEMS = loadfn(cwd / "mu_elements.json")
-
+CONFIG_ENTROPY = loadfn(cwd / "icsd_ideal_config_entropy.json")
 
 def load_experimental_data(fn: str | Path) -> dict[str, dict[float, Any]]:
     """Load experimental data from a json file.

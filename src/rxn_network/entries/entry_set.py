@@ -16,12 +16,12 @@ from monty.serialization import loadfn
 from numpy.random import normal
 from pymatgen.analysis.phase_diagram import PhaseDiagram
 from pymatgen.core.composition import Element
-from pymatgen.entries.computed_entries import ConstantEnergyAdjustment
+from pymatgen.entries.computed_entries import ConstantEnergyAdjustment, TemperatureEnergyAdjustment
 from pymatgen.entries.entry_tools import EntrySet
 from tqdm import tqdm
 
 from rxn_network.core import Composition
-from rxn_network.data import PATH_TO_NIST
+from rxn_network.data import PATH_TO_NIST, CONFIG_ENTROPY
 from rxn_network.entries.corrections import (
     CarbonateCorrection,
     CarbonDioxideAtmosphericCorrection,
@@ -369,6 +369,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_freed_data: bool = False,
         apply_carbonate_correction: bool = True,
         apply_atmospheric_co2_correction: bool = True,
+        apply_icsd_entropy_correction: bool = False,
         ignore_nist_solids: bool = True,
         calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
@@ -438,6 +439,10 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                     energy_adjustments.append(
                         CarbonDioxideAtmosphericCorrection(entry.composition.num_atoms, temperature)
                     )
+                if apply_icsd_entropy_correction:
+                    corr = cls._get_icsd_entropy_correction(entry, temperature)
+                    if corr is not None:
+                        energy_adjustments.append(corr)
 
                 structure = entry.structure
                 formation_energy_per_atom = pd.get_form_energy_per_atom(entry)
@@ -482,6 +487,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
         include_freed_data: bool = False,
         apply_carbonate_correction: bool = True,
         apply_atmospheric_co2_correction: bool = True,
+        apply_icsd_entropy_correction: bool = False,
         ignore_nist_solids: bool = True,
         calculate_e_above_hulls: bool = False,
         minimize_obj_size: bool = False,
@@ -510,6 +516,9 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             ignore_nist_solids: Whether to ignore NIST data for the solids specified in
                 the "data/nist/ignore_solids.json" file; these all have melting points
                 Tm >= 1500 ºC. Defaults to True.
+            apply_icsd_entropy_correction: Whether to apply the fit entropy correction
+                for ICSD solids based on ideal mixing entropy, usually a good guess for
+                disordered sites in the structure. Use with caution! Defaults to False.
             calculate_e_above_hulls: Whether to calculate energy above hull for each
                 entry and store in the entry's data. Defaults to False.
             minimize_obj_size: Whether to minimize the size of the object by removing
@@ -531,6 +540,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
                 apply_atmospheric_co2_correction=apply_atmospheric_co2_correction,
+                apply_icsd_entropy_correction=apply_icsd_entropy_correction,
                 ignore_nist_solids=ignore_nist_solids,
                 calculate_e_above_hulls=calculate_e_above_hulls,
                 minimize_obj_size=minimize_obj_size,
@@ -546,6 +556,7 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
                 include_freed_data=include_freed_data,
                 apply_carbonate_correction=apply_carbonate_correction,
                 apply_atmospheric_co2_correction=apply_atmospheric_co2_correction,
+                apply_icsd_entropy_correction=apply_icsd_entropy_correction,
                 ignore_nist_solids=ignore_nist_solids,
                 calculate_e_above_hulls=calculate_e_above_hulls,
                 minimize_obj_size=minimize_obj_size,
@@ -683,6 +694,21 @@ class GibbsEntrySet(collections.abc.MutableSet, MSONable):
             return None
 
         return CarbonateCorrection(num_c)
+    
+    @staticmethod
+    def _get_icsd_entropy_correction(entry, temperature: float):
+        """Helper method for determining the ICSD entropy correction for an entry."""
+        comp = entry.composition
+        formula = comp.reduced_formula
+
+        if formula not in CONFIG_ENTROPY:
+            return None
+
+        return TemperatureEnergyAdjustment(adj_per_deg=-CONFIG_ENTROPY[formula],
+                                            name="ICSD Entropy Adjustment",
+                                            temp=temperature,
+                                            n_atoms=comp.num_atoms,
+                                            uncertainty_per_deg=CONFIG_ENTROPY[formula])
 
     def _clear_cache(self) -> None:
         """Clears all cached properties. This method is called whenever the entry set is
